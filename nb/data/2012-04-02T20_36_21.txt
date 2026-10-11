@@ -1,0 +1,47 @@
+TITLE: Verified VDatum transformation
+AUTHOR: Kurt
+DATE: 04.02.2012 20:36
+DESC: progress goes slowly
+-----
+BODY:
+I finally have a vdatum transformation that I have a way to verify.  I
+had started out creating a KML of the Epoch tables for all of the tide
+stations in the United States.  
+
+<img width="600" height="420" title="All your stations are belong to us" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-04/vdatum-tide-stations-google-earth.png"/>
+
+I pulled the <a
+href="http://tidesandcurrents.noaa.gov/station_index.shtml?state=Complete+Index&id1=06&id2=1&id3=2&id4=7&id5=8&id6=9">tide
+station locations</a> and use that as a list of station positions and
+station ids so that I could get the Epoch table.  Unfortunetly, those
+tables are in feet (booo!  no SI?).  But how do I get from Mean Lower Low Water
+to NAVD88?  e.g.
+
+<a href="http://tidesandcurrents.noaa.gov/epoch_datum_check.shtml?stnid=9410230">epoch_datum_check.shtml?stnid=9410230</a>
+
+<img width="514" height="388" title="Epoch Check" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-04/vdatum-epoch-ft.png"/>
+
+Then, Barry pointed me to a benchmark page for a station and things made more sense!
+
+<a href="http://tidesandcurrents.noaa.gov/data_menu.shtml?stn=9410230%20La%20Jolla,%20CA&type=Bench%20Mark%20Data%20Sheets">Bench Mark Data Sheets La Jolla, CA Station ID: 9410230</a>
+
+<img width="600" height="420" title="SIO tide station making some sense" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-04/vdatum-benchmark.png"/>
+
+I can see that there is a consistant 1.33 meter offset between the
+Epoch table and the SIO benchmark info.  The best part is that I have
+the difference between NAVD88 and MLLW, which is 0.058 meters.  I brought
+up VDatum 2.3.3 and gave it a try.  It's off by less than 1mm.  I'll take
+that!  One good earthquake could provide more error than that!
+
+<img width="600" height="366" title="VDatum transform documented" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-04/vdatum-transform-verified.png"/>
+
+I'm feeling more comfortable with my VDatum transformations!  I've
+still got a lot of work to do before I've got the whole process nailed
+down, but there is nothing like getting a first successful check.
+I'm making the assumption that the surveyors for the benchmark have
+this process pretty well nailed down.
+
+Trackback:
+
+<a href="http://slashgeo.org/2012/04/08/Batch-Geonews-Landsat-5-Suspended-Wikipedia-Mobile-Switch-OpenStreetMap-Your-Facebook-Con">Batch Geonews: Landsat 5 Suspended, Wikipedia Mobile Switch to OpenStreetMap, Your Facebook Connections Map, Vertical Datums, and much more</a> [slashgeo]
+-----

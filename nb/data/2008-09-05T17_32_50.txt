@@ -1,0 +1,106 @@
+TITLE: Building track lines over a region
+AUTHOR: Kurt
+DATE: 09.05.2008 17:32
+DESC: Using Python and PostGIS
+-----
+BODY:
+For a CCOM/JHC project, Jim G. needs a series of lines 500m apart over a
+region.  This is a lot of work in a tool like Fledermaus to create
+this kind of thing.  This is something that people normally use <a 
+href="http://www.hypack.com/">HyPack</a> to do.
+
+I wanted to try out doing this kind of task with PostGIS and I needed
+a quick break.  Here is how I did it, but it took a bit longer than I
+was expecting.  First I need to compute the intersection of the
+bounding polygon with a series of lines running easy west.  Here is
+mklines.py:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#2040a0">x0</font> <font color="4444FF">=</font> <font color="4444FF">-</font><font color="#FF0000">77.4589</font>
+<font color="#2040a0">x1</font> <font color="4444FF">=</font> <font color="4444FF">-</font><font color="#FF0000">73.2555</font>
+<font color="#444444">#</font>
+<font color="#2040a0">y0</font> <font color="4444FF">=</font> <font color="#FF0000">29.9144</font>
+<font color="#2040a0">y1</font> <font color="4444FF">=</font> <font color="#FF0000">33.1567</font>
+<font color="#444444">#</font>
+<font color="#2040a0">dy</font> <font color="4444FF">=</font> <font color="#2040a0">y1</font> <font color="4444FF">-</font> <font color="#2040a0">y0</font>
+<font color="#2040a0">ny</font> <font color="4444FF">=</font> <font color="#FF0000">1</font><font color="4444FF">+</font> <font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">dy</font> / <font color="#FF0000">0.005</font><font color="4444FF">)</font> <font color="#444444"># 500m</font>
+<font color="#444444">#</font>
+<font color="#2040a0">poly</font><font color="4444FF">=</font><font color="#008000">'POLYGON((-73.25549438 33.04821167, -76.33447876 33.15672241, -77.41587524 31.44949341, -77.45893921 30.53608643, -77.02830444 29.91438477, -76.35857666 30.64095947, -73.88764160 31.84687744, -73.25549438 33.04821167))'</font>
+<font color="#444444">#</font>
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font> <font color="4444FF">(</font><font color="#2040a0">ny</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">y0</font> <font color="4444FF">+</font> <font color="#2040a0">i</font> <font color="4444FF">*</font> <font color="#FF0000">0.005</font>
+    <font color="#2040a0">line</font> <font color="4444FF">=</font> <font color="#008000">'(%f %f, %f %f)'</font> <font color="4444FF">%</font> <font color="4444FF">(</font><font color="#2040a0">x0</font>,<font color="#2040a0">y</font>,<font color="#2040a0">x1</font>,<font color="#2040a0">y</font><font color="4444FF">)</font>
+    <font color="#2040a0">linestring</font> <font color="4444FF">=</font> <font color="#008000">'LINESTRING(%f %f, %f %f)'</font> <font color="4444FF">%</font> <font color="4444FF">(</font><font color="#2040a0">x0</font>,<font color="#2040a0">y</font>,<font color="#2040a0">x1</font>,<font color="#2040a0">y</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#008000">&quot;SELECT AsText( ST_Intersection('%s', '%s') );&quot;</font> <font color="4444FF">%</font> <font color="4444FF">(</font><font color="#2040a0">poly</font>,<font color="#2040a0">linestring</font><font color="4444FF">)</font>
+</pre>
+It outputs lines that look like this:
+<pre>
+<strong>SELECT</strong> AsText( 
+         ST_Intersecti<strong>on</strong>(
+         <font color="#008000">'POLYGON((-73.25549438 33.04821167, -76.33447876 33.15672241, -77.41587524 31.44949341, -77.45893921 30.53608643, -77.02830444 29.91438477, -76.35857666 30.64095947, -73.88764160 31.84687744, -73.25549438 33.04821167))'</font>, 
+	 <font color="#008000">'LINESTRING(-77.458900 29.914400, -73.255500 29.914400)'</font>
+	 )
+       );
+</pre>
+Now setup postgis on my mac:
+<pre>% <b>fink install postgis83</b>
+% <b>sudo -u postgres createuser -U postgres $USER</b>
+% <b>createdb somedb</b>
+% <b>psql somedb "CREATE LANGUAGE plpgsql;"</b>
+% <b>psql -f /sw/share/doc/postgis83/lwpostgis.sql -d somedb</b>
+% <b>psql -f /sw/share/doc/postgis83/spatial_ref_sys.sql -d somedb</b>
+</pre>
+Now pipe the results from mklines into PostGIS:
+<pre>% <b>mklines.py  | psql somedb | head -4</b>
+                             astext                              
+&#45;----------------------------------------------------------------
+ LINESTRING(-77.0283149893808 29.9144,-77.0282904015892 29.9144)
+(1 row)</pre>
+That looks good, so grab the coordinates:
+<pre>% <b>mklines.py  | psql somedb | grep LINESTRING | cut -c12- > results.txt</b></pre>
+results.txt looks like this:
+<pre>(-77.0283149893808 29.9144,-77.0282904015892 29.9144)
+(-77.031778344859 29.9194,-77.0236815996312 29.9194)
+(-77.0352417003373 29.9244,-77.0190727976732 29.9244)
+(-77.0387050558155 29.9294,-77.0144639957152 29.9294)
+(-77.0421684112938 29.9344,-77.0098551937572 29.9344)</pre>
+From here, we need to get each line of two points into the form that will work with Fledermaus.
+<pre>x0 y0
+x1 y1</pre>
+We also need to create a shell script of cmdop commands to write out an
+sd file for each line.  Here is sdfiles.py:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">#</font>
+<font color="#2040a0">script</font> <font color="4444FF">=</font> <font color="#2040a0">file</font> <font color="4444FF">(</font><font color="#008000">'make-sd-files.sh'</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+<font color="#2040a0">script</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">'#!/usr/bin/env bash\n'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">i</font> <font color="4444FF">=</font> <font color="#FF0000">0</font> <font color="#444444"># Keep track of the line numbers</font>
+<strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#008000">'results.txt'</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">i</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+    <font color="#2040a0">line</font> <font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="#008000">'()\n'</font><font color="4444FF">)</font>
+    <font color="#2040a0">start</font>,<font color="#2040a0">end</font> <font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="#008000">','</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font> <font color="4444FF">=</font> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#008000">'%03d.xy'</font><font color="4444FF">%</font><font color="#2040a0">i</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">'%s\n%s\n'</font> <font color="4444FF">%</font><font color="4444FF">(</font><font color="#2040a0">start</font>,<font color="#2040a0">end</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">cmd</font> <font color="4444FF">=</font> <font color="#008000">'cmdop mklines -in %03d.xy -out line%03d.sd -data xy'</font> <font color="4444FF">%</font> <font color="4444FF">(</font><font color="#2040a0">i</font>,<font color="#2040a0">i</font><font color="4444FF">)</font>
+    <font color="#2040a0">script</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">cmd</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+</pre>
+After running the script, we now have make-sd-files.sh that looks like this:
+<pre>
+#!/usr/bin/env bash
+cmdop mklines -in 001.xy -out line001.sd -data xy
+cmdop mklines -in 002.xy -out line002.sd -data xy
+cmdop mklines -in 003.xy -out line003.sd -data xy
+cmdop mklines -in 004.xy -out line004.sd -data xy
+cmdop mklines -in 005.xy -out line005.sd -data xy
+...
+</pre>
+Run the script and watch it create over 600 sd files.  From here, open
+Fledermaus.  Then <i>File -&gt; Open Data Object</i>.  Then select all
+the sd files.  <i>File -&gt; Save Scene</i> and you are done.
+
+Python and PostGIS make this task pretty easy.  Don't forget to
+cleanup the 1200 temp files now sitting on your computer after trying
+this :)
+-----

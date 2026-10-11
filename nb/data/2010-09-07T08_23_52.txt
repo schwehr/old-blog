@@ -1,0 +1,115 @@
+TITLE: Comparing the "old" Nav 55 and IMO Circ 289 AIS binary messages
+AUTHOR: Kurt
+DATE: 09.07.2010 08:23
+DESC: comparing versions
+-----
+BODY:
+<b>NOTE for the US</b>: Just got the latest US scituation.  The USCG
+has unofficially said that it will not be using the IMO circular 289
+message.  For now, we are going to use DAC 366 and FI 22 for Cape Cod.
+This is a regional message for the United States. 
+If the international standard is harmonized, then the USCG may tell me
+to switch to using DAC 1 and FI 22.  The old pair that I've been transmitting
+is DAC 366 and FI 34.
+
+<b>NOTE for the non-US world</b>: Other countries are welcome to
+implement this as 366/22.  Please do not replicate the same message
+into your country's DAC.  It is okay to use DAC/FI pairs from other
+countries.  Your country just has to get the "competent authority" to
+say as much.
+
+This post refers to the area notice definitions in the <a
+href="http://vislab-ccom.unh.edu/~schwehr/papers/2009-Nav55-CG-AIX-Report-Annex1.pdf">old
+Nav 55 documentation</a> and the <a
+href="http://vislab-ccom.unh.edu/~schwehr/papers/2010-IMO-SN.1-Circ.289.pdf">new
+IMO Circular 289</a>.  Both link to PDFs from my papers folder.
+
+I am finally getting to implement the IMO Area Notice AIS Binary Message (aka zone timed notices).  Here is my summary of changes:
+
+<b>Same/Compatible:</b>
+<ul>
+<li>The DAC and FI are still 1and 22 respectively.</li>
+<li>The preamble through the duration is the same.  There are minor naming changes, but all code should match.</li>
+</ul>
+<b>Different/Incompatible:</b>
+<ul>
+<li>All sub-area blocks have shrunk from 90 to 87 bits.</li>
+<li>Position coordinates have shrunk.  Longitude went from 28 to 25 bits and Latitude went from 27 to 24 bits.  The takes position from increments of 1.7 meters to 17 meters.</li>
+<li>There is a new Precision field that talk about the number of decimal places to truncate.  I will set this to 4 and just ignore it in my code.</li>
+<li>For polylines and polygons, the distances shrank from 11 bits to 10 bits</li>
+</ul>
+The preliminary text is pretty much the same.  The base preamble of
+the area notice is the same.  The difference comes in the sub-areas.
+Here is the 2009 Nav 55 Circle or point.  Note the decrease in number
+of bits for the longitude and latitude along with the addition of the
+"Precision" field.  What exactly are we supposed to do with this?  I
+presume they meant rounding on the decimal minutes.  For my purposes,
+I am going to just always set this to 4.  Is this just for
+presentation?  IMO definitely needs to talk about the motivation and purpose
+of this field.
+
+<img title="Before at Nav 55" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/2009-circle-or-point.png"/>
+
+<img title="IMO definition" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/imo289-circle-or-point.png"/>
+
+Looking at the Notice Description table, some of the text has changed
+in the tables.  We will still be using 0 for no whales detected and 1
+for whales detected/reduce speed for the Boston approaches.  The older text
+that I originally coded to was:
+<pre>0: 'Caution Area: Marine mammals NOT observed',
+1: 'Caution Area: Marine mammals in area - Reduce Speed',
+2: 'Caution Area: Marine mammals in area - Stay Clear',
+3: 'Caution Area: Marine mammals in area - Report Sightings',
+4: 'Caution Area: Protected Habitat - Reduce Speed',
+5: 'Caution Area: Protected Habitat - Stay Clear',
+6: 'Caution Area: Protected Habitat - No fishing or anchoring'
+...</pre>
+The new text is pretty close:
+<pre>0 Caution Area: Marine mammals habitat
+1 Caution Area: Marine mammals in area - reduce speed
+2 Caution Area: Marine mammals in area - stay clear
+3 Caution Area: Marine mammals in area - report sightings
+4 Caution Area: Protected habitat - reduce speed
+5 Caution Area: Protected habitat - stay clear
+6 Caution Area: Protected habitat - no fishing or anchoring
+...</pre>
+I will post again when I have the Python ais-areanotice-py and libais
+working with the new IMO messages 1-22.
+
+In my opinion, IMO has broken the specification from what we had in 2009, but even if
+I think it is broken, I have to stick with it.  It wasn't perfect
+before anyways.  The pain will come with the confined spaces of inland
+water ways.  IMO dropped the number of bits for the longitude and
+latitude.  If this notice is deployed in those tight quarters, you
+will see zones on land or on the wrong side of the water way in some
+places.  We can specify the size of a zone down to 1m accuracy, but
+the corner of the box can only be placed to 17m steps.  Even if people
+were not using GPSes were not using differential, WAAS, RTK, or other
+technologies to get down 3m or better, if the the chart is trying to
+represent these small details, there is going to be trouble.  There
+was not really a way for me to communicate reasoning behind these
+things up to IMO beyond a correspondance group.  Here are some images
+to illustrate what we are leaving out.  This will not matter to most,
+but small boaters in the future will likely really care.  All for just
+a 6 bits, 3 of which were turned into a "Precision" field and 3 of
+which were removed from the side of a sub-area block.  Perhaps there
+was a bit stuffing issue that came up with the 90 bit blocks, but this
+sort of critical information (for message designers at least) is never
+published.  I think that we should require such background analysis to
+be published along with the message.  
+
+Here are some example images from Google Earth and <a
+href="http://earthnc.com/chartviewer/?ll=43.087726879271806,-70.75855135917664&z=17&chart=onechart">EarthNC
+online</a> to illustrate two possible places where harbor managers
+might run into trouble with the larger increment.  The first is a pass through for small boats.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/tight-space-nh-route-1-ge.png"/>
+
+The above tight squeeze is circled in the following EarthNC Online image:
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/tight-space-nh-route-1-earthnc.png"/>
+
+If the notice was to be used for a berth, it is going to be hard to distinguish these two:
+
+<img title="Berthing issues" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/tight-space-newcastle-ge.png"/>
+-----

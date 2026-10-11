@@ -1,0 +1,101 @@
+TITLE: ScientificPython fit and fit from gnuplot.py
+AUTHOR: Kurt
+DATE: 05.14.2005 12:05
+DESC: a trick from the author
+-----
+BODY:
+I was wanting to use fit results from gnuplot in python code to
+calculate the residuals to an exponential.  I was thinking of doing
+something like what I did with ams.py/k15_hext that uses popen2 to
+grad the results.  That works, but I am thing popen2 is kind of ugly
+and it was slow.  What does gnuplot.py use to talk to gnuplot?
+<pre>
+  As the others have pointed out, you can call any gnuplot command from
+  Gnuplot.py.  The other issue with "fit", however, is how do you get the
+  results of the fit back into Python?  This is a problem because
+  Gnuplot.py doesn't have access to gnuplot's standard output.
+  
+  Luckily this is easy--you write the parameters to a "parameters file"
+  (which fortuitously is valid python code) then read them back into
+  python.  This is untested but should approximately work:
+  
+    &gt;&gt;&gt; g = Gnuplot.Gnuplot()
+    &gt;&gt;&gt; open('fit.par', 'w').write('m=0\nb=0\n')
+    &gt;&gt;&gt; g('fit m*x+b "data.in" via "fit.par"')
+    &gt;&gt;&gt; g('update "fit.par" "fit2.par"') # saves fitted parameters to fit2.par
+    &gt;&gt;&gt; parameters = {}
+    &gt;&gt;&gt; execfile('fit2.par', globals(), parameters)
+    &gt;&gt;&gt; print parameters
+  {'b': 1.5015, 'm': 1e-30}
+    &gt;&gt;&gt; print parameters['m'], parameters['b']
+  1e-30 1.5015
+  
+  In principle you could also parse "fit.log" to get the gory details
+  about the fit (standard errors, correlation matrix, etc).
+  
+  Hope this helps,
+  Michael
+  
+  -- Michael Haggerty mhagger at alum dott mit.edu
+</pre>
+<a href="http://www.ctcms.nist.gov/fipy/">FiPy</a> - FiPy: A Finite
+Volume PDE Solver Using Python
+
+<a href="http://homepage2.nifty.com/peco/pybld/pybld.html">PyBLD</a> -
+not that I really know what BLD is, but it does have a data fit
+capability.
+
+<a href="http://www.physik.tu-dresden.de/~baecker/python/gnuplot.html">GnuplotBiDir.py</a>:
+<pre>
+  Sometimes it is useful to get variables from a gnuplot session
+  steered from python, e.g. to extract parameters from a
+  fit. GnuplotBiDir.py is a test of bidirectional interfacing with
+  gnuplot. For this you need a really recent gnuplot (from CVS) . The
+  basic usage is 
+    from GnuplotBiDir import Gnuplot
+    gp=Gnuplot()
+    gp("a=10")
+    print "var=",gp.getvar("a")
+  Remark: for an excellent python interface to gnuplot see gnuplot-py
+  and the interactive add-ons to this from IPython. 
+</pre>
+<a href="http://www.python.org/moin/NumericAndScientific">Numeric And
+Scientific</a> packages [python.org]
+
+<a href="http://mayavi.sourceforge.net/">MayaVI</a> is in fink.
+<pre>MayaVi is a free, easy to use scientific data visualizer. It is
+written in Python and uses the amazing Visualization Toolkit (VTK) for
+the graphics. It provides a GUI written using Tkinter.</pre>
+<a
+href="http://starship.python.net/~hinsen/ScientificPython/">ScientificPython</a>
+does nonlinear least squares fits.
+
+<a
+href="http://starship.python.net/~hinsen/ScientificPython/ScientificPythonManual/Scientific_12.html">Module
+Scientific.Functions.LeastSquares</a>
+
+<a
+href="http://www.astro.rub.de/laboca/download/boa_master_doc/7_6_4Scientific_Functions_L.html">7.6.4
+Scientific.Functions.LeastSquares</a>.  From <a
+href="http://www.astro.rub.de/laboca/download/boa_master_doc/boa_master_doc.html#boadoccontents">BoA
+- The Bolometer Data Analysis Project</a>.  If every project had such documentation!
+<pre>
+  &gt;&gt;&gt; from Scientific.Functions.LeastSquares import *
+  &gt;&gt;&gt; from Numeric import exp
+  &gt;&gt;&gt; def f(param, t):
+  ...     return param[0]*exp(-param[1]/t)
+  ...
+  &gt;&gt;&gt; data = [(100, 4.999e-8),(200, 5.307e+2),
+    (300, 1.289e+6),(400, 6.559e+7)]
+  &gt;&gt;&gt; print leastSquaresFit(f, (1e13,4700), data)
+  ([8641551709749.7666, 4715.4677901570467], 1080.2526437958597)
+</pre>
+I tried the above and it seems to work!  I will probably be skipping
+gnuplot for fitting from now on.  It is the same algorithm between the
+two.  We will see if I take to this or not!
+
+And another interesting mention: <a href="http://scigraphica.sourceforge.net/">SciGraphica</a> a scientific application for data analysis and technical graphics. It pretends to be a clone of the popular commercial (and expensive) application "Microcal Origin". It fully supplies plotting features for 2D, 3D and polar charts.
+
+Wow.  Too many plotting options!
+-----
+

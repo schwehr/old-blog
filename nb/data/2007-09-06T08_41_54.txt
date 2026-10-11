@@ -1,0 +1,44 @@
+TITLE: fink - automatically starting postgresql on boot
+AUTHOR: Kurt
+DATE: 09.06.2007 08:41
+DESC: getting things figured out
+-----
+BODY:
+This one tripped me up.  When fink installs apache2, it also
+configures the mac to start apache2 during the boot-up process.  The
+postgresql82 package is not setup the same way.  It gets everything
+ready so that it can be quickly done, but leaves it up to the system
+administrator to do this.  Rob and I are working on a complete
+configuration for our server and starting PostgreSQL on boot-up is
+essential for our application.  The key is to tell <a
+href="http://daemonic.sourceforge.net/">daemonic</a> that you need
+postgresql running:
+<pre>sudo daemonic enable postgresql82</pre>
+Daemonic then creates a directory in /Library/StartupItems called
+daemonic-postgresql82:
+<pre>ls -l /Library/StartupItems/daemonic-postgresql82/
+total 16
+-rw-r--r--   1 root  wheel  326 Sep  6 08:27 StartupParameters.plist
+-rwxr-xr-x   1 root  wheel  301 Sep  6 08:27 daemonic-postgresql82</pre>
+This is the Mac equivalent to /etc/init.d scripts common to linux/unix.
+In fact the script in daemonic-postgresql82 looks much like a portion 
+of what you would find on a linux box:
+<pre><font color="0000ff"><strong>#&#33;/bin/&#115;h</strong></font>
+<font color="#444444"># startup script for service postgresql82, created by daemonic
+. /etc/rc.common</font>
+case <font color="#008000">&quot;<font color="#2040a0">$1</font>&quot;</font> in
+  start)
+    ConsoleMessage <font color="#008000">&quot;Starting  PostgreSQL database server&quot;</font>
+    if [ -x /sw/bin/pgsql.sh-8.2 ];; then
+     <font color="#444444"> # run the daemon
+      /sw/bin/pgsql.sh-8.2 start 
+    fi</font>
+    ;;
+esac
+exit 0</pre>
+It is missing the normal stop and restart commands that an init script
+would have.
+
+Daemonic is much like chkconfig that I first discovered on SGI IRIX
+boxes back in the 90's that has been redone by RedHat.
+-----

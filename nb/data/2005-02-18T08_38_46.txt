@@ -1,0 +1,28 @@
+TITLE: Possible X11 solution
+AUTHOR: Kurt
+DATE: 02.18.2005 08:38
+DESC: I hope this works
+-----
+BODY:
+Need to try this:
+<pre>
+Q9.13: I'm still having problems with X11 and Fink.
+
+A: If the hints in the Fink tries to install XFree86 or X.org or X11
+and upgrade from 10.2 entries don't help, or aren't applicable to your
+situation, you may need to flush out your X11 installation and remove
+any old placeholders and partially/fully installed X11-related
+packages:
+
+sudo dpkg -r --force-all system-xfree86 system-xfree86-42 system-xfree86-43 \
+xorg xorg-shlibs xfree86 xfree86-shlibs \
+xfree86-base xfree86-base-shlibs xfree86-rootless xfree86-rootless-shlibs \
+xfree86-base-threaded xfree86-base-threaded-shlibs \
+xfree86-rootless-threaded xfree86-rootless-threaded-shlibs
+rm -rf /Library/Receipts/X11SDK.pkg /Library/Receipts/X11User.pkg
+fink selfupdate; fink index
+
+(the first line may give you warnings about trying to remove
+nonexistent packages). Then, reinstall Apple's X11 and the X11SDK.
+</pre>
+-----

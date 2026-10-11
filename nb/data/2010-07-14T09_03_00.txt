@@ -1,0 +1,49 @@
+TITLE: internet network tracking viewed through NMEA message traffic
+AUTHOR: Kurt
+DATE: 07.14.2010 09:03
+DESC: behvior illustrated
+-----
+BODY:
+I did some system maintenance yesterday on a computer that is
+receiving AIS via the internet.  CCOM and another group are both
+watching this critical feed and, as expected, it tripped the alarms
+for both groups.  This was the first test of the monitoring for this
+machine since it was all put in place a couple weeks ago.  Seeing this
+happen gives me at least a little bit of warm fuzzy.  I can't see
+what the other monitoring solution looks like, but here is what I got when
+things settled back down:
+<pre>***** Nagios *****
+<!-- -->
+Notification Type: FLAPPINGSTART
+<!-- -->
+Service: AIS_FEED
+Host: aisserver.unh.edu
+Address: xxx.xxx.xxx.xxx
+State: OK
+<!-- -->
+Date/Time: Tue Jul 13 14:16:05 EDT 2010
+<!-- -->
+Additional Info:
+<!-- -->
+SNMP OK - 2926 new records in last 10 minutes</pre>
+Nagios is feeding nagios grapher at a pretty low update rate, but you can 
+see a sharp drop right above the 13th July tag.
+
+<img title="Nagios weekly view of vessels in the last 10 minutes" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/ais-vessels-3week.png"/>
+
+I wanted more detail, so I setup a small python program to log the
+NMEA messages per second coming across the internet connection.  It's
+a bit hard to see what is going on in this 12 hour view, but it gives
+you a sense that the network connection is reasonably stable.  Perhaps
+I should set this up as an audio file.
+
+<img title="NMEA messages in the last second" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/ais-network-throughput.png"/>
+
+Here is zoomed in to one of the zones on the right side of the above
+graph.  You can see that the biggest upward spike follows a short
+period of no data.  This should be the network connection trying to
+catch up for a block of missed packets and is likely from network
+congestion somewhere on the link.
+
+<img title="NMEA messages in the last second" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/ais-network-throughput-closeup.png"/>
+-----

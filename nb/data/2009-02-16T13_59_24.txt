@@ -1,0 +1,30 @@
+TITLE: ISO 19115 metadata
+AUTHOR: Kurt
+DATE: 02.16.2009 13:59
+DESC: good?
+-----
+BODY:
+While the ISO 19115 spec is essential closed because I don't feel like
+paying for it, I did discover that there is opensource software that
+the <a
+href="http://www.fgdc.gov/metadata/iso-metadata-editor-review">FGDC
+claims writes ISO 19115</a>: <a
+href="http://geonetwork-opensource.org">GeoNetwork</a>.  It's Java
+based, so I'll have a harder time seeing what it is doing, but the
+source code is hopefully available here: <a href="http://sourceforge.net/projects/geonetwork">GeoNetwork on sourceforge</a> --&gt; <a href="http://geonetwork.svn.sourceforge.net/viewvc/geonetwork/trunk/">GeoNetwork svn source</a>
+<pre>% <b>svn co https://geonetwork.svn.sourceforge.net/svnroot/geonetwork</b></pre>
+I downloaded the universal installer to my Mac.  Once installed, it
+was a little cranky.  I'm testing it on an old G4 laptop.  Their startup
+instructions hide what is going on a bit, so I was a bit more explicit.
+<pre>% <b>cd /Applications/geonetwork/jetty</b>
+% <b>java -Xms48m -Xmx512m -DSTOP.PORT=8079 -Djava.awt.headless=true -jar start.jar ../bin/jetty.xml</b></pre>
+Then I wanted to see what ports it was really opening up.  I had something else using port 8080 that I had to kill first.  lsof is good for networking too.  Try this:
+<pre>% <b>lsof -i -nP</b> # Like netstat</pre>
+The metadata tab is pretty, but where I can I export or get ISO19115 metadata?
+
+<img title="GeoNetwork" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-02/geonetwork-datasets.png"/>
+
+I tried the display it in Google Earth.  The legend came up, but no actual data.
+
+<img title="GeoNetwork" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-02/geonetwork-distribution-types.png"/>
+-----

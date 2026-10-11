@@ -1,0 +1,38 @@
+TITLE: Sun compiler issues
+AUTHOR: Kurt
+DATE: 06.30.2005 10:40
+DESC: blade 100 has more issues
+-----
+BODY:
+One of the Sun blade 100's hard disk bought the farm recently (these
+machine are trouble).  Once Sun put a new disk in it and it was built
+back up, it's main use as the workstation for the drafting table style
+digitizer was put to use, accept that the program stopped working.
+<pre>
+ ./digimap 
+ld.so.1: ./digimap: fatal: libF77.so.4: open failed: No such file or directory
+Killed
+</pre>
+Ouch.  No Fortran 77 library!?!?!  Checking out the program on another
+machine tells me where this library should live:
+<pre>
+  ldd digimap
+
+        libF77.so.4 =>   /opt/SUNWspro/lib/libF77.so.4
+        libM77.so.2 =>   /opt/SUNWspro/lib/libM77.so.2
+        libsunmath.so.1 =>       /opt/SUNWspro/lib/libsunmath.so.1
+        libm.so.1 =>     /opt/SUNWspro/lib/libm.so.1
+        libc.so.1 =>     /usr/lib/libc.so.1
+        libdl.so.1 =>    /usr/lib/libdl.so.1
+        /usr/platform/SUNW,Sun-Blade-100/lib/libc_psr.so.1
+</pre>
+If you do not install the compilers on every machine, then you run
+into troubles!  How strange to not just put the lib[FM]77.so.* on
+every install.  The solution is to install the compilers.  We paid for
+them, but it is just another thing to have to install.  The os info:
+<pre>
+uname -s -r
+
+SunOS 5.8
+</pre>
+-----

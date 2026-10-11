@@ -1,0 +1,36 @@
+TITLE: Python logging module and daemons
+AUTHOR: Kurt
+DATE: 02.05.2008 21:17
+DESC: import logging trick
+-----
+BODY:
+I just started working with python's <a
+href="http://docs.python.org/lib/module-logging.html">logging</a>
+module.  Very powerful.  It is going to take a while to get really
+comfortable with how it works, but why reinvent the wheel?
+
+So far I ran into two funky stumbling blocks.  The first is that the
+default setup is supposed to send all logging messages to stderr,
+right?  I don't see any output until I get to "warn."   I am explicitly
+setting the level to 0 with this:
+<pre>
+  logging.basicConfig(filename = options.log_file
+                      , level  = options.log_level
+                      )
+</pre>
+The second problem totally caught me off guard.  At first I 
+just got zero output from logging in ais-port-forward when
+I switched from my testing area to starting it from an init.d
+script.  The level did not matter.  Then I opened a file down
+farther in my code to see if I could write anything.  And boom!
+I got both my writes to the file AND the logging data.  Turns
+out that you do not want to detach your daemon after you
+initialize logging.  The file descriptors get all wonky.  With
+my daemon.py in noaadata, I attach stdout and stderr to /dev/null.
+I think that is where logging also gets sent.  This code will
+be in the next release of noaadata inside aisutils/daemon.py and
+scripts/ais-port-forward.
+
+<b>KEY POINT:</b> Do all your forking first.  Only then initialize your
+logging.
+-----

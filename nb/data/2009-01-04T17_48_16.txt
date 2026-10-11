@@ -1,0 +1,61 @@
+TITLE: AIS JSON encoding
+AUTHOR: Kurt
+DATE: 01.04.2009 17:48
+DESC: exciting to find other interested parties
+-----
+BODY:
+Update: Sean Gillies suggested using a standard time format like RFC
+3339 (ISO 8601). <a
+href="http://www.ietf.org/rfc/rfc3339.txt">rfc3339.txt</a>
+
+Was just googling the combination of AIS and <a href="http://aprs.org/">APRS</a> and ran into this:
+<a href="http://wiki.ham.fi/JSON_AIS.en">JSON AIS transmission
+protocol</a>.  I sent an email in the last couple weeks suggesting
+that JSON might be better for sending AIS messages over the Internet
+compared to XML.  Of note: I don't see any mention of <a href="http://geojson.org/">GeoJSON</a> on the
+page.  It would be important to consider GeoJSON when building an JSON
+AIS definition.
+<pre>This is a work-in-progress specification for passing parsed AIS data
+in human- and computer-readable JSON format. If you have ideas for
+this specification, please email Heikki Hannikainen, OH7LZB (hessu at
+hes dot iki dot fi).
+<!-- -->
+This protocol is useful for transmitting AIS data between AIS receiver
+sites and live AIS database services, and also for transmitting AIS
+data between AIS database services which choose to trust each other
+and exchange data.
+<!-- -->
+This specification was initially implemented by Lekkas Dimitris of
+marinetraffic.com, and documented by Heikki Hannikainen of
+aprs.fi. Additional feedback has been received from Tapio Sokura,
+OH2KKU.
+...</pre>
+Their two sample messages:
+<pre>{
+    "msgtype": 3,
+    "mmsi":2320787,
+    "status":14,
+    "speed":0,
+    "lon":-1.11023795604706,
+    "lat":50.7996215820313,
+    "course":0,
+    "heading":0,
+    "timestamp":"20081013091401"
+}
+<!-- -->
+{
+    "msgtype": 5,
+    "mmsi":211189000,
+    "imo":8705383,
+    "callsign":"DQEJ",
+    "shipname":"SASSNITZ",
+    "shiptype":69,
+    "length":0,
+    "width":0,
+    "eta":"20081014101000",
+    "draught":58,
+    "destination":"TRELLEBORG/SASSNITZ",
+    "timestamp":"20081013091717"
+}</pre>
+I also just stumbled into <a href="http://www.erikburrows.com/index.php?node=AIS">aislib</a> - a java AIS parser that integrates with <a href="http://openmap.bbn.com/">OpenMap</a>
+-----

@@ -1,0 +1,84 @@
+TITLE: ctypes python interface built by pyglet
+AUTHOR: Kurt
+DATE: 11.25.2008 07:15
+DESC: seems to generate valid code
+-----
+BODY:
+I've been looking at python ctypes code generators a bit.  The idea is
+to look at the C header and get most of the work done automatically to
+code the functions, structures, and #defines.  Then I can focus on
+making a pythonic interface.  The first one to work is <a
+href="http://pyglet.googlecode.com/svn/trunk/doc/internal/wraptypes.txt">wraptypes</a>
+in <a href=http://www.pyglet.org/">pyglet</a>.  However, the release does
+not seem to contain wraptype, so I had to pull it from svn.
+<pre>% <b>mkdir pyglets</b>
+% <b>cd pyglets</b>
+% <b>svn co http://pyglet.googlecode.com/svn/trunk/tools/wraptypes</b>
+% <b>cd wraptypes</b>
+% <b>chmod +x wrap.py</b>
+% <b>./wrap.py magic.h</b></pre>
+I've cut down the output some, but it shows that I can use some of
+the code it generates.
+<pre><tt>__docformat__ <font color="#990000">=</font>  <font color="#FF0000">'restructuredtext'</font>
+<!-- -->
+<b><font color="#000080">import</font></b> ctypes
+<b><font color="#000080">from</font></b> ctypes <b><font color="#000080">import</font></b> <font color="#990000">*</font>
+<!-- -->
+<b><font color="#000080">import</font></b> pyglet<font color="#990000">.</font>lib
+_lib <font color="#990000">=</font> pyglet<font color="#990000">.</font>lib<font color="#990000">.</font><b><font color="#000000">load_library</font></b><font color="#990000">(</font><font color="#FF0000">'magic'</font><font color="#990000">)</font>
+<!-- -->
+_int_types <font color="#990000">=</font> <font color="#990000">(</font>c_int16<font color="#990000">,</font> c_int32<font color="#990000">)</font>
+<b><font color="#0000FF">if</font></b> <b><font color="#000000">hasattr</font></b><font color="#990000">(</font>ctypes<font color="#990000">,</font> <font color="#FF0000">'c_int64'</font><font color="#990000">):</font>
+    _int_types <font color="#990000">+=</font> <font color="#990000">(</font>ctypes<font color="#990000">.</font>c_int64<font color="#990000">,)</font>
+<b><font color="#0000FF">for</font></b> t <b><font color="#0000FF">in</font></b> _int_types<font color="#990000">:</font>
+    <b><font color="#0000FF">if</font></b> <b><font color="#000000">sizeof</font></b><font color="#990000">(</font>t<font color="#990000">)</font> <font color="#990000">==</font> <b><font color="#000000">sizeof</font></b><font color="#990000">(</font>c_size_t<font color="#990000">):</font>
+        c_ptrdiff_t <font color="#990000">=</font> t
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">c_void</font></b><font color="#990000">(</font>Structure<font color="#990000">):</font>
+    _fields_ <font color="#990000">=</font> <font color="#990000">[(</font><font color="#FF0000">'dummy'</font><font color="#990000">,</font> c_int<font color="#990000">)]</font>
+<!-- -->
+MAGIC_NONE <font color="#990000">=</font> <font color="#993399">0</font> 	<i><font color="#9A1900"># magic.h:32</font></i>
+MAGIC_DEBUG <font color="#990000">=</font> <font color="#993399">1</font> 	<i><font color="#9A1900"># magic.h:33</font></i>
+MAGIC_SYMLINK <font color="#990000">=</font> <font color="#993399">2</font> 	<i><font color="#9A1900"># magic.h:34</font></i>
+MAGIC_COMPRESS <font color="#990000">=</font> <font color="#993399">4</font> 	<i><font color="#9A1900"># magic.h:35</font></i>
+MAGIC_DEVICES <font color="#990000">=</font> <font color="#993399">8</font> 	<i><font color="#9A1900"># magic.h:36</font></i>
+<i><font color="#9A1900"># ...</font></i>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">struct_magic_set</font></b><font color="#990000">(</font>Structure<font color="#990000">):</font>
+    __slots__ <font color="#990000">=</font> <font color="#990000">[</font>
+    <font color="#990000">]</font>
+struct_magic_set<font color="#990000">.</font>_fields_ <font color="#990000">=</font> <font color="#990000">[</font>
+    <font color="#990000">(</font><font color="#FF0000">'_opaque_struct'</font><font color="#990000">,</font> c_int<font color="#990000">)</font>
+<font color="#990000">]</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">struct_magic_set</font></b><font color="#990000">(</font>Structure<font color="#990000">):</font>
+    __slots__ <font color="#990000">=</font> <font color="#990000">[</font>
+    <font color="#990000">]</font>
+struct_magic_set<font color="#990000">.</font>_fields_ <font color="#990000">=</font> <font color="#990000">[</font>
+    <font color="#990000">(</font><font color="#FF0000">'_opaque_struct'</font><font color="#990000">,</font> c_int<font color="#990000">)</font>
+<font color="#990000">]</font>
+<!-- -->
+magic_t <font color="#990000">=</font> <b><font color="#000000">POINTER</font></b><font color="#990000">(</font>struct_magic_set<font color="#990000">)</font> 	<i><font color="#9A1900"># magic.h:62</font></i>
+<i><font color="#9A1900"># magic.h:63</font></i>
+magic_open <font color="#990000">=</font> _lib<font color="#990000">.</font>magic_open
+magic_open<font color="#990000">.</font>restype <font color="#990000">=</font> magic_t
+magic_open<font color="#990000">.</font>argtypes <font color="#990000">=</font> <font color="#990000">[</font>c_int<font color="#990000">]</font>
+<!-- -->
+<i><font color="#9A1900"># magic.h:68</font></i>
+magic_buffer <font color="#990000">=</font> _lib<font color="#990000">.</font>magic_buffer
+magic_buffer<font color="#990000">.</font>restype <font color="#990000">=</font> c_char_p
+magic_buffer<font color="#990000">.</font>argtypes <font color="#990000">=</font> <font color="#990000">[</font>magic_t<font color="#990000">,</font> <b><font color="#000000">POINTER</font></b><font color="#990000">(</font>None<font color="#990000">),</font> c_size_t<font color="#990000">]</font>
+<!-- -->
+<i><font color="#9A1900"># ...</font></i>
+<!-- -->
+__all__ <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'MAGIC_NONE'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_DEBUG'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_SYMLINK'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_COMPRESS'</font><font color="#990000">,</font>
+<font color="#FF0000">'MAGIC_DEVICES'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_MIME_TYPE'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_CONTINUE'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_CHECK'</font><font color="#990000">,</font>
+<font color="#FF0000">'MAGIC_PRESERVE_ATIME'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_RAW'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_ERROR'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_MIME_ENCODING'</font><font color="#990000">,</font>
+<font color="#FF0000">'MAGIC_MIME'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_NO_CHECK_COMPRESS'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_NO_CHECK_TAR'</font><font color="#990000">,</font>
+<font color="#FF0000">'MAGIC_NO_CHECK_SOFT'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_NO_CHECK_APPTYPE'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_NO_CHECK_ELF'</font><font color="#990000">,</font>
+<font color="#FF0000">'MAGIC_NO_CHECK_ASCII'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_NO_CHECK_TOKENS'</font><font color="#990000">,</font> <font color="#FF0000">'MAGIC_NO_CHECK_FORTRAN'</font><font color="#990000">,</font>
+<font color="#FF0000">'MAGIC_NO_CHECK_TROFF'</font><font color="#990000">,</font> <font color="#FF0000">'magic_t'</font><font color="#990000">,</font> <font color="#FF0000">'magic_open'</font><font color="#990000">,</font> <font color="#FF0000">'magic_close'</font><font color="#990000">,</font> <font color="#FF0000">'magic_file'</font><font color="#990000">,</font>
+<font color="#FF0000">'magic_descriptor'</font><font color="#990000">,</font> <font color="#FF0000">'magic_buffer'</font><font color="#990000">,</font> <font color="#FF0000">'magic_error'</font><font color="#990000">,</font> <font color="#FF0000">'magic_setflags'</font><font color="#990000">,</font>
+<font color="#FF0000">'magic_load'</font><font color="#990000">,</font> <font color="#FF0000">'magic_compile'</font><font color="#990000">,</font> <font color="#FF0000">'magic_check'</font><font color="#990000">,</font> <font color="#FF0000">'magic_errno'</font><font color="#990000">]</font></tt></pre>
+Other than the custom import and the opaque structs, I should be able to use most of this.
+-----

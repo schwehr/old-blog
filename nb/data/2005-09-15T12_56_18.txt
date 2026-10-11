@@ -1,0 +1,54 @@
+TITLE: xstar trouble solved
+AUTHOR: Kurt
+DATE: 09.15.2005 12:56
+DESC: woo hoo!
+-----
+BODY:
+I have now solved the <b>impossible - icount =0 and its the same ping
+no</b> error.  Yeah, I think Becca or Jeff mentioned this to me quite a
+while ago, but now I have all the tools to more easily see what is
+going on.  segysqldump.py now takes any field from the segyTrace
+table, so I can watch what I want to see.  Check out Shotpoint 67233
+which is made up of two traces at positions 1477 and 1478.
+<pre>
+segysqldump.py -w 6 -d segy.db SweepLen SweepFreqStart SweepFreqEnd            
+
+traceN   X        Y        Min      Shotpo   SweepL   SweepF   SweepF   
+
+500      -44792   146998   36       66744    50       1000     6000    
+1000     -44792   146997   37       66994    50       1000     6000
+<font color="red">Error occured here </font>
+1500     -44791   146996   38       67244    10       1000     15000   
+2000     -44791   146995   39       67497    10       1000     15000   
+2500     -44790   146994   40       67747    10       1000     15000   
+3000     -44790   146994   41       67997    10       1000     15000   
+3500     -44789   146993   42       68247    10       1000     15000   
+4000     -44789   146992   43       68497    10       1000     15000   
+4500     -44788   146991   44       68747    10       1000     15000   
+5000     -44788   146990   45       68997    10       1000     15000   
+5500     -44787   146989   47       69247    10       1000     15000   
+6000     -44787   146988   48       69497    10       1000     15000   
+6500     -44787   146987   49       69747    10       1000     15000   
+7000     -44786   146986   50       69997    10       1000     15000   
+7500     -44786   146986   51       70247    10       1000     15000   
+8000     -44785   146985   52       70498    10       1000     15000   
+8500     -44785   146984   53       70756    <b>30</b>       1000     15000   
+9000     -44784   146983   54       71006    <b>30</b>       1000     15000   
+9500     -44784   146982   55       71267    10       1000     15000   
+10000    -44783   146981   56       71517    10       1000     15000   
+10500    -44783   146980   57       71767    10       1000     15000   
+11000    -44782   146979   58       72017    10       1000     15000   
+11500    -44782   146979   59       72267    10       1000     15000   
+12000    -44782   146978   0        72517    10       1000     15000   
+12500    -44781   146977   1        72767    10       1000     15000   
+13000    -44781   146976   2        73017    10       1000     15000   
+13500    -44780   146975   3        73267    10       1000     15000   
+</pre>
+I then used my new segyslice.py to chop the file into two halves.
+<pre>segyslice.py -i EEL5kL01.xstar -o EEL5kL01-0000-1476.xstar --max=1476
+segyslice.py -i EEL5kL01.xstar -o EEL5kL01-1477.xstar --min=1477</pre>
+Then passing those two sections through sioseis, there were no
+complains.  That does not mean that I am out of the woods, but at
+least I can now say what that error message refers to.  It looks like
+SweepLength is not the issue.  Just the sweep frequency range.
+-----

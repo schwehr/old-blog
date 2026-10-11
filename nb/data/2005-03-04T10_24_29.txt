@@ -1,0 +1,39 @@
+TITLE: more pil fonts
+AUTHOR: Kurt
+DATE: 03.04.2005 10:24
+DESC: something that works
+-----
+BODY:
+I got a font to load and work.  This is not great since it does stuff
+outside of fink that is whacky and non-standard.  The key is that I
+can move on with real work.  First, I needed to download some
+.pil/.pbm fonts.  Then I have to add those to the python path.
+Finally, a load_path command is used to snag them.
+
+My .bashrc gets this
+<pre>
+  export PYTHONPATH=$PYTHONPATH:\
+  ${HOME}/projects/xcore/doc/BPSIO-04/work/pilfonts
+</pre>
+Then I need my makefile to ensure that the fonts are present.
+<pre>
+<font color="8b2252"><strong>pilfonts</strong>:</font> pilfonts.zip
+        unzip pilfonts.zip
+<font color="8b2252">
+<strong>pilfonts.zip</strong>:</font>
+        wget http://effbot.org/downloads/pilfonts.zip
+</pre>
+Finally a sample python program that draws the font:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">Image</font>, <font color="#2040a0">ImageDraw</font>, <font color="#2040a0">ImageFont</font>
+<font color="#2040a0">im</font> <font color="4444FF">=</font> <font color="#2040a0">Image</font>.<font color="#2040a0">new</font><font color="4444FF">(</font><font color="#008000">&quot;RGB&quot;</font>,<font color="4444FF">(</font><font color="#FF0000">400</font>,<font color="#FF0000">400</font><font color="4444FF">)</font>,<font color="#008000">&quot;orange&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">draw</font> <font color="4444FF">=</font> <font color="#2040a0">ImageDraw</font>.<font color="#2040a0">Draw</font><font color="4444FF">(</font><font color="#2040a0">im</font><font color="4444FF">)</font>
+<font color="#2040a0">draw</font>.<font color="#2040a0">text</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#FF0000">10</font>,<font color="#FF0000">100</font><font color="4444FF">)</font>,<font color="#008000">&quot;default&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">font</font> <font color="4444FF">=</font> <font color="#2040a0">ImageFont</font>.<font color="#2040a0">load_path</font><font color="4444FF">(</font><font color="#008000">&quot;helvR24.pil&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">draw</font>.<font color="#2040a0">text</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#FF0000">10</font>,<font color="#FF0000">200</font><font color="4444FF">)</font>,<font color="#008000">&quot;helvR24&quot;</font>, <font color="#2040a0">font</font><font color="4444FF">=</font><font color="#2040a0">font</font>, <font color="#2040a0">fill</font><font color="4444FF">=</font><font color="#008000">&quot;red&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">im</font>.<font color="#2040a0">show</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+This will show a tiny white default font with a larger 24 point font
+below in red all on an orange background.
+-----

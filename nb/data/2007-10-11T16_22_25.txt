@@ -1,0 +1,32 @@
+TITLE: density simpleview gets long needed improvements
+AUTHOR: Kurt
+DATE: 10.11.2007 16:22
+DESC: after 3 years, finally completed these two tasks
+-----
+BODY:
+I'm using simpleview to aid development of some geometric code and
+finally hit the breaking point with simpleview having a really lame
+starting configuration.  A little searching got me the tricks on how
+to set the window size for SoQtExaminerViewer and SoCamera knows how
+to "viewAll."
+
+Setting the window size at startup can be had by tweaking the <a
+href="http://doc.trolltech.com/3.3/qwidget.html">QWidget</a> that
+SoQt::init() returns.
+<pre>
+#include <qwidget.h>
+...
+  myWindow->resize(a.width_arg,a.height_arg);
+</pre>
+Where are "a" contains my command line args from gengetopts.
+
+Then for the camera view, it is easy enough to ask the camera
+to view the whole volume.  "si" is a small class that has all
+of my scene info.
+<pre>
+  si->camera->viewAll(si->root,myViewer->getViewportRegion(),10);
+</pre>
+
+It is nice to finally have that done.  Two items that have been on my
+"to do" list for 3 years.
+-----

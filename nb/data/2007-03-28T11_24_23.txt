@@ -1,0 +1,105 @@
+TITLE: nagios on mac osx
+AUTHOR: Kurt
+DATE: 03.28.2007 11:24
+DESC: just a cheap hack
+-----
+BODY:
+I made it past step one.  I compiled and installed <a
+href="http://www.nagios.org">Nagios</a> on my laptop.  Nagios is
+formally known as NetSaint.  Back in 2000, ACD showed me how awesome
+this program is for monitoring computers.  I definitely need to get
+Nagios running now that we are starting to deploy data logging boxes
+out in the field.  This first install was just a quick hack and I
+realized that I needed to install apache2 when I was off the net.
+Here is where I am at.  First I snagged nagios-2.7.tar.gz from
+nagios.org, but I later realized that I should have also grabbed
+nagios-plugins-1.4.6.tar.gz and nagiosmib-1.0.0.tar.gz.
+<pre>
+  cd ~/Desktop
+  tar xf Downloads/nagios-2.7.tar.gz
+  cd nagios-2.7
+  ./configure --prefix=$HOME/nagios --with-nagios-user=$USER --with-nagios-group=staff
+  make all
+  make install
+  make install-config
+  cd ~/nagios
+  cd etc
+  cp commands.cfg-sample commands.cfg
+  cp resource.cfg-sample resource.cfg
+  cp localhost.cfg-sample localhost.cfg
+  cp nagios.cfg-sample nagios
+  cd ~/Desktop
+  tar xf Downloads/nagios-plugins-1.4.6.tar.gz
+  ./configure --prefix=/Users/schwehr/nagios 
+  make
+  make install
+  # 
+  cd ~/nagios
+  ./bin/nagios -v  etc/nagios.cfg
+  ./bin/nagios etc/nagios.cfg
+</pre>
+Got that?  
+<pre>
+Nagios 2.7
+Copyright (c) 1999-2007 Ethan Galstad (http://www.nagios.org)
+Last Modified: 01-19-2007
+License: GPL
+</pre>
+And some status check...
+<pre>
+~/nagios/bin/nagiostats 
+.
+Nagios Stats 2.7
+Copyright (c) 2003-2007 Ethan Galstad (www.nagios.org)
+Last Modified: 01-19-2007
+License: GPL
+.
+CURRENT STATUS DATA
+----------------------------------------------------
+Status File:                          /Users/schwehr/nagios/var/status.dat
+Status File Age:                      0d 0h 0m 5s
+Status File Version:                  2.7
+.
+Program Running Time:                 0d 0h 0m 36s
+Nagios PID:                           23207
+Used/High/Total Command Buffers:      0 / 0 / 4096
+Used/High/Total Check Result Buffers: 0 / 0 / 4096
+.
+Total Services:                       5
+Services Checked:                     0
+Services Scheduled:                   5
+Active Service Checks:                5
+Passive Service Checks:               0
+Total Service State Change:           0.000 / 0.000 / 0.000 %
+Active Service Latency:               0.000 / 0.000 / 0.000 sec
+Active Service Execution Time:        0.000 / 0.000 / 0.000 sec
+Active Service State Change:          0.000 / 0.000 / 0.000 %
+Active Services Last 1/5/15/60 min:   0 / 0 / 0 / 0
+Passive Service State Change:         0.000 / 0.000 / 0.000 %
+Passive Services Last 1/5/15/60 min:  0 / 0 / 0 / 0
+Services Ok/Warn/Unk/Crit:            5 / 0 / 0 / 0
+Services Flapping:                    0
+Services In Downtime:                 0
+.
+Total Hosts:                          1
+Hosts Checked:                        0
+Hosts Scheduled:                      0
+Active Host Checks:                   1
+Passive Host Checks:                  0
+Total Host State Change:              0.000 / 0.000 / 0.000 %
+Active Host Latency:                  0.000 / 0.000 / 0.000 sec
+Active Host Execution Time:           0.000 / 0.000 / 0.000 sec
+Active Host State Change:             0.000 / 0.000 / 0.000 %
+Active Hosts Last 1/5/15/60 min:      0 / 0 / 0 / 0
+Passive Host State Change:            0.000 / 0.000 / 0.000 %
+Passive Hosts Last 1/5/15/60 min:     0 / 0 / 0 / 0
+Hosts Up/Down/Unreach:                1 / 0 / 0
+Hosts Flapping:                       0
+Hosts In Downtime:                    0
+</pre>
+That would be the cheap hack install.  This still needs the web
+interface and it will be much better as a fink package.  At least this
+is progress.  I need to look at the user account that fink adds to see
+if there is one I can reuse or if I need to add something to the passwd 
+package.
+-----

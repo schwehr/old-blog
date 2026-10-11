@@ -1,0 +1,53 @@
+TITLE: Handling large number of BAGs in a Survey
+AUTHOR: Kurt
+DATE: 05.29.2010 17:38
+DESC: a good first pass
+-----
+BODY:
+I'm working back through NOAA's published BAG archive as fast as I
+can.  In my December 2009 take on things, I had one bounding box and
+icon per bag file that I got from NGDC's server.  I have 2059 bag
+files, but only 406 surveys.  I am using an idea I picked up from
+Trey's work at NASA Ames.  When you are zoomed out, I present an icon from the Survey and
+hide all the individual bags.  I've created a small database of the
+bags, so it is trivial to get the over all bounding box for the
+survey.  The one feature I am missing that Trey had for his photo
+viewer is a count on the icon of the number of bags that are being
+hidden.  I think that is outside of the scope for the time that I have
+(e.g. negative 1 day)
+
+<img title="Survey view in Google Earth" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-05/ge-survey-bbox.png"/>
+
+As you zoom in, the <i>Region</i> control in the KML switches the view
+over to the individual bags.  I use the same icon, but inverted
+
+<img title="" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-05/ge-bag-bbox.png"/>
+
+I have also switched my code to use the UTM bounding box.  I never saw
+the tiled bathymetry out of place, but some of the geographic bounding
+boxes were off by multiple degrees.  I am not seeing any more crazy
+survey bounding boxes in my quick look.  Example delta degrees between
+the Metdata Geographic and UTM coordinate (when projected back to
+geographic of course):  
+<pre>
+bag file, deltas     x_min    y_min    x_max    y_max
+H11536_1_of_4       0.9380  -6.5251   0.1306  -7.3478
+H11554_1_of_1_BAG   0.2377  -8.0011  -0.5709  -8.7929
+H11555_1_of_1       0.1354  -8.1659  -0.6326  -8.9748
+H11612_1_of_2     -14.7299 -16.4563 -15.6013 -17.3354
+</pre>
+Those are the worst ones.  The nice thing is that the venders are writing
+info about their software (not correctly, but there are only a few), so I can
+noticify the software vendor.  It will be critical to create ERRATA sheets, so 
+that we know what kind of bugs are likely to be present in the archived
+data.
+
+There is also the possibility of a Caris generated GML export that I
+just found out about yesterday.  Here is an example boundry created by
+running this gdal command:
+<pre>ogr2ogr -f kml survey.kml caris_survey.gml</pre>
+<img title="Caris GML to Google Earth with gdal" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-05/ge-survey-caris-gml.png"/>
+-----

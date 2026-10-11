@@ -1,0 +1,46 @@
+TITLE: finding what is known on a local network
+AUTHOR: Kurt
+DATE: 05.31.2006 06:10
+DESC: broadcasting
+-----
+BODY:
+<a href="http://www.macosxhints.com/article.php?story=20060530064822804">How to find devices on your local network</a>
+
+Turns out you can ping the broadcast address and most machines on a
+subnet will respond.  The first trick is to find the broadcast
+address.  Run "ifconfig".  Look for the "broadcast" keyword followed
+by an address that probably ends in 255.  For example:
+<pre>
+$ ifconfig
+en1: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+        inet6 fe80::20d:93ff:fef0:6111%en1 prefixlen 64 scopeid 0x5 
+        inet 192.168.2.101 netmask 0xffffff00 broadcast 192.168.2.255
+        ether 00:0d:93:f0:61:11 
+        media: autoselect status: active
+        supported media: autoselect
+</pre>
+Based on the 3rd line, the ping should be
+<pre>
+$ ping 192.168.2.255
+PING 192.168.2.255 (192.168.2.255): 56 data bytes
+64 bytes from 192.168.2.101: icmp_seq=0 ttl=64 time=0.285 ms
+64 bytes from 192.168.2.1: icmp_seq=0 ttl=64 time=1.615 ms (DUP!)
+</pre>
+Then use "arp -a" to see the IP addresses that the computer knows
+about.  For example:
+<pre>
+$ arp -a
+onefish.ucsd.edu (132.239.80.86) at 0:9:e9:1c:78:80 on en0 [ethernet]
+sio-pps-rh-ptr.ucsd.edu (132.239.121.4) at 0:0:f0:a5:74:f2 on en0 [ethernet]
+squidward.ucsd.edu (132.239.121.23) at 0:2:55:7a:b5:2e on en0 [ethernet]
+...
+</pre>
+A comment also suggests something like this "nmap -sP
+192.168.1.1/24".  Be careful with nmap so that you don't get yourself
+in trouble.
+
+Some follow on about broadcasting and multicasting: <a
+href="http://www.comptechdoc.org/independent/networking/guide/netbroadcasting.html">Network
+Broadcasting and Multicasting</a> from <a
+href="http://www.comptechdoc.org/">http://www.comptechdoc.org/</a>
+-----

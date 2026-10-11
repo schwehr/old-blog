@@ -1,0 +1,40 @@
+TITLE: Embedding SQL commands in a gnuplot command file
+AUTHOR: Kurt
+DATE: 11.05.2005 12:14
+DESC: Flinn plot done up snazzy
+-----
+BODY:
+This is my first time using the '!' shell escape command in a gnuplot
+file to generate the datafiles for a plot from within the gnuplot
+command file (flinn-jelinek.bash).  I have not yet done the Jelinek
+plot, so just the Flinn plot here.  I feel pretty clever right now :)
+<pre>
+<font color="0000ff"><strong>#!/usr/bin/env gnuplot</strong></font>
+<font color="#FF8800"># Build Flinn and Jelinek plots</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800">#####################</font>
+<font color="#FF8800"># FLINN</font>
+<font color="#FF8800">#####################</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># Build the data files for the plot</font>
+! sqlite ~/x/data/BPSIO-04/bpsio04.db 'select tau2/tau3,tau1/tau2 from ams where <font color="#2040a0">corenum</font>=1' | tr '|' ' ' &gt; 1.fl
+! sqlite ~/x/data/BPSIO-04/bpsio04.db 'select tau2/tau3,tau1/tau2 from ams where <font color="#2040a0">corenum</font>=2' | tr '|' ' ' &gt; 2.fl
+! sqlite ~/x/data/BPSIO-04/bpsio04.db 'select tau2/tau3,tau1/tau2 from ams where <font color="#2040a0">corenum</font>=4' | tr '|' ' ' &gt; 4.fl
+<font color="#FF8800"># Flinn diagram is F vr L</font>
+set ylabel 'T1/T2 (L)'
+set xlabel 'T2/T3 (F)'
+<font color="#FF8800">#</font>
+set label 1 'Oblate' at 1.06, 1.04
+set label 2 'Prolate' at 1.04, 1.06
+<font color="#FF8800">#</font>
+set xrange [1:1.1]
+<font color="#FF8800">#</font>
+set title 'Flinn Diagram'
+f(x) = x
+plot  '1.fl'  title 'Core 1'\
+     ,'2.fl'  title 'Core 2'\
+     ,'4.fl'  title 'Core 4'\
+     ,f(x)
+pause -1 <font color="#008000">&quot;yo, press enter to move on with life&quot;</font>
+</pre>
+-----

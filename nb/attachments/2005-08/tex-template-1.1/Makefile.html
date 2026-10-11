@@ -1,0 +1,133 @@
+<html>
+<head>
+  <title>Makefile</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre>
+<font color="#444444"># $Revision: 1.1 $  $Author: schwehr $  $Date: 2005/08/21 18:11:18 $</font>
+<font color="#444444">##############################################################################</font>
+<font color="#444444"># Copyright (C) 2004  Kurt Schwehr</font>
+<font color="#444444">#</font>
+<font color="#444444">#    This program is free software; you can redistribute it and/or modify</font>
+<font color="#444444">#    it under the terms of the GNU General Public License as published by</font>
+<font color="#444444">#    the Free Software Foundation; either version 2 of the License, or</font>
+<font color="#444444">#    (at your option) any later version.</font>
+<font color="#444444">#</font>
+<font color="#444444">#    This program is distributed in the hope that it will be useful,</font>
+<font color="#444444">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</font>
+<font color="#444444">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</font>
+<font color="#444444">#    GNU General Public License for more details.</font>
+<font color="#444444">#</font>
+<font color="#444444">#    You should have received a copy of the GNU General Public License</font>
+<font color="#444444">#    along with this program; if not, write to the Free Software</font>
+<font color="#444444">#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</font>
+<font color="#444444">##############################################################################</font>
+<font color="8b2252">
+<strong>NAME</strong>:</font>= eel
+<font color="2040a0">TARGETS:=</font><font color="2040a0">${NAME}</font>.pdf
+<font color="8b2252">
+<strong>force</strong>:</font> 
+	pdflatex <font color="2040a0">${NAME}</font>.tex
+	bibtex <font color="2040a0">${NAME}</font>.aux
+	pdflatex <font color="2040a0">${NAME}</font>.tex
+	pdflatex <font color="2040a0">${NAME}</font>.tex
+	make check
+<font color="8b2252">
+
+<strong>no-fig</strong>:</font>
+	grep -v includegraphics <font color="2040a0">${NAME}</font>.tex |perl -p -e &quot;s/bibliography{<font color="2040a0">${NAME}</font>}/bibliography{<font color="2040a0">${NAME}</font>-nofig}/g&quot;  &gt; <font color="2040a0">${NAME}</font>-nofig.tex
+	cp <font color="2040a0">${NAME}</font>.bib <font color="2040a0">${NAME}</font>-nofig.bib
+	pdflatex <font color="2040a0">${NAME}</font>-nofig.tex
+	bibtex <font color="2040a0">${NAME}</font>-nofig.aux
+	pdflatex <font color="2040a0">${NAME}</font>-nofig.tex
+	pdflatex <font color="2040a0">${NAME}</font>-nofig.tex
+<font color="#444444">#	rm -f *-nofig.{aux,bbl,blg,log,tex}</font>
+<font color="8b2252">
+
+<strong>${NAME}.pdf</strong>:</font> <font color="2040a0">${NAME}</font>.tex
+	pdflatex <font color="4080ff">$&lt;</font>
+<font color="8b2252">
+<strong>clean</strong>:</font>
+	rm -rf <font color="2040a0">${TARGETS}</font> *~ texput.log
+<font color="8b2252">
+<strong>real-clean</strong>:</font> clean
+	rm -rf <font color="2040a0">${NAME}</font>{,-nofig}.{log,aux,bbl,blg} *.bak
+	rm -f *.pdf *.dvi
+	rm -f *-nofig*
+
+
+
+<font color="#444444"># Release to the world in many formats</font>
+<font color="8b2252"><strong>export</strong>:</font> <font color="2040a0">${NAME}</font>.pdf
+	latex2rtf -o <font color="2040a0">${NAME}</font>.rtf <font color="2040a0">${NAME}</font>.tex 
+<font color="#444444">#	latex2html</font>
+<font color="#444444">#	pdf2ps</font>
+<font color="#444444">#	pdftops</font>
+<font color="8b2252">
+<strong>check</strong>:</font> check-fig-refs
+	@-egrep -n --with-filename 'xx| x | y |FIX|XXX|LON|DEPTH|LAT' <font color="2040a0">${NAME}</font>.tex
+
+<font color="#444444"># Assumes ${NAME}.txt was export from EndNote onto the Desktop</font>
+<font color="8b2252"><strong>bib</strong>:</font>
+	-mv <font color="2040a0">${NAME}</font>.bib <font color="2040a0">${NAME}</font>.bib.bak
+	/sw/bin/tr '\r' '\n' &lt; ~/Desktop/<font color="2040a0">${NAME}</font>.txt &gt; <font color="2040a0">${NAME}</font>.bib
+	-diff <font color="2040a0">${NAME}</font>.bib.bak <font color="2040a0">${NAME}</font>.bib
+
+<font color="#444444"># Make a directory to upload to the web</font>
+<font color="2040a0">EEL_VERSION :=</font> <font color="2040a0">${shell ./parsecvsdir.py -r -e CVS/Entries -n ${NAME}</font>.tex}
+<font color="2040a0">DATE        :=</font> <font color="2040a0">${shell date +'%b%d'}</font>
+<font color="2040a0">SNAP        :=</font> <font color="2040a0">${DATE}</font>-<font color="2040a0">${EEL_VERSION}</font>-<font color="2040a0">${NAME}</font>
+<font color="8b2252"><strong>snap</strong>:</font>
+	@echo &quot;Making directory for revision <font color="2040a0">${EEL_VERSION}</font> on <font color="2040a0">${DATE}</font>&quot;
+	rm -rf <font color="2040a0">${SNAP}</font>
+	mkdir <font color="2040a0">${SNAP}</font>
+	cp <font color="2040a0">${NAME}</font>.tex <font color="2040a0">${SNAP}</font>/<font color="2040a0">${NAME}</font>-<font color="2040a0">${EEL_VERSION}</font>.tex
+	cp <font color="2040a0">${NAME}</font>.pdf <font color="2040a0">${SNAP}</font>/
+	cp <font color="2040a0">${NAME}</font>-nofig.pdf <font color="2040a0">${SNAP}</font>/
+	cp <font color="2040a0">${NAME}</font>.bib <font color="2040a0">${SNAP}</font>/
+	cp Makefile <font color="2040a0">${SNAP}</font>/Makefile-<font color="2040a0">${EEL_VERSION}</font>
+	cp <font color="2040a0">${NAME}</font>.end <font color="2040a0">${SNAP}</font>/<font color="2040a0">${NAME}</font>-<font color="2040a0">${EEL_VERSION}</font>.end
+	bzip2 -9 <font color="2040a0">${SNAP}</font>/<font color="2040a0">${NAME}</font>-<font color="2040a0">${EEL_VERSION}</font>.end
+	cp *agu* <font color="2040a0">${SNAP}</font>/
+<font color="8b2252">
+<strong>snap-back</strong>:</font>
+	cp Figures/*-v*.pdf <font color="2040a0">${SNAP}</font>/
+<font color="8b2252">
+<strong>snap-web</strong>:</font>
+	scp -r <font color="2040a0">${SNAP}</font> kds.ucsd.edu:www/somewhere/
+<font color="8b2252">
+<strong>snap-open</strong>:</font>
+	open http://schwehr.org/somewhere/<font color="2040a0">${SNAP}</font>
+
+<font color="#444444"># EVERY FIGURE SHOULD BE REF AT LEAST ONCE!</font>
+<font color="#444444"># FIX: Make this get the figure names some how</font>
+<font color="8b2252"><strong>check-fig-refs</strong>:</font>
+	@echo &quot;There should be no zeros in this list:&quot;
+	@echo -n &quot;location:     &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep location | wc -l
+	@echo -n &quot;gav-crack:    &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep gav-crack | wc -l
+	@echo -n &quot;gaviota-seis: &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep gaviota-seis | wc -l
+	@echo -n &quot;crack-seis:   &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep crack-seis | wc -l
+	@echo -n &quot;water:        &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep water | wc -l
+	@echo -n &quot;core1:        &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep core1 | wc -l
+	@echo -n &quot;core2:        &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep core2 | wc -l
+	@echo -n &quot;core4:        &quot;
+	@grep '\\ref{fig' <font color="2040a0">${NAME}</font> | grep core4 | wc -l
+	@echo &quot;Any missing fig: in refs??&quot;
+	@-grep 'ref{' <font color="2040a0">${NAME}</font> | egrep -v 'fig|tab'
+<font color="#444444"># FIX: make a script that looks for double word or phrases like &quot;the the&quot;</font>
+<font color="8b2252">
+<strong>open</strong>:</font>
+	open <font color="2040a0">${NAME}</font>.pdf
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>

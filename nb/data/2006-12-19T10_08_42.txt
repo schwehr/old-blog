@@ -1,0 +1,41 @@
+TITLE: python OptParse choice example
+AUTHOR: Kurt
+DATE: 12.19.2006 10:08
+DESC: handy
+-----
+BODY:
+Here is a small example of using a choice command line option.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>if</strong> <font color="#2040a0">__name__</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>from</strong> <font color="#2040a0">optparse</font> <strong>import</strong> <font color="#2040a0">OptionParser</font>
+    <font color="#2040a0">myparser</font> <font color="4444FF">=</font> <font color="#2040a0">OptionParser</font><font color="4444FF">(</font><font color="#2040a0">usage</font><font color="4444FF">=</font><font color="#008000">&quot;%prog [options]&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">typeChoices</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#008000">'binary'</font>,<font color="#008000">'nmea'</font>,<font color="#008000">'nmeapayload'</font><font color="4444FF">)</font>
+    <font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-t'</font>,<font color="#008000">'--type'</font>
+			,<font color="#2040a0">choices</font><font color="4444FF">=</font><font color="#2040a0">typeChoices</font>,<font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'choice'</font>
+			,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'ioType'</font>
+			,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'nmea'</font>
+			,<font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'What kind of string to expect ('</font>
+			<font color="4444FF">+</font><font color="#008000">', '</font>.<font color="#2040a0">join</font><font color="4444FF">(</font><font color="#2040a0">typeChoices</font><font color="4444FF">)</font>
+			<font color="4444FF">+</font><font color="#008000">') [default: %default]'</font><font color="4444FF">)</font>
+    <font color="4444FF">(</font><font color="#2040a0">options</font>,<font color="#2040a0">args</font><font color="4444FF">)</font> <font color="4444FF">=</font> <font color="#2040a0">myparser</font>.<font color="#2040a0">parse_args</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+I used a temporary variable (typeChoices) to allow the same list to
+handle both the choices option and the help.  Here is the help.
+<pre>./foo.py -h
+usage: foo.py [options]
+
+options:
+  -h, --help            show this help message and exit
+  -t IOTYPE, --type=IOTYPE
+                        What kind of string to expect (binary, nmea,
+                        nmeapayload) [default: nmea]
+</pre>And if all goes well:
+<pre>./foo.py -t binary
+# No output</pre>
+And when you give it something that is not allowed:
+<pre>./foo.py -t arsenic
+usage: foo.py [options]
+
+foo.py: error: option -t: invalid choice: 'arsenic' (choose from 'binary', 'nmea', 'nmeapayload')</pre>
+-----

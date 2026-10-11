@@ -1,0 +1,49 @@
+TITLE: A little more puppet
+AUTHOR: Kurt
+DATE: 06.06.2012 04:56
+DESC: apt-get
+-----
+BODY:
+I wanted to show how to install something on Ubuntu in my first post
+on puppet, but it ended up being just too much for one go.  Here is
+installing one package on a Ubuntu 10.04 LTS machine.  I picked the
+cheetah python module at random.
+<pre><b>apt-cache search cheetah</b>
+python-cheetah - text-based template engine and Python code generator
+moap - Swiss army knife for project maintainers and developers
+python-mako - fast and lightweight templating for the Python platform
+<!-- -->
+<b>dpkg -l python-cheetah</b>
+No packages found matching python-cheetah.
+<!-- -->
+# trying to install it
+<b>puppet apply cheetah.pp</b>
+err: /Stage[main]//Package[python-cheetah]/ensure: change from purged to present failed: Execution of '/usr/bin/apt-get -q -y -o DPkg::Options::=--force-confold install python-cheetah' returned 100: E: Could not open lock file /var/lib/dpkg/lock - open (13: Permission denied)
+E: Unable to lock the administration directory (/var/lib/dpkg/), are you root?
+<!-- -->
+notice: Finished catalog run in 0.23 seconds
+<!-- -->
+# It needs to be root to have permission to install
+<b>sudo puppet apply cheetah.pp</b>
+notice: /Stage[main]//Package[python-cheetah]/ensure: ensure changed 'purged' to 'present'
+notice: Finished catalog run in 6.78 seconds
+<!-- -->
+<b>dpkg -l python-cheetah</b>
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Cfg-files/Unpacked/Failed-cfg/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                         Version                      Description
++++-============================-============================-=======================================
+ii  python-cheetah               2.0.1-2ubuntu7               text-based template engine and Python code generator</pre>
+Here is what the cheetah.pp file looks like:
+<pre>package <font color="#FF0000">{</font> <font color="#FF0000">"python-cheetah"</font><font color="#990000">:</font>
+    <b><font color="#0000FF">ensure</font></b> <font color="#990000">=&gt;</font> present<font color="#990000">,</font>
+<font color="#FF0000">}</font></pre>
+Last time, I showed using an erb template.  Here is running the ruby erb command to see what it does to a template:
+<pre>cat mytemplate.erb 
+os: &lt;%= operatingsystem %&gt;
+<b>erb -x mytemplate.erb </b>
+_erbout = ''; _erbout.concat "os: "; _erbout.concat(( operatingsystem ).to_s); _erbout.concat "\n"
+; _erbout</pre>
+I don't speak ruby, but this looks like it might be a ruby script.
+-----

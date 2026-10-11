@@ -1,0 +1,47 @@
+TITLE: django admin interface
+AUTHOR: Kurt
+DATE: 02.10.2008 19:16
+DESC: the initial trial of the admin tools
+-----
+BODY:
+I spent a little more time with django today.  I've just looked
+through chapter 6 with the admin interface.  I don't want people
+to be able to edit the AIS data.  That just would not be good.
+However, it does illustrate some of the look that I would like
+to have.  
+
+<img src="http://schwehr.org/blog/attachments/2008-02/django-admin-login.png"/>
+
+Once you are logged on to the system, here is the initial view with
+users and the tables that have admin turned enabled.  Here I only
+have the last_position/LastPosition with an admin interface.
+
+<img src="http://schwehr.org/blog/attachments/2008-02/django-admin-tables.png"/>
+
+The default view gives a quick sense of what is in the table.  It uses
+the string representation that I defined for the LastPosition model.
+<pre>
+    def __str__(self):
+        return '%s last position' % self.name
+</pre>
+<img src="http://schwehr.org/blog/attachments/2008-02/django-admin-default-view.png"/>
+
+Then I used the list_display attribute to give a better look.
+<pre>
+    class Admin:
+        list_display = ('userid','name','cog','cg_timestamp')
+</pre>
+<img src="http://schwehr.org/blog/attachments/2008-02/django-admin-custom-list.png"/>
+
+You can click on the column headings to sort or flip the direction of
+sorting.  This is pretty standard web or spreadsheet behavior that
+users expect.
+
+<img src="http://schwehr.org/blog/attachments/2008-02/django-admin-reverse-sort.png"/>
+
+The edit page illustrates that I've got some work to do for a better 
+individual view.  The position geometry comes out as the raw WKB Hex
+text.  That and sog is confused.  Not friendly to the user.
+
+<img src="http://schwehr.org/blog/attachments/2008-02/django-admin-edit-entry.png"/>
+-----

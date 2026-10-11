@@ -1,0 +1,33 @@
+TITLE: Python arguments
+AUTHOR: Kurt
+DATE: 10.02.2008 15:41
+DESC: lots of options
+-----
+BODY:
+Capt Ben had a couple python arg questions today that made me have to
+think carefully how this actually works.
+Here is a little demo of function arguments (parameters) in python.
+<pre>
+def magic(foo=None,*args, **kwargs):
+    print 'foo', foo
+    print 'args',args
+    for key in kwargs:
+        print 'key %s .... value %s' % (key,kwargs[key])
+    if 'bar' in kwargs:
+        print 'we have a bar'
+</pre>
+The result of calling with a dictionary being expanded with '**', and two named args. 
+<pre>% <b>demo.magic(foo='bar',bar='stuff',**{'one':2,'three':4})</b>
+foo bar
+args ()
+key bar .... value stuff
+key three .... value 4
+key one .... value 2
+we have a bar
+</pre>
+Or simpler:
+<pre>% <b>demo.magic(1,2,3)</b>
+foo 1
+args (2, 3)
+</pre>
+-----

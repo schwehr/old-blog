@@ -1,0 +1,31 @@
+TITLE: Quick transparent seismic lines fails
+AUTHOR: Kurt
+DATE: 06.27.2005 14:27
+DESC: no luck with gs or convert
+-----
+BODY:
+I thought that maybe there would be an easy way to get seismic lines
+with transparent backgrounds by using ghostscript, but nope.  When I
+tried the transparent png support, I got a solid white box right
+around the seismic line.  Here is the command line that I used:
+<pre>
+  gs -sDEVICE=pngalpha -r300 -sOutputFile=test.png 04-final-noline.ps 
+</pre>
+What happens if I try convert?
+<pre>
+  convert -transparent '#FFFFFF' test.png test-transparent.png
+</pre>
+That is better, but I really want from just above the water bottom
+pick up to be transparent.  The bottom, I can probably fix by making
+the last gain be 0.0000 instead of 1.0:
+<pre>
+    0.0000    1.0000
+    0.0005    1.0000
+    0.0020    5.0000
+    0.005     10.0000
+    0.0200    15.0000 
+    0.0500    15.0000
+    0.0700    15.0000
+    0.0800    1.0000
+</pre>
+-----

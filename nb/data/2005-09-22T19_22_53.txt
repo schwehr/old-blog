@@ -1,0 +1,69 @@
+TITLE: gdal python in fink
+AUTHOR: Kurt
+DATE: 09.22.2005 19:22
+DESC: no luck
+-----
+BODY:
+I tried just removing the --without-python in the configure line of
+gdal 1.2.6 info file in fink 10.3 unstable.  Of course it did not
+work...
+<pre>
+g++-3.3 -Wl,-bind_at_load  -o .libs/_gdalmodule.so -bundle \
+.libs/gdal_wrap.o .libs/numpydataset.o .libs/gdalnumeric.o \
+/sw/lib/libpq.dylib /sw/lib/libnetcdf.dylib /sw/lib/libpng.dylib \
+/sw/lib/libogdi31.dylib -L/usr/X11R6/lib /sw/lib/libiconv.dylib \
+-L/sw/lib -L/sw/src /sw/lib/libproj.dylib /sw/lib/libgeos.dylib \
+/sw/lib/libodbc.dylib -L/sw -logdi31 /sw/lib/libgif.dylib \
+/sw/lib/libjpeg.dylib /sw/lib/libtiff.dylib -lpng -lnetcdf -lcfitsio \
+-lz -ldl -lpq -L/sw/src/fink.build/gdal-1.2.6-6/gdal-1.2.6/.libs \
+../.libs/libgdal.dylib 
+ld: warning -prebind has no effect with -bundle
+ld: Undefined symbols:
+_PyArg_Parse
+_PyArg_ParseTuple
+_PyDict_New
+_PyDict_Next
+_PyDict_SetItem
+_PyDict_Type
+_PyErr_Clear
+_PyErr_SetString
+_PyEval_CallObjectWithKeywords
+_PyExc_MemoryError
+_PyExc_NameError
+_PyExc_TypeError
+_PyExc_ValueError
+_PyFloat_AsDouble
+_PyFloat_FromDouble
+_PyInt_AsLong
+_PyInt_FromLong
+_PyInt_Type
+_PyList_New
+_PyList_SetItem
+_PyList_Size
+_PyList_Type
+_PyModule_GetDict
+_PyObject_AsWriteBuffer
+_PyString_AsString
+_PyString_FromString
+_PyString_FromStringAndSize
+_PyString_Type
+_PyTuple_Size
+_PyTuple_Type
+_PyType_IsSubtype
+_PyType_Type
+_Py_BuildValue
+_Py_InitModule4
+__Py_NoneStruct
+make[1]: *** [_gdalmodule.la] Error 1
+make: *** [py-module] Error 2
+### execution of /var/tmp/tmp.1.6XodMR failed, exit code 2
+</pre>
+I also tried building gdal 1.3.0 with these configure lines, but no
+success:
+<pre>
+  ./configure --prefix=/Users/schwehr/Desktop/gdal/install
+  ./configure --prefix=/Users/schwehr/Desktop/gdal/install --with-libtiff=internal
+  ./configure --prefix=/Users/schwehr/Desktop/gdal/install --with-libtiff=no
+  ./configure --prefix=/Users/schwehr/Desktop/gdal/install --with-libtiff=internal --with-hdf5=no
+</pre>
+-----

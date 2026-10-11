@@ -1,0 +1,56 @@
+TITLE: NOAA needs a public software interface specification for multibeam data
+AUTHOR: Kurt
+DATE: 06.02.2010 12:01
+DESC: targetting a sis
+-----
+BODY:
+Comments can go here: <a href="http://schwehr.blogspot.com/2010/06/bag-file-naming-convention.html">BAG file naming convention</a>
+
+Next week, I will be talking in Norfolk about technology transfer
+between NASA And NOAA.  One thing that is clear, we need a file naming
+convention for published data files that come out of NOAA.  These
+things are not fun, but they make or break the long term usability of
+data.  When I join a NASA mission, the first few times I try to use
+these filename, it is a bit confusing, but once you lookup the codes
+and start to use them, you realize the power of well controlled file
+names.  The naming convention for NOAA BAGs is great that it has a
+survey name, but the rest of the filename is basically information.
+It's done differently and there is no reference in the metadata to the
+standard applied.  To kick off this idea, let us first think about just
+BAGs.  What should be in the filename and how can we code it?
+
+Take a look through the Mars Exploration Rover (MER) Software Interface Specification (SIS): <a href="http://pds-imaging.jpl.nasa.gov/documentation/MER_camsis_v4_9-25-07.pdf">MER_camsis_v4_9-25-07.pdf</a> [JPL]
+
+First, take a look at the Data Processing Level.  With multibeam and
+lidar data, we have the similar kinds of concepts, but the data
+usually starts off collected with an IMU providing GPS derived
+positioning (not something we have on Mars at the moment).
+
+<img title="MER camsis - Data Processing Levels - P 10" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/mer-camsis-data-levels.png"/>
+
+Now for the part that I really want you to take a look at: Section
+4.4, File Naming, P22.  The file names are broken into a whole bunch
+of fields:
+<pre>&lt;scid&gt;&lt;inst&gt;&lt;sclk&gt;&lt;prod&gt;&lt;site&gt;&lt;pos&gt;&lt;seq&gt;&lt;eye&gt;&lt;filt&gt;&lt;who&gt;&lt;ver&gt;&lt;ext&gt;</pre>
+Each of these fields is defined in the document.  For BAG instrument
+type, I could see codes something like this: <b>S</b> = <b>S</b>ingle
+beam sonar <b>M</b> = <B>M</b>ultibeam, <b>l</b> = topo <b>l</b>idar,
+<b>L</b> = bathy <b>L</b>idar, <b>G</b> = predicted from
+<b>G</b>ravity, <b>c</b> = <b>c</b>ombined sensors, <b>C</b> = lead
+line or similar from a <b>C</b>able, etc.  Then when I had a BAG that
+was from a bathy lidar, I would not be surprise when I opened it and
+it did not look like multibeam sonar data.  There was no need to look
+at the metadata (which would not have told me) or the
+non-machine-readable Descriptive Reports.
+
+<img title="MER camsis" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/mer-camsis-example-definitions.png"/>
+
+The document has some examples of decoding image file names:
+
+<img title="MER camsis" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/mer-camsis-image-name-examples.png"/>
+
+These kinds of conventions are really powerful, but they do take a
+while to create and debug.  I've spent hundreds of hours working on
+spacecraft imaging teams making sure that everything in the SIS
+document is correct.  
+-----

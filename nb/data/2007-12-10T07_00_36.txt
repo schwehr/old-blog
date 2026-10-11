@@ -1,0 +1,89 @@
+TITLE: GPS on a train plus EVDO internet
+AUTHOR: Kurt
+DATE: 12.10.2007 07:00
+DESC: fun with spatial data
+-----
+BODY:
+I'm on a train to AGU with my i.Trek GPS running in my pocket and
+logging data to my serial logger.
+<pre>
+serial_logger.py -p /dev/tty.iBT-GPS-SPPslave-1 -v --uscg -skurt_itrek
+</pre>
+The feed looks like this in verbose mode:
+<pre>
+$GPGGA,150312.000,3731.6458,N,12217.0280,W,1,9,1.02,10.1,M,-25.6,M,,*58,rkurt_itrek,1197298992.73
+$GPGSA,A,3,11,28,25,27,26,15,17,19,08,,,,1.31,1.02,0.83*07,rkurt_itrek,1197298992.74
+$GPGSV,3,1,11,28,73,318,23,08,68,062,30,27,49,102,28,35,41,210,*7E,rkurt_itrek,1197298992.74
+$GPGSV,3,2,11,17,40,184,27,26,33,313,16,25,30,112,25,15,21,316,18*7B,rkurt_itrek,1197298992.76
+$GPGSV,3,3,11,11,20,097,26,19,11,039,31,13,05,159,*4B,rkurt_itrek,1197298992.76
+$GPRMC,150312.000,A,3731.6458,N,12217.0280,W,46.44,312.00,101207,,,A*4B,rkurt_itrek,1197298992.77
+$GPGGA,150313.000,3731.6539,N,12217.0405,W,1,9,1.02,9.8,M,-25.6,M,,*65,rkurt_itrek,1197298993.78
+</pre>
+Time to do something with the data!
+<pre>
+gpsbabel -i nmea -f tmp.log -o gpx -F tmp.gpx
+</pre>
+That will output an xml version of the NMEA.
+<pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;gpx
+ version=&quot;1.0&quot;
+creator=&quot;GPSBabel - http://www.gpsbabel.org&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns=&quot;http://www.topografix.com/GPX/1/0&quot;
+xsi:schemaLocation=&quot;http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd&quot;&gt;
+&lt;time&gt;2007-12-10T15:06:17Z&lt;/time&gt;
+&lt;bounds minlat=&quot;37.527430000&quot; minlon=&quot;-122.284008333&quot; maxlat=&quot;37.527565000&quot; maxlon=&quot;-122.283800000&quot;/&gt;
+&lt;trk&gt;
+&lt;trkseg&gt;
+&lt;trkpt lat=&quot;37.527430000&quot; lon=&quot;-122.283800000&quot;&gt;
+  &lt;ele&gt;10.100000&lt;/ele&gt;
+&lt;time&gt;2007-12-10T15:03:12Z&lt;/time&gt;
+  &lt;course&gt;312.000000&lt;/course&gt;
+  &lt;speed&gt;23.890800&lt;/speed&gt;
+  &lt;fix&gt;3d&lt;/fix&gt;
+  &lt;sat&gt;9&lt;/sat&gt;
+  &lt;hdop&gt;1.020000&lt;/hdop&gt;
+  &lt;vdop&gt;0.830000&lt;/vdop&gt;
+  &lt;pdop&gt;1.310000&lt;/pdop&gt;
+&lt;/trkpt&gt;
+&lt;trkpt lat=&quot;37.527565000&quot; lon=&quot;-122.284008333&quot;&gt;
+  &lt;ele&gt;9.800000&lt;/ele&gt;
+&lt;time&gt;2007-12-10T15:03:13Z&lt;/time&gt;
+  &lt;fix&gt;3d&lt;/fix&gt;
+  &lt;sat&gt;9&lt;/sat&gt;
+  &lt;hdop&gt;1.020000&lt;/hdop&gt;
+&lt;/trkpt&gt;
+&lt;/trkseg&gt;
+&lt;/trk&gt;
+&lt;/gpx&gt;
+</pre>
+A little easer to read is csv:
+<pre>
+%gpsbabel -i nmea -f tmp.log -o csv -F tmp.csv
+%cat tmp.csv 
+37.52743, -122.28380, 
+37.52756, -122.28401, 
+</pre>
+How about some google earth kml?
+<pre>
+% gpsbabel -i nmea -f tmp.log -o kml -F tmp.kml
+</pre>
+That outputs a static kml of the positions:
+<pre>
+...
+        &lt;Placemark&gt;
+          &lt;name&gt;Path&lt;/name&gt;
+          &lt;styleUrl&gt;#lineStyle&lt;/styleUrl&gt;
+          &lt;LineString&gt;
+            &lt;tessellate&gt;1&lt;/tessellate&gt;
+            &lt;coordinates&gt;
+              -122.283800,37.527430,10.100000
+              -122.284008,37.527565,9.800000
+            &lt;/coordinates&gt;
+          &lt;/LineString&gt;
+        &lt;/Placemark&gt;
+...
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-12/gpsbabel-kml.png"/>
+-----

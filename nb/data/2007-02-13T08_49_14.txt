@@ -1,0 +1,23 @@
+TITLE: sqlhelp gets PostGIS support
+AUTHOR: Kurt
+DATE: 02.13.2007 08:49
+DESC: off the cuff
+-----
+BODY:
+The next release of my noaadata package will add PostGIS support to
+ais.sqlhelp module.  It works something like this:
+<pre>
+import sqlhelp
+c = sqlhelp.create('foo','postgres')
+c.addPrimaryKey()
+c.addPostGIS('aPoint','POINT',2)
+c.addInt('bar')
+str(c)
+</pre>
+This results in this string:
+<pre>
+CREATE TABLE foo ( key SERIAL PRIMARY KEY, bar INTEGER ); 
+SELECT AddGeometryColumn('foo','aPoint','POINT',2,-1);
+</pre>
+Which, at this point, has not yet been tested against PostGIS82. :)
+-----

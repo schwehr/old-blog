@@ -1,0 +1,38 @@
+TITLE: ints as booleans and return codes
+AUTHOR: Kurt
+DATE: 08.17.2006 08:15
+DESC: C++ style versus C style
+-----
+BODY:
+I used to be very comfortable with ints used as booleans, but as I
+program more with languages that have bools (even C99 has bools), I
+get very uncomfortable with numbers representing true state.  It is
+much more natural to check a return code as being true for success or
+false for failure.  In C, sometime 0 means everything is great and
+other times it means that something bad happens.  Yesterday while
+looking at some inherited code, I had to refresh my brain and started
+overhauling the code to use bool return codes.  First, I had to get
+rid of strcmp to see if two strings are equal.  That just causes
+bugs... did they mean to use !=0 or ==0?  It is easy to get them
+backwards.  We all can guess what strequ means, right?
+<pre>
+<strong>inline</strong> <strong>bool</strong> <font color="#2040a0">strequ</font><font color="4444FF">(</font><strong>const</strong> <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">s1</font>, <strong>const</strong> <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">s2</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>return</strong> <font color="#2040a0">strcmp</font><font color="4444FF">(</font><font color="#2040a0">s1</font>,<font color="#2040a0">s2</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Then I had to write a program to double check what C thinks of
+integers when treating them as booleans.
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;iostream&gt;</font></strong></font>
+<strong>int</strong> <font color="#2040a0">main</font><font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">argc</font>,<strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cout</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;-1 evaluates to &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="4444FF">(</font><font color="4444FF">-</font><font color="#FF0000">1</font>?<font color="#008000">&quot;true&quot;</font><font color="4444FF">:</font><font color="#008000">&quot;false&quot;</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">endl</font><font color="4444FF">;</font>
+    <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cout</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot; 0 evaluates to &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="4444FF">(</font> <font color="#FF0000">0</font>?<font color="#008000">&quot;true&quot;</font><font color="4444FF">:</font><font color="#008000">&quot;false&quot;</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">endl</font><font color="4444FF">;</font>
+    <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cout</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot; 1 evaluates to &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="4444FF">(</font> <font color="#FF0000">1</font>?<font color="#008000">&quot;true&quot;</font><font color="4444FF">:</font><font color="#008000">&quot;false&quot;</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">endl</font><font color="4444FF">;</font>
+    <strong>return</strong> <font color="#FF0000">0</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font></pre>
+Which tells me what I need to know (and should have remembered!)
+<pre>./bool
+-1 evaluates to true
+ 0 evaluates to false
+ 1 evaluates to true</pre>
+-----

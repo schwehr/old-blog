@@ -1,0 +1,42 @@
+TITLE: C++ bit vector data structures
+AUTHOR: Kurt
+DATE: 04.13.2007 08:02
+DESC: thinking about bit vectors, python, and ais
+-----
+BODY:
+I have been looking at possible ways that I could get functionality
+like that in the <a
+href="http://cheeseshop.python.org/pypi/BitVector/1.3">BitVector</a>,
+but with out the overhead of a pure python implementation.  If I could
+just choose between these two, then I would be super happy:
+<pre>
+fast:
+  from cBitVector import BitVector
+original:
+  from BitVector import BitVector
+</pre>
+Rather than write it all myself, I have been thinking a bit about what
+existing C++ libraries could help me with keeping track of bits in a
+very standard way.  I'd also like to be able to generate straight C++
+for AIS messages from my XML definitions.  I am starting to hit AIS
+parsing performance issues.  Trying to crunch 20 GB of AIS NMEA
+strings takes way too long.
+
+The options right now include std::vector<bool>,
+std::bitset<numberofbits>, and boost:dynamic_bitset<>.
+std::vector<bool> currently is not a real STL container and people are
+warning developers not to use it.  If it were to loose its
+special/funky status and become a normal container, it would be okay,
+but use a lot of memory.  std::bitset looks nice, but does requires
+setting the vector size at compile time.  The boost dynamic_bitset
+appears to be very nice and additionally <a
+href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2050.pdf">n2050</a>
+(2006) proposes to put it in the next C++ standard.
+
+Right now boost tends to scare people off with its size.  It did that
+to me until last year, but Brian Locke encouraged me to look at it for
+its matrix support.  I was pleasantly surprised.  I think at this
+point, dynamic_bitset looks like the way to go.  Now for some spare
+cycles to get this coded up for a non python AIS and then maybe
+someday a cBitVector.
+-----

@@ -1,0 +1,41 @@
+TITLE: Whale notice change
+AUTHOR: Kurt
+DATE: 11.14.2009 13:06
+DESC: a band aid for bad time on windows
+-----
+BODY:
+I've just changed the zone notice for no whales detected to expire
+after 20 minutes.  It was 10 minutes before.  If the there is
+substantial clock drift on the computer displaying the AIS messages,
+the no whales observed can flap... it can dissappear and reappear in a
+slow flicker.  This shows how critical it is to have computers track
+time and that Windows Time Service is just not up to the task.  Here
+is a sample of a decode of a message with the new delay time:
+<pre><b>zonemsg_decode.py -v '!AIVDM,1,1,,B,803OvriK`U07Aj0Vh3nt61A9DT;0,0*2D,d-090,S0285,t175107.00,T07.60366941,r00369945,1258221067'</b>
+{'DAC': 366, 'RepeatIndicator': 0, 'UserID': 3669739, 'Spare': 0, 'MessageID': 8, 'FI': 34}
+ZoneMsg
+  dac: 366
+  fi: 34
+  zone_id: 10
+  zone_type: 0 [Right Whales NOT OBSERVED] 
+  start_utc_day: 14
+  start_utc_hour: 17
+  start_utc_minute: 50
+  zone_duration_minutes: <b>20</b>
+  num zones: 1
+  ZoneCircular 9260m radius at (-69.85239, 42.08153)
+  ZoneCircular
+        radius:         9260m
+        longitude:      -69.8523866667
+        latitude:       42.0815283333
+  Now:        2009-11-14 17:59:19.986791
+  Start time: 2009-11-14 17:50:00
+  Expires:    2009-11-14 18:10:00
+  Remaining:   640 sec
+  Remaining:   10.67 min
+  Remaining:   0.18 hr</pre>
+NOTE: this is the old style of zone from last summer.  The final IMO
+message will differ slightly from this.  I've heard that IMO is going
+to change things like the order of Longitude and Latitude to be
+different than in the ITU AIS specification.
+-----

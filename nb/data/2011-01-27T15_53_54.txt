@@ -1,0 +1,75 @@
+TITLE: Google refine and Fusion Tables
+AUTHOR: Kurt
+DATE: 01.27.2011 15:53
+DESC: partial success
+-----
+BODY:
+At the suggestion of folks at Google, I'm taking a look at <a
+href="http://www.google.com/fusiontables/">Google Fusion Tables</a>
+and in the process I ran into <a
+href="http://code.google.com/p/google-refine/">Google refine</a> to
+clean up data.  My goal is to do this with a different data set, but I
+figured I would try to throw the <a href="">MISLE</a> vessel event
+dataset into Fusion Tables to see how it goes.
+
+I changed my code to output a CSV rather than a KML to attempt making
+importing easier and fit inside of the file size limits.
+<pre><tt><b><font color="#0000FF">def</font></b> <b><font color="#000000">build_csv</font></b><font color="#990000">():</font>
+<i><font color="#9A1900">    'CVS for Google refine and/or Google Fusion Tables'</font></i>
+    <b><font color="#000080">import</font></b> csv
+    <b><font color="#000080">import</font></b> pprint
+<!-- -->
+    w <font color="#990000">=</font> csv<font color="#990000">.</font><b><font color="#000000">DictWriter</font></b><font color="#990000">(</font><b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'misle-vsl-events.csv'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">),</font> event_fields_google<font color="#990000">)</font>
+    w<font color="#990000">.</font><b><font color="#000000">writerow</font></b><font color="#990000">(</font><b><font color="#000000">dict</font></b><font color="#990000">(</font><b><font color="#000000">zip</font></b><font color="#990000">(</font>event_fields_google<font color="#990000">,</font>event_fields_google<font color="#990000">)))</font>
+    <b><font color="#0000FF">for</font></b> line_num<font color="#990000">,</font> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font><b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'mislevslevents.txt'</font><font color="#990000">)):</font>
+        event <font color="#990000">=</font> <b><font color="#000000">MisleVesselEvent</font></b><font color="#990000">(</font>line<font color="#990000">)</font>
+        event<font color="#990000">.</font>values<font color="#990000">[</font><font color="#FF0000">'long'</font><font color="#990000">]</font> <font color="#990000">=</font> event<font color="#990000">.</font>values<font color="#990000">[</font><font color="#FF0000">'x'</font><font color="#990000">]</font>
+        event<font color="#990000">.</font>values<font color="#990000">[</font><font color="#FF0000">'lat'</font><font color="#990000">]</font> <font color="#990000">=</font> event<font color="#990000">.</font>values<font color="#990000">[</font><font color="#FF0000">'y'</font><font color="#990000">]</font>
+        event<font color="#990000">.</font>values<font color="#990000">.</font><b><font color="#000000">pop</font></b><font color="#990000">(</font><font color="#FF0000">'x'</font><font color="#990000">)</font>
+        event<font color="#990000">.</font>values<font color="#990000">.</font><b><font color="#000000">pop</font></b><font color="#990000">(</font><font color="#FF0000">'y'</font><font color="#990000">)</font>
+        event<font color="#990000">.</font>values<font color="#990000">[</font><font color="#FF0000">'timeline_dt'</font><font color="#990000">]</font> <font color="#990000">=</font> event<font color="#990000">.</font>values<font color="#990000">[</font><font color="#FF0000">'timeline_dt'</font><font color="#990000">].</font><b><font color="#000000">strftime</font></b><font color="#990000">(</font><font color="#FF0000">'%Y-%m-%d'</font><font color="#990000">)</font>
+        w<font color="#990000">.</font><b><font color="#000000">writerow</font></b><font color="#990000">(</font>event<font color="#990000">.</font>values<font color="#990000">)</font></tt></pre>
+
+refine is a funny beast.  When you run it, it starts up as a server
+and the interface is through your web browser.  It takes a minute to
+realize you don't want to bring forward the app, but rather the
+browser.  But that really isn't a big deal.  I had trouble getting
+refine to make the timeline_dt column with of type date.  I tried ISO
+8601 time format (YYYY-MM-DDTHH:MM:SSZ), "YYYY-MM-DD HH:MM:SS",
+"YYYY-MM-DD" and "[date %Y-%m-%dT%H:%M:%SZ]".  None of those seemed to
+work.  The 2nd date and time seemed to convert to a date data type,
+but I could only figure out how to do that for one entry at a time.
+I've got 70000 entries, so "by hand" is not an option.
+
+<img title="Google" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-01/google-refine-invalid-date.png"/>
+
+Yeah, I have no idea what I'm doing with date/time in refine...
+
+<img title="Google" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-01/google-refine-confused.png"/>
+
+I think that refine will be a great data analysis tool in the future,
+but I don't really need it right at the moment for my critical
+project.
+
+So I dropped refine for now and went for Fusion Tables.  I was able to
+import the data in via the CSV upload option:
+
+<img title="Google" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-01/google-fusion-table-misle-data.png"/>
+
+I could then make a map!
+
+<img title="Google" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-01/google-fusion-tables-misle-map.png"/>
+
+This is great, but only being able to use the set of Google provided icons is not going to work.  I want "Oil Spill" to have this icon:
+
+<img src="http://vislab-ccom.unh.edu/~schwehr/misle/icons/oil_spill.png"/>
+
+Turns out that lots of other people want the same ability: <a
+href="http://code.google.com/p/fusion-tables/issues/detail?id=69">Allow
+custom marker image with public image url</a>.  This is a show stopper
+for visualizing the MISLE data.  The icons make the dataset.
+
+For my other data set, I need to figure out how to change the contents
+of the table from remote python code every few minutes and to be able
+to draw polygons.
+-----

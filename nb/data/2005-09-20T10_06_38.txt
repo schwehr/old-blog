@@ -1,0 +1,66 @@
+TITLE: simple subsetting sioseis script
+AUTHOR: Kurt
+DATE: 09.20.2005 10:06
+DESC: minitutorial
+-----
+BODY:
+Here is a very basic sioseis script.  When I am working on rendering a
+small upset of the line, it is nice to have just a small subset of the
+shots in a segy file.  This makes the rest of the process quicker.  I
+then don't have to worry about first and last shots and disk usage is
+kept to a minimum.  First use lsd to see the total number of shots.  My subset will be from shots 88500 to 90000
+<pre>
+lsd EEL5kL03.sgy  | head -4
+      SHOT   TR       RP    TR ID  RANGE DELAY NSAMPS    SI   YR DAY HR MIN SEC
+     83543     1   83543     0  1      0    90   1988    83 1999 217 22  44  25
+     83543     1   83543     0  1      0    90   1988    83 1999 217 22  44  25
+     83544     1   83544     0  1      0    90   1988    83 1999 217 22  44  25
+
+# schwehr@CatBoxII 66 $ cd && lsd EEL5kL03.sgy  | tail -4
+     93535     1   93535     0  1      0   380   1988    83 1999 218  0  16  51
+     93536     1   93536     0  1      0   380   1988    83 1999 218  0  16  51
+     93537     1   93537     0  1      0   380   1988    83 1999 218  0  16  52
+     93538     1   93538     0  1      0   380   1988    83 1999 218  0  16  52
+</pre>
+I then run the chop command: <em>./sioseis-chop.bash EEL5kL03-00001.sgy 88500 90000</em>:
+<pre>
+ls -l EEL5kL03*.sgy
+-rwxr-xr-x    1 schwehr  staff    41274896 Sep 20 08:00 EEL5kL03-88500-99000.sgy
+-rwxr-xr-x    1 schwehr  staff    81890832 Sep 20 07:57 EEL5kL03.sgy
+</pre>
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+declare -ri <font color="#2040a0">EXIT_FAILURE</font>=1
+if [ <font color="#2040a0">$#</font> != 3 ] ; then
+  echo
+  echo <font color="#008000">&quot;  ERROR: Must specify 3 arguments.  Found <font color="#2040a0">$#</font>&quot;</font>
+  echo
+  echo <font color="#008000">&quot;  usage:  <font color="#2040a0">$0</font> [segy in file] [start] [end] &quot;</font> 
+  echo
+  echo <font color="#008000">&quot;  Example:&quot;</font>
+  echo <font color="#008000">&quot;    <font color="#2040a0">$0</font> longline.sgy 88500 90000&quot;</font>
+  exit <font color="#2040a0">$EXIT_FAILURE</font>
+fi
+declare -ri <font color="#2040a0">start</font>=<font color="#2040a0">$2</font>
+declare -ir <font color="#2040a0">end</font>=<font color="#2040a0">$3</font>
+declare -r <font color="#2040a0">INFILE</font>=<font color="#2040a0">$1</font>
+declare -r <font color="#2040a0">OUTFILE</font>=${INFILE%%.sgy}-<font color="#2040a0">$start</font>-<font color="#2040a0">$end</font>.sgy
+echo RANGE:  <font color="#2040a0">$start</font> ... <font color="#2040a0">$end</font>
+echo INFILE <font color="#2040a0">$INFILE</font>
+echo OUTFILE <font color="#2040a0">$OUTFILE</font>
+<font color="#2040a0">OS</font>=`uname -s`
+<font color="#FF8800">#sioseis=${HOME}/bin/sioseis.${OS}</font>
+sioseis=sioseis
+$sioseis &lt;&lt; EOF 
+<em>procs diskin diskoa end
+diskin
+  ipath <font color="#2040a0">$INFILE</font> end
+end
+!
+diskoa
+ opath <font color="#2040a0">$OUTFILE</font>  fno <font color="#2040a0">$start</font> lno <font color="#2040a0">$end</font> end
+end
+end</em>
+EOF
+</pre>
+-----

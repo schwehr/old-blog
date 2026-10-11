@@ -1,0 +1,90 @@
+TITLE: AIS time from position messages
+AUTHOR: Kurt
+DATE: 08.24.2009 12:58
+DESC: what is the solution?
+-----
+BODY:
+I've been working on how best to produce a sense of time for received
+AIS messages where the time stamps on the receiver either do not exist
+or are untrustworthy.  One thing that I assume for an individual
+receiver is that the messages come out of the receiver in the same
+order that they came out of the VHF Data Link (VHF).  AIS Class A
+position messages all send their sense of the seconds of the minute
+from the vessel's GPS.  If the vessel is operating in SOTDMA mode,
+every 8th packet should also include the hour and minutes.  
+
+I started by taking a look at two minutes of data from a space based
+receiver (AprizeSat-3) and see what looks like a fairly rosy looking
+picture.  I plotted the received packet count across the bottom and
+the seconds timestamp on the y-axis.  Red "+" symbols are messages
+with just the seconds of the minute and the green "x" symbols are the
+reports that include hour and minute.  The two major groups show that
+ships are reporting a sense of time that ranges about 5 seconds.  This
+is likely delays in getting from assembling a packet to getting it
+transmitted.  There are a small percentage of reports that do not fit
+the basic line.  These outliers likely have a very poor sense of time
+or there is something wrong with the AIS transceiver.  The points with
+seconds of 60 seconds or higher know they have a poor sense of time:
+<pre>60 - time stamp is not available
+61 - positioning system in manual input mode
+62 - dead reckoning mode
+63 - positioning system is inoperative)</pre>
+Reporting that you don't know is a perfectly valid thing to do.  Reporting
+that you know, but you really don't know, is a "bad thing."
+
+<img title="2 minute satellite view - seconds timestamp" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/aprize-sat-2min-sec-ts.png"/>
+
+With that promissing picture, I took a look at one receiver in the Boston
+area.  This receiver can't hear downtown boston, so it doesn't have
+that many ships.  Here is 10000 samples from the receiver.  You can
+clearly see the minutes ticking over.  You can also see the slope of
+the lines changes as the number of reported vessels changes.  More
+vessels gives a lower slope, as the x-axis is number of samples (not
+time).
+
+<img title="170 minutes from Scituate receiver" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/scituate-time-record-1.png"/>
+
+Looking closer, we can see that there are two trails of time that are
+offset by about 10 seconds.
+
+<img title="3 minutes of data from Scituate" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/scituate-time-record-2.png"/>
+
+I tried to come up with reasonable ways to keep track of when the
+minutes tick over.  Then if I assume that this ship is reporting its
+position with a proper second with a transmission delay, I can
+generate a valid time for each report.  I took a running average that
+is 60% of the average samples per minute.  I can calculate this
+because I know I am looking at 24 hours of data (+/- a couple
+minutes).
+<pre>./find_time.py
+cg_t_min: 2008-04-07 03:57:20
+cg_t_max: 2008-04-08 03:57:37
+duration_mins: 1440.28
+num_samples: 211830
+ave_samples_per_min: 147.08
+window_len: 88</pre>
+In the next two plots (just with different vertical stretches), I have
+plotted the window average and std deviation.  The peak of the running
+average is right before the beginning of seeing ships with the next
+minute.  This is likely an early best estimate of the minute
+transition.  A likely better match would be the peak of the standard
+deviation, but we have to look back 1/2 the window size to get the
+sample that best matches the transition.  This will only work if there
+is a roughly consistent number of ships.  A rapid change in number of
+ships will throw this off.
+
+There is a very strange separation of time in the middle of the
+minute, where this time seems to separate.  I am not sure yet what is
+going on.
+
+<img title="31 minutes of data from the Scituate receiver"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2009-08/scituate-time-rec-3-ave-stddev.png"/>
+
+Slight different picks of the transiotion to show how things line up.
+
+<img title="Vertically exagerated view of the previous graph" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/scituate-time-rec-4-ave-stddev.png"/>
+
+Thanks to Maria, Matt, Monica, and Tom for suggestions on how to look
+at this data.
+-----

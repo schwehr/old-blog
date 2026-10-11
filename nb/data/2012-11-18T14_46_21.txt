@@ -1,0 +1,36 @@
+TITLE: libais 0.13
+AUTHOR: Kurt
+DATE: 11.18.2012 14:46
+DESC: almost there
+-----
+BODY:
+Still trying to figure out some packaging issues, but version 0.13 of
+libais is out.  A long ways to go before this code base becomes what
+it should be, but this point release is a big checkpoint for me.  I want
+to refactor out the bitset decoding into an AisFactory class.  This version
+sets the stage with cleaner code that is easier to refactor.  Now I just need
+to get the <a href="http://code.google.com/p/googletest/">GoogleTest</a> C++ framework 
+and CMake sorted for this project.  The team at Google that works on GoogleTest
+recommended commiting a copy of gtest into libais to make sure it is built with
+exactly the same C++ compiler and flags.  I need to reorganize the structure of
+libais so as to not make a mess.  Anyone have a recommendation for a project that
+has done this really well?  I found <a href="https://github.com/snikulov/google-test-examples">https://github.com/snikulov/google-test-examples</a> which seems to reasonably simple, but does not include the gtest code.
+
+<a href="http://pypi.python.org/pypi/libais/0.13">http://pypi.python.org/pypi/libais/0.13</a>
+<ul>
+   <li>Switch to the Google <a
+  href="http://code.google.com/p/google-styleguide/">C++ style
+  guide</a> and <a href="http://google-styleguide.googlecode.com/svn/trunk/cpplint/">cpplint.py</a></li>
+   <li>Lots of small bugs found in the code review process</li>
+   <li>Message constructors now start as status = AIS_UNINITIALIZED
+  and set to AIS_OK when decoding is done</li>
+   <li>Switched to using initializers to call parent initializers in C++</li>
+   <li>Removed a lot of duplicate and unused code.
+  AIS_ERR_WRONG_MSG_TYPE removed.  More still needs
+  to be removed.</li>
+   <li>Rewrote the C++ NMEA parsing functions: GetBody, GetNthField,
+  GetPad and Split.</li>
+   <li>Switch to using asserts for checks that imply coding errors
+  within the library.</li>
+</ul>
+-----

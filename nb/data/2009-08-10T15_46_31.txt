@@ -1,0 +1,43 @@
+TITLE: Building your own debian dpkg world
+AUTHOR: Kurt
+DATE: 08.10.2009 15:46
+DESC: bootstrap
+-----
+BODY:
+<b>WARNING: Work in progess.  Use at your own risk</b>
+
+If you want total control over an environment, then you need to have
+your own personal package managed area.  I prefer debian to rpm in
+general, so Trey and I are looking at building a small debian world on
+top of MacOS, Ubuntu, and Windows Cygwin.  The goal is to layer this
+over say fink in MacOS and then we can do exactly what we want without
+impacting fink.  This should even work on an RPM distribution.  How
+to start?  Build dpkg of course.  Since I am a fink contributor, I'll
+use that as the starting point.  I will be using exactly the same version
+of dpkg (1.10.21) to make sure the patch will work without a hitch.
+First, I copied the source from fink.
+<pre><b>fink rebuild dpkg</b> # Force fink to download the source
+<b>mkdir ~/foo && cd ~/foo</b>
+<b>cp /sw/fink/10.4/unstable/main/finkinfo/base/dpkg.patch .</b> # Pull in from fink</pre>
+I'm going to try to keep things simple than fink and use gettext from my path (aka from fink).
+Therefore, I needed to remove the first two entries in the dpkg.patch that are for get text.
+Use your favorite editor here (emacs, right?).
+<pre><b>tar xf /sw/src/dpkg_1.10.21.tar.gz</b>
+<b>sed 's|@PREFIX@|/Users/schwehr/foo/world|g' &lt; dpkg.patch | patch -p0</b>
+<b>mkdir build && cd build</b>
+<b>rootdir=/Users/schwehr/foo/world</b>
+<b>mkdir $rootdir</b>
+<b>../dpkg-1.10.21/configure --prefix=$rootdir  --without-start-stop-daemon --without-sgml-doc \
+  --with-admindir=$rootdir/var/lib/dpkg --mandir=$rootdir/share/man \
+  --infodir=$rootdir/share/info --srcdir=$rootdir/../dpkg-1.10.21</b>
+<b>make  all-include all-optlib all-lib all-dpkg-deb all-split all-scripts all-utils \
+  all-main all-dselect all-po all-methods all-man all-doc -j 3</b></pre>
+This fails with a ranlib error on the archive.  Eh?
+<pre><b>make</b> # Seems to then work?  Will this blow up later?</pre>
+At this point, it works and I need to figure out how to make a debian
+out of it to bootstrap the system.  Calling <i>make install</i> here
+would defeat the purpose of package managing the system.  To play with it,
+I went ahead and did the install.  In the future, I should do something like:
+<pre><b>make install DEST=somewhere</b></pre>
+And then I can build a deb of it and get dpkg to self install the deb of dpkg.
+-----

@@ -1,0 +1,27 @@
+TITLE: Saturn of the Valley and bibtex
+AUTHOR: Kurt
+DATE: 07.28.2005 08:33
+DESC: plus bibtex
+-----
+BODY:
+I am in the "Saturn of the Valley" this morning getting an oil change
+and some other stuff done before going across the country.  Not all
+Saturns are created equally.  Yes, this one has donuts (not all do),
+but no donut holes :) The biggest bummer for ne is that I don't see
+any outlets to plug my laptop in.  I had that same problem in the
+Barns and Noble coffee shop in the grove.  That had one outlet that
+was taped up to hamper people like me.
+
+I made a trivial change to my x/doc/BPSIO-04/Makefile for sucking in
+Endnote bibliographic info into Bibtex.  My new rule looks like this:
+<pre>
+# Assumes santabarbara.txt was export from EndNote onto the Desktop
+bib:
+	-mv ${NAME}.bib ${NAME}.bib.bak
+	/sw/bin/tr '\r' '\n' < ~/Desktop/${NAME}.txt > ${NAME}.bib
+	diff ${NAME}.bib.bak ${NAME}.bib
+</pre>
+The rule now makes a backup of the bibtex file, then translates the
+new Mac format bibtex from the desktop to create a new
+santabarbara.bib.  Then it gives me some feedback as to what changed.
+-----

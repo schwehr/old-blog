@@ -1,0 +1,4010 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: January 2008 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2008-01-30T08_34_09.txt" name=
+"e2008-01-30T08_34_09.txt"></a>
+<h2 class="date">01.30.2008 08:34</h2>
+<div class="blogbody">
+<h3 class="title">epydoc 3.0 released</h3>
+<div class="item-description">My favorite python documentation
+program, <a href="http://epydoc.sourceforge.net/">epydoc</a>,
+released version 3.0. I've been using the beta for a year and it is
+really great. I just discovered that is it not a good thing that I
+commited the fink package with a version of 3.0beta. 3.0 without a
+beta does not rate higher. Oops. RangeRick suggested 3.0.0...
+<pre>
+% dpkg --compare-versions '3.0beta' lt '3.0.0' &amp;&amp; echo yes
+yes
+</pre>
+Now I just need to change it over to update-alternatives and ditch
+the epydoc-py25-bin package.<br />
+<br />
+Here is the basic epydoc architecture:<br />
+<br />
+<img src=
+"../attachments/2008-01/epydoc.png" /><br />
+<br />
+Here is a bit of my template that is stripped down to just to show
+what is possible.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#2040A0">__version__</font> <font color=
+"#4444FF">=</font> <font color=
+"#008000">'$Revision: 1234 $'</font>.<font color=
+"#2040A0">split</font><font color="#4444FF">(</font><font color=
+"#4444FF">)</font><font color="#4444FF">[</font><font color=
+"#FF0000">1</font><font color="#4444FF">]</font>
+<font color="#2040A0">__date__</font> <font color=
+"#4444FF">=</font> <font color=
+"#008000">'$Date: 2008-01-30 $'</font>.<font color=
+"#2040A0">split</font><font color="#4444FF">(</font><font color=
+"#4444FF">)</font><font color="#4444FF">[</font><font color=
+"#FF0000">1</font><font color="#4444FF">]</font>
+<font color="#2040A0">__author__</font> <font color=
+"#4444FF">=</font> <font color=
+"#008000">' put in the authors name'</font>
+<font color="#2040A0">__doc__</font><font color=
+"#4444FF">=</font><font color="#008000">''</font><font color=
+"#008000">'
+Example python file that is all tricked out.  Designed for epydoc,
+unittest and doctest.  Please keep updating to make this the best
+possible template file.
+@requires: U{lxml&lt;http://codespeak.net/lxml/&gt;} - For libxml2 ElementTree interface
+@requires: U{Python&lt;http://python.org/&gt;} &gt;= 2.5
+@requires: U{epydoc&lt;http://epydoc.sourceforge.net/&gt;} &gt;= 3.0
+@author: U{'</font><font color="#008000">''</font><font color=
+"#4444FF">+</font><font color=
+"#2040A0">__author__</font><font color=
+"#4444FF">+</font><font color="#008000">''</font><font color=
+"#008000">'&lt;http://fix.author.url/&gt;} FIX: replace with your name/url
+@version: '</font><font color="#008000">''</font> <font color=
+"#4444FF">+</font> <font color=
+"#2040A0">__version__</font> <font color=
+"#4444FF">+</font><font color="#008000">''</font><font color=
+"#008000">'
+@copyright: 2008
+@var __date__: Date of last svn commit
+@undocumented: __version__ __author__ __doc__ parser success
+@since: 2008-Jan-30  FIX: replace with the file creation date
+@status: under development
+@organization: U{somewhere&lt;http://somewhere.edu/&gt;} - FIX: put in URL
+@license: Your license here
+@bug: epydoc --check complains about unittest additions
+@bug: Bug two
+@todo: Keep writing example code
+@todo: copy the code and replace the author and since fields
+@todo: To make your code executable after check-in (to allow
+for doc and unittest), do svn propset svn:executable ON yourfile.py
+@todo: "svn propedit svn:keywords yourfile.py", then put in "Date Revision"
+@see: U{python idioms&lt;http://jaynes.colorado.edu/PythonIdioms.html&gt;} -
+Read this before modifying any code here.
+'</font><font color="#008000">''</font>
+<strong>import</strong> <font color="#2040A0">sys</font>
+<strong>import</strong> <font color="#2040A0">os</font>
+<font color=
+"#444444">######################################################################</font>
+<strong>class</strong> <font color=
+"#2040A0">Template</font><font color="#4444FF">:</font>
+    <font color="#008000">''</font><font color="#008000">'
+    Class documentation goes here.
+    &gt;&gt;&gt; print "This is a doctest"
+    This is a doctest
+    '</font><font color="#008000">''</font>
+<strong>   <font color="#FF0000"> def</font><font color=
+"#FF0000"> __init__</font><font color=
+"#2040A0">(self,someArg=None)</font>:
+</strong>       <font color="#008000">''</font><font color=
+"#008000">'
+        Initialize the class.  Add some detail here.
+        @param someArg: example argument
+        @type someArg: int
+        '</font><font color="#008000">''</font>
+        <strong>pass</strong>  <font color=
+"#444444"># A way to have a do nothing stub</font>
+<strong>   <font color="#FF0000"> def</font><font color=
+"#FF0000"> aMethod</font><font color=
+"#2040A0">(self,anotherArg)</font>:
+</strong>       <font color="#008000">''</font><font color=
+"#008000">'
+        This is the detailed description of aMethod that tells you it
+        is a really moronic method.  It does howver show how to
+        document a class method.
+        @param anotherArg: what to print
+        @return: prints the arg to stdout
+        @rtype: str
+        '</font><font color="#008000">''</font>
+        <strong>print</strong> <font color=
+"#2040A0">anotherArg</font>
+</pre>
+<br />
+<br />
+This is the basic overview:<br />
+<br />
+<img src=
+"../attachments/2008-01/epydoc-2.png" /><br />
+<br />
+You can then drill into the templace class:<br />
+<br />
+<img src=
+"../attachments/2008-01/epydoc-3.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-30T08_34_09.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-02-01T08_36_33.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-29T12_18_29.txt" name=
+"e2008-01-29T12_18_29.txt"></a>
+<h2 class="date">01.29.2008 12:18</h2>
+<div class="blogbody">
+<h3 class="title">scplugin - svn for mac osx finder</h3>
+<div class="item-description">Bob Arko pointed me to <a href=
+"http://scplugin.tigris.org/">scplugin</a> that provides svn access
+through the finder very much like TortoiseSVN. Nice!<br />
+<br />
+<img src=
+"../attachments/2008-01/scplugin.png" /><br />
+<br />
+You have to do an initial refresh of the icons to get things
+going:<br />
+<br />
+<img src=
+"../attachments/2008-01/scplugin-2.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-29T12_18_29.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-30T08_34_09.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-29T07_14_06.txt" name=
+"e2008-01-29T07_14_06.txt"></a>
+<h2 class="date">01.29.2008 07:14</h2>
+<div class="blogbody">
+<h3 class="title">Art in Bonaire with Gavia AUVs</h3>
+<div class="item-description"><a href=
+"http://www.hydro-international.com/news/id2240-AUVs_Map_Coral_Reef_Environment.html">
+AUVs Map Coral Reef Environment</a> [hydro international]
+<pre>
+...
+The Bonaire expedition is being led by Mark Patterson of the Virginia
+Institute of Marine Science (VIMS), along with co-Principal
+Investigators Arthur Trembanis (University of Delaware), Jim Leichter
+and Dale Stokes (Scripps Institution of Oceanography). Dr. Trembanis
+has recently placed an order for a GeoSwath-equipped Gavia for the
+Coastal Sediments, Hydrodynamics, and Engineering Laboratory (CSHEL)
+in the College of Marine and Earth Studies at the University of
+Delaware. As well as the Principal Investigators (and 16 students from
+Delaware), academics have come to assist the mission from NOAA's
+Undersea Research Center (NURC, USA), the University of British
+Columbia (Canada), and the National Oceanography Centre Southampton
+(UK). Technology specialists from Iceland and England are also
+on-hand, helping gather the data needed to understand the reef
+environment.
+.
+ 
+One of the key aims of the mission is to look at ways of collecting
+sub-sea data using novel technology. Three AUVs are mapping the corals
+and taking measurements from the sea around them. Two 'Gavia'
+man-portable AUVs along with the &#226;&#196;&#242;Fetch1' AUV designed by Mark
+Patterson, are carrying various types of survey equipment into areas
+that would be dangerous to visit or slow to explore using divers or
+surface boats.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-29T07_14_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-29T12_18_29.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-28T20_55_52.txt" name=
+"e2008-01-28T20_55_52.txt"></a>
+<h2 class="date">01.28.2008 20:55</h2>
+<div class="blogbody">
+<h3 class="title">Cosco Busan response report</h3>
+<div class="item-description"><a href=
+"http://www.uscgsanfrancisco.com/posted/823/CoscoBusanISPRFinal.190115.pdf">
+CoscoBusanISPRFinal.190115.pdf</a> [uscg sf]<br />
+<br />
+<img src=
+"../attachments/2008-01/CoscoBusanSPRFinal.190115.png" />
+<br />
+<br />
+<a href=
+"http://coastguardnews.com/panel-releases-report-on-cosco-busan-oil-spill-response/2008/01/28/">
+Panel Releases Report on Cosco Busan Oil Spill Response</a>
+<pre>
+San Francisco - A panel of outside experts formed by the commandant of
+the Coast Guard to study the response to the Cosco Busan oil spill
+today released the first of two reports it was chartered to
+produce. The 120-page 'Phase I' report looks at the first two weeks of
+response operations that unfolded in the wake of the Nov. 7
+incident. A second report on the entire cleanup operation is due in
+several months.
+...
+Known as an Incident Specific Preparedness Review (ISPR) team, the
+panel found that despite dense fog in the area, problems encountered
+by investigators trying to verify the amount of the oil that leaked
+from the ship, and other communications gaps, the amount of spill
+response equipment deployed during the first crucial hours exceeded by
+almost 10 times both state and federal requirements. The report also
+details the unprecedented outpouring of volunteers and community
+involvement in direct spill cleanup operations and the efforts of
+response officials to quickly create and implement safe volunteer
+programs. Contingency plans in place at the time of the spill
+specifically barred the use of volunteers for spill cleanup because of
+health and safety concerns including the handling hazardous materials.
+.
+The ISPR panel also found that there was effective early communication
+and coordination between the unified command and specific local
+agencies, such as the City of San Francisco Department of Public
+Health. The local government liaison office within the unified
+command, however, took several days establish a smooth process for
+overall coordination with local governments. More emphasis on the
+liaison function in plans and increased training for liaison staff are
+recommended in the report.
+...
+</pre>
+<pre>
+
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-28T20_55_52.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-29T07_14_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-28T14_37_13.txt" name=
+"e2008-01-28T14_37_13.txt"></a>
+<h2 class="date">01.28.2008 14:37</h2>
+<div class="blogbody">
+<h3 class="title">Whale, GIS, and AIS</h3>
+<div class="item-description">Random Google Connections...<br />
+<br />
+From the <a href="http://dusk2.geo.orst.edu/djl/arcgis/">Arc
+Marine</a> website, I found this interesting paper: <a href=
+"http://dusk2.geo.orst.edu/esri07/p1569.htm">Tracking the Great
+Whales: An Arc Marine Case Study</a>
+<pre>
+Arc Marine presents a new framework for collaboration in oceanic and
+coastal biogeographic analysis. With a common data structure,
+researchers can share results without conversion, automatically
+integrate environmental datasets, and develop common tools. This case
+study explores how Arc Marine supports the scientific process for the
+Oregon State University Marine Mammal Program (OSU-MMP). The OSU-MMP
+has used satellite telemetry to track nine cetacean species across two
+ocean basins. Customization of the model creates a geodatabase fit for
+data exploration, hypothesis testing, and research permitting
+compliance. The standardized framework allows for automated import of
+ARGOS downloads and easy conversion of standard environment rasters
+such as HDF MODIS or netCDF. Custom applications and tools conform to
+the core classes of Arc Marine. Thus, other projects using common tag
+types can utilize the same data loading tools and analysis tools
+without an extensive geodatabase redesign and reprogramming process.
+</pre>
+From <a href=
+"http://dusk2.geo.orst.edu/djl/arcgis/ESRI_Press/arcmarine_panel07_pnh.ppt">
+ArcMarine Panel 07</a> [PPT]:<br />
+<br />
+<img src=
+"../attachments/2008-01/marine-animal-tracking-esri.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-28T14_37_13.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-28T20_55_52.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-28T13_48_46.txt" name=
+"e2008-01-28T13_48_46.txt"></a>
+<h2 class="date">01.28.2008 13:48</h2>
+<div class="blogbody">
+<h3 class="title">WebEOC Mapper</h3>
+<div class="item-description">An ESRI ArcGIS Server based disaster
+response web interface: <a href=
+"http://www.esi911.com/home/index.php?option=com_content&amp;task=view&amp;id=91&amp;Itemid=43">
+WebEOC Mapper Released</a> [esi911.com] WebEOC Mapper Provides the
+Power of GIS for Optimized Situational Awareness, Decision Support
+and Much More (Sept 2007)
+<pre>
+Two global technology innovators have collaborated to put the power of
+geographic information system (GIS) technology into the hands of
+decision makers. ESi, the leader in crisis information management
+technology, and ESRI, the leader in GIS, today announced the release
+of WebEOC Mapper Professional (WebEOC Mapper). This Web-enabled
+emergency management communications system was designed for public and
+private organizations involved in homeland security and emergency
+operations. WebEOC Mapper provides users with powerful technology
+tools to create a dynamic, geographically based common operating
+picture and the ability to view data from multiple WebEOC screens
+simultaneously on a centralized map. It allows fast data access and
+dissemination critical to all phases of preparedness and response to
+both commanders working in an emergency operations center and first
+responders in the field.
+...
+</pre>
+<img src=
+"../attachments/2008-01/esi911-webeoc.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-28T13_48_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-28T14_37_13.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-28T13_06_26.txt" name=
+"e2008-01-28T13_06_26.txt"></a>
+<h2 class="date">01.28.2008 13:06</h2>
+<div class="blogbody">
+<h3 class="title">Talk this evening - Anticipating Climate Change
+Impacts in Southern New Hampshire</h3>
+<div class="item-description">Anticipating Climate Change Impacts
+in Southern New Hampshire
+<pre>
+January 28, 2008
+6:30 - 8:30 pm
+Memorial Union Building (MUB), Theatre 1
+* How will global changes in carbon dioxide translate to local
+  changes in temperature and precipitation?
+* How will sea level rise affect New Hampshire coastlines and salt
+  marshes?
+* How will changes in precipitation and storms influence local
+  land use and infrastructure decisions?
+If you are interested in these and similar questions, join us for a
+seminar and panel discussion of how climate change may affect water and
+resource management in Southern New Hampshire.
+.
+Panelists:
+.
+Dr. Cameron Wake - Associate Research Professor, Institute for the Study
+of Earth, Oceans, and Space &amp; Department of Earth Sciences, UNH.
+.
+Dr. Larry Ward - Associate Research Professor, Department of Earth
+Sciences, Center for Coastal and Ocean Mapping, and Jackson Estuarine
+Laboratory, UNH
+.
+Mr. Michael Simpson - Director, Resource Management and Conservation
+Program, Antioch University of New England
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-28T13_06_26.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-28T13_48_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-28T10_54_22.txt" name=
+"e2008-01-28T10_54_22.txt"></a>
+<h2 class="date">01.28.2008 10:54</h2>
+<div class="blogbody">
+<h3 class="title">NRC Report - A Geospatial Framework for the
+Coastal Zone</h3>
+<div class="item-description">I have recently been asked about the
+US plans for Coastal Mapping. I've got a bit more information on
+the topic. There is a group called "The Interagency Working Group
+on Ocean and Coastal Mapping" (IWG-OCM) that was established by the
+Joint Subcommittee on Ocean Science and Technology (JSOST). The
+Energy Policy Act of 2005, OMB Circular A-16 (Coordination of
+Geographic Infrastructure and Related Spatial Data Activities)
+began this process.<br />
+<br />
+Larry Mayer's statement to congress: <a href=
+"http://www7.nationalacademies.org/ocga/testimony/Natl_Needs_for_Coastal_Mapping_and_Charting.asp">
+Statement of Larry A. Mayer, Ph.D.</a>
+<pre>
+...
+Let me set my remarks in context by saying a few words about the
+importance of coastal and ocean mapping. We are a maritime nation. We
+depend on the oceans and coastal zones for commerce, for food, for
+resources, for recreation, for regulating our environment and climate,
+and for national security. Under Article 76 of the Law of the Sea
+Treaty, mapping can also serve to extend our sovereignty over seafloor
+resources far beyond our current 200 nm Exclusive Economic Zone
+(EEZ). Ninety-five percent of our nation's imports, by weight, are
+transported by sea and fourteen of the country's twenty largest urban
+centers are located on the coast. To assure safe navigation, to
+explore for, exploit and preserve our resources, to understand climate
+change and to protect our environment and our security, we need
+accurate maps of our offshore regions that tie in with the accurate
+maps that exist onshore.
+...
+</pre>
+<br />
+<br />
+The National Research Council report, <a href=
+"http://www.nap.edu/catalog.php?record_id=10947#description">A
+Geospatial Framework for the Coastal Zone: National Needs for
+Coastal Mapping and Charting</a> [national academies press] can be
+read online.<br />
+<br />
+<!-- Start NAP Book Display -->
+<br />
+<br />
+<table style=
+"BORDER-RIGHT: black 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: black 1px solid; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; BORDER-LEFT: black 1px solid; WIDTH: 158px; PADDING-TOP: 0px; BORDER-BOTTOM: black 1px solid; HEIGHT: 200px; line-height: 10px; background-color: #ffffff;"
+cellspacing="0" cellpadding="0" width="158" border="0" height=
+"200">
+<tbody>
+<tr>
+<td style=
+"PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; WIDTH: 129px; PADDING-TOP: 0px; HEIGHT: 38px;"
+valign="top" align="right" width="129" colspan="2" height="38">
+<img style=
+"VERTICAL-ALIGN: top; WIDTH: 129px; HEIGHT: 38px; border: none; margin: 0; padding: 0;"
+src="http://images.nap.edu/images/widgetdisplay_nap1.gif" width=
+"129" height="38" alt="" border="0" align="top" /></td>
+<td style=
+"VERTICAL-ALIGN: top; WIDTH: 29px; BACKGROUND-COLOR: #990000; padding: 0; margin: 0;"
+valign="top" align="left" width="29" bgcolor="#990000" rowspan="4">
+<img height="200" alt="" src=
+"http://images.nap.edu/images/widgetdisplay_nap2.gif" width="29"
+valign="top" style=
+"VERTICAL-ALIGN: top; WIDTH: 29px; border: none; margin: 0; padding: 0;" /></td>
+</tr>
+<tr>
+<td valign="top" width="130" style=
+"width: 130px; padding: 0; margin: 0; vertical-align: top; text-align: center; height: 50px;">
+<div style=
+"PADDING-RIGHT: 5px; PADDING-LEFT: 0px; PADDING-BOTTOM: 10px; WIDTH: 115px; PADDING-TOP: 2px; HEIGHT: 50px; VERTICAL-ALIGN: top; margin: 0;">
+<!-- insert book title -->
+<a style=
+"PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; FONT: 11/13px arial; COLOR: #990000; PADDING-TOP: 0px; text-decoration: underline;"
+href=
+"http://www.nap.edu/catalog.php?record_id=10947&amp;utm_source=Network&amp;utm_medium=Widgetv2&amp;utm_content=v2&amp;utm_campaign=Widget"
+target="_blank">A Geospatial Framework for the Coastal Zone:
+...</a></div>
+</td>
+</tr>
+<tr>
+<td align="middle" width="130">
+<!-- insert tinycov image --><img style=
+"BORDER-RIGHT: #000 1px solid; BORDER-TOP: #000 1px solid; BORDER-LEFT: #000 1px solid; BORDER-BOTTOM: #000 1px solid; padding: 0; margin: 0"
+alt="" src=
+"http://images.nap.edu/images/cover.php?id=10947&amp;type=tinycov"
+width="70" /></td>
+</tr>
+<tr>
+<td style=
+"PADDING-RIGHT: 2px; PADDING-LEFT: 2px; PADDING-BOTTOM: 2px; PADDING-TOP: 2px"
+valign="top" align="middle"><span style=
+"PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; FONT: 11px arial; PADDING-TOP: 0pxcolor:#000000;">
+Read this FREE online!<br />
+<a style=
+"PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; FONT: 9px arial; COLOR: #990000; PADDING-TOP: 0px; text-decoration: underline;"
+href=
+"http://www.nap.edu/openbook.php?record_id=10947&amp;utm_source=Network&amp;utm_medium=Widgetv2&amp;utm_content=v2&amp;utm_campaign=Widget">
+Full Book</a> | <a style=
+"PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; FONT: 9px arial; COLOR: #990000; PADDING-TOP: 0px; text-decoration: underline;"
+href=
+"http://www.nap.edu/nap-cgi/execsumm.cgi?record_id=10947&amp;utm_source=Network&amp;utm_medium=Widgetv2&amp;utm_content=v2&amp;utm_campaign=Widget">
+PDF Summary</a> | <a style=
+"PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; FONT: 9px arial; COLOR: #990000; PADDING-TOP: 0px; text-decoration: underline;"
+href=
+"http://dels.nas.edu/dels/rpt_briefs/coastal_mapping_final.pdf?utm_source=Network&amp;utm_medium=Widgetv2&amp;utm_content=v2&amp;utm_campaign=Widget">
+PDF Report Brief</a></span></td>
+</tr>
+</tbody>
+</table>
+<!-- End NAP Book Display --></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-28T10_54_22.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-28T13_06_26.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-28T08_20_52.txt" name=
+"e2008-01-28T08_20_52.txt"></a>
+<h2 class="date">01.28.2008 08:20</h2>
+<div class="blogbody">
+<h3 class="title">Leopard Server review</h3>
+<div class="item-description">10.5 Server version...<br />
+<br />
+<pre>
+...
+Leopard Server continues the OS X Server tradition of delivering
+platform-independent file/print, e-mail, Web, and network edge
+services (such as stateful firewall, VPN, proxy, virus, and spam
+filtering). But it is as easy to set up and run as a desktop. Truly;
+the typical Mac user could get a Leopard Server going, because the
+default administrative interface is a match for a Mac's System
+Preferences.
+...
+<b>Open and mighty</b>
+Apple, which has been known to approach challenges by inventing
+proprietary wheels, went full-bore on public standards with Leopard
+Server. Standouts among Leopard Server's standard standards are CalDAV
+shared calendars, Jabber/XMPP, Apache 2.2, Ruby on Rails with Mongrel
+and Capistrano, IPSec and PPTP VPN, RSS, and Kerberos. Apple went
+proprietary only on the underlying plumbing of management GUIs. SNMPv3
+is supported for monitoring with open tools. 
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-28T08_20_52.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-28T10_54_22.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-27T17_02_22.txt" name=
+"e2008-01-27T17_02_22.txt"></a>
+<h2 class="date">01.27.2008 17:02</h2>
+<div class="blogbody">
+<h3 class="title">fink update-alternatives</h3>
+<div class="item-description">I finally did my first fink package
+using update-alternatives as opposed to using a -bin package. The
+idea here is to be able to have multiple versions of grass
+installed at the same time and have a default "best" version
+installed. Then if the user wishes, they can tell the system to
+switch to a different version if they need it. From my draft fink
+info file for grass62:
+<pre>
+PostInstScript: &lt;&lt;
+ <font color=
+"orange"> # assumes that the name has the version at the end... %n is grass62</font>
+  update-alternatives --install <font color=
+"#008000">"%p/bin/grass"</font> grass <font color=
+"#008000">"%p/bin/%n"</font> 62
+&lt;&lt;
+PreRmScript: &lt;&lt;
+  if [ <font color="#2040A0">$1</font> != <font color=
+"#008000">"upgrade"</font> ]; then
+    update-alternatives --remove grass <font color=
+"#008000">"%p/bin/%n"</font>
+  fi
+&lt;&lt;
+</pre>
+From "man update-alternatives":
+<pre>
+  update-alternatives  [options]  --install  link  name path priority [--slave
+       link name path]...
+</pre>
+Here is setting up the link, checking it, and removing it all by
+the system administrator.
+<pre>
+% <b>ls -l /sw/bin/grass*</b>
+-rwxr-xr-x 1 root admin 1094 Jan 27 15:38 /sw/bin/grass62
+% <b>sudo update-alternatives --install /sw/bin/grass grass /sw/bin/grass62 62</b>
+% <b>ls -l /sw/bin/grass*</b>
+lrwxr-xr-x 1 root admin   26 Jan 27 16:55 /sw/bin/grass -&gt; /sw/etc/alternatives/grass
+-rwxr-xr-x 1 root admin 1094 Jan 27 15:38 /sw/bin/grass62
+% <b>update-alternatives --display grass</b>
+grass - status is auto.
+ link currently points to /sw/bin/grass62
+/sw/bin/grass62 - priority 62
+Current `best' version is /sw/bin/grass62.
+% <b>sudo update-alternatives --remove grass /sw/bin/grass62 --verbose</b>
+Checking available versions of grass, updating links in /sw/etc/alternatives ...
+(You may modify the symlinks there yourself if desired - see `man ln'.)
+Last package providing grass (/sw/bin/grass) removed, deleting it.
+% <b>ls -l /sw/bin/grass*</b>
+-rwxr-xr-x 1 root admin 1094 Jan 27 15:38 /sw/bin/grass62
+</pre>
+Pretty cool stuff! Just remember to only use integers for the
+priority.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-27T17_02_22.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-28T08_20_52.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-27T16_00_51.txt" name=
+"e2008-01-27T16_00_51.txt"></a>
+<h2 class="date">01.27.2008 16:00</h2>
+<div class="blogbody">
+<h3 class="title">grass 6.2.3 in fink</h3>
+<div class="item-description">I've got a draft info file for the
+latest grass stable release (6.2.3). If you are a grass user on mac
+osx 10.5, I could really use some testers. I've enabled
+postgresql82, but that is about it for extensions at this
+point.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/software/fink/grass62.info">grass62.info</a><br />
+
+<br />
+<img src=
+"../attachments/2008-01/grass62.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-27T16_00_51.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-27T17_02_22.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-27T13_38_06.txt" name=
+"e2008-01-27T13_38_06.txt"></a>
+<h2 class="date">01.27.2008 13:38</h2>
+<div class="blogbody">
+<h3 class="title">dual core workout</h3>
+<div class="item-description">My new Core 2 Duo is getting a
+workout today... the <a href=
+"http://www.ragingmenace.com/software/menumeters/">menumeter</a>
+load display:<br />
+<br />
+<img src=
+"../attachments/2008-01/menumeter-load.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-27T13_38_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-27T16_00_51.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-27T13_09_37.txt" name=
+"e2008-01-27T13_09_37.txt"></a>
+<h2 class="date">01.27.2008 13:09</h2>
+<div class="blogbody">
+<h3 class="title">irc logs</h3>
+<div class="item-description">pinson on the fink IRC channel posted
+some links to IRC logs. These are great examples how IRC is
+actually a work tool and not just for warez, crackers, and other
+less than acceptable hobbies.<br />
+<br />
+From fink <a href=
+"http://ircbrowse.com/channel/fink/20080125">20080125</a>:<br />
+<br />
+<img src=
+"../attachments/2008-01/fink-irc-log.png" />
+<ul>
+<li><a href=
+"http://ircbrowse.com/index.html">http://ircbrowse.com/index.html</a></li>
+<li><a href=
+"http://ircbrowse.com/cdates.html?channel=fink">http://ircbrowse.com/cdates.html?channel=fink</a></li>
+<li><a href=
+"http://www.ircbrowse.com/channel/fink/today">http://www.ircbrowse.com/channel/fink/today</a></li>
+<li><a href=
+"http://www.opennms.org/~ranger/irc_logs/public/">http://www.opennms.org/~ranger/irc_logs/public/</a></li>
+</ul>
+I am working on grass62, r 2.6.1, and qgis 0.9.1 fink packages
+today. Also contemplating matplotlib. A number of projects I am
+working on are having huge pushes over the next month and having
+these working would be a huge advantage.<br />
+<br />
+More to do. Getting these shared libraries straightened out takes a
+while with packages the take a long time to compile.
+<pre>
+% fink validate grass62-shlibs_6.2.3-1_darwin-i386.deb
+Validating .deb file /sw/fink/10.4/local/main/binary-darwin-i386/sci/grass62-shlibs_6.2.3-1_darwin-i386.deb...
+Error: File name '/sw/lib/grass-6.2.3/lib/libgrass_D.6.2.3.dylib' specified in Shlibs does not match install_name '/sw/lib/grass-6.2.3/lib/libgrass_D.dylib'
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-27T13_09_37.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-27T13_38_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-26T13_26_06.txt" name=
+"e2008-01-26T13_26_06.txt"></a>
+<h2 class="date">01.26.2008 13:26</h2>
+<div class="blogbody">
+<h3 class="title">SPRING GIS</h3>
+<div class="item-description">Maria mentioned <a href=
+"http://www.dpi.inpe.br/spring/english/">SPRING</a> GIS to me. I
+haven't heard of this one before. I was just working on packaging
+issues for qgis and grass63 in fink.
+<pre>
+SPRING is a state-of-the-art GIS and remote sensing image processing
+system with an object-oriented data model which provides for the
+integration of raster and vector data representations in a single
+environment. SPRING is a product of Brazil's National Institute for
+Space Research (INPE/DPI Image Processing Division).
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-26T13_26_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-27T13_09_37.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-25T11_47_21.txt" name=
+"e2008-01-25T11_47_21.txt"></a>
+<h2 class="date">01.25.2008 11:47</h2>
+<div class="blogbody">
+<h3 class="title">States and shiptracks in mapserver</h3>
+<div class="item-description">With help from Hobu, I was able to
+get both the states from a shapefile and ship tracks from postgis
+working in a map that is projected into the Google epsg:900913
+mercator projection. The trick is to specify the projection of each
+layer.
+<pre>
+MAP
+  SIZE 512 512
+  UNITS METERS
+  EXTENT  -7925000 5240000 -7825000 5400000
+  PROJECTION
+   <font color="#008000">"init=epsg:900913"</font>
+  END
+  LAYER
+    NAME states
+    TYPE POLYGON
+    STATUS DEFAULT
+    PROJECTION
+      <font color="#008000">"init=epsg:4326"</font>
+    END
+    DATA statesp020/statesp020.shp
+    CLASS
+      STYLE
+        OUTLINECOLOR 100 100 100
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+ <font color="orange"> #</font>
+ <font color="orange"> # Now access the database</font>
+ <font color="orange"> #</font>
+  LAYER
+    NAME <font color="#008000">"shiptrack"</font>
+    PROJECTION
+      <font color="#008000">"init=epsg:4326"</font>
+    END
+    CONNECTIONTYPE postgis
+    CONNECTION <font color=
+"#008000">"host=localhost dbname=ais user=postgres port=5432"</font>
+    DATA <font color="#008000">"track from track_lines"</font>
+    TYPE LINE
+    STATUS ON
+    CLASS
+      NAME <font color="#008000">"Ship Tracks"</font>
+      STYLE
+        COLOR 255 0 0
+        WIDTH 2
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+END<font color="orange"> # MAP</font>
+</pre>
+<img src=
+"../attachments/2008-01/mapserver-ships-900913.png" /><br />
+
+<br />
+<b>Note:</b> Hobu has an RFC in requesting a change to the
+mapserver projection behavior. <a href=
+"http://mapserver.gis.umn.edu/development/rfc/ms-rfc-37/">MS RFC
+37: MapServer Spatial Reference Improvements and
+Additions</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-25T11_47_21.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-26T13_26_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-25T11_01_17.txt" name=
+"e2008-01-25T11_01_17.txt"></a>
+<h2 class="date">01.25.2008 11:01</h2>
+<div class="blogbody">
+<h3 class="title">Google project with mapserver</h3>
+<div class="item-description">Turns out that with mapserver, for
+data files, it is up to the user to specify the projection of files
+used in layers. Here is my map file for my previous hello world
+example now done up in the google mercator projection.
+<pre>
+MAP
+  SIZE 512 512
+  PROJECTION
+   <font color="#008000">"init=epsg:900913"</font> <font color=
+"orange"># Google Maps projection</font>
+  END
+  UNITS METERS <font color="orange"># Have to work in meters</font>
+  EXTENT  -7925000 5240000 -7825000 5400000 <font color=
+"orange"># Ouch... guess where this is</font>
+  LAYER
+    NAME states
+    TYPE POLYGON
+    STATUS DEFAULT
+    PROJECTION
+      <font color="#008000">"init=epsg:4326"</font> <font color=
+"orange"># Tell mapserver that this is geographic with WGS84 ellps and datum</font>
+    END
+    DATA statesp020/statesp020.shp
+    CLASS
+      STYLE
+        OUTLINECOLOR 100 100 100
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+END<font color="orange"> # MAP</font>
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-25T11_01_17.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-25T11_47_21.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-25T09_42_31.txt" name=
+"e2008-01-25T09_42_31.txt"></a>
+<h2 class="date">01.25.2008 09:42</h2>
+<div class="blogbody">
+<h3 class="title">mapserver hello world</h3>
+<div class="item-description">I figured I had better get the basics
+down if I am going to debug some projection issues, so here is my
+"hello world" for mapserver. It would be better if I had "hello
+world" written out, but this is pretty simple.
+<pre>
+% http://edcftp.cr.usgs.gov/pub/data/nationalatlas/statesp020.tar.gz
+% (mkdir statesp020 &amp;&amp; cd statesp020 &amp;&amp; tar xf ../statesp020.tar.gz)
+</pre>
+Now make this mapfile as mapserver-helloworld.map:
+<pre>
+MAP
+  SIZE 512 512
+  EXTENT -71.25 42.5 -70.25  43.5
+  LAYER
+    NAME states
+    TYPE POLYGON
+    STATUS DEFAULT
+    DATA statesp020/statesp020.shp
+    CLASS
+      STYLE
+        OUTLINECOLOR 100 100 100
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+END<font color="orange"> # MAP</font>
+</pre>
+Now, make the map:
+<pre>
+% shp2img -m mapserver-helloworld.map -o mapserver-helloworld.png -i png
+% display mapserver-helloworld.png
+</pre>
+Now you should see a map of the NH Sea Coast area.<br />
+<br />
+<img src=
+"../attachments/2008-01/mapserver-helloworld.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-25T09_42_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-25T11_01_17.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-25T09_14_14.txt" name=
+"e2008-01-25T09_14_14.txt"></a>
+<h2 class="date">01.25.2008 09:14</h2>
+<div class="blogbody">
+<h3 class="title">National Atlas</h3>
+<div class="item-description">I haven't been thinking about this
+stuff much lately, so this is probably something the GIS pros out
+there have been using for a long time.<br />
+<br />
+The United States <a href="http://nationalatlas.gov/">National
+Atlas</a> [nationalatlas.gov]<br />
+<br />
+I am behind my verizon EVDO link, so I am only going to download
+what I need, but there looks to be a lot of useful background
+geospatial data.
+<pre>
+% wget http://edcftp.cr.usgs.gov/pub/data/nationalatlas/statesp020.tar.gz
+% ogr2ogr -f KML statesp020.{kml,shp}
+% open statesp020.kml
+</pre>
+Looks pretty good, but Alaska has got issues. I'm only looking in
+New England, so it will work for me.<br />
+<br />
+<img src=
+"../attachments/2008-01/nationalatlas-states.png" />
+<br />
+<br />
+They even have a<a href=
+"http://nationalatlas.gov/atlasftp-na.html?openChapters=chpgeol#chpgeol">North
+American Atlas - Bathymetry</a>. The US Geology looks interesting
+too.<br />
+<br />
+This page has the most interesting set of layers: <a href=
+"http://nationalatlas.gov/atlasftp.html?openChapters=chpgeol#chpgeol">
+Geology: Earthquakes, Landslides, Shaded Relief,
+Volcanoes...</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-25T09_14_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-25T09_42_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-25T07_10_41.txt" name=
+"e2008-01-25T07_10_41.txt"></a>
+<h2 class="date">01.25.2008 07:10</h2>
+<div class="blogbody">
+<h3 class="title">Nippon Foundation GEBCO training program in Ocean
+Mapping at UNH</h3>
+<div class="item-description">The Ocean Mapping 1 year program here
+has been funded for the 2008-2009 year. If you are in and around
+hydrography, please apply. The program will pay for your one year
+program and I have to admit that I am jealous of the course work
+that the Nippon/GEBCO students go through. Classes like these were
+not offered at any of the universities where I have studied. There
+is no longer the requirement for applicants to come from developing
+nations. More information can be found here:<br />
+<br />
+Nippon Foundation/Gebco Training Project - <a href=
+"http://www.ngdc.noaa.gov/mgg/gebco/traininginformation.html">Postgraduate
+Certificate in Ocean Bathymetry</a> [noaa.gov]<br />
+<br />
+The preliminary application is due Feb 25th. If you are interested,
+download the application and get it in right now!<br />
+<br />
+Also, check out where the <a href=
+"http://www.jhc.unh.edu/index.php?p=35&amp;page=gebco_nippon.php">current
+students are from</a>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-25T07_10_41.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-25T09_14_14.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-24T20_09_57.txt" name=
+"e2008-01-24T20_09_57.txt"></a>
+<h2 class="date">01.24.2008 20:09</h2>
+<div class="blogbody">
+<h3 class="title">EPA visit</h3>
+<div class="item-description">Today, we met with a number of people
+from the EPA at UNH. They have a large amount of information
+available via ARC IMS. More interesting to me is that a number of
+<a href="http://www.r-project.org/">R</a> scripts that are running
+behind the scenes. Here are some screen shots I grabbed from my
+browser as we were discussing some of their capabilities.<br />
+<br />
+The National Coastal Assesment: <a href=
+"http://www.nj.gov/dep/bmw/NCA/NCASediment.html">NJDEP Marine Water
+Monitoring - MCA Sediment Results in NJ</a> [nj.gov]<br />
+<br />
+<img src=
+"../attachments/2008-01/epa-1.png" /><br />
+<br />
+<a href="http://www.epa.gov/emap/nca/">NCA Map Server</a> [epa.gov]
+Using the mouse in info mode, you can get sediment toxicity.<br />
+<br />
+<img src=
+"../attachments/2008-01/epa-2.png" /><br />
+<br />
+There is access from these services to the data tables:<br />
+<br />
+<img src=
+"../attachments/2008-01/epa-3.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-24T20_09_57.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-25T07_10_41.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-24T16_20_47.txt" name=
+"e2008-01-24T16_20_47.txt"></a>
+<h2 class="date">01.24.2008 16:20</h2>
+<div class="blogbody">
+<h3 class="title">gdal for mac osx fink</h3>
+<div class="item-description">Thanks to Etsushi Kato, I fixed a
+long standing bug in the fink package for gdal. gdal-config
+--cflags was returning /sw/include when is should have been
+returning /sw/include/gdal1. The magic trick is to add this line to
+ConfigureParams:
+<pre>
+--includedir=%p/include/gdal1
+</pre>
+BTW, ORT8 for Phoenix is underway. Looking for RKSML. Have you seen
+any good ones lately?</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-24T16_20_47.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-24T20_09_57.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-23T18_24_40.txt" name=
+"e2008-01-23T18_24_40.txt"></a>
+<h2 class="date">01.23.2008 18:24</h2>
+<div class="blogbody">
+<h3 class="title">how do you debug mapserver?</h3>
+<div class="item-description">How do you debug mapserver apps? Rob
+and I think we have the postgis database setup correctly, but it
+only works in geographic, but going to the funky Google projection,
+nothing comes up. We tried this, but I don't see anything extra
+going anyplace to tell me what is happening.
+<pre>
+shp2img -layer_debug shiptrack -map_debug 3 -all_debug 10000 -m ships.map &gt; ~/foo3.png
+</pre>
+<br />
+<br />
+So I am working on making a fink package of the python interface
+for mapserver5 (mapscript-py25). Maybe I can see what in the world
+is going on. It builds... maybe it will tell me more.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/software/fink/mapscript-py.info">
+mapscript-py.info</a><br />
+<br />
+See Alse: <a href=
+"http://mapserver.gis.umn.edu/docs/howto/mapscript_python">mapscript
+python</a> [mapserver.gis.umn.edu]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-23T18_24_40.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-24T16_20_47.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-23T09_27_16.txt" name=
+"e2008-01-23T09_27_16.txt"></a>
+<h2 class="date">01.23.2008 09:27</h2>
+<div class="blogbody">
+<h3 class="title">RTCM AIS binaries for VTS meeting yesterday</h3>
+<div class="item-description">Yesterday was the RTCM SC121 Working
+Group on Expanded Use of AIS within VTS meeting at the USCG RDC in
+Groton, CT. We had a very productive meeting that covered a wide
+range of topics. Most importantly for me, there was a big
+discussion on three proposed AIS binary messages. We focused on the
+meteorology and hydrography (met/hydro) message. The group has
+decided to create a message that can roll up a set of various
+sensor measurements from a station. The message will have a
+variable number of reports and the censor type for each sub-report
+can be variable. This is going to force me to extend my XML
+description language, which is something I needed to do anyway. I
+need a "switch" construct to handle the communications state in the
+position reports anyway.<br />
+<br />
+I am currently thinking along the following lines. <b>Please give
+me feedback on this!</b><br />
+<br />
+For arrays, there are two possible cases. I think it is always
+better to specify how many groups there are going to be. The code
+then will just loop through the data.
+<pre>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"some_number"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"3"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Number of data items in the array<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">arraygroup</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"sensor_report"</font> <font color=
+"#2040A0">length=</font><font color=
+"#008000">"some_number"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Some description<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"field1"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"5"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Some sensor value<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"field2"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"6"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Another sensor value<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/arraygroup</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+In some of the existing binary messages, the authors counted on the
+length of the data received to figure out how many groups there
+will be. Please do not create any more of these types, but here is
+how I would code these messages:
+<pre>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">arraygroup</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"_GUESS_"</font> <font color=
+"#2040A0">length=</font><font color=
+"#008000">"some_number"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"field1"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"5"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Some sensor value<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"field2"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"6"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Another sensor value<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/switch</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+For the <b>switch</b> construct, I had something like this flat
+structure before. This made parsing easier than a deep structure.
+However, I don't think this will work for all of the ways the group
+wants to represent data.
+<pre>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"slotoffset"</font> <font color=
+"#2040A0">start=</font><font color=
+"#008000">"154"</font> <font color=
+"#2040A0">end=</font><font color="#008000">"167"</font> <font color="#2040A0">numberofbits=</font><font color="#008000">"14"</font> <font color="#2040A0">type=</font><font color="#008000">"unsigned int"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>In what slot will the next transmission occur<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">case</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">fieldname</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>slottimeout<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/fieldname</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">values</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>0<font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/values</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/case</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">range</font> <font color=
+"#2040A0">min=</font><font color="#008000">"0"</font> <font color=
+"#2040A0">max=</font><font color=
+"#008000">"2249"</font><font color="#2040A0">/</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font> 
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font> 
+</pre>
+I am thinking more along these lines that will be more familar to
+programmers.
+<pre>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"some_number"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"4"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Which item to use in the switch<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">switch</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"switchname"</font> <font color=
+"#2040A0">use=</font><font color=
+"#008000">"some_number"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">case</font> <font color=
+"#2040A0">values=</font><font color=
+"#008000">"0"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"field1"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"5"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Some sensor value<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/case</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">case</font> <font color=
+"#2040A0">values=</font><font color=
+"#008000">"1 3"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"field2"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"6"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Illustrating multiple values for a case as in commstate<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">case</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">case</font> <font color=
+"#2040A0">values=</font><font color=
+"#008000">"2"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"field2"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"6"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"unsigned int"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Another sensor value<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">case</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/arraygroup</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+One big problem with the above changes comes with automatic SQL
+database table creation. Do I fully expand all possible columns for
+a table resulting in a very wide database table that is mostly
+empty? Or do I split each case into a separate table? In this case
+receiving a 3 sub-report met/hydro message would result in a SQL
+block with inserts into three separate tables. I think that I
+should add a hinting tag on how to handle sql tables.<br />
+<br />
+This is going to take some serious coding effort on my part. The
+way I have my compiler structured, it is going to be almost a
+complete rewrite. Maybe I will start to output C++ code this time
+around in addition to python.<br />
+<br />
+D. Pietraszewski gave us a quick run through on AIS message types
+25 and 26. I have not read through the ITU 1371-3 specification
+yet, so this was really helpful for me. Message 25 is especially
+interesting. It is designed to fit in exactly one slot and allows
+for units to do a carrier sense (CS) before transmitting a binary
+message. This will allow units to play nicer with the VHF Data Link
+and cause fewer packet collisions. However, that doesn't give us
+very many bits for application data. It can be either addressed for
+98 bits of data or broadcast for 128 bits of payload.<br />
+<br />
+Message 26 is another binary message type. This addressed or
+broadcast message like message 25, but adds multiple slots and
+communications state. I wish they had put the comm state before the
+variable length binary data, but nobody asked me. Adding the
+communications state will allow broadcast messages to be scheduled
+into slots such that all transponders in a cell will know when to
+expect the next broadcast message.<br />
+<br />
+Somewhere on 395 in CT:<br />
+<br />
+<img src=
+"../attachments/2008-01/ct.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-23T09_27_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-23T18_24_40.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-23T07_46_07.txt" name=
+"e2008-01-23T07_46_07.txt"></a>
+<h2 class="date">01.23.2008 07:46</h2>
+<div class="blogbody">
+<h3 class="title">Stanford's new Center for Ocean Solutions</h3>
+<div class="item-description"><a href=
+"http://news-service.stanford.edu/news/2008/january16/cos-011608.html">
+$25 million Packard Foundation grant establishes Center for Ocean
+Solutions</a> [stanford.edu]<br />
+<br />
+<a href=
+"http://www.centerforoceansolutions.org/">centerforoceansolutions.org</a>
+<pre>
+...
+To address these and other major threats to the marine environment,
+Stanford, the Monterey Bay Aquarium and the Monterey Bay Aquarium
+Research Institute (MBARI) have joined forces to create the Center for
+Ocean Solutions, a new collaboration that will bring together
+international experts in marine science and policy to find innovative
+ways to protect and restore the world's oceans.
+.
+The David and Lucile Packard Foundation provided a $25 million grant
+to establish the new center near the Monterey Bay Aquarium-one of the
+world's top aquariums, with more than 42 million visitors since
+1984-and Stanford's Hopkins Marine Station, the oldest marine research
+lab on the West Coast. MBARI, a leading independent oceanographic
+research institution, is located about 20 miles to the north in Moss
+Landing.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-23T07_46_07.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-23T09_27_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-21T20_24_50.txt" name=
+"e2008-01-21T20_24_50.txt"></a>
+<h2 class="date">01.21.2008 20:24</h2>
+<div class="blogbody">
+<h3 class="title">ActiveCaptain Mobile - beta</h3>
+<div class="item-description">Panbo has a <a href=
+"http://www.panbo.com/archives/2008/01/activecaptain_mobile_in_beta_at_last.html">
+post</a> that <a href="http://activecaptain.com/">Active
+Captain</a> is in beta.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-21T20_24_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-23T07_46_07.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-21T14_16_40.txt" name=
+"e2008-01-21T14_16_40.txt"></a>
+<h2 class="date">01.21.2008 14:16</h2>
+<div class="blogbody">
+<h3 class="title">Batch of fink package updates</h3>
+<div class="item-description">I just committed a big batch of fink
+package updates:
+<pre>
+database/sqlalchemy-py.info
+devel/astng-py.info
+devel/gengetopt.info
+devel/logilab-common-py.info
+devel/pylint-py.info
+languages/setuptools-py.info
+libs/magicdate-py.info
+sci/dap-py.info
+sci/pcl-core-py.info
+sci/quadtree-py.info
+text/lxml-py.info
+x11/xtermcontrol.info
+</pre>
+Some of the above updates are just fixing the homepage listed for
+the package. Clearsilver needs some serious reworking and I totally
+ignored pdflib, which is drastically behind the times.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-21T14_16_40.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-21T20_24_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-21T14_13_47.txt" name=
+"e2008-01-21T14_13_47.txt"></a>
+<h2 class="date">01.21.2008 14:13</h2>
+<div class="blogbody">
+<h3 class="title">UN Law of the Sea</h3>
+<div class="item-description">From Jane's:
+<pre>
+<b>US should adopt sea law treaty, urges coastguard chief</b>
+The US military's ability to operate in the Arctic Ocean will be
+severely hampered over the long term if the United States fails to
+adopt the UN Convention of the Law of the Sea (UNCLOS), the head of
+the US Coast Guard has told Jane's . Admiral Thad Allen, Commandant of
+the US Coast Guard, warned that the US will have difficulty defining
+its role in the international response to oil spills and other
+emergencies in the Arctic unless it joins the UNCLOS
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-21T14_13_47.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-21T14_16_40.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-21T10_14_05.txt" name=
+"e2008-01-21T10_14_05.txt"></a>
+<h2 class="date">01.21.2008 10:14</h2>
+<div class="blogbody">
+<h3 class="title">mbsystem, coin 2.5.0, and density for fink
+10.5</h3>
+<div class="item-description">I gave it a go and I've got coin
+2.5.0 (coin46) working for Mac OSX 10.5 and everything needed to
+build density so that I can use simpleview on my laptops. I used
+SetLDFLAGS to make them work:
+<pre>
+SetLDFLAGS: -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+</pre>
+mbsystem gave me more trouble. There is a missing symbol issue with
+GLwCreateMDrawingArea that I don't know how to fix. As a result,
+mbsystem for 10.5 does not have mbview, but the rest of mbsystem
+should work.<br />
+<br />
+For gdal, I committed the 10.5 gdal 1.5.0 and the associated python
+module. Soon, I will push that back down to 10.4. The new python
+module is gdal-py25 rather than the old gdal-python-py2[45]. I am
+trying to drop support for python 2.4 as fast as I can.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-21T10_14_05.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-21T14_13_47.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-20T19_55_50.txt" name=
+"e2008-01-20T19_55_50.txt"></a>
+<h2 class="date">01.20.2008 19:55</h2>
+<div class="blogbody">
+<h3 class="title">php5 and mapserver5 custom info files</h3>
+<div class="item-description">I've got some draft info files that
+"work for me," but I won't be committing these into fink just yet.
+You are welcome to download them. If you do, please let me know how
+it goes. Someone recently asked me if fink is dead. Definitely not!
+But, I personally need more people to send me reports when my
+packages do not work. And, it doesn't hurt to look in the info file
+to see what is going on.<br />
+<br />
+You can see my list of fink packages here:<br />
+<br />
+<a href=
+"http://pdb.finkproject.org/pdb/browse.php?maintainer=Kurt%20Schwehr">
+maintainer=Kurt Schwehr</a> [fink pdb]<br />
+<br />
+<b>php5</b><br />
+<br />
+For php5 The Sin says that he is close to having a new set of info
+files for apache2 and php5. Right now, imap support is causing the
+build to fail. I tried my hand at fixing the existing php5, but no
+luck. This file that I put up switch from postgresql80 to
+postgresql82 and rips out imap support.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/software/fink/php5-10.5.info">php5-10.5.info</a><br />
+
+<br />
+<b>mapserver 5.0.0</b><br />
+<br />
+mapserver 5.0.0 builds for me, but I am not presently setup to try
+it out. I still need to work on getting libgeos3 + mapserver
+support and I have not tried building mapscript yet. That was why I
+was trying to build php5.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/software/fink/mapserver.info">mapserver.info</a><br />
+
+<br />
+<b>mbsystem</b> needs some attention. I think it is suffering from
+the OpenGL bug that Apple introduced. Hopefully, I will get to this
+soon.<br />
+<br />
+<a href=
+"http://wiki.finkproject.org/index.php/Fink:Packaging:Preparing_for_10.5">
+Preparing_for_10.5</a> [fink wiki] suggests something linke this
+for LDFLAGS:
+<pre>
+-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+</pre>
+<b>xsonar</b> is on the radar. I am waiting to hear from Bill,
+Jenna and Liz how the testing is going. I also hear rumors that
+Danni has been looking at the problem too, but that is second
+hand.<br />
+<br />
+<b>coin</b> is farther down my list but will get bumped up soon for
+Phoenix operations usage. <b>cwp-su</b> (seimic unix) is prett low
+on the list right now. And for the rest, I really need to run
+through and check on them. There are 90 packages listed for me, but
+there is not really that many as many are various python
+variants.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-20T19_55_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-21T10_14_05.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-19T17_45_42.txt" name=
+"e2008-01-19T17_45_42.txt"></a>
+<h2 class="date">01.19.2008 17:45</h2>
+<div class="blogbody">
+<h3 class="title">CCOM Makes Wired</h3>
+<div class="item-description">Go Michelle! She has a <a href=
+"http://michellejw.wordpress.com/2008/01/19/ccom-in-wired-magazine/">
+blog post</a> where she points out that CCOM made Wired.
+Nice!<br />
+<br />
+<a href=
+"http://www.wired.com/science/planetearth/magazine/16-02/mf_continentalshelf?currentPage=1">
+Foreigners Keep Out! High Tech Mapping Starts to Redefine
+International Borders</a><br />
+<br />
+Not a great title and there has been a lot of miss-representation
+about what went on in the Arctic this last summer. So that is it is
+clear: The US was already sending the USCG Ice Breaker Healy up
+there before the Russians pulled their titanium flag stunt.<br />
+<br />
+<pre>
+...
+Some 3,200 miles and 47 degrees of latitude away, at the University of
+New Hampshire's Center for Coastal and Ocean Mapping (CCOM), Jim
+Gardner followed the action with intense interest and a wry smile. One
+of the country's foremost marine geologists, Gardner knew the
+flag-planting itself was meaningless; it gave the Russians as much
+legal claim to the undersea Arctic as the US got to the moon when
+Armstrong and Aldrin put up the Stars and Stripes in the Sea of
+Tranquility. He also knew, however, that the Russians had a legitimate
+reason to celebrate. The stunt capped off a Russian study of vast
+swaths of uncharted seafloor, including the survey of an undersea
+mountain range called the Lomonosov Ridge. Canada and Denmark are also
+arguing that the ridge is their own, but Russia's new maps could prove
+it actually belongs to Moscow. And it's this kind of work - not the
+flag-planting - that is at the center of the current "landgrab" in the
+Arctic, and indeed across the globe.
+...
+</pre>
+<br />
+<br />
+<a href=
+"http://ccom.unh.edu/index.php?p=39|46&amp;page=law_of_the_sea.php">
+Law of the Sea Mapping Program</a> at CCOM/UNH. Feel free to head
+over there and download the data. It's free.<br />
+<br />
+Here is a CCOM map of the work:<br />
+<br />
+<img src=
+"../attachments/2008-01/unclos_map.gif" /><br />
+
+<br />
+And last May, I presented the idea of accessing this data via
+Google Earth. Image is by Schwehr, Gardner, and Sullivan:<br />
+<br />
+<img src=
+"../attachments/2008-01/unclos-ge-2007.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-19T17_45_42.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-20T19_55_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-19T12_13_58.txt" name=
+"e2008-01-19T12_13_58.txt"></a>
+<h2 class="date">01.19.2008 12:13</h2>
+<div class="blogbody">
+<h3 class="title">new gdal python package for fink</h3>
+<div class="item-description">With help from Hobu and Rob, I have a
+new python package for gdal using 1.5.0. It needs testing, so
+please give it a try. You can comment on the fink-gis group thread
+or email me.<br />
+<br />
+<a href=
+"http://groups.google.com/group/fink-gis/browse_thread/thread/b29398892e3308dd">
+gdal 1.5.0 with python needs testing</a> [groups.google.com]<br />
+<br />
+Please test gdal 1.5.0 and the python bindings. I'm going to give
+it a few days and then put this in place of the existing gdal. This
+is a complete rework on how python is supported. Many thanks to the
+gdal team for the improvements in packaging!<br />
+<br />
+http://vislab-ccom.unh.edu/~schwehr/software/fink/gdal-py.info
+http://vislab-ccom.unh.edu/~schwehr/software/fink/gdal.info<br />
+<br />
+Put these two files in /sw/fink/10.5/local/main/libs<br />
+<br />
+If anyone wants to take a stab a packaging other languages via the
+swig interface, let me know.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-19T12_13_58.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-19T17_45_42.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-19T11_21_54.txt" name=
+"e2008-01-19T11_21_54.txt"></a>
+<h2 class="date">01.19.2008 11:21</h2>
+<div class="blogbody">
+<h3 class="title">Raccoon</h3>
+<div class="item-description">This morning, I noticed a critter
+running through the yard two doors down. I've only seen a raccoon
+from the house once before and that was a Bailey discovery at night
+from the sun room. I hope this one isn't unhealthy being out during
+the day.<br />
+<br />
+Running up my driveway:<br />
+<br />
+<img src=
+"../attachments/2008-01/raccoon-1.jpg" /><br />
+
+<br />
+Trying to chase a squirrel up my maple tree:<br />
+<br />
+<img src=
+"../attachments/2008-01/raccoon-2.jpg" /><br />
+
+<br />
+He gave up on the squirrel and headed for the pine trees. He looks
+a little wet on his bottom half.<br />
+<br />
+<img src=
+"../attachments/2008-01/raccoon-3.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-19T11_21_54.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-19T12_13_58.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-19T10_02_30.txt" name=
+"e2008-01-19T10_02_30.txt"></a>
+<h2 class="date">01.19.2008 10:02</h2>
+<div class="blogbody">
+<h3 class="title">ipython notes</h3>
+<div class="item-description">I just watched part I of Jeff Roush's
+ipython videos on <a href="http://showmedo.com">showmedo</a>. I use
+ipython almost every day, but I really don't use much of its power.
+Here are some quick notes of some things that I did't know.
+<pre>
+who # list all variables
+who int # list all int variables
+whos # variables detailed listing
+psearch *sg* # List all variables that have sg in their name
+psearch *sg* int # List all variables with sg that are ints
+store msgflag # keep a variable for future sessions
+store # List store
+ls .ipython/db/autorestore/msgflag 
+logstate # Get status
+logstart
+logon
+logoff
+lsmagic
+logon?
+logon??
+p sys.path # p is an alias print
+page sys.path # pretty print
+help 'for'
+help()  # interactive help
+  topics
+  PRIVATENAMES
+import re
+pdef re.match
+pdoc re.match
+pinfo re.match # def and doc
+pfile re.match # Lets you page through the source file
+edit -x re.match # edit the source file that contains re.match
+quit()
+</pre>
+Then take a look at the log file generated...
+<pre>
+...
+#log# It is safe to make manual edits below here.
+#log#-----------------------------------------------------------------------
+msgflag = 1
+pi = 3
+msg = 'hello'
+warning = None
+msgflag
+_ip.magic("who ")
+help(who)
+_ip.magic("who int")
+_ip.magic("whos ")
+_ip.magic("psearch *sg*")
+_ip.magic("psearch sg*")
+_ip.magic("psearch *sg* int")
+sore msgflag
+_ip.magic("store msgflag")
+_ip.magic("store ")
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-19T10_02_30.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-19T11_21_54.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-18T20_31_36.txt" name=
+"e2008-01-18T20_31_36.txt"></a>
+<h2 class="date">01.18.2008 20:31</h2>
+<div class="blogbody">
+<h3 class="title">SensorWare Systems adds KML download</h3>
+<div class="item-description">I was talking to Myche this evening
+and he showed me some of the work going on at <a href=
+"http://www.sensorwaresystems.com/">SensorWare Systems</a>. They
+have added KML export. They have had a really nice web app for
+quite a while.<br />
+<br />
+<img src=
+"../attachments/2008-01/sensorware-1.png" /><br />
+
+<br />
+<img src=
+"../attachments/2008-01/sensorware-2.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-18T20_31_36.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-19T10_02_30.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-18T19_44_23.txt" name=
+"e2008-01-18T19_44_23.txt"></a>
+<h2 class="date">01.18.2008 19:44</h2>
+<div class="blogbody">
+<h3 class="title">Mac OSX 10.5.1 X11 install problems</h3>
+<div class="item-description">There have been a number of people on
+the fink mailing lists that have been getting weird problems with
+fink that boil down to the Apple installers not putting all the
+necessary files onto a Mac. We figured out today that was why Rob's
+laptop could not compile ghostscript. e.g. this:
+<pre>
+gcc -DHAVE_MKSTEMP -DHAVE_HYPOT -DHAVE_FONTCONFIG -O2 -Wall \
+-Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes \
+-Wwrite-strings -Wno-strict-aliasing -fno-builtin -fno-common \
+-DHAVE_STDINT_H -DGX_COLOR_INDEX_TYPE="unsigned long long" -I./obj \
+-I./src -I/usr/X11/include -o ./obj/gp_unix.o -c ./src/gp_unix.c \
+In file included from ./src/gp_unix.c:17:
+./src/pipe_.h:39: warning: function declaration isn't a prototype
+./src/gp_unix.c:25:37: error: fontconfig/fontconfig.h: No such file or directory
+</pre>
+My solution today was a bit different than the normal one suggested
+by people on the fink mailing lists. They suggest telling the mac
+to force remove the X11SDK and reinstall. We didn't have the
+install media on us, so I made a tar of the missing headers and
+dropped them into the right spot on his computer.
+<pre>
+cd ~/Desktop
+wget <a href=
+"../attachments/2008-01/mac-10.5.1-x11-fontconfig-headers.tar.bz2">../attachments/2008-01/mac-10.5.1-x11-fontconfig-headers.tar.bz2</a>
+cd /usr/X11/include/fontconfig
+sudo tar xf ~/Desktop/mac-10.5.1-x11-fontconfig-headers.tar.bz2
+</pre>
+Warning... the above assume that the only problem is the missing
+headers in that one particular place. If anything else is borked in
+the Apple install, then it still is may fail for other things. The
+more Apple way is:<br />
+<br />
+<a href=
+"http://www.mail-archive.com/fink-users@lists.sourceforge.net/msg26382.html&quot;">
+msg26382.html</a> [fink users post archive]a
+<pre>
+Looks like you might need to re-install x11.
+ pkgutil --forget com.apple.pkg.X11User
+ pkgutil --forget com.apple.pkg.X11SDKLeo
+ pkgutil --forget com.apple.pkg.X11DocumentationLeo
+ pkgutil --forget org.x.X11.pkg
+</pre>
+Then reinstall X11. On my machine, these are what I have installed:
+<pre>
+pkgutil --pkgs | grep -i X11
+com.apple.pkg.X11User
+com.apple.pkg.X11SDKLeo
+com.apple.pkg.X11DocumentationLeo
+</pre>
+See Also: <a href=
+"http://www.uoregon.edu/~noeckel/LeopardIntelSetup.html">LeopardInstelSetup</a>
+[noeckel at uoregon]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-18T19_44_23.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-18T20_31_36.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-18T19_10_32.txt" name=
+"e2008-01-18T19_10_32.txt"></a>
+<h2 class="date">01.18.2008 19:10</h2>
+<div class="blogbody">
+<h3 class="title">Nautical Publication Standards</h3>
+<div class="item-description"><a href=
+"http://www.hydro-international.com/news/id2221-Pilot_Program_For_Nautical_Publication_Standards.html">
+Pilot Program For Nautical Publication Standards</a> [hydro
+international]
+<pre>
+The primary goal of this pilot project is to support the development
+of global standards for nautical navigation publications that can
+effectively be implemented in commercial products and services. BSH
+has contributed substantially to the effort of the IHO Standardization
+of Nautical Publications Working Group (SNPWG) to define a data model
+for nautical publications. BSH has begun restructuring the text in
+their sailing directions books to support this data model. Jeppesen
+and BSH plan to present findings of the pilot study, and samples of
+Jeppesen Marine's electronic outputs, to the SNPWG in April 2008.
+.
+According to the agreement, the two will undertake joint research in
+the development of mathematical models of ships, carry out joint
+conferences, conduct independent expert evaluation of navigational
+information and designs and jointly develop distance-learning
+educational programs on nautical astronomy and navigation using
+electronic charts. In addition, the two will co-operate extensively in
+training and doctoral study.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-18T19_10_32.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-18T19_44_23.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-18T19_08_13.txt" name=
+"e2008-01-18T19_08_13.txt"></a>
+<h2 class="date">01.18.2008 19:08</h2>
+<div class="blogbody">
+<h3 class="title">Open source geospatial software</h3>
+<div class="item-description">It's been an intense 2 days for me in
+terms of open source GIS/geospatial software. My noaadata package
+is almost to the point where it can reliably send ship tracks to
+postgis and hopefully in the next couple days, Rob and I can get
+live ship tracks being visualized through the openlayers/mapserver
+based application that Rob is leading.<br />
+<br />
+Yesterday, Norm Vine came to CCOM and spent a bit of time talking
+with me. He pointed me to a whole range a neat things... He got me
+to jump on the gdal IRC group. We talked about possibilities for
+OSSIM Planet work this summer.<br />
+<br />
+He pointed me to this FOSS2007 talk:<br />
+<br />
+<a href=
+"http://www.foss4g2007.org/presentations/view.php?abstract_id=64">Minerva:
+Integrating GIS, 3D and Virtual Reality</a> by Adam Kubach at ASU.
+<a href="http://www.minerva-gis.org/">minerva-gis.org/</a> and
+<a href=
+"http://www.decisiontheater.org/">descisiontheater.org</a><br />
+<br />
+The Scientific and Engineering Research Visualization blog looks
+pretty cool but has only 7 posts in the last year. <a href=
+"http://serv-asu.blogspot.com/">serv-asu.blogspot.com</a>:<br />
+<br />
+<img src=
+"../attachments/2008-01/dt_ossim_juggler_02.jpg" />
+<br />
+<br />
+Trackback: <a href=
+"http://technology.slashgeo.org/article.pl?sid=08/01/24/2251208">Minerva
+Open Source GIS</a> [slashgeo]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-18T19_08_13.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-18T19_10_32.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-18T13_57_42.txt" name=
+"e2008-01-18T13_57_42.txt"></a>
+<h2 class="date">01.18.2008 13:57</h2>
+<div class="blogbody">
+<h3 class="title">gdal in Google applications</h3>
+<div class="item-description">Just realized today that Google
+extensively uses gdal in their programs. On my 10.5:
+<pre>
+locate libgdal
+/Applications/Google Earth Pro.app/Contents/MacOS/libgdal.dylib
+/Applications/Google Earth.app/Contents/MacOS/libgdal.dylib
+/Applications/Google SketchUp 6/SketchUp.app/Contents/Frameworks/libgdal.dylib
+</pre>
+And thanks to Hobu on the gdal IRC list, I should have spiffy new
+packages for gdal 1.5.0 with python support very soon. I didn't
+realize that there is distutils and setuputils support now in
+gdal-1.5.0/swig/python.<br />
+<br />
+<a href="http://pypi.python.org/pypi/GDAL/">pypi GDAL
+page</a><br />
+<br />
+After that, I need to look at mapserver 5.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-18T13_57_42.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-18T19_08_13.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-17T14_13_57.txt" name=
+"e2008-01-17T14_13_57.txt"></a>
+<h2 class="date">01.17.2008 14:13</h2>
+<div class="blogbody">
+<h3 class="title">noaadata 0.33 out yesterday</h3>
+<div class="item-description">Yesterday, I released noaadata 0.33.
+Here is the Changelog entry:
+<ul>
+<li>Draft live AIS feed to postgis with track_lines</li>
+<li>waterlevel2.xml draft message for NOAA PORTS</li>
+<li>Improved description in setup.py</li>
+<li>Parses more fields in uscg.py</li>
+<li>Added an AIS endnote library and bibtex</li>
+<li>ais_port_forward does a better job of reconnecting to
+destination port</li>
+<li>ais_db.py now can add or remove the track_lines postgis
+table</li>
+</ul>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-17T14_13_57.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-18T13_57_42.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-17T12_00_12.txt" name=
+"e2008-01-17T12_00_12.txt"></a>
+<h2 class="date">01.17.2008 12:00</h2>
+<div class="blogbody">
+<h3 class="title">Allision with Petaluma RR Bridge</h3>
+<div class="item-description"><a href=
+"http://www.piersystem.com/go/doc/823/188646/">Coast Guard
+Investigating Tug and Barge Allision with Petaluma Railroad
+Bridge</a> [piersystem.com uscg]
+<pre>
+SAN FRANCISCO, Calf. - The United States Coast Guard is investigating
+a tug and barge allision with the Petaluma railroad bridge.  At
+approximately 2:30 am the tug Trig Lind and barge carrying sand were
+on a northbound transit from San Francisco to Petaluma when they
+struck the Petaluma railroad bridge.  The 71.5 foot tug and 206 foot
+barge reported no damage to the vessels. The bridge suffered damage
+measuring approximately fifteen feet by ten feet. Alcohol testing was
+completed and the results were negative; drug test results are
+forthcoming.  Upon notification, the CG immediately launched a small
+boat and marine casualty investigators. A Coast Guard HH-65 helicopter
+was also diverted to respond to the marine incident. The Petaluma
+railroad bridge owner's engineer inspected the bridge today and will
+further inspect the bridge tomorrow. All assets report that there are
+no signs of pollution as a result of the allision. The Coast Guard has
+begun a marine casualty investigation.
+</pre>
+<a href="http://www.piersystem.com/go/doc/823/188643/">Photo
+1</a><br />
+<br />
+<img src=
+"../attachments/2008-01/petaluma-rr-bridge-allision.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-17T12_00_12.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-17T14_13_57.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-17T11_43_01.txt" name=
+"e2008-01-17T11_43_01.txt"></a>
+<h2 class="date">01.17.2008 11:43</h2>
+<div class="blogbody">
+<h3 class="title">Cosco Busan first report</h3>
+<div class="item-description"><a href=
+"http://coastguardnews.com/cosco-busan-incident-team-sends-first-report-to-coast-guard-headquarters/2008/01/16/">
+Cosco Busan Incident Team Sends First Report to Coast Guard
+Headquarters</a> [coastguardnews.com] or what looks to be the
+original source: <a href=
+"http://www.piersystem.com/go/doc/823/188660/">Team Sends First
+Report on Cosco Busan Incident</a> [piersystem.com - USCG
+DHS]<br />
+<br />
+<pre>
+ALAMEDA, Calif. - A team formed here to analyze the response to the
+Cosco Busan oil spill in San Francisco Bay sent the first of two
+reports to Coast Guard headquarters in Washington, D.C.,
+Wednesday. The 112-page report focuses on the first two weeks, or
+initial phase, of the response to the Nov. 7 spill and was sent to
+Vice Adm. Robert Papp, the service's Chief of Staff.
+<br /><br />The report was prepared by the Incident Specific Preparedness Review
+(ISPR) team chartered by the Vice Adm. Papp at the direction of the
+Commandant of the Coast Guard. A second report covering the remainder
+of the response phase and more long-term response issues is slated to
+be completed by the ISPR team by May 2008. The team was not tasked
+with determining the cause of the Cosco Busan incident, but rather was
+directed to review objectively the response actions undertaken
+following the incident compared to the plans in effect at the time.
+.
+While not an investigation, the ISPR process is an administrative
+assessment rooted in Coast Guard marine safety directives. It provides
+a method for outside entities to join the Coast Guard to review the
+response of the Unified Command to a particular incident. The ISPR
+focused on two primary areas: preparedness and response. An ISPR
+report identifies lessons learned and makes recommendations.
+.
+"The Coast Guard and our response partners share the public's concern
+about environmental protection; indeed, this is a core Coast Guard
+mission," said Vice Adm. Charles D. Wurster, Commander, Coast Guard
+Pacific Area, whom Papp tasked to oversee the ISPR.
+.
+"We welcome the information and recommendations of the review panel
+and will work as a team to improve our response system in any way
+possible. Coast Guard partnerships with state and local agencies as
+well as other organizations and industries are the key to success. The
+lessons learned in this incident will sharpen our response
+capabilities in the event of any emergency or other incident," he
+said.
+.
+Chaired by Rear Adm. Carlton Moore, U.S. Coast Guard Reserve
+(retired), the ISPR team is comprised of senior representatives from
+the Pacific Merchant Shipping Association, California Office of Spill
+Prevention &amp; Response, Pacific States/British Columbia Oil Spill Task
+Force, City and County of San Francisco Department of Emergency
+Management, the National Oceanic &amp; Atmospheric Administration Office
+of Response and Restoration, California Coastkeeper Alliance and San
+Francisco Baykeepers.
+.
+Public release of the report is expected in approximately two weeks.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-17T11_43_01.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-17T12_00_12.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-17T07_41_47.txt" name=
+"e2008-01-17T07_41_47.txt"></a>
+<h2 class="date">01.17.2008 07:41</h2>
+<div class="blogbody">
+<h3 class="title">Boston Port Operations Group</h3>
+<div class="item-description">Yesterday, I got a chance to go to a
+Boston Port Operations Group (POG) meeting. It was a chance for me
+to meet a lot of nice people.<br />
+<br />
+<img src=
+"../attachments/2008-01/boston-pog.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-17T07_41_47.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-17T11_43_01.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-17T07_16_34.txt" name=
+"e2008-01-17T07_16_34.txt"></a>
+<h2 class="date">01.17.2008 07:16</h2>
+<div class="blogbody">
+<h3 class="title">Mac OSX 10.5 Server has a wiki built in</h3>
+<div class="item-description">Does anyone know which wiki this is
+that mac osx server 10.5 comes with?<br />
+<br />
+<a href=
+"http://www.apple.com/server/macosx/features/wikis.html">Mac OS X
+Server - Features - Wiki Server</a> [apple.com]
+<pre>
+Mac OS X Server makes it easy for groups to collaborate and
+communicate through their own wiki-powered intranet website complete
+with group calendar, blog, and mailing list. Users can create and edit
+wiki pages, tag and cross-reference material, upload files and images,
+add comments, and search content with point-and-click ease.
+...
+The <b>wiki blog</b> is the perfect place for sharing team news and status
+reports or encouraging brainstorming.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-17T07_16_34.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-17T07_41_47.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-17T07_10_28.txt" name=
+"e2008-01-17T07_10_28.txt"></a>
+<h2 class="date">01.17.2008 07:10</h2>
+<div class="blogbody">
+<h3 class="title">Another ship hits a SF Bay Area bridge</h3>
+<div class="item-description">3 allisions in 3 months for San
+Francisco.<br />
+<br />
+<a href=
+"http://www.kcbs.com/Ship-Hits-Bay-Area-Bridge---Again/1491318">Ship
+Hits Bay Area Bridge...Again</a>
+<pre>
+PETALUMA, Calif. (KCBS) -- For the third time in three months a ship
+has collided with a Bay Area bridge.
+.
+The US Coast Guard says that around 2:30 Wednesday morning, a tug and
+barge heading from San Francisco to Petaluma struck the Petaluma
+railroad bridge. Offiicials say neither the tug nor barge were
+damaged, but a section of the bridge measuring fifteen feet by ten was
+damaged.
+.
+Coast Guard officials say those onboard the vessels were immediately
+tested for alcohol and drugs. The alcohol test came back negative,
+showing no one had been drinking. Results from the drug test will take
+longer to process.
+.
+There were no signs of pollution following the accident. The Coast
+Guard is still investigating the accident.
+</pre>
+and <a href=
+"http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2008/01/17/BAGD5UH06J.DTL">
+NOVATO - Tug, barge hit bridge over Petaluma River</a> [sfgate/San
+Francisco Chronicle]
+<pre>
+A tug and a sand barge ran into the Northwestern Pacific Railroad
+bridge over the Petaluma River at Black Point near Novato early
+Wednesday, causing an unknown amount of damage to the bridge, the
+Coast Guard reported.
+.
+The accident was the third time in a little over two months that a
+bridge on San Francisco Bay or its tributaries has been hit by a
+vessel. On Nov. 7, a cargo ship ran into the Bay Bridge, causing a
+58,000-gallon oil spill, and last week, an oil barge being towed by an
+ocean-going tug hit the Richmond-San Rafael Bridge.
+.
+No oil was spilled in the Richmond-San Rafael accident, and neither
+the tug nor the barge spilled any cargo in the Petaluma River
+incident.
+.
+The Coast Guard said Wednesday's accident occurred about 2 a.m. when
+the 71.5-foot tug, accompanying a 206-foot sand barge, hit the
+bridge. The river bridge, which swings to allow vessels to pass
+through, is normally kept in an open position.
+.
+No trains have operated over the bridge in several years. The bridge
+is located on the Marin-Sonoma county line near where State Highway 37
+crosses the Petaluma River.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-17T07_10_28.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-17T07_16_34.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-16T06_33_59.txt" name=
+"e2008-01-16T06_33_59.txt"></a>
+<h2 class="date">01.16.2008 06:33</h2>
+<div class="blogbody">
+<h3 class="title">Web services for the National Water Information
+System</h3>
+<div class="item-description">An interesting article that I need to
+grab: <a href=
+"http://dx.doi.org/10.1016/j.envsoft.2007.01.005">http://dx.doi.org/10.1016/j.envsoft.2007.01.005</a><br />
+
+<br />
+Goodall et al., <em>A first approach to web services for the
+National Water Information System</em>, <b>Environmental Modelling
+&amp; Software</b>
+<pre>
+A wealth of freely available hydrologic data are provided by
+governmental organizations including in situ observations, geospatial
+data sets, remote sensing products, and simulation model
+output. Despite having access to this information, much of the data
+remain underutilized in the hydrologic sciences due in part to the
+time required to access, obtain, and integrate data from different
+sources. Web services offer a means for sharing hydrologic data more
+openly by providing a standard protocol for machine-to-machine
+communication. We have used this new technology to create a machine
+accessible interface for the National Water Information System (NWIS),
+an online repository of historical and real-time streamflow,
+water-quality, and ground water level observations maintained by the
+United States Geological Survey (USGS). These services provide a
+middle-layer of abstraction between the NWIS database and hydrologic
+analysis systems, allowing such analysis systems to proxy the NWIS
+server for on-demand data access. We intentionally designed the
+services to be generic and applicable to other hydrologic databases,
+in order to provide interoperability between disparate data
+sources. Performance tests showed that, for time series with less than
+1000 observations, the web services layer added minimal overhead in
+terms of data response time, and development of an example client
+application for time series visualization highlighted some of the
+benefits and costs of using web services for data access.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-16T06_33_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-17T07_10_28.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-15T14_35_31.txt" name=
+"e2008-01-15T14_35_31.txt"></a>
+<h2 class="date">01.15.2008 14:35</h2>
+<div class="blogbody">
+<h3 class="title">Polluting Shipper Violated Probation</h3>
+<div class="item-description"><a href=
+"http://www.newhavenindependent.org/archives/2008/01/us_judge_finds.php">
+Arterton: Polluting Shipper Violated Probation</a> [New Haven
+Independent]<br />
+<br />
+<pre>
+The Greek shipping company fined nearly $5 million late last year in a
+New Haven federal courtroom for dumping waste oil into international
+waters and covering its tracks found itself aground on a similar reef
+in that court Thursday, this time ruled in violation the terms of its
+probation.
+...
+The M/T Dromeas, a 60,000-ton tanker owned by Ionia, did not have the
+required equipment on board. The U.S. Attorney filed papers accusing
+the company of violating the probation.
+...
+At least 968 tons of oil-contaminated waste were unaccounted for in
+the Kriton's oil record books. In addition to falsifying oil record
+books, Ionia Management submitted false statements in environmental
+compliance checklists that it was required to submit to the U.S. Coast
+Guard as part of its probation from the 2004 conviction in the Eastern
+District of New York, according to the court's ruling.
+...
+At issue is the equipment on board ship that confines oily water and
+monitors that no oily water is discharged into the sea. Arterton had
+ordered that equipment that prevents this discharge be installed on
+all ships making port in the U.S., saying in her order that all these
+ships must have a "white box" on board. Assistant U.S. Attorney Bill
+Brown told the court "it is clear" that the oil-content monitors the
+ship did have were not the same as the "white box" mentioned in the
+court's order.
+...
+</pre>
+Would be interesting to know exactly what device this is that the
+court ordered to be installed on the company's vessels.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-15T14_35_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-16T06_33_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-15T09_33_33.txt" name=
+"e2008-01-15T09_33_33.txt"></a>
+<h2 class="date">01.15.2008 09:33</h2>
+<div class="blogbody">
+<h3 class="title">morning visitor ... an owl</h3>
+<div class="item-description">My neighborhood got a morning visit
+from an owl.<br />
+<br />
+<img src=
+"../attachments/2008-01/owl.jpg" /><br />
+<br />
+The owl got visited by a hawk and then harassed by a bunch of
+crows. The owl stood its ground and was still there when I left for
+work. If anybody knows the exact types these birds are, please
+email me and I will update it hear.<br />
+<br />
+<img src=
+"../attachments/2008-01/owl-and-hawk.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-15T09_33_33.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-15T14_35_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-14T14_54_24.txt" name=
+"e2008-01-14T14_54_24.txt"></a>
+<h2 class="date">01.14.2008 14:54</h2>
+<div class="blogbody">
+<h3 class="title">Driscoll lab students</h3>
+<div class="item-description">I thought I lost this photo, but
+found it last week going through some backups looking for something
+else. This is from an SIO Holiday party in either 2004 or 2005. The
+grad students of the Driscoll lab at the time:<br />
+<br />
+Top row: Danny, Alex, Leah, Kurt<br />
+Bottom row: Becca, Nico, Santa, and Liz<br />
+Not Pictured: Jenna, Jen, Dingler, or Christie<br />
+<br />
+<img src=
+"../attachments/2008-01/driscoll-lab.png" /><br />
+
+<br />
+Note: this was a crummy polaroid scanned on a dirty scanner.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-14T14_54_24.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-15T09_33_33.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-14T13_06_48.txt" name=
+"e2008-01-14T13_06_48.txt"></a>
+<h2 class="date">01.14.2008 13:06</h2>
+<div class="blogbody">
+<h3 class="title">Helium a looming serious problem</h3>
+<div class="item-description">Liquid helium is already becoming a
+serious problem for people doing paleomagnetics. Julie mentioned at
+AGU that the rising prices for Helium are making it become a larger
+fraction of research budgets that are already pretty tight. Places
+are looking to start recycling helium, but many research labs are
+far from any place that could handle re-liquifying the stuff.<br />
+<br />
+From slashdot (<a href=
+"http://science.slashdot.org/article.pl?sid=08/01/14/0219246">Helium
+Crisis Approaching</a>)... "<a href=
+"http://www.sciencedaily.com/releases/2008/01/080102093943.htm">the
+world's largest reserve, outside of Amarillo, Texas, that supplies
+are expected to be depleted there within the next eight years</a>."
+[sciencedaily.com]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-14T13_06_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-14T14_54_24.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-12T08_43_55.txt" name=
+"e2008-01-12T08_43_55.txt"></a>
+<h2 class="date">01.12.2008 08:43</h2>
+<div class="blogbody">
+<h3 class="title">Added noaadata to python pypi (aka cheeseshop)
+database</h3>
+<div class="item-description">I finally got around to adding
+noaadata to the pypi database:<br />
+<br />
+<a href=
+"http://pypi.python.org/pypi/noaadata-py/0.32">http://pypi.python.org/pypi/noaadata-py/0.32</a><br />
+
+<br />
+I have just submitted the project to freshmeat. Take a look at my
+freshmeat page to see if the package has been approved:<br />
+<br />
+<a href=
+"http://freshmeat.net/~schwehr/">http://freshmeat.net/~schwehr/</a>
+now lists <a href=
+"http://freshmeat.net/projects/noaadata/">http://freshmeat.net/projects/noaadata/</a>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-12T08_43_55.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-14T13_06_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-11T15_03_12.txt" name=
+"e2008-01-11T15_03_12.txt"></a>
+<h2 class="date">01.11.2008 15:03</h2>
+<div class="blogbody">
+<h3 class="title">Boston LNG security</h3>
+<div class="item-description"><a href=
+"http://www.lnglawblog.com/BlogEntry.aspx?_entry=494499bc-b092-4ede-9348-29a46671637e">
+Officials Agree Security in Port of Boston Robust</a>
+<pre>
+Following a GAO report questioning the Coast Guard's ability to
+address LNG and oil tanker security risks issued earlier this week,
+Captain Gail Kulisch, the U.S. Coast Guard officer in charge of the
+Port of Boston, told the Boston Globe that his command has "a very
+robust safety and security plan with many partners contributing to
+that for each and every transit [of LNG and oil tankers]." Citing
+assurances from state and federal officials, Everett, Mass., Mayor
+Carlo DeMaria Jr. said, "The Coast Guard might be stretched thin, but
+not here in Everett." ...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-11T15_03_12.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-12T08_43_55.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-11T13_32_22.txt" name=
+"e2008-01-11T13_32_22.txt"></a>
+<h2 class="date">01.11.2008 13:32</h2>
+<div class="blogbody">
+<h3 class="title">SimpleDEMViewer</h3>
+<div class="item-description">Steve L. pointed me to this
+application. I haven't had the chance yet to give it a spin.
+<a href=
+"http://www.apple.com/downloads/macosx/math_science/simpledemviewer.html">
+SimpleDEMViewer</a> [apple.com]<br />
+<br />
+<img src=
+"../attachments/2008-01/simpledemviewer.jpg" />
+<br />
+<br />
+[image from the Apple website]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-11T13_32_22.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-11T15_03_12.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-11T11_01_35.txt" name=
+"e2008-01-11T11_01_35.txt"></a>
+<h2 class="date">01.11.2008 11:01</h2>
+<div class="blogbody">
+<h3 class="title">noaadata 0.32</h3>
+<div class="item-description">I am very close to having realtime
+updates working for AIS in postgis. There have been a lot of
+changes to noaadata since the last release in early December. Here
+is the ChangeLog message:
+<ul>
+<li style="list-style: none">0.32 - 2008-Jan-11 - <a href=
+"http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.32.tar.bz2">
+noaadata-py-0.32.tar.bz2</a></li>
+<li>Preliminary release of live AIS feeds</li>
+<li>Lots of documentation cleanup</li>
+<li>Added ais_db.py for creating and destroying database
+tables</li>
+<li>ais/__init__.py changed to provide lists of messages for more
+automation</li>
+<li>Added ais message 15 - interrogation</li>
+<li>Now builds with ais messages 15, 23-26</li>
+<li>Added timed_circular_notice.xml to replace the right whale
+specific message</li>
+<li>Fixed messages 15 and 22 so the do not have field
+collisions</li>
+<li>All ais messages now have a dbTableName in their module</li>
+<li>cleanup xymt2kml.py</li>
+<li>port-server renamed to port_server</li>
+<li>ais_build_{sqlite3,postgis} are getting better, but still need
+work to handle more message types</li>
+<li>ais_build_sqlite3 uses the python 2.5 built in sqlite
+interface. Better than using pysqlite2</li>
+<li>Added ais_port_forward.py and ais_net_to_postgis.py to scraps.
+These will get moved over to scripts soon</li>
+<li>Added uscg.py to aisutils for parsing the uscg fields from nmea
+strings</li>
+<li>Added database.py to aisutils. Makes working with ais and
+databases much simpler</li>
+<li>Fixed the serial logger to report 'r' in front of station.
+Doesn't yet handle r or b</li>
+</ul>
+And I am now using svn much more effectively for diffs with this
+command, but the diffs for this verson run way longer than the
+xterm scrollback buffer.
+<pre>
+svn diff -r {2007-12-05} | colordiff
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-11T11_01_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-11T13_32_22.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-11T08_52_53.txt" name=
+"e2008-01-11T08_52_53.txt"></a>
+<h2 class="date">01.11.2008 08:52</h2>
+<div class="blogbody">
+<h3 class="title">finkproject.org site troubles</h3>
+<div class="item-description">The fink project's <a href=
+"http://finkproject.org/">finkproject.org</a> expired this morning.
+Users apparently see godaddy's web page. I still have the dns
+cached, so I don't see it. The team is working on it.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-11T08_52_53.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-11T11_01_35.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-11T07_31_58.txt" name=
+"e2008-01-11T07_31_58.txt"></a>
+<h2 class="date">01.11.2008 07:31</h2>
+<div class="blogbody">
+<h3 class="title">Barge hits Richmond Bridge</h3>
+<div class="item-description">Another event in the SF Bay...
+<a href=
+"http://www.efluxmedia.com/news_Oil_Barge_Strikes_SF_Richmond_San_Rafael_Bridge_12700.html">
+Oil Barge Strikes SF Richmond-San Rafael Bridge</a> [efluxmedia]
+<pre>
+A 309-foot barge carrying 63,000 barrels of heavy oil through San
+Pablo Bay struck the Richmond-San Rafael Bridge on Thursday night, but
+the U.S. Coast Guard reported no sign of oil spilled at the scene of
+the accident.
+.
+The incident comes two months after the Cosco Busan, one of the China
+COSCO Holdings Co LTD's cargo struck a Bay Bridge tower and caused a
+58,000-gallon oil spill into the San Francisco Bay. The spill led to
+appreciatively 1,800 dead birds, out of which 648 died after being
+rescued, the Department of Fish and Games said.
+.
+The barge was heading on a foggy weather out to sea from Rodeo on
+Thursday, being pushed by a tugboat when it struck the Richmond-San
+Rafael Bridge around 6 p.m. The U.S. Coast Guard officials reported
+that the barge, on its name Cascades, had hit a piling on the west
+side of the bridge with its starboard bow.
+...
+</pre>
+and <a href="http://www.mercurynews.com/news/ci_7941569">Barge hits
+Richmond Bridge; Coast Guard investigating</a> [mercurynews]
+<pre>
+A barge struck the Richmond-San Rafael Bridge Thursday evening,
+according to the Coast Guard. The extent of damage, if any, was not
+immediately known.
+.
+The bridge was not closed following the 6:20 p.m. accident, according
+to the California Highway Patrol.
+.
+No pollution has been detected in the water, Coast Guard Petty Officer
+Anastasia Devlin said.
+.
+Fog limited visibility in portions of the Bay Area on Thursday night,
+although it was not clear whether that played a role in the
+accident. Visibility was three miles at Oakland International Airport
+and a mile and a half at San Francisco International Airport, said
+meteorologist Steve Anderson of the National Weather Service.
+.
+The Coast Guard pushed the barge away from the bridge and anchored it,
+and was still investigating the incident Thursday night.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-11T07_31_58.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-11T08_52_53.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-10T21_59_28.txt" name=
+"e2008-01-10T21_59_28.txt"></a>
+<h2 class="date">01.10.2008 21:59</h2>
+<div class="blogbody">
+<h3 class="title">my old friend netcat</h3>
+<div class="item-description">Back in 1999 while working on the
+Polar Lander, Anil introduced me to netcat. This was the original
+netcat. It worked great. We used it to data through a firewall from
+the flight operations network over to the web backends. It didn't
+have a configure script, so I set it up to use GNU autoconf and
+tried to contribute it back to the project. I never heard anything.
+However, there is now a new generation of autoconf: <a href=
+"http://netcat.sourceforge.net/">http://netcat.sourceforge.net/</a><br />
+
+<br />
+I am using netcat to help debug a little network server for AIS. I
+need to be able to simply feed some data to a python script that
+connects to a port. The same script is going to transmit a subset
+of the data out to another port that will eventually on a separate
+host. It's in fink, so "fink install netcat".<br />
+<br />
+In the first window, set up the receiver
+<pre>
+% nc -l -p 31402
+</pre>
+Then in the 2nd window, set up the transmission:
+<pre>
+% cat 123.ais | netcat -l -p 31401
+</pre>
+Then I run my bridge and a mess of data gets printed in the receive
+window.
+<pre>
+ais_port_forward.py -v
+</pre>
+There is also a program called <a href=
+"http://www.dest-unreach.org/socat/">socat</a> that is supposed to
+be more powerful, but I haven't done more than install it.
+<pre>
+fink install socat-ssl
+</pre>
+socat has many more options that look very handy.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-10T21_59_28.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-11T07_31_58.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-10T11_49_32.txt" name=
+"e2008-01-10T11_49_32.txt"></a>
+<h2 class="date">01.10.2008 11:49</h2>
+<div class="blogbody">
+<h3 class="title">USCG and the Northeast Gateway Security Plan</h3>
+<div class="item-description"><a href=
+"http://www.lnglawblog.com/BlogEntry.aspx?_entry=29eb94d7-d63a-4ae1-bdf9-355dd46cf997">
+USCG Close to Approving Northeast Gateway Security Plan, Operations
+Manual</a> [LNGLawBlog]
+<pre>
+Reuters reports that a spokesperson for the U.S. Coast Guard predicted
+that final approval of the Northeast Gateway LNG terminal's security
+plan and operations manual would be granted by the end of January. The
+piece also notes that start-up of the terminal may be key to German
+firm RWE's reported purchase of 50% of Northeast Gateway project
+developer Excelerate Energy.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-10T11_49_32.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-10T21_59_28.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-09T17_57_54.txt" name=
+"e2008-01-09T17_57_54.txt"></a>
+<h2 class="date">01.09.2008 17:57</h2>
+<div class="blogbody">
+<h3 class="title">colordiff</h3>
+<div class="item-description">My blog has been severly lacking in
+the other than black-and-white category lately. I haven't been
+taking much in the way of pictures, so you will have to put up with
+a bit of color code. This was posted today here: <a href=
+"http://debaday.debian.net/2008/01/09/colordiff-put-some-color-in-your-diffs/">
+colordiff: put some color in your diffs</a> [debaday].<br />
+<br />
+colordiff is already in fink, so I did a "fink install colordiff"
+and now can do: "svn diff | colordiff". Too bad it doesn't work
+with less, but it is still very cool when writing up svn commit log
+messages.<br />
+<br />
+So a little color... and some amusing code that I wrote
+today.<br />
+<br />
+<img src=
+"../attachments/2008-01/colordiff.png" /><br />
+
+<br />
+On a totally different note, the warm weather (60F) combined with
+all the snow on the ground has been making for steamy snow banks.
+Michelle W. has a nice photo on her blog today of this:<br />
+<br />
+<a href=
+"http://michellejw.wordpress.com/2008/01/09/january-morning/">January
+morning</a> [michellejw.wordpress] (which is her new blog
+location).</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-09T17_57_54.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-10T11_49_32.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-09T13_40_59.txt" name=
+"e2008-01-09T13_40_59.txt"></a>
+<h2 class="date">01.09.2008 13:40</h2>
+<div class="blogbody">
+<h3 class="title">setting up a postgresql/postgis database on mac
+osx 10.5 with fink</h3>
+<div class="item-description">Now that I have libgeos2 installed
+via fink for <b>OSX 10.5</b>, here are my notes on creating a
+database for AIS. First, the Mac needs to have the shared memory
+kernel parameters changed from the defaults. This is done through
+the sysctl.conf file. Once these parameters are all set, they are
+stuck until the machine is rebooted. Create an /etc/sysctl.conf.
+You probably do not have a sysctl.conf, but use &gt;&gt; to append,
+just in case you already have settings from some other software
+already in there.
+<pre>
+% sudo cat &lt;&lt; EOF &gt;&gt; /etc/sysctl.conf
+# These values are to support postgresql                                                     
+# See also: <a href=
+"http://wiki.finkproject.org/index.php/Shared_Memory_Regions_on_Darwin">http://wiki.finkproject.org/index.php/Shared_Memory_Regions_on_Darwin</a>
+# See also: man sysctl.conf
+kern.sysv.shmmax=16777216
+kern.sysv.shmmin=1
+kern.sysv.shmmni=64
+kern.sysv.shmseg=8
+kern.sysv.shmall=32768
+EOF
+</pre>
+Reboot the mac. Now check up on what the actual shared memory
+settings are:
+<pre>
+% sysctl -a | grep shm
+kern.exec: unknown type returned
+kern.sysv.shmall: 32768
+kern.sysv.shmseg: 8
+kern.sysv.shmmni: 64
+kern.sysv.shmmin: 1
+kern.sysv.shmmax: 16777216
+machdep.pmap.hashmax: 9
+security.mac.sysvshm_enforce: 1
+security.mac.posixshm_enforce: 1
+</pre>
+Install the software from fink (you need to have fink unstable
+turned on).
+<pre>
+% fink install postgresql82{,-dev,-shlibs} postgis82
+% pgsql.sh start
+</pre>
+If you want to always have postgresql available, you need to have
+the server be started at boot time. See what programs can be
+started at boot from fink:
+<pre>
+% sudo daemonic dump | less
+</pre>
+Now set postgresql82 to start at boot:
+<pre>
+% sudo daemonic enable postgresql82
+% ls /Library/StartupItems/
+daemonic-anacron  daemonic-apache2  daemonic-postgresql82
+</pre>
+Now create a database for AIS. This is only for a secured machine
+where all the users are trusted.
+<pre>
+% createuser -U postgres -W $USER
+% createdb ais
+psql -f /sw/share/doc/postgis82/lwpostgis.sql -d ais
+psql -f /sw/share/doc/postgis82/spatial_ref_sys.sql -d ais
+</pre>
+Now you can create the database tables using noaadata:
+<pre>
+% ./ais_db.py --create-tables -v
+Connect string: dbname='ais' user='schwehr' host='localhost'
+Creating tables
+1  ... adding position
+2  ... skipping - already in the db - position
+3  ... skipping - already in the db - position
+4  ... adding bsreport
+5  ... adding shipdata
+6  ... adding abm
+7  ... adding binack
+8  ... adding bin_broadcast
+9  ... adding SARposition
+10  ... adding utcquery
+12  ... adding asrm
+14  ... adding srbm
+15  ... adding interrogation
+18  ... adding positionb
+19  ... adding b_pos_and_shipdata_broken
+20  ... adding datalinkmng
+21  ... adding AidsToNavReport
+22  ... adding ChanMngmt
+Done.
+</pre>
+ais_db.py will be released in the next version of noaadata. Note
+that the 'b_pos_and_shipdata_broken' table name means that I do not
+think that I have the table defined correctly.<br />
+<br />
+Now take a look at the database tables:
+<pre>
+% psql -l
+           List of databases
+      Name      |  Owner   | Encoding  
+================+==========+===========
+ ais            | postgres | SQL_ASCII
+ postgres       | postgres | SQL_ASCII
+ template0      | postgres | SQL_ASCII
+ template1      | postgres | SQL_ASCII
+(4 rows)
+</pre>
+And look inside the ais database:
+<pre>
+% psql ais
+ais=# \d
+                        List of relations
+ Schema |               Name                |   Type   |  Owner  
+========+===================================+==========+=========
+ public | abm                               | table    | schwehr
+ public | abm_key_seq                       | sequence | schwehr
+ public | aidstonavreport                   | table    | schwehr
+ public | aidstonavreport_key_seq           | sequence | schwehr
+ public | asrm                              | table    | schwehr
+ public | asrm_key_seq                      | sequence | schwehr
+ public | b_pos_and_shipdata_broken         | table    | schwehr
+ public | b_pos_and_shipdata_broken_key_seq | sequence | schwehr
+ public | bin_broadcast                     | table    | schwehr
+ public | bin_broadcast_key_seq             | sequence | schwehr
+ public | binack                            | table    | schwehr
+ public | binack_key_seq                    | sequence | schwehr
+ public | bsreport                          | table    | schwehr
+ public | bsreport_key_seq                  | sequence | schwehr
+ public | chanmngmt                         | table    | schwehr
+ public | chanmngmt_key_seq                 | sequence | schwehr
+ public | datalinkmng                       | table    | schwehr
+ public | datalinkmng_key_seq               | sequence | schwehr
+ public | geometry_columns                  | table    | schwehr
+ public | interrogation                     | table    | schwehr
+ public | interrogation_key_seq             | sequence | schwehr
+ public | position                          | table    | schwehr
+ public | position_key_seq                  | sequence | schwehr
+ public | positionb                         | table    | schwehr
+ public | positionb_key_seq                 | sequence | schwehr
+ public | sarposition                       | table    | schwehr
+ public | sarposition_key_seq               | sequence | schwehr
+ public | shipdata                          | table    | schwehr
+ public | shipdata_key_seq                  | sequence | schwehr
+ public | spatial_ref_sys                   | table    | schwehr
+ public | srbm                              | table    | schwehr
+ public | srbm_key_seq                      | sequence | schwehr
+ public | track_lines                       | table    | schwehr
+ public | track_lines_track_key_seq         | sequence | schwehr
+ public | utcquery                          | table    | schwehr
+ public | utcquery_key_seq                  | sequence | schwehr
+(36 rows)
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-09T13_40_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-09T17_57_54.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-09T11_01_53.txt" name=
+"e2008-01-09T11_01_53.txt"></a>
+<h2 class="date">01.09.2008 11:01</h2>
+<div class="blogbody">
+<h3 class="title">libgeos2 in fink for 10.5</h3>
+<div class="item-description">I found a patch on macports/darwin
+ports that changes up the cast and it seems to work.
+<pre>
+PatchScript: &lt;&lt;
+  perl -pi -e 's|safe_ctype&lt;std::tolower&gt;|(int(*)(int))std::tolower|' source/test/XMLTester.cpp
+&lt;&lt;
+</pre>
+<pre>
+
+An info file that you can put in /sw/fink/10.5/local/main/finkinfo/libs can be had from:
+</pre>
+<pre>
+
+wget http://vislab-ccom.unh.edu/~schwehr/software/fink/libgeos2.info
+</pre>
+<pre>
+
+I have tested this on 10.4 and 10.5 and it compiles on both.  I will
+leave it up to BABA Yoshihiko to commit this if he thinks it is okay.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-09T11_01_53.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-09T13_40_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-08T14_27_18.txt" name=
+"e2008-01-08T14_27_18.txt"></a>
+<h2 class="date">01.08.2008 14:27</h2>
+<div class="blogbody">
+<h3 class="title">Fledermaus 6.7 out</h3>
+<div class="item-description">Fledermaus 6.7.0 is out. If you have
+a license, get it from <a href=
+"http://www.ivs3d.com/download/">http://www.ivs3d.com/download/</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-08T14_27_18.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-09T11_01_53.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-08T14_05_22.txt" name=
+"e2008-01-08T14_05_22.txt"></a>
+<h2 class="date">01.08.2008 14:05</h2>
+<div class="blogbody">
+<h3 class="title">ASN.1 Encoding</h3>
+<div class="item-description">Brian L. just pointed me to ASN.1 and
+a book, Cryptography for Developers, that is in Safari (the online
+books for computer programmers).<br />
+<br />
+<pre>
+...
+Abstract Syntax Notation One (ASN.1) is an ITU-T set of standards for
+encoding and rep-resenting common data types such as printable
+strings, octet strings, bit strings, integers, and composite sequences
+of other types as byte arrays in a portable fashion. Simply put,ASN.1
+specifies how to encode nontrivial data types in a fashion such that
+any other platform or third-party tool can interpret the content.
+.
+For example, on certain platforms the literal character "a" would be
+encoded in ASCII (or IA5) as the decimal value 97, whereas on other
+non-ASCII platforms it may have another encoding. ASN.1 specifies an
+encoding such that all platforms can decode the string
+uniformly. Similarly, large integers, bit strings, and dates are also
+platform sensitive data types that benefit from standardization.
+...
+ASN.1 was originally standardized in 1994 and again in 1997 and
+2002. The current standard is ITU-T X.680, also filed as ISO/IEC
+8824-1:2002, and is freely available on the Internet (ASN.1 Reference:
+http://asn1.elibel.tm.fr/standards/). This chapter discusses the
+implementation of ASN.1 encodings more than the theory behind the
+ASN.1 design. The reader is encouraged to read the ITU-T documents for
+a deeper treatment. The standards we are aiming to support by learning
+ASN.1 are the PKCS #1/#7 and ANSI X9.62/X9.63 public key cryptography
+standards. As it turns out, to support these standards your ASN.1
+routines have to handle quite a bit of the ASN.1 types in the DER
+rule-set, resulting in encoding routines usable for a broad range of
+other tasks.
+...
+</pre>
+<a href=
+"http://asn1.elibel.tm.fr/en/introduction/index.htm">Introduction
+to ASN.1</a><br />
+<br />
+and <a href="http://en.wikipedia.org/wiki/XML_Encoding_Rules">XML
+Encoding Rules</a> [wikipedia]
+<pre>
+ML Encoding Rules (XER) are a set of ASN.1 encoding rules for
+producing an XML-based verbose textual transfer syntax for data
+structures described in ASN.1.
+.
+A variant of XER called Canonical XML Encoding Rules (CXER) is also
+defined for uses where the encodings have to be preserved, such as
+security exchanges. Data encoded in CXER is always valid XER, but not
+vice versa.
+</pre>
+Not to be forgotten: <a href=
+"http://en.wikipedia.org/wiki/Basic_encoding_rules">Basic Encoding
+Rules (BER)</a> [wikipedia]<br />
+<br />
+There is of course a python library for this: <a href=
+"http://pyasn1.sourceforge.net/">pyasn1</a> [sf.net]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-08T14_05_22.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-08T14_27_18.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-08T13_13_35.txt" name=
+"e2008-01-08T13_13_35.txt"></a>
+<h2 class="date">01.08.2008 13:13</h2>
+<div class="blogbody">
+<h3 class="title">USCG - SafeZones: Northeast Gateway, Deepwater
+Port, Atlantic Ocean, Boston, MA</h3>
+<div class="item-description"><a href=
+"http://www.lnglawblog.com/BlogEntry.aspx?_entry=9cee896c-0f5c-48a7-b3e4-13e7a905b18b">
+Safety Zones: Northeast Gateway, Deepwater Port, Atlantic Ocean,
+Boston, MA</a> [LNGLawBlog]<br />
+<br />
+<a href=
+"http://schwehr.org/projects/blog/attachments/2008-01/federal-register-v73-no5-20080108.pdf">
+</a>PDF
+<pre>
+<b>AGENCY:</b> Coast Guard, DHS.
+<b>ACTION:</b> Temporary final rule.
+<b>SUMMARY:</b> The Coast Guard is establishing two temporary safety
+zones 500 meters around the primary components, two independent
+submerged turret loading buoys, of Excelerate Energy's Northeast
+Gateway Deepwater Port, Atlantic Ocean, and its accompanying
+systems. The purpose of these temporary safety zones is to protect
+vessels and mariners from the potential safety hazards associated with
+deepwater port facilities. All vessels, with the exception of
+deepwater port support vessels, are prohibited from entering into or
+moving within either of the safety zones.
+<b>DATES:</b> This rule is effective from January 8, 2008 until May 7,
+2008.
+<b>ADDRESSES:</b> Documents indicated in this preamble as being
+available in the docket, are part of docket USCG-2007- 0191 and are
+available for inspection or copying at the Docket Management Facility
+(M-30), U.S. Department of Transportation, West Building Ground Floor,
+Room W12-140, 1200 New Jersey Avenue, SE., Washington, DC 20590,
+between 9 a.m. and 5 p.m., Monday through Friday, except Federal
+holidays.  You may also find this docket on the Internet at
+www.regulations.gov.
+<b>FOR FURTHER INFORMATION CONTACT:</b> If you have questions on this rule,
+contact Chief Eldridge McFadden, Waterways Management Division, Coast
+Guard Sector Boston, at 617-223-5160. If you have questions on viewing
+the docket, call Renee V. Wright, Program Manager, Docket Operations,
+telephone 202-366- 9826.
+<b>SUPPLEMENTARY INFORMATION:</b>
+<b>Regulatory Information</b>
+We did not publish a notice of proposed rulemaking (NPRM) for this
+regulation. Under 5 U.S.C. 553(b)(B), the Coast Guard finds that good
+cause exists for not publishing an NPRM. The deepwater port facilities
+discussed elsewhere in this rule were recently completed and present a
+potential safety
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-08T13_13_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-08T14_05_22.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-08T11_53_24.txt" name=
+"e2008-01-08T11_53_24.txt"></a>
+<h2 class="date">01.08.2008 11:53</h2>
+<div class="blogbody">
+<h3 class="title">OSX 10.5 X11</h3>
+<div class="item-description">Update: Another post about X11 on
+10.5 being a mess... <a href=
+"http://www.macresearch.org/x11-and-xquartz">X11 and XQuartz</a>
+[MacResearch.org]<br />
+<br />
+What do I have installed for X11 on my 10.5 Intel MacBook Pro?
+<pre>
+% pkgutil --packages | grep -i X11
+com.apple.pkg.X11User
+com.apple.pkg.X11SDKLeo
+com.apple.pkg.X11DocumentationLeo
+</pre>
+How do I easily find the version of X11? Not really that easy to
+see it the XQuartz 2.1.1 update is in there.
+<pre>
+% pkgutil --export-plist com.apple.pkg.X11User
+        &lt;key&gt;pkg-version&lt;/key&gt;
+        &lt;string&gt;10.5.0.1.1.1192168948&lt;/string&gt;
+        &lt;key&gt;pkgid&lt;/key&gt;
+        &lt;string&gt;com.apple.pkg.X11User&lt;/string&gt;
+</pre>
+There is always the old and crusty method:
+<pre>
+% xdpyinfo
+version number:    11.0
+vendor string:    The X.Org Foundation
+vendor release number:    70200000
+.Org version: 7.2.0
+...
+number of extensions:    28
+    Apple-DRI
+    Apple-WM
+    BIG-REQUESTS
+    DAMAGE
+    DEC-XTRAP
+    DOUBLE-BUFFER
+    DPMS
+    Extended-Visual-Information
+...
+screen #0:
+  print screen:    no
+  dimensions:    1440x879 pixels (488x298 millimeters)
+  resolution:    75x75 dots per inch
+  depths (7):    24, 1, 4, 8, 15, 16, 32
+...
+</pre>
+Do I want to install 2.1.1?? <a href=
+"http://trac.macosforge.org/projects/xquartz/wiki/Releases">xquarts
+macosforge.org page</a><br />
+<br />
+From <a href=
+"http://trac.macosforge.org/projects/xquartz/wiki/X112.1.1">X112.1.1</a>...
+??
+<pre>
+Changes in 2.1.1
+...
+  o Added workaround to support Fink until they update their packages
+</pre>
+I definitely need to understand what is going on.<br />
+<br />
+This is a good resource: <a href=
+"http://forums.macosxhints.com/showthread.php?t=80171">Apple's X11
+and Leopard FAQs</a><br />
+<br />
+Apple's X11 Frequently Asked Questions in Leopard (Mac OS X 10.5)
+[macosxhints.com]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-08T11_53_24.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-08T13_13_35.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-08T11_18_06.txt" name=
+"e2008-01-08T11_18_06.txt"></a>
+<h2 class="date">01.08.2008 11:18</h2>
+<div class="blogbody">
+<h3 class="title">Voted</h3>
+<div class="item-description">I've done my part voting in the NH
+primaries. Last night I had a slight run in with the Clintons. I
+got stuck trying to get into the Manchester airport for about 50
+minutes (to go about 1 mile). The police blocked of the roads and
+didn't provide any information about what was going on. People were
+driving like maniacs. My car even decided to voice its opinion by
+turn on the service engine light. The traffic was worse than being
+stuck on the 110 in downtown LA during rush hour. Then, when I got
+to the actual airport, I was one of three cars in the pickup/drop
+off area. The airport was like a ghost town. All the cars on the
+road were all trying to get into the Clinton event. It's exciting
+to be in NH for the direct exposure to politics and feeling like I
+can actually count in the primaries, but people really go nuts with
+this stuff. I saw cops driving over medians piled high with snow
+and people getting out of their cars and risking getting hit by
+raffic coming the opposite direction. I even reported a drunk
+(maybe on politics) driver at 8 PM on 101 driving way under the
+speed limit, randomly breaking and swerving between lanes.
+Elections and voting is a time to use your head, not loose
+it.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-08T11_18_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-08T11_53_24.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-08T11_09_39.txt" name=
+"e2008-01-08T11_09_39.txt"></a>
+<h2 class="date">01.08.2008 11:09</h2>
+<div class="blogbody">
+<h3 class="title">10.5 troubles</h3>
+<div class="item-description">I am definitely having pains with
+10.5. I am having issues with X11. I no longer have an xinitrc and
+the Applications menu freaks out if you give a program command line
+options. WTF?
+<pre>
+1/8/08 8:40:37 AM org.x.X11[174] login: xterm -r: No such file or directory 
+</pre>
+I am slowly working through compiling programs with fink. I keep
+running into troubles. libgeos is on the top of my list right now.
+Hopefully I can figure out the trouble and give BABA Yoshihiko a
+hand.<br />
+<br />
+I have to look more through peoples' notes on upgrading. For
+example, I really do not know what this does: <a href=
+"http://xanana.ucsc.edu/xtal/wiki/index.php/X11#In_10.5">X11 - OS X
+Scientific Computing</a> [ucsc.edu]
+<pre>
+defaults write org.x.X11_launcher app_to_run /usr/X11/bin/xlsclients
+or
+defaults write org.x.X11_launcher app_to_run /usr/bin/true
+and to put it back,
+defaults write org.x.X11_launcher app_to_run /usr/X11/bin/xterm
+</pre>
+I also need to read <a href=
+"http://wiki.finkproject.org/index.php/Fink:Packaging:Preparing_for_10.5">
+Preparing for 10.5</a> [finkproject.org] and probably many more
+pages. The changes from 10.4 to 10.5 feel much more radical than
+the changes in 10.2-10.3 or 10.3-10.4.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-08T11_09_39.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-08T11_18_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-07T19_10_43.txt" name=
+"e2008-01-07T19_10_43.txt"></a>
+<h2 class="date">01.07.2008 19:10</h2>
+<div class="blogbody">
+<h3 class="title">GigaPan in GoogleEarth</h3>
+<div class="item-description">This is what I was expecting when I
+first saw the GigaPixel layer in GoogleEarth. Now both GigaPan and
+GigaPixel layers are in there. Go Randy!<br />
+<br />
+<img src=
+"../attachments/2008-01/sargent-gigapan.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-07T19_10_43.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-08T11_09_39.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-07T12_59_58.txt" name=
+"e2008-01-07T12_59_58.txt"></a>
+<h2 class="date">01.07.2008 12:59</h2>
+<div class="blogbody">
+<h3 class="title">NAGT - Teaching with New Geoscience Tools</h3>
+<div class="item-description">The deadline has been
+extended...<br />
+<br />
+<a href=
+"http://serc.carleton.edu/NAGTWorkshops/tools08/index.html">Teaching
+with New Geoscience Tools: Visualizations, Models, and Online
+Data</a>
+<pre>
+February 10-12, 2008, University of Massachusetts, Amherst
+(note that the location of this workshop has changed)
+Applications are still being accepted until <b>January 14, 2008</b>.
+.
+Geoscience today is a space-age science making extensive use of remote
+sensing data, remotely collected data, high performance computing, and
+state of the art data visualizations. These new research tools can
+often be accessed on-line making them particularly suitable for use in
+undergraduate teaching.
+.
+This workshop will bring together geoscientists and educators to look
+at how we currently take advantage of these new tools in undergraduate
+education, to look at newly emerging opportunities, and to consider
+what learning science has to say about teaching with these tools.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-07T12_59_58.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-07T19_10_43.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-07T09_48_24.txt" name=
+"e2008-01-07T09_48_24.txt"></a>
+<h2 class="date">01.07.2008 09:48</h2>
+<div class="blogbody">
+<h3 class="title">vmware fusion on the mac</h3>
+<div class="item-description">I'm out of time for my weekend
+project. The goal was to get Windows P SP2 Enterprise running on my
+MacBook Pro Core2 Duo... (2.4 GHz Intel w/ 4GB of 667 MHz DDR2
+SDRAM). Here's where I am at: The mac now has 10.5 on it and about
+to reboot to 10.5.1. I've got vmware fusion installed and the 1.1
+update was downloaded. I've also downloaded an image of <a href=
+"http://www.vmplanet.net/?q=node/31">Ubuntu 8.04 Alpha 2</a> so I
+can at least give vmware a run through. I'm also working through
+fink 10.5 and hitting a lot of snags. I'm going to have to postpone
+a lot of this to get some normal work done for the week, but
+hopefully I will sneak in some more of this during the week. Also,
+we've got someone here trying to get 10.5 on an older G4 mac laptop
+that is refusing to install 10.5. I will post more as that update
+progresses (or doesn't).</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-07T09_48_24.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-07T12_59_58.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-07T09_02_33.txt" name=
+"e2008-01-07T09_02_33.txt"></a>
+<h2 class="date">01.07.2008 09:02</h2>
+<div class="blogbody">
+<h3 class="title">New paper talks to pilots in the UK</h3>
+<div class="item-description">From <a href=
+"http://gcaptain.com/maritime/blog/the-ship-whispers-nautical-psychologists/">
+The Ship Whispers, Nautical Psychologists</a> [gCaptain]<br />
+<br />
+<a href=
+"http://women.timesonline.co.uk/tol/life_and_style/women/the_way_we_live/article3122236.ece">
+The ship whisperers</a> - As a container ship runs aground, our
+correspondent talks to the unsung pilots who, with courage, skill
+and nerve, shepherd these vast vessels to port</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-07T09_02_33.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-07T09_48_24.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-07T08_57_10.txt" name=
+"e2008-01-07T08_57_10.txt"></a>
+<h2 class="date">01.07.2008 08:57</h2>
+<div class="blogbody">
+<h3 class="title">CA Shoreline Protection Regulations</h3>
+<div class="item-description"><a href=
+"http://www.simsl.com/CaliforniaShoreProtect0108.html">California
+Shoreline Protection Regulations</a> [Steamship Mutual]
+<pre>
+...
+On 17 July 2006 OSPR issued new shoreline protection requirements
+which call for increased performance and response times in order to
+further protect California's shoreline and sensitive site areas. These
+areas are identified in the California regulation's Shoreline
+Protection Tables (found in CCR, Title 14, Chapter 3, Subchapter 3,
+Section 818.02(f) and Subchapter 4, Section 827.02(i)) and can also be
+found on California's Office of Spill Prevention and Response (OSPR)
+website at www.dfg.ca.gov/ospr/law/regs.html. These changes came into
+effect for high volume ports on 1 May 2007 and for low volume ports on
+1 September 2007.
+...
+</pre>
+From <a href=
+"http://maritimeaccident.wordpress.com/2008/01/05/maritime-safety-news-today-5th-january-2008/">
+Maritime Safety News Today - 5th January 2008</a> [Bob
+Couttie]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-07T08_57_10.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-07T09_02_33.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-07T08_53_29.txt" name=
+"e2008-01-07T08_53_29.txt"></a>
+<h2 class="date">01.07.2008 08:53</h2>
+<div class="blogbody">
+<h3 class="title">moble sensor web</h3>
+<div class="item-description"><a href=
+"http://www.ogleearth.com/2008/01/links_3dclearea.html">Mobile
+pollution sensor web</a> [aogleearth]
+<pre>
+Mobile pollution sensor web: New Scientist reports that in Cambridge
+(UK), computer scientists have cobbled together a cheap mobile
+pollution sensor web using bicycle couriers, GPS devices, smartphones
+and phone-sized pollution sensors that record carbon monoxide,
+nitrogen oxide, and nitrogen dioxide levels. The devices all talk via
+bluetooth, and then the phone send the georeferenced data live to a
+server as the courier cycles about town.
+...
+</pre>
+DOI: <a href=
+"http://doi.ieeecomputersociety.org/10.1109/MDSO.2007.46">10.1109/MDSO.2007.46</a>
+- IEEE Distributed Sytems</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-07T08_53_29.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-07T08_57_10.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-07T08_45_06.txt" name=
+"e2008-01-07T08_45_06.txt"></a>
+<h2 class="date">01.07.2008 08:45</h2>
+<div class="blogbody">
+<h3 class="title">AIS Class B mandatory for Turkish seas</h3>
+<div class="item-description">From <a href=
+"http://www.navagear.com/2008/01/class-b-ais-mandatory-in-turkey/">Navagear</a>...<br />
+
+<br />
+<a href=
+"http://www.todayszaman.com/tz-web/detaylar.do?load=detay&amp;link=130619">
+ID system to become mandatory for all boats on Turkish seas</a>
+[Today's Zaman]
+<pre>
+The Search and Rescue Coordination Center will require a boat ID
+system for all vessels engaged in cabotage (transporting goods or
+passengers between two points in the same country) in Turkey.
+.
+Officials from the Undersecretariat for Maritime Affairs, under which
+the Search and Rescue Coordination Center operates, said the Automatic
+Identification System (AIS), which collects statistical, dynamics and
+navigational information on vessels to increase maritime security,
+went into effect for vessels engaged in international transport in
+August 2007.
+.
+Now, all vessels, including yachts, small passenger boats, cargo
+vessels and fishing boats, will be required to carry the AIS equipment
+as of March. A total of 18,000 vessels are anticipated to be equipped
+with the system. The installation cost ranges between 600 and 1,000
+euros.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-07T08_45_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-07T08_53_29.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-06T15_59_03.txt" name=
+"e2008-01-06T15_59_03.txt"></a>
+<h2 class="date">01.06.2008 15:59</h2>
+<div class="blogbody">
+<h3 class="title">Mac OSX 10.5 issues</h3>
+<div class="item-description">I ran into two issues today with mac
+osx 10.5. The first was with the install DVD. The installer was
+stuck at the point where it asks which volume to install from. I
+went into the disk utility and my main partition was not showing
+up. After a couple of minutes I was about to give up and
+repartition the disk. Just as I was about to hit go... up came my
+partition. Why did it take so long?<br />
+<br />
+Next I hit trouble with the apple updater. I am using a verizon
+EVDO link and do not want my bandwidth used up for software
+updates. I'm happy to wait until I am in the office for the
+updates. I got a spike in network traffic with nothing running. A
+tcpdump showed http traffic with somewhere that doesn't resolve to
+anything: 128.241.218.152.http. Turns out this is apple's software
+update. It would be nice if there hostnames resolve so that I know
+that something is not hijacking my system.<br />
+<br />
+And a 3rd item that is Verizon... I have been running 10.5 for a
+few days on a laptop. With the many reboots and misc testing that I
+have done, I have yet to crash the machine. Then I installed the
+Verizon VZAccess Manager. It asks to reboot the machine and I
+rebooted right into a kernel panic. Thanks Verizon! I had done the
+check for updates on another machine and the access manager said
+there were new updates. I check on the web and yes, there is a new
+version out... I am now using VZAccess Manager 3.10.1958d. Verizon
+needs some serious help with their quality control. At least their
+"unlimited" policy no longer will disconnect you if you transfer
+more than 5GB in a month. They just warn you that they will limit
+your bandwidth to 200kbps. Gee thanks. Oh, and their download site
+needs more bandwidth... I was only getting 6Kbps. The Apple Update
+was coming down at 14Kbps.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-06T15_59_03.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-07T08_45_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-06T10_52_45.txt" name=
+"e2008-01-06T10_52_45.txt"></a>
+<h2 class="date">01.06.2008 10:52</h2>
+<div class="blogbody">
+<h3 class="title">Skiing at Mt Sunapee</h3>
+<div class="item-description">Yesterday, I got in a bit of skiing
+at Mt Sunapee, NH with Lynn and Eric. I haven't been skiing since
+the winter of 98-99. The conditions were excellent!<br />
+<br />
+<img src=
+"../attachments/2008-01/mtsunapee-skiing.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-06T10_52_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-06T15_59_03.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-06T10_48_47.txt" name=
+"e2008-01-06T10_48_47.txt"></a>
+<h2 class="date">01.06.2008 10:48</h2>
+<div class="blogbody">
+<h3 class="title">Mac OSX Firewire networking?</h3>
+<div class="item-description">On Friday, I tried hooking up two
+macs with a firewire network. I turned on sharing on my 10.5
+machine and was able to mount it on the 10.4 machine with no
+effort. It just worked. Today, I tried the same thing with no luck.
+So very strange. When it worked, I got about 12 MB/s sustained file
+transfer, which is so-so when I realized that I am using
+Firewire800 that has a theoretical 100MB/s transfer
+capability.<br />
+<br />
+And where are the firewall settings on 10.5?</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-06T10_48_47.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-06T10_52_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-04T17_58_08.txt" name=
+"e2008-01-04T17_58_08.txt"></a>
+<h2 class="date">01.04.2008 17:58</h2>
+<div class="blogbody">
+<h3 class="title">Panama Accepts Electronic Logbooks</h3>
+<div class="item-description"><a href=
+"http://www.hydro-international.com/news/id2191-Panama_Accepts_Electronic_Logbooks.html">
+Panama Accepts Electronic Logbooks</a> [Hydro International]
+<pre>
+The Panamanian flag state administration has authorised the use of
+electronic logbooks onboard all Panamanian flag vessels. The backing
+of the electronic logbooks by the largest shipping flag state in the
+world is an important milestone for Kongsberg Maritime, who introduced
+such system in 2004.
+...
+</pre>
+Is there an official standard format for log files?</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-04T17_58_08.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-06T10_48_47.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-04T17_40_57.txt" name=
+"e2008-01-04T17_40_57.txt"></a>
+<h2 class="date">01.04.2008 17:40</h2>
+<div class="blogbody">
+<h3 class="title">US Hydrographic Services Review Panel -
+Membership Solicitation</h3>
+<div class="item-description"><a href=
+"https://www.thefederalregister.com/d.p/2007-12-11-E7-23906">Notice
+of Membership Solicitation for Hydrographic Services Review
+Panel</a> [FederalRegister.com] - Summary:
+<pre>
+This notice responds to the Hydrographic Services Improvement Act
+Amendments of 2002, Public Law 107372, which requires the Under
+Secretary of Commerce for Oceans and Atmosphere to solicit nominations
+for membership on the Hydrographic Services Review Panel (the
+Panel). This advisory committee will advise the Under Secretary on
+matters related to the responsibilities and authorities set forth in
+section 303 of the Hydrographic Services Improvement Act of 1998, (the
+Act) and such other appropriate matters as the Under Secretary refers
+to the Panel for review and advice.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-04T17_40_57.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-04T17_58_08.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-04T17_09_37.txt" name=
+"e2008-01-04T17_09_37.txt"></a>
+<h2 class="date">01.04.2008 17:09</h2>
+<div class="blogbody">
+<h3 class="title">LJ takes a nose dive</h3>
+<div class="item-description">Looks like LiveJournal is very
+unhappy at the moment...
+<pre>
+Error running style: Style code didn't finish running in a timely
+fashion. Possible causes:
+    * Infinite loop in style or layer
+    * Database busy
+</pre>
+Thought this was a minor thing until I saw it on two different
+peoples' LJ pages. However, I am sure it will be short lived and
+things look happier just a few minutes later.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-04T17_09_37.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-04T17_40_57.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-04T10_06_02.txt" name=
+"e2008-01-04T10_06_02.txt"></a>
+<h2 class="date">01.04.2008 10:06</h2>
+<div class="blogbody">
+<h3 class="title">Coastal River Information Service AIS
+Presentation</h3>
+<div class="item-description">Just found another interesting source
+of information that has a great presentation on inland waterway
+issues in the US:<br />
+<br />
+<a href=
+"http://www.gicaonline.com/media/tools/070827_cris.ppt">Coastal
+River Information Service (CRIS) Real-time Electronic Data via
+Automatic Identification System</a> [PPT] by U.S. Army Corps of
+Engineers<br />
+<br />
+Posted on the Gulf Intracoastal Canal Association page: <a href=
+"http://www.gicaonline.com/pages/initiatives/tools.htm">GICA
+Tools/Presenations</a><br />
+<br />
+<img src=
+"../attachments/2008-01/cris-dam-incident.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-04T10_06_02.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-04T17_09_37.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-04T08_45_15.txt" name=
+"e2008-01-04T08_45_15.txt"></a>
+<h2 class="date">01.04.2008 08:45</h2>
+<div class="blogbody">
+<h3 class="title">Cold</h3>
+<div class="item-description">This morning it hit -2&#176;F. I am
+definitely ready for things to warm up.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-04T08_45_15.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-04T10_06_02.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-03T15_49_51.txt" name=
+"e2008-01-03T15_49_51.txt"></a>
+<h2 class="date">01.03.2008 15:49</h2>
+<div class="blogbody">
+<h3 class="title">How to receive AIS</h3>
+<div class="item-description">I was wondering if it is possible to
+receive AIS with a normal receiver. Here is the answer from
+<a href="http://www.coaa.co.uk/shipplotterfaq.htm">ShipPlotter
+FAQ</a>:
+<pre>
+If you want to receive AIS transmissions you really need a
+discriminator output on your receiver or you must use a dedicated AIS
+receiver. A few radios already have a discriminator output (I use a
+WinRadio which has a suitable output labelled 'data' and the PCR1000
+receiver has a suitable output labelled '9600'), but most receivers do
+not have one. The good news is that adding a discriminator output to
+an existing receiver is generally very simple
+indeed. www.discriminator.nl is the place to find about discriminator
+taps.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-03T15_49_51.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-04T08_45_15.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-03T15_39_53.txt" name=
+"e2008-01-03T15_39_53.txt"></a>
+<h2 class="date">01.03.2008 15:39</h2>
+<div class="blogbody">
+<h3 class="title">How Addicted to Apple Are You?</h3>
+<div class="item-description">What is your <a href=
+"http://www.justsayhi.com/bb/apple_addiction">apple addiction
+level</a>?<br />
+<br />
+<img src=
+"../attachments/2008-01/mac-addict.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-03T15_39_53.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-03T15_49_51.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-03T13_58_47.txt" name=
+"e2008-01-03T13_58_47.txt"></a>
+<h2 class="date">01.03.2008 13:58</h2>
+<div class="blogbody">
+<h3 class="title">AIS via software radio - GNU Radio</h3>
+<div class="item-description">I was hoping to work on this about a
+year ago, but never got a chance. Thankfully, it looks like others
+have gotten it done! This is way cool (at least to me)!!!<br />
+<br />
+<a href="http://folk.ntnu.no/undheim/sdr/ais.php">AIS data received
+in Google Earth using GNU Radio</a> - Demodulated AIS with GNU
+Radio. The following image is from the site:<br />
+<br />
+<img src=
+"../attachments/2008-01/aisgnuplot.jpg" /><br />
+
+<br />
+and<br />
+<br />
+<a href="http://gnuais.sourceforge.net/">gnuais.sourceforge.net</a>
+- Automatic Identification System for Linux<br />
+<br />
+<!--
+It looks like there is some sample data here: <a href="http://www.dsprelated.com/showmessage/48916/1.php">GMSK decoder implementation</a>
+--></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-03T13_58_47.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-03T15_39_53.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-03T13_32_14.txt" name=
+"e2008-01-03T13_32_14.txt"></a>
+<h2 class="date">01.03.2008 13:32</h2>
+<div class="blogbody">
+<h3 class="title">eNavigation 2007 presentations online</h3>
+<div class="item-description">Thanks to Fred for pointing out that
+the eNavigation 2007 presenations are online here:<br />
+<br />
+<a href=
+"http://www.enavigation.org/presentations.html">http://www.enavigation.org/presentations.html</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-03T13_32_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-03T13_58_47.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-03T09_04_49.txt" name=
+"e2008-01-03T09_04_49.txt"></a>
+<h2 class="date">01.03.2008 09:04</h2>
+<div class="blogbody">
+<h3 class="title">AIS to make a DSC VHF call</h3>
+<div class="item-description">Fred Pot pointed me to the ability of
+an AIS device to assist in making a VHF DSC call. Nice!<br />
+<br />
+<a href=
+"http://cs.simradyachting.com/Index.aspx?PageID=92&amp;CategoryBrowse=Browse%2c7&amp;FilesGallery=Download,999">
+Simrad AI50 Class B Transceiver Manual</a>, 988-0168-001 May07
+<pre>
+<b>6.10 Making a DSC Call (In map mode)</b>
+To make a DSC call, the unit must be connected to a SimNet compatible
+DSC VHF radio.
+.
+In Display Mode highlight a vessel icon then press and hold the
+HOME/DSC key, the AI50 will format a Routine Individual DSC call.  A
+"Creating DSC Call" window opens showing the MMSI number and name of
+the vessel you intend to call.
+.
+If this is correct and you wish to continue, press Ret MENU or &gt; to
+send the call. The "Routine DSC Call" window opens confirming that the
+call has been created and sent to the VHF radio.
+.
+If you wish to cancel the DSC call at this stage, press the &lt; key
+and the display will return to the map view.
+.
+If the AI50 is not connected to a compatible VHF radio when the DSC
+key is pressed a message window will open indicating that a compatible
+VHF radio cannot be detected.
+.
+Press the &lt; key to return to the map view.
+.
+<b>Note</b>
+Further control for the DSC radio from this point must be done at the
+radio. For further information on the DSC functionality consult your
+radio's user manual.
+</pre>
+<img src=
+"../attachments/2008-01/ai50-screen.png" /><br />
+
+<br />
+UPDATE: Thanks to gCaptain for the link... <a href=
+"http://gcaptain.com/maritime/blog/ais-as-a-dsc-transceiver/">AIS
+as a DSC Transceiver</a>, Jan 5th.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-03T09_04_49.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-03T13_32_14.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-02T15_18_23.txt" name=
+"e2008-01-02T15_18_23.txt"></a>
+<h2 class="date">01.02.2008 15:18</h2>
+<div class="blogbody">
+<h3 class="title">Post winter storm</h3>
+<div class="item-description">I think we need a bit of a break from
+the snow. We managed to pass the record for December snowfall last
+month and then it decided to snow again last night. Good for a
+workout.<br />
+<br />
+What's burried in my back yard?<br />
+<br />
+<img src=
+"../attachments/2008-01/winter-01.jpg" /><br />
+
+<br />
+Days where it warms up enough to melt some mean that it is going to
+be darn icy! The snow is working it's way towards the consistency
+of concrete.<br />
+<br />
+<img src=
+"../attachments/2008-01/winter-02.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-02T15_18_23.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-03T09_04_49.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-02T11_47_21.txt" name=
+"e2008-01-02T11_47_21.txt"></a>
+<h2 class="date">01.02.2008 11:47</h2>
+<div class="blogbody">
+<h3 class="title">Updated publications list</h3>
+<div class="item-description"><br />
+<br />
+You might have noticed that I have been doing the end of the year
+house cleaning on my computers. I have found references for a
+number of publications that I had misplaced. These are not all true
+publications by some standards, but I think they are important for
+me to document. There are now 49 items in my bibtex file that
+includes 3 pubs in the works: <a href=
+"http://vislab-ccom.unh.edu/~schwehr/papers/schwehr.bib">schwehr.bib</a>.
+I should have all of the documents online on my <a href=
+"http://vislab-ccom.unh.edu/~schwehr/papers/">publications
+page</a><br />
+<br />
+Here are the new (old) items with the bibtex key first:
+<ul>
+<li>constant2004, Seismic-Sites: a Web-based Field Guide to the
+Faults of Southern California, SCEC Conference Poster</li>
+<li>schwehr2003d, Continued Exploration of the Humboldt Slide using
+Anisotropy of Magnetic Susceptibility, Oceans03 MTS/IEEE
+Poster</li>
+<li>nguyen1999, The Viz Architecture, NASA Report</li>
+<li>zbinden1999, Visualizing Mars Using Virtual Reality: A state of
+the art Mapping Technique Used on Mars Pathfinder, The Fifth
+International Conference On Mars</li>
+<li>zbinden1998, Mapping Mars Using Virtual Reality: The Pathfinder
+Experience, ISPRS WG IV/5</li>
+<li>stoker1997, MarsMap: Analyzing Pathfinder Data using Virtual
+Reality, AGU Talk</li>
+<li>schwehr1997, VEVI and the Stereo Pipeline for Terrain
+Visualization, LPSC Conference Demonstration</li>
+<li>christian1997b, Demonstration of the Ames Marsokhod Rover,
+Rover Roundup</li>
+<li>blackmon1997, Mars Pathfinder Terrain Model Demonstrations,
+SigGraph Demonstration</li>
+<li>schwehr1994, GRASS Usage for Virtual Planetary Exploration,
+NASA Report</li>
+<li>schwehr1993, Mars Surface Science, Precursor Rover Mission
+Options, etc, 1993 Stanford International Mars Mission</li>
+<li>schwehr1992, ROV Telepresence Software, NASA Report</li>
+<li>schwehr1991, Analysis of Photometric Data from a Robotic
+Telescope, Planet Search 1991, Using a Robotic Photometric
+Telescope to Search for Extrasolar Planets, NASA Ames Contractor
+Report</li>
+<li>garcia1991, Propsal to the Philippine Government for the
+Widespread Use of Ethanol as an Automotive Fuel, Sierra Club
+Internation Committee</li>
+<li>schwehr1990a,Acquire: Photometric Telescope Data Collection
+Software, NASA Report</li>
+<li>schwehr1990b, Martian Dust Issues: Triboluminescence and
+Composition, NASA Ames Contractor</li>
+</ul>
+I also found a pile of in progress papers that are up to 10 years
+old. Time to finish them up or drop them. It is also tough to
+decide what to include in my list of references. I am leaning more
+towards putting in everything including public talks and such and
+letting anyone who wants to use the bibtex or endnote files decide
+for themselves what constitutes a publication they are willing use.
+On my laptop I now have a Pubs folder with a bunch of different
+subdirectories:
+<ul>
+<li>Papers - Anything that I think of as a paper or report</li>
+<li>PapersInProgress - Ugh... things that I have not finished</li>
+<li>Posters - All my Illustrator PDF files and abstracts for
+conference posters</li>
+<li>Proposals - All the proposals that I have worked on or been
+associated with over the years. I am missing a lot in this
+folder.</li>
+<li>Rejected - Oops. And I gave up on it.</li>
+<li>Reviews - Self review reports for grants and management. Wish I
+had all the ones I wrote back at ARC.</li>
+<li>Software - A bunch of tar balls of the latest released
+versions</li>
+<li>Talks - PPT, Keynote , and PDFs of talks I have given</li>
+<li>Teaching - Classes that I have taught</li>
+<li>ThesesNotSchwehr - Finding a thesis on the web can be nearly
+impossible, so I try to keep those for students that I have worked
+with or I think their thesis is particularly awesome.</li>
+</ul>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-02T11_47_21.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-02T15_18_23.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-02T10_38_33.txt" name=
+"e2008-01-02T10_38_33.txt"></a>
+<h2 class="date">01.02.2008 10:38</h2>
+<div class="blogbody">
+<h3 class="title">Embedded linux system design using
+syscalltrack</h3>
+<div class="item-description">A while back (2002/2003), I worked on
+a contract project for an embedded Linux system that was meant to
+run on a solid state disk with not much space that allowed users to
+plug a flash drive into the unit and have automatic updates. The
+problem was that the system only had 256MB of storage space and had
+to fit the Linux kernel, busy box, Mozilla, and java. One of the
+really cool tricks that I used to develop this Linux distribution
+was to use <a href=
+"http://syscalltrack.sourceforge.net/">syscalltrack</a>. This is a
+Linux kernel module that lets you hijack system calls. I used it to
+generate a complete list of files that a running system would use
+during a test run. I then used a script to remove all unused files
+from the system accept for a few in a known list of unused files
+that I wanted to keep. I haven't tried doing this kind of thing
+with Linux 2.6 kernels, but it worked greate with 2.4.<br />
+<br />
+Here is what a syscalltrack log likes like for Mozilla starting
+up...
+<pre>
+...
+syscall: 71["mozilla"]: 5_open("/lib/mmx/libtermcap.so.2", 0, 0) (rule 1)
+syscall: 71["mozilla"]: 5_open("/lib/libtermcap.so.2", 0, 0) (rule 1)
+syscall: 71["mozilla"]: 5_open("/lib/libdl.so.2", 0, 512) (rule 1)
+syscall: 71["mozilla"]: 5_open("/lib/libc.so.6", 0, 12288) (rule 1)
+syscall: 71["mozilla"]: 5_open("/dev/tty", 34818, 0) (rule 1)
+syscall: 71["mozilla"]: 5_open("/usr/share/locale/locale.alias", 0, 438) (rule 1)
+</pre>
+And then a java processing kicking off:
+<pre>
+...
+syscall: 81["java"]: 5_open("/lib/libc.so.6", 0, 1024) (rule 1)
+syscall: 81["java"]: 5_open("/usr/local/j2re1.4.1_02/lib/i386/jvm.cfg", 0, 438) 
+(rule 1)
+syscall: 81["java"]: 5_open("/etc/ld.so.preload", 0, <img src=
+"../moods/smilies/cool.gif" alt="8)" border=
+"0" syscall:="" />
+</pre>
+strace has to be done on a process by process basis, thereby
+becoming very difficult to track everything that is happing on a
+complete system run. I also had to make a little script to
+excercise other programs on the system that I wanted to remain
+(e.g. grep, sed, etc) I then ended up with a list of files that I
+want to keep:
+<pre>
+...
+/bin/rm
+/bin/sed
+/bin/sh
+/bin/stat
+/bin/touch
+/bin/umount
+/bin/uname
+/dev
+/dev/apm_bios
+/dev/console
+/dev/cpu/
+/dev/cpu/mtrr
+/dev//dev/sct_log0
+/dev/mem
+/dev/null
+...
+</pre>
+I glued it all together with a lot of egrep, cut, awk, xargs, etc.
+scripting. This was definitely a fun project.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-02T10_38_33.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-02T11_47_21.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-01-01T22_07_44.txt" name=
+"e2008-01-01T22_07_44.txt"></a>
+<h2 class="date">01.01.2008 22:07</h2>
+<div class="blogbody">
+<h3 class="title">svn properties</h3>
+<div class="item-description">I've been working my way through the
+SVN book a couple minutes a day and I hit properties just as I was
+creating my 2008 work log and retiring my 2nd 2007 log. To have a
+keyword replacement for tracking a file, I did this from the
+command line:
+<pre>
+% <b>svn propset svn:keywords 'Id' kurt-2008.txt</b>
+% <b>svn proplist kurt-2008.txt -v</b>
+Properties on 'kurt-2008.txt':
+  svn:keywords : Id
+</pre>
+By putting "$Id:$" at the top of the file, it gets replaced with
+the current revision information at each commit.
+<pre>
+$Id: kurt-2007.txt 8058 2008-01-01 16:07:52Z schwehr $
+</pre>
+I'd been using "svn propedit svn:keywords" and that pops up a text
+editor. Not very convenient if you need to do this on many
+files.<br />
+<br />
+I was also reading about arbitraty keywords. I can't think of a
+really good use for me right now, but I can see how it could be
+important tool.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-01.html#e2008-01-01T22_07_44.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-01-02T10_38_33.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">January 2008</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-01T22_07_44.txt">1</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-02T15_18_23.txt">2</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-03T15_49_51.txt">3</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-04T17_58_08.txt">4</a></span></td>
+<td align="center"><span class="calendar">5</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-06T15_59_03.txt">6</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-07T19_10_43.txt">7</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-08T14_27_18.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-09T17_57_54.txt">9</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-10T21_59_28.txt">10</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-11T15_03_12.txt">11</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-12T08_43_55.txt">12</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-14T14_54_24.txt">14</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-15T14_35_31.txt">15</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-16T06_33_59.txt">16</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-17T14_13_57.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-18T20_31_36.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-19T17_45_42.txt">19</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-20T19_55_50.txt">20</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-21T20_24_50.txt">21</a></span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-23T18_24_40.txt">23</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-24T20_09_57.txt">24</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-25T11_47_21.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-26T13_26_06.txt">26</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-27T17_02_22.txt">27</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-28T20_55_52.txt">28</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-29T12_18_29.txt">29</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-01.html#e2008-01-30T08_34_09.txt">30</a></span></td>
+<td align="center"><span class="calendar">31</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

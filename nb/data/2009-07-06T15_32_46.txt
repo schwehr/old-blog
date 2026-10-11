@@ -1,0 +1,74 @@
+TITLE: AIS Area Notice reference implmentation
+AUTHOR: Kurt
+DATE: 07.06.2009 15:32
+DESC: buggy, but released
+-----
+BODY:
+I've just released <a href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/">ais-areanotice-py</a> verion 0.1.  This
+initial release is guaranteed to have bugs and is still missing some
+implementation details on the rendering side.  Feedback is definitely needed!
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/downloads/ais-areanotice-py-0.1.tar.bz2">ais-areanotice-py-0.1.tar.bz2</a> [77K]
+
+This is my attempt to provide sample software that handles the Area
+Notice that will be submitted to IMO's NAV 55 conference this summer
+by Sweden.  The message is documented in <a
+href="http://vislab-ccom.unh.edu/~schwehr/papers/2009-Nav55-CG-AIX-Report-Annex1.pdf">2009-Nav55-CG-AIX-Report-Annex1.pdf</a>.
+The AIS binary message provides points, circles, rectangles, sectors,
+polylines, polygons, and additional free text (129 characters max).
+There are 127 possible notice types (<a target="new"
+href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/table.html">table</a>).
+These are grouped into cautions, warnings, restricted areas,
+anchorages, security, distress, instruction, infomration, chart
+features, and reporting.  In April, I gave an example of the polylines
+showing the edge of the ice and the suggested route through the ice.
+The routing portion of the initial concept didn't survive the
+committee, but it still gives the idea.
+
+<img title="Ice area with route through ice" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/ais-bin-msg-area-ice.png"/>
+
+What is ais-areanotice-py?  My hope is that by providing code that can
+encode and decode this binary message, providors of AIS software will
+be able to implement support more rapidly.  I provide build_samples.py
+to produce a <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/samples/samples.txt">sample
+set of messages</a> that contain a text description, geojson output
+(not yet correct), BBM that can be sent to a transceiver (e.g. a
+basestation or ATON device), VDM as it would be returned by a
+receiver, and the raw bits for the VDM.  For example:
+<pre># Point
+AreaNotice: type=0  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
+{"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"bbm_type": [1, 22], \
+ "bbm_name": "area_notice", "areas": [{"geometry": {"type": "Point", \
+ "coordinates": [-69.799999999999997, 42.0]}, "area_shape_name": "point", \
+ "area_shape": 0}]}}
+!ECBBM,1,1,3,A,8,01F0`0qP000N0n0uT0h4;0000000,5*69
+!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P=P?I0&lt;12h000000,3*3D
+001000000001110101101111001101000101010000000000010101100000001010000000001\
+110011000000000000000000000000111100000001101100000001111011001000000001100\
+000001000010110000000000000000000000000000000000000</pre>
+
+There is an associated object in a <a href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/samples/samples.kml">sample.kml</a>:
+
+<img title="Initial release of Area Notice reference implementation" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-07/areanotice-sample-ge.png"/>
+
+Remember that this is an initial 0.1 release.  Issues:
+<ul>
+  <li>I am pretty sure that the JSON is not right for starters.</li>
+  <li>The MMSI is not getting set in the json output</li>
+  <li>No support for rendering to kml for polylines or polygons that span multiple area parts</li>
+  <li>There has been no external testing.  Will the BBM's work?</li>
+  <li>And...</li>
+</ul>
+
+This is a switch in style for me.  Normally, I generate XML and python
+from there, but my XML definitely can't handle the complexity of these
+messages.  I also wanted to try out a more object oriented (OO)
+approach to the code.  There is a parent AIVDM class with a BBM child.
+AreaNotice inherits from BBM.  Hopefully the relationships and
+spreading of work should make sense.  It's really nice to put the
+__str__ method in the parent so that it always just calls the
+__unicode__ method.  Note that the area types are a different
+inheritance tree and AreaNotice contains AreaNoticeSubAreas.  There is
+no "is a" relationship there.
+-----

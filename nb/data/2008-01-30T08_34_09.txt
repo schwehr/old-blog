@@ -1,0 +1,92 @@
+TITLE: epydoc 3.0 released
+AUTHOR: Kurt
+DATE: 01.30.2008 08:34
+DESC: killer
+-----
+BODY:
+My favorite python documentation program, <a
+href="http://epydoc.sourceforge.net/">epydoc</a>, released version
+3.0.  I've been using the beta for a year and it is really great.
+I just discovered that is it not a good thing that I commited the
+fink package with a version of 3.0beta.  3.0 without a beta does
+not rate higher.  Oops. RangeRick suggested 3.0.0...
+<pre>
+% dpkg --compare-versions '3.0beta' lt '3.0.0' && echo yes
+yes
+</pre>
+Now I just need to change it over to update-alternatives and ditch the
+epydoc-py25-bin package.
+
+Here is the basic epydoc architecture:
+
+<img src="http://schwehr.org/blog/attachments/2008-01/epydoc.png"/>
+
+Here is a bit of my template that is stripped down to just to show what
+is possible.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#2040a0">__version__</font> <font color="4444FF">=</font> <font color="#008000">'$Revision: 1234 $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">__date__</font> <font color="4444FF">=</font> <font color="#008000">'$Date: 2008-01-30 $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">__author__</font> <font color="4444FF">=</font> <font color="#008000">' put in the authors name'</font>
+<font color="#2040a0">__doc__</font><font color="4444FF">=</font><font color="#008000">''</font><font color="#008000">'
+Example python file that is all tricked out.  Designed for epydoc,
+unittest and doctest.  Please keep updating to make this the best
+possible template file.
+@requires: U{lxml&lt;http://codespeak.net/lxml/&gt;} - For libxml2 ElementTree interface
+@requires: U{Python&lt;http://python.org/&gt;} &gt;= 2.5
+@requires: U{epydoc&lt;http://epydoc.sourceforge.net/&gt;} &gt;= 3.0
+@author: U{'</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">__author__</font><font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'&lt;http://fix.author.url/&gt;} FIX: replace with your name/url
+@version: '</font><font color="#008000">''</font> <font color="4444FF">+</font> <font color="#2040a0">__version__</font> <font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'
+@copyright: 2008
+@var __date__: Date of last svn commit
+@undocumented: __version__ __author__ __doc__ parser success
+@since: 2008-Jan-30  FIX: replace with the file creation date
+@status: under development
+@organization: U{somewhere&lt;http://somewhere.edu/&gt;} - FIX: put in URL
+@license: Your license here
+@bug: epydoc --check complains about unittest additions
+@bug: Bug two
+@todo: Keep writing example code
+@todo: copy the code and replace the author and since fields
+@todo: To make your code executable after check-in (to allow
+for doc and unittest), do svn propset svn:executable ON yourfile.py
+@todo: &quot;svn propedit svn:keywords yourfile.py&quot;, then put in &quot;Date Revision&quot;
+@see: U{python idioms&lt;http://jaynes.colorado.edu/PythonIdioms.html&gt;} -
+Read this before modifying any code here.
+'</font><font color="#008000">''</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+<font color="#444444">######################################################################</font>
+<strong>class</strong> <font color="#2040a0">Template</font><font color="4444FF">:</font>
+    <font color="#008000">''</font><font color="#008000">'
+    Class documentation goes here.
+    &gt;&gt;&gt; print &quot;This is a doctest&quot;
+    This is a doctest
+    '</font><font color="#008000">''</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,someArg=None)</font>:
+</strong>	<font color="#008000">''</font><font color="#008000">'
+	Initialize the class.  Add some detail here.
+	@param someArg: example argument
+        @type someArg: int
+	'</font><font color="#008000">''</font>
+	<strong>pass</strong>  <font color="#444444"># A way to have a do nothing stub</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> aMethod</font><font color="2040a0">(self,anotherArg)</font>:
+</strong>	<font color="#008000">''</font><font color="#008000">'
+	This is the detailed description of aMethod that tells you it
+	is a really moronic method.  It does howver show how to
+	document a class method.
+	@param anotherArg: what to print
+	@return: prints the arg to stdout
+        @rtype: str
+	'</font><font color="#008000">''</font>
+	<strong>print</strong> <font color="#2040a0">anotherArg</font>
+</pre>
+
+This is the basic overview:
+
+<img src="http://schwehr.org/blog/attachments/2008-01/epydoc-2.png"/>
+
+You can then drill into the templace class:
+
+<img src="http://schwehr.org/blog/attachments/2008-01/epydoc-3.png"/>
+-----

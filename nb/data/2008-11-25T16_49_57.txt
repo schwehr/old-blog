@@ -1,0 +1,56 @@
+TITLE: Simple structure and pointer ctypes example
+AUTHOR: Kurt
+DATE: 11.25.2008 16:49
+DESC: more the way I think
+-----
+BODY:
+I needed a more straightforward example of a pointer to a structure
+being returned from a function call to practice ctypes on.  So, I made
+one and here is what I did.  There wasn't anything quite like it in
+the <a href="http://www.python.org/doc/lib/ctypes-ctypes-tutorial.html">ctypes tutorial</a>.
+
+First the C code.  I didn't want to deal with malloc / free, so I just
+put an instance of the structure (sample2) in the scope of the shared object.
+
+<pre><tt><i><font color="#9A1900">// Build like this on the mac: gcc -g -Wall -bundle -undefined dynamic_lookup test_ctypes.c -o _test_ctypes.so</font></i>
+<!-- -->
+<b><font color="#0000FF">struct</font></b> <font color="#008080">two</font> <font color="#FF0000">{</font>
+    <font color="#009900">int</font> g<font color="#990000">;</font>
+    <font color="#009900">float</font> h<font color="#990000">;</font>
+<font color="#FF0000">}</font><font color="#990000">;</font>
+<!-- -->
+<b><font color="#0000FF">typedef</font></b> <b><font color="#0000FF">struct</font></b> <font color="#008080">two</font> <font color="#990000">*</font>two_ptr<font color="#990000">;</font>
+<!-- -->
+<b><font color="#0000FF">struct</font></b> <font color="#008080">two</font> sample2<font color="#990000">;</font>
+<!-- -->
+<font color="#008080">two_ptr</font> <b><font color="#000000">return_a_two</font></b> <font color="#990000">(</font><font color="#009900">void</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+    sample2<font color="#990000">.</font>g <font color="#990000">=</font> <font color="#993399">123</font><font color="#990000">;</font>
+    sample2<font color="#990000">.</font>h <font color="#990000">=</font> <font color="#993399">456.789</font><font color="#990000">;</font>
+<!-- -->
+    <b><font color="#0000FF">return</font></b> <font color="#990000">&amp;</font>sample2<font color="#990000">;</font>
+<font color="#FF0000">}</font></tt></pre>
+And the python ctypes interface.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> ctypes
+lib <font color="#990000">=</font> ctypes<font color="#990000">.</font><b><font color="#000000">CDLL</font></b><font color="#990000">(</font><font color="#FF0000">'_test_ctypes.so'</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">struct_two</font></b><font color="#990000">(</font>ctypes<font color="#990000">.</font>Structure<font color="#990000">):</font>
+    _fields_ <font color="#990000">=</font> <font color="#990000">[</font>
+        <font color="#990000">(</font><font color="#FF0000">'g'</font><font color="#990000">,</font>ctypes<font color="#990000">.</font>c_int<font color="#990000">),</font>
+        <font color="#990000">(</font><font color="#FF0000">'h'</font><font color="#990000">,</font>ctypes<font color="#990000">.</font>c_float<font color="#990000">)</font>
+        <font color="#990000">]</font>
+<!-- -->
+return_a_two <font color="#990000">=</font> lib<font color="#990000">.</font>return_a_two
+return_a_two<font color="#990000">.</font>restype <font color="#990000">=</font> ctypes<font color="#990000">.</font><b><font color="#000000">POINTER</font></b><font color="#990000">(</font>struct_two<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    ptr <font color="#990000">=</font> <b><font color="#000000">return_a_two</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">print</font></b> ptr<font color="#990000">.</font>contents<font color="#990000">.</font>g
+    <b><font color="#0000FF">print</font></b> ptr<font color="#990000">.</font>contents<font color="#990000">.</font>h</tt></pre>
+When run, it prints out the value of the two members of the structure.
+<pre>% <b>./test_ctype.py</b>
+123
+456.789001465</pre>
+Now to figure out the actual structure of magic_set of file.
+-----

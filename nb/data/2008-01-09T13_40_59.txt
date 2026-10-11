@@ -1,0 +1,151 @@
+TITLE: setting up a postgresql/postgis database on mac osx 10.5 with fink
+AUTHOR: Kurt
+DATE: 01.09.2008 13:40
+DESC: kickstart
+-----
+BODY:
+Now that I have libgeos2 installed via fink for <b>OSX 10.5</b>, here
+are my notes on creating a database for AIS.  First, the Mac needs to
+have the shared memory kernel parameters changed from the defaults.
+This is done through the sysctl.conf file.  Once these parameters are
+all set, they are stuck until the machine is rebooted.  Create an
+/etc/sysctl.conf.  You probably do not have a sysctl.conf, but use
+&gt;&gt; to append, just in case you already have settings from some
+other software already in there.
+<pre>
+% sudo cat &lt;&lt; EOF &gt;&gt; /etc/sysctl.conf
+# These values are to support postgresql                                                     
+# See also: <a href="http://wiki.finkproject.org/index.php/Shared_Memory_Regions_on_Darwin">http://wiki.finkproject.org/index.php/Shared_Memory_Regions_on_Darwin</a>
+# See also: man sysctl.conf
+kern.sysv.shmmax=16777216
+kern.sysv.shmmin=1
+kern.sysv.shmmni=64
+kern.sysv.shmseg=8
+kern.sysv.shmall=32768
+EOF
+</pre>
+Reboot the mac. Now check up on what the actual shared memory settings are:
+<pre>
+% sysctl -a | grep shm
+kern.exec: unknown type returned
+kern.sysv.shmall: 32768
+kern.sysv.shmseg: 8
+kern.sysv.shmmni: 64
+kern.sysv.shmmin: 1
+kern.sysv.shmmax: 16777216
+machdep.pmap.hashmax: 9
+security.mac.sysvshm_enforce: 1
+security.mac.posixshm_enforce: 1
+</pre>
+Install the software from fink (you need to have fink unstable turned on).
+<pre>
+% fink install postgresql82{,-dev,-shlibs} postgis82
+% pgsql.sh start
+</pre>
+If you want to always have postgresql available, you need to have the 
+server be started at boot time.  See what programs can be started at 
+boot from fink:
+<pre>
+% sudo daemonic dump | less
+</pre>
+Now set postgresql82 to start at boot:
+<pre>
+% sudo daemonic enable postgresql82
+% ls /Library/StartupItems/
+daemonic-anacron  daemonic-apache2  daemonic-postgresql82
+</pre>
+Now create a database for AIS.  This is only for a secured machine
+where all the users are trusted.
+<pre>
+% createuser -U postgres -W $USER
+% createdb ais
+psql -f /sw/share/doc/postgis82/lwpostgis.sql -d ais
+psql -f /sw/share/doc/postgis82/spatial_ref_sys.sql -d ais
+</pre>
+Now you can create the database tables using noaadata:
+<pre>
+% ./ais_db.py --create-tables -v
+Connect string: dbname='ais' user='schwehr' host='localhost'
+Creating tables
+1  ... adding position
+2  ... skipping - already in the db - position
+3  ... skipping - already in the db - position
+4  ... adding bsreport
+5  ... adding shipdata
+6  ... adding abm
+7  ... adding binack
+8  ... adding bin_broadcast
+9  ... adding SARposition
+10  ... adding utcquery
+12  ... adding asrm
+14  ... adding srbm
+15  ... adding interrogation
+18  ... adding positionb
+19  ... adding b_pos_and_shipdata_broken
+20  ... adding datalinkmng
+21  ... adding AidsToNavReport
+22  ... adding ChanMngmt
+Done.
+</pre>
+ais_db.py will be released in the next version of noaadata.  Note that
+the 'b_pos_and_shipdata_broken' table name means that I do not think that
+I have the table defined correctly.
+
+Now take a look at the database tables:
+<pre>
+% psql -l
+           List of databases
+      Name      |  Owner   | Encoding  
+================+==========+===========
+ ais            | postgres | SQL_ASCII
+ postgres       | postgres | SQL_ASCII
+ template0      | postgres | SQL_ASCII
+ template1      | postgres | SQL_ASCII
+(4 rows)
+</pre>
+And look inside the ais database:
+<pre>
+% psql ais
+ais=# \d
+                        List of relations
+ Schema |               Name                |   Type   |  Owner  
+========+===================================+==========+=========
+ public | abm                               | table    | schwehr
+ public | abm_key_seq                       | sequence | schwehr
+ public | aidstonavreport                   | table    | schwehr
+ public | aidstonavreport_key_seq           | sequence | schwehr
+ public | asrm                              | table    | schwehr
+ public | asrm_key_seq                      | sequence | schwehr
+ public | b_pos_and_shipdata_broken         | table    | schwehr
+ public | b_pos_and_shipdata_broken_key_seq | sequence | schwehr
+ public | bin_broadcast                     | table    | schwehr
+ public | bin_broadcast_key_seq             | sequence | schwehr
+ public | binack                            | table    | schwehr
+ public | binack_key_seq                    | sequence | schwehr
+ public | bsreport                          | table    | schwehr
+ public | bsreport_key_seq                  | sequence | schwehr
+ public | chanmngmt                         | table    | schwehr
+ public | chanmngmt_key_seq                 | sequence | schwehr
+ public | datalinkmng                       | table    | schwehr
+ public | datalinkmng_key_seq               | sequence | schwehr
+ public | geometry_columns                  | table    | schwehr
+ public | interrogation                     | table    | schwehr
+ public | interrogation_key_seq             | sequence | schwehr
+ public | position                          | table    | schwehr
+ public | position_key_seq                  | sequence | schwehr
+ public | positionb                         | table    | schwehr
+ public | positionb_key_seq                 | sequence | schwehr
+ public | sarposition                       | table    | schwehr
+ public | sarposition_key_seq               | sequence | schwehr
+ public | shipdata                          | table    | schwehr
+ public | shipdata_key_seq                  | sequence | schwehr
+ public | spatial_ref_sys                   | table    | schwehr
+ public | srbm                              | table    | schwehr
+ public | srbm_key_seq                      | sequence | schwehr
+ public | track_lines                       | table    | schwehr
+ public | track_lines_track_key_seq         | sequence | schwehr
+ public | utcquery                          | table    | schwehr
+ public | utcquery_key_seq                  | sequence | schwehr
+(36 rows)
+</pre>
+-----

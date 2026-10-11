@@ -1,0 +1,170 @@
+TITLE: Bulding a better rat trap - working with older C code
+AUTHOR: Kurt
+DATE: 03.06.2008 09:18
+DESC: crazy code and using the compiler to help you out
+-----
+BODY:
+I got a chance yesterday to give a look at some older C code that has
+had a long history of being passed from person to person.  I was looking
+to see how hard a port to Mac OSX with X11 would be.  It's too much
+for me right now, but here are some notes on how to approach this type 
+of problem.  The are huge number of code bases floating around just 
+like the one I was inspecting.  People have invested huge amounts of
+time in this code it is a shame to not bring the code up to date.
+
+The first thing was to update the Makefile.  I just go ahead and force
+the makefile to be GNU specific.  Roland would say that I should switch
+to scons, but here the project has been make based for 15 years.
+People often list out all the object files that they want to build.
+This is brittle and labor intensive.  The best thing to do is get
+make to build every source file in the directory:
+<pre>
+SRCS:=${wildcard *.c}
+OBJS:=${SRCS:.c=.o}
+</pre>
+That can remove huge numbers of lines from makefiles.  Then I don't
+have to wonder which source is being used by the project and which
+is rafted.  I just go ahead and svn rm anything that is no longer in
+use.  It's svn, so if need be, it can always come back.
+
+Then the next step is to make the gnu compiler go agro over checking
+the code.  I make warnings errors and fix every one of them.  If all
+warnings are fixed, then when you are working forward, then you will
+notice when things get a little sketchy.  It keeps you honest about
+what you are doing.  In C, that honesty can save you from days of
+pain staring at the debugger.
+
+Here is the makefile that I came up with for building a library:
+<pre>
+<font color="orange"># GNU Make specific code</font>
+<font color="2040a0">RANLIB :=</font> ranlib  <font color="orange"># Make this /bin/true for systems without ranlib</font>
+<font color="orange"># Be as aggressive as possible about code correctness</font>
+<font color="2040a0">CFLAGS :=</font> -Wall
+<font color="2040a0">CFLAGS +=</font> -Wimplicit 
+<font color="2040a0">CFLAGS +=</font> -pedantic 
+<font color="2040a0">CFLAGS +=</font> -W 
+<font color="2040a0">CFLAGS +=</font> -Wredundant-decls
+<font color="2040a0">CFLAGS +=</font> -Werror
+ifdef OPTIMIZE
+<font color="2040a0">  CFLAGS +=</font> -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG
+<font color="2040a0">  CFLAGS +=</font> -ffast-math 
+else
+<font color="2040a0">  CFLAGS +=</font> -g3 -O0
+endif
+<font color="orange"># Don't list out all the sources</font>
+<font color="2040a0">SRCS:=</font><font color="2040a0">${wildcard *.c}</font>
+<font color="2040a0">OBJS:=</font><font color="2040a0">${SRCS:.c=.o}</font>
+<font color="orange"># Build a library</font>
+<font color="8b2252"><strong>libsomething.a</strong>:</font> <font color="2040a0">${OBJS}</font>
+	@echo &quot;Building the library&quot;
+	ar rv <font color="4080ff">$@</font> <font color="4080ff">$&lt;</font>
+	<font color="2040a0">${RANLIB}</font> <font color="4080ff">$@</font>
+<font color="orange"># Rest the world</font>
+<font color="8b2252"><strong>clean</strong>:</font>
+	-rm -f *.o *~ core *.a
+</pre>
+And here is a simple source file that makes a couple points.  It used to be
+considered okay to let the return value of functions just default to int.
+If you are not going to return anything, I strongly suggest you make the
+function void.  This makes it clear what you are intending.  Some people
+used these for strange side effects.  If you must have an usused parameter,
+then let me know with an UNUSED.
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdlib.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdio.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;math.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;string.h&gt;</font></strong></font>
+<font color="#444444">/* #include &lt;malloc.h&gt; - This is not a standard header. */</font>
+<font color="0000ff"><strong>#ifdef __GNUC__</strong></font>
+<font color="0000ff"><strong>#define UNUSED __attribute((__unused__))</strong></font>
+<font color="0000ff"><strong>#else</strong></font>
+<font color="#444444">/*!
+  \brief GNU CC attribute to denote unused paramters in function calls.
+  The attribute remove compiler warning for unused arguments and variable.  Only works
+  for GNU compilers such as gcc and g++.
+  http://gcc.gnu.org/onlinedocs/gcc-3.4.2/gcc/Variable-Attributes.html
+*/</font>
+<font color="0000ff"><strong>#define UNUSED</strong></font>
+<font color="#444444">/* **************************************** */</font>
+<font color="0000ff"><strong>#endif</strong></font>
+<strong>int</strong>
+<font color="#2040a0">do_not_let_the_return_just_default</font> <font color="4444FF">(</font><strong>void</strong><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>return</strong> <font color="#FF0000">1</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<font color="#444444">/* **************************************** */</font>
+<strong>void</strong>
+<font color="#2040a0">if_nothing_to_return_say_so</font> <font color="4444FF">(</font><font color="#2040a0">UNUSED</font> <strong>int</strong> <font color="#2040a0">mark_unused_as_unused</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#444444">/* Nothing - NOP */</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Now that we have a makefile and a foo.c, here is a quick runthrough of
+the behavior.  The default build is a debugging build - slow and large.
+<pre>
+% <b>make</b>
+cc -Wall -Wimplicit  -pedantic  -W  -Wredundant-decls -Werror -g3 -O0   -c -o foo.o foo.c
+Building the library
+ar rv libsomething.a foo.o
+ar: creating archive libsomething.a
+a - foo.o
+ranlib   libsomething.a
+</pre>
+This is what the directory looks like after the build:
+<pre>
+% <b>ls -l</b>
+total 40
+-rw-r--r-- 1 schwehr schwehr   625 Mar  6 08:19 Makefile
+-rw-r--r-- 1 schwehr schwehr   754 Mar  6 08:16 foo.c
+-rw-r--r-- 1 schwehr schwehr 14652 Mar  6 08:20 foo.o
+-rw-r--r-- 1 schwehr schwehr 14912 Mar  6 08:20 libsomething.a
+</pre>
+Now, rebuild with the code heavily optimized.  It is always good to
+run your code both ways to find any places that are unstable.
+<pre>
+% <b>make clean</b>
+rm -f *.o *~ core *.a
+% <b>make OPTIMIZE=1</b>
+cc -Wall -Wimplicit  -pedantic  -W  -Wredundant-decls -Werror -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG -ffast-math    -c -o foo.o foo.c
+Building the library
+ar rv libsomething.a foo.o
+ar: creating archive libsomething.a
+a - foo.o
+ranlib   libsomething.a
+</pre>
+The results are drastically smaller:
+<pre>
+% <b>ls -l</b>
+total 16
+-rw-r--r-- 1 schwehr schwehr 625 Mar  6 08:19 Makefile
+-rw-r--r-- 1 schwehr schwehr 754 Mar  6 08:16 foo.c
+-rw-r--r-- 1 schwehr schwehr 436 Mar  6 08:20 foo.o
+-rw-r--r-- 1 schwehr schwehr 696 Mar  6 08:20 libsomething.a
+</pre>
+Now, if this were going to be an internet release of code to a 
+wide audience, I would suggest switching to GNU autoconf.
+
+A quick final note.  It is often useful to see what the compiler
+puts in object files and libraries:
+<pre>
+% <b>make clean && make</b>
+% <b>nm foo.o</b>
+00000000 T _do_not_let_the_return_just_default
+00000020 T _if_nothing_to_return_say_so
+% <b>nm libsomething.a</b>
+libsomething.a(foo.o):
+00000000 T _do_not_let_the_return_just_default
+00000020 T _if_nothing_to_return_say_so
+</pre>
+Oh, and for some C++ fun, check out this from <a href="http://planet.debian.net/">planet.debian.net</a>:
+
+Enrico looking at formatting in C++: <a href="http://www.enricozini.org//2008/tips/iostream-formatting.html">Formatting numbers with iostream</a>
+
+The <a href="http://www.hogyros.de/?q=node/379">response</a> from GyrosGeier:
+<pre>
+Enrico, you were probably looking for
+.
+std::cout &lt;&lt; (std::stringstream() &lt;&lt; "foo" &lt;&lt; std::setw(8) &lt;&lt; "bar").rdbuf() &lt;&lt; std::endl;
+.
+which is a WTF in itself.
+</pre>
+Happy hacking!
+-----

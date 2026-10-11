@@ -1,0 +1,57 @@
+TITLE: Remko's notes on GMT in OSX 10.5
+AUTHOR: Kurt
+DATE: 11.20.2007 13:50
+DESC: what to do
+-----
+BODY:
+Remko posted some notes about GMT on Mac OSX 10.5 in the GMT mailing
+list.  I'm duplicating the notes here so that I don't loose them.
+<pre>
+- Leopard has a new way of launching X11 (by itself) whenever you start an X
+  application. But this requires some work to set up correctly if you have been
+  fidgeting with X11 on Tiger.
+  . Remove ~/.xinitrc. I had it so that X11 wouldn't automatically launch xterm.
+    That won't happen anymore by default. It you want xterm, simply click the
+    xterm icon in /usr/X11/bin or start xterm from the Terminal.app.
+  . Remove X11 from your Login Items in the Accounts preference pane. Take if also
+    out of the Dock so that you are not prone to start X11 from there. It doesn't work
+    that way any longer.
+  . Make sure NOT to set the DISPLAY environment variable. DO NOT put it in your
+    .cshrc or .bashrc. X11 will not launch automatically when you do.
+    MacOSX will set it to something like: tmp/launch-Uhmf6W/:0
+    So type: echo $DISPLAY to check that's the case.
+  . You may also want to say goodbye to .Xdefaults (at least font settings).
+  . Now X11 should automatically launch when you type e.g. "gv" in a Terminal window.
+  . By the way: also trash ~/.gv. The ghostscript setting -dGraphicsAlphaBits=4
+    that I had in there made gv crash when is started plotting fonts.
+- The preference file ~/Library/Preferences/org.x.X11_launcher.plist is created.
+  When you just launch X11 applications from the Terminal, you can ignore it.
+  But if you launch X11 manually by clicking the icon --which you shouldn't--
+  it will launch xterm. It will also cause an additional launch of xterm when you
+  click a file associated with an X11 application (see below).
+  The xterm, I have learned, is just there to cause X11 to launch.
+  You can avoid launching the xterm, but still have X11 be launched, type
+  $ defaults write org.x.X11_launcher app_to_run /usr/X11/bin/xhost
+  or edit the file mentioned above and change "xterm" to "xhost".
+- The launcher is really nice. Without much ado you can now attach gv to launch
+  when double clicking a .eps or .ps file. Much faster than launching Preview
+  which will change your plot into an ugly PDF. Here are the steps:
+  . Get XDroplets (http://www.rhythmiccanvas.com/software/xdroplets)
+  . Unpack and ignore the "XDroplets Setup" !
+  . Dig into XDroplets and move the X11-Others folder inside to your Applications
+    folder. Inside are the goodies: ready to launch links to your favorite X11
+    applications. Rename the folder if you want and trash stuff you don't need.
+  . Go to any .eps file, select it, and click Cmd-I (Get info).
+  . In the "Open with" portion, click the dropdown and select "Ghostview".
+  . Click "Change All..." and "Continue".
+  . Do the last three steps also for a .ps file.
+  . Now every .eps and .ps file opens with ghostview.
+- 3-Button emulation doesn't work (but 3-button mouse does). Fixed in available
+  XDarwin release of Xquartz 1.2a3: http://www.x.org/wiki/XDarwin.
+  You may need to activate 3-Button emulation again in the X11 Preferences.
+- You couldn't drag X windows between Spaces. Fixed in Xquarts 1.2a7.
+- If you want to feed X11 screens from a remote host back to your local host,
+  make sure /etc/sshd_config on the remote host contains "X11Forwarding yes"
+  and use ssh -X to log into the remote host.
+</pre>
+-----

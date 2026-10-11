@@ -1,0 +1,67 @@
+TITLE: Python performance testing
+AUTHOR: Kurt
+DATE: 04.19.2006 06:55
+DESC: very slow
+-----
+BODY:
+Now comes the time when I need to start understand who costs what in
+python.  My log file parse runs <b>very</b> slow.  In working up this
+program, I was aiming to get the API and behavior correct
+all-the-while knowing that I was coding this the "slow" way.  I have a
+good sense of costs in the C/C++/Fortran worlds, but not yet in
+Python.  This is my chance to get to know it better.  I have a lot of
+searches through an element tree in this code that could be turned
+into much faster array or hash lookups.  array lookup tables would
+take a lot of the code from O(n) to O(1) and that O(1) would be with a
+very small constant.  To kick off the games, here is a graph of log
+files with increasing number of log entries.
+
+<img src="http://schwehr.org/blog/attachments/2006-04/speed-initial.gif">
+
+There are some interesting features to note.  First, here is the
+results from time for the 5000 line log file:
+<pre>
+1xG4 1.5GHz 137.85 real       131.15 user         0.97 sys
+4xG5 2.5GHz  92.57 real        92.09 user         0.28 sys
+</pre>
+
+Note that I am NOT doing any parallel processing in this python
+script.  I would expect that the 4xG5 would be at least 2 times faster
+than the G4 laptop.  The laptop has a slower memory bus which should
+really cause problems.  Not seeing such slowdown implies that most of
+this python program is staying in cache on the CPU.  This is not too
+surprising since all of the data structures are pretty small.  Looking
+at the time spent on system calls, it is plain to see that the 4xG5
+machine is generally much faster than the G4 almost by a factor of 4
+when dealing with OS level calls.  Another thing to note with these
+tests is that there is hardly any effort spent on disk IO.  The largest
+log file is 211KB.
+
+Finally, it is interesting no note that there is a knee in the graph
+at around 500 lines.  I believe that this comes from the number of
+time stamps in the log file.  Time stamps should take much less effort
+to process.
+<pre>Log 
+File               Percent
+Length  NumStamps  Time Stamps
+0001      0          0
+0002      1          0.5
+0003      1          0.333
+0004      2          0.5
+0005      2          0.4
+0010      5          0.5
+0020     10          0.5
+0030     15          0.5
+0040     20          0.5
+0050     25          0.5
+0100     50          0.5
+0200    100          0.5
+0300    150          0.5
+0400    200          0.5
+0500    250          0.5    Change in slope
+1000    596          0.596  starts here
+2000   1300          0.65
+3000   1960          0.653
+4000   2491          0.623
+5000   2991          0.598<pre>
+-----

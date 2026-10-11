@@ -1,0 +1,38 @@
+TITLE: Waterlevel messages to kml
+AUTHOR: Kurt
+DATE: 01.05.2007 15:37
+DESC: getting easier
+-----
+BODY:
+I just gave the waterlevel messages a go to verify that I could take a
+NMEA string for a binary message and extract a kml placemark.
+
+First get the binary payload from the msg 8 packet:
+<pre>./ais_msg_8.py -d -t nmea '!AIVDM,1,1,,A,8E2HH<h1\
+KY014cF0>=dtdd<=B4qI:`Zd0000?3@qF000BeH0,0*12'
+BinaryData:
+        MessageID:        8
+        RepeatIndicator:  1
+        UserID:           338040883
+        Spare:            0
+        BinaryData:       000000010110111000010000000\
+00001000100101011010110000000001110001101101100111100\
+101100101100001100001101010010000100111001011001001010\
+101000100010101100000000000000000000000000001111000011\
+010000111001010110000000000000000000010010101101011000\
+000000
+</pre>
+Then, I have to paste that binary string into the waterlevel decoder:
+<pre>./waterlevel.py -d -t binary -T kml-full '0000000\
+101101110000100000000000100010010101101011000000000111\
+000110110110011110010110010110000110000110101001000010\
+011100101100100101010100010001010110000000000000000000\
+000000000111100001101000011100101011000000000000000000\
+0010010101101011000000000' >  wl-8632200.kml
+open  wl-8632200.kml</pre>
+With that, I have a nice view of the tide guage data via AIS (ais-over-internet).
+
+<a href="http://schwehr.org/blog/attachments/2007-01/wl-8632200.kml">wl-8632200.kml</a>
+
+<img src="http://schwehr.org/blog/attachments/2007-01/wl-8632200-kml.png">
+-----

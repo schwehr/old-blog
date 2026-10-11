@@ -1,0 +1,55 @@
+TITLE: Adding a stack trace to an error report in python
+AUTHOR: Kurt
+DATE: 06.10.2008 18:39
+DESC: better error reporting?
+-----
+BODY:
+For some code that I have that parses AIS code, I want to know about
+any errors, but I really want to code to keep going.  I wrapped the
+whole processing of one in a try, but that just hid what was going
+wrong for some lines.  There are occasional bad lines in the data.
+I added two lines to end of the <a href="http://www.python.org/doc/current/lib/traceback-example.html">basic exception example</a> in the python
+documentation:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>, <font color="#2040a0">traceback</font>
+<strong>try</strong><font color="4444FF">:</font>
+    <strong>raise</strong> <font color="#2040a0">Exception</font><font color="4444FF">(</font><font color="#008000">'spam'</font>, <font color="#008000">'eggs'</font><font color="4444FF">)</font>
+<strong>except</strong> <font color="#2040a0">Exception</font>, <font color="#2040a0">inst</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">inst</font><font color="4444FF">)</font>     <font color="#444444"># the exception instance</font>
+    <strong>print</strong> <font color="#2040a0">inst</font>.<font color="#2040a0">args</font>      <font color="#444444"># arguments stored in .args</font>
+    <strong>print</strong> <font color="#2040a0">inst</font>           <font color="#444444"># __str__ allows args to printed directly</font>
+    <font color="#2040a0">x</font>, <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">inst</font>          <font color="#444444"># __getitem__ allows args to be unpacked directly</font>
+    <strong>print</strong> <font color="#008000">'x ='</font>, <font color="#2040a0">x</font>
+    <strong>print</strong> <font color="#008000">'y ='</font>, <font color="#2040a0">y</font>
+    <font color="#444444"># Now write to stderr, where errors should go</font>
+    <font color="#2040a0">sys</font>.<font color="#2040a0">stderr</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">inst</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+    <font color="#2040a0">sys</font>.<font color="#2040a0">stderr</font>.<font color="#2040a0">write</font><font color="4444FF">(</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">inst</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+    <font color="#2040a0">traceback</font>.<font color="#2040a0">print_exc</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">=</font><font color="#2040a0">sys</font>.<font color="#2040a0">stderr</font><font color="4444FF">)</font>
+</pre>
+The results now look like:
+<pre>
+% <b>./ex_test.py</b>
+&lt;type 'exceptions.Exception'&gt;
+('spam', 'eggs')
+('spam', 'eggs')
+x = spam
+y = eggs
+<i>&lt;type 'exceptions.Exception'&gt;
+('spam', 'eggs')
+Traceback (most recent call last):
+  File "./ex_test.py", line 4, in &lt;module&gt;
+    raise Exception('spam', 'eggs')
+Exception: ('spam', 'eggs')</i>
+</pre>
+Now I can hopefully log and fix any problems that I run into.  For starters,
+I just ran into the 4GB limit on filesize.  Now, I have to process by month
+or change my code.  My norm2008.bash script:
+<pre>
+#!/bin/bash
+for mon in 01 02 03 04 05 06 07 08 09 10 11 12; do
+    echo Starting month $mon
+    ~/projects/src/noaadata/scripts/ais_normalize.py -v -t -o 2008-${mon}.norm uscg-logs-2008-${mon}*
+done
+</pre>
+-----

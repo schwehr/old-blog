@@ -1,0 +1,189 @@
+TITLE: What to do about python setuptutils/eggs in fink?
+AUTHOR: Kurt
+DATE: 09.17.2005 08:04
+DESC: what to do
+-----
+BODY:
+I fear there may be a rough road ahead for the python eggs/setuputils
+system in fink.  An interesting discussion from June... I still don't
+fully understand the situation.
+<pre>
+[Distutils] setuptools-0.4a2: Eggs, scripts, and __file__
+Ryan Tomayko rtomayko at gmail.com
+Tue Jun 14 00:00:56 CEST 2005
+
+    * Previous message: [Distutils] setuptools-0.4a2: Eggs, scripts, and __file__
+    * Next message: [Distutils] setuptools-0.4a2: Eggs, scripts, and __file__
+    * Messages sorted by: [ date ] [ thread ] [ subject ] [ author ]
+
+On Jun 13, 2005, at 12:21 PM, Phillip J. Eby wrote:
+&gt; Are you distributing an application, or a library?  If you're  
+&gt; distributing a library, you don't need require() in library code.   
+&gt; If it's an application, you can handle your own dependencies by  
+&gt; force-installing the eggs in the application script directory using  
+&gt; EasyInstall, and then just require() your main package.
+
+Libraries, applications, and libraries with helper scripts.
+
+&gt;&gt; This should give me all of the benefits of
+&gt;&gt; eggs when I'm using them and fallback to the old-style manual
+&gt;&gt; dependency management otherwise. Does that make sense?
+&gt;
+&gt; Um, yeah, except I don't think you really need to fall back, just  
+&gt; because people have other stuff installed.  The worst that's going  
+&gt; to happen is that you're going to force reinstallation of  
+&gt; dependencies they already have, just to get them into eggs.  (Or  
+&gt; make them create .egg-info directories to tell the system the stuff  
+&gt; is already installed.)
+
+That's the problem. I'm trying to figure out a general plan of attack  
+that Linux/BSD package maintainers can adopt for python packages that  
+want to use eggs / setuptools. Here's some numbers on how many python  
+packages are included in a couple different distributions:
+
+On a OS X darwinports box:
+
+     $ port list | grep -e '^py-' | wc -l
+     237
+
+On a Fedora 3 box (Core + Extras):
+
+     $ yum list all | grep -e '^py' -e 'python' | wc -l
+     78
+
+I don't have any debian or gentoo boxes handy but I imagine they'd  
+weigh in somewhere around the darwinports number.
+
+None of these packages are currently provided as eggs or with .egg- 
+info directories when they are installed to site-packages and they  
+have complex dependency relationships that are managed by the  
+distribution's utility (port, yum, apt-get, emerge, etc.) This  
+creates a problem for these packages because it means that they can  
+not assume dependencies will always be egg managed. If they start  
+adding require() calls to their scripts, they will break under these  
+environments. require() is an all or nothing proposition for  
+distributions and that means there will need to be a planned  
+"upgrade" period or something for all packages.
+
+As a more specific example, I contribute to two packages that are  
+distributed with Fedora Core: python-urlgrabber and yum. yum depends  
+on python-urlgrabber and python-elementtree. Now, if I wanted to move  
+yum to be egg based and use require(), I would also need to ensure  
+that all yum's dependencies are egg based. When yum (and its  
+dependencies) are installed from RPM, they must all be in egg format  
+(or at least provide .egg-info dirs). If not, the yum script will fail.
+
+So a single package using require() can cause a snowball effect where  
+many other packages would need to be upgraded to egg format as well.  
+In time, this may be a good thing because it could accelerate  
+adoption of eggs but for the time being it makes it really hard to  
+use require().
+
+&gt; Hm.  What if you created .egg directories and symlinked the  
+&gt; dependencies into them during your installation process?  Or if  
+&gt; there were some way to create the .egg-info directories  
+&gt; automatically from packaging system databases, or from inspecting  
+&gt; module contents?  Setuptools has some code that can look for the  
+&gt; setting of constants or presence of symbols in modules, without  
+&gt; importing them.  Perhaps I could extend this somehow so that a  
+&gt; transitional package like yours could include additional info in  
+&gt; the setup script, that checks for these dependencies and tags them  
+&gt; somehow?
+
+Yes, yes. Along those lines.
+
+&gt; Or maybe this could be done by metadata -- you put a legacy.py file  
+&gt; in your egg-info, and when processing your egg's dependencies, if  
+&gt; pkg_resources can't find a package you need, it would call a  
+&gt; function in legacy.py that would check for the dependency using  
+&gt; setuptools' inspection facilities, and return a path and a guess at  
+&gt; a version number.
+&gt;
+&gt; How does that sound?
+
+That would solve my problem perfectly.
+
+&gt;&gt;  If that's the case, I might be
+&gt;&gt; able to make my scripts as simple as::
+&gt;&gt;
+&gt;&gt;     from pkg_resources import require, find_distributions
+&gt;&gt;     if list(find_distributions('MyPackage')):
+&gt;&gt;
+&gt;
+&gt; Don't do this.  find_distributions() yields distributions found in  
+&gt; a directory or zipfile; it doesn't take a package name, it takes a  
+&gt; sys.path entry.
+
+Ahhh..
+
+&gt; I'm not sure exactly what you're trying to do here.  If you just  
+&gt; want to know if your script is running from a development location  
+&gt; (and therefore needs to call require() to set up dependencies),  
+&gt; couldn't you just check for 'MyPackage.egg-info' in the sys.path[0]  
+&gt; (script) directory?
+&gt;
+&gt; e.g.:
+&gt;
+&gt;     import sys, os
+&gt;     if os.path.isdir(os.path.join(sys.path[0],"MyPackage.egg-info")):
+&gt;         from pkg_resources import require
+&gt;         require("MyPackage")  # ensures dependencies get processed
+&gt;
+&gt; If this is what you want, perhaps we can create a standard recipe  
+&gt; in pkg_resources, like maybe 'script_package("MyPackage")', that  
+&gt; only does the require if you're a development egg and not being run  
+&gt; from run_main().
+&gt;
+&gt;&gt; The downside to this approach is that I would have to be sure to NOT
+&gt;&gt; distribute MyPackage.egg-info with RPMs and other packages, which
+&gt;&gt; kind of rules out any phased approach to bringing egg based packaging
+&gt;&gt; to Fedora's stock RPMs.
+&gt;&gt;
+&gt;
+&gt; I don't know if .egg-info is a good idea for RPMs.  .egg-info is  
+&gt; primarily intended for *development*, not deployment, because you  
+&gt; can't easily override a package installed with .egg-info in site- 
+&gt; packages.  In fact, the only way you can normally override it is to  
+&gt; install an egg alongside the script.
+&gt;
+&gt; My current idea for how RPMs and other packagers should install  
+&gt; eggs is just to dump them in site-packages as egg files or  
+&gt; directories, and let people use require() or else use EasyInstall  
+&gt; to set the active package.
+
+Right. But that's going to require significant lobbying and effort to  
+get all core python packages included in a distribution migrated over  
+to eggs. This is the root of my dilemma. The only realistic approach  
+seems to be supporting dual egg and non-egg deployment for a little  
+while. The legacy.py proposal is one method and I threw out a couple  
+earlier. But yea.. I think this is the root of the problem.
+
+&gt; Hey, wait a second...  if you can put install/uninstall scripts in  
+&gt; packages, couldn't installing or uninstalling an RPM ask  
+&gt; EasyInstall to fix up the easyinstall.pth file?  This would let  
+&gt; packagers distribute as eggs, but without breaking users'  
+&gt; expectations that the package would be available to "just import".   
+&gt; If somebody explicitly wants to support multiversion for a package,  
+&gt; they can run 'EasyInstall -m PackageName' to reset it to multi- 
+&gt; version after installing a new version.
+
+I think that would be great but it assumes modification to a whole  
+lot of existing packages. Ideally, I'd like to be able to start using  
+eggs and require() in my packages without having to convince everyone  
+else to do so just yet. Not that I won't be trying to convince  
+people, I just don't want to rely on other packages being eggified in  
+Fedora Core, darwinports, etc for upcoming releases.
+
+&gt; EasyInstall doesn't have everything that's needed to do this yet  
+&gt; (no "uninstall" mode), but perhaps it's a good option to add, and  
+&gt; then packagers could standardize on this approach.
+
+I'd be happy to advocate to / work with packagers once we get a basic  
+set of best practices together. It seems like there are a lot of  
+options here - we just need to iron out the details.
+
+Thanks,
+
+Ryan Tomayko
+</pre>
+-----

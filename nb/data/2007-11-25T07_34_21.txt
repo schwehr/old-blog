@@ -1,0 +1,48 @@
+TITLE: bar graphs in gnuplot 4.2
+AUTHOR: Kurt
+DATE: 11.25.2007 07:34
+DESC: hurray for charts and graphs
+-----
+BODY:
+GNUplot 4.2 a big step over previous versions.  Not to say that
+previous versions were bad.  Many of the graphs I made to get through
+my thesis were done with gnuplot.  But the new bar graph functionality
+is very nice.
+
+First the original graph style.
+<pre>
+set xtics nomirror rotate by -45
+set style data linespoints
+plot 'mydata.dat' using 2:xtic(1) t 2, \
+'' u 3 t 3,\
+'' u 4 t 4,\
+'' u 5 t 5
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-11/month-summaries-2-lines.png"/>
+
+Now to make a bar for each data type:
+<pre>
+set style data histogram
+set style histogram cluster gap 1
+set style fill solid border -1
+set boxwidth 0.9
+replot
+</pre>
+
+<img src="http://schwehr.org/blog/attachments/2007-11/month-summaries-2-bars.png"/>
+
+And finally, lets stack the data:
+<pre>
+set style data histogram
+set style histogram rowstacked
+set style fill solid border -1
+set boxwidth 0.75
+replot
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-11/month-summaries-2-stacked.png"/>
+
+On a mac with fink, you can find more on histograms in:
+<pre>
+/sw/share/doc/gnuplot/demo/histograms.dem
+</pre>
+-----

@@ -1,0 +1,51 @@
+TITLE: line numbering for Marine Geology
+AUTHOR: Kurt
+DATE: 03.24.2006 07:50
+DESC: getting closer
+-----
+BODY:
+This is the suggestion for how to do line numbering that I got from Marine Geology.
+<pre>
+Please find below a sample on how you will prepare your LaTeX document with line number:
+
+\documentclass{elsart}
+<b>\usepackage{lineno}</b>
+\begin{document}
+<b>\linenumbers</b>
+\title{A Framework for Language Identification}
+\author{John Smith, John Doe, John JohnJohn}
+\address{Speech and Audio Research Laboratory,\\ Technology Way,\\ A City, AUSTRALIA, 4001.\\ \{jsmith, jdoe, johnjohnjohn\}@unversity.edu}
+\begin{abstract}
+Whilst several examples of segment based approaches to Language Identification (LID) have been published, they are not as good as this one.
+\end{abstract}
+</pre>
+Unfortunately that did not work for me.  It mangled the title and
+abstract.  I can not figure out how to no use \begin{frontmatter}
+which also stops the line numbering at the end of frontmatter.  Also,
+the line number stops for the figure captions.  Bummer.  Here is the 
+skeleton of what I did:
+<pre>
+%\documentclass{elsart}
+\documentclass[doublespacing]{elsart} % MARINE GEOLOGY DOUBLE SPACED
+\usepackage{lineno}                   % LINE NUMBER PACKAGE
+\usepackage{natbib}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{lscape} % landscape
+\usepackage[usenames]{color} 
+
+\begin{document}
+\begin{frontmatter}
+\title{Origin of continental margin morphology: submarine-slide or
+  downslope current-controlled bedforms, a rock magnetic approach}
+...
+\end{frontmatter}
+\linenumbers % Tell latex lineno package to start using line numbers
+\section{Introduction}
+Rest of the paper...
+</pre>
+I hope that helps someone.  I was not able to find this on the
+Elsevier web site.  Their latex help page seems to have lost most of its
+content.
+-----

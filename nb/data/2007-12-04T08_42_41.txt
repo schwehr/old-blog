@@ -1,0 +1,335 @@
+TITLE: noaadata AIS questions with answers
+AUTHOR: Kurt
+DATE: 12.04.2007 08:42
+DESC: justmagic.com
+-----
+BODY:
+I got a email with some questions about noaadata-py and AIS in
+general.  Here are the questions with my attempts at answers.
+
+<pre>
+<b>1.</b>  I received some message of type "18" like this sentence :
+!AIVDM,1,1,,A,BCHOFF00F7v03HVh;0DkgwRUoP06,0*58
+Do you know this kind of message ? I didn't seems to be standard in Class A ? 
+</pre>
+In noaadata, you can use binary.py to find out what message number
+that is.  The above question already figured out that this is message
+18, but just to go back through the process:
+<pre>
+% cd ais
+% ipython
+In [1]: import binary
+In [2]: binary.ais6chartobitvec('B')
+Out[2]: <BitVector.BitVector object at 0x12bfcb0>
+In [3]: print binary.ais6chartobitvec('B')
+010010
+In [4]: print int(binary.ais6chartobitvec('B'))
+18
+</pre>
+18 is a Class B position report.  I have added this message to
+noaadata-py and it will be out in the next release.  <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/ais_msg_18.html">ais_msg_18.html</a>
+
+Here is an example of decoding the above message:
+<pre>
+./ais_msg_18.py -T html -d '!AIVDM,1,1,,A,BCHOFF00F7v03HVh;0DkgwRUoP06,0*58' &gt; 18.html
+open 18.html
+</pre>
+<table border="1">
+<tr bgcolor="orange">
+<th align="left">Field Name</th>
+<th align="left">Type</th>
+<th align="left">Value</th>
+<th align="left">Value in Lookup Table</th>
+<th align="left">Units</th>
+<tr>
+<td>MessageID</td>
+<td>uint</td>
+	<td>18</td>
+	<td>18</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>uint</td>
+	<td>1</td>
+<td><i>Missing LUT entry</i></td></tr>
+<tr>
+<td>UserID</td>
+<td>uint</td>
+	<td>227006040</td>
+	<td>227006040</td>
+</tr>
+<tr>
+<td>Reserved1</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+<tr>
+<td>SOG</td>
+<td>udecimal</td>
+	<td>8.8</td>
+<td><i>Missing LUT entry</i></td><td>knots</td>
+</tr>
+<tr>
+<td>PositionAccuracy</td>
+<td>uint</td>
+	<td>0</td>
+<td>low (greater than 10 m)</td></tr>
+<tr>
+<td>longitude</td>
+<td>decimal</td>
+	<td>-1.746905</td>
+	<td>-1.746905</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>decimal</td>
+	<td>47.20470166666666666666666667</td>
+	<td>47.20470166666666666666666667</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>COG</td>
+<td>udecimal</td>
+	<td>82.7</td>
+	<td>82.7</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>TrueHeading</td>
+<td>uint</td>
+	<td>511</td>
+	<td>511</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>TimeStamp</td>
+<td>uint</td>
+	<td>5</td>
+<td><i>Missing LUT entry</i></td><td>seconds</td>
+</tr>
+<tr>
+<td>RegionalReserved</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+<tr>
+<td>RAIM</td>
+<td>bool</td>
+	<td>True</td>
+<td>in use</td></tr>
+<tr>
+<td>CommStateSelector</td>
+<td>uint</td>
+	<td>1</td>
+<td>ITDMA</td></tr>
+<tr>
+<td>CommState</td>
+<td>uint</td>
+	<td>393222</td>
+	<td>393222</td>
+</tr>
+</table>
+<pre>
+2. Documentation about AIS.
+I didn't found on the web a document with the table of the list type
+for the ShipandCargo field. (message 5) .  do you have an URL or pdf
+to recommend me to understand deeper all the particularities of AIS
+messages?
+</pre>
+The ITU 1371-[123] specification documents are only available if you pay.
+<a href="http://www.itu.int/rec/R-REC-M.1371/en">M.1371 : Technical
+characteristics for an automatic identification system using time
+division multiple access in the VHF maritime mobile band</a>.
+
+IALA has some documentation on the web, but I have not seen any that
+cover msg 5.  "A-124 on AIS Shore Stations and Networking Aspects
+Related to the AIS Service" has (in Table 15.1) a list of AIS Message
+numbers and short descriptions.
+
+Also, the UN ECE has documentation on the River Information Services
+(RIS) that includes some documentation on AIS messages 1-3, and 5:
+<a href="http://www.unece.org/trans/doc/finaldocs/sc3/ECE-TRANS-SC3-176e.doc">ECE-TRANS-SC3-176e.doc</a>.
+
+You can always look at the HTML derived from my XML definition of
+message 5, but be careful that I might not have it complete correct.
+<a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/ais_msg_5.html">ais_msg_5.html</a>
+
+<pre>
+<b>3.</b>Composite sentence 
+Here we received some "composite" sentence like : 
+!AIVDM,2,1,3,A,5CIUmQ02&lt;qvPI4&lt;J221&lt;4mDDj0@F0&lt;P4m0h4Tr1S000006n90?4hBCU8,0*69
+!AIVDM,2,2,3,A,3PFPBDQH8888880,2*4D
+With a small Ruby script, I recompose to one sentence before to sent to your ais_build_postgis function.
+But may be I miss something that already exist in  the "noaadata-py-0.23" project ?
+</pre>
+First thing is to make sure that you are using the latest release.  As
+of right now, the software is at version 0.30 and I expect to have
+0.31 out later this week.
+
+I have a program in scripts called "ais_normalize".  This code assumes
+that the ais messages are in the USCG N-AIS format.  I did that, so
+that it can cope with NMEA messages interspersed from multiple receive
+stations (which is mostly what I deal with).  I do not consider
+multiline NMEA strings in most of my software.  I first convert the
+multiline NMEA to what I call the "normal" form.  Note that this form
+violates the line length limits of the NMEA specifications.
+
+I did a quick hack to the above NMEA strings to make ais_normalize
+happy.  I used a timestamp from this morning and gave it a receive
+station of 'UNKNOWN'.
+<pre>
+!AIVDM,2,1,3,A,5CIUmQ02&lt;qvPI4&lt;J221&lt;4mDDj0@F0&lt;P4m0h4Tr1S000006n90?4hBCU8,0*69,rUNKNOWN,1196778635
+!AIVDM,2,2,3,A,3PFPBDQH8888880,2*4D,rUNKNOWN,1196778635
+</pre>
+Now to normalize the message and 
+<pre>
+ais_normalize.py log.ais 
+!AIVDM,1,1,3,A,5CIUmQ02&lt;qvPI4&lt;J221&lt;4mDDj0@F0&lt;P4m0h4Tr1S000006n90?4hBCU83PFPBDQH8888880,2*25,rUNKNOWN,1196778635
+ais_normalize.py log.ais &gt; log.ais.norm
+cat log.ais.norm | ./ais_msg_5.py -d -T html  > 5.html
+open 5.html
+</pre>
+<table border="1">
+<tr bgcolor="orange">
+<th align="left">Field Name</th>
+<th align="left">Type</th>
+<th align="left">Value</th>
+<th align="left">Value in Lookup Table</th>
+<th align="left">Units</th>
+<tr>
+<td>MessageID</td>
+<td>uint</td>
+	<td>5</td>
+	<td>5</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>uint</td>
+	<td>1</td>
+<td><i>Missing LUT entry</i></td></tr>
+<tr>
+<td>UserID</td>
+<td>uint</td>
+	<td>228160900</td>
+	<td>228160900</td>
+</tr>
+<tr>
+<td>AISversion</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+<tr>
+<td>IMOnumber</td>
+<td>uint</td>
+	<td>9234408</td>
+	<td>9234408</td>
+</tr>
+<tr>
+<td>callsign</td>
+<td>aisstr6</td>
+	<td>FQCF   </td>
+	<td>FQCF   </td>
+</tr>
+<tr>
+<td>name</td>
+<td>aisstr6</td>
+	<td>SAMUEL DE CHAMPLAIN </td>
+	<td>SAMUEL DE CHAMPLAIN </td>
+</tr>
+<tr>
+<td>shipandcargo</td>
+<td>uint</td>
+	<td>99</td>
+<td>other type, No additional information</td></tr>
+<tr>
+<td>dimA</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+<td>m</td>
+</tr>
+<tr>
+<td>dimB</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+<td>m</td>
+</tr>
+<tr>
+<td>dimC</td>
+<td>uint</td>
+	<td>0</td>
+<td><i>Missing LUT entry</i></td><td>m</td>
+</tr>
+<tr>
+<td>dimD</td>
+<td>uint</td>
+	<td>0</td>
+<td><i>Missing LUT entry</i></td><td>m</td>
+</tr>
+<tr>
+<td>fixtype</td>
+<td>uint</td>
+	<td>1</td>
+<td>GPS</td></tr>
+<tr>
+<td>ETAminute</td>
+<td>uint</td>
+	<td>45</td>
+	<td>45</td>
+</tr>
+<tr>
+<td>ETAhour</td>
+<td>uint</td>
+	<td>17</td>
+	<td>17</td>
+</tr>
+<tr>
+<td>ETAday</td>
+<td>uint</td>
+	<td>4</td>
+	<td>4</td>
+</tr>
+<tr>
+<td>ETAmonth</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+<tr>
+<td>draught</td>
+<td>udecimal</td>
+	<td>6</td>
+<td><i>Missing LUT entry</i></td><td>m</td>
+</tr>
+<tr>
+<td>destination</td>
+<td>aisstr6</td>
+	<td>SAINT NAZAIRE       </td>
+	<td>SAINT NAZAIRE       </td>
+</tr>
+<tr>
+<td>dte</td>
+<td>uint</td>
+	<td>0</td>
+<td>available</td></tr>
+<tr>
+<td>Spare</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+</table>
+-----

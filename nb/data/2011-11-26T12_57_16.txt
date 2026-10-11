@@ -1,0 +1,56 @@
+TITLE: sbet parsing and ploting with numpy and matplotlib
+AUTHOR: Kurt
+DATE: 11.26.2011 12:57
+DESC: works
+-----
+BODY:
+I finally sat down and worked through how to read SBET files using the 
+numpy binary reader "fromfile".  I have to make a list of (field name,type), so
+I use the zip trick to mash a list of 'double' repeated for each field name.
+Only later did I realize that dtype can be set from a list of names and a list
+of types, which would be clearer.  The dtype ends up looking like this when I do 'sbet_data.dtype':
+<pre><tt><b><font color="#000000">dtype</font></b><font color="#990000">([(</font><font color="#FF0000">'time'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'x'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'z'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'x-vel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y-vel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),
+</font> <font color="#990000">(</font><font color="#FF0000">'z-vel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'roll'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'pitch'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'heading'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'wander'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> 
+<font color="#990000">(</font><font color="#FF0000">'x-accel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y-accel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'z-accel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'x-ang'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y-ang'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'z-ang'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">)])</font></tt></pre>
+And this is the whole code:
+<pre><tt><b><font color="#000080">import</font></b> numpy as np
+<!-- -->
+sbet_file <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'sample.sbet'</font><font color="#990000">,</font><font color="#FF0000">'rb'</font><font color="#990000">)</font>
+fields <font color="#990000">=</font> <font color="#990000">(</font><font color="#FF0000">'time'</font><font color="#990000">,</font><font color="#FF0000">'y'</font><font color="#990000">,</font><font color="#FF0000">'x'</font><font color="#990000">,</font><font color="#FF0000">'z'</font><font color="#990000">,</font><font color="#FF0000">'x-vel'</font><font color="#990000">,</font><font color="#FF0000">'y-vel'</font><font color="#990000">,</font><font color="#FF0000">'z-vel'</font><font color="#990000">,</font><font color="#FF0000">'roll'</font><font color="#990000">,</font><font color="#FF0000">'pitch'</font><font color="#990000">,</font><font color="#FF0000">'heading'</font><font color="#990000">,</font><font color="#FF0000">'wander'</font><font color="#990000">,
+   </font><font color="#FF0000">'x-accel'</font><font color="#990000">,</font><font color="#FF0000">'y-accel'</font><font color="#990000">,</font><font color="#FF0000">'z-accel'</font><font color="#990000">,</font><font color="#FF0000">'x-ang'</font><font color="#990000">,</font><font color="#FF0000">'y-ang'</font><font color="#990000">,</font><font color="#FF0000">'z-ang'</font><font color="#990000">)</font>
+<!-- -->
+sbet_dtype <font color="#990000">=</font> <b><font color="#000000">zip</font></b><font color="#990000">(</font>fields<font color="#990000">,</font> <font color="#990000">(</font><font color="#FF0000">'double'</font><font color="#990000">,)*</font> <b><font color="#000000">len</font></b><font color="#990000">(</font>fields<font color="#990000">))</font>
+sbet_data <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">fromfile</font></b><font color="#990000">(</font>file<font color="#990000">=</font>sbet_file<font color="#990000">,</font> dtype<font color="#990000">=</font>sbet_dtype<font color="#990000">)</font>
+<!-- -->
+sec_of_the_week <font color="#990000">=</font> sbet_data<font color="#990000">[</font><font color="#FF0000">'time'</font><font color="#990000">]</font>
+x <font color="#990000">=</font> sbet_data<font color="#990000">[</font><font color="#FF0000">'x'</font><font color="#990000">]</font> <i><font color="#9A1900"># longitude</font></i>
+y <font color="#990000">=</font> sbet_data<font color="#990000">[</font><font color="#FF0000">'y'</font><font color="#990000">]</font> <i><font color="#9A1900"># latitude</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> matplotlib <b><font color="#000080">import</font></b> pyplot
+pyplot<font color="#990000">.</font><b><font color="#000000">interactive</font></b><font color="#990000">(</font>True<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> field_num<font color="#990000">,</font> field <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>fields<font color="#990000">):</font>
+    pyplot<font color="#990000">.</font><b><font color="#000000">subplot</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>fields<font color="#990000">),</font> <font color="#993399">1</font><font color="#990000">,</font> field_num <font color="#990000">)</font>
+    pyplot<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">(</font>sbet_data<font color="#990000">[</font>field<font color="#990000">])</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> ax_num<font color="#990000">,</font> ax <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>pyplot<font color="#990000">.</font><b><font color="#000000">figure</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">).</font><b><font color="#000000">get_axes</font></b><font color="#990000">()):</font>
+    ax<font color="#990000">.</font><b><font color="#000000">get_xaxis</font></b><font color="#990000">().</font><b><font color="#000000">set_ticks</font></b><font color="#990000">([])</font>
+    ax<font color="#990000">.</font><b><font color="#000000">get_yaxis</font></b><font color="#990000">().</font><b><font color="#000000">set_ticks</font></b><font color="#990000">([])</font>
+    ax<font color="#990000">.</font><b><font color="#000000">text</font></b><font color="#990000">(</font><font color="#993399">0.5</font><font color="#990000">,</font> <font color="#993399">0.5</font><font color="#990000">,</font> fields<font color="#990000">[</font>ax_num<font color="#990000">],</font>
+            horizontalalignment<font color="#990000">=</font><font color="#FF0000">'center'</font><font color="#990000">,</font> verticalalignment<font color="#990000">=</font><font color="#FF0000">'center'</font><font color="#990000">,</font>
+            transform <font color="#990000">=</font> ax<font color="#990000">.</font>transAxes<font color="#990000">)</font>
+<!-- -->
+pyplot<font color="#990000">.</font><b><font color="#000000">savefig</font></b><font color="#990000">(</font><font color="#FF0000">'sample-sbet-graph.png'</font><font color="#990000">)</font></tt></pre>
+<img width="600" height="450" title="SBET by field plot" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-11/sample-sbet-graphs.png"/>
+
+This works great for files with only one type of record, but I have
+yet to figure out how to handle something like the typical multibeam
+file formats like the Reson and Simrad/Kongsberg raw all format that
+have many packet/datagram types and some of which are variable size.
+
+Sources:
+<a href="http://docs.scipy.org/doc/numpy/reference/arrays.dtypes.html">NumPy Data type objects (dtype)</a><br/>
+<a href="http://www.scipy.org/Cookbook/InputOutput">SciPy Cookbook / InputOutput </a><br/>
+<a href="http://matplotlib.sourceforge.net/users/text_props.html">Matplotlib Text properties and layout</a><br/>
+<a href="http://stackoverflow.com/questions/2176424/hiding-axis-text-in-matplotlib-plots">Hiding axis text in matplotlib plots</a> on Stackoverflow.
+-----

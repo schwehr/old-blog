@@ -1,0 +1,30 @@
+TITLE: Trouble with the IPS
+AUTHOR: Kurt
+DATE: 09.09.2007 14:21
+DESC: how to avoid this in general?
+-----
+BODY:
+The local intrusion protection system (IPS) has been blocking my blog
+for the last few days.  I finally tracked down the issue to my entry
+on what to put in the startup script for a mac.  When I changed the s
+of sh to the html character code, the rss.xml will now pass through
+the snort system.  Too bad I can't see the snort logs.
+<pre>
+wget http://schwehr.org/blog/rss.xml
+--12:45:34--  http://schwehr.org/blog/rss.xml
+           =&gt; `rss.xml'
+Resolving schwehr.org... 209.209.48.32
+Connecting to schwehr.org|209.209.48.32|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 15,508 (15K) [application/xml]
+.
+42% [=========&gt;     ] 6,533         --.--K/s            
+.
+12:45:35 (159.75 MB/s) - Read error at byte 6533/15508 (Connection reset by peer). Retrying.
+</pre>
+xxdiff between the original and what wget returned:
+
+<img src="http://schwehr.org/blog/attachments/2007-09/ips-trouble.png">
+
+Things seem back to normal for the moment.
+-----

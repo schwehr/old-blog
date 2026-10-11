@@ -1,0 +1,44 @@
+TITLE: sioseis water bottom picks
+AUTHOR: Kurt
+DATE: 09.25.2005 12:34
+DESC: this is nuts
+-----
+BODY:
+Just created an interesting little water bottom pick visualization.
+This is in the total hack catagory!
+
+First, in my sioseis script, I have been trying to add gains hung off
+the water bottom with no luck.  But here is what I have:
+<pre>
+wbt3
+  lprint 2
+  thres 10000 track 0.5 end
+end
+</pre>
+I picked 10000 as a guess based on what I saw in this graph of the
+100th trace in line43.sgy.  I used 0.5 seconds for track, so that it
+basically would not track at all.
+<img src="http://schwehr.org/blog/attachments/2005-09/line43-00100.gif">
+The then ran the sioseis plot script with gave lots of these warnings:
+<pre>
+****    0 ERRORS IN THIS JOB   ****
+  ***  WARNING  ***  No pick, using last.
+  picked time is   0.
+  ***  WARNING  ***  Pick of   0.793249965 is outside the track.
+  picked time is   0.
+  ***  WARNING  ***  Pick of   0.710500002 is outside the track.
+  picked time is   0.
+  ***  WARNING  ***  Pick of   0.760999978 is outside the track.
+  picked time is   0.
+  ***  WARNING  ***  Pick of   0.712249994 is outside the track.
+  picked time is   0.
+</pre>
+Wait, those pick times in the warnings look great.  So maybe the track
+time needs to be larger, but before that I wanted to see what they
+look like:
+<pre>
+grep WARN foo | awk '{print $6}' | grep '0\.' &gt; foo2
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-09/wbt.gif">
+I can definitely see the water bottom.
+-----

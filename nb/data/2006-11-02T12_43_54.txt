@@ -1,0 +1,125 @@
+TITLE: Converting utm fledermaus sd file to geographic (ll)
+AUTHOR: Kurt
+DATE: 11.02.2006 12:43
+DESC: Maybe not the best way
+-----
+BODY:
+
+[WARNING: this is not currently working right.  I think I picked the
+wrong UTM zone for the regional dataset.  This worked fine for the
+shallow water survey data, but again had aliasing issues.]
+
+Yesterday, I tried to convert some fledermaus files to Google Earth as
+I wrote about a couple days ago.  When I opened up the sd files, I
+realized that they are all UTM.  I haven't ever tried to do UTM to
+Geographic conversions for Fledermaus before, so this is probably not
+the best/easiest route, but it works (other than some minor aliasing
+issues, that are probably my fault).  Here is what I did (using a Mac
+of course).
+
+First open dmagic and "open project".  Choose the directory that has
+your UTM sd file.  Then from file, "Import From SD/Scene".
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll01.png"><br><br>
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll02.png">
+
+Bring all the dtm and geo into the display area.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll03.png"><br><br>
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll04.png">
+
+Now export the surface.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll05.png">
+
+Make the file XYZ values.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll06.png">
+
+Save these as the sd file name, but replace sd with .xyz
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll07.png">
+
+Now, we need to look up which UTM zone this data resides in.  This are
+is off the coast of Massachusetts.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll08.png">
+
+The data must be in zone 19, based on this map.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll10.png">
+
+Now, convert the xyz UTM coordinates to Geographic (lon lat).
+
+<pre>mv gutmtest.xyz gutmtest.xyz.utm19
+invproj +proj=utm +zone=19 < gutmtest.xyz.utm19 > gutmtest.xyz.ll</pre>
+
+This results in geographic coordinates in a form that can not be
+imported directly:
+<pre>head gutmtest.xyz.ll
+
+65d34'29.817"W  39d34'41.967"N 8544.00
+65d34'10.096"W  39d34'41.385"N 8519.98
+65d33'50.375"W  39d34'40.802"N 8508.90
+65d33'30.654"W  39d34'40.217"N 8497.92
+65d33'10.934"W  39d34'39.632"N 8477.91
+65d32'51.213"W  39d34'39.046"N 8468.98</pre>
+I wrote a small python script to parse the coordinates and make a
+decimal degree formatted file:
+<pre><font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">projCoord2decDeg</font><font color="4444FF">(</font><font color="#2040a0">projStr</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">''</font><font color="#008000">'
+    &gt;&gt;&gt; projCoord2decDeg('</font>65<font color="#2040a0">d32</font>\<font color="#008000">'11.773&quot;W'</font><font color="4444FF">)</font>
+    <font color="4444FF">-</font><font color="#FF0000">65.536603611111104</font>
+    <font color="#008000">''</font><font color="#008000">'
+    deg,minutes,sec=0,0,0
+    deg,rest = projStr.split('</font><font color="#2040a0">d</font><font color="#008000">')
+    deg = float(deg)
+    if -1 != rest.find(&quot;'</font><font color="#008000">&quot;):
+	minutes,rest = rest.split(&quot;</font><font color="#008000">'&quot;)
+	minutes = float(minutes)
+	if -1 != rest.find('</font><font color="#008000">&quot;'):
+	    sec = rest.split('&quot;</font><font color="#008000">')[0]
+	    sec = float(sec)
+    hemisphere=projStr.strip()[-1]
+    # Assemble the decimal number
+    result = deg + minutes/60. + sec/3600.
+    if '</font><font color="#2040a0">W</font><font color="#008000">'==hemisphere or '</font><font color="#2040a0">S</font><font color="#008000">'==hemisphere:
+	result = -result
+    return result
+
+if __name__=='</font><font color="#2040a0">__main__</font>'<font color="4444FF">:</font>
+    <strong>for</strong> <font color="#2040a0">filename</font> <strong>in</strong> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">:</font>
+	<strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font><font color="4444FF">:</font>
+	    <font color="#2040a0">lon</font>,<font color="#2040a0">lat</font>,<font color="#2040a0">z</font> <font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+	    <strong>print</strong> <font color="#2040a0">projCoord2decDeg</font><font color="4444FF">(</font><font color="#2040a0">lon</font><font color="4444FF">)</font>,<font color="#2040a0">projCoord2decDeg</font><font color="4444FF">(</font><font color="#2040a0">lat</font><font color="4444FF">)</font>,<font color="#2040a0">z</font>
+</pre>
+I then passed the data through this script:
+<pre>
+chmod +x proj_ll2decimal__ll.py
+./proj_ll2decimal_ll.py gutmtest.xyz.ll > gutmtest.xyz.ll.decimal
+</pre>
+I then did "File - Import Ungridded data" in dmagic.  That starts
+AveGrid.  My first attempt after adding the file was with 0.001 degrees.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll15.png">
+
+The results are not good.  I need to make my cell size larger.  I
+think I used 2.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll17.png">
+
+In AvgGrid, I did an export to DTM/Geo.  When I put those two files
+into the view window of dmagic, I now see geographic coordinates.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll21.png">
+
+I assembled a fledermaus sd file and ran it in fledermaus for decent
+results.  However, you will see that there are some aliasing issues in
+the terrain.  The striping is in the original UTM grid, so it is going
+to be difficult to remove without creating other problems.
+
+<img src="http://schwehr.org/blog/attachments/2006-11/utm2ll22.png">
+-----

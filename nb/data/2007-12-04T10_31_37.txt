@@ -1,0 +1,35 @@
+TITLE: Getting page count from a PDF
+AUTHOR: Kurt
+DATE: 12.04.2007 10:31
+DESC: quick unix'y trick
+-----
+BODY:
+I found two ways to quickly get the page count from a PDF.  Method 1: <a href="http://www.foolabs.com/xpdf/">xpdf</a> [foolabs]
+<pre>
+% fink install xpdf
+% pdfinfo Document.pdf 
+Title:          
+Subject:        
+Author:         
+Creator:        Hewlett Packard MFP
+Producer:       
+CreationDate:   
+Tagged:         no
+Pages:          2
+Encrypted:      no
+Page size:      612 x 792 pts (letter)
+File size:      1152903 bytes
+Optimized:      no
+PDF version:    1.4
+</pre>
+Method 2: <a href="http://www.accesspdf.com/pdftk/">pdftk</a> [accesspdf]
+<pre>
+% fink install pdftk
+% pdftk Document.pdf dump_data output report.txt
+% cat report.txt 
+InfoKey: Creator
+InfoValue: Hewlett Packard MFP
+NumberOfPages: 2
+</pre>
+Method 1 would be my choice.
+-----

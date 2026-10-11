@@ -1,0 +1,197 @@
+TITLE: CGI with Python on a Mac
+AUTHOR: Kurt
+DATE: 01.11.2009 13:53
+DESC: small steps
+-----
+BODY:
+See: <a href="http://docs.python.org/library/cgi.html">cgi - Common Gateway Interface support</a> [docs.python.org]
+
+I've done a bit more with CGI and Python.  This works up to handling a
+form with user input.  In my first post on python and cgi, I created
+helloworld-py.cgi.  To improve on this, I first wanted to get some
+better error handling going.  Python provides this through a cgitb
+module.  cgitb (or CGI TraceBack) can be used either just as a
+response to the web browser, saved as a log file, or both.  Here I
+have both turned on.  I then use the AssertionError to force a
+traceback.  cd ~/Sites/test and create <i>demo-py.cgi</i>:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+<i><font color="#9A1900">#import cgitb; cgitb.enable()</font></i>
+<i><font color="#9A1900">#import cgitb; cgitb.enable(display=0, logdir="/tmp") # Only write log file</font></i>
+<b><font color="#000080">import</font></b> cgitb<font color="#990000">;</font> cgitb<font color="#990000">.</font><b><font color="#000000">enable</font></b><font color="#990000">(</font>logdir<font color="#990000">=</font><font color="#FF0000">"/tmp"</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'Content-type: text/html\n'</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'Hello, World.'</font>
+<b><font color="#0000FF">raise</font></b> <b><font color="#000000">AssertionError</font></b><font color="#990000">(</font><font color="#FF0000">'Test raising some exception'</font><font color="#990000">)</font>
+</tt></pre>
+Save this as ~/Sites/test/demo-py.cgi and run <b>open http://localhost/~$USER/test/demo-py.cgi</b>.  The results should look like this:
+<pre>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#6622aa">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>&lt;type 'exceptions.AssertionError'&gt;</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial">Python 2.6: /sw/bin/python<br>Sun Jan 11 13:19:45 2009</font></td></tr></table>
+A problem occurred in a Python script.  Here is the sequence of
+function calls leading up to the error, in the order they occurred.
+<table width="100%" cellspacing=0 cellpadding=0 border=0>
+<tr><td bgcolor="#d8bbff"><big>&nbsp;</big><a href="file:///Users/schwehr/Sites/test/demo-py.cgi">/Users/schwehr/Sites/test/demo-py.cgi</a> in <strong><module></strong>()</td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;6</small>&nbsp;import&nbsp;cgitb;&nbsp;cgitb.enable(logdir="/tmp")</tt></font></td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;7</small>&nbsp;</tt></font></td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;8</small>&nbsp;print&nbsp;'Content-type:&nbsp;text/html\n'</tt></font></td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;9</small>&nbsp;print&nbsp;'Hello,&nbsp;World.'</tt></font></td></tr>
+<tr><td bgcolor="#ffccee"><tt><small>&nbsp;&nbsp;&nbsp;10</small>&nbsp;raise&nbsp;AssertionError('Test&nbsp;raising&nbsp;some&nbsp;exception')</tt></td></tr>
+<tr><td><small><font color="#909090"><em>builtin</em> <strong>AssertionError</strong>&nbsp;= &lt;type 'exceptions.AssertionError'&gt;</font></small></td></tr></table><p><strong>&lt;type 'exceptions.AssertionError'&gt;</strong>: Test raising some exception
+<tt><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;</tt>args&nbsp;=
+('Test raising some exception',)
+<tt><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;</tt>message&nbsp;=
+'Test raising some exception'</pre>
+You can also look in /tmp for the same results: <b>ls -ltr
+/tmp/tmp*.html</b>.  That's much easier to debug than "Internal Server
+Error"!  It would also be nice to be able to allow importing these
+scripts.  This requires that there are no '-' characters in the CGI
+script names and that the file names end in <i>.py</i>.  To handle the
+file extention, we need to add it to apache2's mime type hander.
+<pre> % <b>sudo emacs /sw/etc/apache2/mods-enabled/mime.conf</b></pre> and
+add this line next to <i>AddHandler cgi-script .cgi</i>:
+<pre>AddHandler cgi-script .py</pre>
+Then restart apache2:
+<pre>% <b>sudo apache2ctl restart</b></pre>
+Now we are ready to attempt the next demo where we create a html form document
+that calls a python cgi when the user presses the submit button.  Save this as
+<i>demo2-from.html</i>
+<pre><tt><b><font color="#0000FF">&lt;html&gt;</font></b>
+<b><font color="#0000FF">&lt;body&gt;</font></b>
+<b><font color="#0000FF">&lt;form</font></b> <font color="#009900">method</font><font color="#990000">=</font><font color="#FF0000">"POST"</font> <font color="#009900">action</font><font color="#990000">=</font><font color="#FF0000">"demo2.py"</font><b><font color="#0000FF">&gt;</font></b>
+  <b><font color="#0000FF">&lt;p&gt;</font></b>Some text: <b><font color="#0000FF">&lt;input</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"text"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"text"</font><b><font color="#0000FF">/&gt;&lt;/p&gt;</font></b>
+  <b><font color="#0000FF">&lt;p&gt;&lt;input</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"submit"</font> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"Press to submit"</font><b><font color="#0000FF">/&gt;&lt;/p&gt;</font></b>
+  <b><font color="#0000FF">&lt;input</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"hidden"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"hiddenname"</font> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"foo"</font><b><font color="#0000FF">/&gt;</font></b>
+<b><font color="#0000FF">&lt;/form&gt;</font></b>
+<b><font color="#0000FF">&lt;/body&gt;</font></b>
+<b><font color="#0000FF">&lt;/html&gt;</font></b>
+</tt></pre>
+Now create <i>demo2.py</i>:
+<pre><tt><i><font color="#9A1900">#!/sw/bin/python</font></i>
+<i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+<b><font color="#000080">import</font></b> cgitb<font color="#990000">;</font> cgitb<font color="#990000">.</font><b><font color="#000000">enable</font></b><font color="#990000">()</font> <i><font color="#9A1900"># For debugging</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Content-type: text/html\n'</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;p&gt;Processing form&lt;/p&gt;'</font> 
+    form <font color="#990000">=</font> cgi<font color="#990000">.</font><b><font color="#000000">FieldStorage</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Form:'</font><font color="#990000">,</font>form
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;ul&gt;'</font>
+    <b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> form<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;li&gt;'</font>
+        <b><font color="#0000FF">print</font></b> key<font color="#990000">,</font><font color="#FF0000">'-'</font><font color="#990000">,</font>form<font color="#990000">[</font>key<font color="#990000">].</font>value
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/li&gt;'</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/ul&gt;'</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font> 
+    <b><font color="#000000">main</font></b><font color="#990000">()</font></tt></pre>
+Now run the demo:
+<pre>% <b>chmod +x demo2.py</b>
+% <b>open http://localhost/~$USER/test/demo2-from.html</b></pre>
+Put <i>test 123</i> in the text field and press submit.  You should see something like this:
+<pre>Processing form
+Form: FieldStorage(None, None, [MiniFieldStorage('text', 'test 123'), MiniFieldStorage('hiddenname', 'foo')])
+<!-- -->
+    * text - test 123
+    * hiddenname - foo</pre>
+FieldStorage works similar to a python dictionary.
+
+A final improvement to the script is to combine the form html and the
+form processing script.  <i>cgi.FieldStorage()</i> will return
+<i>None</i> if there is no form data.  demo3.py:
+<pre><tt><i><font color="#9A1900">#!/sw/bin/python</font></i>
+<i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+<b><font color="#000080">import</font></b> cgitb<font color="#990000">;</font> cgitb<font color="#990000">.</font><b><font color="#000000">enable</font></b><font color="#990000">()</font> <i><font color="#9A1900"># For debugging</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Content-type: text/html\n'</font>
+<!-- -->
+    form <font color="#990000">=</font> cgi<font color="#990000">.</font><b><font color="#000000">FieldStorage</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> form<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b><font color="#FF0000"> '''&lt;html&gt;</font>
+<font color="#FF0000">&lt;body&gt;</font>
+<font color="#FF0000">&lt;form method="POST" action="demo2.py"&gt;</font>
+<font color="#FF0000">  &lt;p&gt;Some text: &lt;input type="text" name="text"/&gt;&lt;/p&gt;</font>
+<font color="#FF0000">  &lt;p&gt;&lt;input type="submit" value="Press to submit"/&gt;&lt;/p&gt;</font>
+<font color="#FF0000">  &lt;input type="hidden" name="hiddenname" value="foo"/&gt;</font>
+<font color="#FF0000">&lt;/form&gt;</font>
+<font color="#FF0000">&lt;/body&gt;</font>
+<font color="#FF0000">&lt;/html&gt;'''</font>
+        <b><font color="#0000FF">return</font></b>
+<!-- -->
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;p&gt;Processing form&lt;/p&gt;'</font> 
+    <b><font color="#0000FF">print</font></b> form
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;ul&gt;'</font>
+    <b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> form<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;li&gt;'</font>
+        <b><font color="#0000FF">print</font></b> key<font color="#990000">,</font><font color="#FF0000">'-'</font><font color="#990000">,</font>form<font color="#990000">[</font>key<font color="#990000">].</font>value
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/li&gt;'</font>
+<!-- -->
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/ul&gt;'</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font> 
+    <b><font color="#000000">main</font></b><font color="#990000">()</font>
+</tt></pre>
+You can also use the GET method rather than the POST that I used above.  Try this:
+<pre>% <b>open http://localhost/~$USER/test/demo2.py?first=one\&second=two</b></pre>
+You should see this:
+<pre>Processing form
+Form: FieldStorage(None, None, [MiniFieldStorage('first', 'one'), MiniFieldStorage('second', 'two')])
+<!-- -->
+    * second - two
+    * first - one</pre>
+To see everything that is going on with cgi, there is a test() function.  Try out demo4.py:
+<pre><tt><i><font color="#9A1900">#!/sw/bin/python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+cgi<font color="#990000">.</font><b><font color="#000000">test</font></b><font color="#990000">()</font></tt></pre>
+And open it:
+<pre>% <b>chmod +x demo4.py</b>
+% <b>open http://localhost/~$USER/test/demo4.py?first=one\&second=two</b></pre>
+You will be presented with a large amount of info about your cgi environment:
+<pre><b>Current Working Directory:</b>
+/Users/schwehr/Sites/test
+<b>Command Line Arguments:</b>
+['/Users/schwehr/Sites/test/demo4.py']
+<b>Form Contents:</b><DL><DT>first: <i>&lt;type 'instance'&gt;</i>
+<DD>MiniFieldStorage('first', 'one')
+<DT>second: <i>&lt;type 'instance'&gt;</i>
+<DD>MiniFieldStorage('second', 'two')
+</DL>
+<b>Shell Environment:</b><DL><DT> DOCUMENT_ROOT <DD> /sw/var/www/
+<DT> GATEWAY_INTERFACE <DD> CGI/1.1
+<DT> HTTP_ACCEPT <DD> text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+<DT> HTTP_ACCEPT_CHARSET <DD> ISO-8859-1,utf-8;q=0.7,*;q=0.7
+<DT> HTTP_ACCEPT_ENCODING <DD> gzip,deflate
+<DT> HTTP_ACCEPT_LANGUAGE <DD> en-us,en;q=0.5
+<DT> HTTP_CACHE_CONTROL <DD> max-age=0
+<DT> HTTP_CONNECTION <DD> keep-alive
+<DT> HTTP_HOST <DD> localhost
+<DT> HTTP_KEEP_ALIVE <DD> 300
+<DT> HTTP_USER_AGENT <DD> Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.0.5) Gecko/2008120121 Firefox/3.0.5
+<DT> PATH <DD> /sw/bin:/sw/sbin:...
+<DT> QUERY_STRING <DD> first=one&amp;second=two
+<DT> REMOTE_ADDR <DD> 127.0.0.1
+<DT> REMOTE_PORT <DD> 56992
+<DT> REQUEST_METHOD <DD> GET
+<DT> REQUEST_URI <DD> /~schwehr/test/demo4.py?first=one&amp;second=two
+<DT> SCRIPT_FILENAME <DD> /Users/schwehr/Sites/test/demo4.py
+<DT> SCRIPT_NAME <DD> /~schwehr/test/demo4.py
+<DT> SERVER_ADDR <DD> 127.0.0.1
+<DT> SERVER_ADMIN <DD> webmaster@localhost
+<DT> SERVER_NAME <DD> localhost
+<DT> SERVER_PORT <DD> 80
+<DT> SERVER_PROTOCOL <DD> HTTP/1.1
+<DT> SERVER_SIGNATURE <DD> &lt;address&gt;Apache/2.2.9 (Unix) PHP/5.2.6 Server at localhost Port 80&lt;/address&gt;
+<DT> SERVER_SOFTWARE <DD> Apache/2.2.9 (Unix) PHP/5.2.6</DL>
+...</pre>
+-----

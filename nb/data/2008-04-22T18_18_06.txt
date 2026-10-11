@@ -1,0 +1,146 @@
+TITLE: Creating a deb software package for Ubuntu
+AUTHOR: Kurt
+DATE: 04.22.2008 18:18
+DESC: is this right?
+-----
+BODY:
+
+<b>WARNING:</b> This post needs verification.  Please let me know if
+you see something wrong.  If you wipe your Linux partition with this don't
+blame me.  You should try it in scratch VMWare Ubuntu image or something
+similar.
+
+<b>WARNING 2:</b>This is most definitely not a good way to build a
+deb.  I need to figure out dh_make (from the dh-make package).
+
+The following is on a Ubuntu 8.04 beta install on a Intel machine.
+
+After reading lots of documentation and getting all turned around
+trying to package some python software for Ubuntu, I decided to strike
+out on my own.  I looked at what fink does and modelled my process
+after that.
+
+Basically, I need to create a sub-directory tree with a DEBIAN
+directory containing a 'control' file and a directory tree that
+matches the root of the Debian tree.  The root for fink defaults to sw
+and on Debian is will be usr (/usr).
+
+I created a new rule in the noaadata package Makefile:
+<pre>
+<font color="8b2252"><strong>deb</strong>:</font>
+	rm -rf build
+	rm -rf python-noaadata-<font color="2040a0">${VERSION}</font>
+	mkdir -p python-noaadata-<font color="2040a0">${VERSION}</font>/DEBIAN
+	perl -p -e &quot;s|\@VERSION\@|<font color="2040a0">${VERSION}</font>|&quot; &lt; control.in &gt; python-noaadata-<font color="2040a0">${VERSION}</font>/DEBIAN/control
+	./setup.py install --root=python-noaadata-<font color="2040a0">${VERSION}</font>
+	dpkg-deb -b python-noaadata-<font color="2040a0">${VERSION}</font> python-noaadata-<font color="2040a0">${VERSION}</font>.deb
+</pre>
+The first step is to clean up from any prior installs.  Installing
+creates a build directory.  Remove that.  Also, to match Ubuntu's
+package naming, I am calling this python-noaadata.  With Fink, the
+convention is noaadata-py25.
+
+Next mkdir -p creates the package name and version directory and the
+location for the control file: <b>python-noaadata-0.36/DEBIAN</b>
+
+Next I use a control file template and replace @VERSION@ with the
+actual version with a perl replacement.  Here is the control file
+template, <b>control.in</b>:
+<pre>
+Package: python-noaadata
+Source: python-noaadata
+Version: <b>@VERSION@</b>-1
+Section: sci
+Installed-Size: 3456
+Architecture: i386-linux
+Priority: optional
+Depends: python
+Maintainer: Kurt Schwehr &lt;kurt _at_ ccom.unh.edu&gt;
+Description: Python marine AIS library
+ Marine Automatic Indentification System networking library.  noaadata-py
+ provides routines to encode and decode bitstreams need to send and
+ receive AIS messages.  The package also contains code to talk to
+ the NOAA PORTS/CO-OPS waterlevel data through both SOAP and OpenDAP.
+ .
+ Web site: http://vislab-ccom.unh.edu/~schwehr/software/noaadata
+</pre>
+I got <b>Architecture</b> from dpkg-architecture.
+<pre>% <b>echo `dpkg-architecture -qDEB_HOST_ARCH`-`dpkg-architecture -qDEB_HOST_ARCH_OS`</b>
+i386-linux</pre>
+Now build the deb.  This first does a standard setup.py distutils
+install followed by a <b>dpkg-deb --build</b>
+<pre>% make deb</pre>
+Now we need to inspect that deb that we just created.
+<pre>
+% <b>dpkg-deb --info python-noaadata-0.36.deb</b>
+ new debian package, version 2.0.
+ size 761392 bytes: control archive= 523 bytes.
+     589 bytes,    16 lines      control              
+ Package: python-noaadata
+ Source: python-noaadata
+ Version: 0.36-1
+ Section: sci
+ Installed-Size: 3456
+ Architecture: i386-linux
+ Priority: optional
+ Depends: python
+ Maintainer: Kurt Schwehr &lt;kurt _at_ ccom.unh.edu&gt;
+ Description: Python marine AIS library
+  Marine Automatic Indentification System networking library.  noaadata-py
+  provides routines to encode and decode bitstreams need to send and
+  receive AIS messages.  The package also contains code to talk to
+  the NOAA PORTS/CO-OPS waterlevel data through both SOAP and OpenDAP.
+  .
+  Web site: http://vislab-ccom.unh.edu/~schwehr/software/noaadata
+</pre>
+The show command:
+<pre><b>dpkg-deb --show python-noaadata-0.36.deb</b>
+python-noaadata 0.36-1
+</pre>
+Check out the contents:
+<pre>% <b>dpkg-deb --contents python-noaadata-0.36.deb</b>
+drwxr-xr-x schwehr/schwehr   0 2008-04-22 21:00 ./
+drwxr-xr-x schwehr/schwehr   0 2008-04-22 21:00 ./usr/
+drwxr-xr-x schwehr/schwehr   0 2008-04-22 21:00 ./usr/bin/
+-rwxr-xr-x schwehr/schwehr 3076 2008-04-22 21:00 ./usr/bin/ais_uniq.py
+-rwxr-xr-x schwehr/schwehr 96434 2008-04-22 21:00 ./usr/bin/aisxmlbinmsg2py.py
+...
+-rw-r--r-- schwehr/schwehr  2753 2008-04-22 21:00 ./usr/lib/python2.5/site-packages/aisutils/daemon.pyc
+-rw-r--r-- schwehr/schwehr  4214 2008-02-05 21:08 ./usr/lib/python2.5/site-packages/aisutils/normalize.py
+-rw-r--r-- schwehr/schwehr  1630 2008-04-22 21:00 ./usr/lib/python2.5/site-packages/noaadata_py-0.36.egg-info
+</pre>
+Give the installation a try:
+<pre>% <b>sudo dpkg -i python-noaadata-0.36.deb</b>
+Selecting previously deselected package python-noaadata.
+(Reading database ... 132467 files and directories currently installed.)
+Unpacking python-noaadata (from python-noaadata-0.36.deb) ...
+Setting up python-noaadata (0.36-1) ...
+</pre>
+Inspect the installed package:
+<pre>% <b>dpkg -S /usr/bin/ais-db</b>
+python-noaadata: /usr/bin/ais-db
+% <b>dpkg -L python-noaadata | head -5</b>
+/.
+/usr
+/usr/bin
+/usr/bin/ais_uniq.py
+/usr/bin/aisxmlbinmsg2py.py
+</pre>
+Now remove that package that you installed.
+<pre>% <b>sudo apt-get remove python-noaadata</b>
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  linux-headers-2.6.24-12-generic linux-headers-2.6.24-12
+Use 'apt-get autoremove' to remove them.
+The following packages will be REMOVED:
+  python-noaadata
+0 upgraded, 0 newly installed, 1 to remove and 130 not upgraded.
+After this operation, 3539kB disk space will be freed.
+Do you want to continue [Y/n]? 
+(Reading database ... 132621 files and directories currently installed.)
+Removing python-noaadata ...
+</pre>
+See Also: <a href="https://wiki.ubuntu.com/PackagingGuide/Complete">https://wiki.ubuntu.com/PackagingGuide/Complete</a>
+-----

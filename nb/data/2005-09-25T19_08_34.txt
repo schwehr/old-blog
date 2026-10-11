@@ -1,0 +1,48 @@
+TITLE: ipython rocks!
+AUTHOR: Kurt
+DATE: 09.25.2005 19:08
+DESC: woo hoo
+-----
+BODY:
+IPython rocks!  Gareth gave me a quick tutorial and I just used it to
+debug a segy-py bug.  Actually, segy-py really could use a complete
+rewrite.  I wrote the whole thing and I still get a bit confused each
+time I try to get header values.  I think all the subclasses just
+cause more trouble than they are worth.  
+
+Here is what I did with ipython:
+
+Calls to getBinHeader were bailing on me and I couldn't figure out
+what was wrong.  When I did <b>print type(traceHeader)</b>  python
+just said that it was an instance.  So I popped open an ipython just
+before this point to see what methods were available from traceHeader.
+<pre>
+def offset2seconds(segy, trace, offset):
+    traceHeader = segy.getTraceHdr(1)#trace)
+<b>
+    from IPython.Shell import IPShellEmbed
+    ipshell = IPShellEmbed(argv=[])
+    ipshell() 
+</b>
+    print type(traceHeader)
+    interval = traceHeader.getBinHeader('SampleInterval')/1000000.
+    delay    = traceHeader.getBinHeader('Delay')
+    time = delay + interval * offset
+    return time
+</pre>
+Then at the ipython prompt, I just typed <b>traceHeader.[tab]</b>
+where [tab] is hitting the tab key.
+<pre>
+In [2]: traceHeader.
+traceHeader.__class__              traceHeader.getHeader
+traceHeader.__doc__                traceHeader.getTextTranslateValue
+traceHeader.__init__               traceHeader.printHeader
+traceHeader.__module__             traceHeader.segyHdr
+traceHeader.data                   traceHeader.sqlInsert
+traceHeader.drv                    traceHeader.start
+</pre>
+Aha!  I was reading the methods for the wrong class.  Not
+getBinHeader, but getHeader.  Now all is well.
+
+Brought to you by Unwritten and JoJo on my iPod
+-----

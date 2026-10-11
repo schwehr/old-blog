@@ -1,0 +1,64 @@
+TITLE: python time
+AUTHOR: Kurt
+DATE: 11.03.2008 12:49
+DESC: coping with time
+-----
+BODY:
+Time and date just keeps coming up as a confusing point with data
+logging.  I wrote a quite program to help understand some common time
+issue with finding local time.  It doesn't help that I'm looking at
+data from last week and there was a daylight savings change over the
+weekend.
+<pre>% <b>./check_time.py</b>
+/sw/bin/date -R -u  : Mon, 03 Nov 2008 17:45:58 +0000
+/sw/bin/date -R     : Mon, 03 Nov 2008 12:45:58 -0500
+/sw/bin/date -u     : Mon Nov  3 17:45:58 UTC 2008
+/sw/bin/date        : Mon Nov  3 12:45:58 EST 2008
+/sw/bin/date -u +%s : 1225734358
+/sw/bin/date    +%s : 1225734358
+<!-- -->
+time.time(): 1225734358.86
+datetime.datetime.utcnow(): 2008-11-03 17:45:58.863182
+datetime.datetime.utcnow().timetuple(): (2008, 11, 3, 12, 45, 58, 0, 308, -1)
+calendar.timegm(datetime.datetime.utcnow().timetuple()) 1225734358
+datetime.datetime.fromtimestamp(time.time()) 2008-11-03 12:45:58.863338
+<!-- -->
+EST     EST     2008-11-03 17:45:58+00:00 -> 2008-11-03 12:45:58-05:00
+EST5EDT EST5EDT 2008-11-03 17:45:58+00:00 -> 2008-11-03 12:45:58-05:00</pre>
+Here is the source code to the above.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> datetime<font color="#990000">,</font> calendar<font color="#990000">,</font> time
+<b><font color="#000080">import</font></b> pytz
+<b><font color="#000080">import</font></b> os
+<!-- -->
+cmds <font color="#990000">=</font> <font color="#990000">[</font>
+    <font color="#FF0000">'/sw/bin/date -R -u '</font><font color="#990000">,</font>
+    <font color="#FF0000">'/sw/bin/date -R    '</font><font color="#990000">,</font>
+    <font color="#FF0000">'/sw/bin/date -u    '</font><font color="#990000">,</font>
+    <font color="#FF0000">'/sw/bin/date       '</font><font color="#990000">,</font>
+    <font color="#FF0000">'/sw/bin/date -u +%s'</font><font color="#990000">,</font>
+    <font color="#FF0000">'/sw/bin/date    +%s'</font><font color="#990000">,</font>
+    <font color="#990000">]</font>
+<b><font color="#0000FF">for</font></b> cmd <b><font color="#0000FF">in</font></b> cmds<font color="#990000">:</font>
+    <b><font color="#0000FF">print</font></b> cmd<font color="#990000">,</font><font color="#FF0000">':'</font><font color="#990000">,</font>
+    <b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> os<font color="#990000">.</font><b><font color="#000000">popen</font></b><font color="#990000">(</font>cmd<font color="#990000">):</font>
+        <b><font color="#0000FF">print</font></b> line<font color="#990000">,</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'time.time():'</font><font color="#990000">,</font>time<font color="#990000">.</font><b><font color="#000000">time</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'datetime.datetime.utcnow():'</font><font color="#990000">,</font>datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">utcnow</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'datetime.datetime.utcnow().timetuple():'</font><font color="#990000">,</font>datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">now</font></b><font color="#990000">().</font><b><font color="#000000">timetuple</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'calendar.timegm(datetime.datetime.utcnow().timetuple())'</font><font color="#990000">,</font>calendar<font color="#990000">.</font><b><font color="#000000">timegm</font></b><font color="#990000">(</font>datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">utcnow</font></b><font color="#990000">().</font><b><font color="#000000">timetuple</font></b><font color="#990000">())</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'datetime.datetime.fromtimestamp(time.time())'</font><font color="#990000">,</font>datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">fromtimestamp</font></b><font color="#990000">(</font>time<font color="#990000">.</font><b><font color="#000000">time</font></b><font color="#990000">())</font>
+<!-- -->
+utc <font color="#990000">=</font> pytz<font color="#990000">.</font>utc
+now <font color="#990000">=</font> datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">utcnow</font></b><font color="#990000">()</font>
+now <font color="#990000">=</font> datetime<font color="#990000">.</font><b><font color="#000000">datetime</font></b><font color="#990000">(</font>now<font color="#990000">.</font>year<font color="#990000">,</font>now<font color="#990000">.</font>month<font color="#990000">,</font>now<font color="#990000">.</font>day<font color="#990000">,</font> now<font color="#990000">.</font>hour<font color="#990000">,</font> now<font color="#990000">.</font>minute<font color="#990000">,</font> now<font color="#990000">.</font>second<font color="#990000">,</font> tzinfo<font color="#990000">=</font>utc<font color="#990000">)</font>
+<!-- -->
+tz_strs <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'EST'</font><font color="#990000">,</font><font color="#FF0000">'EST5EDT'</font><font color="#990000">]</font>
+<b><font color="#0000FF">for</font></b> tz_str <b><font color="#0000FF">in</font></b> tz_strs<font color="#990000">:</font>
+    tz <font color="#990000">=</font> pytz<font color="#990000">.</font><b><font color="#000000">timezone</font></b><font color="#990000">(</font>tz_str<font color="#990000">)</font>
+    <b><font color="#0000FF">print</font></b> tz_str<font color="#990000">,</font> <b><font color="#000000">str</font></b><font color="#990000">(</font>tz<font color="#990000">),</font> now<font color="#990000">,</font> <font color="#FF0000">'-&gt;'</font><font color="#990000">,</font> now<font color="#990000">.</font><b><font color="#000000">astimezone</font></b><font color="#990000">(</font>tz<font color="#990000">)</font>
+<!-- -->
+</tt></pre>
+-----

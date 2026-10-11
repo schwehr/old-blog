@@ -1,0 +1,55 @@
+TITLE: pkg-config
+AUTHOR: Kurt
+DATE: 02.24.2014 00:12
+DESC: unix tools
+-----
+BODY:
+I had never really used <a href="http://pkgconfig.freedesktop.org">pkg-config</a> before today.  Turns out to be
+reasonably simple.  I read through the man page an here is me messing with it.
+<pre><b><font color="#0000FF">type</font></b> -a pkg-config
+<i><font color="#9A1900">pkg-config is /sw/bin/pkg-config</font></i>
+<!-- -->
+dpkg -S /sw/bin/pkg-config
+<i><font color="#9A1900">pkgconfig: /sw/bin/pkg-config</font></i>
+<!-- -->
+fink list -i pkgconfig <font color="#990000">|</font> grep -v virtual
+<i><font color="#9A1900"> i  pkgconfig                0.25-2  Manager for library compile/link flags</font></i>
+<!-- -->
+pkg-config --help
+pkg-config --list-all
+pkg-config --list-all <font color="#990000">|</font> wc -l
+<i><font color="#9A1900">    300</font></i>
+pkg-config --list-all <font color="#990000">|</font> head -<font color="#993399">4</font>
+<font color="#990000">gstreamer-tag-0.10 GStreamer Tag Library - Tag base classes and helper functions
+libmetalink libmetalink - Metalink library
+xf86rushproto XF86RushProto - XF86Rush extension headers
+fontsproto FontsProto - Fonts extension headers</font>
+<!-- -->
+pkg-config x11 <font color="#990000">&amp;&amp;</font> echo <font color="#FF0000">'yes'</font>
+<i><font color="#9A1900">yes</font></i>
+<!-- -->
+pkg-config missing <font color="#990000">&amp;&amp;</font> echo <font color="#FF0000">'yes'</font>
+pkg-config missing <font color="#990000">||</font> echo <font color="#FF0000">'do not have "missing"'</font>
+<i><font color="#9A1900">do not have "missing"</font></i>
+<!-- -->
+pkg-config --print-variables x11
+<font color="#990000">xthreadlib
+exec_prefix
+prefix
+includedir
+libdir</font>
+<!-- -->
+pkg-config --print-provides x11
+x11 <font color="#990000">=</font> <font color="#993399">1.6</font><font color="#990000">.</font><font color="#993399">2</font>
+<!-- -->
+pkg-config --print-requires x11
+<i><font color="#9A1900">xproto</font></i>
+<i><font color="#9A1900">kbproto</font></i>
+<!-- -->
+pkg-config --cflags x11
+<i><font color="#9A1900">-I/opt/X11/include</font></i>
+<!-- -->
+pkg-config --libs x11
+<i><font color="#9A1900">-L/opt/X11/lib -lX11</font></i>
+</pre>
+-----

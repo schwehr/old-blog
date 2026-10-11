@@ -1,0 +1,3409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Kurt's Weblog: May 2005 Archives</title>
+
+<link rel="stylesheet" href="../styles/nb_default.css" type="text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="../atom.xml" />
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span>
+</div>
+
+<div id="content">
+
+<div class="blog">
+<div id="menu">
+	<a href="../index.html">Main</a>
+</div>
+</div>
+
+<div class="blog">
+<div class="item">
+<a id="e2005-05-31T19_52_41.txt" name="e2005-05-31T19_52_41.txt"></a>
+<h2 class="date">05.31.2005 19:52</h2>
+<div class="blogbody">
+<h3 class="title">segy sql database working</h3>
+<div class="item-description">
+Just packaged up segy-py-0.3.tar.bz2 for release... sql database generation.
+<br /><br />
+Doh!  I just spent 15 minutes writing a nice explanation of the
+database building of SEGY header information (both file and trace).
+Then I hit the wrong key in the nanoblogger add and nuked the whole
+thing.  Basic gist... it works.  It is heavy on disk usage and cpu
+cycles, but I wrote it in less than an hour and a half while on the
+airplane.  It needs better typing as I assumed everything should be
+saved as a 4 byte integer, but it is a great first pass.
+<pre>
+ls -l *db
+<br /><br />
+-rw-r--r--    1 schwehr  staff    18501632 May 31 19:40 bpsegy.db
+<br /><br />
+sqlite bpsegy.db 'select x/3600.0,y/3600.0 from segyTrace' | head
+<br /><br />
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+</pre>
+The sample db creation code:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">segy</font> <strong>import</strong> <font color="#2040a0">Segy</font>
+<strong>import</strong> <font color="#2040a0">sqlite</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+<br /><br />
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">&quot;__main__&quot;</font><font color="4444FF">:</font>
+	<font color="#2040a0">dbName</font> <font color="4444FF">=</font> <font color="#008000">'bpsegy.db'</font>
+	<strong>if</strong> <font color="#2040a0">os</font>.<font color="#2040a0">access</font><font color="4444FF">(</font><font color="#2040a0">dbName</font>,<font color="#2040a0">os</font>.<font color="#2040a0">W_OK</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">os</font>.<font color="#2040a0">remove</font><font color="4444FF">(</font><font color="#2040a0">dbName</font><font color="4444FF">)</font>
+	<font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#2040a0">dbName</font><font color="4444FF">)</font>
+	<font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+	
+	<font color="#2040a0">xstar</font> <font color="4444FF">=</font> <font color="#2040a0">Segy</font><font color="4444FF">(</font><font color="#008000">'bpsio01L00.xstar'</font><font color="4444FF">)</font>
+<br /><br />
+	<font color="#444444">#</font>
+	<font color="#444444"># CREATE the database tables</font>
+	<font color="#444444">#</font>
+	<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">xstar</font>.<font color="#2040a0">header</font>.<font color="#2040a0">sqlCreate</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">True</font><font color="4444FF">:</font>
+	    <font color="#2040a0">t</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+	    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">t</font>.<font color="#2040a0">sqlCreate</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<br /><br />
+	<font color="#444444">#</font>
+	<font color="#444444"># POPULATE the tables</font>
+	<font color="#444444">#</font>
+	<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">xstar</font>.<font color="#2040a0">header</font>.<font color="#2040a0">sqlInsert</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">xstar</font>.<font color="#2040a0">getNumberOfTraces</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+	    <font color="#2040a0">t</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+<br /><br />
+	    <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">i</font><font color="4444FF">%</font><font color="#FF0000">500</font><font color="4444FF">:</font>
+		    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">t</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'X'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+		    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">t</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Y'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+		    <strong>print</strong> <font color="#2040a0">i</font>,<font color="#008000">':   '</font>,<font color="#2040a0">x</font>,<font color="#2040a0">y</font>
+	
+	    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">t</font>.<font color="#2040a0">sqlInsert</font><font color="4444FF">(</font><font color="#2040a0">traceNumber</font><font color="4444FF">=</font><font color="#2040a0">i</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>	<font color="#444444"># Flush this to the db!</font>
+</pre>
+My quick and dirty sql string generation code.  Note that there are
+only INTEGER fields!
+<pre>
+  ...
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> sqlCreate</font><font color="2040a0">(self,specificKeys=None, table='segyFile')</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        Build an SQL string to create a table for the keys/fields in a
+        SEGY file header
+<br /><br />
+        arguments:
+        specificKeys - in set, these are the keys that will used in the create string
+        table - SQL table name (may have different tables for different formats)
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <strong>if</strong> <strong>not</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">specificKeys</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">drv</font>.<font color="#2040a0">binaryHeaderEntries</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">cStr</font>  <font color="4444FF">=</font> <font color="#008000">'CREATE TABLE '</font><font color="4444FF">+</font><font color="#2040a0">table</font><font color="4444FF">+</font><font color="#008000">' ('</font>
+        <strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">cStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">key</font><font color="4444FF">+</font><font color="#008000">' INTEGER,'</font>
+        <font color="#2040a0">cStr</font> <font color="4444FF">=</font> <font color="#2040a0">cStr</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+        <font color="#2040a0">cStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">');'</font>
+        <strong>return</strong> <font color="#2040a0">cStr</font>
+<br /><br />
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> sqlInsert</font><font color="2040a0">(self,specificKeys=None, table='segyFile')</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        Build an SQL string to INSERT the values for the current file
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <strong>if</strong> <strong>not</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">specificKeys</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">drv</font>.<font color="#2040a0">binaryHeaderEntries</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">iStrStart</font> <font color="4444FF">=</font> <font color="#008000">'INSERT INTO '</font><font color="4444FF">+</font><font color="#2040a0">table</font><font color="4444FF">+</font><font color="#008000">' ('</font>
+        <font color="#2040a0">iStrEnd</font> <font color="4444FF">=</font> <font color="#008000">' VALUES ('</font><font color="4444FF">;</font>
+        <strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">iStrStart</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">key</font><font color="4444FF">+</font><font color="#008000">','</font>
+            <font color="#2040a0">iStrEnd</font>   <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">getBinEntry</font><font color="4444FF">(</font><font color="#2040a0">key</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">','</font>
+        <font color="#2040a0">iStrStart</font> <font color="4444FF">=</font> <font color="#2040a0">iStrStart</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#008000">')'</font>
+        <font color="#2040a0">iStrEnd</font>   <font color="4444FF">=</font> <font color="#2040a0">iStrEnd</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#008000">');'</font>
+        <strong>return</strong> <font color="#2040a0">iStrStart</font> <font color="4444FF">+</font> <font color="#2040a0">iStrEnd</font>
+</pre>
+Feels strange to have the sql string generators inside the header
+instances, but that way, I know the driver is loaded.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-31T19_52_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-06-01T13_01_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-31T15_48_06.txt" name="e2005-05-31T15_48_06.txt"></a>
+<h2 class="date">05.31.2005 15:48</h2>
+<div class="blogbody">
+<h3 class="title">segy-py setup.py and distutils</h3>
+<div class="item-description">
+I am now in the Chicago O'Hare airport.  I actually found an electrical
+outlet next to a seat.  What a rare thing in this airport.  I usually
+end up sitting on the floor, often under a drinking fountain or pay
+phone.
+<br /><br />
+I have been working on packaging up segy-py a bit better while on the
+plane, but first want to write a bit about some thoughts on python
+segy driver files.  I keep discovering little design problems that
+show off the power of python.  I realized one today.  I was thinking
+about how I have to create a large python file full of dictionaries
+for each flavor of segy.  If this were C/C++ this would definitely be
+the case or I could write a whole bunch of wrapper functions to go
+into other definitions for functionality.  In python, it turns out
+that it should be really easy to pull parts of functionality from
+different config files.  The example that I was thinking of was with a
+segy flavor that is almost segy rev1.
+<br /><br />
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<br /><br />
+<strong>import</strong> <font color="#2040a0">segy_rev1</font>
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+<br /><br />
+<strong>from</strong> <font color="#2040a0">segy_rev1</font> <strong>import</strong> <font color="#2040a0">textFileHeaderEntries</font>
+<br /><br />
+<strong>print</strong> <font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#FF0000">3</font>,<font color="#FF0000">5</font><font color="4444FF">]</font>
+<strong>print</strong> <font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+<br /><br />
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+</pre>
+Running this as './segy_tweak.py' gives results like this:
+<pre>
+  [2, 5]
+  [2, 5]
+  [3, 5]
+  [3, 5]
+</pre>
+This show that there is one problem or drawback to this approach.  The
+original module data is altered.  If you had two different segy files
+open with different drivers for each, they could step on each other,
+right?  I did a quick check and this is a global problem (or feature
+if it helps you for other code).  So a better way to solve this
+trickiness is to do a deep copy of the data.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<br /><br />
+<strong>import</strong> <font color="#2040a0">segy_rev1</font>
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+<br /><br />
+<strong>import</strong> <font color="#2040a0">copy</font>
+<font color="#2040a0">textFileHeaderEntries</font> <font color="4444FF">=</font> <font color="#2040a0">copy</font>.<font color="#2040a0">deepcopy</font><font color="4444FF">(</font><font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">)</font>
+<br /><br />
+<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#FF0000">3</font>,<font color="#FF0000">5</font><font color="4444FF">]</font>
+<strong>print</strong> <font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+<br /><br />
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+</pre>
+Which shows that the deep copy does what we want in this case:
+<pre>
+  ./segy_tweaked3.py 
+  [2, 5]
+  [3, 5]
+  [2, 5]  &lt;-- The original value is not changed.  Perfect!
+</pre>
+<br /><br />
+<b>PACKAGING</b>
+<br /><br />
+In order for people to be able to use my segy-py package, it needs to
+work as a solid python package.  As such, I have been trying to use
+the standard distutils.  This started off pretty quickly, but then I
+ran into a few things that I figured out by looking at other
+packages.  The first one is that I hate having to list out every
+source file.  There ways to do this with GNU Make, but it is
+complicated for a beginner.  With python it turns out to be simple,
+but I am not sure the difference between the two.  I started out with
+something like this inside of the setup call in setup.py:
+<pre>
+        py_modules = ['segy','ebcdic','segy_sql','ibm'],
+</pre>
+There I have listed out each python file that I want to end up in the
+distributed tarball.  But what I really want is every python file
+included.  I found an example that does this:
+<pre>
+        packages=['']
+</pre>
+So what really is the difference between a module and a package?  I
+bet I will discover that when I get around to trying to install the
+stuff with setup.py.
+<br /><br />
+The next question is should I be putting my pure python sources under
+a subdirectory or can I leave them all in the top level right now?
+Will everything at the top level cause install problems?   Looking in
+the fink directory <em>/sw/lib/python2.4/site-packages</em> I see a
+mess.  There are directories, python files, .so compiled shared
+libraries, pth files (what are these?), and other junk.  I will have
+to get back to this one later.
+<br /><br />
+Then on to a Makefile.  I almost always end up with a Makefile for
+everything I do.  People who work on projects with me know that I love
+simple GNU makefiles and bash scripts.  Bash is falling quickly by the
+wayside with python, but I have a makefile for this project.  Take a
+quick look at part of my makefile:
+<pre>
+<font color="2040a0">PYTHON_FILES:=</font><font color="2040a0">${wildcard *.py}</font>
+<font color="2040a0">PYTHON_MODS:=</font><font color="2040a0">${PYTHON_FILES:.py=}</font>
+<font color="2040a0">PYTHON_MOD_DOCS:=</font><font color="2040a0">${PYTHON_FILES:.py=.html}</font>
+<font color="8b2252">
+<strong>docs</strong>:</font> 
+	@echo &quot;<font color="2040a0">${PYTHON_MODS}</font>&quot;
+	pydoc -w <font color="2040a0">${PYTHON_MODS}</font>
+	code2html Makefile &gt; Makefile-segy-py.html
+<font color="8b2252">
+<strong>BASE_URL</strong>:</font>=http://schwehr.org/software/segy-py
+<font color="2040a0">BASE_SCP:=</font>schwehr.org:www/software/segy-py
+<font color="8b2252"><strong>docs-install</strong>:</font> docs
+	scp <font color="2040a0">${PYTHON_MOD_DOCS}</font>  Makefile-segy-py.html <font color="2040a0">${BASE_SCP}</font>/docs
+	open <font color="2040a0">${BASE_URL}</font>/docs
+<font color="8b2252">
+<strong>help</strong>:</font>
+	open <font color="2040a0">${BASE_URL}</font>/docs
+<font color="8b2252">
+<strong>check</strong>:</font> test
+	pychecker *.py
+	grep -n FIX *.py
+<font color="8b2252">
+<strong>test</strong>:</font>
+	./segy.py -v
+<font color="8b2252">
+<strong>clean</strong>:</font>
+	rm -f *.pyc *.html *~
+<br /><br />
+<font color="#444444"># dist is build by &quot;python setup.py sdist&quot;</font>
+<font color="#444444"># and MANIFEST gets built in the process based on MANIFEST.in</font>
+<font color="8b2252"><strong>dist-clean</strong>:</font> clean
+	rm -rf dist *.db
+	rm -rf MANIFEST
+<br /><br />
+<font color="#444444"># python packaging</font>
+<font color="8b2252"><strong>sdist</strong>:</font> dist-clean
+	./setup.py sdist --formats=bztar
+<font color="8b2252">
+<strong>sdist-install</strong>:</font> sdist
+	scp dist/* <font color="2040a0">${BASE_SCP}</font>/
+</pre>
+It really does not do very much, but it helps me remember common
+tasks.  For example, testing the code and uploading the web
+documentation to my server becomes as easy as this:
+<pre>
+  make check && make test && make docs-install
+</pre>
+Well, that does not work right now as I often have tests that fail,
+but you get the idea.
+<br /><br />
+Why am I bringing up make other than the fact that I think make is
+cool?  Well, the default setup.py file I had does not put the Makefile
+in the tarball.  Doh! <img src="../moods/smilies/sad.gif" alt=":(" border="0"  Some projects put these kinds of things in
+"data_files=", but these are NOT datafiles.  Turns out that this is
+what MANIFEST.in is for.  There I can list files that I want to end up
+in the tar ball.  I ultimately would like them to get installed in the
+fink doc dir (e.g. /sw/share/doc/segy-py) without explicitly mentioning them
+in the info file, but that is another day.  Here is the MANIFEST.in
+that I created:
+<pre>
+  # Files to also put in the distribution (sdist or bdist)
+<br /><br />
+  # Active files
+  include Makefile
+<br /><br />
+  # Documentation files
+  include COPYRIGHT ChangeLog README TODO
+</pre>
+Then I did a make sdist (which is just ./setup.py sdist
+  --formats=bztar) and I now have a MANIFEST that shows:
+<pre>
+  COPYRIGHT
+  ChangeLog
+  Makefile
+  README
+  TODO
+  ebcdic.py
+  ibm.py
+  segy.py
+  segy_rev1.py
+  segy_sql.py
+  setup.py
+</pre>
+And looking at the tar that is produced, everything looks great:
+<pre>
+  tar tfj dist/segy-py-0.3.tar.bz2 
+<br /><br />
+  segy-py-0.3/
+  segy-py-0.3/ChangeLog
+  segy-py-0.3/COPYRIGHT
+  segy-py-0.3/ebcdic.py
+  segy-py-0.3/ibm.py
+  segy-py-0.3/Makefile
+  segy-py-0.3/PKG-INFO
+  segy-py-0.3/README
+  segy-py-0.3/segy.py
+  segy-py-0.3/segy_rev1.py
+  segy-py-0.3/segy_sql.py
+  segy-py-0.3/setup.py
+  segy-py-0.3/TODO
+</pre>
+Hopefully that will help others get an even quicker jump start on
+setup.py files than I got (and I started just a day or two ago).
+<br /><br />
+Now what exactly is __init__.py supposed to do?  None of them seem to
+really have any info in them.  I do not yet see a purpose.
+<br /><br />
+<b>DB WORK BEGINNING...</b>
+<br /><br />
+It is now time to start working on the database side of the house.  I
+want these drivers to be able to create and/or flush out an sql
+database.  I would prefer the design to be generic enough that it will
+work with any database that I may want to interface with ( for
+example: sqlite, mysql, postgres, oracle, and so on).  I am thinking
+that the simplest way (but not the best for absolute performance) is
+to have the drivers be able to return SQL strings.  So for a trace, I
+can first get a CREATE TABLE string.  Then I can ask for an INSERT
+INTO string.  Then from outside the driver I can work with the
+database how I see fit.
+<br /><br />
+The other key idea I have is to either take a list of field that will
+be used or dynamically generate a string that inspects the dictionary
+in the driver to see what table fields should be called.  The later
+may cause serious trouble when trying to build a large database of
+SEGY info between instruments.
+<br /><br />
+Soon I will be running into another problem.  The contractor SEGY from
+the 70's that is available on the USGS walrus database does not have
+navigation in the SEGY.  That comes as a separate file.  Somehow, I
+will have to shoehorn that into the driver for that older SEGY Rev 0
+data.  Joy.  Right now, I have a parser called sins_nav_data.py that
+handles the navigation data.  What does SINS stand for?
+<br /><br />
+That is enough writing for now.  If you made it this far into what I
+wrote, I am impressed.  Time to get back to coding this up.
+When I am back in San Diego, I will have to transition from these
+couple days of coding back to writing up the data for my thesis.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-31T15_48_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-31T19_52_41.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-30T15_00_30.txt" name="e2005-05-30T15_00_30.txt"></a>
+<h2 class="date">05.30.2005 15:00</h2>
+<div class="blogbody">
+<h3 class="title">misc stuff</h3>
+<div class="item-description">
+<a
+href="http://www6.tomshardware.com/storage/20050530/index.html">Disk
+recovery</a> from crashes.  The inside scoup by Toms Hardware.
+<br /><br />
+<a href="http://www.windowssecrets.com/comp/050526/#story1">WiFi
+security</a>.
+<br /><br />
+<a href="http://www.linuxisotorrent.com/">LinuxISOTorrent</a>
+<br /><br />
+<a
+href="http://siovizcenter.ucsd.edu/icluster/index.html">iCluster</a>
+at SIO.  Many screen Mac G5 systems.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-30T15_00_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-31T15_48_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-30T09_22_08.txt" name="e2005-05-30T09_22_08.txt"></a>
+<h2 class="date">05.30.2005 09:22</h2>
+<div class="blogbody">
+<h3 class="title">pysqlite, python CAD, more segy-py</h3>
+<div class="item-description">
+<a
+href="http://freshmeat.net/projects/pysqlite/?branch_id=57517&release_id=197328">pysqlite
+2.0.3</a> was just released.  I need to soon switch from version 1.0!
+<br /><br />
+<a href="http://www.pythoncad.org/">Python CAD</a>  - no idea about his thing.
+<br /><br />
+<a href="http://roo.no-ip.org/fish/">fish</a> is a user friendly
+command line shell for UNIX-like operating systems such as Linux.
+Sounds interesting.
+<br /><br />
+<a href="http://brlcad.org/">BRL CAD</a> looks like an interesting CSG
+CAD system
+<br /><br />
+I have been working on the loadable driver support for segy-py.  It is
+getting there.  I think I need to start using a real python IDE.
+Also, it is tough to debug problems when unit tests do not produce
+stack traces.  The segy-py API is likely to drift a bit.
+<br /><br />
+<a href="http://www.freeantennas.com/">FreeAntennas.com</a> for wifi antennas.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-30T09_22_08.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-30T15_00_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-29T09_25_58.txt" name="e2005-05-29T09_25_58.txt"></a>
+<h2 class="date">05.29.2005 09:25</h2>
+<div class="blogbody">
+<h3 class="title">first release of segy-py</h3>
+<div class="item-description">
+I have just put together an actual release of segy-py.  This is hardly
+even alpha code at this point.  Rougher than rough.  But now it has a
+python setup and on the web docs that get automatically updated via a
+Makefile.  I am still learning how to make a proper setup.py, but it
+seems to work.
+<pre>
+  <a href="http://schwehr.org/software/segy-py">segy-py</a>
+</pre>
+<br /><br />
+BTW, I was reading the <a
+href="http://www.markcarey.com/mars/">MarsRoverBlog</a> for a while,
+but I can not deal with the Martian alien civilization junk.  Goodbye.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-29T09_25_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-30T09_22_08.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-28T12_05_00.txt" name="e2005-05-28T12_05_00.txt"></a>
+<h2 class="date">05.28.2005 12:05</h2>
+<div class="blogbody">
+<h3 class="title">python dynamic module loading</h3>
+<div class="item-description">
+I have been wanting to implement a system for dynamically loading of
+driver information.  I want to have a set of files where each one
+contains the python information needed to load SEGY files for that
+particular vender version.  I would then have one for standard segy
+rev1 and possibly one for rev 0.  After that, there would be drivers
+for xstar/Edgetech and other venders.  These files would be a function
+to help ID the file followed by custom readers and lookup tables for
+what fields are where in the file.  Today, I started figuring out how
+to load in these files.  I was thinking that I would want to load the
+module into a "driver" namespace.  Doing "import segy_xstar" is not
+very flexible.  I want to do something like "<b>drv =
+load_driver("xstar")</b>" or "<b>drv = load_driver("rev1")</b>".
+Turns out that this is not to hard to do!  Here is my first test
+example using the <a
+href="http://docs.python.org/lib/module-imp.html">imp</a> module.
+<br /><br />
+First the file <b>foo.py</b> that will be loaded:
+<pre>
+<font color="#2040a0">bar</font> <font color="4444FF">=</font> <font color="#008000">'this is in foo'</font>
+</pre>
+Here is <b>main.py</b>:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+Test out module loading
+&quot;</font><font color="#008000">&quot;&quot;</font>
+<br /><br />
+<strong>import</strong> <font color="#2040a0">imp</font>
+<br /><br />
+<font color="#2040a0">file</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'foo.py'</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>
+<font color="#2040a0">modFoo</font> <font color="4444FF">=</font> <font color="#2040a0">imp</font>.<font color="#2040a0">load_module</font><font color="4444FF">(</font><font color="#008000">'chirp'</font>,<font color="#2040a0">file</font>,<font color="#008000">'foo.py'</font>,<font color="4444FF">(</font><font color="#008000">'.py'</font>,<font color="#008000">'r'</font>,<font color="#2040a0">imp</font>.<font color="#2040a0">PY_SOURCE</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<br /><br />
+<strong>print</strong> <font color="#2040a0">modFoo</font>.<font color="#2040a0">bar</font>
+</pre>
+Then to run it:
+<pre>
+  chmod +x main.py
+  ./main.py
+<br /><br />
+  this is in foo
+</pre>
+<br /><br />
+<br /><br />
+<a href="http://www.findsounds.com/">findsounds.com</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-28T12_05_00.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-29T09_25_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-28T09_28_57.txt" name="e2005-05-28T09_28_57.txt"></a>
+<h2 class="date">05.28.2005 09:28</h2>
+<div class="blogbody">
+<h3 class="title">BitTorrent</h3>
+<div class="item-description">
+Perhaps BitTorrent, eDonkey, or some other P2P mechanism is the real
+way that we should be distributing marine science data.  The files are
+huge and it is mandatory that we have a national archive, but it new
+surveys were distributed via P2P, people could really get at this
+stuff quickly.
+<br /><br />
+<a href="http://i31www.ira.uka.de/~baas/pydoxy/">Python and Doxygen</a>!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-28T09_28_57.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-28T12_05_00.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-26T10_02_47.txt" name="e2005-05-26T10_02_47.txt"></a>
+<h2 class="date">05.26.2005 10:02</h2>
+<div class="blogbody">
+<h3 class="title">segy python sqlite simple example</h3>
+<div class="item-description">
+This is an example of how to quickly create an sqlite database using
+segy python and the sqlite module.  This is nothing fancy and it is
+missing 99.9% of all the information available, but it is small and
+thus easier to understand (I hope).  First the code.  This is the
+previous example, but with a little extra sqlite code.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">segy</font> <strong>import</strong> <font color="#2040a0">Segy</font>
+<strong>import</strong> <font color="#2040a0">sqlite</font>
+<br /><br />
+<font color="#2040a0">dbFilename</font> <font color="4444FF">=</font> <font color="#008000">'bpsegy.db'</font>
+<font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#2040a0">dbFilename</font><font color="4444FF">)</font>
+<font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<br /><br />
+<font color="#444444"># traceCount is the trace offset in a file</font>
+<font color="#2040a0">createStr</font>  <font color="4444FF">=</font> <font color="#008000">&quot;CREATE TABLE traces&quot;</font>
+<font color="#2040a0">createStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; ( traceCount INTEGER, lat REAL, long REAL );&quot;</font>
+<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">createStr</font><font color="4444FF">)</font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<br /><br />
+<font color="#2040a0">xstar</font> <font color="4444FF">=</font> <font color="#2040a0">Segy</font><font color="4444FF">(</font><font color="#008000">'bpsio01L00.xstar'</font><font color="4444FF">)</font>
+<br /><br />
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">xstar</font>.<font color="#2040a0">getNumberOfTraces</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">traceHdr</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+<br /><br />
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'X'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Y'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+<br /><br />
+    <font color="#2040a0">insertStr</font>  <font color="4444FF">=</font> <font color="#008000">&quot;INSERT INTO traces&quot;</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; (traceCount, lat,long)&quot;</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; VALUES&quot;</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; (&quot;</font> <font color="4444FF">+</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; ,&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">)</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; ,&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">y</font><font color="4444FF">)</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; );&quot;</font>
+    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">insertStr</font><font color="4444FF">)</font>
+<br /><br />
+<font color="#444444"># Flush this to the db... </font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Once this is run, you will now have a little sqlite database in the
+same directory.  Here is a simple query to look at a range of traces.
+<pre>
+  sqlite bpsegy.db "select * from traces where traceCount&gt;40 and \
+  traceCount&lt;50;" | tr '|' ' '
+<br /><br />
+  41 -120.101111111 34.4061111111
+  42 -120.101111111 34.4061111111
+  43 -120.101111111 34.4061111111
+  44 -120.101111111 34.4061111111
+  45 -120.101111111 34.4061111111
+  46 -120.101111111 34.4061111111
+  47 -120.101388889 34.4061111111
+  48 -120.101388889 34.4061111111
+  49 -120.101388889 34.4061111111
+</pre>
+That is it for now.
+<br /><br />
+Constantin Cranganu from Brooklyn College had an interesting over
+pressure poster this morning.
+<br /><br />
+The <a href="http://mbmgquake.mtech.edu/seismic_glossary.html">Seismic
+Glosary</a> is helping me get through the Sumatra talks.
+<br /><br />
+<a href="http://www.cia.gov/cia/publications/factbook/">CIA
+Factbook</a> - Just a reminder that it is still with us.
+<br /><br />
+<a
+href="http://os.newsforge.com/os/05/05/19/1946219.shtml?tid=6&tid=132">OSS
+on OSX</a> - this article covers fink too.
+<br /><br />
+<a
+href="http://www.networkworld.com/columnists/2005/052305schwartau.html">Windows
+guys gives up on MS Windows</a> - An amusing read about someone who
+has had it with Windows.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-26T10_02_47.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-28T09_28_57.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-26T09_16_25.txt" name="e2005-05-26T09_16_25.txt"></a>
+<h2 class="date">05.26.2005 09:16</h2>
+<div class="blogbody">
+<h3 class="title">NAMSS and segy python example</h3>
+<div class="item-description">
+NOTE: For the USGS maps, you will need a working SVG plugin.  Firefox
+has one built in, while you will have to install one from Adobe for
+Safari.
+<br /><br />
+I talked to Hart and Childs this morning about the <a
+href="http://walrus.wr.usgs.gov/NAMSS/">National Archive of Marine
+Seismic Surveys</a> or NAMSS.  What really caught my eye on their
+poster was the Santa Barbara Basin!
+<br /><br />
+From the <a
+href="http://walrus.wr.usgs.gov/NAMSS/uswest_tracklines.html">uswest</a>
+page there are a number of marked surveys in the Santa Barbara area.
+The red dots are not yet available, but the green are available!
+<ul>
+<li><a
+href="http://walrus.wr.usgs.gov/infobank/w/w1377sc/html/w-13-77-sc.seis.html">USGS
+CMG W-13-77-SC Seismic</a></li>
+<li><a
+href="http://walrus.wr.usgs.gov/infobank/w/w4085sc/html/w-40-85-sc.seis.html">USGS
+CMG W-40-85-SC Seismic</a></li>
+</ul>
+<br /><br />
+Now back to <b>segy python</b>!  I now have a working shot location
+dumper.  I was caught off guard by the X,Y not changing in the first
+few traces, but I should have remembered that is the case.  The traces
+always have the last available X,Y such that it looks like traces do
+not move for a while unit the next GPS data.  I need to make some sort
+of interpolation function for this.  Here is my simple trace,
+shotpoint, x and y dumper program.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">segy</font> <strong>import</strong> <font color="#2040a0">Segy</font>
+<font color="#2040a0">xstar</font> <font color="4444FF">=</font> <font color="#2040a0">Segy</font><font color="4444FF">(</font><font color="#008000">'bpsio01L00.xstar'</font><font color="4444FF">)</font>
+<br /><br />
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(1,</font><font color="#2040a0">xstar</font>.<font color="#2040a0">getNumberOfTraces</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">traceHdr</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+<br /><br />
+    <font color="#2040a0">shot</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Shotpoint'</font><font color="4444FF">)</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'X'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Y'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+    <strong>print</strong> <font color="#2040a0">shot</font>,<font color="#008000">&quot;: &quot;</font>,<font color="#2040a0">x</font>,<font color="#2040a0">y</font>
+<br /><br />
+</pre>
+Creating a Segy option with a filename loads up the datafile as a very
+efficient memory map.  This way the data from the file only comes into
+memory when needed.  The hope if that if you are only reading, say,
+one trace, the file header and that trace are paged in, but thing
+else.
+<br /><br />
+Then the code loops over all the traces.  The range must have a "1,"
+in it as there is no trace 0 in the SEGY specification.  If you ask
+for trace 0, you will get garbage.
+<br /><br />
+For each loop, the getTraceHdr(i), pulls out another mmap'ed reference
+to a particular trace.  From the trace reference, I can then ask for
+the X,Y, and shotpoint fields.  I know from prior knowledge (but you
+could look at the header fields too) that these X,Y pairs are in
+seconds of arc.  To get decimal lat/long, I divide by 3600.  Then I
+print it out.  That is it!  Here is the beginning and end of the
+output:
+<pre>
+./segy_sql.py
+<br /><br />
+  1 13961172 :  -120.101111111 34.4061111111
+  2 13961172 :  -120.101111111 34.4061111111
+  3 13961172 :  -120.101111111 34.4061111111
+  4 13961172 :  -120.101111111 34.4061111111
+  5 13961172 :  -120.101111111 34.4061111111
+  6 13961172 :  -120.101111111 34.4061111111
+  7 13961172 :  -120.101111111 34.4061111111
+  8 13961172 :  -120.101111111 34.4061111111
+  9 13961172 :  -120.101111111 34.4061111111
+  10 13961172 :  -120.101111111 34.4061111111
+  ...
+  13540 13961172 :  -120.1275 34.4308333333
+  13541 13961172 :  -120.1275 34.4308333333
+  13542 13961172 :  -120.1275 34.4308333333
+  13543 13961172 :  -120.1275 34.4308333333
+  13544 13961172 :  -120.1275 34.4308333333
+  13545 13961172 :  -120.1275 34.4308333333
+  13546 13961172 :  -120.1275 34.4308333333
+  13547 13961172 :  -120.1275 34.4308333333
+  13548 13961172 :  -120.1275 34.4308333333
+  13549 13961172 :  -120.1275 34.4308333333
+</pre>
+<br /><br />
+Other news:  <a href="http://www.sciencedaily.com/releases/2005/05/050526092730.htm">New Method For Imaging Dec. 26 Indian Ocean Earthquake Yields Unprecedented Results</a>.  Mentions Scripps and IGPP
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-26T09_16_25.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-26T10_02_47.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-26T06_10_36.txt" name="e2005-05-26T06_10_36.txt"></a>
+<h2 class="date">05.26.2005 06:10</h2>
+<div class="blogbody">
+<h3 class="title">SIO, Audio books</h3>
+<div class="item-description">
+<a href="http://www.netlibrary.com/">netlibrary</a> is the LA
+libraries free audio book service.
+<br /><br />
+<a href="http://www.sciencedaily.com/releases/2005/05/050524225351.htm">NASA's Rovers Continue Martian Missions</a>
+<br /><br />
+<a
+href="http://www.sciencedaily.com/releases/2005/05/050525205301.htm">Researchers
+Discover Underwater Volcano -- Unique Hydrothermal Community Of
+Hundreds Of Eels Uncovered</a> - Quotes by Hubert!
+<br /><br />
+<a href="http://www.kingsasquatch.com/phpBB/viewtopic.php?t=8">Lots of
+programming tutorials</a> - SQL, Cobol, Assembly, XML
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-26T06_10_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-26T09_16_25.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-25T13_58_31.txt" name="e2005-05-25T13_58_31.txt"></a>
+<h2 class="date">05.25.2005 13:58</h2>
+<div class="blogbody">
+<h3 class="title">Segy python works.  Woohoo</h3>
+<div class="item-description">
+<br /><br />
+UPDATE 17:00 - Turns out that the <b>API below is already out of date</b>,
+but I just made my first plot of a trace dumped to a sample
+number/value pair.  Looks very much like I expected!
+<br /><br />
+Talking to quite a number of people about seismic data yesterday got
+me motivated to really go for it with my python segy library.  The
+task really has been mostly an exercise in making lots of lookup
+tables with dictionaries.  Just a few minutes ago, I got my first
+correct lat/long pair out of a trace from an Edgetech Xstar segy file.
+This is extra exciting since the xstar format does not follow the SEGY
+standards.  In fact, seismic unix (aka su or cwp-su) is unable to read
+xstar files.  Right now, we first run them through sioseis to write
+out a better segy file.  My hope is to have code that can easily be
+adapted to each vender's interpretation of the SEGY standards.
+Clearly people treat the SEGY documentation as <em>suggestions</em>.
+Being that I intend this to be an open source utility, here is the
+source.  Note that this is just my test code.  It is FUGLY.
+<pre>
+  <a href="http://schwehr.org/software/scripts/segy-1.7.py.html">segy-1.7.py.html</a>
+</pre>
+Here is a little bit of pseudo code that shows how I can read from the
+first file/trace of the Santa Barbara data.  I open up the file by
+creating a Segy class object and from there, I create a SegyTrace
+object.  One problem right now is that it is possible to close the
+mmap from the Segy class while SegyTrace objects are still using the
+mmap.  I do not know what would happen if that happens.  Pseudo code:
+<pre>
+<b>
+	import Segy
+	xstar = Segy("bpsio01L00.xstar")
+        trace1 = SegyTrace(xstar.data,3600)
+        trace1.printHeader()
+</b>
+SweepFreqStart  =  1000
+RecvGrpElev  =  0
+SweepLen  =  50
+OverTravel  =  392
+GapSize  =  235
+SrcEDirTenths  =  0
+LowCutFreq  =  0
+...
+<b>
+        # look!  If we divide by 3600, we get degrees!
+        x = trace1.getHeader('X'); print x, '--&gt;  ',x/3600.
+        y = trace1.getHeader('Y'); print y, '--&gt;  ',y/3600.
+</b>
+-432364 --&gt;  -120.101111111
+ 123862 --&gt;    34.4061111111
+</pre>
+Those lat/lon numbers actually look like they are in the right area.
+Party time!  Actually, now I need to be able to seek through the
+traces.  I have not done that yet, hence the hard coded 3600 for the
+trace start.  Then after that, I need to build and sqlite database of
+the file and trace parameters.
+<br /><br />
+<pre>
+  fugal
+       adj : of or relating to or in the style of a musical fugue
+<br /><br />
+  fugue
+       n 1: dissociative disorder in which a person forgets who who they
+            are and leaves home to creates a new life; during the
+            fugue there is no memory of the former life; after
+            recovering there is no memory for events during the
+            dissociative state [syn: {psychogenic fugue}]
+       2: a dreamlike state of altered consciousness that may last for
+          hours or days
+       3: a musical form consisting of a theme repeated a fifth above
+          or a fourth below its first statement
+</pre>
+<br /><br />
+<a href="http://www.w3schools.com/xml/">XML tutorials</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-25T13_58_31.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-26T06_10_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-25T08_16_17.txt" name="e2005-05-25T08_16_17.txt"></a>
+<h2 class="date">05.25.2005 08:16</h2>
+<div class="blogbody">
+<h3 class="title">AGU and more</h3>
+<div class="item-description">
+Yesterday, I talked to lots of interesting people in the OS and PP
+groups.  I also went to the lunch meeting for the AGU informatics
+group.  They spent their time on beaurocratic drudgery.  Who is going
+to host the web site and what is the group to be called.  Please.
+That is not what I went for!
+<br /><br />
+<a href="http://www.ilovejackdaniels.com/php/mysql-cheat-sheet/">MySQL
+cheat sheet</a> - it is not nice to cheet.
+<br /><br />
+<a
+href="http://www.yafray.org/index.php?s=10&PHPSESSID=3c30bc5d18220738a446d56dae311ddf">Yafray</a>
+is a raytracer that <a href="http://www.blender3d.org/">blender</a> can use.
+<br /><br />
+<a href="http://www.blender.org/modules/verse/">Verse</a> is some sort
+of networked visualization/geometry system.  May have some viz like
+aspects to it and may take the idea a lot farther, moving the
+visualization away from the center.  The exact opposite from Viz.
+<br /><br />
+<a href="http://www.drpaulcarter.com/pcasm/">PC Assembly tutorial</a>
+- Intel 32-bit protected mode programming with NASM.  What about PPC?
+<a href="http://www.timestocome.com/personal/mac.html">Mac PCC
+assembly links</a>
+<br /><br />
+<a
+href="http://www.lightsoft.co.uk/Fantasm/Beginners/begin1.html">Beginners
+Guide - PowerPC Assembly Language</a>
+<br /><br />
+<a href="http://www.dumblaws.com/">dumb laws</a>
+<br /><br />
+<a href="http://www.wisegeek.com/">WiseGeek.com</a> - Clear Answers for Common Questions.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-25T08_16_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-25T13_58_31.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-23T19_41_13.txt" name="e2005-05-23T19_41_13.txt"></a>
+<h2 class="date">05.23.2005 19:41</h2>
+<div class="blogbody">
+<h3 class="title">reading binary files with python</h3>
+<div class="item-description">
+Now that I finished my poster presentation today at AGU, I wanted to
+take a quick look at reading segy files with python.  I wanted to read
+straigt from mmap, but did not know how.  Now I do.  I have not
+started working with byte order, but here is the basics.  Byte order
+can be done with <a
+href="http://www.zvon.org/other/python/doc21/lib/module-socket.html">Module-socket</a>
+with the htonl type functions.  Or better yet with the struct module
+with the "@=&lt;&gt;"
+<br /><br />
+<a href="http://seg.org/publications/tech-stand/">SEG
+publications</a>: segy rev 0 and reb 1 are on this page.
+<pre>
+All values in the binary File Header and the Trace Header are two's
+compliment integers, either two bytes or four bytes long.  There are
+no floating-point values defined in the headers.
+<br /><br />
+Trace Data sample values are either two's complement integers or
+floating-point.  This revision adds data sample formats of 8-bit
+integer and 32-bit IEEE floating-point.  Both IBM floating-point and
+IEEE floating-point values are written in big-endian byte order.
+</pre>
+<br /><br />
+Here is a little program that I wrote to tell byte order for xsonar.
+GCC can also tell you byte order, and I really need to write or find a
+couple liner in python.
+<br /><br />
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdlib.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;unistd.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdio.h&gt;</font></strong></font>
+<br /><br />
+<strong>enum</strong> <font color="#2040a0">endian</font> <font color="4444FF"><strong>{</strong></font><font color="#2040a0">LITTLE</font>,<font color="#2040a0">BIG</font>,<font color="#2040a0">UNKNOWN_ENDIAN</font><font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font> // <font color="#2040a0">aka</font> <font color="#2040a0">LOW</font>, <font color="#2040a0">HIGH</font>
+<br /><br />
+<strong>enum</strong> <font color="#2040a0">endian</font> <font color="#2040a0">getHostEndian</font><font color="4444FF">(</font><strong>void</strong><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <strong>int</strong> <strong>short</strong> <font color="#2040a0">s</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">;</font>
+  <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">b</font> <font color="4444FF">=</font> <font color="4444FF">(</font><strong>char</strong> <font color="4444FF">*</font><font color="4444FF">)</font><font color="4444FF">&amp;</font><font color="#2040a0">s</font><font color="4444FF">;</font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">b</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <strong>return</strong> <font color="4444FF">(</font><font color="#2040a0">LITTLE</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>return</strong> <font color="4444FF">(</font><font color="#2040a0">BIG</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<br /><br />
+<strong>int</strong>
+<font color="#2040a0">main</font> <font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">argc</font>, <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <strong>switch</strong> <font color="4444FF">(</font><font color="#2040a0">getHostEndian</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+<font color="0000ff"><strong>#if 0</strong></font>
+  <strong>case</strong> <font color="#2040a0">LITTLE</font><font color="4444FF">:</font> <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;little<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>break</strong><font color="4444FF">;</font>
+  <strong>case</strong> <font color="#2040a0">BIG</font><font color="4444FF">:</font> <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;big<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>break</strong><font color="4444FF">;</font>
+<font color="0000ff"><strong>#else</strong></font>
+  <strong>case</strong> <font color="#2040a0">LITTLE</font><font color="4444FF">:</font> <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;-DINTEL=1 -DMOTOROLA=0<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>break</strong><font color="4444FF">;</font>
+  <strong>case</strong> <font color="#2040a0">BIG</font><font color="4444FF">:</font>    <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;-DINTEL=0 -DMOTOROLA=1<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>break</strong><font color="4444FF">;</font>
+<font color="0000ff"><strong>#endif</strong></font>
+  <strong>case</strong> <font color="#2040a0">UNKNOWN_ENDIAN</font><font color="4444FF">:</font> <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;ERROR: UNKNOWN endian<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#2040a0">EXIT_FAILURE</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>default</strong><font color="4444FF">:</font> <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;ERROR: unexpected endian<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#2040a0">EXIT_FAILURE</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+  <strong>return</strong><font color="4444FF">(</font><font color="#2040a0">EXIT_SUCCESS</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<br /><br />
+<font color="#444444">/* NOTES - What machines return, what xsonar returns
+ *
+ * Darwin/Mac OSX/PPC - big
+ * IRIX/SGI/Mips      - big,    MOTOROLA
+ * Linux/x86          - little, INTEL
+ */</font>
+</pre>
+Mac OSX is big endian and the same byte order as SEGY which will help
+performance.  But I must make sure that I check out the code on an
+Intel machine.
+<br /><br />
+<br /><br />
+First two write some binary data with a simple C++ program:
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;unistd.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cstdio&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;fcntl.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cstdlib&gt;</font></strong></font>
+<br /><br />
+<strong>using</strong> <strong>namespace</strong> <font color="#2040a0">std</font><font color="4444FF">;</font>
+<br /><br />
+<strong>int</strong> <font color="#2040a0">main</font> <font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">argc</font>,<strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <font color="4444FF"><strong>{</strong></font>
+    <strong>int</strong> <font color="#2040a0">fd</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">&quot;int&quot;</font>,<font color="#2040a0">O_WRONLY</font><font color="4444FF">|</font><font color="#2040a0">O_CREAT</font>,<font color="#FF0000">0644</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">int32_t</font> <font color="#2040a0">_int32</font><font color="4444FF">=</font><font color="#FF0000">6</font><font color="4444FF">;</font>
+    <font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">fd</font>,<font color="4444FF">&amp;</font><font color="#2040a0">_int32</font>,<strong>sizeof</strong><font color="4444FF">(</font><font color="#2040a0">_int32</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">close</font><font color="4444FF">(</font><font color="#2040a0">fd</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <font color="4444FF"><strong>{</strong></font>
+    <strong>int</strong> <font color="#2040a0">fd</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">&quot;int_neg&quot;</font>,<font color="#2040a0">O_WRONLY</font><font color="4444FF">|</font><font color="#2040a0">O_CREAT</font>,<font color="#FF0000">0644</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">int32_t</font> <font color="#2040a0">_int32</font><font color="4444FF">=</font><font color="4444FF">-</font><font color="#FF0000">6</font><font color="4444FF">;</font>
+    <font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">fd</font>,<font color="4444FF">&amp;</font><font color="#2040a0">_int32</font>,<strong>sizeof</strong><font color="4444FF">(</font><font color="#2040a0">_int32</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">close</font><font color="4444FF">(</font><font color="#2040a0">fd</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <font color="4444FF"><strong>{</strong></font>
+    <strong>int</strong> <font color="#2040a0">fd</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">&quot;float&quot;</font>,<font color="#2040a0">O_WRONLY</font><font color="4444FF">|</font><font color="#2040a0">O_CREAT</font>,<font color="#FF0000">0644</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <strong>float</strong> <font color="#2040a0">d</font><font color="4444FF">=</font><font color="#FF0000">6.77</font><font color="4444FF">;</font>
+    <font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">fd</font>,<font color="4444FF">&amp;</font><font color="#2040a0">d</font>,<strong>sizeof</strong><font color="4444FF">(</font><strong>float</strong><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">close</font><font color="4444FF">(</font><font color="#2040a0">fd</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <font color="4444FF"><strong>{</strong></font>
+    <strong>int</strong> <font color="#2040a0">fd</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">&quot;float_neg&quot;</font>,<font color="#2040a0">O_WRONLY</font><font color="4444FF">|</font><font color="#2040a0">O_CREAT</font>,<font color="#FF0000">0644</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <strong>float</strong> <font color="#2040a0">d</font><font color="4444FF">=</font><font color="#FF0000">6.78</font><font color="4444FF">;</font>
+    <font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">fd</font>,<font color="4444FF">&amp;</font><font color="#2040a0">d</font>,<strong>sizeof</strong><font color="4444FF">(</font><strong>float</strong><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">close</font><font color="4444FF">(</font><font color="#2040a0">fd</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <strong>return</strong> <font color="4444FF">(</font><font color="#2040a0">EXIT_SUCCESS</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<br /><br />
+<strong>import</strong> <font color="#2040a0">mmap</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+<strong>import</strong> <font color="#2040a0">struct</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">readInt</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">file</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="#008000">&quot;r+&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">size</font> <font color="4444FF">=</font> <font color="#2040a0">os</font>.<font color="#2040a0">path</font>.<font color="#2040a0">getsize</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>
+    <font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">mmap</font>.<font color="#2040a0">mmap</font><font color="4444FF">(</font><font color="#2040a0">file</font>.<font color="#2040a0">fileno</font><font color="4444FF">(</font><font color="4444FF">)</font>,<font color="#2040a0">size</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">struct</font>.<font color="#2040a0">unpack</font><font color="4444FF">(</font><font color="#008000">&quot;i&quot;</font>,<font color="#2040a0">data</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="#FF0000">4</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">readFloat</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">file</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="#008000">&quot;r+&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">size</font> <font color="4444FF">=</font> <font color="#2040a0">os</font>.<font color="#2040a0">path</font>.<font color="#2040a0">getsize</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>
+    <font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">mmap</font>.<font color="#2040a0">mmap</font><font color="4444FF">(</font><font color="#2040a0">file</font>.<font color="#2040a0">fileno</font><font color="4444FF">(</font><font color="4444FF">)</font>,<font color="#2040a0">size</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">struct</font>.<font color="#2040a0">unpack</font><font color="4444FF">(</font><font color="#008000">&quot;f&quot;</font>,<font color="#2040a0">data</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="#FF0000">4</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+<br /><br />
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">&quot;__main__&quot;</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#008000">&quot;testing...&quot;</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">readInt</font><font color="4444FF">(</font><font color="#008000">&quot;int&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>print</strong> <font color="#2040a0">x</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">readInt</font><font color="4444FF">(</font><font color="#008000">&quot;int_neg&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>print</strong> <font color="#2040a0">x</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">readFloat</font><font color="4444FF">(</font><font color="#008000">&quot;float&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>print</strong> <font color="#2040a0">x</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">readFloat</font><font color="4444FF">(</font><font color="#008000">&quot;float_neg&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <strong>print</strong> <font color="#2040a0">x</font>
+</pre>
+When I run the python code, it reads these values correctly:
+<pre>
+  ./tryMmapStruct.py 
+<br /><br />
+  testing...
+  6
+  -6
+  6.76999998093
+  6.78000020981
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-23T19_41_13.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-25T08_16_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-23T08_27_37.txt" name="e2005-05-23T08_27_37.txt"></a>
+<h2 class="date">05.23.2005 08:27</h2>
+<div class="blogbody">
+<h3 class="title">Nanoblogger comment system</h3>
+<div class="item-description">
+I have not tried this, but <a
+href="http://www.nhw.pl/blg/articles/nbcom.php">comments for
+nanoblogger</a>
+<br /><br />
+<a href="http://silentbobspeaks.com/">My Boring Ass Life</a> - Silent
+Bob Speaks in his blog.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-23T08_27_37.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-23T19_41_13.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-22T19_26_11.txt" name="e2005-05-22T19_26_11.txt"></a>
+<h2 class="date">05.22.2005 19:26</h2>
+<div class="blogbody">
+<h3 class="title">In NOLA</h3>
+<div class="item-description">
+I'm here for the AGU/SEG conference.  Please come by my poster
+tomorrow afternoon and Leah Hogarth has hers tomorrow morning.
+<br /><br />
+I am having trouble finding ANY Two Dog beer.
+<br /><br />
+<a
+href="http://www.informit.com/articles/article.asp?p=373339&rl=1">C++
+Exceptions</a> scare me still.  I use exceptions in python, but never
+really tried in C++.
+<br /><br />
+Cruise on over to <a href="http://labs.google.com/">google labs</a> if
+you have not already.  The only thing I would warn against is their
+desktop search tool and web accelarator.  Large chances of google
+caching personal information.
+<br /><br />
+<a
+href="http://www.rentacoder.com/RentACoder/default.asp">RentACoder</a>
+- maybe a way to earn cash.
+<br /><br />
+<a href="http://souptonuts.sourceforge.net/readme_mysql.htm">MySQL
+tips</a>
+<br /><br />
+<a
+href="http://www.informit.com/articles/article.asp?p=379757&rl=1">How
+Effective is Your Test Automation?</a>
+<br /><br />
+<a href="http://www.informit.com/articles/article.asp?p=379758">Using Performance Test Tools for High Volume Automated Testing</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-22T19_26_11.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-23T08_27_37.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-21T21_57_42.txt" name="e2005-05-21T21_57_42.txt"></a>
+<h2 class="date">05.21.2005 21:57</h2>
+<div class="blogbody">
+<h3 class="title">Off to AGU New Orleans</h3>
+<div class="item-description">
+Monday starts AGU/SEG.
+<br /><br />
+Please stop by the Monday afternoon GP poster session and check out my
+magnetic susceptibility poster.
+<br /><br />
+For you folks still using Matlab: <a
+href="http://www.mathworks.com/contest/ants/home.html">Matlab contest
+winners</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-21T21_57_42.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-22T19_26_11.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-20T21_58_13.txt" name="e2005-05-20T21_58_13.txt"></a>
+<h2 class="date">05.20.2005 21:58</h2>
+<div class="blogbody">
+<h3 class="title">New version of global paleomag database</h3>
+<div class="item-description">
+The Global paleomagnetic database <a
+href="http://www.ngu.no/dragon/Palmag/paleomag.htm">Bersion 4.6,
+February 2005</a> is out.  I do not use this myself right now, but is
+cool to have available.  Only bummer is that it is avaiable as an
+access database... that would mean that I would have to go use a
+Windows XP machine.  Or is there something in the open source world
+that will read MS Access database files?  There looks to be some stuff
+on <a hfef="http://freshmeat.net">freshmeat.net</a> that can read MS
+Access databases.  The one that seems to be the most likely for
+success is: <a href="http://mdbtools.sourceforge.net/">mdbtools</a>.
+The mailing list has a number of emails from this year and 0.6pre1 is
+from last summer.  This looks to do the trick, but I have not tried
+it.
+<br /><br />
+<a href="http://www.sxc.hu/">Royalty free stock photos</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-20T21_58_13.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-21T21_57_42.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-20T13_56_24.txt" name="e2005-05-20T13_56_24.txt"></a>
+<h2 class="date">05.20.2005 13:56</h2>
+<div class="blogbody">
+<h3 class="title">Not My Workstation OS - Irix</h3>
+<div class="item-description">
+In the past, I was a hard core IRIX/SGI fan.  Those were the days when
+NASA put a $50K machine on my desk (Octane MXI - Dual 200MHz R10K).  I
+was just exploring SGI's OpenInventor 2.x and the SGI user interface
+was way beyond Mac OS (was it 7 or 8 in 1996/7).  There was the
+freeware CD which was so-so but worked, I build gcc to cross compile
+with 68K VxWorks, and we could use the new MipsPro compilers to do
+parallel processing for our stereo code.  Life was good.  Then I
+realized that I was using PC, Mac, VxWorks cage, Linux, SGI, and Sun
+all in one day.  Yikes.  Now I am a happy user of Mac OSX and Linux.
+The last stand for me with Irix is the 21 foot wide panoram screen in
+the viz center.  Otherwise, Irix <b>was</b> a fantastic OS.  It still
+has many advancements that are yet to be seen on other OSes.  Someday
+I should rewrite button fly for any OS so then I can have flashbacks
+to my early days with Irix.  I will never forget learning computer
+graphics at Stanford on those "super fast" R3K machines in the
+basement of Sweet Hall and the old computer science building.
+<br /><br />
+<a href="http://os.newsforge.com/os/05/05/13/131257.shtml?tid=10">My
+Workstation OS: Irix</a> by  Robert Mertling-Blake who apparently is a
+huge Irix fan.  More power to him.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-20T13_56_24.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-20T21_58_13.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-20T09_15_29.txt" name="e2005-05-20T09_15_29.txt"></a>
+<h2 class="date">05.20.2005 09:15</h2>
+<div class="blogbody">
+<h3 class="title">Wave farm in Portugal</h3>
+<div class="item-description">
+I thought there were already some wave farms going, like in Scotland,
+but this is pretty cool.
+<br /><br />
+<a href="http://story.news.yahoo.com/s/nm/20050520/sc_nm/energy_portugal_wavepower_dc">Portugal to get world's first commercial wave farm</a>
+<br /><br />
+And some news about the people who killed the Giant Sea Bass in La
+Jolla.  Finally San Diego does something smart.  Fishing in these
+areas hurts the local protected populations and hurts the tourist
+industry that this area counts on.  Now for making the Children's Cove
+back into a protected seal area!  The seals are a huge tourist
+attraction and there are plenty of other beaches for people to go to!
+<pre>
+  FOR IMMEDIATE RELEASE:  May 19, 2005 
+  Contact:  Maria Velasquez, Communications Director:  (619) 235-5725
+  (pager & voicemail) mvelasquez@sandiego.gov 
+<br /><br />
+  CRIMINAL CHARGES FILED AGAINST SEA BASS POACHERS 
+  Complaint filed by San Diego City Attorney's Office
+<br /><br />
+  San Diego, CA:  The Office of the San Diego City Attorney has filed
+  criminal charges against three San Diego men involved in the April
+  24, 2005, killing of a protected Giant Sea Bass taken from the La
+  Jolla Marine Conservation Area. Omid Adhami, 34 years old, has
+  previously admitted to using a spear gun to kill the protected
+  fish. Nima Hodaji, 26 years old, was diving with Adhami at the time
+  the fish was killed.  Navid Adibi, 22 years old, was operating the
+  boat that took the two divers into the Conservation Area.
+<br /><br />
+  The Criminal Complaint filed in San Diego Superior Court alleges
+  that all three men assisted in loading the 171 pound protected Giant
+  Sea Bass onto the boat in the Marine Conservation Area off of La
+  Jolla. Two counts of misdemeanor conspiracy have been filed against
+  all three defendants who face up to one year in jail and a $10,000
+  fine on each conspiracy charge. According to Deputy City Attorney
+  Kathyrn  Lange of the City Attorney's Consumer and Environmental
+  Protection Unit, Adhami faces a total four misdemeanor counts (three
+  years in jail and $22,000 in fines), Hodaji and Adibi each face
+  three misdemeanors counts (two and one-half years in jail and
+  $21,000 in fines.) Arraignment of the three defendants will take
+  place on June 2, 2005, in Department 1 of the San Diego Superior
+  Court. 
+<br /><br />
+  Giant Sea Bass are described as docile, curious, and slow moving
+  fish. They are a protected species off of the California Coast. The
+  Giant Sea Bass killed on April 24, 2005, was a reproductive female
+  between 15 and 20 years old. The suspicious activity of the three
+  men was first noticed by the City of San Diego Lifeguards located at
+  the La Jolla Cove. The case is under investigation by the California
+  Department of Fish and Game.
+</pre>
+<br /><br />
+<a href="https://depot.info.apple.com/batteryexchange/index.html?lang=en">Apple battery recall</a>:
+<pre>
+  The recalled batteries include those with model numbers A1061,
+  A1078, and A1079 and serial numbers that begin with HQ441 through
+  HQ507 and 3X446 through 3X510
+</pre>
+<br /><br />
+<a
+href="http://freshmeat.net/projects/veusz/?branch_id=57011&release_id=196641">Veusz</a>
+- yet another python plotting package.
+<br /><br />
+We really need a Mac version of the python win32 <a
+href="http://videocapture.sourceforge.net/">video capture</a> package.
+Working with the quicktime api directly is very frustrating.
+<br /><br />
+<a
+href="http://www.macosxhints.com/article.php?story=20050510151249986">Terminal
+from OSX 10.4 DVD</a> - Nice.  Now I need time to install 10.4.
+<br /><br />
+<a href="http://www.pythonchallenge.com/">PythonCallenge!</a> - Also
+need more time for this.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-20T09_15_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-20T13_56_24.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-20T05_16_32.txt" name="e2005-05-20T05_16_32.txt"></a>
+<h2 class="date">05.20.2005 05:16</h2>
+<div class="blogbody">
+<h3 class="title">more on the butterflies</h3>
+<div class="item-description">
+I have not seen these butterflies since my last post on there, but saw
+an article on the painted lady butterflies: <a
+href="http://www.sciencedaily.com/releases/2005/05/050519144731.htm">Butterfly
+Migration Could Be Largest Known</a>
+<br /><br />
+Earthquake possibility in northern LA: <a
+href="http://www.sciencedaily.com/releases/2005/05/050519141339.htm">Los
+Angeles 'Big Squeeze' Continues, Straining Earthquake Faults</a>
+<br /><br />
+A python unit conversion program that includes magnetic units: <a
+href="http://www.unihedron.com/projects/gonvert/gonvert.php">gonvert</a>.
+I need to test the magnetics units.  Here are some of the units:
+<pre>
+Magnetic Field strength :
+	ampere per meter
+	oersted
+Magnetic Flux :
+	microweber
+	milliweber
+	unit pole (electro magnetic unit)
+	weber
+Magnetic Flux Density :
+	gauss
+	tesla
+	weber per square meter
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-20T05_16_32.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-20T09_15_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-19T08_09_14.txt" name="e2005-05-19T08_09_14.txt"></a>
+<h2 class="date">05.19.2005 08:09</h2>
+<div class="blogbody">
+<h3 class="title">New multilanguage SQLite interface API</h3>
+<div class="item-description">
+<a
+href="http://freshmeat.net/redir/sqlitepp/52014/url_homepage/SQLitepp">SQLitepp</a>
+"is a multilanguage object oriented wrapper to the sqlite library. It
+supports self-updatable records and a simple SQL-based query method."
+This was just <a
+href="http://freshmeat.net/projects/sqlitepp/?branch_id=52014&release_id=196467">announced
+on freshmeat.net</a>
+<br /><br />
+<a href="http://www.livejournal.com/users/benlast/24719.html">Python on the Playtation?</a>
+<br /><br />
+<a href="http://www.macosxhints.com/article.php?story=20050508193551743>AddressBook to html</a> applescript.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-19T08_09_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-20T05_16_32.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-18T18_34_56.txt" name="e2005-05-18T18_34_56.txt"></a>
+<h2 class="date">05.18.2005 18:34</h2>
+<div class="blogbody">
+<h3 class="title">php</h3>
+<div class="item-description">
+I did not know until just now that you can use php as a command line
+scripting language and it is available on on Mac OSX by default:
+<pre>
+$ type -a php
+<br /><br />
+php is /usr/bin/php
+<br /><br />
+$ php -v
+<br /><br />
+PHP 4.3.10 (cli) (built: Jan 23 2005 21:23:17)
+Copyright (c) 1997-2004 The PHP Group
+Zend Engine v1.3.0, Copyright (c) 1998-2004 Zend Technologies
+<br /><br />
+type -a php5
+<br /><br />
+php5 is /sw/bin/php5  (this is fink)
+<br /><br />
+$ php5 -v
+<br /><br />
+PHP 5.0.4 (cli) (built: May 15 2005 12:55:54)
+Copyright (c) 1997-2004 The PHP Group
+Zend Engine v2.0.4-dev, Copyright (c) 1998-2004 Zend Technologies
+</pre>
+To get you started, here is a very simple program to get started with:
+test.phps
+<pre>
+#!/usr/bin/php
+&lt;?
+$str="World";
+print "Hello $str\n";
+?&gt;
+</pre>
+Which you can run like this.
+<pre>
+  ./chmod +x test.phps
+  ./test.phps
+</pre>
+And you will see something like this
+<pre>
+./test.phps 
+<br /><br />
+Hello World
+</pre>
+Now, I really have no need to write php5 scripts, but it is nice to
+know that I can if I want to <img src="../moods/smilies/smiley.gif" alt=":)" border="0" 
+<br /><br />
+Tom's Networking on <a href="http://www.tomsnetworking.com/Sections-article120.php">How To Crack WEP - Part 2: Performing the Crack</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-18T18_34_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-19T08_09_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-18T07_13_10.txt" name="e2005-05-18T07_13_10.txt"></a>
+<h2 class="date">05.18.2005 07:13</h2>
+<div class="blogbody">
+<h3 class="title">Computer Graphics World - May 2005</h3>
+<div class="item-description">
+Today is May 18th - the 25th anniversary of the big Mt. St. Helens
+eruption. <a href="http://www.fs.fed.us/gpnf/mshnvm/">At 8:32 Sunday morning,
+May 18, 1980, Mount St. Helens erupted.</a>
+<br /><br />
+Computer Graphics World is one of those skinny little trade rags that
+say they cost but always end up giving you free subscriptions that
+never end.  The May 2005 issue has some interesting things worth
+mentioning.
+<br /><br />
+First, I have been thinking that there has to be someone doing a
+survey of new visualization and UI (User Interface) designs being used
+in computer games.  There are like 12000 playstation games to date.
+That is a huge amount of engineering energy that had to get the look
+and feel right.  How can we harness this for the marine and
+geo-sciences? So what is the very first text in this months issue?
+Exactly this topic.  The "editor's note" is about Marc Prensky who
+wrote Digital Game-Based Learning.  He goes through the top 10
+nuggets.  They did not do much for me, but the idea is right!
+<br /><br />
+Then there is an add by 3Dconnexion for the <a
+href="http://www.3dconnexion.com/spacepilot.cgwp/">SpacePilot</a>.  I
+have been thinking about a visualization workstation that combined a
+spacemouse for one hand and a dial for the other.  I was thinking
+there are a lot of untried ideas for a dial:
+<ul>
+   <li> could dial time in the model - just like my Sony VCR (remember
+        VCR's right?)</li>
+   <li> spin along a flight path</li>
+   <li> dial in a brightness</li>
+   <li> how to navigate a color space?</li>
+   <li> spin an attached view, or...</li>
+   <li> add yet one more degree of freedom to camera motion with a
+   spacemouse</li>
+   <li> and lots more</li>
+</ul>
+Damn... I never finished that opensource spacemouse driver that I
+tried to do last year.  Anyone have a nice, free, and open driver?
+The 3dconnexion guys said they were only going to support USB on the
+mac and I have a serial spacemouse.  Doh.  Come on guys.  Keyspan
+serial ports are cheap and show up as /dev/usb*.
+<br /><br />
+"nobody-ever-got-for-buying-intel-world" - Those folks are missing out
+on some great stuff!
+<br /><br />
+For NASA spacecraft, that would be: "nobody ever got fired for using
+VxWorks"
+<br /><br />
+<a href="http://www.macosxhints.com/article.php?story=2005050606123892">URL dmg attaching</a> for Mac OSX:
+<pre>
+  After reading the hdid man (via man hdid) page, I realized that we
+  could mount .DMG images via HTTP under Terminal.app. And even
+  cooler, the segmented images work too. Just reference the http-based
+  DMG via this command: 
+  % hdid http://server.company.com/Images/stuff.dmg
+<br /><br />
+...
+<br /><br />
+  so the correct command is <em>hdiutil attach URL</em>. works fine for me.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-18T07_13_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-18T18_34_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-18T05_08_52.txt" name="e2005-05-18T05_08_52.txt"></a>
+<h2 class="date">05.18.2005 05:08</h2>
+<div class="blogbody">
+<h3 class="title">Fun with MS Windows</h3>
+<div class="item-description">
+Arg.  On our windows XP box we have been having yet more "issues."  "ViewMgr" keeps popping up in zone alarm.
+<br /><br />
+<a href="http://www.liutilities.com/products/wintaskspro/processlibrary/ViewMgr/">ViewMgr info</a>
+<br /><br />
+So why does each program need to have it's own updater that stays
+running on a system.  That seems insane.  If every program that one
+user had on a machine did the same thing, the machine would be
+clobbered just by the shear number of processes.  Then there is
+another thing driving me crazy.  A person was trying to use an GUI based
+ftp program to upload some stuff to a site.  First off, they all want
+$30-$50 for an ftp program.  You have got to be kidding.  WinSCP is
+free and kicks all of their butts. If only the machine she were using
+allowed sftp... doh.  Then, when she runs these ftp programs, norton
+says:
+<pre>
+  Default Block Bla Trojan Horse 
+  c:\WINNT\system32\ntvdm.exe
+  Port 1042
+</pre>
+Norton then gives you no further help or explanation.  It looks like
+it is complaining about active ftp.  Most users will opt to block this
+"trojan" and then have ftp not work.  Is this the right conclusion?
+If not, PLEASE, someone set me straight!
+<br /><br />
+Many tutorials: <a href="http://www.pixel2life.com/">http://www.pixel2life.com/</a>
+<br /><br />
+<a href="http://www.usatoday.com/travel/news/2005-05-15-airport-xray-bottomstrip_x.htm?csp=34">Air travelers stripped bare with X-ray machine</a>
+<br /><br />
+<a href="http://www.sciencedaily.com/releases/2005/05/050517220706.htm">New Collision Looks Imminent For B-15A Iceberg</a>
+<br /><br />
+<a href="http://www.projectorcentral.com/video_signals.htm">http://www.projectorcentral.com/video_signals.htm</a> - 
+The Difference Between HDTV, EDTV, and SDTV
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-18T05_08_52.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-18T07_13_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-17T13_52_27.txt" name="e2005-05-17T13_52_27.txt"></a>
+<h2 class="date">05.17.2005 13:52</h2>
+<div class="blogbody">
+<h3 class="title">Find cheap gas</h3>
+<div class="item-description">
+<a href="http://www.ahding.com/cheapgas/">http://www.ahding.com/cheapgas/</a> is down probably because of too much traffic, but this is what we all want.  Where is that cheap gas?  And it uses google maps too.
+<br /><br />
+<a href="http://gasbuddy.com/">gasbuddy.com</a> ... any good?  Points to:
+<br /><br />
+<a href="http://www.sandiegogasprices.com/">http://www.sandiegogasprices.com/</a> - none of these prices are anywhere near us <img src="../moods/smilies/sad.gif" alt=":(" border="0" 
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-17T13_52_27.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-18T05_08_52.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-17T11_08_11.txt" name="e2005-05-17T11_08_11.txt"></a>
+<h2 class="date">05.17.2005 11:08</h2>
+<div class="blogbody">
+<h3 class="title">more python, pysqlite 2.0</h3>
+<div class="item-description">
+Wow... not yet, but I can't wait to dig into this soon: <a href="http://freshmeat.net/projects/pysqlite/?branch_id=57517&release_id=196359">pysqlite 2.0.0</a> [freshmeat]
+<br /><br />
+For me back in the old days, there is this: <a href="http://initd.org/tracker/pysqlite/wiki/basicintro">basic get-started guide for pysqlite 1.x</a>
+<br /><br />
+<a href="http://www.bluesock.org/~willg/blog/site/setup-20050515">a pyblosxom setup</a>
+<br /><br />
+<a href="http://www.devshed.com/c/a/Python/Python-Email-Libraries-part-2-IMAP/">python imap</a> email libs part 2
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-17T11_08_11.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-17T13_52_27.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-17T10_07_43.txt" name="e2005-05-17T10_07_43.txt"></a>
+<h2 class="date">05.17.2005 10:07</h2>
+<div class="blogbody">
+<h3 class="title">python</h3>
+<div class="item-description">
+An attempt at <a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/414140">Constant types in Python</a>
+<br /><br />
+<a href="http://www.bluesock.org/~willg/blog/dev/pyblosxom/20050514">Work on a pyblosxom manual</a> - <a href="http://sourceforge.net/projects/pyblosxom/">pyblosxom</a> - need time to play with this code!
+<br /><br />
+<a href="http://www.anandtech.com/guides/showdoc.aspx?i=2418">AMD and Intel processors demistified</a> at anandtech
+<br /><br />
+Looks like rock positioning nicely controlling the location of wind generated ripples:
+<br /><br />
+<a href="http://www.lyle.org/mars/imagery/color/2-169418644-6.jpg"><img src="http://www.lyle.org/mars/imagery/color/thumbnail/2-169509806-6.jpg"></a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-17T10_07_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-17T11_08_11.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-17T08_15_39.txt" name="e2005-05-17T08_15_39.txt"></a>
+<h2 class="date">05.17.2005 08:15</h2>
+<div class="blogbody">
+<h3 class="title">SQL delete</h3>
+<div class="item-description">
+This was my first chance to use the SQL DELETE command.  Up until now,
+the only removal I needed to do was to delete the <b>entire</b>
+database as I regenerate it in about 30 sections from all of the flat
+file data tables.  Now my problem is that I am on a deadline and
+crafting a way to compose a graph of remeasured data is a bit of a
+challenge (to me at least).  I do not want to comment out the older
+values from the weights table that now how new measurements, but if I
+remove them from the table, I can later remove one function call from
+python to nuke that remove set of calls.
+<br /><br />
+Here is one of the removes that I would like to do.  For all of
+section 2 of core 3, I want to remove the first drying where the
+samples were just set out at room temp to dry (step=1).  Since then, I
+dried the samples in the Norris and Jackson ovens at 50 &deg;C for 2.75
+days:
+<br /><br />
+<b>Update 2009-Jan-29</b>: The new URL... <a href="http://vislab-ccom.unh.edu/~schwehr/Gaviota/bpsio-Aug04/measuring/">http://vislab-ccom.unh.edu/~schwehr/Gaviota/bpsio-Aug04/measuring/</a>
+<br /><br />
+<a
+href="http://schwehr.org/Gaviota/bpsio-Aug04/measuring/2005-May-16-drying/">2005-May-16-drying
+photos</a>
+<br /><br />
+By the way, drying in the fume hood was only started the samples
+drying.  Two days in the fume hood or the vacuum chambers only removed
+a small fraction of the water.
+<br /><br />
+So how to make the query?  Here are the schemas for the weights and
+the ams tables.  I need the ams table since weights does not know
+about sections, cores, and other handy stuff:
+<pre>
+  sqlite db ".schema weights"
+<br /><br />
+  CREATE TABLE weights (id INTEGER PRIMARY KEY, samplename
+  VARCHAR(40), weight REAL, timeMeasured TIMESTAMP, status
+  VARCHAR(20), operator VARCHAR(20), sticker VARCHAR(15), step
+  INTEGER);
+<br /><br />
+  sqlite db ".schema ams"
+<br /><br />
+  CREATE TABLE ams (id INTEGER PRIMARY KEY, samplename VARCHAR(40),
+  user VARCHAR(40), datemeasured TIMESTAMP, cruise VARCHAR(20),
+  corenum INTEGER, coretype VARCHAR(1), corehalf VARCHAR(1), section
+  INTEGER, sectionoffset REAL, depth REAL,counts INTEGER, sampleholder
+  REAL  ... and so forth
+</pre>
+The final delete query:
+<pre>
+  sqlite db "DELETE FROM weights WHERE weights.id IN (SELECT\
+  weights.id FROM weights,ams WHERE weights.samplename=ams.samplename\
+  AND corenum=3 AND section=2 AND weights.step=1);"
+</pre>
+Before I deleted the samples, I can see lots of the ones I want to be
+rid of.  There should only be 
+<pre>
+  sqlite db "select weights.id,weights.samplename,weights.step from\
+  weights,ams where weights.samplename=ams.samplename AND corenum=3\
+  and section=2 AND weights.step=1;" | tail -6
+<br /><br />
+310|bp04-3gw-s2-132|1
+311|bp04-3gw-s2-135|1
+312|bp04-3gw-s2-138|1
+313|bp04-3gw-s2-141|1
+314|bp04-3gw-s2-144|1
+315|bp04-3gw-s2-147|1
+</pre>
+After the delete call here is what I see.  All is well I hope!
+<pre>
+  sqlite db "select weights.* FROM weights,ams WHERE weights.samplename=ams.samplename AND step=1 AND corenum=3 AND section=2"
+<br /><br />
+<b>Nothing</b>
+<br /><br />
+  sqlite db "select weights.* FROM weights,ams WHERE \
+  weights.samplename=ams.samplename AND step=1 AND corenum=3" | head -3
+<br /><br />
+316|bp04-3gw-s1-004|9.7838|2005-04-25 10:30:00|wet|schwehr|no-sticker|1
+317|bp04-3gw-s1-007|9.8447|2005-04-25 10:30:00|wet|schwehr|no-sticker|1
+318|bp04-3gw-s1-010|9.9916|2005-04-25 10:30:00|wet|schwehr|no-sticker|1
+<br /><br />
+  sqlite db "select weights.* FROM weights,ams WHERE \
+  weights.samplename=ams.samplename AND step=2 AND corenum=3" | head -3
+<br /><br />
+561|bp04-3gw-s2-123|5.9082|2005-05-16 09:14:00|dry|schwehr|sticker|2
+562|bp04-3gw-s2-126|5.8825|2005-05-16 09:14:00|dry|schwehr|sticker|2
+563|bp04-3gw-s2-141|5.5927|2005-05-16 09:14:00|dry|schwehr|sticker|2
+</pre>
+Now I need to account for the weight of the stickers.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-17T08_15_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-17T10_07_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-17T06_18_07.txt" name="e2005-05-17T06_18_07.txt"></a>
+<h2 class="date">05.17.2005 06:18</h2>
+<div class="blogbody">
+<h3 class="title">M. Chan on Mars Marbles</h3>
+<div class="item-description">
+<br /><br />
+Yesterday, we had an interesting talk at SIO by Marjorie Chan
+entitled: "Analogs of Utah Marbles to Mars Blueberries."  She makes a
+strong case for the spheroids on Mars being ground water derived
+concretions, but I am still not convinced and even if it was ground
+water, it may not have been very much.  I still need to do some
+serious reading before I officially weigh in on this debate.
+<br /><br />
+Wow.  Someone from Moscow sucked down half a gig of stuff from my
+webserver yesterday.  Hello to Moscow!
+<br /><br />
+With spam the way it is today, if you actually won a contest, you
+would never know.
+<br /><br />
+<a href="http://kharkoma.homelinux.com/gmaps/gmaptc.html">Google maps + tranceroute</a> - give it a while to bring up the map.  Especially today <img src="../moods/smilies/smiley.gif" alt=":)" border="0" 
+<br /><br />
+<a href="http://uitest.com/en/cat/misc/">UI testing resources</a>
+<br /><br />
+<a href="http://www.techwikal.com/wiki/HOWTO_WASTE_Network">WASTE Network</a>:
+<pre>
+  WASTE (<a href="http://waster.sf.net/">waste.sf.net</a>) is software for setting up small, secure,
+  private filesharing networks. WASTE provides chat, instant
+  messaging, and file transfers between connected users, all of which
+  is encrypted. The software is entirely peer to peer so no server is
+  required. WASTE facilitates connections between NATed users with
+  routing through addressable nodes. It works best for transferring
+  files between small groups of people, like a group of friends. 
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-17T06_18_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-17T08_15_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-16T19_21_45.txt" name="e2005-05-16T19_21_45.txt"></a>
+<h2 class="date">05.16.2005 19:21</h2>
+<div class="blogbody">
+<h3 class="title">PS3!!!</h3>
+<div class="item-description">
+I am sure that if you care at all about the PS3, you have already
+scene this, but I'll put it here anyway.  Alex and I spent a lot of
+time back in 1999/2000 talking about what we could do if we went in
+for a PS2 dev kit.  I have never seen any of the products we thought
+up.  Maybe I can get motivated for the PS3.  What about a PS3 on the
+bridge of every major ship?  It would no longer be just a game.
+<br /><br />
+<a
+href="http://www.anandtech.com/tradeshows/showdoc.aspx?i=2417">Anandtech
+on the PS3</a>.  Launch set for 2006.
+<br /><br />
+It looks a little skimpy on RAM, but the unit should be a screamer.
+And with BlueRay disks, it will have a lot of space for data files.
+Plus a 2.5 inch HD will make the thing nice and flexible.  Ah, 3 GigE
+port, 6 USB ports and WiFi should make integration a snap.  Nice.
+<br /><br />
+The real questions are what will be the price of the machine of the
+machine be, how much are dev kits, and how hard will it be to program
+for someone not in a game dev shop?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-16T19_21_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-17T06_18_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-16T14_49_40.txt" name="e2005-05-16T14_49_40.txt"></a>
+<h2 class="date">05.16.2005 14:49</h2>
+<div class="blogbody">
+<h3 class="title">Managing many computers</h3>
+<div class="item-description">
+Here is a slashdot article where the comments might actually be useful
+in the future: <a
+href="http://ask.slashdot.org/article.pl?sid=05/05/16/132238&from=rss">Updating
+Free Software in the Enterprise?</a>
+<pre>
+  wallykeyster asks: "I'm an IT Director for a small private
+  university in the U.S., and we are largely a Microsoft shop. We pay
+  over $15,000 each year for our Campus Agreement so that we can
+  upgrade the desktop OS to our version of choice, run Office, and
+  have some Client Access Licenses. I would like to move to FOSS
+  solutions, but I'm having trouble finding support for Enterprise
+  management. For example, OpenOffice and Firefox (both of which I use
+  personally) would be easy first steps, but IE is updated
+  automatically via our SUS server (and settings pushed to clients via
+  group policies) and Office updates will be included soon. How are
+  other larger organizations (i.e. more than 200 desktops) dealing
+  with software deployment and updates? Is anyone using Zen with
+  Novell Desktop Linux?"
+</pre>
+Maybe someday, I will actually look at CSS and see what it really
+is... <a
+href="http://www.webreference.com/authoring/style/sheets/layout/advanced/">Advanced
+CSS Layouts: Step by Step</a>
+<br /><br />
+Ask macslash: <a
+href="http://macslash.org/article.pl?sid=05/05/16/1444202">Bacula for
+mac and windows?</a>
+<pre>
+  ZEB17 writes "Anybody out there have any experience using Bacula to
+  back up a Mac? How about with Tiger? We've been Retrospect users
+  forever, but we find their upgrade and support policies a bit tough
+  to swallow. Plus we've never been all that impressed with their
+  software. So we started thinking about the open source project
+  Bacula. It is supposed to work well on heterogenous networks with
+  Linux, Windows, and Mac clients. But doing the usual searches
+  reveals little about actual Mac usage. Is it so good that nobody
+  ever posts anything? Or is it so bad that nobody even tries it?
+  Thanks for any info."
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-16T14_49_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-16T19_21_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-16T11_07_04.txt" name="e2005-05-16T11_07_04.txt"></a>
+<h2 class="date">05.16.2005 11:07</h2>
+<div class="blogbody">
+<h3 class="title">inside an G4 TiBook</h3>
+<div class="item-description">
+<a href="http://ether.asu.edu/video/TiGutz/">TizGutz</a> web page has
+an xray of the guts of a G4 Titanium laptop:
+<br /><br />
+<a href="http://ether.asu.edu/video/TiGutz/TiGutz.jpg"><img
+src="http://ether.asu.edu/video/TiGutz/powerbookxray.jpg"></a>
+<br /><br />
+A chapter on the <a href="http://www3.interscience.wiley.com:8100/legacy/college/silberschatz/0471694665/appendices/appb.pdf"> chapter online about the Mach system from the very good book 'Operating System Concepts'</a>
+<br /><br />
+<a href="http://www.engadget.com/entry/1234000167021291/">How-To:
+BroadCatching using RSS + BitTorrent to automatically download TV
+shows</a> - not for Macs, but you can adapt, right?
+<br /><br />
+<a href="http://amailer.cjb.net/">amail</a> - anonymous email
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-16T11_07_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-16T14_49_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-16T06_13_17.txt" name="e2005-05-16T06_13_17.txt"></a>
+<h2 class="date">05.16.2005 06:13</h2>
+<div class="blogbody">
+<h3 class="title">grid resampling in python</h3>
+<div class="item-description">
+<a
+href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/414084">Extracting
+a low resolution grid from a high resolution grid</a>
+<br /><br />
+<a href="http://greasemonkey.mozdev.org/">GreaseMonkey</a> for
+Firefox.  I still use Safari, but this sounds pretty cool but does it
+have serious security issues?
+<br /><br />
+<a href="http://coralcdn.org/">Coral Distribution Network</a> -
+interesting network of web proxies.  Have your page cached.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-16T06_13_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-16T11_07_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-15T13_20_04.txt" name="e2005-05-15T13_20_04.txt"></a>
+<h2 class="date">05.15.2005 13:20</h2>
+<div class="blogbody">
+<h3 class="title">python doctest</h3>
+<div class="item-description">
+For some reason, I just decided that it is time to start adding
+doctest examples into my water analysis code.  Then I discovered that
+I am not really understanding how this is supposed to work.  I thought
+my array slicing function would be a good starting point.  After a
+step back, I have a working example of doctest.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">subsetList</font> <font color="4444FF">(</font><font color="#2040a0">list</font>, <font color="#2040a0">min</font>, <font color="#2040a0">max</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    return a subregion of a list of (x,y) pairs based on the x range
+<br /><br />
+    &gt;&gt;&gt; subsetList([(1,11),(2,22),(12,1212),(15,1515),(21,2121),(30,3030)], 10,20)
+    [(12, 1212), (15, 1515)]
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <font color="#2040a0">newList</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+    <strong>for</strong> <font color="#2040a0">item</font> <strong>in</strong> <font color="#2040a0">list</font><font color="4444FF">:</font>
+        <strong>if</strong> <font color="#2040a0">item</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">&gt;</font><font color="4444FF">=</font><font color="#2040a0">min</font> <strong>and</strong> <font color="#2040a0">item</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">&lt;</font><font color="4444FF">=</font><font color="#2040a0">max</font><font color="4444FF">:</font>
+            <font color="#2040a0">newList</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#2040a0">item</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">newList</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">_test</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>import</strong> <font color="#2040a0">doctest</font>, <font color="#2040a0">foo</font>
+    <font color="#2040a0">doctest</font>.<font color="#2040a0">testmod</font><font color="4444FF">(</font><font color="#2040a0">foo</font><font color="4444FF">)</font>
+<br /><br />
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <font color="#2040a0">_test</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Which I then run by doing:
+<pre>
+  chmod +x foo.py
+  ./foo.py -v
+<br /><br />
+Trying:
+    subsetList([(1,11),(2,22),(12,1212),(15,1515),(21,2121),(30,3030)], 10,20)
+Expecting:
+    [(12, 1212), (15, 1515)]
+ok
+2 items had no tests:
+    foo
+    foo._test
+1 items passed all tests:
+   1 tests in foo.subsetList
+1 tests in 3 items.
+1 passed and 0 failed.
+Test passed.
+</pre>
+The key was to add "<b>-v</b>" after the command name to get more
+output as to what is going on through the tests.
+<br /><br />
+<a
+href="http://jstripchart.sourceforge.net/index.html">PyStripchart</a>
+looks very handy.  Too bad it is not in fink.
+<br /><br />
+Just noticed that there is python code for <a
+href="http://aima.cs.berkeley.edu/">Artificial Intelligence: A Modern
+Approach</a> by <a href="http://www.norvig.com/">Peter Norvig</a>.
+This is in addition to Lisp and Java.  I have an older copy of this
+book on my shelf.
+<br /><br />
+More free web hosting: <a href="http://pho2hosting.com/">http://pho2hosting.com/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-15T13_20_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-16T06_13_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-15T10_04_06.txt" name="e2005-05-15T10_04_06.txt"></a>
+<h2 class="date">05.15.2005 10:04</h2>
+<div class="blogbody">
+<h3 class="title">stumbler - viha</h3>
+<div class="item-description">
+I tried to install Viha 0.0.1a and gave stumbler a try.  I really just
+wanted to see how many wifi access points are in view and what
+channels they are using.  No go:
+<pre>
+  ./Stumbler
+  IOConnectMapMemory (ipc/send) invalid destination port (10000003)
+  Abort trap
+</pre>
+And then I run it the top right menu bar goes blank and then comes
+back.  Scary.  Time to throw out the framework.  Maybe I need to get
+and build 0.0.2 from source, but I am not going to spend the time to
+try that.
+<br /><br />
+Instead, I got <a href="http://www.macstumbler.com/">MacStumbler</a>
+to work right off.  Turns out that just about everyone in range is
+using channel 6.  Not good!  The only thing about macstumbler that I
+don't like is that it is actively interrogating all channels and
+devices.  kismet/Viha does a passive grab of packets.
+<br /><br />
+I never heard of <a href="http://www.abfp.com/">Forensic
+Psychology</a> until now:
+<pre>
+  Forensic Psychology is the application of the science and profession
+  of psychology to questions and issues relating to law and the legal
+  system. The word "forensic" comes from the Latin word "forensis,"
+  meaning "of the forum," where the law courts of ancient Rome were
+  held. Today forensic refers to the application of scientific
+  principles and practices to the adversary process where specially
+  knowledgeable scientists play a role.
+</pre>
+<a href="http://www.ace.net.nz/tech/TechFileFormat.html">File Format List</a>
+<br /><br />
+<a href="http://souptonuts.sourceforge.net/how_to_linux_and_open_source.htm">Linux tips</a> most of which are good for Mac OSX too.
+<br /><br />
+<a href="http://www.forumer.com/">Forumer</a> - Free forums if you
+want to run an online discussion.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-15T10_04_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-15T13_20_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-14T14_07_35.txt" name="e2005-05-14T14_07_35.txt"></a>
+<h2 class="date">05.14.2005 14:07</h2>
+<div class="blogbody">
+<h3 class="title">Python Numeric exp not faster?</h3>
+<div class="item-description">
+I thought the whole point about Numeric.exp() over the standard python
+Math.exp() was that it is faster.  I figured I would do a quick check
+since I will be doing a lot of fitting to exponential functions.  I
+got that Numeric is <b>much</b> slower.  This is on a 1.5 GHz G4 Ti
+laptop with 1GB ram and 10.3.9 using python 2.4.1-1 from fink and
+numeric-py24 23.8-11.  First the code.  It maybe that there is some
+internal optimization that I am cancelling out by calling exp this
+way.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">math</font>
+<strong>import</strong> <font color="#2040a0">time</font>
+<strong>import</strong> <font color="#2040a0">Numeric</font>
+<br /><br />
+<font color="#2040a0">totalMath</font><font color="4444FF">=</font><font color="#FF0000">0</font>.
+<font color="#2040a0">totalNumeric</font><font color="4444FF">=</font><font color="#FF0000">0</font>.
+<br /><br />
+<strong>for</strong> <font color="#2040a0">j</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#FF0000">100</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">start</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#FF0000">100</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">math</font>.<font color="#2040a0">exp</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font><font color="4444FF">+</font>.<font color="#FF0000">1</font><font color="4444FF">)</font>
+    <font color="#2040a0">end</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">totalMath</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">end</font><font color="4444FF">-</font><font color="#2040a0">start</font>
+<br /><br />
+    <font color="#2040a0">start</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#FF0000">100</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">Numeric</font>.<font color="#2040a0">exp</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font><font color="4444FF">+</font>.<font color="#FF0000">1</font><font color="4444FF">)</font>
+    <font color="#2040a0">end</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">totalNumeric</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">end</font><font color="4444FF">-</font><font color="#2040a0">start</font>
+<br /><br />
+<strong>print</strong> <font color="#008000">&quot; totalMath    = &quot;</font>,<font color="#2040a0">totalMath</font>
+<strong>print</strong> <font color="#008000">&quot; totalNumeric = &quot;</font>,<font color="#2040a0">totalNumeric</font>
+</pre>
+You just can not get any simpler than that.  I do not think that
+python does any optimization that would just throw out the exp call
+since it is really a no-op.  With C++, I would have to go look at the
+generated assembly to make sure the call actually happened.  Now for
+the results:
+<pre>
+./speed.py 
+ totalMath    =  0.064
+ totalNumeric =  0.192
+</pre>
+Ouch <img src="../moods/smilies/sad.gif" alt=":(" border="0"  I did find one thing that is much better about the Numeric
+exp.  If you give a value too large, the Numeric.exp() call returns
+inf, while math.exp() throws OverflowError.  I suppose which is better
+depends on what you are trying to do.  e.g.:
+<pre>
+  max=700
+  print max
+  print Numeric.exp(max)
+  print math.exp(max)
+<br /><br />
+  max=800
+  print max
+  print Numeric.exp(max)
+  print math.exp(max)
+</pre>
+gives
+<pre>
+  700
+  1.01423205474e+304
+  1.01423205474e+304
+  800
+  inf
+  Traceback (most recent call last):
+    File "./speed.py", line 17, in ?
+      print math.exp(max)
+  OverflowError: math range error
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-14T14_07_35.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-15T10_04_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-14T12_05_08.txt" name="e2005-05-14T12_05_08.txt"></a>
+<h2 class="date">05.14.2005 12:05</h2>
+<div class="blogbody">
+<h3 class="title">ScientificPython fit and fit from gnuplot.py</h3>
+<div class="item-description">
+I was wanting to use fit results from gnuplot in python code to
+calculate the residuals to an exponential.  I was thinking of doing
+something like what I did with ams.py/k15_hext that uses popen2 to
+grad the results.  That works, but I am thing popen2 is kind of ugly
+and it was slow.  What does gnuplot.py use to talk to gnuplot?
+<pre>
+  As the others have pointed out, you can call any gnuplot command from
+  Gnuplot.py.  The other issue with "fit", however, is how do you get the
+  results of the fit back into Python?  This is a problem because
+  Gnuplot.py doesn't have access to gnuplot's standard output.
+  
+  Luckily this is easy--you write the parameters to a "parameters file"
+  (which fortuitously is valid python code) then read them back into
+  python.  This is untested but should approximately work:
+  
+    &gt;&gt;&gt; g = Gnuplot.Gnuplot()
+    &gt;&gt;&gt; open('fit.par', 'w').write('m=0\nb=0\n')
+    &gt;&gt;&gt; g('fit m*x+b "data.in" via "fit.par"')
+    &gt;&gt;&gt; g('update "fit.par" "fit2.par"') # saves fitted parameters to fit2.par
+    &gt;&gt;&gt; parameters = {}
+    &gt;&gt;&gt; execfile('fit2.par', globals(), parameters)
+    &gt;&gt;&gt; print parameters
+  {'b': 1.5015, 'm': 1e-30}
+    &gt;&gt;&gt; print parameters['m'], parameters['b']
+  1e-30 1.5015
+  
+  In principle you could also parse "fit.log" to get the gory details
+  about the fit (standard errors, correlation matrix, etc).
+  
+  Hope this helps,
+  Michael
+  
+  -- Michael Haggerty mhagger at alum dott mit.edu
+</pre>
+<a href="http://www.ctcms.nist.gov/fipy/">FiPy</a> - FiPy: A Finite
+Volume PDE Solver Using Python
+<br /><br />
+<a href="http://homepage2.nifty.com/peco/pybld/pybld.html">PyBLD</a> -
+not that I really know what BLD is, but it does have a data fit
+capability.
+<br /><br />
+<a href="http://www.physik.tu-dresden.de/~baecker/python/gnuplot.html">GnuplotBiDir.py</a>:
+<pre>
+  Sometimes it is useful to get variables from a gnuplot session
+  steered from python, e.g. to extract parameters from a
+  fit. GnuplotBiDir.py is a test of bidirectional interfacing with
+  gnuplot. For this you need a really recent gnuplot (from CVS) . The
+  basic usage is 
+    from GnuplotBiDir import Gnuplot
+    gp=Gnuplot()
+    gp("a=10")
+    print "var=",gp.getvar("a")
+  Remark: for an excellent python interface to gnuplot see gnuplot-py
+  and the interactive add-ons to this from IPython. 
+</pre>
+<a href="http://www.python.org/moin/NumericAndScientific">Numeric And
+Scientific</a> packages [python.org]
+<br /><br />
+<a href="http://mayavi.sourceforge.net/">MayaVI</a> is in fink.
+<pre>MayaVi is a free, easy to use scientific data visualizer. It is
+written in Python and uses the amazing Visualization Toolkit (VTK) for
+the graphics. It provides a GUI written using Tkinter.</pre>
+<a
+href="http://starship.python.net/~hinsen/ScientificPython/">ScientificPython</a>
+does nonlinear least squares fits.
+<br /><br />
+<a
+href="http://starship.python.net/~hinsen/ScientificPython/ScientificPythonManual/Scientific_12.html">Module
+Scientific.Functions.LeastSquares</a>
+<br /><br />
+<a
+href="http://www.astro.rub.de/laboca/download/boa_master_doc/7_6_4Scientific_Functions_L.html">7.6.4
+Scientific.Functions.LeastSquares</a>.  From <a
+href="http://www.astro.rub.de/laboca/download/boa_master_doc/boa_master_doc.html#boadoccontents">BoA
+- The Bolometer Data Analysis Project</a>.  If every project had such documentation!
+<pre>
+  &gt;&gt;&gt; from Scientific.Functions.LeastSquares import *
+  &gt;&gt;&gt; from Numeric import exp
+  &gt;&gt;&gt; def f(param, t):
+  ...     return param[0]*exp(-param[1]/t)
+  ...
+  &gt;&gt;&gt; data = [(100, 4.999e-8),(200, 5.307e+2),
+    (300, 1.289e+6),(400, 6.559e+7)]
+  &gt;&gt;&gt; print leastSquaresFit(f, (1e13,4700), data)
+  ([8641551709749.7666, 4715.4677901570467], 1080.2526437958597)
+</pre>
+I tried the above and it seems to work!  I will probably be skipping
+gnuplot for fitting from now on.  It is the same algorithm between the
+two.  We will see if I take to this or not!
+<br /><br />
+And another interesting mention: <a href="http://scigraphica.sourceforge.net/">SciGraphica</a> a scientific application for data analysis and technical graphics. It pretends to be a clone of the popular commercial (and expensive) application "Microcal Origin". It fully supplies plotting features for 2D, 3D and polar charts.
+<br /><br />
+Wow.  Too many plotting options!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-14T12_05_08.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-14T14_07_35.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-13T19_12_10.txt" name="e2005-05-13T19_12_10.txt"></a>
+<h2 class="date">05.13.2005 19:12</h2>
+<div class="blogbody">
+<h3 class="title">TOR</h3>
+<div class="item-description">
+<a href="http://tor.eff.org/">TOR</a> = Tor: An anonymous Internet
+communication system.  Uses "onion routers."
+<br /><br />
+Is your port 9100 open?  Look out.  I wonder if we could make them run
+grid 
+<br /><br />
+:)
+<br /><br />
+An Opportunity rover wheel that is stuck:
+<br /><br />
+<a href="http://coewww.rutgers.edu/~shinbrot/temp/one.gif"><img src=http://coewww.rutgers.edu/~shinbrot/temp/one.gif"></a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-13T19_12_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-14T12_05_08.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-13T06_31_03.txt" name="e2005-05-13T06_31_03.txt"></a>
+<h2 class="date">05.13.2005 06:31</h2>
+<div class="blogbody">
+<h3 class="title">Weight &#37; water, Mail.app ssl, bash cheat sheet</h3>
+<div class="item-description">
+Yesterday, I finally measured the weight of the "dry" samples.  After
+talking to a few people, I realize that there are better ways to get
+this information.  I should have taken samples straight from the oven
+at 50 degrees C and put them quickly into a vacuum desiccator.
+Instead, my samples were in atmosphere for up to 2 hours before being
+weighed.  I found this document describing procedures from the Puget
+Sound project.
+<pre>
+  <a href="http://www.psat.wa.gov/Publications/protocols/protocol_pdfs/sed_conv.pdf">Sedimentary Protocols</a> [pdf]
+</pre>
+Also, a higher temperature (&gt;= 55&deg; C) will get rid of some
+volatile organics.
+<br /><br />
+<a href="http://www.google.com/search?q=procedure+dry+weight+%2Bsediments+%2Bdesiccant+oven+marine">Google dry weight procedure for marine sediments</a>
+<br /><br />
+I do not think the keychain stuff I did yesterday for Mail.app on Mac
+OSX worked.  Maybe I need to logout/log back in?  I need to dig in the
+keychain and make sure the cert is actually in there.  Some relevant links:
+<ul>
+<li><a href="http://improbable.org/chris/?ID=118">Installing Custom Certificate Authorities for OpenSSL</a> by Chris Adams</li>
+<li><a href="http://www.theatrain.net/pantherimaps.html">Secure IMAPd for OS X 10.3</a> by Michael Johnson</li>
+<li><a href="http://www.cse.ucsd.edu/users/lbreyer/rootcert/OSX/">http://www.cse.ucsd.edu/users/lbreyer/rootcert/OSX/</a></li>
+<li><a href="http://www-no.ucsd.edu/documentation/application/macosx/mail/">http://www-no.ucsd.edu/documentation/application/macosx/mail/</a></li>
+<li><a href="http://www-no.ucsd.edu/documentation/application/macosx/mail/ssl/index.html">http://www-no.ucsd.edu/documentation/application/macosx/mail/ssl/index.html</a></li>
+</ul>
+I tried again to add the UCSD pem file, but keychain says that it is
+already in the list.  What gives?  I still get a cert complaint from
+Mail.app.
+<br /><br />
+And yet more Bash stuff:  <a href="http://www.justlinux.com/nhf/Programming/Bash_Programming_Cheat_Sheet.html">Bash Programming Cheat Sheet</a>
+<br /><br />
+Human-Computer Interaction(HCI)/Viz people that are on my list of people to lookup:
+<ul>
+<li><a href="http://www.hitl.washington.edu/people/tfurness/">Tom Furness</a> - uman Interface Technology Lab at UW.</li>
+<li><a href="http://www.soe.ucsc.edu/~pang/">Alex Pang</a> at UCSC.  Research interests: tensor visualization, scientific visualization, collaboration software, uncertainty visualization, virtual reality interfaces.</li>
+<li><a href="http://pcd.stanford.edu/winograd/">Terry Winograd</a></li>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-13T06_31_03.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-13T19_12_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-12T09_29_12.txt" name="e2005-05-12T09_29_12.txt"></a>
+<h2 class="date">05.12.2005 09:29</h2>
+<div class="blogbody">
+<h3 class="title">OpenInventor syntax highlighting</h3>
+<div class="item-description">
+I made an offhand post this morning to the coin discussion list and
+wow did it get responses!  And that was just in an hour.  I wanted to
+know if it would be possible to emit syntax highlight for open
+inventor code,
+<br /><br />
+<pre>
+  Bernhard Breinbauer:
+<br /><br />
+  Maybe also not what you are looking for, but kwrite/kate from the
+  KDE project have syntax highlighting for vrml files, and also a HTML
+  export function.  It's not the direct way, but you get coloured html
+  output :-)
+</pre>
+<pre>
+  Morton:
+<br /><br />
+  Not exactly what you're looking for, but in case it would be useful:
+  Emacs comes with a VRML mode, which also works with Inventor
+  files. As they usually do, the Emacs mode comes with syntax
+  highlighting and indentation. Very useful.
+</pre>
+<pre>
+  Chris Scharver
+<br /><br />
+  GNU enscript is another option. It can pretty-print the file and
+  output to RTF, HTML, or PostScript as needed. It defaults to vrml
+  syntax for .wrl files, but you can force it to use that mode for .iv
+  files too. Very handy! I use it quite a bit on Linux, Mac OS X, and
+  Windows via cygwin.
+<br /><br />
+  <a href="http://mega.ist.utl.pt/~ic-cg/laboratorio/vrmlTutorials/tutorial/source/tut7.html">http://mega.ist.utl.pt/~ic-cg/laboratorio/vrmlTutorials/tutorial/source/tut7.html</a>
+</pre>
+I figured I might as well throw up an ugly version of my python xcore
+code for interested parties to look at.  This code is UGLY:
+<pre>
+  <a href="http://schwehr.org/xcore/xcore-py-0.1.tar.bz2">http://schwehr.org/xcore/xcore-py-0.1.tar.bz2</a>
+</pre>
+<br /><br />
+From the parental news wire service:
+<br /><br />
+<a href="http://www.usatoday.com/tech/science/space/2005-05-12-rover-sand-dunes_x.htm">Mars rover struggles to escape sand dune</a>
+<br /><br />
+<a
+href="http://www.macosxhints.com/article.php?story=20050503172154759">Easily
+import self-signed SSL certificates</a> on Mac OSX.  About time!  I am
+tired of complaints from my mail server!
+<pre>
+  With the new Safari in Tiger, it is easy to import self-signed SSL
+  certificates you may come across. Just click Show More in the alert
+  box, and then drag the certificate icon to a folder or your
+  desktop. Then double-click the certificate, and Keychain Access will
+  prompt to import it. Select the "X509Anchors" keychain from the
+  Select box and click OK. Finally, enter your admin password to allow
+  that keychain to be modified.
+<br /><br />
+  For example, my university has a self-signed SSL certificate for
+  their IMAP server, and Mail.app constantly complains about this. So
+  I pointed Safari at the IMAP SSL port eg: https://imap.ufl.edu:993/
+  to grab and import the certificate into the system keychain. Now
+  when I start up Mail.app, it doesn't complain when connecting
+  securely to my school's IMAP server
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-12T09_29_12.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-13T06_31_03.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-12T08_13_34.txt" name="e2005-05-12T08_13_34.txt"></a>
+<h2 class="date">05.12.2005 08:13</h2>
+<div class="blogbody">
+<h3 class="title">OpenInventor LineSet</h3>
+<div class="item-description">
+This is a quick exploration of the OpenInventor/Coin LineSet (man <a
+href="http://doc.coin3d.org/Coin/classSoLineSet.html">SoLineSet</a>).
+I want to be able to simplify my usage of IndexedLineSet when I am not
+reusing vertices and I also want to be able to do reasonable effecient
+scatter plots so I will take a look at <a
+href="http://doc.coin3d.org/Coin/classSoPointSet.html">PointSet</a>.
+I do not know if PointSet is in SGI's OpenInventor, but I am hoping
+that it is.
+<br /><br />
+For LineSet, here is the example straight out of the Coin
+documentation:
+<pre>
+#Inventor V2.1 ascii
+<br /><br />
+Separator {
+    Coordinate3 {
+        point [ 0 0 0, 1 1 1, 2 1 1, 2 2 1, 2 2 2, 2 2 3, 2 3 2, 2 3 3, 3 3 3 
+	]
+    }
+    LineSet {
+        numVertices [ 3, 4, 2 ]
+    }
+}
+</pre>
+The above example makes three disconnected lines.  What if we have the
+simpler case of just one line for all the vertices that we specify?
+All you have to do is change the numVertices to be -1!
+<pre>
+#Inventor V2.1 ascii
+<br /><br />
+Separator {
+    Coordinate3 {
+        point [ 0 0 0, 1 1 1, 2 1 1, 2 2 1, 2 2 2, 2 2 3, 2 3 2, 2 3 3, 3 3 3 
+	]
+    }
+    LineSet {
+        numVertices [ -1 ]
+    }
+}
+</pre>
+Now for a PointSet (man SoPointSet):
+<pre>
+#Inventor V2.1 ascii
+<br /><br />
+Separator {
+    Material {
+        diffuseColor [
+            1 0 0, 0 1 0, 0 0 1, 1 1 0, 1 0 1, 1 1 1, 1 0.8 0.6, 0.6 0.8 1
+        ]
+    }
+    MaterialBinding { value PER_PART }
+<br /><br />
+    Coordinate3 {
+        point [
+            -1 1 0, -1 -1 0, 1 -1 0, 1 1 0, 0 2 -1, -2 0 -1, 0 -2 -1, 2 0 -1
+        ]
+    }
+<br /><br />
+    DrawStyle { pointSize 3 }
+<br /><br />
+    PointSet { }
+}
+</pre>
+Why is it that we had a separate DotCloud application back in
+1996-1997?  Did Lew Hitchner all  sorts of features that I never knew
+about (which is probably true) or was it a more fundamental problem
+with OpenInventor not having a PointSet back then? 
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-12T08_13_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-12T09_29_12.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-12T06_55_45.txt" name="e2005-05-12T06_55_45.txt"></a>
+<h2 class="date">05.12.2005 06:55</h2>
+<div class="blogbody">
+<h3 class="title">Another title about 'stuff'</h3>
+<div class="item-description">
+<a
+href="http://www.advogato.org/person/titus/diary.html?start=89">pyparsing</a>
+got a positive but terse review.  <a
+href="http://www.nedbatchelder.com/text/python-parsers.html">More
+python parsing tools</a>
+<br /><br />
+<a href="http://www.devshed.com/c/a/Python/Python-Email-Libraries-part-1-POP3/">POP and IMAP with python</a>
+<br /><br />
+Do not forget to download the latest firefox.  <a href="http://www.mozilla.org/products/firefox/">1.0.4</a> is out.
+<br /><br />
+Dutch universities are <a
+href="http://www.theregister.co.uk/2005/05/11/open_access_research/">going
+open</a>.  However, the actual website is all in dutch: <a
+href="http://www.theregister.co.uk/2005/05/11/open_access_research/">DAREnet</a>.
+<br /><br />
+Kraftwerk
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-12T06_55_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-12T08_13_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-11T18_49_29.txt" name="e2005-05-11T18_49_29.txt"></a>
+<h2 class="date">05.11.2005 18:49</h2>
+<div class="blogbody">
+<h3 class="title">Wireless woe</h3>
+<div class="item-description">
+So I can't seem to get a reliable wireless connection to the
+basestation about 15 feet away.  I think there are just too many base
+stations all trying to use the same freqeuencies.  Is there a decent
+tool for Mac OSX that will tell me the real scoup on what it sees?
+<br /><br />
+I am looking right now at how to do a funky self join in SQL.  We will
+see if I can figure it out.... after about 15 minutes, here is what I
+have.  I am guessing that there probably is a much better (read more
+efficient) way to rewrite this.  First the table schema:
+<br /><br />
+<pre>
+  .schema mag
+  CREATE TABLE mag ( samplename VARCHAR(40), treatment REAL, csd REAL,
+  intensity REAL, dec REAL, inc REAL, timeMeasured TIMESTAMP,  type
+  VARCHAR(10), operator VARCHAR(20),  depth REAL,  cruise VARCHAR(20),
+  corenum INTEGER, coretype VARCHAR(1), corehalf VARCHAR(1) ,  section
+  INTEGER, sectionoffset REAL);
+</pre>
+I want arm from the table and irm from the table for the same
+samplename.  But I want the arm to always be from the same treatment
+of 100.  This makes a table alias ARM and a table alias IRM table
+which I bring together:
+<pre>
+  SELECT arm.samplename,arm.intensity,irm.intensity
+   FROM mag arm 
+   INNER JOIN mag irm 
+   ON arm.samplename=irm.samplename 
+   WHERE arm.type='arm'
+    AND irm.type='irm' 
+    AND arm.treatment=100
+    AND arm.corenum=5 
+   ORDER BY arm.depth;
+</pre>
+Which gives results like this with the middle column being ARM 100 and the
+right column being IRM.
+<pre>
+  ...
+  bp04-5gw-s2-126|0.0000317600|0.0014030000
+  bp04-5gw-s2-129|0.0000277200|0.0011360000
+  bp04-5gw-s2-132|0.0000372000|0.0014940000
+  bp04-5gw-s2-135|0.0000351100|0.0013400000
+  bp04-5gw-s2-138|0.0000301600|0.0011740000
+  bp04-5gw-s2-141|0.0000346500|0.0014260000
+  bp04-5gw-s2-144|0.0000361300|0.0014160000
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-11T18_49_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-12T06_55_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-11T16_29_22.txt" name="e2005-05-11T16_29_22.txt"></a>
+<h2 class="date">05.11.2005 16:29</h2>
+<div class="blogbody">
+<h3 class="title">mmap in python</h3>
+<div class="item-description">
+Terry Fong and Marsokhod in the news: <a href="http://www.boingboing.net/2005/05/11/overview_of_nasas_ro.html">Overview of NASA's robots at BoingBoing</a>.  Thanks to ACD.
+<br /><br />
+Lots of great data at the California Geological Survey: <a
+href="http://www.consrv.ca.gov/CGS/rghm/rgm/southern_region_quads.htm">southern
+region quads</a>.  Thanks Roi!  Check out San Diego on the right side:
+<a href="ftp://ftp.consrv.ca.gov/pub/dmg/rgmp/Prelim_geo_pdf/sandiego_map2_ai9.pdf">pdf</a>
+<br /><br />
+Wow.  I did not know that python had easy access to mmap.  This bodes
+well for my ideas on writing a generic low level driver for reading
+segy files quickly (maybe with writing too).  I had been thinking that
+I needed some sort of low level C/C++ code to allow fast access into a
+file, but not if I can mmap in the file!
+<br /><br />
+It is funny that this article is trying to get around a lack of solid
+IPC in MS Windows.  I did not realize that windows had mmap.  Now I
+need 64 bit mmap.
+<br /><br />
+<a
+href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/413807">Communicate
+between processes using mmap</a>
+<br /><br />
+More on <a
+href="http://sourceforge.net/mailarchive/message.php?msg_id=11033442">matplotlib</a>
+which I think is more flexible than Gnuplot.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-11T16_29_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-11T18_49_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-11T06_25_09.txt" name="e2005-05-11T06_25_09.txt"></a>
+<h2 class="date">05.11.2005 06:25</h2>
+<div class="blogbody">
+<h3 class="title">Python/emacs</h3>
+<div class="item-description">
+An <a
+href="http://spyced.blogspot.com/2005/05/emacs-support-for-spyce.html">emacs
+mode for spyce</a>.  So I really don't understand the lisp code, but
+it sounds interesting and it really is a short snippet.  This follows
+after I was thinking yesterday about emacs modes.
+<br /><br />
+<a href="http://www.thomasscott.net/mp3gif/">Hidding mp3's in gifs</a>
+<br /><br />
+<a
+href="http://gumuz.looze.net/wordpress/index.php/archives/2005/05/09/python-challenge-solutions-part-1/">Python
+challenge solutions, part 1</a>
+<br /><br />
+<a href="http://flashkit.com/index.shtml">Flashkit</a> - If you use
+flash, this is supposed to have lots of cool stuff.  I would like to
+play with flash someday.  It looks very cool.  Need more time/day!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-11T06_25_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-11T16_29_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-10T19_36_38.txt" name="e2005-05-10T19_36_38.txt"></a>
+<h2 class="date">05.10.2005 19:36</h2>
+<div class="blogbody">
+<h3 class="title">A9.com Block View</h3>
+<div class="item-description">
+Saw an interesting article in the June Discover: "Come Fly With Me."
+It talks about Google's Keyhole flyover software that uses keyhole
+satellite data and the A9.com (Amazon) Block View system where you can
+go up and down a block.  
+<br /><br />
+Here is <a
+href="http://www.amazon.com/gp/yp/B0004RGIV4/104-5139248-6198311">Frankie
+Johnnie &amp; Luigi Too</a> in Mountain View where Roy, Ruwan and I
+have met up many times.  I think there should be a wiki for posting
+funny pictures from Block View.  Find anyone you know driving by in
+the picture?
+<br /><br />
+More on <a href="http://users.sdsc.edu/~steube/Bshell/">bash by Ken
+Steube</a> at the SDSC.
+<br /><br />
+I really want a nicer OpenInventor emacs mode.  Maybe someday I will
+read this <a href="http://two-wugs.net/emacs/mode-tutorial.html">mode
+tutorial</a> and write a real mode.  I did write a mode for Arc Macro
+Language (AML), but I have long since lost the code.  Maybe it is
+still hiding on the USGS WR sierra machine.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-10T19_36_38.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-11T06_25_09.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-10T15_40_57.txt" name="e2005-05-10T15_40_57.txt"></a>
+<h2 class="date">05.10.2005 15:40</h2>
+<div class="blogbody">
+<h3 class="title">Schneier on Cryptography</h3>
+<div class="item-description">
+<a href="http://www.securityfocus.com/columnists/324">Bruce Schneier
+on Cryptography</a> at Security Focus.
+<br /><br />
+<a href="http://yellowicon.com/index.php">YellowIcon</a> - another
+free icon site.
+<br /><br />
+<a
+href="http://www.rednova.com/news/display/?id=148893&source=r_science">Yellowstone
+Rated High for Eruption Threat</a>
+<br /><br />
+<a
+href="http://money.cnn.com/2005/05/10/news/midcaps/wendys_frosty/index.htm?cnn=yes">Free
+Wendy's frosty this weekend</a>
+<br /><br />
+Tomsnetworking on <a
+href="http://www.tomsnetworking.com/Sections-article118.php">how to
+crack wep</a> - Remember, just because you are running wep someone may
+be listening to your traffic.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-10T15_40_57.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-10T19_36_38.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-10T09_15_07.txt" name="e2005-05-10T09_15_07.txt"></a>
+<h2 class="date">05.10.2005 09:15</h2>
+<div class="blogbody">
+<h3 class="title">Python data visualization</h3>
+<div class="item-description">
+The linux gazette has an interesting article: <a
+href="http://linuxgazette.net/114/andreasen.html">Python for
+scientific use. Part I: Data Visualization</a>
+<br /><br />
+<a href="http://wordpress.org/development/2005/05/one-five-one/">WordPress 1.5.1 released</a>.  This to try after I graduate.
+<br /><br />
+Scary: <a
+href="http://www.sciencedaily.com/releases/2005/05/050509170546.htm">MIT
+Profs, Colleagues Propose Plan For Nuclear Energy</a>.  What is the
+true solution for long term global energy needs?
+<br /><br />
+<a href="http://www.sciencedaily.com/releases/2005/05/050509171919.htm">Previously Unknown Fault Provides New Insights On Himalayan Mountain Building</a>
+<br /><br />
+<a href="http://www.sciencedaily.com/releases/2005/05/050509113645.htm">Surf Not Up For Palaeozoic Creatures - New Model Reveals Ancient Sea Was A Giant Lake</a>
+<br /><br />
+<a
+href="http://www.howdykid.com/mt/archives/2005/05/google_maps_and.html">Google
+maps weblogs</a>
+<br /><br />
+<a href="http://www.templetons.com/brad/copymyths.html">10 Big Myths
+about copyright explained</a>.  I should read this.
+<br /><br />
+<a href="http://linuxgazette.net/114/okopnik.html">More bash
+craziness</a>.  Part 4.  If I was still doing my whole database work
+from bash, I would devour this article.  As it is, I'll stick to
+python.  But Ben writes very well and bash is my favorit shell (I
+never want to go back to csh,tcsh,or the most evil or evil's - DOS)
+<br /><br />
+<a href="http://linuxgazette.net/114/howell.html">More on
+knoppix</a>... what to use when you can't deal with MS windows any
+more.
+<br /><br />
+<a href="http://www.sciencedaily.com/releases/2005/05/050509174120.htm">Work on Opportunity to get it out of a dune</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-10T09_15_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-10T15_40_57.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-09T14_20_24.txt" name="e2005-05-09T14_20_24.txt"></a>
+<h2 class="date">05.09.2005 14:20</h2>
+<div class="blogbody">
+<h3 class="title">Joann Stock on the Gulf of California</h3>
+<div class="item-description">
+Got to hear Joann Stock talk about the Gulf of California today.  Great talk!
+<br /><br />
+<a href="http://www.unrealid.com/">unrealid</a>
+<br /><br />
+<a href="http://interfacethis.com/pub/index.php?itemid=56">Spacial
+Metaphore</a> - debates about finder and all
+<br /><br />
+<a href="http://leoville.tv/radio/pmwiki.php/Main/VideoEditing">VideoEditing</a>
+<br /><br />
+Working today on drying out my samples to get weight percent water.
+Not going as fast as I hoped.  I now have two vacuum balls full of
+samples.  I put some fresh dryright in one of them to see if that
+makes a difference.
+<br /><br />
+<a
+href="http://schwehr.org/Gaviota/bpsio-Aug04/measuring/2005-May-09-drying/">Photos
+of drying</a>.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-09T14_20_24.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-10T09_15_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-09T05_22_50.txt" name="e2005-05-09T05_22_50.txt"></a>
+<h2 class="date">05.09.2005 05:22</h2>
+<div class="blogbody">
+<h3 class="title">ALIA-KM0506 Samoa Expedition</h3>
+<div class="item-description">
+Check out the web page for the Samoa expedition:
+<br /><br />
+<a href="http://earthref.org/ERESE/projects/ALIA/">ALIA</a>
+<br /><br />
+Someone on the fink dev mailing list posted a picture that was being
+served up by gopher.  Yikes.  Flashbacks to 1993.
+<br /><br />
+gopher://sdf.lonestar.org/00/users/newmanbe/Random_Pictures_I_Have_Made/fin=kmap.png
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-09T05_22_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-09T14_20_24.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-08T21_00_30.txt" name="e2005-05-08T21_00_30.txt"></a>
+<h2 class="date">05.08.2005 21:00</h2>
+<div class="blogbody">
+<h3 class="title">Gantt charts and other notes</h3>
+<div class="item-description">
+<a href="http://ganttproject.sourceforge.net/">GanttProject</a>
+<br /><br />
+<a
+href="http://www.informit.com/articles/article.asp?p=380343&rl=1">Using
+Ant rather than GNU Make</a>.  Will I ever give up make files?
+<br /><br />
+Did some more IRM's today on the Santa Barbara cores.  Finished up
+core 6 and 1.  Started those two sets of cubes drying in the fume
+hood.  Need to get them setup in vacuum drier to make sure.
+<br /><br />
+Two notes from Becca about xraying... news from the Gulf of Mexico
+<pre>
+<br /><br />
+  Just read your blog and we got some software from the xray guy on
+  the cruise - Barry. He uses some free software called ImageJ
+<br /><br />
+  <a href="http://rsb.info.nih.gov/ij/download.html">http://rsb.info.nih.gov/ij/download.html</a>
+<br /><br />
+  it is medical software but is very useful for viewing xrays in tif format
+  and Barry wrote a macro using the pixel intensity (~density) to calculate
+  out the cracks and voids in the core to get the true length. I have not
+  really used it yet but he swears by it so definetly worth a look!
+</pre>
+<pre>
+  Barry brought a ct and a really really high res xray machine that he
+  built on the boat - it can xray cores that are stil under pressure
+  in an autoclave! and then if that is not enough he can also do "time
+  lapse" measurements of the core degassing as the pressure is
+  released slowly.  All sorts of techno gradgetry is going on!
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-08T21_00_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-09T05_22_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-07T13_40_01.txt" name="e2005-05-07T13_40_01.txt"></a>
+<h2 class="date">05.07.2005 13:40</h2>
+<div class="blogbody">
+<h3 class="title">4D visualization/capture</h3>
+<div class="item-description">
+<a
+href="http://www.berkeley.edu/news/media/releases/2005/04/25_zakhor.shtml">The
+Hungry Mind: Prof. Avideh Zakhor on being a science nerd in Iran, why
+Larry Summers made her mad, and what the heck a 4D model is</a>.
+Interesting content is at the bottom.  She is trying to capture both
+the spacial component along with the temporal changes.  Here are the
+key links.  Some of her work is here:
+<br /><br />
+<a href="http://www-video.eecs.berkeley.edu/">UC Berkeley Video and
+Image Processing Lab</a>
+<br /><br />
+<a
+href="http://www-video.eecs.berkeley.edu/vismuri/murindex.html">Next
+Generation, 4-D Distributed Modeling and Visualization</a> - vismuri
+<br /><br />
+An older Slashdot article: <a
+href="http://science.slashdot.org/article.pl?sid=05/03/13/1315255&tid=126">Automatic
+3D Reconstruction of Scenes</a> about the <a
+href="http://www.mdrobotics.ca/ism.html">instant scene modeler</a>
+which looks like they are using like the gray point system, no?
+<br /><br />
+I need to look through the available open source 3D software again to
+see what the possibilities are as I do not think the Ames Stereo
+Pipeline will be released any time soon.
+<br /><br />
+<a
+href="http://thomasyung.com:81/MyBlog.nsf/dx/05062005045614PMTHOTQQ.htm">Quicktime
+Pro 6 Key with most of 7</a> - Use a backup of Quicktime Pro 6 on a
+machine with 7.  The old app will use the new codecs.
+<br /><br />
+<a href="http://timyang.com/comments.php?id=630_0_1_0_C">15 things you
+can do with RSS</a>.  Don't forget to scroll down to the comments too.
+<br /><br />
+<a href="http://www.learnmorsecode.com/">Learning morse code</a> with
+a binary tree.  It has been about 17 years since I took the morse code
+test.  Back then I only passed because I guessed what the scentence
+was from the few letters that I got right.  It would be fun to be
+really good at morse code.  I would love to be able to practice by
+entering text into my computers in morse via a keyer.  That would be a
+fun and very simple microcontroller project.
+<br /><br />
+Back to processing the new core photo...
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-07T13_40_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-08T21_00_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-07T11_13_53.txt" name="e2005-05-07T11_13_53.txt"></a>
+<h2 class="date">05.07.2005 11:13</h2>
+<div class="blogbody">
+<h3 class="title">Preventing owners from data</h3>
+<div class="item-description">
+The same goes with cars and ships.  I think it is not right to
+disallow the owner of a car, ship, or plane from the diagnostic data
+for the vehicle or certain parts.
+<br /><br />
+<a
+href="http://www.avweb.com/newswire/11_18b/briefs/189696-1.html">Engine
+Monitor Data Change Upsets Owners</a>
+<br /><br />
+<a
+href="http://www.wired.com/wired/archive/13.05/realestate.html">Cracking
+the realestate code</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-07T11_13_53.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-07T13_40_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-07T10_27_31.txt" name="e2005-05-07T10_27_31.txt"></a>
+<h2 class="date">05.07.2005 10:27</h2>
+<div class="blogbody">
+<h3 class="title">Reshooting BPSIO-04 gravity cores</h3>
+<div class="item-description">
+Yesterday Liz helped me reshoot the BPSIO-04 cores.  We first scraped
+the surface of the cores to remove wire drag marks and the older
+oxidized surface.  The hope is that this would reveal many more
+features in the core.  I really should have done this when I split the
+cores, so I will definitely remember that for next time I collect
+cores!
+<br /><br />
+To do the scraping, we removed the plastic marker plugs and used a
+piece of metal lightly dragged across the surface.  We tried both with
+and without the fluorescent lights and think that without them
+produces a better image.
+<br /><br />
+<a
+href="http://schwehr.org/Gaviota/bpsio-Aug04/core-photos/2005-May-06/">Photos
+of the process</a> were taken with the paleomag digital camera - an
+Olympus Camedia Z3000 Zoom 3.3 MPixel model that is now a couple years
+old.
+<br /><br />
+<a
+href="http://schwehr.org/Gaviota/bpsio-Aug04/core-photos/IMG_0609.png"><img
+src="http://schwehr.org/Gaviota/bpsio-Aug04/core-photos/IMG_0609-thumb.png"></a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-07T10_27_31.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-07T11_13_53.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-07T08_13_07.txt" name="e2005-05-07T08_13_07.txt"></a>
+<h2 class="date">05.07.2005 08:13</h2>
+<div class="blogbody">
+<h3 class="title">lots of links</h3>
+<div class="item-description">
+<a href="http://maczealots.com/articles/development/">Beginning Mac
+Development</a> tries to get you started with Cocoa.
+<br /><br />
+<a href="http://www.sciencedaily.com/releases/2005/05/050506142212.htm">Extreme Life Discovery In Yellowstone Bodes Well For Astrobiologists</a>
+<br /><br />
+<a
+href="http://www.sciencedaily.com/releases/2005/05/050504180149.htm">Chemical
+Guidebook May Help Mars Rover Track Extraterrestrial Life</a>
+<br /><br />
+<a href="http://video.search.yahoo.com/">video search at yahoo</a>
+<br /><br />
+<a href="http://www.esa.int/esaEO/SEMGSY2IU7E_index_0.html">Envisat making sharpest ever global Earth map</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-07T08_13_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-07T10_27_31.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-06T08_49_40.txt" name="e2005-05-06T08_49_40.txt"></a>
+<h2 class="date">05.06.2005 08:49</h2>
+<div class="blogbody">
+<h3 class="title">mosaicing xrays</h3>
+<div class="item-description">
+I have been thinking about the issues with digital xrays of cores.
+What we have done works pretty well, but we can always do better.
+There are several goals that I have in mind for processing xrays.
+<ul>
+  <li>Make nice mosaics for publications
+  <li>Make mosaics that best show off all of the features in the core
+  <li>Be able to make quantative statements about xray density
+</ul>
+I haven't really figured out any of these issues to any satisfaction,
+but I have lots of ideas.
+<br /><br />
+This morning, I ran into a document on the web about compositing xray
+images from paintings using a system called VIPS:
+<br /><br />
+<a
+href="http://www.vips.ecs.soton.ac.uk/vips-7.6/doc/ipdummies/x-ray/">Working
+With Digital X-ray Images: Some practical image manipulation using
+VIPS/ip 7."</a> by Joseph Padfield.  Some issues are the same, some
+are not.  It would be great to be able to do a good job with whole
+round or half round cores by correcting for both thickness and xray
+emmission issues(e.g. where on the plate the pixel comes from).
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-06T08_49_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-07T08_13_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-06T07_51_28.txt" name="e2005-05-06T07_51_28.txt"></a>
+<h2 class="date">05.06.2005 07:51</h2>
+<div class="blogbody">
+<h3 class="title">Network toolkits and depth level in Open Inventor</h3>
+<div class="item-description">
+Terry Fong based me a CMU tech report yesterday that is pretty cool.
+Jay Gowdy compares network transport packages for robotics.
+<br /><br />
+<a href="http://www.ri.cmu.edu/pubs/pub_3333.html">A Qualitative
+Comparison of Interprocess Communications Toolkits for Robotics</a>
+<br /><br />
+It is missing a some of the things that I consider with network
+toolkits and it is a bit dated at 2000, but definitely a great read.
+<br /><br />
+On another note, I just added a draggable depth line to my xcore
+displays.  I was getting annoyed with trying to figure out what depth
+an object is at and I did not want to go write a ray pick call back.
+This is based on the floating ocean for my Eel River / Humboldt 2002
+project.
+<pre>
+<font color="#FF4400">#Inventor V2.1 ascii
+# Small IV file to give a depth reference line so that I stop
+# spending so much time guessing depths.
+</font>
+Separator {
+    Separator {
+	Transform {
+	    rotation	0 -1 0  1.57
+	}
+	DEF +2 Translate1Dragger {}
+    }
+    Separator {
+	Translation { translation -20 0 5 }
+	Scale { scaleFactor .3 .3 .3 }
+	RotationXYZ { axis X angle 1.57 }
+	Text3 { string <font color="#008000">&quot;Depth in cm&quot;</font> = 
+		Calculator {
+		    C	0 0 0 =
+		    USE +2
+		    . translation
+		    expression	<font color="#008000">&quot;oa = -C[0]&quot;</font>
+		}
+		. oa
+	    }
+    }
+    Translation { translation 5 -.2 0 }
+    Transform {
+	translation	0 0 0 =
+	Calculator {
+	    C	0 0 0 =
+	    USE +2
+	    . translation
+	    expression	<font color="#008000">&quot;oA = vec3f(0,0,C[0])&quot;</font>
+		}
+		. oA
+<br /><br />
+    }
+    Coordinate3 { point [ 
+	    0 0 0,
+	    300 0 0,
+	] }<font color="#FF4400"> # Coord3 </font>
+    IndexedLineSet { coordIndex [
+	    0,     1,     -1,     
+	    ]}<font color="#FF4400"> # IndexedLineSet</font>
+}
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-06T07_51_28.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-06T08_49_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-06T05_16_58.txt" name="e2005-05-06T05_16_58.txt"></a>
+<h2 class="date">05.06.2005 05:16</h2>
+<div class="blogbody">
+<h3 class="title">Mars Polar Lander found?</h3>
+<div class="item-description">
+An article from Sky and Telescope: <a
+href="http://skyandtelescope.com/news/article_1509_1.asp">Mars Polar
+Lander may have been found</a>
+<br /><br />
+<a href="http://home.tiscali.nl/annejan/swf/timeline.swf">Flash timeline</a>
+<br /><br />
+<a
+href="http://bitworking.org/news/Sparklines_in_data_URIs_in_Python">Sparklines
+with python</a> - those weird little inline graphics.
+<br /><br />
+<a href="http://www.jwz.org/picturetile/">JWZ on Picturetile</a> part 2.
+<br /><br />
+<a href="http://www.circlemud.org/~jelson/software/tcpflow/">tcpflow</a>
+<br /><br />
+<a href="http://www-128.ibm.com/developerworks/power/library/pa-macmini3/?ca=dgr-lnxw07MacMiniP3">An embedded view of the Mac mini, Part 3: Rapidly prototype an embedded application</a> at IBM dev works
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-06T05_16_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-06T07_51_28.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-04T13_47_46.txt" name="e2005-05-04T13_47_46.txt"></a>
+<h2 class="date">05.04.2005 13:47</h2>
+<div class="blogbody">
+<h3 class="title">python stuff</h3>
+<div class="item-description">
+<a
+href="http://freshmeat.net/projects/tclpython/?branch_id=13130&release_id=195117">tclpython</a>
+- Calling python code from within Tcl.
+<br /><br />
+<a
+href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/412982">Contact
+sheet of images</a> using PIL.  Maybe this will be better than what I
+was doing with JWZ's code that would not work do to a broken image
+magick on OSX.
+<br /><br />
+<a href="http://www.usatoday.com/tech/science/space/2005-05-03-mars-polar-lander-search_x.htm?csp=N007&RM_Exclude=Juno&POE=click-refer">Search Resumes for the Mars Polar Lander</a> (MPL)
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-04T13_47_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-06T05_16_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-03T02_49_35.txt" name="e2005-05-03T02_49_35.txt"></a>
+<h2 class="date">05.03.2005 02:49</h2>
+<div class="blogbody">
+<h3 class="title">Dulles airport</h3>
+<div class="item-description">
+It's 2:40 AM PST in the Dulles airport with 2 hours until my next
+flight, so it is time to catch up a on few links sitting in my
+laptop's dock.
+<br /><br />
+<a
+href="http://nsf.gov/news/news_summ.jsp?cntn_id=104101&org=olpa&from=news">Lake
+Tahoe</a> makes the top of NSF's news.
+<br /><br />
+<a href="http://www.emagin.com/3dvisor/html/product.htm">Z800 3D
+Visor</a> - Yet another head mounted display.  No head tracking?
+<br /><br />
+<a href="http://www.freephotoshop.com/index.htm">Freephotoshop.com</a>
+- Brushes, etc.
+<br /><br />
+<a href="http://www.sciencedaily.com/releases/2005/05/050502094459.htm">Geologists' Find Is Evolutionary</a>
+<pre>
+  Geologists believe that Earth experienced at least three global ice
+  ages from 800 to 580 million years ago (mya) during the
+  Neoproterozoic Era, at the end of the Precambrian Age. In most
+  places, evidence of the glaciations has disappeared, but traces
+  remain in several areas with "cap carbonates," thin layers of
+  limestone containing distinctive ratios of carbon isotopes. "When
+  the ice melts, the oceans rapidly precipitate carbonate, which
+  appears in the sedimentary rock," explains one of the geologists,
+  Daniel Condon, a postdoctoral fellow in geology/geochemistry. "Cap
+  carbonates are very unusual and restricted to glacial periods in the
+  Neoproterozoic."
+</pre>
+<a href="http://www.coyotegulch.com/reviews/gcc4/index.html">GCC 4.0
+review</a>
+<br /><br />
+<a href="http://home.sol.se/michael/qtguide/">Hackers guide to QT</a>
+<br /><br />
+<a
+href="http://spyced.blogspot.com/2005/04/how-well-do-you-know-python-part-6.html">How
+well do you know python</a> - Say what?  Maybe it is that I am reading
+this in the middle of the night.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-03T02_49_35.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-04T13_47_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2005-05-01T06_59_22.txt" name="e2005-05-01T06_59_22.txt"></a>
+<h2 class="date">05.01.2005 06:59</h2>
+<div class="blogbody">
+<h3 class="title">why updatedb has been filling my disk</h3>
+<div class="item-description">
+I have been dealing with daily find/sort issues stemming from the fink
+locate/updatedb system.  Here are some posts about this.
+<br /><br />
+<pre>
+&gt;&gt;&gt;&gt; When I run updatedb from findutils in fink, I get this error:
+&gt;
+&gt;&gt;&gt; Does /usr/bin/find have the same problem?
+&gt;
+&gt;&gt; It doesn't say it does.
+&gt;
+&gt; Sorry to bother everyone, but found a fix. I added fsdec to the list 
+&gt; of fstypes to prune, and it worked fine (/dev/fd/3 couldn't be 
+stat'd)
+&gt; Maybe we can still track down why it says the hard link count is 
+&gt; incorrect though; if it doesn't have that error there is a very nice 
+&gt; speed boost because it doesn't stat each file then.
+&gt;
+Hey folks,
+<br /><br />
+I'd like to add that this is a *critical* bug, and it occurs on 10.3, 
+too -- maybe the new findutils version introduce the problem?
+<br /><br />
+Today and yesterday my HD run full. The problem is that apparently, for 
+updatedb /dev/fd/3 is an alias for /. So when updatedb scans my FS, it 
+gets into an infinite recursion loop. In my case it created about 15 GB 
+of temp files (indexing the "infinitely many files" on my HD), before 
+it run out of HD space.
+<br /><br />
+Running out of HD space is rather dangerous, if you notice it too late 
+it can cause data loss (10.3 really tries to warn you about this, but 
+if your machine is running while you are absent, as in my case, you can 
+be too late)...
+</pre>
+<br /><br />
+Hula Girl hot sauces
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2005-05.html#e2005-05-01T06_59_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2005-05-03T02_49_35.html#comments">Comments</a> -->
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="links">
+
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary="Calendar with links to days with entries">
+<caption class="calendarhead">May 2005</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+             
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-01T06_59_22.txt">1</a></span></td>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-03T02_49_35.txt">3</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-04T13_47_46.txt">4</a></span></td>
+<td align="center"><span class="calendar">5</span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-06T08_49_40.txt">6</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-07T13_40_01.txt">7</a></span></td>
+</tr>
+<tr>
+        
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-08T21_00_30.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-09T14_20_24.txt">9</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-10T19_36_38.txt">10</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-11T18_49_29.txt">11</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-12T09_29_12.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-13T19_12_10.txt">13</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-14T14_07_35.txt">14</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-15T13_20_04.txt">15</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-16T19_21_45.txt">16</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-17T13_52_27.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-18T18_34_56.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-19T08_09_14.txt">19</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-20T21_58_13.txt">20</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-21T21_57_42.txt">21</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-22T19_26_11.txt">22</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-23T19_41_13.txt">23</a></span></td>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-25T13_58_31.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-26T10_02_47.txt">26</a></span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-28T12_05_00.txt">28</a></span></td>
+</tr>
+<tr>
+  
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-29T09_25_58.txt">29</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-30T15_00_30.txt">30</a></span></td>
+<td align="center"><span class="calendar"><a href="2005-05.html#e2005-05-31T19_52_41.txt">31</a></span></td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<br clear="all" />
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+TITLE: Where was the SR162g AIS receiver tested?
+AUTHOR: Kurt
+DATE: 03.03.2008 20:13
+DESC: where is the world?
+-----
+BODY:
+I just got another batch of AIS receivers.  This time I got a SR162g
+with a GPS instead for the straight SR162 units that I have been
+getting.  I was getting weird results from the unit.  I was expecting
+to get the location for my office or 0,0, but instead I was getting
+some other strange numbers.  The I realized that this is probably the
+test facility for these devices.
+<pre>
+% <b>serial-logger -p /dev/tty.USA49W4b433P1.1  --uscg -s ccom-152-162g -v</b>
+$AITXT,01,01,91,FREQ,2087,2088*57,rccom-152-162g,1204575527.29
+!AIVDM,1,1,,A,152GeG@P00Js@cnHccGP0?wL06Q8,0*15,rccom-152-162g,1204575527.76
+&,rccom-152-162g,1204575529.36
+RX YACHT AIS Receiver v1.3,rccom-152-162g,1204575529.37
+RECE FRQ        R1F1619750,rccom-152-162g,1204575529.38
+RECE FRQ        R2F1620250,rccom-152-162g,1204575529.38
+INT RATE        IED00,rccom-152-162g,1204575529.39
+$GPRMC,001522.41,V,2232.3410,N,11404.0099,E,0.10,0.0,030108,2.0,W,N*00,rccom-152-162g,1204575529.66
+!AIVDO,1,1,,,13tfD@?P018::16&lt;qIlP0?vd0000,0*05,rccom-152-162g,1204575529.67
+$GPRMC,001522.41,V,2232.3410,N,11404.0099,E,0.10,0.0,030108,2.0,W,N*00,rccom-152-162g,1204575530.54
+</pre>
+When I decode the AIVDO (which is oddly easier for me than decoding the GPRMC), I get this:
+<pre>
+% <b>ais_msg_1.py -d '!AIVDO,1,1,,,13tfD@?P018::16&lt;qIlP0?vd0000,0*05,rccom-152-162g,1204575548.57'</b>
+position:
+        MessageID:          1
+        RepeatIndicator:    0
+        UserID:             265000000
+        NavigationStatus:   15
+        ROT:                -128
+        SOG:                0.1
+        PositionAccuracy:   0
+        longitude:          114.066831667
+        latitude:           22.5390166667
+        COG:                0
+        TrueHeading:        511
+        TimeStamp:          22
+        RegionalReserved:   0
+        Spare:              0
+        RAIM:               False
+</pre>
+I threw the location at Google Earth and got a building in China right
+next to the border of Hong Kong.
+
+<img src="http://schwehr.org/blog/attachments/2008-03/sr-factory-location.png"/>
+
+It took quite a while, but the unit finally did lock up on the GPS signals.
+<pre>
+!AIVDO,1,1,,,13tfD@?P0EJs@jTHcc=4igvt0000,0*61,rccom-152-sr162g,1204583190.51
+$GPRMC,222631.15,A,4308.1396,N,07056.4007,W,1.08,122.2,030308,15.0,W,A*34,rccom-152-sr162g,1204583191.5
+</pre>
+-----

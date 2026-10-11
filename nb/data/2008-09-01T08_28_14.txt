@@ -1,0 +1,57 @@
+TITLE: AIS parsing trouble
+AUTHOR: Kurt
+DATE: 09.01.2008 08:28
+DESC: oops
+-----
+BODY:
+Loic has found two more trouble spots with noaadata parsing AIS messages.
+I very much appreciate bug reports.
+
+I didn't notice that '<b>"</b>' is a validate AIS 6 bit text value for strings:
+<pre>" 34 0x22 10 0010</pre>
+That means that my database code (which is not up to the python db
+standards) will put a double quote ("") before the name.  Why people put
+quotes in their name field, Idonno, but I should handle this case properly and I don't.
+<pre> % <b>./ais_msg_5.py -v -d '!AIVDM,1,1,3,A,544MVC027obuD&lt;u40028lDdP4pTf1T59A&lt;EJ80168@C;36?h0=SPCU1Dh00000000000000,2*7F'</b>
+shipdata:
+    MessageID:        5
+    RepeatIndicator:  0
+    UserID:           273114700
+    AISversion:       0
+    IMOnumber:        8904367
+    callsign:         UCOQ@@@
+    name:             "MEKHANIK YARTSEV"@@
+    shipandcargo:     70
+    dimA:             66
+    dimB:             19
+    dimC:             11
+    dimD:             3
+    fixtype:          1
+    ETAminute:        35
+    ETAhour:          30
+    ETAday:           0
+    ETAmonth:         0
+    draught:          5.4
+    destination:      NANTES@@@@@@@@@@@@@@
+    dte:              0
+    Spare:            0
+</pre>
+This is one of those messages where you have to know the size to know
+how many segments are in the message.  Turns out that if you don't
+fill all the blocks, AIS sends fewer bits than a slot.  This reduces
+the chances that you will have bit errors in your message.  Shorter
+messages are supposed to be a good thing and I've heard people say
+that 5 slot messages are a really bad idea.
+<pre> % <b>./ais_msg_15.py -v -d '!AIVDM,1,1,,A,?03OvkiGRP7P000,2*31'</b>
+Traceback (most recent call last):
+  File "./ais_msg_15.py", line 902, in &lt;module&gt;
+    printFields(decode(bv)
+  File "./ais_msg_15.py", line 186, in decode
+    r['MessageID2']=int(bv[126:132])
+  File "/Users/loic/Development/Marine/_AISFON/noaadata-py-0.40/ais/BitVector.py", line 1080, in __getslice__
+    return BitVector( bitlist = slicebits )                      #(c6)
+  File "/Users/loic/Development/Marine/_AISFON/noaadata-py-0.40/ais/BitVector.py", line 725, in __init__
+    raise ValueError("wrong arg(s) for constructor")        #(A68)
+ValueError: wrong arg(s) for constructor 
+</pre>
+-----

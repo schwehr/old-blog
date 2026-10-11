@@ -1,0 +1,83 @@
+TITLE: Old Hydrosweep Data
+AUTHOR: Kurt
+DATE: 12.28.2008 22:01
+DESC: when we only had 40 beams
+-----
+BODY:
+Was looking at some older files and ran into my old Hydrosweep data of
+the Eel River / Humboldt area from my <a
+href="http://vislab-ccom.unh.edu/~schwehr/TTN136B/">TTN136B</a> cruise
+during Nov 2001.  I'm pretty sure this data has never been used and it
+does not seem to appear in any database.  The Hydrosweep system is a
+pretty weak by today's standards and is no longer on the R/V Thompson.
+Here is a quick look generated on a mac:
+
+<pre>% <b>wget http://vislab-ccom.unh.edu/~schwehr/TTN136B/Data/hysweep/TN136HS.306.bz2</b>
+% <b>bunzip2 TN136HS.306.bz2</b>
+% <b>mbm_plot -F21 -ITN136HS.306 -G2 -N</b>
+% <b>./TN136HS.306.cmd</b>
+% <b>open TN136HS.306.ps</b>
+% <b>convert -rotate 90 TN136HS.306.ps TN136HS.306.png</b>
+% <b>display TN136HS.306.png</b></pre>
+<img title="Humboldt/Eel Hydrosweep survey" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-12/TN136HS.306.png"/>
+
+It is interesting to see that mbsystem doesn't recognize the file type
+and that the file format is ASCII...
+<pre>
+ERGNMESS
+-124.9828643 +40.757629320011101235951  41840103.8      +.2     +5.2B -.40001 2706.41.00 1
+29  72 144 215 288 360 433 506 578 655 730 808 883 963104511271208129413821475156416501750184719472057218622952408   0
+292706270327032706270527022702269226972693269626882689269026882680268126792683267426572658265126422642265926462632   0
+29  70 142 214 286 359 433 507 583 657 731 813 893 9711054114512301314141015131606170118041899201721382240238525182575
+2927062714271327102712271627192722271427082723272527162719273727352727273727562750274427442729274127492729275327542672
+ERGNSLZT
+-124.9828643 +40.757629320011101235951103.8106.5     +5.5 +0    -.4  +.60360090.0010
+2936023602360836203631364036583663369237123744376438003839387839113960401140744122416042344298436644554579465947460000
+2936023616362236263640366036803704371637323782381638393880394839914028409841844239429843714426453046354699484849674939
+103.7103.6103.6103.6103.6103.6103.6103.6103.6103.7103.7
+ERGNAMPL
+-124.9828643 +40.757629320011101235951D239236239110511512208000269211094149992 +2.72363342
+2222333329244194115069132117116115048053073083054067072067096103110131130116140122120103144104000
+3333222229082122166132065099069100183132063093093060051155132096114145097121105090109094072070048
+2222333329334302141231128141141077303286251312677364616616110103103080083131128165120210096283000
+3333332229334141192225372090443047024017063041040076114064091145088046160124130204183235291233364
+...</pre>
+I found a copy of the documentation online here: <a href="http://epic.awi.de/Publications/Gee1996a.pdf">INTERFACE SPECIFICATION
+ATLAS HYDRO SWEEP DS
+MAGNETIC TAPE RECORDING
+Issued by: V.Geering
+</a>
+
+<b>Updates 29-Dec-2008</b>: 
+
+Monica wrote a blog post yesterday that goes into detail of trying out
+MB-System: <a
+href="http://the-moni-blog.blogspot.com/2008/12/mb-system-free-open-source-sonar-data.html">MB-System:
+free, open-source sonar data editing software!</a>
+
+
+Dale C. points out that if I properly
+named my data file as TN136HS.306.mb21, then all would work and
+MB-System would not need the -F21 command line argument.
+<pre>% <b>mbinfo -I TN136HS.306.mb21</b>
+<!-- -->
+Swath Data File:      TN136HS.306.mb21
+MBIO Data Format ID:  21
+Format name:          MBF_HSATLRAW
+Informal Description: Raw Hydrosweep
+Attributes:           Hydrosweep DS, bathymetry and amplitude, 59 beams,
+                      ascii, Atlas Electronik.
+<!-- -->
+Data Totals:
+Number of Records:                       12504
+Bathymetry Data (59 beams):
+  Number of Beams:           737736
+  Number of Good Beams:      718351     97.37%
+  Number of Zero Beams:       19385      2.63%
+  Number of Flagged Beams:        0      0.00%
+Amplitude Data (59 beams):
+  Number of Beams:           737736
+  Number of Good Beams:      718351     97.37%
+  Number of Zero Beams:       19385      2.63%
+  Number of Flagged Beams:        0      0.00%</pre>
+-----

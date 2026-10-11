@@ -1,0 +1,51 @@
+TITLE: segy-py does it again
+AUTHOR: Kurt
+DATE: 07.13.2005 10:39
+DESC: ship track for a figure
+-----
+BODY:
+I just made use of segy-py to help with a figure.  I wanted the shot
+position x,y (lon/lat) pairs for the shots in my seismic figure of the
+Santa Barbara Crack. SBC - am I in trouble yet?  I just used the
+database!
+<pre>
+  sqlite segy.db 'select x/3600.0,y/3600.0 from segyTrace \
+    where Shotpoint&gt;=82000 and Shotpoint<=84000' \
+    | tr '|' ' '\
+    &gt; ~/Desktop/core4-fig.xy
+</pre>
+Which gives:
+<pre>
+ head -1 ~/Desktop/core4-fig.xy 
+    -120.058333333333 34.3691666666667
+
+ tail -1 ~/Desktop/core4-fig.xy 
+    -119.553333333333 34.3786111111111
+</pre>
+Now there is a problem.  The shot number got reset a few times
+throughout the cruise.  The solution is to plot the cores at the same
+time just to make sure.  loc.dat:
+<pre>
+  -120.05883333 34.36566666 
+  -120.05716666 34.37899999 
+</pre>
+Then gnuplot&gt; plot 'core4-fig.xy' with lp, 'loc'<br>
+<img src="http://schwehr.org/blog/attachments/2005-07/track1.gif"><br>
+Now we need a better query that uses some geographic bounding to avoid
+the other shot numbers!
+<pre>
+  sqlite segy.db 'select x/3600.0,y/3600.0 from segyTrace where \
+    Shotpoint&gt;=82000 and Shotpoint&lt;=84000 and y&gt;34.36*3600 and \
+    x&lt;-119.8*3600' \
+    | tr '|' ' ' \
+    &gt; ~/Desktop/core4-fig.xy 
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-07/track2.gif">
+Notice that you can see the issues with the GPS logging that are in
+the xstar format files.
+
+On a totally different topic: <a
+href="http://www.stani.be/python/sdxf/blog/">sdcf</a> is a python
+library for writing DXF CAD files.  However, I can't tell if this
+library can read in DXF.
+-----

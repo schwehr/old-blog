@@ -1,0 +1,155 @@
+TITLE: Huge resource of Deepwater Horizon information
+AUTHOR: Kurt
+DATE: 04.30.2011 10:06
+DESC: overwhelming
+-----
+BODY:
+I was just looking at the UC Berkeley <a
+href="http://ccrm.berkeley.edu/">Center for Catastrophic Risk
+Management (CCRM)</a> <a
+href="http://ccrm.berkeley.edu/deepwaterhorizonstudygroup/">Deepwater
+Horizon Study Group (DHSG)</a> final report and saw their reference to
+their document archive.  1405 entries is lot of information... to much
+for me to really deal with.  They have a <a
+href="http://calmap.gisc.berkeley.edu/dwh_parse.html">database
+search</a> and a link for <a
+href="http://calmap.gisc.berkeley.edu/cgi-bin/dwh_parse.pl?alldocs=select+docpath%2C+filename+from+dwh_doc_lib+order+by+filename">all
+the entries</a>.  You can see the files <a href="http://calmap.gisc.berkeley.edu/dwh_doc_link/">in apache generated indexes of directories</a>.
+
+<img title="Deepwater Horizon Study Group (DHSG) document database"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2011-04/dhsg-db-all.png"/>
+
+This was a chance for me to breakout BeautifulSoup, which I've never
+used before.  It is a tool designed to handle the goo that is normal
+HTML web pages.  It certainly did the trick here.  My goal was to
+create a BibTex file that would get me started looking through the
+documents and to be able to pull down all of the files with one
+script.  For each file, there is also a text file, so I would go crazy
+trying to download everything.  Before I dig into the code, here are
+the results.
+
+I made two bib files.  If I could download the document successfully,
+I put it in a <a
+href="http://vislab-ccom.unh.edu/~schwehr/dwh/dhsg/dhsg.bib.bz2">dhsg.bib.bz2</a>
+(938 entries) and if I couldn't, it went in <a
+href="http://vislab-ccom.unh.edu/~schwehr/dwh/dhsg/dhsg-bad.bib.bz2">dhsg-bad.bib.bz2</a>
+(467 entries).  I loaded the dhsg.bib into JabRef and did an html
+export: <a
+href="http://vislab-ccom.unh.edu/~schwehr/dwh/dhsg/dhsg-bibtec.html">dhsg-bibtex.html</a>
+
+<img title="DHSG document database - BibTex in html"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2011-04/dhsg-bibtex.png"/>
+
+Clearly this is not great, but hopefully someone with the time can
+take it and look through the documents quickly and turn this into a
+bibtex with years, real titles, and abstracts.  I have uploaded the
+zip of all the pdf, doc, and txt files.  I probably won't leave this
+online for too long as it is 694MB compressed.
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/dwh/dhsg/dhsg.zip">dhsg.zip</a>
+
+In case you are interested, here is the code that produced the bib file based on the listing of all documents.  I've made a snapshot of the file here:
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/dwh/dhsg/dhsg-webpage.html.bz2">dhsg-webpage.html.bz2</a>
+
+Here is what one entry looks like:
+
+<pre><tt><b><font color="#0000FF">&lt;tr&gt;</font></b>
+		<b><font color="#0000FF">&lt;td&gt;&lt;font</font></b> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">2 face</font>=<font color="#009900">helvetica</font><b><font color="#0000FF">&gt;</font></b> <b><font color="#0000FF">&lt;A</font></b> <font color="#009900">href</font><font color="#990000">=</font><font color="#FF0000">"http://calmap.gisc.berkeley.edu/dwh_doc_link/DHSG_White_Papers/Technical_White_Papers/White_Paper_Edits/11-01-07_DR_DHSG_Underwater+Investigation+Salvage.doc"</font><b><font color="#0000FF">&gt;</font></b>11-01-07_DR_DHSG_Underwater+Investigation+Salvage.doc<b><font color="#0000FF">&lt;/A&gt;&lt;/td&gt;</font></b> 
+		<b><font color="#0000FF">&lt;td&gt;&lt;font</font></b> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">2 face</font>=<font color="#009900">helvetica</font><b><font color="#0000FF">&gt;</font></b> <b><font color="#0000FF">&lt;/td&gt;</font></b> 
+		<b><font color="#0000FF">&lt;td&gt;&lt;font</font></b> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">2 face</font>=<font color="#009900">helvetica</font><b><font color="#0000FF">&gt;</font></b> /DHSG_White_Papers/Technical_White_Papers/White_Paper_Edits/<b><font color="#0000FF">&lt;/td&gt;</font></b>
+<b><font color="#0000FF">&lt;/tr&gt;</font></b></tt></pre>
+And here is the code that parses the whole deal. It's more complicated
+that it should have to be to try to deal with a unicode character that
+was in one of the entries.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> BeautifulSoup <b><font color="#000080">import</font></b> BeautifulSoup
+<b><font color="#000080">import</font></b> urllib2
+<b><font color="#000080">import</font></b> sys
+<!-- -->
+file_types <font color="#990000">=</font> <font color="#990000">{</font><font color="#FF0000">'PDF'</font><font color="#990000">:</font><font color="#FF0000">'PDF'</font><font color="#990000">,</font> <font color="#FF0000">'DOC'</font><font color="#990000">:</font><font color="#FF0000">'Word'</font><font color="#990000">}</font>
+<!-- -->
+entry_template<font color="#990000">=</font><font color="#FF0000">'''@MISC{{{key},</font>
+<font color="#FF0000">  title = {{{title}}},</font>
+<font color="#FF0000">  file = {file_entry},</font>
+<font color="#FF0000">  url = {{{url}}}</font>
+<font color="#FF0000">}}'''</font>
+<!-- -->
+bib_good <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'good.bib'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+bib_bad <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'bad.bib'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+<!-- -->
+html <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'dhsg-webpage.html'</font><font color="#990000">).</font><b><font color="#000000">read</font></b><font color="#990000">()</font>
+soup <font color="#990000">=</font> <b><font color="#000000">BeautifulSoup</font></b><font color="#990000">(</font>html<font color="#990000">)</font>
+<b><font color="#0000FF">for</font></b> row_num<font color="#990000">,</font>row <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>soup<font color="#990000">.</font><b><font color="#000000">findAll</font></b><font color="#990000">(</font><font color="#FF0000">'tr'</font><font color="#990000">)):</font>
+    cols <font color="#990000">=</font> row<font color="#990000">.</font><b><font color="#000000">findAll</font></b><font color="#990000">(</font><font color="#FF0000">'td'</font><font color="#990000">)</font>
+    a <font color="#990000">=</font> cols<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">].</font><b><font color="#000000">find</font></b><font color="#990000">(</font><font color="#FF0000">'a'</font><font color="#990000">)</font> <i><font color="#9A1900"># find the "&lt;a href" tag</font></i>
+    <b><font color="#0000FF">if</font></b> a <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font> <i><font color="#9A1900"># Skip header entries with no link</font></i>
+        <b><font color="#0000FF">continue</font></b>
+    url <font color="#990000">=</font> a<font color="#990000">.</font><b><font color="#000000">get</font></b><font color="#990000">(</font><font color="#FF0000">'href'</font><font color="#990000">)</font>
+    extension <font color="#990000">=</font> url<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'.'</font><font color="#990000">)[-</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">upper</font></b><font color="#990000">()</font>
+    title <font color="#990000">=</font> a<font color="#990000">.</font>string
+<!-- -->
+    cat <font color="#990000">=</font> cols<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">].</font>font<font color="#990000">.</font>string<font color="#990000">.</font><b><font color="#000000">strip</font></b><font color="#990000">()</font>
+    cat <font color="#990000">=</font> cat<font color="#990000">.</font><b><font color="#000000">strip</font></b><font color="#990000">(</font><font color="#FF0000">'/'</font><font color="#990000">)</font>
+<!-- -->
+    <i><font color="#9A1900"># There was a unicode character in one entry</font></i>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        url <font color="#990000">=</font> <b><font color="#000000">str</font></b><font color="#990000">(</font>url<font color="#990000">)</font>
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        url <font color="#990000">=</font> url<font color="#990000">.</font><b><font color="#000000">replace</font></b><font color="#990000">(</font>u<font color="#FF0000">'\u2013'</font><font color="#990000">,</font><font color="#FF0000">'-'</font><font color="#990000">)</font>
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            url <font color="#990000">=</font> <b><font color="#000000">str</font></b><font color="#990000">(</font>url<font color="#990000">)</font>
+        <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">continue</font></b>
+    url <font color="#990000">=</font> <b><font color="#000000">str</font></b><font color="#990000">(</font>url<font color="#990000">)</font>
+    title <font color="#990000">=</font> <b><font color="#000000">str</font></b><font color="#990000">(</font>title<font color="#990000">)</font>
+<!-- -->
+    ok <font color="#990000">=</font> True
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        f <font color="#990000">=</font> urllib2<font color="#990000">.</font><b><font color="#000000">urlopen</font></b><font color="#990000">(</font>url<font color="#990000">,</font> None<font color="#990000">,</font> timeout<font color="#990000">=</font><font color="#993399">120</font><font color="#990000">)</font>
+        data <font color="#990000">=</font> f<font color="#990000">.</font><b><font color="#000000">read</font></b><font color="#990000">()</font>
+        out <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'files/'</font><font color="#990000">+</font>title<font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>data<font color="#990000">)</font>
+        out<font color="#990000">.</font><b><font color="#000000">close</font></b><font color="#990000">()</font>
+        <b><font color="#0000FF">pass</font></b>
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        ok <font color="#990000">=</font> False
+        sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'Unable to open: "'</font><font color="#990000">+</font>url<font color="#990000">+</font><font color="#FF0000">'"\n'</font><font color="#990000">)</font>
+<!-- -->
+    have_txt <font color="#990000">=</font> True
+    txt_filename <font color="#990000">=</font> <font color="#FF0000">''</font>
+    <b><font color="#0000FF">if</font></b> ok<font color="#990000">:</font>
+        url2 <font color="#990000">=</font> url<font color="#990000">[:-</font><font color="#993399">3</font><font color="#990000">]+</font><font color="#FF0000">'txt'</font>
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            f <font color="#990000">=</font> urllib2<font color="#990000">.</font><b><font color="#000000">urlopen</font></b><font color="#990000">(</font>url2<font color="#990000">,</font>None<font color="#990000">,</font> timeout<font color="#990000">=</font><font color="#993399">120</font><font color="#990000">)</font>
+            data <font color="#990000">=</font> f<font color="#990000">.</font><b><font color="#000000">read</font></b><font color="#990000">()</font>
+            txt_filename <font color="#990000">=</font> <font color="#FF0000">'files/'</font><font color="#990000">+</font>title<font color="#990000">[:-</font><font color="#993399">3</font><font color="#990000">]+</font><font color="#FF0000">'txt'</font>
+            out <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font>txt_filename<font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+            out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>data<font color="#990000">)</font>
+            out<font color="#990000">.</font><b><font color="#000000">close</font></b><font color="#990000">()</font>
+        <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+            have_txt <font color="#990000">=</font> False
+<!-- -->
+    <b><font color="#0000FF">if</font></b> have_txt<font color="#990000">:</font>
+        file_entry <font color="#990000">=</font> <font color="#FF0000">'{:files/'</font><font color="#990000">+</font>title<font color="#990000">+</font><font color="#FF0000">':'</font><font color="#990000">+</font>file_types<font color="#990000">[</font>extension<font color="#990000">]+</font><font color="#FF0000">';'</font><font color="#990000">+</font>txt_filename<font color="#990000">+</font> <font color="#FF0000">':Text}'</font>
+    <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+        file_entry <font color="#990000">=</font> <font color="#FF0000">'{:files/'</font><font color="#990000">+</font>title<font color="#990000">+</font><font color="#FF0000">':'</font><font color="#990000">+</font>file_types<font color="#990000">[</font>extension<font color="#990000">]+</font><font color="#FF0000">'}'</font>
+<!-- -->
+    bib_entry <font color="#990000">=</font> entry_template<font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>key<font color="#990000">=</font>row_num<font color="#990000">,</font>title<font color="#990000">=</font>title<font color="#990000">,</font>url<font color="#990000">=</font>url<font color="#990000">,</font>file_entry<font color="#990000">=</font>file_entry<font color="#990000">)</font>
+    <b><font color="#0000FF">if</font></b> ok<font color="#990000">:</font>
+        bib_good<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>bib_entry<font color="#990000">)</font>
+    <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+        bib_bad<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>bib_entry<font color="#990000">)</font></tt></pre>
+After using BeautifulSoup for a little bit, I think it is a very handy
+tool.  It took me a few minutes to figure out that I could just access
+child tags with the dot notation and that if the node was not there, I
+would get back a None.  I'm now thinking about parsing my blog entries
+from nano blogger this way and extracting all the text for keyword
+indexing so that I can build myself a nice bibtex database for all my
+4100 entries and my 1850 delicious bookmarks.  I have 187 Deepwater
+Horizon bookmarks and a lot of them are intended for use in writing
+papers.  Delicious entries are not proper XML entires.  For example:
+<pre><tt>&lt;DT&gt;<b><font color="#0000FF">&lt;A</font></b> <font color="#009900">HREF</font><font color="#990000">=</font><font color="#FF0000">"http://www.nasa.gov/multimedia/imagegallery/image_feature_1649.html"</font> <font color="#009900">ADD_DATE</font><font color="#990000">=</font><font color="#FF0000">"1272401584"</font> <font color="#009900">PRIVATE</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="#009900">TAGS</font><font color="#990000">=</font><font color="#FF0000">"deepwaterhorizon,oilspill,oilplatform,erma"</font><b><font color="#0000FF">&gt;</font></b>NASA - Oil Slick Spreads off Gulf Coast<b><font color="#0000FF">&lt;/A&gt;</font></b></tt></pre>
+-----

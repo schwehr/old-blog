@@ -1,0 +1,51 @@
+TITLE: Annoying GIS data delivery systems
+AUTHOR: Kurt
+DATE: 04.23.2006 14:48
+DESC: grr
+-----
+BODY:
+
+I am hitting the same frustration that I have been going through since
+about 1997.  Why do people wrap data in silly web interfaces such that
+it is impossible to easily specify what data you have fetched and
+track it through a project?  Today I am playing with local GIS data.
+First problem is that it is not that easy to find data sources.  The
+city of <a
+href="http://www.ci.dover.nh.us/planning/GIS/gis.htm">Dover's web
+site</a> says that they will take orders for maps.  Great.  Like they
+are going to give me gmt grids and Fledermaus scene files... I don't
+think so.  I did find the <a
+href="http://www.granit.sr.unh.edu/cgi-bin/load_file?PATH=/data/datacat/index.html">GRANIT</a>
+system at unh.  I found a first dem to pull down, but what it does is
+not that fun.  I get to download a GRANIT.zip for each item that I
+fetch.  When I unzip that file, it unpacks to this:
+<pre>
+-rwxrwxr-x    1044839 Jun 19  2000 dem169.dem
+-rwxrwxr-x      36523 Mar  6 13:21 dem169.html
+</pre>
+Those filenames are helpful (like I know what 169 is!), but what I
+prefer is to be able to pull these files with a sane URL so that I can
+pass along my notes in a useful form to others.  I think along the
+lines of something like this:
+<pre>
+#!/bin/bash
+echo "Fetch all raw data need for project X - ship tracking"
+echo "Region includes Portsmouth, Newington, Dover, Durham, Kittery, "
+echo "New Castle, and Rye areas"
+echo
+echo "DEM's"
+wget http://mygisdatasite.org/nh/portsmouth.dem
+wget http://mygisdatasite.org/nh/newington.dem
+wget http://mygisdatasite.org/nh/dover.dem
+wget http://mygisdatasite.org/nh/durham.dem
+wget http://mygisdatasite.org/nh/kittery.dem
+
+echo
+echo "Fetching completed Fledermaus scene file."
+echo "View with iview3d"
+wget http://mygisdatasite.org/nh/nh-ship-tracking.scene
+</pre>
+Bam!  Someone could start following through how I assembled my data
+and get there much faster than my first time through.  End of rant
+about data availability before I get carried away.
+-----

@@ -1,0 +1,74 @@
+TITLE: mac system_profile command
+AUTHOR: Kurt
+DATE: 02.24.2007 19:02
+DESC: byte order
+-----
+BODY:
+There is a GUI for this on the mac, but dmalloc just pointed me to the
+system_profile command to get more info about a machine in a shell script.
+First example is my laptop:
+<pre>
+Hardware:
+    Hardware Overview:
+      Machine Name: PowerBook G4 15"
+      Machine Model: PowerBook5,4
+      CPU Type: PowerPC G4  (1.1)
+      Number Of CPUs: 1
+      CPU Speed: 1.5 GHz
+      L2 Cache (per CPU): 512 KB
+      Memory: 1 GB
+      Bus Speed: 167 MHz
+      Boot ROM Version: 4.8.6f0
+      Serial Number: *******
+</pre>
+An intel mac desktop:
+<pre>
+Hardware:
+    Hardware Overview:
+      Machine Name: Mac Pro
+      Machine Model: MacPro1,1
+      Processor Name: Dual-Core Intel Xeon
+      Processor Speed: 2.66 GHz
+      Number Of Processors: 2
+      Total Number Of Cores: 4
+      L2 Cache (per processor): 4 MB
+      Memory: 4 GB
+      Bus Speed: 1.33 GHz
+      Boot ROM Version: MP11.005C.B04
+      SMC Version: 1.7f8
+      Serial Number: *****
+</pre>
+And of course, need to have my G5 desktop at work:
+<pre>
+Hardware:
+    Hardware Overview:
+      Machine Name: Power Mac G5 Quad
+      Machine Model: PowerMac11,2
+      CPU Type: PowerPC G5 (1.1)
+      Number Of CPUs: 4
+      CPU Speed: 2.5 GHz
+      L2 Cache (per CPU): 1 MB
+      Memory: 8 GB
+      Bus Speed: 1.25 GHz
+      Boot ROM Version: 5.2.7f1
+      Serial Number: ********
+</pre>
+To go with this... thanks to Vasi for this little byte order test code.  On a PPC Mac:
+<pre>
+touch foo.h; cpp -dM foo.h | grep __BIG_ENDIAN__
+#define __BIG_ENDIAN__ 1
+touch foo.h; cpp -dM foo.h | grep __BIG_ENDIAN__ &gt; /dev/null; echo $?
+0
+touch foo.h; cpp -dM foo.h | grep __LITTLE_ENDIAN__ &gt; /dev/null; echo $?
+1
+</pre>
+Intel Mac:
+<pre>
+touch foo.h; cpp -dM foo.h | grep __BIG_ENDIAN__
+
+touch foo.h; cpp -dM foo.h | grep __BIG_ENDIAN__ &gt; /dev/null; echo $?
+1
+cpp -dM foo.h | grep __LITTLE_ENDIAN__ &gt; /dev/null; echo $?
+0
+</pre>
+-----

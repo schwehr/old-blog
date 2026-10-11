@@ -1,0 +1,59 @@
+TITLE: More python gems/tricks/tips
+AUTHOR: Kurt
+DATE: 11.04.2008 04:47
+DESC: More to learn
+-----
+BODY:
+I was reading Eric Flornzano's trigger article and decided to take a look
+at his non-django posts:
+
+<a href="http://www.eflorenzano.com/blog/post/gems-python/">Gems of Python</a> [Eric Florenzano]
+<ul>
+<li>filter</li>
+<li>itertools.chain</li>
+<li>setdefault</li>
+<li>collections.defaultdict</li>
+<li>zip</li>
+<li>title</li>
+</ul>
+That led me to this:
+<a href="http://ericholscher.com/blog/2008/nov/3/python-gems-my-own/">Python gems of my own</a> [Eric Holscher]
+<ul>
+<li>ulrparse.urlparse</li>
+<li>inspect.getargspec(somefunction)</li>
+<li>Generators</li>
+<li>re.DEBUG</li>
+<li>enumerate ... I do i+=1 all the time.  Time to break the habit</li>
+<li></li>
+</ul>
+Also, Eric Holscher has an article on unittesting for Django... <a
+href="http://ericholscher.com/blog/2008/nov/4/introduction-pythondjango-testing-basic-unit-tests/">Django
+testing: Basic Unit Tests</a>
+
+Here is enumerate:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+l <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'zero'</font><font color="#990000">,</font><font color="#FF0000">'one'</font><font color="#990000">,</font><font color="#FF0000">'two'</font><font color="#990000">,</font><font color="#FF0000">'three'</font><font color="#990000">]</font>
+<b><font color="#0000FF">for</font></b> count<font color="#990000">,</font>number_str <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>l<font color="#990000">):</font>
+    <b><font color="#0000FF">print</font></b> count<font color="#990000">,</font><font color="#FF0000">'...'</font><font color="#990000">,</font>number_str</tt></pre>
+When run:
+<pre> % <b>./enum.py</b>
+0 ... zero
+1 ... one
+2 ... two
+3 ... three</pre>
+Starting from an artibrary number (e.g. 1) is a bit less readable:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> itertools <b><font color="#000080">import</font></b> izip<font color="#990000">,</font> count
+a_list <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'one'</font><font color="#990000">,</font><font color="#FF0000">'two'</font><font color="#990000">,</font><font color="#FF0000">'three'</font><font color="#990000">,</font><font color="#FF0000">'four'</font><font color="#990000">]</font>
+start<font color="#990000">=</font><font color="#993399">1</font>
+<b><font color="#0000FF">for</font></b> i<font color="#990000">,</font>number_str <b><font color="#0000FF">in</font></b> <b><font color="#000000">izip</font></b><font color="#990000">(</font><b><font color="#000000">count</font></b><font color="#990000">(</font>start<font color="#990000">),</font> a_list<font color="#990000">):</font>
+    <b><font color="#0000FF">print</font></b> i<font color="#990000">,</font><font color="#FF0000">'...'</font><font color="#990000">,</font>number_str
+</tt></pre>
+The result:
+<pre>% <b>./enum2.py</b>
+1 ... one
+2 ... two
+3 ... three
+4 ... four</pre>
+More stuff I need to add to my giant template file.
+-----

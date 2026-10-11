@@ -1,0 +1,60 @@
+TITLE: States and shiptracks in mapserver
+AUTHOR: Kurt
+DATE: 01.25.2008 11:47
+DESC: nice!  Google Maps projection
+-----
+BODY:
+With help from Hobu, I was able to get both the states from a
+shapefile and ship tracks from postgis working in a map that is
+projected into the Google epsg:900913 mercator projection.  The trick
+is to specify the projection of each layer.
+<pre>
+MAP
+  SIZE 512 512
+  UNITS METERS
+  EXTENT  -7925000 5240000 -7825000 5400000
+  PROJECTION
+   <font color="#008000">&quot;init=epsg:900913&quot;</font>
+  END
+  LAYER
+    NAME states
+    TYPE POLYGON
+    STATUS DEFAULT
+    PROJECTION
+      <font color="#008000">&quot;init=epsg:4326&quot;</font>
+    END
+    DATA statesp020/statesp020.shp
+    CLASS
+      STYLE
+        OUTLINECOLOR 100 100 100
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+ <font color="orange"> #</font>
+ <font color="orange"> # Now access the database</font>
+ <font color="orange"> #</font>
+  LAYER
+    NAME <font color="#008000">&quot;shiptrack&quot;</font>
+    PROJECTION
+      <font color="#008000">&quot;init=epsg:4326&quot;</font>
+    END
+    CONNECTIONTYPE postgis
+    CONNECTION <font color="#008000">&quot;host=localhost dbname=ais user=postgres port=5432&quot;</font>
+    DATA <font color="#008000">&quot;track from track_lines&quot;</font>
+    TYPE LINE
+    STATUS ON
+    CLASS
+      NAME <font color="#008000">&quot;Ship Tracks&quot;</font>
+      STYLE
+        COLOR 255 0 0
+        WIDTH 2
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+END<font color="orange"> # MAP</font>
+</pre>
+<img src="http://schwehr.org/blog/attachments/2008-01/mapserver-ships-900913.png"/>
+
+<b>Note:</b> Hobu has an RFC in requesting a change to the mapserver projection 
+behavior.  <a href="http://mapserver.gis.umn.edu/development/rfc/ms-rfc-37/">MS RFC 37: MapServer Spatial Reference Improvements and Additions</a>
+-----

@@ -1,0 +1,33 @@
+TITLE: CISCO VPN not working
+AUTHOR: Kurt
+DATE: 05.22.2008 10:19
+DESC: what to do?
+-----
+BODY:
+Sometimes it works, sometimes it doesn't.  But never is there much in
+the way of diagnostics.
+<pre>May 20 21:43:21 laptop com.apple.SystemStarter[34]: Starting Cisco Systems VPN Driver
+May 20 21:43:23 laptop com.apple.SystemStarter[34]: kextload: extension /System/Library/Extensions/CiscoVPN.kext is already loaded
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : attempting to attach to all available ethernet interfaces.
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : checking if we are already attached to interface: en1
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : no, not yet attached to interface: en1
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : interface: en1, filter attached.
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : current MTU for en1 is 1500, saving it.
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : checking if we are already attached to interface: en0
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : no, not yet attached to interface: en0
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : interface: en0, filter attached.
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : current MTU for en0 is 1500, saving it.
+May 20 21:43:28 laptop kernel[0]: CiscoVPN : loading cisco ipsec kernel module.
+May 22 10:11:00 laptop [0x0-0xd20d2].com.cisco.VPNClient[21102]: Could not attach to driver. Is kernel module loaded?
+May 22 10:11:01 laptop [0x0-0xd20d2].com.cisco.VPNClient[21102]: QString::arg(): Argument missing: Error 51: Unable to communicate with the VPN subsystem.
+May 22 10:11:01 laptop [0x0-0xd20d2].com.cisco.VPNClient[21102]:  Please make sure that you have at least one network interface that is currently active
+May 22 10:11:01 laptop [0x0-0xd20d2].com.cisco.VPNClient[21102]:  and has an IP address and start this application again., 4
+May 22 10:11:04 laptop com.apple.launchd[139] ([0x0-0xd20d2].com.cisco.VPNClient[21102]): Exited with exit code: 255</pre>
+The fix:
+<pre>sudo /System/Library/StartupItems/CiscoVPN/CiscoVPN restart
+Stopping Cisco Systems VPN Driver
+kextunload: unload kext /System/Library/Extensions/CiscoVPN.kext succeeded
+Starting Cisco Systems VPN Driver
+kextload: /System/Library/Extensions/CiscoVPN.kext loaded successfully</pre>
+Now the CISCO VPN client works!
+-----

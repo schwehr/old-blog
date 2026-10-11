@@ -1,0 +1,50 @@
+TITLE: Slashdot on emacs tricks
+AUTHOR: Kurt
+DATE: 11.09.2008 17:04
+DESC: too many tricks
+-----
+BODY:
+<a href="http://news.slashdot.org/article.pl?sid=08/11/07/0533222">(Stupid) Useful Emacs Tricks?</a> [Ask Slashdot]  First, try these:
+
+<pre>M-x tetris
+M-x doctor
+M-x yow
+M-x phases-of-moon
+M-x hanoi
+M-x spook</pre>
+And for your .emacs file:
+<pre>
+;; remote compile support
+(setq remote-compile-host "hostname")
+(setq remote-shell-program "/usr/bin/ssh")
+(setq default-directory "/home/username/compileDir")
+;; remote edit of files:
+(require 'tramp)
+(setq tramp-default-method "scp")
+;in one's .emacs file. Then open remote files with:
+;/username@host:remote_path
+;/ssh:example.com:/Users/someone/.emacs
+;C-x C-f /sudo::/path/to/file, or su: C-x C-f /root@localhost:/path/to/file.
+;
+(setq inhibit-startup-message t)
+(menu-bar-mode -1)
+; Put backup files not in my directories
+(setq backup-directory-alist `(("." . ,(expand-file-name "~/.emacs-backup"))))
+;
+(global-set-key "\C-x\C-e" 'compile)
+(global-set-key "\C-x\C-g" 'goto-line)
+;; setup function keys
+(global-set-key [f1] 'compile)
+(global-set-key [f2] 'next-error)
+(global-set-key [f3] 'manual-entry)
+;
+(display-time)
+(setq compile-command "make ")
+(fset 'yes-or-no-p 'y-or-n-p) ; stop forcing me to spell out "yes"
+</pre>
+and
+<ul><li><a href="http://stein.bioch.dundee.ac.uk/~charlie/software/pdb-mode/">pdb-mode</a> - Python debugger mode for emacs.
+<li><a href="http://ess.r-project.org/">http://ess.r-project.org/</a>- Emacs Speaks statistics - (R)</li>
+<li><a href="http://www.emacswiki.org/emacs/EmacsNiftyTricks">http://www.emacswiki.org/emacs/EmacsNiftyTricks</a></li>
+</ul>
+-----

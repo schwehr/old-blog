@@ -1,0 +1,92 @@
+TITLE: GDAL gdaldem color and shaded relief
+AUTHOR: Kurt
+DATE: 12.07.2009 10:09
+DESC: slow and steady
+-----
+BODY:
+I am working towards the final product.  I want a colored shaded relief image of the terrain to splat on Google Earth using gdal.  I started out doing the hillshade:
+<pre><b>~/local/bin/gdaldem hillshade H11657_1of5_1m_Final_Depth.grd hillshade.tif</b>
+<b>open hillshade.tif</b></a></pre>
+Unfortunetly, Apple's Preview mangles the large grayscale image:
+
+<img title="Preview makes the results look terrible" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/gdal-hillshade-in-preview.png"/>
+
+Opening the image in Photoshop, it looks just fine:
+
+<img title="Nice looking hillshade/shaded relief" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/gdal-hillshade.png"/>
+
+Then I needed the colored version, but I needed to create the color ramp.  I know that gmt does a nice job with it's default grd2cpt:
+<pre><b>grd2cpt H11657_1of5_1m_Final_Depth.grd</b>
+#       cpt file created by: grd2cpt H11657_1of5_1m_Final_Depth.grd
+#COLOR_MODEL = +HSV
+#
+-18.7246704102  285     1       1       -18.6818471085  285     1       1
+-18.6818471085  255     1       1       -15.7773623013  255     1       1
+-15.7773623013  225     1       1       -13.6830275878  225     1       1
+-13.6830275878  195     1       1       -11.8935142402  195     1       1
+-11.8935142402  165     1       1       -10.2208589862  165     1       1
+-10.2208589862  135     1       1       -8.54820373221  135     1       1
+-8.54820373221  105     1       1       -6.75869038467  105     1       1
+-6.75869038467  75      1       1       -4.66435567113  75      1       1
+-4.66435567113  45      1       1       -1.75987086396  45      1       1
+-1.75987086396  15      1       1       0       15      1       1
+B       0       0       0
+F       0       0       1
+N       0       0       0.501960784314
+</pre>
+However, gdaldem needs RGB colors.  I wrote this little python script to convert
+the cpt to RGB:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> colorsys
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">cpt2rgb</font></b><font color="#990000">(</font>h<font color="#990000">,</font>s<font color="#990000">,</font>v<font color="#990000">):</font>
+<i><font color="#9A1900">    'input in cpt style... h 0..255 s and v 0.0 to 1.0'</font></i>
+    h <font color="#990000">=</font> fields<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]</font> <font color="#990000">/</font> <font color="#993399">360</font><font color="#990000">.</font>
+    s <font color="#990000">=</font> fields<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">]</font>
+    v <font color="#990000">=</font> fields<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">]</font>
+    rgb <font color="#990000">=</font> colorsys<font color="#990000">.</font><b><font color="#000000">hsv_to_rgb</font></b><font color="#990000">(</font>h<font color="#990000">,</font>s<font color="#990000">,</font>v<font color="#990000">)</font>
+    <b><font color="#0000FF">return</font></b> <font color="#990000">[</font><b><font color="#000000">int</font></b><font color="#990000">(</font>color<font color="#990000">*</font><font color="#993399">255</font><font color="#990000">)</font> <b><font color="#0000FF">for</font></b> color <b><font color="#0000FF">in</font></b> rgb<font color="#990000">]</font>
+<!-- -->
+colors <font color="#990000">=</font> <font color="#990000">[]</font>
+<b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'cpt'</font><font color="#990000">):</font>
+    <b><font color="#0000FF">if</font></b> line<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <b><font color="#0000FF">in</font></b> <font color="#990000">(</font><font color="#FF0000">'#'</font><font color="#990000">,</font><font color="#FF0000">'B'</font><font color="#990000">,</font><font color="#FF0000">'N'</font><font color="#990000">,</font><font color="#FF0000">'F'</font><font color="#990000">):</font>
+        <b><font color="#0000FF">continue</font></b>
+    fields <font color="#990000">=</font> <font color="#990000">[</font><b><font color="#000000">float</font></b><font color="#990000">(</font>field<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> field <b><font color="#0000FF">in</font></b> line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()]</font>
+    colors<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font> <b><font color="#000000">cpt2rgb</font></b> <font color="#990000">(*</font>fields<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">:</font><font color="#993399">4</font><font color="#990000">])</font> <font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> i<font color="#990000">,</font>color <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>colors<font color="#990000">):</font>
+    color <font color="#990000">=</font> <font color="#990000">(</font><b><font color="#000000">int</font></b><font color="#990000">(</font><b><font color="#000000">float</font></b><font color="#990000">(</font>i<font color="#990000">)/</font><b><font color="#000000">len</font></b><font color="#990000">(</font>colors<font color="#990000">)*</font><font color="#993399">100</font><font color="#990000">),</font> <font color="#990000">)</font> <font color="#990000">+</font> <b><font color="#000000">tuple</font></b><font color="#990000">(</font>color<font color="#990000">)</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'%d%% %3d %3d %3d'</font> <font color="#990000">%</font> color
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'nv    0   0   0'</font></tt></pre>
+Running that gives me a percent ramp that I can use on any bathy file:
+<pre><b>./cpt2gdal.py</b>
+0% 191   0 255
+10%  63   0 255
+20%   0  63 255
+30%   0 191 255
+40%   0 255 191
+50%   0 255  63
+60%  63 255   0
+70% 191 255   0
+80% 255 191   0
+90% 255  63   0
+nv    0   0   0</pre>
+I am now ready to create the color file:
+<pre><b>~/local/bin/gdaldem color-relief H11657_1of5_1m_Final_Depth.grd ramp.txt  colored.tif</b></pre>
+<img title="gdaldem color-relief" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/gdal-colored.png"/>
+
+I then pulled the two layers into photoshop and made the color be partially tranparent.
+
+<img title="Blending in Photoshop" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/photoshop-colored-and-shaded.png"/>
+
+Better yet, is to combine them using ImageMagick's composite command:
+
+<pre><b>composite -compose multiply gdal-colored.png gdal-hillshade.png composite-colored-and-shaded.png</b></pre>
+
+<img title="composite hillshade and color" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/composite-colored-and-shaded.png"/>
+
+Better results come with using the blend option rather than the multiply:
+<pre>composite -blend 50 gdal-colored.png gdal-hillshade.png composite-blend.png</pre>
+<img title="composite hillshade and color" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/composite-blend.png"/>
+-----

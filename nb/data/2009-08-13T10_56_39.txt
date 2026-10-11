@@ -1,0 +1,47 @@
+TITLE: AIS and bitstuffing issues
+AUTHOR: Kurt
+DATE: 08.13.2009 10:56
+DESC: trouble
+-----
+BODY:
+The whole binary message creation process is suffering from the lack
+of a well thought out guide to creating messages that work well.  I
+was mostly focusing on what I have to decode and hadn't been thinking
+about how things were going across the network.  This means I had not
+though about bit stuffing.
+
+For a single slot message, if we use all 168 bits, then we will have
+room for 4 bit-stuffing additional bits.  Bit stuffing adds a 0 bit
+every time there is 5 1 bits in a row.  Therefore 11111 becomes
+111110.  This is generally not a big deal until you realize that most
+of our default / unavailable values have been the highest value for a
+field.  So for a 7 bit field, we would make unavailable be 127
+(111111 going out as 11111011).  Greg pointed out that if we use 121 as
+unavailable, which is fairly common, then we have a better scituation:
+<pre>ipython
+from BitVector import BitVector
+bv = BitVector(intVal=121)
+print str(bv)
+'1111001'</pre>
+So for safety, the unvailables should be 0 (zero) if possible.  Otherwise,
+here are the values that work for the high end.
+<pre>print(int(BitVector(bitstring='11101')))
+29</pre>
+or
+<pre>print(int(BitVector(bitstring='11110')))
+30</pre>
+A training 1 will likely cause the next high value to generate a
+bit-stuff event.  Here is a table of possible default/unknown values.
+The whole point to try to keep as many messages as possible to just
+1 slot.
+<pre>NoBits MaxVal   Bits    Unavail   Bits    Loss-of-Range
+ 5       31       11111   30        11110 3%
+ 6       63      111111   60       111100 5%
+ 7      127     1111111  122      1111010 4%
+ 8      255    11111111  246     11110110 4%
+ 9      511   111111111  494    111101110 3%
+10     1023  1111111111  990   1111011110 3%</pre>
+I wonder when this will cause more confusion than help.  Basically, I
+tried to keep no more than 4 ones in a row and make sure it is okay
+if you have two of these unknowns in a row.
+

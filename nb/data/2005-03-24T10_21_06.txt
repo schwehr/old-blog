@@ -1,0 +1,27 @@
+TITLE: SQL help from Alex
+AUTHOR: Kurt
+DATE: 03.24.2005 10:21
+DESC: Selecting the max of some property for each cube
+-----
+BODY:
+Sometimes it is better to ask for help.  In this case, that was
+certainly true.  Alex gave me a quick leg up with a task that was
+troubling me.  For my BPSIO-2004 paleomag cube data, I need to be able
+to quickly list the maximum afdemag treatment applied to the samples
+in a core.  This then lets me do a quicker job of pseudo-Thellier.
+<pre>
+    SELECT max(samplename),max(treatment) FROM mag WHERE corenum=5 AND \
+    type='afdemag' GROUP BY depth ORDER BY depth;
+</pre>
+This query gives something like this:
+<pre>
+   ...
+   bp04-5gw-s2-126|80.00
+   bp04-5gw-s2-129|80.00
+   bp04-5gw-s2-132|80.00
+   bp04-5gw-s2-135|60.00
+   bp04-5gw-s2-138|100.00
+   bp04-5gw-s2-141|100.00
+   bp04-5gw-s2-144|80.00
+</pre>
+-----

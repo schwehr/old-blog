@@ -1,0 +1,113 @@
+TITLE: Finding the water bottom
+AUTHOR: Kurt
+DATE: 09.18.2005 10:27
+DESC: not working yet
+-----
+BODY:
+I figured I'd give a go at using the automatic water bottom pickers.
+I clearly do not understand what is going on.  So be aware that what I
+write in this section is not right.  It is mostly for me to record
+what I have done and what the results were.
+
+I started with the sgy file produced by my last couple of posts.  This
+file has been converted to standard SEGY by sioseis with the 2
+channels merged into one with this sioseis option:
+<pre>xstar
+   type 2 dummies 2  end
+end</pre>
+Here is the input file: <em>6049296 Sep 16 12:37
+EEL5kL01-00001.sgy</em>.  I have a script that is hard coded for
+working on this example file.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+
+declare -r <font color="#2040a0">FNO</font>=0
+declare -r <font color="#2040a0">LNO</font>=999999
+declare -r <font color="#2040a0">INFILE</font>=EEL5kL01-00001.sgy
+declare -r <font color="#2040a0">OUTFILE</font>=EEL5kL01-00001-wbt.sgy
+declare -r <font color="#2040a0">GAINFILE</font>=default.gains 
+
+<font color="#2040a0">OS</font>=`uname -s`
+<font color="#2040a0">sioseis</font>=${HOME}/x/src/sioseis/sioseis.${OS}
+<font color="#2040a0">$sioseis</font> &lt;&lt; EOF 
+procs diskin header wbt3 gains prout diskoa end
+!
+diskin
+  ipath <font color="#2040a0">$INFILE</font> end
+end
+!
+header 
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font>
+ l6 = l3 end
+end
+! ORIGINAL thres 0.000000005 track 0.005 end
+wbt3
+  thres 0.000000005 track 0.05 end
+end
+!
+gains
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> addwb yes type 9 TGP
+`cat <font color="#2040a0">$GAINFILE</font>`
+ end
+end
+!
+! wbt = l50
+prout
+ indices l1 l2 l3 l4 l6 l50 fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> end
+end
+!
+diskoa
+ opath <font color="#2040a0">$OUTFILE</font> fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftr 0 ltr 1 end
+end
+!
+end
+EOF
+</pre>
+I am using wbt3 which is described on Paul's <a
+href="http://sioseis.ucsd.edu/wbt.html">wbt</a> page.  I then added a
+prout to display the water bottom picks.  I wanted to see what the
+picks look like.  The <b>l50</b> entry in prout is the water bottom
+value.  I got that by finding wbt in <a
+href="http://sioseis.ucsd.edu/segy.header.html">segy.header</a>.
+
+The default.gains file looks like this:
+<pre>    0.0000    1.0000
+    0.0005    1.0000
+    0.0020    5.0000
+    0.005     10.0000
+    0.0200    15.0000 
+    0.0500    15.0000
+    0.1       40.000</pre>
+I then have a pltsegy file that plots the new file.  I will not
+include the pltsegy file since it is very long.
+
+I then wanted to take a look at the water bottom picks and the
+resulting pltsegy output.  How could I draw the wbt picks right on top
+of the graph?  A little grep and awk will make a table of the picks by
+wbt3:
+<pre>./wbt.bash | grep -v WARNING | awk '{print $1,$4,$6}' | \
+grep '1\.0' &gt; foo</pre>
+I then took a look at them with gnuplot.
+<pre>
+gnuplot
+plot 'foo' using 1:3 with l
+</pre>
+Here is the plot:
+<img src="http://schwehr.org/blog/attachments/2005-09/wbt-pics-l50.gif">
+and the resulting pltsegy screen grab.
+<img src="http://schwehr.org/blog/attachments/2005-09/wbt3-pltsegy.png">
+Note that this is a time pick, so as the picks get shallower, the plot
+goes down.  Also, since I relaxed the allowable jump between picks
+with a <em>track 0.05</em>,
+there are a couple spikes.  You can see these spike in the pltsegy
+figure as grayed out zones.
+
+So at this point, I don't have a nice figure, but I am getting much
+more comfortable with sioseis.
+
+<b>UPDATE:</b> This seems to work:
+<pre>wbt3
+  thres 0.0000000001 track 0.05 end
+end</pre>
+The units on the wbt pick seem a little strange to me.
+-----

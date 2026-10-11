@@ -1,0 +1,141 @@
+TITLE: layback update for cracks cruise
+AUTHOR: Kurt
+DATE: 10.31.2005 08:39
+DESC: Results looking good
+-----
+BODY:
+I went through the cracks data a little more this morning and verified
+that all the layback points I used have there speed from within a few
+shots.  And thankfully that is the case.  Here is the results table
+with all 52 entries.
+<pre>
+#   1     2     3     4       5      6        7
+# shot wireout vert layback angle1 speed  shot_offset_for_speed
+
+525106 264.6 79.8168 252.2745299 17.56 3.8 2
+528154 240.8 85.0668 225.273788 20.69 3.8 17
+595405 218.5 62.5668 209.3505327 16.64 5.0 0
+597545 254.7 82.8168 240.8598506 18.97 3.8 0
+598722 254.7 79.0668 242.1167717 18.09 4.2 0
+605053 254.7 76.0668 243.0759798 17.38 3.7 17
+633320 185.6 73.0668 170.6124343 23.18 4.0 0
+670983 258.6 76.0668 247.1594666 17.11 3.9 0
+683526 278.3 89.5668 263.4932226 18.77 4.0 0
+689024 256.6 73.8168 245.7532096 16.72 4.1 0
+711636 191.8 82.3668 173.2135972 25.43 4.2 0
+713188 244.8 82.3668 230.5271139 19.66 4.3 0
+741727 212.4 62.5668 202.9757511 17.13 4.8 0
+745538 272.5 62.5668 265.2199946 13.27 4.5 0
+760000 272.5 73.8168 262.3115134 15.72 3.8 0
+815797 185.6 73.0668 170.6124343 23.18 3.8 0
+821962 240.8 93.3168 221.9833661 22.80 3.6 0
+844793 216.5 73.0668 203.797676 19.72 3.7 0
+850749 270.5 76.0668 259.5844601 16.33 4.2 0
+856363 305.2 76.0668 295.5687432 14.43 4.0 0
+913976 214.4 64.0668 204.6040203 17.39 4.2 0
+918322 258.6 79.0668 246.2161675 17.80 4.1 0
+921739 295.6 91.0668 281.2226839 17.94 4.3 0
+946083 185.6 72.3168 170.9316835 22.93 4.1 0
+952200 314.8 84.3168 303.2980667 15.54 4.2 0
+1289000 185.6 73.8168 170.2892834 23.44 3.9 0
+1306641 242.8 79.0668 229.565418 19.00 4.0 0
+1355961 210.3 65.5668 199.8176287 18.17 4.2 0
+1360480 242.8 85.8168 227.1284149 20.70 4.0 0
+1386006 191.8 76.8168 175.7453249 23.61 3.8 0
+1387816 248.7 85.8168 233.4248634 20.19 4.1 0
+1396015 248.7 72.0168 238.0446818 16.83 3.8 0
+1405500 204.1 63.0168 194.1280323 17.98 4.0 0
+1433000 195.6 64.0668 184.8101868 19.12 4.9 0
+1433557 262.6 76.8168 251.1133992 17.01 4.5 0
+28067 191.8 72.3168 177.6443651 22.15 3.6 0
+29794 278.3 92.5668 262.4543342 19.43 3.8 0
+37030 278.3 96.3168 261.101444 20.25 3.6 0
+39700 305.2 91.8168 291.0613599 17.51 3.7 0
+44800 272.5 72.3168 262.7290057 15.39 3.9 0
+60575 128.4 56.5668 115.2681966 26.14 3.7 0
+61542 310.9 84.3168 299.2482034 15.74 3.6 0
+223345 177.2 61.0668 166.3450809 20.16 3.6 0
+229052 195.6 79.8168 178.5739019 24.08 3.9 0
+263470 170.9 67.0668 157.1905033 23.11 3.7 0
+267038 266.5 82.0668 253.5493844 17.94 3.6 0
+309101 305.2 85.8168 292.8865255 16.33 3.3 0
+313592 258.6 83.5668 244.7254583 18.85 4.8 0
+316027 208.2 74.5668 194.3888689 20.99 3.7 0
+383600 258.6 76.0668 247.1594666 17.11 3.6 0
+394351 220.6 61.0668 211.9792583 16.07 3.7 0
+418500 256.6 80.4918 243.6485792 18.28 4.2 0
+</pre>
+After verifying the data, I created a little least square fit program
+to use the results table.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">########################################</font>
+<font color="#444444"># FIT a line to the data</font>
+<font color="#2040a0">dataFile</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'results.dat'</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>
+<font color="#2040a0">dataFile</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">dataFile</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">dataFile</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">wireoutAngle</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+<font color="#2040a0">speedAngle</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+<strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">dataFile</font>.<font color="#2040a0">readlines</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">fields</font> <font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">wireoutAngle</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">2</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font>,<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">5</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#2040a0">speedAngle</font>.<font color="#2040a0">append</font>  <font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">6</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font>,<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">5</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>from</strong> <font color="#2040a0">Scientific</font>.<font color="#2040a0">Functions</font>.<font color="#2040a0">LeastSquares</font> <strong>import</strong> <font color="#2040a0">leastSquaresFit</font>
+<font color="#2040a0">def</font> <font color="#2040a0">linear</font><font color="4444FF">(</font><font color="#2040a0">parameters</font>,<font color="#2040a0">values</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">a</font>,<font color="#2040a0">b</font> <font color="4444FF">=</font> <font color="#2040a0">parameters</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">values</font>
+    <strong>return</strong> <font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">*</font><font color="#2040a0">x</font> <font color="4444FF">+</font> <font color="#2040a0">b</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">initial</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="4444FF">-</font>.<font color="#FF0000">1</font>,<font color="#FF0000">32</font><font color="4444FF">)</font>
+<font color="#2040a0">param</font>,<font color="#2040a0">error</font> <font color="4444FF">=</font> <font color="#2040a0">leastSquaresFit</font><font color="4444FF">(</font><font color="#2040a0">linear</font>,<font color="#2040a0">initial</font>,<font color="#2040a0">wireoutAngle</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">&quot;  ----- WIREOUT TO ANGLE ----- &quot;</font>
+<strong>print</strong> <font color="#2040a0">param</font>,<font color="#2040a0">error</font>
+<strong>print</strong> <font color="#FF0000">130</font>, <font color="#FF0000">130</font> <font color="4444FF">*</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<strong>print</strong> <font color="#FF0000">300</font>, <font color="#FF0000">300</font> <font color="4444FF">*</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#444444">#</font>
+<font color="#2040a0">initial</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#FF0000">22</font><font color="4444FF">)</font>
+<font color="#2040a0">param</font>,<font color="#2040a0">error</font> <font color="4444FF">=</font> <font color="#2040a0">leastSquaresFit</font><font color="4444FF">(</font><font color="#2040a0">linear</font>,<font color="#2040a0">initial</font>,<font color="#2040a0">speedAngle</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">&quot;  ----- SPEED TO ANGLE ----- &quot;</font>
+<strong>print</strong> <font color="#2040a0">param</font>,<font color="#2040a0">error</font>
+<strong>print</strong> <font color="#FF0000">3.4</font>, <font color="#FF0000">3.4</font> <font color="4444FF">*</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<strong>print</strong> <font color="#FF0000">4.8</font>, <font color="#FF0000">4.8</font> <font color="4444FF">*</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#2040a0">param</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+</pre>
+That made a simple linear fit to the data.  The results of a run look
+like this:
+<pre>
+./cracks_cruise_layback_fit.py
+  ----- WIREOUT TO ANGLE ----- 
+[-0.051842754250418684, 31.465098411287943] 194.768779108
+130 24.7255403587
+300 15.9122721362
+  ----- SPEED TO ANGLE ----- 
+[-1.703222454552509, 25.827653874339632] 415.848028016
+3.4 20.0366975289
+4.8 17.6521860925
+</pre>
+After creating two data files for gnuplot, I end up with plots that
+have the best fit line.
+
+<img src="http://schwehr.org/blog/attachments/2005-10/cracks-speed-angle-fit.gif">
+
+<img src="http://schwehr.org/blog/attachments/2005-10/cracks-wireout-angle-fit.gif">
+
+The code for the processing of the excel data from Jenna is in <a
+href="http://schwehr.org/blog/attachments/2005-10/cracks_cruise_layback.py.html">cracks_cruise_layback.py.html</a>
+(raw python: <a href="http://schwehr.org/blog/attachments/2005-10/cracks_cruise_layback.py">cracks_cruise_layback.py</a>)
+
+Finally a quick calculation from the Santa Barbara Cruise...
+<pre>
+ipython
+In [1]: from math import *
+In [2]: from units import rad2deg
+
+In [3]: rad2deg(asin(30.75/50))
+Out[3]: 37.951920289246438  # Wire angle seen
+
+In [4]: 50 * (-0.051842754250418684) + 31.465098411287943
+Out[4]: 28.87296069876701   # Wire angle predicted
+</pre>
+-----

@@ -1,0 +1,103 @@
+TITLE: gdal ogr2ogr from s57 to kml
+AUTHOR: Kurt
+DATE: 12.05.2006 15:14
+DESC: the road begins
+-----
+BODY:
+I just tried gdal's beta feature for writing out kmls.  This works
+only for vector data (which was not what I was aiming for).  My first
+attempt was to see what would happen if I blindly converted an S57
+electronic navigation chart (ENC) to a Google Earth KML file.  As you
+will see below, the results are not pretty.  This is not a big deal
+nor unexpected.  Displaying charts is not a simple task.
+
+First, the KML support only comes in the gdal 1.4.0beta versions, so
+don't expect to find the formats in gdal 1.3.2 or older.  Here is the
+build command that I used for gdal-1.4.0beta1:
+<pre>
+prefix=~/gdal
+CPPFLAGS="-Os -I/sw/include" ./configure --prefix=$prefix \
+--mandir='${prefix}/share/man' --with-local=/sw --with-libz=/sw  \
+--with-grass=no --with-cfitsio=/sw --with-pcraster=no \
+--with-netcdf=/sw --with-png=/sw --with-libtiff=/sw \
+--with-geotiff=internal --with-jpeg=/sw --with-gif=/sw --with-ogdi=/sw \
+--with-fme=no --without-hdf4 --with-hdf5=/sw --with-jasper=no \
+--with-ecw=no --with-kakadu=no --with-mrsid=no --with-bsb --with-ogr \
+--with-pg=/sw/bin/pg_config --with-mysql=no --with-xerces \
+--with-xerces-inc=/sw/include --with-xerces-lib='-L/sw/lib -lxerces-c \
+-lpthread' --with-odbc=/sw --with-oci=no --with-dods-root=no \
+--with-sqlite=/sw --with-geos=/sw/bin/geos-config \
+--with-static-proj4=/sw --without-perl --without-php --without-ruby \
+--without-python
+</pre>
+Now to give it a try and see what formats are available:
+<pre>
+# <b>~/gdal/bin/gdalinfo --version</b>
+GDAL 1.4.0.0beta1, released 2006/12/04
+# <b>~/gdal/bin/ogr2ogr -h</b>
+Usage: ogr2ogr [--help-general] [-skipfailures] [-append] [-update]
+               [-select field_list] [-where restricted_where] 
+               [-sql <sql statement>] 
+               [-spat xmin ymin xmax ymax] [-preserve_fid] [-fid FID]
+               [-a_srs srs_def] [-t_srs srs_def] [-s_srs srs_def]
+               [-f format_name] [-overwrite] [[-dsco NAME=VALUE] ...]
+               dst_datasource_name src_datasource_name
+               [-lco NAME=VALUE] [-nln name] [-nlt type] [layer [layer ...]]
+ -f format_name: output file format name, possible values are:
+     -f "ESRI Shapefile"
+     -f "MapInfo File"
+     -f "TIGER"
+     -f "S57"
+     -f "DGN"
+     -f "Memory"
+     -f "CSV"
+     -f "GML"
+     -f "KML"
+     -f "Interlis 1"
+     -f "Interlis 2"
+     -f "SQLite"
+     -f "ODBC"
+     -f "PostgreSQL"
+...
+</pre>
+I down loaded the US5VA17M S57 vector ENC from NOAA (Norfolk Harbor
+and Elizabeth River) and opened the s57 to find this:
+<pre>
+ls -l
+-rw-r--r-- 1 schwehr schwehr     3279 Dec  5 14:58 US5VA17E.TXT
+-rw-r--r-- 1 schwehr schwehr  4225184 Dec  5 14:58 US5VA17M.000
+-rw-r--r-- 1 schwehr schwehr    20689 Dec  5 14:58 US5VA17M.001
+-rw-r--r-- 1 schwehr schwehr     2637 Dec  5 14:58 US5VA17M.002
+-rw-r--r-- 1 schwehr schwehr     5243 Dec  5 14:58 US5VA17M.003
+-rw-r--r-- 1 schwehr schwehr      423 Dec  5 14:58 USEAX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      255 Dec  5 14:58 USEBX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      213 Dec  5 14:58 USEDX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      222 Dec  5 14:58 USEEX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      552 Dec  5 14:58 USEFX17E.TXT
+</pre>
+Now it is time to see what happens with the default conversion to kml!
+<pre>
+~/gdal/bin/ogr2ogr -f KML 0.kml US5VA17M.000
+open 0.kml
+</pre>
+<img src="http://schwehr.org/blog/attachments/2006-12/s57_ogr2kml.png">
+
+When they all stack up, Google Earth grays out a bunch and expands a
+neighborhood of thumbtacks to click.  Here I picked an OBJL of 27,
+which is a caution area.
+
+<img src="http://schwehr.org/blog/attachments/2006-12/s57_ogr2kml-2.png">
+
+Each thumbtack is a catagory of object class (OBJL).  For example,
+<b>75</b> is a light.
+
+<img src="http://schwehr.org/blog/attachments/2006-12/s57_ogr2kml-3.png">
+
+And <b>17</b> is a Bouy.
+
+<img src="http://schwehr.org/blog/attachments/2006-12/s57_ogr2kml-4.png">
+
+Clearly, a lot of work needs to be done to get the s57 to look nice in
+KML format, but this shows that a good bit of the work has been done
+and this view makes it easier to understand what things are in s57 files.
+-----

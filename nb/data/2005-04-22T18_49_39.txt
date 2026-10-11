@@ -1,0 +1,50 @@
+TITLE: unittest for sqlite database
+AUTHOR: Kurt
+DATE: 04.22.2005 18:49
+DESC: sample test code
+-----
+BODY:
+Just a quick note first.  The problem of my laptop randomly loosing
+power from the charger has gone away.  When this happened, it was not
+the connector to the laptop.  I had to unplug it from the wall and
+then plug it back in.  Then it would go back to using wall power.  I
+am not sure when this stopped happing.  Probably a couple months ago.
+Maybe it was 10.3.8?
+
+Here is my very simple unittest that checks my sqlite database.  Not
+much to it so far.  It definitely needs more consistency checks.  I
+did find my bug.  I had a bad entry in the section number for a core
+in the section table.  It was just one letter to fix, once I knew
+where it was!
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<strong>import</strong> <font color="#2040a0">unittest</font>
+<strong>import</strong> <font color="#2040a0">ttn136b</font>
+<strong>import</strong> <font color="#2040a0">sqlite</font> <font color="#444444"># for DepthLookup</font>
+
+<strong>class</strong> <font color="#2040a0">Ttn136bTests</font><font color="4444FF">(</font><font color="#2040a0">unittest</font>.<font color="#2040a0">TestCase</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    Test the TTN136B sqlite database
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> setUp</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot; Prep the database and lookup table for the tests in this group&quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font> <font color="4444FF">(</font><font color="#2040a0">ttn136b</font>.<font color="#2040a0">dbFileName</font><font color="4444FF">)</font><font color="4444FF">;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">depthLookup</font> <font color="4444FF">=</font> <font color="#2040a0">ttn136b</font>.<font color="#2040a0">DepthLookup</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">cx</font><font color="4444FF">)</font>
+        
+        
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> testSectionOne</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot; Check the simplest cases for samples that are in the first section &quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">&quot;SELECT depth FROM ams WHERE samplename='ttn136b-2ta-s1-003';&quot;</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">assertEqual</font><font color="4444FF">(</font><font color="#FF0000">3</font>,<font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">cu</font>.<font color="#2040a0">fetchone</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#008000">'depth'</font><font color="4444FF">]</font><font color="4444FF">)</font>
+        
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> testSectionOneDepthLookup</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot; Check the simplest cases for samples that are in the first section &quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">assertEqual</font><font color="4444FF">(</font><font color="#FF0000">3</font>,<font color="#2040a0">self</font>.<font color="#2040a0">depthLookup</font>.<font color="#2040a0">lookup</font><font color="4444FF">(</font><font color="#008000">&quot;ttn136b-2ta-s1-003&quot;</font><font color="4444FF">)</font><font color="4444FF">)</font>
+
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#008000">&quot;Starting to test the data base&quot;</font>
+    <font color="#2040a0">unittest</font>.<font color="#2040a0">main</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+-----

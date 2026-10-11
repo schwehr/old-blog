@@ -1,0 +1,38 @@
+TITLE: K15 or Kn in python rmag_ams.py
+AUTHOR: Kurt
+DATE: 03.05.2005 09:17
+DESC: opinions 
+-----
+BODY:
+I took an hour and put together what I think the interface should be
+like for ams data in python.  Comments?  Anything is open to change at
+this point.  Is rmag_ams.py the right filename?
+
+<a href="http://schwehr.org/Gaviota/bpsio-Aug04/docs/rmag_ams.html">rmag_ams.html</a>
+
+I was thinking that it would work something like this:
+<pre>
+import rmag_ams
+file = rmag_ams.K15file()
+file.open("antarctica.k15","r")
+# Write out all the sample entries
+file.writeMagIC("antartica.samples.magic")
+
+# get one sample
+sample = file.getNextK15()
+
+new = rmag_ams.K15()
+new.sampleholder = 4.75
+new.K[0] = 1.077E+2
+new.K[1] = 1.057E+2
+....
+new.K[13] = 1.076E+2
+new.K[14] = 1.071E+2
+
+new.write("measurements.k15")
+</pre>
+Alternatively, it could start out like this, which would allow different numbers of positions...
+<pre>
+file = rmag_ams.KnFile(numPos=9)
+</pre>
+-----

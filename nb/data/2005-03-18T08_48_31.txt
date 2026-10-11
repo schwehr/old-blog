@@ -1,0 +1,171 @@
+TITLE: USGS ISIS
+AUTHOR: Kurt
+DATE: 03.18.2005 08:48
+DESC: discussions with the usgs
+-----
+BODY:
+I posted a message to the USGS ISUS support board.  Here are the
+messages from the <a
+href="http://isis.astrogeology.usgs.gov/IsisSupport/viewtopic.php?p=1163">thread</a>.
+
+<pre>
+I am looking into adding ISIS to fink (Mac OSX packaging tool) before
+the next Mars lander mission. The fink policy is to only allow systems
+that can be built from source. Unfortunetely, the rsync distribution
+mechanism makes in nearly impossible for fink to grab a snapshot of
+ISIS. I would have to rsync the source myself and create my own
+snapshot (which I would prefer not to do). Is there anyway to make
+available on the web a gzip or bzip2 compressed tar archive of
+upcoming releases in addition to rsync? Then fink could then do 
+
+curl http://someusgsurl.usgs.gov/src/isis-3.1.0.tar.bz2 
+
+This tar would just be all the sources and support files excluding the
+very large mission datasets.
+
+My goal with fink is to help create a complete planetary science
+workstation. Any person on the science team can get a Mac laptop and
+have as many of the mission tools as possible. This greatly reduces
+the load on the flightops support staff and puts more power in the
+hands of the science team members. I have also been trying to
+accomplish the same for marine geology/shipboard operations.
+
+See this page for some of the software I have been packaging: 
+
+<a
+href="http://fink.sourceforge.net/pdb/maintainer.php?maintainer=Kurt%20Schwehr">Maintainer=Kurt Schwehr</a>
+
+Thanks for you consideration, 
+-Kurt Schwehr 
+</pre>
+The response
+<pre>
+Hi Kurt... 
+
+Adding ISIS to Fink is not feasible at the moment for the following reasons: 
+
+ISIS is built entirely independant of the Fink environment. This is a
+concious decision we made because we felt the Fink overhead was
+significant and unnecessary (and we still feel that way).
+
+There is some proprietary code used in ISIS, albeit a very small
+number of routines, but proprietary none-the-less.
+
+The effort required to make ISIS Finkable would be in addition to our
+already preferred distribution method (rsync) and probably substantial
+in comparison to our current development environment (you do realize
+you are asking us to migrate development, or at least support, of Mac
+ISIS to the Fink environment).
+
+We have 3rd party software dependancies for the Mac that exist only in
+binary form. We would like to take advantage of the availability of
+binary versions of software where ever possible to minimize
+support. These are, but not limited to:
+
+  OpenMotif 
+  A package called PGPLOT 
+  GNU Fortran Compiler (g77) 
+
+We have limited support staff and resources to support ISIS, let alone
+support the Mac OS X platform.
+
+Fink is a great tool to migrate Unix/Linux software to the Mac
+platform, but the downside is that Fink software cannot run
+independant of that environment. Our goal is to provide ISIS to the
+widest community possible and minimize maintainence and installation
+difficulties.
+
+In my opinion, DarwinPorts (http://darwinports.opendarwin.org/)
+provides more flexible (runs natively in the Mac environment) and
+appealing (does not require the enduser to install anything) ISIS
+software development support. With this approach, our ISIS developers
+can install the necessary 3rd party software ISIS depends on and only
+those software tools. We can then provide these dependancies (i.e.,
+shared libraries) with the ISIS distribution. This scenario is
+obviously directly in conflict with the Fink policy as you state.
+
+At this time, we do have a consistant development and distribution
+configuration for all operating systems we support (Linux, Solaris and
+Mac OS X). In my opinion, adding Fink to this mix creates additional
+overhead we cannot at this time support.
+_________________
+Kris Becker 
+Computer Scientist 
+Astrogeology Team 
+U.S. Geological Survey
+</pre>
+My followup
+<pre>
+Hi Kris, 
+
+Thanks for your reply. 
+
+Here are some added some clarifications to what I meant in that last 
+post. 
+
+* First: The last thing I want to do is add more work to your load. 
+I am offering to do the leg work for an info file. 
+
+* 2nd: I am thinking long term here. I personally can not start 
+working on this until I finish my PhD later this year. I ask that you 
+consider allowing me to work on a fink info file sometime over the 
+next two years before the 2007 mission. 
+
+* This does not have to impact your current development and release 
+mechanism. Fink packages generally use what ever a project releases. 
+Changing the development methods for such a large project would be 
+not a good idea. 
+
+* I would be the one creating an info file to fink. That info file 
+would take your source base as is. It is then up to me to create any 
+patches and run any commands against that source base necessary to 
+compile the program. 
+
+* I was thinking that you could add a tar cfj isis-3.0.3.tar.bz 
+ISIS_ROOT to your release process and maybe add an exclude list of the 
+proprietary files so that tar skips them. Then, maybe we could get 
+community support to create replacements for those missing functions 
+and APIs if they are as few as you suggest. This could be done 
+without involving the USGS. 
+
+* Alternatively, I could create a fink info file that lives outside of 
+the normal fink process that users place in their 
+/sw/fink/10.3/local/main/sci directory. Then issues of licenses and 
+proprietary code could be reduced. 
+
+* As for dependencies, that should not be a problem. Fink has info 
+files for all of what you mentioned (g77, openmotif, and pgplot). The 
+fink community can work on getting them into the stable tree where the 
+servers build binaries for them. 
+
+* During MER operations, I noticed that there was a huge proportion 
+Mac Laptops and many of those had fink. There were a few G5 Macs in 
+flight ops this time and I think there will be many more Mac 
+workstation setups for the 2007 mission. 
+
+* Fink and darwinports do have some collaboration between projects. 
+They definitely have a different style, but in the science teams I am 
+around, the science end users seem to really prefer fink with the 
+FinkCommander program to provide functionality over the base Mac OSX 
+system. 
+
+* Here is the complete list of current packages in fink: 
+
+<a href="http://fink.sourceforge.net/pdb/list.php">http://fink.sourceforge.net/pdb/list.php</a>
+
+And links to the ones you mentioned. 
+
+<a href="http://fink.sourceforge.net/pdb/package.php/g77">http://fink.sourceforge.net/pdb/package.php/g77</a>
+<a href="http://fink.sourceforge.net/pdb/package.php/openmotif3">http://fink.sourceforge.net/pdb/package.php/openmotif3</a>
+<a href="http://fink.sourceforge.net/pdb/package.php/pgplot">http://fink.sourceforge.net/pdb/package.php/pgplot</a>
+
+Please take your time thinking about this. I am not in any rush. 
+Just wanted to plant the idea in your head. Feel free to ask me or 
+anyone on the fink lists if you have any questions or thoughts. 
+
+Sincerely, 
+Kurt Schwehr 
+</pre>
+We will see how this goes.  Plenty of time to work through this before
+mission time!
+-----

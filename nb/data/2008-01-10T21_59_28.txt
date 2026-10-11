@@ -1,0 +1,40 @@
+TITLE: my old friend netcat
+AUTHOR: Kurt
+DATE: 01.10.2008 21:59
+DESC: powertools
+-----
+BODY:
+Back in 1999 while working on the Polar Lander, Anil introduced me to
+netcat.  This was the original netcat.  It worked great.  We used it
+to data through a firewall from the flight operations network over to
+the web backends.  It didn't have a configure script, so I set it up
+to use GNU autoconf and tried to contribute it back to the project.
+I never heard anything.  However, there is now a new generation of 
+autoconf: <a href="http://netcat.sourceforge.net/">http://netcat.sourceforge.net/</a>
+
+I am using netcat to help debug a little network server for AIS.  I
+need to be able to simply feed some data to a python script that
+connects to a port.  The same script is going to transmit a subset of
+the data out to another port that will eventually on a separate host.
+It's in fink, so "fink install netcat".
+
+In the first window, set up the receiver
+<pre>
+% nc -l -p 31402
+</pre>
+Then in the 2nd window, set up the transmission:
+<pre>
+% cat 123.ais | netcat -l -p 31401
+</pre>
+Then I run my bridge and a mess of data gets printed in the receive window.
+<pre>
+ais_port_forward.py -v
+</pre>
+There is also a program called <a
+href="http://www.dest-unreach.org/socat/">socat</a> that is supposed
+to be more powerful, but I haven't done more than install it.
+<pre>
+fink install socat-ssl
+</pre>
+socat has many more options that look very handy.
+-----

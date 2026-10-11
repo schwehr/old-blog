@@ -1,0 +1,58 @@
+TITLE: UDP data broadcast on the Langseth
+AUTHOR: Kurt
+DATE: 09.28.2009 20:42
+DESC: realtime data
+-----
+BODY:
+It is fairly common for ships to broadcast sensor data on the internal
+science network using UDP text messages.  The Langseth does this, but
+I didn't see any details about which computers were broadcasting and
+on what ports.  To figure this out, I fired up wireshark on my mac
+when it was attached to the ship's science network via wireless.
+<pre>fink install wireshark-ssl
+sudo wireshark &</pre>
+<img title="Wireshark on the Langseth" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-09/langseth-wireshark-udp.png"/>
+
+I let it run for a while and paused the stream and scanned through for
+broadcast udp (Destination: 255.255.255.255 and Protocol: UDP).  Here,
+you can see that I found packet number 5024 from host 192.168.3.21.  I
+then noted that the machine is sending to port 33103.  Selecting the
+packet, wireshark shows the contents of the packet, which looks like a
+"$GPGGA" NMEA string from a computer called cnav.  <a
+href="http://www.cctechnol.com/site47.php">C-NAV</a> is the payed
+subscription GPS service that the ship uses for positioning.
+
+Based on that information, I wrote a little UDP logging client that is
+about as simple as possible:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> socket
+<b><font color="#000080">import</font></b> time
+<!-- -->
+host<font color="#990000">=</font><font color="#FF0000">'0.0.0.0'</font> <i><font color="#9A1900"># All interfaces</font></i>
+port<font color="#990000">=</font><font color="#993399">33103</font>
+buffer <font color="#990000">=</font> <font color="#993399">10000</font>
+<!-- -->
+sock <font color="#990000">=</font> socket<font color="#990000">.</font><b><font color="#000000">socket</font></b><font color="#990000">(</font>socket<font color="#990000">.</font>AF_INET<font color="#990000">,</font>socket<font color="#990000">.</font>SOCK_DGRAM<font color="#990000">)</font>
+sock<font color="#990000">.</font><b><font color="#000000">bind</font></b><font color="#990000">((</font>host<font color="#990000">,</font>port<font color="#990000">))</font>
+<!-- -->
+log <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'udpmsgs.dat'</font><font color="#990000">,</font><font color="#FF0000">'w+'</font><font color="#990000">)</font>
+<b><font color="#0000FF">while</font></b> <font color="#993399">1</font><font color="#990000">:</font>
+    data<font color="#990000">,</font>addr <font color="#990000">=</font> sock<font color="#990000">.</font><b><font color="#000000">recvfrom</font></b><font color="#990000">(</font>buffer<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> data<font color="#990000">:</font>
+        log<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">"NO DATA"</font><font color="#990000">)</font>
+	<b><font color="#0000FF">break</font></b>
+    log<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>data<font color="#990000">)</font>
+</tt></pre>
+I then ran this program and used "tail -f udpmsgs.dat" to watch the data come streaming in:
+<pre>cnav    2009:270:13:11:17.8980  $GPGSA,A,3,,32,,2,4,16,20,25,13,23,7,,2.2,1.0,1.9*0A
+cnav    2009:270:13:11:17.9732  $GPVTG,045.0,T,,M,0.01,N,0.01,K*61
+cnav    2009:270:13:11:18.0503  $GPZDA,131117.00,27,9,2009,+0,+0*55
+cnav    2009:270:13:11:18.6557  $GPGGA,131118.00,4611.32498,N,12351.52776,W,2,9,1.0,12.54,M,-20.71,M,10,0108*5E
+cnav    2009:270:13:11:18.7598  $GPGLL,4611.32498,N,12351.52776,W,131118.00,A*1e
+cnav    2009:270:13:11:18.8709  $GPGSA,A,3,,32,,2,4,16,20,25,13,23,7,,2.2,1.0,1.9*0A
+cnav    2009:270:13:11:18.9461  $GPVTG,000.0,T,,M,0.01,N,0.01,K*60
+cnav    2009:270:13:11:19.0233  $GPZDA,131118.00,27,9,2009,+0,+0*5A
+cnav    2009:270:13:11:19.7349  $GPGGA,131119.00,4611.32498,N,12351.52776,W,2,9,1.0,12.54,M,-20.71,M,10,0108*5F
+cnav    2009:270:13:11:19.8378  $GPGLL,4611.32498,N,12351.52776,W,131119.00,A*1f</pre>
+-----

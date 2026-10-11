@@ -1,0 +1,43 @@
+TITLE: Faxing from OSX
+AUTHOR: Kurt
+DATE: 01.28.2005 09:59
+DESC: how to get this to work?
+-----
+BODY:
+Just tried sending my first Fax from OSX.  I opened a scanned image in
+Preview and selected print.  I then inserted the fax number from my
+address book, discovering that a 1- in the number makes life easier.
+Why does it insist on defaulting to a bluetooth modem when I have
+bluetooth turned off?  I select the internal modem and type in a cover
+sheet being carful to not press return and use Apple-V to past in
+carrage returns.  Then send it.  The "Internal Modem" printer window
+pops up and starts dialing.  The first one went fine until it said
+sent and then just hang then looking busy and saying finished, but
+then not going on two document 2.  I stopped the jobs, deleted the
+first one, and restarted to stat doc 2 would go.  That dialed, got the
+fax machine and just sat there saying connecting.  Hey Apple, how
+about some more debugging info.  Not much int the window, so I went
+into /var/log/system.log, where I get this kind of thing:
+<pre>
+Jan 28 09:30:46 localhost kernel: AppleModemOnHoldNub::start--registered service
+Jan 28 09:30:46 localhost kernel: AppleModemOnHoldService: Initializing
+Jan 28 09:30:46 localhost kernel: AppleModemOnHoldService: Probing
+Jan 28 09:30:46 localhost kernel: AppleModemOnHoldService: Starting
+Jan 28 09:30:46 localhost /System/Library/Extensions/IOSerialFamily.
+   kext/Contents/PlugIns/InternalModemSupport.kext/
+   Contents/Resources/AppleModem
+OnHold.app/Contents/MacOS/AppleModemOnHold: ModemOnHoldOpen >> 
+Jan 28 09:30:46 localhost /System/Library/Extensions/IOSerialFamily.
+   kext/Contents/PlugIns/InternalModemSupport.kext/Contents/Resources/
+   AppleModem
+OnHold.app/Contents/MacOS/AppleModemOnHold: MOHServiceAddedProc >> 
+Jan 28 09:30:46 localhost /System/Library/Extensions/IOSerialFamily.
+   kext/Contents/PlugIns/InternalModemSupport.kext/Contents/Resources/
+   AppleModem
+OnHold.app/Contents/MacOS/AppleModemOnHold: MOHServiceAddedProc <<< 
+Jan 28 09:34:07 localhost kernel: AppleModemOnHoldService: Stopping
+Jan 28 09:34:07 localhost kernel: AppleModemOnHoldNub::stop()
+Jan 28 09:34:07 localhost kernel: AppleModemOnHoldService: Freeing
+</pre>
+That does not tell me much.
+-----

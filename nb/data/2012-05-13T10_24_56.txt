@@ -1,0 +1,64 @@
+TITLE: mbsystem and tides
+AUTHOR: Kurt
+DATE: 05.13.2012 10:24
+DESC: just a taste
+-----
+BODY:
+schwehr.org is currently in a "transitional stage"... it will be back
+soon.  Too much going on with the group of use all hosting together
+for us to get this settled right away.
+
+<a href="http://schwehr.blogspot.com/2012/05/debianfink-and-mbsystem.html">same post of blogspot</a>
+
+Jonny B asked a question this morning about tides and mbsystem.  I
+didn't know the answer, but here is how I went about investigating.
+This is on a mac with 10.7 and fink.  Hopefully this will give people
+some ideas about how to dig through what is around.  "dpkg -L" lists
+the files in a package.  As Jonny B said with a reference to the movie
+The Matrix, "Yowza, nice kung fu!".  I didn't have a fish to give, so
+the best I could do was point to the tackle store and say you might be
+able to get what you need to fish in there.
+<pre># Which fink packages deal with sonar?
+<b>fink apropos sonar</b>
+# If you already know about mbsystem...
+<b>fink list mbsystem
+fink install mbsystem
+dpkg -L mbsystem | grep tide</b>
+# Nothing
+<b>cd ~/Desktop
+ls /sw/src/mbsystem*</b>
+# See that the latest tar is version 5.3.1917
+<b>tar xf /sw/src/mbsystem-5.3.1917.tar.gz
+cd mbsystem-5.3.1917
+find . | grep -i tide</b>
+# Nothing
+<!-- -->
+<b>find . | xargs grep -l tide | wc -l</b>
+# 84
+<b>find . | xargs grep -l tide</b>
+# ./html/mbdatalist.html
+# ./html/mbio.html
+# ./html/mbnavadjust.html
+# ./html/mbotps.html
+# ./html/mbprocess.html
+# ./html/mbset.html
+# ./html/mbsystem.html
+# ./html/mbsystem_how_to_get.html
+# ./install_makefiles
+# ./man/man1/mbdatalist.1
+# ./man/man1/mbnavadjust.1
+# ./man/man1/mbotps.1
+# ./man/man1/mbprocess.1
+# ./man/man1/mbset.1
+# ./man/man1/mbsystem.1
+# ...
+# ./src/utilities/mb7kpreprocess.c
+# ./src/utilities/mbcopy.c
+# ./src/utilities/mbinfo.c
+# ./src/utilities/mbprocess.c
+# ./src/utilities/mbset.c
+<!-- -->
+<b>man mbset</b>
+# "Apply tides to bathymetry."
+</pre>
+-----

@@ -1,0 +1,31 @@
+TITLE: MS-Access DB import
+AUTHOR: Kurt
+DATE: 06.15.2009 16:53
+DESC: the life of tools that aren't quite standard
+-----
+BODY:
+Since I did this before and can't remember how it was done last time,
+here is how I imported some AIS position data in MS Access.  I thought
+that I could import using SQL INSERT commands, but I guess not.  I had
+to do a CSV import to a new database.
+
+<img title="MS Access Import" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/ms-access-import-1.png"/>
+
+My data looks like this:
+<pre>% <b>bzcat *.csv.bz2 | head</b>
+lon,lat,mmsi,timestamp
+-70.4543233333,41.8040316667,366827210,2008-07-09 12:46:25
+-70.4531783333,41.8086866667,366827210,2008-07-09 12:47:25
+-70.451145,41.8131566667,366827210,2008-07-09 12:48:25
+-70.4477483333,41.8176933333,366827210,2008-07-09 12:49:31</pre>
+
+Then I used the "Advanced" button.  I had to specify my "Date Order"
+as YMD and check "Four Digit Years".  Then I specified my 4 field types
+and made the mmsi be an indexed field.  For file size reasons, I decided
+to leave off a primary key.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/ms-access-import-2.png"/>
+
+After hitting OK, I then selected the first line as field names and it
+zipped through the data.
+-----

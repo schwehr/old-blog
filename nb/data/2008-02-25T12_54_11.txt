@@ -1,0 +1,67 @@
+TITLE: ubuntu update troubles
+AUTHOR: Kurt
+DATE: 02.25.2008 12:54
+DESC: twisted
+-----
+BODY:
+I tried to update a ubunto 6.?? box to 7.10 over the last couple days.
+This is a generic shuttle box.  I did the update to 7.04 without
+hassle.  The reboot went fine, but the I tried to get to 7.10.  I did
+an update, but nothing.  Then I tried again and it got wedged over
+a set of wall paper images.  Of all the useless...
+
+NOTE: The ubuntu ntp settings are not good, so I made sure not to let
+the upgrade process change out ntp settings that Val put together.
+
+First in the 6?? world:
+<pre>
+% sudo apt-get install update-manager-core
+% sudo do-release-upgrade
+% sudo apt-get install language-pack-en
+% reboot
+</pre>
+now try to jump from 7.04 to 7.10
+<pre>
+% sudo apt-get autoremove
+% sudo apt-get install update-manager-core
+</pre>
+Huh?
+<pre>
+Errors were encountered while processing:
+ ubuntu-artwork
+</pre>
+Try some stuff...
+<pre>
+  sudo apt-get update
+  sudo apt-get upgrade
+  sudo apt-get upgrade -f 
+  sudo apt-get -f install
+</pre>
+but...
+<pre>
+Preconfiguring packages ...
+(Reading database ... 141787 files and directories currently installed.)
+Unpacking gutsy-wallpapers (from .../gutsy-wallpapers_0.17_all.deb) ...
+dpkg: error processing /var/cache/apt/archives/gutsy-wallpapers_0.17_all.deb (--unpack):
+ trying to overwrite `/usr/share/backgrounds/warty-final-ubuntu.png', which is also in package edgy-wallpapers
+dpkg-deb: subprocess paste killed by signal (Broken pipe)
+Preparing to replace base-files 4ubuntu2 (using .../base-files_4.0.0ubuntu5_i386.deb) ...
+Unpacking replacement base-files ...
+Errors were encountered while processing:
+ /var/cache/apt/archives/gutsy-wallpapers_0.17_all.deb
+</pre>
+My solution:
+<pre>
+sudo dpkg  --install --force-overwrite /var/cache/apt/archives/gutsy-wallpapers_0.17_all.deb
+sudo apt-get upgrade -f 
+sudo reboot
+</pre>
+All happy now
+<pre>
+cat /etc/lsb-release 
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=7.10
+DISTRIB_CODENAME=gutsy
+DISTRIB_DESCRIPTION="Ubuntu 7.10"
+</pre>
+-----

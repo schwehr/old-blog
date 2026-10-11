@@ -1,0 +1,31 @@
+TITLE: Postgresql insert or update
+AUTHOR: Kurt
+DATE: 05.07.2010 14:33
+DESC: help
+-----
+BODY:
+If anyone has a better suggestion on this, please let me know.  I am
+trying to update a table or insert a new entry if it doesn't exist and
+I would like to do this as fast as possible.  I found a really nice
+example of code that works fine when talking to postgresql over psql,
+but does not work inside of a psycopg2 connection.  Turns out that I got
+introuble by trying the update first.  If I try it with the insert first,
+I am then able to talk to the database only once per record.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> psycopg2
+cx <font color="#990000">=</font> psycopg2<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">"dbname='ais_test'"</font><font color="#990000">)</font>
+cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> i <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">):</font>
+    <b><font color="#0000FF">print</font></b> i
+<!-- -->
+    cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'''BEGIN;</font>
+<font color="#FF0000">SAVEPOINT sp1;</font>
+<font color="#FF0000">  INSERT INTO vessel_name VALUES(12345678, 'RUST BUCKET1', 67);</font>
+<font color="#FF0000">ROLLBACK TO sp1;</font>
+<font color="#FF0000">  UPDATE vessel_name SET name='RUST BUCKET', type_and_cargo=66 WHERE mmsi = 123456789;</font>
+<font color="#FF0000">COMMIT;'''</font><font color="#990000">)</font>
+<!-- -->
+    cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font></tt></pre>
+-----

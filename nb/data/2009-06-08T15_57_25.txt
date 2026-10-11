@@ -1,0 +1,40 @@
+TITLE: CentOS with more packages
+AUTHOR: Kurt
+DATE: 06.08.2009 15:57
+DESC: more better
+-----
+BODY:
+With the help of our IT team, I now have CentOS running with more
+packages available.  I realize now that we should have skipped CentOS
+and gone with Fedora.  At this point, I think we are going to just
+stick with CentOS with this addition: <a
+href="http://www.cyberciti.biz/faq/rhel-fedora-centos-linux-enable-epel-repo/">Red
+Hat Enterprise Linux / CentOS Linux Enable EPEL (Extra Packages for
+Enterprise Linux) Repository</a>
+
+<a href="http://download.fedora.redhat.com/pub/epel/5/x86_64/">http://download.fedora.redhat.com/pub/epel/5/x86_64/</a>
+<pre>% <b>sudo rpm -Uvh  http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-3.noarch.rpm</b>
+% sudo yum update
+% sudo yum clean all</pre>
+Now when I list what I've got available, there is a lot more:
+<pre>% <b>yum repolist</b>
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: centos.cogentcloud.com
+ * updates: mirror.skiplink.com
+ * addons: mirror.trouble-free.net
+ * extras: mirror.unl.edu
+repo id              repo name                                status  
+addons               CentOS-5 - Addons                        enabled :       0
+base                 CentOS-5 - Base                          enabled :   3,272
+epel                 Extra Packages for Enterprise Linux 5 -  enabled :   4,971
+extras               CentOS-5 - Extras                        enabled :     277
+spin-development     spin-development Packages - x86_64       enabled :       9
+updates              CentOS-5 - Updates                       enabled :     337</pre>
+And now I've got ipython and pysqlite2...
+<pre>% <b>yum list | grep python | wc -l</b>
+210
+% <b>sudo yum -y install ipython python-sqlite2</b></pre>
+Definitely better than what I had before.  I still am wishing for
+official python 2.5 and/or 2.6.
+-----

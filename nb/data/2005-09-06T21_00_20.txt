@@ -1,0 +1,57 @@
+TITLE: pyproj sample
+AUTHOR: Kurt
+DATE: 09.06.2005 21:00
+DESC: works nicely
+-----
+BODY:
+I did a quick pyproj test since I would like to use it in segy-py to
+handle the Eel Huntec SEGY which has UTM positioning.  Looks like I
+have a working sample and a fink info file to go with it.
+<pre>
+Info2: &lt;&lt;
+
+Package: pyproj-py%type_pkg[python]
+Version: 1.1
+Revision: 1
+Description: Projection coversions in python
+DescDetail: &lt;&lt;
+&lt;&lt;
+<font color="#444444">#http://www.cdc.noaa.gov/people/jeffrey.s.whitaker/python/pyproj.tar.gz</font>
+Source: http://www.cdc.noaa.gov/people/jeffrey.s.whitaker/python/pyproj-%v.tar.gz
+Source-MD5: f13b2e26389de92a79e5f0efa7ecd0c4
+Type: python (2.4)
+Depends: python%type_pkg[python], proj
+BuildDepend:
+CompileScript: &lt;&lt;
+<font color="0000ff"><strong> #!/bin/bash</strong></font>
+ export <font color="#2040a0">PROJ_DIR</font>=%p
+ %p/bin/python%type_raw[python] setup.py build
+&lt;&lt;
+InstallScript: &lt;&lt;
+ %p/bin/python%type_raw[python] setup.py install
+&lt;&lt;
+DocFiles: README
+License: BSD
+Homepage: http://cheeseshop.python.org/pypi/pyproj/1.0
+Maintainer: Kurt Schwehr &lt;goatbar _at_ users.sourceforge.net&gt;
+<font color="#444444"># Info2</font>
+&lt;&lt;
+</pre>
+The tar is not named quite right on the web site, so I had to download
+pyproj.tar.gz change it to /sw/src/pyproj-1.1.tar.gz.  Then I wrote
+this little python script that converts one utm point (core 1 TTN136B)
+from Lat/Lon to Zone 10 UTM.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<strong>from</strong> <font color="#2040a0">pyproj</font> <strong>import</strong> <font color="#2040a0">Proj</font>
+
+<font color="#2040a0">params</font> <font color="4444FF">=</font> <font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font>
+<font color="#2040a0">params</font><font color="4444FF">[</font><font color="#008000">'proj'</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#008000">'utm'</font>
+<font color="#2040a0">params</font><font color="4444FF">[</font><font color="#008000">'zone'</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#FF0000">10</font>
+<font color="#2040a0">p</font> <font color="4444FF">=</font> <font color="#2040a0">Proj</font><font color="4444FF">(</font><font color="#2040a0">params</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">p</font><font color="4444FF">(</font><font color="4444FF">-</font><font color="#FF0000">120.108</font>, <font color="#FF0000">34.36116666</font><font color="4444FF">)</font>
+<font color="#444444">#765975.64       3805993.13 0</font>
+</pre>
+How to get all the gcc macros: <b>gcc -arch ppc -dM -E - &lt; /dev/null | sort</b>
+-----

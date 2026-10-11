@@ -1,0 +1,75 @@
+TITLE: Correct zone message
+AUTHOR: Kurt
+DATE: 10.10.2008 10:31
+DESC: more better
+-----
+BODY:
+Here is a quick update with a zone message that has the correct zone
+status.  Also, Monica has a post on AIS: <a
+href="http://the-moni-blog.blogspot.com/2008/10/ais-helps-save-whales.html">AIS
+helps save the whales</a>
+
+Server side:
+<pre>
+3 {3: datetime.datetime(2008, 10, 10, 8, 6)}
+status_to_zones: WHALES_PRESENT
+zones:
+ZoneMsg
+  dac: 366
+  fi: 34
+  zone_id: 3
+  zone_type: 1 [Right Whales PRESENT] 
+  start_utc_day: 10
+  start_utc_hour: 8
+  start_utc_minute: 6
+  zone_duration_minutes: 1440
+  num zones: 1
+  ZoneCircular 9260m radius at (-70.45434, 42.33325)
+  ZoneCircular
+        radius:         9260m
+        longitude:      -70.454336
+        latitude:       42.333248
+sending "BMS,SBNMS,43.000,-68.300,41.000,-71.300,3,1001,5,1223735215,0101101110100010,0001100000010101001000000110100100000110101111010111110001010011100110000011100100101000110000100100001011000000"
+</pre>
+Received from N-AIS:
+<pre>
+./zonemsg_decode.py '!AIVDM,1,1,,A,803OvriK`QPE86T6gGiCV3T`hT;000,4*54,s26774,d-107,T10.61714596,x91153,r003669946,1223648831'
+{'DAC': 366, 'RepeatIndicator': 0, 'UserID': 3669739, 'Spare': 0, 'MessageID': 8, 'FI': 34}
+ZoneMsg
+  dac: 366
+  fi: 34
+  zone_id: 3
+  zone_type: <b>1 [Right Whales PRESENT]</b>
+  start_utc_day: 10
+  start_utc_hour: 8
+  start_utc_minute: 6
+  zone_duration_minutes: 1440
+  num zones: 1
+  ZoneCircular 9260m radius at (-70.45434, 42.33325)
+  ZoneCircular
+        radius:         9260m
+        longitude:      -70.454335
+        latitude:       42.3332466667
+</pre>
+The crontab is now set like this:
+<pre>
+% <b>crontab -l</b>
+# m h  dom mon dow   command
+0-59/5 * * * * cd /home/schwehr/projects/rap && ./do_update.bash
+</pre>
+A batch of whale msgs.  There are 9 as we have one buoy that is currently reporting being down.
+<pre>
+!AIVDM,1,1,,B,803OvriK`Q05&gt;`0Fg?TIV3`j0T;000,4*2A,s27037,d-106,T12.45712056,x92020,r003669946,1223649613
+!AIVDM,1,1,,A,803OvriK`QPE86T6gGiCV3T`hT;000,4*54,s26982,d-106,T12.91045208,x92022,r003669946,1223649613
+!AIVDM,1,1,,B,803OvriK`R0E27T6gOv763PKLT;000,4*37,s31924,d-085,T13.33702985,x122948,r003669945,1223649614
+!AIVDM,1,1,,A,803OvriK`RPE4IT6g`:kV3L:0T;000,4*62,s31742,d-085,T13.52369577,x122949,r003669945,1223649614
+!AIVDM,1,1,,B,803OvriK`S05&gt;`0FghGI63GlLT;000,4*51,s26990,d-106,T14.03046862,x92026,r003669946,1223649614
+!AIVDM,1,1,,A,803OvriK`SPE8QT6gpSnV3CJlT;000,4*28,s27051,d-106,T14.51046670,x92028,r003669946,1223649615
+!AIVDM,1,1,,B,803OvriK`T05&gt;`0FgtEM62`0TT;000,4*2E,s31933,d-085,T14.96369401,x122955,r003669945,1223649615
+!AIVDM,1,1,,A,803OvriK`TPDiPT6h06NV1tULT;000,4*7E,s31735,d-085,T15.39034995,x122957,r003669945,1223649616
+!AIVDM,1,1,,B,803OvriK`U05&gt;`0Fh3nt61A9DT;000,4*4E,s31960,d-084,T15.57701587,x122958,r003669945,1223649616
+</pre>
+Here is the corresponding whale status from <a href="http://listenforwhales.org">ListenForWhale</a>:
+
+<img title="Listen for Whales status flash map" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/listenforwhales-20081010.png"/>
+-----

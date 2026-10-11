@@ -1,0 +1,39 @@
+TITLE: remounting an ejected drive
+AUTHOR: Kurt
+DATE: 09.17.2010 09:48
+DESC: finally figured this stuff out
+-----
+BODY:
+If you unmount a drive from your Mac and want to mount it back onto
+the system without unplugging and replugging it, here is how.  You might do this to stop backups for a day during super intensive compute job that generates lots of files that you have no interest in backing up or you just make a mistake and eject a drive.
+<pre><b>diskutil list</b>
+/dev/disk0
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:      GUID_partition_scheme                        *320.1 GB   disk0
+   1:                        EFI                         209.7 MB   disk0s1
+   2:                  Apple_HFS Macintosh HD            319.7 GB   disk0s2
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:      GUID_partition_scheme                        *640.1 GB   disk1
+   1:                        EFI                         209.7 MB   disk1s1
+   2:                  Apple_HFS Time Machine Backups    639.8 GB   disk1s2
+/dev/disk2
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     Apple_partition_scheme                        *84.5 MB    disk2
+   1:        Apple_partition_map                         32.3 KB    disk2s1
+   2:                  Apple_HFS Google Chrome           84.4 MB    disk2s2
+<b>diskutil mount disk1s2</b>
+Volume Time Machine Backups on disk1s2 mounted</pre>
+That Google Chrome partition is a lot weird.
+<pre><b>df -h</b>
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/disk0s2          298G   93G  206G  31% /
+devfs                 113K  113K     0 100% /dev
+/dev/disk2s2           81M   81M     0 100% /private/tmp/UpdateEngine-mount.LDI5zbOjpk
+/dev/disk1s2          596G  116G  481G  20% /Volumes/Time Machine Backups</pre>
+That looks like it has something to do with Google's update process, but I don't see anything show up in the finder.  Even stranger that I don't have it on other machines.  It would have been nice if the mac had just stuck with the traditional unix mount command for these kinds of things.
+
+Also, if you are annoyed that the Mac indexes backup drives (and other
+portable drives), you can tell it not to index them.  
+<pre><b>touch /Volumes/Time\ Machine\ Backups/.metadata_never_index</b></pre>
+-----

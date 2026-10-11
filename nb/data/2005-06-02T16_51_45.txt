@@ -1,0 +1,66 @@
+TITLE: segy-py 0.6 release - segydump.py
+AUTHOR: Kurt
+DATE: 06.02.2005 16:51
+DESC: woo hoo
+-----
+BODY:
+segy-py version 0.6 marks the release of segydump.py which is designed
+to give more English like access to fields inside of a segy file.  Use
+it something like this:
+<pre>
+  ./segydump.py --noFileHeader --driver=segy_drv_xstar -t 3 *.xstar
+</pre>
+And it will return text that is suitable for pasting into python or
+bash scripts.
+<pre>
+########################################
+filename="bpsio01L00.xstar"
+########################################
+
+# TRACE HEADER 3
+SweepFreqStart=1000
+NMEALongSmall=-72060739
+Min=17
+NMEAyear=2004
+NMEAhour=20
+</pre>
+And to let it output the file header, just remove the --noFileHeader:
+<pre>
+./segydump.py --driver=segy_drv_xstar  bpsio01L00.xstar   
+
+########################################
+filename="bpsio01L00.xstar"
+########################################
+
+# FILE HEADER
+TraceSorting=0
+SampleFormat=3
+EnsembleFold=0
+LineNo=0
+SamplesPerTrace=3976
+FixedLenTraceFlag=0
+SegYRev=0
+VerticalSum=0
+NumExtendedTextHeaders=0
+SweepStart=0
+SweepEnd=0
+SampleFormat='2-byte, twos complement integer'
+</pre>
+To get help, just use the --help option:
+<pre>
+./segydump.py  --help
+usage: $prog [options] segyfile1 segyfile2 ... segyfileN
+
+options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -d DRV, --driver=DRV  specify which driver to parse data file
+                        Default=segy_drv_rev1
+  -n, --noFileHeader    see the file header fields
+  -t TRACEHEADERNUMBER, --traceHeader=TRACEHEADERNUMBER
+                        Set this to view values for a trace header
+</pre>
+Have fun!  Don't forget that you can drop the driver option and it
+defaults to the segy_drv_rev1 which is for standard compliant SEGY Rev
+1 files.
+-----

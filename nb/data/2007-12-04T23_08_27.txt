@@ -1,0 +1,67 @@
+TITLE: i.Trek Z1 bluetooth GPS works with my Mac
+AUTHOR: Kurt
+DATE: 12.04.2007 23:08
+DESC: I have gps data
+-----
+BODY:
+I got my new GPS today.  I was a little worried about getting it
+working, but it turned out to be very easy.  I didn't even need to
+setup a bluetooth library.  I was thinking that I needed to write some
+python to talk to the device with something like <a
+href="http://lightblue.sourceforge.net">lightblue</a>
+
+I put in the battery and hooked the GPS up to a USB port on my laptop.
+I set the switch to navigation mode and hen went looking for the
+manual.  Here are the instructions it somes with:
+<ol>
+  <li> Go to System Preferences and click on the Bluetooth icon.</li>
+  <li> Click on settings to ensure BT is turned on and discoverable.</li>
+  <li> Select the Devices tab.</li>
+  <li> Click on set up new device.</li>
+  <li> This brings up the Bluetooth Set Up Assistant.</li>
+  <li> Follow the instructions on the set up assistant and enter 0000 as passkey.</li>
+  <li> The device should be listed in the devices window.</li>
+  <li> Locate the BT serial utility application in the utilities folder, double click to open.</li>
+  <li> Click on new.</li>
+  <li> Assign the port a name, select outgoing, click on select device.</li>
+  <li> Select the iBT-GPS and highlight SPP slave in the right hand window.</li>
+  <li> Click select button and select the port type RS-232.</li>
+  <li> Click OK to finish setup.</li>
+</ol>
+Here is what I did...  System preferences.  Click on the bluetooth
+icon. Select Devices.  Click on setup new device.
+
+<img src="http://schwehr.org/blog/attachments/2007-12/i.trek-z1-gps-1.png"/>
+
+Press Passkey Options.
+
+<img src="http://schwehr.org/blog/attachments/2007-12/i.trek-z1-gps-2.png"/>
+
+Set to "Use a specific passkey".  enter 0000
+
+<img src="http://schwehr.org/blog/attachments/2007-12/i.trek-z1-gps-3.png"/>
+
+And then I was good to go.  A device appeared in /dev!
+<pre>
+ls -l /dev/tty.iBT-GPS-SPPslave-1 
+crw-rw-rw-   1 root  wheel   10,  48 Dec  4 22:51 /dev/tty.iBT-GPS-SPPslave-1
+</pre>
+I then used my serial logging program to pull NMEA strings from the GPS
+<pre>
+ serial_logger.py -p /dev/tty.iBT-GPS-SPPslave-1 -v
+opening logfile: log.2007-12-05
+$GPGGA,133428.811,4308.0723,N,07056.3810,W,1,5,1.46,24.9,M,-32.9,M,,*52
+$GPGSA,A,3,25,08,27,13,16,,,,,,,,1.72,1.46,0.92*01
+$GPGSV,3,1,10,19,75,162,,25,67,297,37,03,62,062,,27,47,308,38*7E
+$GPGSV,3,2,10,13,39,235,39,16,23,077,23,08,20,311,35,23,19,200,*7C
+$GPGSV,3,3,10,11,05,181,,21,01,027,*72
+$GPRMC,133428.811,A,4308.0723,N,07056.3810,W,0.15,0.00,051207,,,A*79
+$GPGGA,133429.793,4308.0846,N,07056.3870,W,1,5,1.46,25.6,M,-32.9,M,,*52
+$GPGSA,A,3,25,08,27,13,16,,,,,,,,1.73,1.46,0.92*00
+$GPGSV,3,1,10,19,75,162,,25,67,297,37,03,62,062,,27,47,308,38*7E
+$GPGSV,3,2,10,13,39,235,39,16,23,077,21,08,20,311,35,23,19,200,*7E
+$GPGSV,3,3,10,11,05,181,,21,01,027,*72
+$GPRMC,133429.793,A,4308.0846,N,07056.3870,W,0.04,0.00,051207,,,A*77
+...
+</pre>
+-----

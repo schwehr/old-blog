@@ -1,0 +1,191 @@
+TITLE: Layback
+AUTHOR: Kurt
+DATE: 06.25.2005 08:32
+DESC: ways to calculate
+-----
+BODY:
+
+<b>Update:</b> 28-Jun-2005
+<pre>
+  The shot distance calculation method that uses the whole line is
+  really not good.  As the water depth under the chirp changes, the
+  time between pings (and hence distance between shots) changes.
+</pre>
+
+One of the issues with chirp seismic profiles that I need to address
+is correlating the locations of cores to shot points that the chirp
+system records.  This task is already handled for hull mounted
+systems, but must accounted for with towed systems like the one that
+Neal Driscoll has.  Since the GPS is mounted on the ship and the fish
+is in the water on a cable, we need a way to know where the fish is
+relative to the the GPS.  To make life easy, I am going to make some
+assumptions that are basically true for this cruise.  Note that these
+assumptions are definitely <b>not</b> valid on other cruises.
+<ul>
+  <li>The ship is moving at a constant velocity
+  <li>The ship is moving in a straight line
+  <li>Nobody changed the wire out on the fish and the wire out is known
+  <li>The fish is stable in water column - not moving up and down
+  <li>The wire from the back of the ship to the fish is in a straight
+  line.  This is not totally true, but it should be close enough
+  <li>We have a large section of flat sea floor somewhere in the line
+</ul>
+The method used here is just some simple geometry with triangles.  If
+we assume a perfect system, it is possible to get an estimate of the
+layback of the fish relative to the GPS both in terms of distance and
+in delta shot count.
+
+The first numbers come from the log book on <a target="new"
+href="http://schwehr.org/Gaviota/bpsio-Aug04/bpsio-log/images/bpsio-log-09.jpg">page
+9</a>.  The distance from the GPS antenna to the block right below the
+A-frame is 12 meters.  The cable out from the block is 50m.
+
+Next I need to get some depth points on a track line in an area near
+where the sea floor is basically flat.  I used segysql.py to generate
+a database for bpsio04L04.xstar and created a lonlatshot log with this
+sqlite command:
+<pre>
+  sqlite segy.db 'select x/3600.0,y/3600.0,Shotpoint from segyTrace'\
+   | tr '|' ' '> lonlatshot.txt
+</pre>
+Fledermaus is an easy way to get these values.  I loaded the data
+object santabarbC_bath.sd which is the model for whole basin made by
+MBARI.  Then File-&gt;Import-&gt;Import Line and use lonlatshot.txt as an xy
+data file.  Then click the drape button to see the line right on the
+bathymetry.  Zoom into the shelf edge where the line is.  Put the
+mouse over a couple points on the line in a flat area:
+<pre>
+  -120.05222321 34.40695572 -84.42
+  -120.05193329 34.40694809 -84.28
+</pre>
+I then went back into the lonlatshot.txt file and found that these
+points were are around shot 88450.  I used pltsegy to show the shot
+range of 88200 to 88700.  I then picked the sea floor and got this
+pick.xtp file:
+<pre>
+88399    1     0.000   0.072
+88451    1     0.000   0.071
+88500    1     0.000   0.071
+</pre>
+This means that the two way travel time (ttwt) between the fish and
+the sea floor is about 0.0714 seconds.  If sound velocity in water is
+1500 m/s, the two way time should be multiplied by 750 m/s to get
+distance.
+<pre>
+  0.0714 s * 750 m/s = 53.55m above the sea floor.
+</pre>
+We need the depth of the fish in the water to complete a right
+triangle:  Water depth minus the distance above the sea floor.
+<pre>
+  84.3m - 53.55m = 30.75 meters below the surface.
+</pre>
+Then add 1 meter for the distance of the block above the sea
+surface. to get 31.75 meters.  With 50 meters of wire out, we can now
+solve the equation x*x + y*y = wirelen*wirelen.
+<pre>
+python -c "import math; print math.sqrt(50*50 - 31.75*31.75)"
+
+38.6256067914
+</pre>
+That 38.63 is the horizontal distance from the block to the fish.  The
+total horizontal distance from the fish to the GPS needs to have the
+extra 12 meters of deck space added.
+<pre>
+  38.63m + 12m = 50.63m behind the GPS.
+</pre>
+Now we need a simple shot offset:  If we have a best fit match for a
+core to an xstar lon,lat,shot, How many shot points to add or subtract
+to where that core is by shot number in the chirp seismics?  Since the
+fish is behind the ship, we have to add shots to the best fit shot to
+find the actual shot for that core location.  How to figure the shot
+offset?  We have to assume a constant speed and calculate an average
+distance per shot.  We can use a whole straight line to figure this
+out.  From lonlatshot.txt:
+<pre>
+  -120.063888888889 34.3408333333333 79830
+  -120.063888888889 34.3408333333333 79830
+  ...
+  -120.051388888889 34.4116666666667 89824
+  -120.051388888889 34.4116666666667 89824
+</pre>
+How far is that?  We can use the <a
+href="http://fink.sourceforge.net/pdb/package.php/proj">proj</a> USGS
+package with the UTM project to calculate distances in small areas
+like the Santa Barbara Basin.  I talked about this in <a
+href="http://schwehr.org/VizClass/VizLecture7.html#proj">VizLecture
+7</a>.  The Santa Barbara Basin is in <a
+href="http://www.dmap.co.uk/utmworld.htm">UTM Zone 11S</a>, but we
+just need the 11.
+<pre>
+  proj +proj=utm +zone=11
+
+  -120.063888888889 34.3408333333333 0.
+  -120.051388888889 34.4116666666667 0.
+
+Giving:
+
+  218142.35       3804201.63 0.
+  219529.19       3812025.38 0.
+</pre>
+Python can compute the distance in meters for us:
+<pre>
+  python -c "import math; print math.sqrt( \
+    pow(218142.35-219529.19,2)+pow(3804201.63-3812025.38,2)\
+    )"
+
+  7945.7151502
+</pre>
+Now use that 7945.71 meters to get the meters/shot:
+<pre>
+  python -c "print 7945.72/(89824-79830)"
+
+  0.795049029418  meters/shot
+</pre> 
+So how many shots is 50.63 meters?
+<pre>
+  python -c "print 50.63/0.79505"
+
+  63.6815294636 Shots
+</pre>
+A little bash script will help make a table of the core locations and
+best fit.:
+<pre>
+for file in ?-find.dat; do 
+  echo -n "$file:  ";head -8 $file | tail -1
+done 
+
+1-find.dat:    -120.108056  34.361111  0.000079 48 245237 4041
+2-find.dat:    -120.107778  34.369722  0.000393 48 245985 5537
+3-find.dat:    -120.058889  34.365556  0.000124 17 81682 3727
+4-find.dat:    -120.057222  34.378889  0.000124 17 83033 6424
+5-find.dat:    -120.023611  34.336667  0.000386 57 293301 15245
+6-find.dat:    -119.977222  34.328333  0.001650 58 296308 1255
+</pre>
+Now for the best matching shot number with layback:
+<pre>
+(for file in ?-find.dat; do echo -n "$file: ";head -8 $file |\
+ tail -1 ; done) | awk '{print $1,$6+64}'
+
+1-find.dat: 245301
+2-find.dat: 246049
+3-find.dat: 81746
+4-find.dat: 83097
+5-find.dat: 293365
+6-find.dat: 296372
+</pre>
+And that is the table of the best shot for each core!
+
+There are several other ways to calculate the layback and most of them
+are better than this one!  Jenna used a method that uses an area of
+the chirp where the water multiple is visible in the sampling window.
+This gives water depth.  Using this method is would be possible to
+build a lookup table of speed to depth.
+
+An even better solution is to have a depth transducer on the fish and
+an encoder on the winch.  Then use a more complete wire/flight model
+for the fish.
+
+Thanks to R. Fenwick and J. Hill for help on this.
+
+Fashion of the day in PB: "Utilikilts"
+-----

@@ -1,0 +1,49 @@
+TITLE: Need help with compiling scipy 0.7.0 on fink
+AUTHOR: Kurt
+DATE: 04.07.2009 21:48
+DESC: Doh!
+-----
+BODY:
+Update: Sebastien Maret found the problem over in numpy (called
+scipy-core-py in fink): <a href="http://projects.scipy.org/numpy/ticket/1087">Trac ticket 1087 for numpy - Unsupported -arch flag on Darwin</a>.  Should now work in fink thanks to Sebastien patching it.
+
+If anyone know how to fix this compile error with scipy 0.7.0 on Mac OSX 10.5.5 intel?  This builds on PPC.  Where do I find this -arch i686 thing and get rid of it?
+
+<a href="http://projects.scipy.org/scipy/ticket/915">SciPy Dev Trac entry 915</a>
+<pre>gcc version 4.4.0 20090327 (prerelease) (GCC) 
+Using built-in specs.
+Target: i686-apple-darwin9
+Configured with: ../gcc-4.4-20090327/configure --prefix=/sw \
+  --prefix=/sw/lib/gcc4.4 --mandir=/sw/share/man --infodir=/sw/share/info \
+  --enable-languages=c,c++,fortran,objc,java --with-gmp=/sw \
+  --with-libiconv-prefix=/sw --with-ppl=/sw --with-cloog=/sw \
+  --with-system-zlib --x-includes=/usr/X11R6/include \
+  --x-libraries=/usr/X11R6/lib --disable-libjava-multilib --with-arch=nocona \
+  --with-tune=generic --build=i686-apple-darwin9 --host=i686-apple-darwin9 \
+  --target=i686-apple-darwin9
+Thread model: posix
+gcc version 4.4.0 20090327 (prerelease) (GCC) 
+customize Gnu95FCompiler using build_clib
+building 'dfftpack' library
+compiling Fortran sources
+Fortran f77 compiler: /sw/bin/gfortran -Wall -ffixed-form -fno-second-underscore \
+-arch i686 -fPIC -O3 -funroll-loops
+Fortran f90 compiler: /sw/bin/gfortran -Wall -fno-second-underscore -arch i686 \
+-fPIC -O3 -funroll-loops
+Fortran fix compiler: /sw/bin/gfortran -Wall -ffixed-form -fno-second-underscore \
+-Wall -fno-second-underscore -arch i686 -fPIC -O3 -funroll-loops
+creating build/temp.macosx-10.5-i386-2.5
+creating build/temp.macosx-10.5-i386-2.5/scipy
+creating build/temp.macosx-10.5-i386-2.5/scipy/fftpack
+creating build/temp.macosx-10.5-i386-2.5/scipy/fftpack/src
+creating build/temp.macosx-10.5-i386-2.5/scipy/fftpack/src/dfftpack
+compile options: '-I/sw/lib/python2.5/site-packages/numpy/core/include -c'
+gfortran:f77: scipy/fftpack/src/dfftpack/dcosqb.f
+f951: error: unrecognized command line option "-arch"
+f951: error: unrecognized command line option "-arch"
+error: Command "/sw/bin/gfortran -Wall -ffixed-form -fno-second-underscore -arch \
+i686 -fPIC -O3 -funroll-loops -I/sw/lib/python2.5/site-packages/numpy/core/include \
+-c -c scipy/fftpack/src/dfftpack/dcosqb.f -o \
+build/temp.macosx-10.5-i386-2.5/scipy/fftpack/src/dfftpack/dcosqb.o" failed with exit status 1
+</pre>
+-----

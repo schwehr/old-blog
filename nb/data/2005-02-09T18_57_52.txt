@@ -1,0 +1,31 @@
+TITLE: Resurecting data
+AUTHOR: Kurt
+DATE: 02.09.2005 18:57
+DESC: pmag resusitation
+-----
+BODY:
+Sounds like the meeting between CalIt2 and JPL went well last week
+with posibilities for future collaboration.
+
+Today I resurrected some paleomag data from last weekend.  It had been
+quite a while since I had used flow with cubes, so I had put the cubes
+in with the arrow point down into flo rather ran out of the side of
+flow/up at the ceiling.  Lisa's pmag library has a nice little program
+call di_geo to help that I wrapped into a little script:
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+rm -f better.mag
+cat bad.mag | while read line; do
+    <font color="#2040a0">decinc_bad</font>=`echo <font color="#2040a0">$line</font> | awk '{print <font color="#2040a0">$5</font>,<fo
+nt color="#2040a0">$6</font>,0,-90}'`
+    <font color="#2040a0">decinc_good</font>=`echo <font color="#2040a0">$decinc_bad</font> | di_geo`
+    <font color="#2040a0">first</font>=`echo <font color="#2040a0">$line</font> | awk '{print <font color="#2040a0">$1</font>,<font co
+lor="#2040a0">$2</font>,<font color="#2040a0">$3</font>,<font color="#2040a0">$4</font>}'`
+    <font color="#2040a0">last</font>=`echo <font color="#2040a0">$line</font> | awk '{print <font color="#2040a0">$7</font>,<font col
+or="#2040a0">$8</font>}'`
+    echo <font color="#008000">&quot;<font color="#2040a0">$first</font>    <font color="#2040a0">$decinc_good</font> <font color="#20
+40a0">$last</font>&quot;</font> &gt;&gt; better.mag
+done
+</pre>
+By the way, I used code2html to make html out of the script.
+-----

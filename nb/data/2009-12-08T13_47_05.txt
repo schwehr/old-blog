@@ -1,0 +1,44 @@
+TITLE: Pulling together the whole process
+AUTHOR: Kurt
+DATE: 12.08.2009 13:47
+DESC: getting close
+-----
+BODY:
+I am now pulling together the whole process.  I was going to do a
+different color ramp for each file, but decided to go with one
+fixed-depth color ramp when I could not figure out how to do a good
+relative ramp that ignored the no-data values in gdaldem color-relief.
+<pre><tt><i><font color="#9A1900">#!/bin/bash -e</font></i>
+<i><font color="#9A1900"># Convert all BAGs from NGDC into KML visualizations</font></i>
+<b><font color="#0000FF">for</font></b> compressed_file <b><font color="#0000FF">in</font></b> `find <font color="#990000">.</font> -name <font color="#990000">\*.</font>bag<font color="#990000">.</font>gz`<font color="#990000">;</font> <b><font color="#0000FF">do</font></b> 
+    echo <font color="#FF0000">"BAGcmp: $compressed_file"</font>
+    <font color="#009900">basename</font><font color="#990000">=</font>`basename <font color="#009900">$compressed_file</font>`
+    echo <font color="#FF0000">"basename: $basename"</font>
+    <font color="#009900">src</font><font color="#990000">=</font>`basename <font color="#009900">${compressed_file%%.gz}</font>`
+    echo <font color="#FF0000">"BAG: $src"</font>
+    <font color="#009900">survey</font><font color="#990000">=</font>`echo <font color="#009900">$compressed_file</font> <font color="#990000">|</font> cut -f<font color="#993399">3</font> -d<font color="#990000">/</font> `
+    echo <font color="#FF0000">"survey: $survey"</font>
+<!-- -->
+    <font color="#009900">patch</font><font color="#990000">=</font><font color="#009900">${src%%.bag}</font>
+    echo <font color="#FF0000">"patch: $patch"</font>
+<!-- -->
+    mkdir -p processed<font color="#990000">/</font><font color="#009900">$survey</font>
+    gzcat <font color="#009900">$compressed_file</font> <font color="#990000">&gt;</font> processed<font color="#990000">/</font><font color="#009900">$survey</font><font color="#990000">/</font><font color="#009900">$src</font>
+    <b><font color="#0000FF">pushd</font></b> processed<font color="#990000">/</font><font color="#009900">$survey</font>
+        echo Processing patch<font color="#990000">:</font> <font color="#009900">$patch</font>
+        <font color="#990000">~</font>/local/bin/gdalwarp -ot Float32 -t_srs EPSG<font color="#990000">:</font><font color="#993399">4326</font>  <font color="#009900">$patch</font><font color="#990000">.</font>bag <font color="#009900">${patch}</font>-depths-f<font color="#993399">32</font><font color="#990000">.</font>tif
+        <font color="#990000">~</font>/local/bin/gdalinfo -hist <font color="#009900">$patch</font><font color="#990000">.</font>bag <font color="#990000">&gt;</font> <font color="#009900">$patch</font><font color="#990000">.</font>bag<font color="#990000">.</font>info
+        <font color="#990000">~</font>/local/bin/gdaldem color-relief -co <font color="#FF0000">"nv=0"</font> <font color="#009900">${patch}</font>-depths-f<font color="#993399">32</font><font color="#990000">.</font>tif <font color="#990000">../..</font>/color_ramp_fixed<font color="#990000">.</font>dat  <font color="#009900">${patch}</font>-color-relief<font color="#990000">.</font>tif -alpha
+        <font color="#990000">~</font>/local/bin/gdaldem hillshade <font color="#009900">${patch}</font>-depths-f<font color="#993399">32</font><font color="#990000">.</font>tif <font color="#009900">$patch</font>-hillshade<font color="#990000">.</font>tif 
+        composite -blend <font color="#993399">50</font> <font color="#009900">$patch</font>-hillshade<font color="#990000">.</font>tif <font color="#009900">${patch}</font>-color-relief<font color="#990000">.</font>tif <font color="#009900">${patch}</font>-blend<font color="#990000">.</font>tif <i><font color="#9A1900"># 2&amp;&gt; /dev/null</font></i>
+        echo
+        echo <font color="#FF0000">"Correcting georeferencing..."</font>
+        listgeo -tfw <font color="#009900">${patch}</font>-depths-f<font color="#993399">32</font><font color="#990000">.</font>tif
+        geotifcp -e <font color="#009900">${patch}</font>-depths-f<font color="#993399">32</font><font color="#990000">.</font>tfw <font color="#009900">${patch}</font>-blend<font color="#990000">.</font>tif <font color="#009900">${patch}</font><font color="#990000">.</font>tif 
+        gdal2tiles<font color="#990000">.</font>py26 -k -s EPSG<font color="#990000">:</font><font color="#993399">4326</font> <font color="#009900">${patch}</font><font color="#990000">.</font>tif
+    <b><font color="#0000FF">popd</font></b>
+<b><font color="#0000FF">done</font></b></tt></pre>
+<img title="Viewing the tiled results" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/bags-together-2.png"/>
+
+<img title="Viewing the tiled results" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/bags-together.png"/>
+-----

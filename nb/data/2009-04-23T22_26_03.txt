@@ -1,0 +1,34 @@
+TITLE: Right whale sightings with time and traffic lanes
+AUTHOR: Kurt
+DATE: 04.23.2009 22:26
+DESC: more better
+-----
+BODY:
+Thanks to a Googalite for telling me how I can set the time slider for
+a dataset.  Before, I cut out the TimeStamp nodes because the view was
+coming up with no whales visible and it was confusing.  By adding the
+gx namespace and setting an overall view with a gx:TimeSpan, the placemarks
+open up and set the time range to show all the whale sightings.
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;kml</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"http://earth.google.com/kml/2.0"</font> <font color="#009900">xmlns:gx</font><font color="#990000">=</font><font color="#FF0000">"http://www.google.com/kml/ext/2.2"</font> <b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;Document&gt;&lt;Folder&gt;</font></b>
+  <b><font color="#0000FF">&lt;LookAt&gt;</font></b>
+    <b><font color="#0000FF">&lt;gx:TimeSpan&gt;</font></b>
+      <b><font color="#0000FF">&lt;begin&gt;</font></b>2009-01-04<b><font color="#0000FF">&lt;/begin&gt;</font></b>
+      <b><font color="#0000FF">&lt;end&gt;</font></b>2009-04-01<b><font color="#0000FF">&lt;/end&gt;</font></b>
+    <b><font color="#0000FF">&lt;/gx:TimeSpan&gt;</font></b>
+    <b><font color="#0000FF">&lt;longitude&gt;</font></b>-70.94<b><font color="#0000FF">&lt;/longitude&gt;</font></b>
+    <b><font color="#0000FF">&lt;latitude&gt;</font></b>40.77<b><font color="#0000FF">&lt;/latitude&gt;</font></b>
+    <b><font color="#0000FF">&lt;altitude&gt;</font></b>0<b><font color="#0000FF">&lt;/altitude&gt;</font></b>
+    <b><font color="#0000FF">&lt;range&gt;</font></b>801077.2<b><font color="#0000FF">&lt;/range&gt;</font></b>
+    <b><font color="#0000FF">&lt;tilt&gt;</font></b>37.27<b><font color="#0000FF">&lt;/tilt&gt;</font></b>
+    <b><font color="#0000FF">&lt;heading&gt;</font></b>-44.46<b><font color="#0000FF">&lt;/heading&gt;</font></b>
+    <b><font color="#0000FF">&lt;altitudeMode&gt;</font></b>relativeToGround<b><font color="#0000FF">&lt;/altitudeMode&gt;</font></b>
+  <b><font color="#0000FF">&lt;/LookAt&gt;</font></b>
+<i><font color="#9A1900">&lt;!-- ... --&gt;</font></i></tt></pre>
+I also added a subset of the S-57 charts from Christin.
+<pre>% <b>ogr2ogr -f KML traffic-lanes.kml traffic-lanes.shp</b></pre>
+<a href="http://schwehr.org/blog/attachments/2009-04/2009-ne-rightwhale-sightings-with-time.kmz">2009-ne-rightwhale-sightings-with-time.kmz</a>
+
+<img title="2009 NE Right Whale sightings" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/rwhalesightings-ge-with-time.png"/>
+-----

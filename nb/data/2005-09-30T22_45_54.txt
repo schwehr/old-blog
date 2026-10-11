@@ -1,0 +1,69 @@
+TITLE: Excellent article on fink at MacDevCenter
+AUTHOR: Kurt
+DATE: 09.30.2005 22:45
+DESC: fink works great on osx
+-----
+BODY:
+
+Update on the Cisco VPN for OSX at UCSD: Works pretty well but is
+annoying.  It freaks in areas of spotty wireless.  It demands to keep
+open it's window while running.  How about a small icon on the menu
+bar like iChat or Adium?  Also, it doens't show much about it's status.
+
+<a
+href="http://www.macdevcenter.com/pub/a/mac/2005/09/30/fink.html?CMP=OTC-13IV03560550">Installing
+Fink on Mac OS X</a> at MacDevCenter looks like a very nice article
+and tutorial on using Fink.  I'm biased since it is very positive and
+I'm on the fink developer team (but definitely not a core member).
+<pre>
+...
+  The Fink project, which began in December 2000, has two goals. It
+  aims to port all this software to Mac OS X ("porting") and makes it
+  available for install ("packaging"). As a full package management
+  system, based on Debian's apt system, it installs and uninstalls
+  packages, tracks dependencies, installs the packages that are
+  needed, updates the packages, etc. Bottom line: installing Unix
+  software on Mac OS X with Fink is a piece of cake (most of the
+  time). There can be challenges, however, and I'll cover those in a
+  minute. 
+...
+</pre>
+I emailed Vince my fink recovery notes earlier today, so I figured I
+would post them here.  Sometimes fink gets a little confused.
+<pre>
+for fink, it you are having trouble, here are my quick debugging tips
+
+* Make sure you have Xcode installed (e.g. you have /Developer)
+* Make sure you have Apples X11 installed
+* Install the X11SDK  (Xcode leaves this out)
+
+Then run this command:
+
+sudo /sw/lib/fink/postinstall.pl
+
+Then make sure /sw/etc/fink.conf has all of the trees.  Using the
+unstable tree is critical...
+
+Trees: local/main stable/main stable/crypto unstable/crypto unstable/main
+
+Then in fink commander do Source->Selfupdate rsync  ( do NOT use
+   CVS... it is Slowwwww) 
+
+Then Source->ScanPackages
+
+Also make sure that you don't have any stale buildlock files around.
+Open FinkCommander, and type lock in the search window.  If you see
+any build locks and are not currently building anything, remove those
+packages.
+
+That has fixed just about every problem I've run into... but never
+fear, you can always nuke /sw and reinstall fink from scratch.  It
+doesn't take too long to get back up and running.
+</pre>
+Also, if X11 refuses to install saying that it is alread there, you
+may need to delete the Receipt for X11.  Be careful... just move the
+Folder to your desktop first and then try to reinstall it.  On 10.3,
+receipts are in /Library/Receipts.  BE CAREFUL with this!
+
+Maybe Dru will have an update for what works with 10.4.
+-----

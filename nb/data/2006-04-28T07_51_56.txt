@@ -1,0 +1,41 @@
+TITLE: lxml and xpath
+AUTHOR: Kurt
+DATE: 04.28.2006 07:51
+DESC: NOAA, pydro
+-----
+BODY:
+I spent about 2 hours yesterday at NOAA talking to Jack who is one of
+the pydro developers.  Pydro is a very large python application that
+does all sorts of neat things with python.  He overloaded my brain
+with all kinds of ideas, but an easiest one for me to use is XPath.
+
+He codes under the Microsoft DOM, so I can't use that.  I found out
+this morning that elementtree only implements a small subset of XPath.
+That is when I discovered lxml.  lxml wraps libxml2 with an
+ElementTree interface, but then extends that to provide more
+capabilities.  First, I created a <a
+href="http://schwehr.org/blog/attachments/2006/lxml-py.info">lxml-py.info</a>
+
+Now for an example.  This first example shows how to load in an xml
+string via the string interface.  This makes is easy to embed the xml
+document inside of a python file.  I should really do this for the
+current application that I am working on so that I don't have to keep
+shoving around the path to the core xml specification file.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">StringIO</font> <strong>import</strong> <font color="#2040a0">StringIO</font>
+<strong>import</strong> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>
+<font color="#2040a0">f</font><font color="4444FF">=</font><font color="#2040a0">StringIO</font><font color="4444FF">(</font><font color="#008000">'&lt;foo&gt;&lt;bar&gt;some text&lt;/bar&gt;&lt;/foo&gt;'</font><font color="4444FF">)</font>
+<font color="#2040a0">doc</font> <font color="4444FF">=</font> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>.<font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#2040a0">f</font><font color="4444FF">)</font>
+<font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#2040a0">doc</font>.<font color="#2040a0">xpath</font><font color="4444FF">(</font><font color="#008000">'/foo/bar'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'length of result should be 1: '</font>,<font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">r</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">r</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">tag</font>
+<strong>print</strong> <font color="#2040a0">r</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">text</font>
+</pre>
+Here is what the code prints when run:
+<pre>
+length of result should be 1:  1
+bar
+some text
+</pre>
+-----

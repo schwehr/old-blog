@@ -1,0 +1,73 @@
+TITLE: Emacs org-export hello world
+AUTHOR: Kurt
+DATE: 01.03.2011 17:57
+DESC: learning
+-----
+BODY:
+I'm trying to write a KML exporter for <a
+href="http://orgmode.org/">org-mode</a>, but before I can do that, I
+need to get even a simple exporter working.  I couldn't find anything
+simple, so I decimated the <a
+href="http://repo.or.cz/w/org-mode.git/blob_plain/HEAD:/EXPERIMENTAL/org-mediawiki.el">mediawiki</a>
+demo of using <a
+href="http://repo.or.cz/w/org-mode.git/blob_plain/HEAD:/EXPERIMENTAL/org-export.el:">org-export</a>
+under <a
+href="http://repo.or.cz/w/org-mode.git/tree/HEAD:/EXPERIMENTAL">EXPERIMENTAL</a>
+to try to make it as small as possible.  Both of these are by <a
+href="http://lumiere.ens.fr/~guerry/">Bastien Guerry</a>.  I'm totally
+new to emacs lisp, so don't expect my code to be any good.
+<pre><tt><i><font color="#9A1900">; Compile like this:</font></i>
+<i><font color="#9A1900">; M-x emacs-lisp-byte-compile-and-load</font></i>
+<!-- -->
+<font color="#FF0000">(</font>require <font color="#009900">'org-export</font><font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defvar</font></b> org-hello-export-table-table-style <font color="#FF0000">""</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defvar</font></b> org-hello-export-table-header-style <font color="#FF0000">""</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defvar</font></b> org-hello-export-table-cell-style <font color="#FF0000">""</font><font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export <font color="#FF0000">()</font>
+  <font color="#FF0000">"Export the current buffer to hello."</font>
+  <font color="#FF0000">(</font>interactive<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>org-export-set-backend <font color="#FF0000">"hello"</font><font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>add-hook <font color="#009900">'org-export-preprocess-before-backend-specifics-hook</font>
+	    <font color="#009900">'org-hello-export-src-example</font><font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>org-export-render<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>remove-hook <font color="#009900">'org-export-preprocess-final-hook</font> <font color="#009900">'org-hello-export-footnotes</font><font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>remove-hook <font color="#009900">'org-export-preprocess-before-backend-specifics-hook</font> 
+	       <font color="#009900">'org-hello-export-src-example</font><font color="#FF0000">))</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-header <font color="#FF0000">()</font> <font color="#FF0000">"Export the header part."</font> <font color="#FF0000">(</font>insert <font color="#FF0000">"Hello"</font><font color="#FF0000">))</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-first-lines <font color="#FF0000">(</font>first-lines<font color="#FF0000">)</font> <font color="#FF0000">"Export first lines."</font> <font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-heading <font color="#FF0000">(</font>section-properties<font color="#FF0000">)</font> <font color="#FF0000">"Export heading"</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-quote-verse-center <font color="#FF0000">()</font> <font color="#FF0000">"Export #+BEGIN_QUOTE/VERSE/CENTER environments."</font> <font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-fonts <font color="#FF0000">()</font> <font color="#FF0000">"Export fontification."</font> <font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-links <font color="#FF0000">()</font> <font color="#FF0000">"Replace Org links with links."</font> <font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-footnotes <font color="#FF0000">()</font> <font color="#FF0000">"Export footnotes."</font> <font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-src-example <font color="#FF0000">()</font> <font color="#FF0000">"Export #+BEGIN_EXAMPLE and #+BEGIN_SRC."</font> <font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-lists <font color="#FF0000">()</font> <font color="#FF0000">"Export lists"</font> <font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-tables <font color="#FF0000">()</font> <font color="#FF0000">""</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-footer <font color="#FF0000">()</font> <font color="#FF0000">""</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-section-beginning <font color="#FF0000">(</font>section-properties<font color="#FF0000">)</font> <font color="#FF0000">""</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> org-hello-export-section-end <font color="#FF0000">(</font>section-properties<font color="#FF0000">)</font> <font color="#FF0000">""</font><font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font>provide <font color="#009900">'org-hello</font><font color="#FF0000">)</font></tt></pre>
+Basically, I stripped the whole thing down to be a bunch of do nothing stubs.
+
+My test org-file looks (hello.org) like this:
+<pre>Execute these two lines with C-x C-e
+(require 'org-hello)
+(org-hello-export)</pre>
+But first, I needed to tweak my .emacs.  I checked out org-mode from
+git and pointed to the experimental directory to get the org-export.el
+file, which I also byte compiled with M-x emacs-lisp-byte-compile.
+<pre>(setq load-path (cons "~/org-7.4/lisp" load-path))
+(setq load-path (cons "~/org-7.4/contrib/lisp" load-path))
+(require 'org-install)
+<!-- -->
+; Experimental section
+(add-to-list 'load-path "~/projects/external/org-mode/EXPERIMENTAL/")
+(require 'org-export)</pre>
+Then when I started emacs and opened hello.org, I was able to execute ( C-x C-e ) the require and the hello export.  I then get a buffer that contains:
+<pre>Hello</pre>
+I know it's not exciting, but this at least gets me moving.
+-----

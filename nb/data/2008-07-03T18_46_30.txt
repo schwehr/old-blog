@@ -1,0 +1,72 @@
+TITLE: Fixing AIS encoding in noaadata
+AUTHOR: Kurt
+DATE: 07.03.2008 18:46
+DESC: more better
+-----
+BODY:
+Many thanks to Miguel Eduardo Gil Biraud for pointing out that my AIS
+encoding functions were wrong.  I've rewritten the routines and it
+looks a lot better.  Here is an example of encoding from within python:
+<pre>
+from decimal import Decimal
+import ais.ais_msg_1
+import aisutils
+params = dict(
+       MessageId = 1, 
+       RepeatIndicator = 2, 
+       UserID = 636010380, 
+       NavigationStatus = 0, 
+       ROT = 0, 
+       SOG = Decimal("8.3"), 
+       PositionAccuracy = 0, 
+       longitude = Decimal("-4.4078229999999900"), 
+       latitude = Decimal("36.679735000000000"),
+       COG = 332,
+       TrueHeading = 336,
+       TimeStamp = 0,
+       RegionalReserved = 0,
+       Spare = 0,
+       RAIM = True,
+       state_syncstate = 1,
+       state_slottimeout = 0,
+       state_slotoffset = 0 
+)
+bv = ais.ais_msg_1.encode(params)
+print aisutils.uscg.create_nmea(bv)
+</pre>
+Here is the result:
+<pre>
+!AIVDM,1,1,,A,1aNRwS001COclaFDw@8Lv:P02P00,0*12,runknown,1215133360.96
+</pre>
+Then as a check, I can decode the generated message:
+<pre>
+% <b>ais_msg_1.py --decode '!AIVDM,1,1,,A,1aNRwS001COclaFDw@8Lv:P02P00,0*12'</b>
+position:
+        MessageID:          1
+        RepeatIndicator:    2
+        UserID:             636010380
+        NavigationStatus:   0
+        ROT:                0
+        SOG:                8.3
+        PositionAccuracy:   0
+        longitude:          -4.407821666666666666666666667
+        latitude:           36.679735
+        COG:                332
+        TrueHeading:        336
+        TimeStamp:          0
+        RegionalReserved:   0
+        Spare:              0
+        RAIM:               True
+        state_syncstate:    1
+        state_slottimeout:  0
+        state_slotoffset:   0
+</pre>
+<a href="http://rl.se/aivdm">rl.se/aivdm</a> is a web decoder:
+
+<img src="http://schwehr.org/blog/attachments/2008-07/ais-web-decode.png"/>
+
+Bug reports are always welcome.  Now I need to get through another set
+of reports and also get commstate and rot working correctly again.  I
+removed the code for those two features a long time ago and it is time to
+bring them back.
+-----

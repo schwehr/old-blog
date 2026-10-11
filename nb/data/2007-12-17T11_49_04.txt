@@ -1,0 +1,73 @@
+TITLE: ais_build_sqlite3 switches db interface and adds class B messages
+AUTHOR: Kurt
+DATE: 12.17.2007 11:49
+DESC: slow and steady wins the race
+-----
+BODY:
+I've spent a little time updating the code that builds a SQLite
+database from AIS messages.  I've switched to using the sqlite3 module
+that comes with python 2.5.  I also added support for loading in AIS
+messages 18 ('B') and 19 ('C') that are the two class B messages for
+position and position and shipdata respectively.
+<pre>
+% <b>cat ais.log | ais_normalize.py > ais.log.norm</b>
+% <b>ais_build_sqlite3.py -C ais.log.norm</b>
+<i>Messages found:</i>
+1: 565
+3: 305
+4: 37
+5: 300
+8: 160
+10: 7
+11: 4
+15: 69
+17: 2
+18: 22
+20: 16
+24: 16
+26: 1
+27: 3
+28: 1
+29: 3
+30: 2
+31: 1
+56: 1
+<i>Messages processed:</i>
+1: 565
+3: 305
+4: 37
+5: 300
+18: 22
+% <b>sqlite3 ais.db3 '.tables'</b>
+b_pos_and_shipdata_broken  positionb                
+bsreport                   shipdata                 
+position                 
+</pre>
+Now, time to take a look at the data.
+<pre>
+% <b>sqlite3 ais.db3 'SELECT longitude,latitude FROM positionb' | tr '|' '\t'</b>
+-122.68733      47.92291
+-122.687306667  47.9229166667
+-122.687318333  47.9229233333
+-122.687316667  47.92293
+-122.687326667  47.9229283333
+-122.68731      47.922925
+-122.687316667  47.9229333333
+-122.687308333  47.9229333333
+-122.687316667  47.9229383333
+<i>-171.388931667  -21.4328733333</i>
+-122.68733      47.9229366667
+-122.687318333  47.9229316667
+-122.687315     47.9229383333
+-122.687318333  47.92293
+-122.687325     47.9229366667
+-122.687313333  47.9229283333
+-122.687321667  47.9229283333
+-122.687301667  47.9229383333
+-122.687303333  47.9229516667
+-122.687296667  47.92294
+-122.687286667  47.9229283333
+-122.687293333  47.92294
+</pre>
+The above mostly makes sense, but what is up with that highlighted packet?
+-----

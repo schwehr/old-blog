@@ -1,0 +1,102 @@
+TITLE: L3 ATON
+AUTHOR: Kurt
+DATE: 11.02.2010 10:32
+DESC: notes
+-----
+BODY:
+A quick note on the kind of data I'm getting back from an L3 aton.  This stuff will generally work
+with Class A devices, but this is not allowed in the United States without approval from the USCG.
+
+On Port 3:
+<pre><b>./serial-logger -p /dev/tty.USA49Wfd313P3.3 -lccom-l3-3- -sccom-office-l3-3 -v --uscg -v</b>
+%0030 0001,rccom-office-l3-3,1288708015.59
+%0031 0011,rccom-office-l3-3,1288708015.6
+%0030 0001,rccom-office-l3-3,1288708018.6
+%0031 0011,rccom-office-l3-3,1288708018.61</pre>
+On Port 4 with no GPS signal:
+<pre><b>./serial-logger -p /dev/tty.USA49Wfd313P4.4 -lccom-l3-4- -sccom-office-l3-4 -v --uscg -v</b>
+!ANVDO,1,1,,X,E03Ovrh77PPh;T0V2h77b4QRaP06NAc0J2@`000000wP40,4*25,rccom-office-l3-4,1288708305.4
+$ANALR,000000.00,007,A,V,AIS: UTC Lost*75,rccom-office-l3-4,1288708306.02
+$ANADS,L3 AIS ID,,A,4,I,N*02,rccom-office-l3-4,1288708306.03
+!ANVDO,1,1,,X,E03Ovrh77PPh;T0V2h77b4QRaP06NAc0J2@`000000wP40,4*25,rccom-office-l3-4,1288708308.4
+!ANVDO,1,1,,X,E03Ovrh77PPh;T0V2h77b4QRaP06NAc0J2@`000000wP40,4*25,rccom-office-l3-4,1288708311.4
+</pre>
+4 with GPS signal:
+<pre>
+!ANVDO,1,1,,Y,E03Ovrh77PPh;T0V2h77b4QRaP0MM`MA&lt;Em=@00000Th20,4*3E,rccom-office-l3-4,1288710714.59
+$ANZDA,151156.00,02,11,2010,00,00*78,rccom-office-l3-4,1288710716.01
+!ANVDO,1,1,,Y,E03Ovrh77PPh;T0V2h77b4QRaP0MM`MB&lt;Em=P00000V@20,4*07,rccom-office-l3-4,1288710717.6
+$ANZDA,151158.00,02,11,2010,00,00*76,rccom-office-l3-4,1288710718.01
+$ANALR,,,,,*7C,rccom-office-l3-4,1288710719.47
+$ANADS,L3 AIS ID,151159.46,V,0,I,I*32,rccom-office-l3-4,1288710719.48
+$ANZDA,151200.00,02,11,2010,00,00*78,rccom-office-l3-4,1288710720.01
+!ANVDO,1,1,,Y,E03Ovrh77PPh;T0V2h77b4QRaP0MM`MB&lt;Em=P00000Wh20,4*2E,rccom-office-l3-4,1288710720.6
+$ANZDA,151202.00,02,11,2010,00,00*7A,rccom-office-l3-4,1288710722.02
+!ANVDO,1,1,,Y,E03Ovrh77PPh;T0V2h77b4QRaP0MM`MB&lt;Em=H00000a@20,4*28,rccom-office-l3-4,1288710723.6
+</pre>
+Port 2 contains debugging information:
+<pre><b>./serial-logger -p /dev/tty.USA49Wfd313P2.2 -lccom-l3-2- -sccom-office-l3-2 -v --uscg -v -b 115200</b>
+001:47:21.596 PrcUTC: *** RTC Updt to 15:41:26 (No RTC Device),rccom-office-l3-2,1288712485.33
+001:47:21.597 PrcUTC: 11/2/10 @ 15:41:26 [ET 1PPS 300],rccom-office-l3-2,1288712485.33
+001:47:21.984 RadShw: DSP [Good A=0, B=0],rccom-office-l3-2,1288712485.69
+001:47:21.984 DspShw: Max DSP Response Time = 1 Msecs,rccom-office-l3-2,1288712485.7
+001:47:21.984 RadShw: [Trc On] DSP Hdrs 0, Bad 0, CRC Errs 3,rccom-office-l3-2,1288712485.7
+001:47:22.007 UbxSvc: UBX Ofst 15 Secs, NV Ofst 15 Secs, RTC Calibrated,rccom-office-l3-2,1288712485.72
+001:47:22.065 UTCShw: [UTCD] Updts 515, UpdErrs 0, Skips 0, SNErrs 0,rccom-office-l3-2,1288712485.78
+001:47:22.065 UTCShw: 1PPSMark = 296, NewMark = 296, SyncTo1PPS = 1,rccom-office-l3-2,1288712485.78
+001:47:22.065 UTCShw: VDL Algnd = 0, VDL SNValid = 0, VDL SNErrs = 0,rccom-office-l3-2,1288712485.79
+001:47:22.066 UTCShw: UTC 1PPS Dtct = 1, LostIntGPS 0, NMErrs 0,rccom-office-l3-2,1288712485.79
+001:47:22.066 UTCShw: *** 1st&gt; [1PPS @ 4375.457, UTC @ 4388.456, Slot @ 4390.563] Sec,rccom-office-l3-2,1288712485.8
+001:47:22.067 UTCShw: *** Cap&gt; [Slot 4, Time 563, Mark 456, Ofst 107],rccom-office-l3-2,1288712485.81
+001:47:22.067 IECShw: *** GPS_ID1: Iec 0          Ser 1967012    Ov 0,rccom-office-l3-2,1288712485.81
+001:47:22.068 IECShw: *** GPS_ID2: Iec 1159018    Ser 4434064    Ov 0,rccom-office-l3-2,1288712485.82
+001:47:22.068 IECShw: *** EXT_SER: Iec 579        Ser 579        Ov 0,rccom-office-l3-2,1288712485.83
+001:47:22.074 IECShw: *** INT_SER: Iec 0          Ser 0          Ov 0,rccom-office-l3-2,1288712485.83
+001:47:22.074 IECShw: *** 0 Lost UBX IEC Events,rccom-office-l3-2,1288712485.84
+001:47:22.074 IecSrv: *** IEC 62320-2 Sentence Mode is [FDIS],rccom-office-l3-2,1288712485.84
+001:47:22.584 PrcGGA: IEC Chan 1 [GPS_ID2] [Null Flgs 00001000] GPS Qual 1,rccom-office-l3-2,1288712486.3
+001:47:22.584 PrcGGA: UTC &lt;154126.00&gt;, UTC Sec 26, Sats 11,rccom-office-l3-2,1288712486.3
+001:47:22.585 PrcGGA: Lat 25881203, Lon -42563769, Alt 34.2 M,rccom-office-l3-2,1288712486.31
+001:47:22.585 OwnPos: *** Pos Updt from Internal Src,rccom-office-l3-2,1288712486.31
+001:47:22.586 OwnPos: *** Off Pos Updt [Thrsh 100 m, Dist 136988 m] OFF,rccom-office-l3-2,1288712486.32
+001:47:23.289 UbxMsg: *** AID-HUI Rcvd, UTC Ofst 15 Secs,rccom-office-l3-2,1288712487.0
+001:47:23.293 UbxMsg: CFG-SBAS Qry Rspns, Len = 8,rccom-office-l3-2,1288712487.0
+001:47:23.293 CFSBAS: 202126EE&gt; 01 01 01 00 00 00 00 00,rccom-office-l3-2,1288712487.01
+001:47:23.349 SltMgr: *** Slot 1014 [Ofst 2130, Slot OK, UTC OK],rccom-office-l3-2,1288712487.06
+001:47:23.349 SltMgr: *** PstErr 0 PndErr 0 OvrRns 0 RspErrs 0 Fails 0,rccom-office-l3-2,1288712487.07
+001:47:23.589 PrcGGA: IEC Chan 1 [GPS_ID2] [Null Flgs 00001000] GPS Qual 1,rccom-office-l3-2,1288712487.3
+001:47:23.589 PrcGGA: UTC &lt;154127.00&gt;, UTC Sec 27, Sats 11,rccom-office-l3-2,1288712487.31
+001:47:23.590 PrcGGA: Lat 25881203, Lon -42563769, Alt 34.3 M,rccom-office-l3-2,1288712487.31
+001:47:23.590 OwnPos: *** Pos Updt from Internal Src,rccom-office-l3-2,1288712487.32
+001:47:23.591 OwnPos: *** Off Pos Updt [Thrsh 100 m, Dist 136988 m] OFF,rccom-office-l3-2,1288712487.32
+001:47:24.009 M13Svc: *** Synthetic VDO [Msg 21, Len 34] Issued,rccom-office-l3-2,1288712487.72</pre>
+Then I tried sending a BBM string to the unit to get a msg 8 area notice transmitted by talking to port 4:
+<pre><b>./serial_send.py -p /dev/tty.USA49Wfd313P4.4 -t 2 '!ECBBM,1,1,3,0,8,5fF0`0qP000N0n0uT0h4;0000000,5*6B'</b>
+sending "!ECBBM,1,1,3,0,8,5fF0`0qP000N0n0uT0h4;0000000,5*6B"
+sent at 1288712163.59
+1288712163.7 returned: "!ANVDO,1,1,,Y,E03Ovrh77PPh;T0V2h77b4QRaP0MM`Mb&lt;Em?@00000Qh20,4*1A"
+1288712164.01 returned: "$ANZDA,153604.00,02,11,2010,00,00*7A"
+1288712165.53 returned: "$ANABK,,B,8,3,3*11"</pre>
+The ABK means that the ATON acknowledges the BBM that I sent.
+
+Then I can check other parts of the system for what happened.  First
+on port 2, there are some debug messages.  I haven't got through and
+found all the relevant messages, but there are 2.
+<pre>001:41:59.929 SavBin: *** Built Msg 8-3, Len 26 for MMSI 3669739,rccom-office-l3-2,1288712163.64
+001:41:59.929 SavBin: *** Posting Ch- Bin Msg 8 to VDL Tx Queue,rccom-office-l3-2,1288712163.64</pre>
+And finally, I can check the SR162G that I have as a receiver in the same room.
+<pre><b>tail -f ccom-sr162g-2010-11-02 | grep AIVDM</b>
+!AIVDM,1,1,,A,803OvrhFqH2P3V0001p3H3n@30@d0000000,2*44,rccom-office,1288712392.42
+!AIVDM,1,1,,A,E03Ovrh77PPh;T0V2h77b4QRaP0MM`M7&lt;Em&gt;H00000V@20,4*74,rccom-office,1288712533.39</pre>
+Port 3 actually has some very nice transmit info about the binary message.
+<pre>%0030 0001,rccom-office-l3-3,1288712392.27
+%0031 0011,rccom-office-l3-3,1288712392.27
+Tx ID Sequence Number: 13,rccom-office-l3-3,1288712392.42
+Slot Number: 1964,rccom-office-l3-3,1288712392.43
+Successful Modulation,rccom-office-l3-3,1288712392.44
+%0030 0001,rccom-office-l3-3,1288712395.27
+%0031 0011,rccom-office-l3-3,1288712395.28</pre>
+My only wish is that there was a defined language for AIS units to use
+about their internal status and that it was a series of simple XML or
+JSON messages that were easy to parse.
+-----

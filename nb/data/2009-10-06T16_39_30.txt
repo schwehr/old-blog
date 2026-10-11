@@ -1,0 +1,20 @@
+TITLE: Mediawiki copied and with images
+AUTHOR: Kurt
+DATE: 10.06.2009 16:39
+DESC: not too many commands
+-----
+BODY:
+Just got the full wiki clone thing going...
+<pre>fink install mediawiki
+sudo a2ensite mediawiki
+mysqldump --host wikihost.ccom.nh --password=###### --user=wikiuser --complete-insert wikidb &gt; ccom-wiki.sql
+mysqladmin -u root -p create wikidb;
+mysql -u root -p 
+mysql&gt; CREATE USER wikiuser IDENTIFIED BY 'pass1';
+mysql&gt; GRANT ALL PRIVILEGES ON wikidb.* TO 'wikiuser'@'localhost' WITH GRANT OPTION;
+mysql -u root -p wikidb &lt; ~/Desktop/ccom-wiki-complete.sql
+open http://localhost/mediawiki/</pre>
+Then:
+<pre>rsync wikihost.ccom.nh:/var/www/html/images /sw/var/mediawiki/images</pre>
+<img title="Launch on the TJ" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-10/mediawiki-images.png"/>
+-----

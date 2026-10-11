@@ -1,0 +1,47 @@
+TITLE: Class B AIS design
+AUTHOR: Kurt
+DATE: 05.09.2009 15:30
+DESC: arg ... frustration
+-----
+BODY:
+Update 2009-08-24: Marcus Akesson wrote me about message 19.  His explanation
+makes sense.
+<pre>But, with Carrier Sense, msg 19 was not possible to use, since its
+multislot. Instead, msg 24 was added.
+...
+So that's why You don't see any msg19, because they are not transmitted.
+There is one exception, if a base station interrogates a ClassB device
+and reserves timeslots for it, then it may transmit a msg19.</pre>
+I'm working through decoding Class B AIS messages.  I have to say that
+the design is not good.  I have yet to find a valid message 19 (first
+letter 'C').  All the packets that I've recorded either have to many or
+two few bits.  There must be a high probability that these two slot messages
+are getting stepped on, plus they are going out with only 2 watts from 
+antennas that are much lower down compaired to large vessels with Class A.
+
+Then comes message 24 - the Class B static message (starts with 'H').
+It comes in two flavors, so I have to write a custom parser (the red
+square around the part number.  And how am I supposed build the
+database to display these?  I have the same complaint about how we
+built the met-hydro and area notice messages.  We keep adding more
+layers of message addressing and these layers are not the same for all
+messages.
+
+The VendorID as a string is not good.  Ethernet has done a number only
+scheme for a very long time that works.  Having a registry of assigned 
+numbers is not a hard thing to do.
+
+Also, notice that the dimension field can be either the size values or
+the mmsi of the "mother ship" and there is no flag to say which.  I
+have to look at the values and decided which it is.  The document gives
+no guidance to seeing which type it is and there may well be ambiguous 
+values.  They could have easily used one of the 6 spare bits to specify 
+which value it is.  I am going to assume that the dimension is the most
+common case and just hard code it in for now.
+
+<img title="Class B Static Data part 2" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/ais_msg_24_classb.png"/>
+
+Looking at the Class A and B messages, I really wish that Class B just
+used the Class A messages with the same restrictions as it has now
+with transmit frequence and power.
+-----

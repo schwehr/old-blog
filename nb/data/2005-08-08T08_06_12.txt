@@ -1,0 +1,40 @@
+TITLE: RSS-Planet - a spacial RSS reader
+AUTHOR: Kurt
+DATE: 08.08.2005 08:06
+DESC: excellent python trick
+-----
+BODY:
+A very snazzy idea: <a
+href="http://freshmeat.net/projects/rssplanet/?branch_id=59520&release_id=203485">RSS-Planet</a>
+is a script which fetches headlines from various news Web sites via
+RSS feeds and then plots the story titles on a world map using
+xplanet.
+
+Declaring lots of local variables for python with a decorator.  I like
+the look of this!!  <a
+href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/438819">Boring
+Constructor Pattern</a>
+<pre>
+def vars_private(func):
+    def wrapper(*args):
+        for i, arg in enumerate(args[1:]):
+            eval("setattr(args[0], '_' + func.func_code.co_varnames[i + 1], arg)")
+        return func(*args)
+    return wrapper
+
+
+# -- Test --
+class Student:
+    @vars_private
+    def __init__(self, name, age):
+        # make young
+        self._age = self._age - 2
+    
+    def info(self):
+        return self._name, self._age
+
+s = Student('Ravi Teja', 28)
+print s.info()
+</pre>
+<a href="http://science.slashdot.org/article.pl?sid=05/08/08/046225&from=rss">March of the Penguins did really well in the box office!!</a>  Cool!
+-----

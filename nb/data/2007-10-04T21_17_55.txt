@@ -1,0 +1,68 @@
+TITLE: xwd and xwininfo to make a movie
+AUTHOR: Kurt
+DATE: 10.04.2007 21:17
+DESC: old school
+-----
+BODY:
+During the recent ORT, I had to pull off a quick movie under tight
+time constraints.  All of my usual routes of making movies were out:
+no VNC moves, scan converters, xvidcap, Jing, CamStudio, etc.  This
+was on a linux box that was locked down (with respect to the time
+frame).  What to do?  I came up with an X11 solution.  Time to go old
+school.  I had the ability to slow down the 3D rendering and had
+imagemagick on the machine, so here is my solution complete with a
+little python...
+
+The key was the X Windows  Dump (xwd) program that has been around for
+ever.  It  is not elegant,  but it really  can get the job  done.  The
+first task  was to get the 3D  graphics X11 window id.   This helps to
+constrain  the data  volume such  that I  am not  capturing  all 2kx1k
+pixels on the display.  It works something like this (which is a quick
+dump on my Mac).
+<pre>
+xwininfo
+xwininfo: Please select the window about which you
+          would like information by clicking the
+          mouse in that window.
+</pre>
+I then clicked in the window (here just an xterm):
+<pre>
+xwininfo: Window id: 0xa0000e "xterm"
+
+  Absolute upper-left X:  635
+  Absolute upper-left Y:  291
+  Relative upper-left X:  0
+  Relative upper-left Y:  22
+...
+</pre>
+The key is that "Window id".  Now I could ask xwd to grab that window
+id.  But I want to create a sequence of numbered frames.  I could do
+this in bash, perl, python or what ever, but Steve taunted me about
+python as he is a very good perl programmer.  Therefore, python it was...
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">os</font>,<font color="#2040a0">sys</font>
+<strong>for</strong> <font color="#2040a0">count</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">500</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">filename</font><font color="4444FF">=</font><font color="#008000">'/tmp/foo%03d.xwd'</font> <font color="4444FF">%</font> <font color="#2040a0">count</font>
+    <strong>print</strong> <font color="#2040a0">filename</font>
+    <font color="#2040a0">os</font>.<font color="#2040a0">system</font><font color="4444FF">(</font><font color="#008000">&quot;xwd -id 0x2800004 -out &quot;</font><font color="4444FF">+</font><font color="#2040a0">filename</font> <font color="4444FF">)</font>
+    <font color="#2040a0">os</font>.<font color="#2040a0">system</font><font color="4444FF">(</font><font color="#008000">'sleep .2'</font><font color="4444FF">)</font>
+</pre>
+That is definitely just a hack (like not calling time.sleep()) and I
+have since created a complete program with an extensive command line
+interface, but it serves the purpose of illustration.  Running that
+dumps a whole mess of xwd images into /tmp.  From that I needed to
+make an animated gif that is a subset of the original frames.  There
+were parts of the display that I can't release.  The imagemagick
+convert program does it all.  It will crop and make an animated gif
+with a specified delay between each frame.
+<pre>
+convert -crop 640x480+303+80 -delay 100 /tmp/foo???.xwd /tmp/movie.gif
+</pre>
+And that's it.  I loaded the gif into firefox and had a little movie.
+The results looked better when Steve put the frames through QuickTime
+pro, but the gif did get the job done.
+
+And that is a nice little old school hack.  Like I thought that I
+would ever pull out xwd or xwininfo again.
+-----

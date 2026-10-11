@@ -1,0 +1,29 @@
+TITLE: Finding what depends on a fink package
+AUTHOR: Kurt
+DATE: 07.31.2007 15:59
+DESC: reverse dependencies in fink
+-----
+BODY:
+Just saw this go across the fink irc channel.  I've always wondered if
+there is an easy way to see what packages depend on a particular
+package.  My main goal is to see when a package no longer has any
+others that require it to still be alive.  For example, coin44 is
+still in fink.  Here is an example of finding the "reverse
+dependencies."
+<pre>
+<b>apt-cache showpkg simage27-shlibs</b>
+Package: simage27-shlibs
+Versions: 
+1.6.1-1003(/sw/var/lib/apt/lists/_sw_fink_dists_unstable_main_binary-darwin-powerpc_Packages)(/sw/var/lib/dpkg/status)
+
+Reverse Depends: 
+  simage27,simage27-shlibs 1.6.1-1003
+  coin45-shlibs,simage27-shlibs 1.6.1-1001
+  density,simage27-shlibs
+Dependencies: 
+1.6.1-1003 - libogg-shlibs (0 (null)) libsndfile1-shlibs (0 (null)) libvorbis0-shlibs (0 (null)) mjpegtools2-shlibs (2 1.6.2-1003) flac-shlibs (2 1.1.1-1001) darwin (2 8-1) 
+Provides: 
+1.6.1-1003 - 
+Reverse Provides: 
+</pre>
+-----

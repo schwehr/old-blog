@@ -1,0 +1,1225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: November 2011 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2011-11-30T14_59_08.txt" name=
+"e2011-11-30T14_59_08.txt"></a>
+<h2 class="date">11.30.2011 14:59</h2>
+<div class="blogbody">
+<h3 class="title">Research Tools videos got a huge number of
+hits</h3>
+<div class="item-description">Someone was recently asking me what
+the statistics were behind the large number of views (really a lot
+more than I expected) for the Research Tools videos. Here are two
+of the displays from Google Analytics for those who are
+interested.<br />
+<br />
+<img width="600" height="614" title="Google Analytics"
+withgrayborder="True" src=
+"../attachments/2011-11/youtube-analytics-researchtools-1.png" />
+<br />
+<br />
+<img width="600" height="421" title="Google Analytics"
+withgrayborder="True" src=
+"../attachments/2011-11/youtube-analytics-researchtools-2.png" />
+<br />
+<br />
+The color ramp for the countries makes it really hard to tell them
+apart.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-30T14_59_08.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-12-01T06_23_49.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-30T14_29_16.txt" name=
+"e2011-11-30T14_29_16.txt"></a>
+<h2 class="date">11.30.2011 14:29</h2>
+<div class="blogbody">
+<h3 class="title">Xah Lee's emacs lisp excercise in python</h3>
+<div class="item-description">Here is my answers to <a href=
+"http://xahlee.blogspot.com/2011/11/emacs-lisp-exercise-latitude-longitude.html">
+emacs lisp exercise: latitude-longitude-decimalize</a>. The first
+is dumb. It hard codes the characters, which I think
+source-highlight mangled pretty badly. The code wasn't very pretty
+to start with. The second solution is much more robust. It allows
+and character(s) to be the separator(s).
+<pre>
+<tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<i><font color="#9A1900"># -*- coding: utf-8 -*-</font></i>
+<!-- -->
+test_data <font color="#990000">=</font> r<font color=
+"#FF0000">"37&Atilde;&Ccedil;&Acirc;&deg;26&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup2;36.42&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup3;N 06&Atilde;&Ccedil;&Acirc;&deg;15&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup2;14.28&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup3;W"</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color=
+"#000000">decimal_deg_simple</font></b><font color=
+"#990000">(</font>coord_str<font color="#990000">):</font>
+    lat_str<font color="#990000">,</font> lon_str <font color=
+"#990000">=</font> coord_str<font color=
+"#990000">.</font><b><font color=
+"#000000">split</font></b><font color="#990000">()</font>
+    lat <font color="#990000">=</font> <b><font color=
+"#000000">int</font></b><font color=
+"#990000">(</font>lat_str<font color=
+"#990000">.</font><b><font color=
+"#000000">split</font></b><font color=
+"#990000">(</font><font color="#FF0000">'&Atilde;&Ccedil;&Acirc;&deg;'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font>
+    lat <font color="#990000">+=</font> <b><font color=
+"#000000">int</font></b><font color=
+"#990000">(</font>lat_str<font color=
+"#990000">.</font><b><font color=
+"#000000">split</font></b><font color=
+"#990000">(</font><font color="#FF0000">'&Atilde;&Ccedil;&Acirc;&deg;'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup2;'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">60</font><font color="#990000">.</font>
+    lat <font color="#990000">+=</font> <b><font color=
+"#000000">float</font></b><font color=
+"#990000">(</font>lat_str<font color=
+"#990000">.</font><b><font color=
+"#000000">split</font></b><font color=
+"#990000">(</font><font color="#FF0000">'&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup2;'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">][:-</font><font color="#993399">4</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> <font color=
+"#FF0000">'S'</font> <b><font color=
+"#0000FF">in</font></b> lat_str<font color="#990000">:</font>
+        lat <font color="#990000">=</font> <font color=
+"#990000">-</font>lat
+<!-- -->
+    lon <font color="#990000">=</font> <b><font color=
+"#000000">int</font></b><font color=
+"#990000">(</font>lon_str<font color=
+"#990000">.</font><b><font color=
+"#000000">split</font></b><font color=
+"#990000">(</font><font color="#FF0000">'&Atilde;&Ccedil;&Acirc;&deg;'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font>
+    lon <font color="#990000">+=</font> <b><font color=
+"#000000">int</font></b><font color=
+"#990000">(</font>lon_str<font color=
+"#990000">.</font><b><font color=
+"#000000">split</font></b><font color=
+"#990000">(</font><font color="#FF0000">'&Atilde;&Ccedil;&Acirc;&deg;'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup2;'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">60</font><font color="#990000">.</font>
+    lon <font color="#990000">+=</font> <b><font color=
+"#000000">float</font></b><font color=
+"#990000">(</font>lon_str<font color=
+"#990000">.</font><b><font color=
+"#000000">split</font></b><font color=
+"#990000">(</font><font color="#FF0000">'&Atilde;&cent;&Acirc;&Auml;&Acirc;&sup2;'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">][:-</font><font color="#993399">4</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> <font color=
+"#FF0000">'W'</font> <b><font color=
+"#0000FF">in</font></b> lon_str<font color="#990000">:</font>
+        lon <font color="#990000">=</font> <font color=
+"#990000">-</font>lon
+<!-- -->
+    <b><font color="#0000FF">return</font></b> lat<font color=
+"#990000">,</font>lon
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color=
+"#FF0000">'simple:'</font><font color=
+"#990000">,</font> <b><font color=
+"#000000">decimal_deg_simple</font></b><font color=
+"#990000">(</font>test_data<font color="#990000">)</font>
+<!-- -->
+<i><font color=
+"#9A1900">########################################</font></i>
+<i><font color="#9A1900"># Use a regular expression</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> re
+<!-- -->
+rawstr <font color="#990000">=</font> r<font color=
+"#FF0000">"""(?P&lt;lat_deg&gt;\d{1,2})\D+</font>
+<font color="#FF0000">(?P&lt;lat_min&gt;\d{1,2})\D+</font>
+<font color="#FF0000">(?P&lt;lat_sec&gt;\d{1,2}(\.\d+))\D+</font>
+<font color="#FF0000">(?P&lt;lat_hemi&gt;[NS])</font>
+<font color="#FF0000">\s+</font>
+<font color="#FF0000">(?P&lt;lon_deg&gt;\d{1,3})\D+</font>
+<font color="#FF0000">(?P&lt;lon_min&gt;\d{1,2})\D+</font>
+<font color="#FF0000">(?P&lt;lon_sec&gt;\d{1,2}(\.\d+))\D+</font>
+<font color="#FF0000">(?P&lt;lon_hemi&gt;[EW])</font>
+<font color="#FF0000">"""</font>
+<!-- -->
+compile_obj <font color="#990000">=</font> re<font color=
+"#990000">.</font><b><font color=
+"#000000">compile</font></b><font color=
+"#990000">(</font>rawstr<font color=
+"#990000">,</font>  re<font color=
+"#990000">.</font>VERBOSE<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color=
+"#000000">decimal_deg_re</font></b><font color=
+"#990000">(</font>coord_str<font color="#990000">):</font>
+    g <font color="#990000">=</font> compile_obj<font color=
+"#990000">.</font><b><font color=
+"#000000">search</font></b><font color=
+"#990000">(</font>coord_str<font color=
+"#990000">).</font><b><font color=
+"#000000">groupdict</font></b><font color=
+"#990000">()</font> <i><font color=
+"#9A1900"># m is match</font></i>
+    lat <font color="#990000">=</font> <b><font color=
+"#000000">int</font></b><font color="#990000">(</font>g<font color=
+"#990000">[</font><font color=
+"#FF0000">'lat_deg'</font><font color="#990000">])</font> <font color="#990000">+</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lat_min'</font><font color="#990000">])/</font><font color="#993399">60</font><font color="#990000">.</font> <font color="#990000">+</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lat_sec'</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> g<font color=
+"#990000">[</font><font color=
+"#FF0000">'lat_hemi'</font><font color=
+"#990000">]</font> <font color="#990000">==</font> <font color=
+"#FF0000">'S'</font><font color="#990000">:</font>
+        lat <font color="#990000">=</font> <font color=
+"#990000">-</font>lat
+    lon <font color="#990000">=</font> <b><font color=
+"#000000">int</font></b><font color="#990000">(</font>g<font color=
+"#990000">[</font><font color=
+"#FF0000">'lon_deg'</font><font color="#990000">])</font> <font color="#990000">+</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lon_min'</font><font color="#990000">])/</font><font color="#993399">60</font><font color="#990000">.</font> <font color="#990000">+</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lon_sec'</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> g<font color=
+"#990000">[</font><font color=
+"#FF0000">'lon_hemi'</font><font color=
+"#990000">]</font> <font color="#990000">==</font> <font color=
+"#FF0000">'S'</font><font color="#990000">:</font>
+        lon <font color="#990000">=</font> <font color=
+"#990000">-</font>lon
+    <b><font color="#0000FF">return</font></b> <font color=
+"#990000">{</font><font color="#FF0000">'y'</font><font color=
+"#990000">:</font>lat<font color="#990000">,</font> <font color=
+"#FF0000">'x'</font><font color="#990000">:</font>lon<font color=
+"#990000">}</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color=
+"#FF0000">'re:'</font><font color=
+"#990000">,</font> <b><font color="#000000">decimal_deg_re</font></b><font color="#990000">(</font>test_data<font color="#990000">)</font></tt>
+</pre>
+This would be a lot harder without kodos for building regular
+expressions in python:<br />
+<br />
+<img width="450" height="530" title="Kodos building the parser"
+withgrayborder="True" src=
+"../attachments/2011-11/parsing-coords.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-30T14_29_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-30T14_59_08.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-30T13_12_00.txt" name=
+"e2011-11-30T13_12_00.txt"></a>
+<h2 class="date">11.30.2011 13:12</h2>
+<div class="blogbody">
+<h3 class="title">Google Scholar Citations</h3>
+<div class="item-description">I got early access to Google Scholar
+Citations, but in the craziness of the semester, I forgot to set it
+up to take a look. Here is my Google Scholar Citation page:
+<a href="http://scholar.google.com/citations?user=fXbCGw0AAAAJ">Kurt
+Schwehr - Google Scholar Citations</a>. The best part about waiting
+till now to try it is that the service is open to all, so I'm not
+talking about something that other people can't use.<br />
+<br />
+<a href=
+"http://googlescholar.blogspot.com/2011/11/google-scholar-citations-open-to-all.html&quot;">
+Google Scholar Citations Open To All</a> on the Google Scholar
+Blog, Nov 16, 2011.<br />
+<br />
+<img width="600" height="387" title=
+"Google Scholar Citations for Kurt Schwehr" withgrayborder="True"
+src=
+"../attachments/2011-11/kurt-schwehr-google-scholar-citations.png" />
+<br />
+<br />
+It's great that you can grab the entire citation index for a
+person. A quick look at what the BibTex exporting looks like...
+it's not very complete, but it's a good start.
+<pre>
+@article{schwehr2008visualizing,
+  title={Visualizing the Operations of the Phoenix Mars Lander},
+  author={Schwehr, K. and Andres, P. and Craig, J. and Deen, R. and De Jong, 
+E. and Fortino, N. and Gorgian, Z. and Kuramura, K. and Lemmon, 
+M. and Levoe, S. and others},
+  journal={AGU Fall Meeting Abstracts},
+  volume={1},
+  pages={1137},
+  year={2008}
+}
+<!-- -->
+@article{schwehr2009discovery,
+  title={Discovery of Marine Datasets and Geospatial Metadata Visualization},
+  author={Schwehr, KD and Brennan, RT and Sellars, J. and Smith, S.},
+  journal={AGU Fall Meeting Abstracts},
+  volume={1},
+  pages={1132},
+  year={2009}
+}
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-30T13_12_00.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-30T14_29_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-30T09_07_50.txt" name=
+"e2011-11-30T09_07_50.txt"></a>
+<h2 class="date">11.30.2011 09:07</h2>
+<div class="blogbody">
+<h3 class="title">RT Lecture 25 - Rob Braswell covering R for
+Statistics</h3>
+<div class="item-description">Yesterday, Rob gave an awesome class
+on the R language for statistics.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/audio/25-r-statistics.mp3">
+mp3</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/present/25-r-statistics.pdf">
+pdf of screenshots</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/25-R-lab1-Intro.pdf">
+25-R-lab1-Intro.pdf</a>, <a href=
+"https://bitbucket.org/schwehr/researchtools/src/tip/class/25-r-statistics.org">
+25-r-statistics.org</a> (on bitbucket via hg).<br />
+<br />
+It's pretty awesome that R comes with some nice built in data
+sets!<br />
+<br />
+<pre>
+<b>R</b>
+&gt; summary(trees)
+     Girth           Height       Volume     
+ Min.   : 8.30   Min.   :63   Min.   :10.20  
+ 1st Qu.:11.05   1st Qu.:72   1st Qu.:19.40  
+ Median :12.90   Median :76   Median :24.20  
+ Mean   :13.25   Mean   :76   Mean   :30.17  
+ 3rd Qu.:15.25   3rd Qu.:80   3rd Qu.:37.30  
+ Max.   :20.60   Max.   :87   Max.   :77.00  
+&gt;
+</pre>
+<br />
+<br />
+<img width="598" height="600" title="R built in Tree data set"
+withgrayborder="True" src=
+"../attachments/2011-11/rt-25-r-stats-by-rob-braswell.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-30T09_07_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-30T13_12_00.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-27T22_32_30.txt" name=
+"e2011-11-27T22_32_30.txt"></a>
+<h2 class="date">11.27.2011 22:32</h2>
+<div class="blogbody">
+<h3 class="title">RT video 19 - Mercurial (hg) for revision
+control</h3>
+<div class="item-description">A basic introduction to Mercurial
+(hg) for for revision control. At 36 minutes, this is my longest
+video yet.<br />
+<br />
+<a href=
+"https://bitbucket.org/schwehr/researchtools/src/tip/video/video-19-mercurial-hg-dvcs.org">
+video-19-mercurial-hg-dvcs.org</a> on BitBucket<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/wup-lP32MUQ" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-27T22_32_30.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-30T09_07_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-27T08_43_48.txt" name=
+"e2011-11-27T08_43_48.txt"></a>
+<h2 class="date">11.27.2011 08:43</h2>
+<div class="blogbody">
+<h3 class="title">Computer History - Secret History of Silicon
+Valley</h3>
+<div class="item-description">I need to visit the computer history
+museum. I'm not sure how I've managed to never make it there... or
+was this the same place that was in San Jose in the early
+90's.<br />
+<br />
+A good view for a slow start Sunday morning. This is the kind of
+stuff I would love to see on the History or Science channels.<br />
+<br />
+<iframe width="420" height="315" src=
+"http://www.youtube.com/embed/ZTC_RxWN_xo" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+<a href=
+"http://steveblank.com/category/secret-history-of-silicon-valley/">The
+Secret History of Silicon Valley</a> (blog series)<br />
+<br />
+Found via <a href=
+"http://www.businessweek.com/printer/magazine/palantir-the-vanguard-of-cyberterror-security-11222011.html">
+Palantir, the War on Terror's Secret Weapon</a> on Businessweek and
+<a href=
+"http://yro.slashdot.org/story/11/11/26/1823200/palantir-the-war-on-terrors-secret-weapon">
+Palantir, the War On Terror's Secret Weapon</a> on slashdot.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-27T08_43_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-27T22_32_30.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-26T12_57_16.txt" name=
+"e2011-11-26T12_57_16.txt"></a>
+<h2 class="date">11.26.2011 12:57</h2>
+<div class="blogbody">
+<h3 class="title">sbet parsing and ploting with numpy and
+matplotlib</h3>
+<div class="item-description">I finally sat down and worked through
+how to read SBET files using the numpy binary reader "fromfile". I
+have to make a list of (field name,type), so I use the zip trick to
+mash a list of 'double' repeated for each field name. Only later
+did I realize that dtype can be set from a list of names and a list
+of types, which would be clearer. The dtype ends up looking like
+this when I do 'sbet_data.dtype':
+<pre>
+<tt><b><font color="#000000">dtype</font></b><font color=
+"#990000">([(</font><font color="#FF0000">'time'</font><font color=
+"#990000">,</font> <font color=
+"#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'x'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'z'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'x-vel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y-vel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),
+</font> <font color="#990000">(</font><font color=
+"#FF0000">'z-vel'</font><font color="#990000">,</font> <font color=
+"#FF0000">'&lt;f8'</font><font color=
+"#990000">),</font> <font color="#990000">(</font><font color=
+"#FF0000">'roll'</font><font color="#990000">,</font> <font color=
+"#FF0000">'&lt;f8'</font><font color=
+"#990000">),</font> <font color="#990000">(</font><font color=
+"#FF0000">'pitch'</font><font color="#990000">,</font> <font color=
+"#FF0000">'&lt;f8'</font><font color=
+"#990000">),</font> <font color="#990000">(</font><font color=
+"#FF0000">'heading'</font><font color=
+"#990000">,</font> <font color=
+"#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'wander'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> 
+<font color="#990000">(</font><font color=
+"#FF0000">'x-accel'</font><font color=
+"#990000">,</font> <font color=
+"#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y-accel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'z-accel'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'x-ang'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'y-ang'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">),</font> <font color="#990000">(</font><font color="#FF0000">'z-ang'</font><font color="#990000">,</font> <font color="#FF0000">'&lt;f8'</font><font color="#990000">)])</font></tt>
+</pre>
+And this is the whole code:
+<pre>
+<tt><b><font color="#000080">import</font></b> numpy as np
+<!-- -->
+sbet_file <font color="#990000">=</font> <b><font color=
+"#000000">open</font></b><font color="#990000">(</font><font color=
+"#FF0000">'sample.sbet'</font><font color=
+"#990000">,</font><font color="#FF0000">'rb'</font><font color=
+"#990000">)</font>
+fields <font color="#990000">=</font> <font color=
+"#990000">(</font><font color="#FF0000">'time'</font><font color=
+"#990000">,</font><font color="#FF0000">'y'</font><font color=
+"#990000">,</font><font color="#FF0000">'x'</font><font color=
+"#990000">,</font><font color="#FF0000">'z'</font><font color=
+"#990000">,</font><font color="#FF0000">'x-vel'</font><font color=
+"#990000">,</font><font color="#FF0000">'y-vel'</font><font color=
+"#990000">,</font><font color="#FF0000">'z-vel'</font><font color=
+"#990000">,</font><font color="#FF0000">'roll'</font><font color=
+"#990000">,</font><font color="#FF0000">'pitch'</font><font color=
+"#990000">,</font><font color=
+"#FF0000">'heading'</font><font color="#990000">,</font><font color="#FF0000">'wander'</font><font color="#990000">,
+   </font><font color="#FF0000">'x-accel'</font><font color=
+"#990000">,</font><font color=
+"#FF0000">'y-accel'</font><font color="#990000">,</font><font color="#FF0000">'z-accel'</font><font color="#990000">,</font><font color="#FF0000">'x-ang'</font><font color="#990000">,</font><font color="#FF0000">'y-ang'</font><font color="#990000">,</font><font color="#FF0000">'z-ang'</font><font color="#990000">)</font>
+<!-- -->
+sbet_dtype <font color="#990000">=</font> <b><font color=
+"#000000">zip</font></b><font color=
+"#990000">(</font>fields<font color="#990000">,</font> <font color=
+"#990000">(</font><font color="#FF0000">'double'</font><font color=
+"#990000">,)*</font> <b><font color=
+"#000000">len</font></b><font color=
+"#990000">(</font>fields<font color="#990000">))</font>
+sbet_data <font color="#990000">=</font> np<font color=
+"#990000">.</font><b><font color=
+"#000000">fromfile</font></b><font color=
+"#990000">(</font>file<font color=
+"#990000">=</font>sbet_file<font color=
+"#990000">,</font> dtype<font color=
+"#990000">=</font>sbet_dtype<font color="#990000">)</font>
+<!-- -->
+sec_of_the_week <font color=
+"#990000">=</font> sbet_data<font color="#990000">[</font><font color="#FF0000">'time'</font><font color="#990000">]</font>
+x <font color="#990000">=</font> sbet_data<font color=
+"#990000">[</font><font color="#FF0000">'x'</font><font color=
+"#990000">]</font> <i><font color="#9A1900"># longitude</font></i>
+y <font color="#990000">=</font> sbet_data<font color=
+"#990000">[</font><font color="#FF0000">'y'</font><font color=
+"#990000">]</font> <i><font color="#9A1900"># latitude</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> matplotlib <b><font color=
+"#000080">import</font></b> pyplot
+pyplot<font color="#990000">.</font><b><font color=
+"#000000">interactive</font></b><font color=
+"#990000">(</font>True<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> field_num<font color=
+"#990000">,</font> field <b><font color=
+"#0000FF">in</font></b> <b><font color=
+"#000000">enumerate</font></b><font color=
+"#990000">(</font>fields<font color="#990000">):</font>
+    pyplot<font color="#990000">.</font><b><font color=
+"#000000">subplot</font></b><font color=
+"#990000">(</font><b><font color=
+"#000000">len</font></b><font color=
+"#990000">(</font>fields<font color=
+"#990000">),</font> <font color="#993399">1</font><font color=
+"#990000">,</font> field_num <font color="#990000">)</font>
+    pyplot<font color="#990000">.</font><b><font color=
+"#000000">plot</font></b><font color=
+"#990000">(</font>sbet_data<font color=
+"#990000">[</font>field<font color="#990000">])</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> ax_num<font color=
+"#990000">,</font> ax <b><font color=
+"#0000FF">in</font></b> <b><font color=
+"#000000">enumerate</font></b><font color=
+"#990000">(</font>pyplot<font color=
+"#990000">.</font><b><font color=
+"#000000">figure</font></b><font color=
+"#990000">(</font><font color="#993399">1</font><font color=
+"#990000">).</font><b><font color=
+"#000000">get_axes</font></b><font color="#990000">()):</font>
+    ax<font color="#990000">.</font><b><font color=
+"#000000">get_xaxis</font></b><font color=
+"#990000">().</font><b><font color=
+"#000000">set_ticks</font></b><font color="#990000">([])</font>
+    ax<font color="#990000">.</font><b><font color=
+"#000000">get_yaxis</font></b><font color=
+"#990000">().</font><b><font color=
+"#000000">set_ticks</font></b><font color="#990000">([])</font>
+    ax<font color="#990000">.</font><b><font color=
+"#000000">text</font></b><font color="#990000">(</font><font color=
+"#993399">0.5</font><font color="#990000">,</font> <font color=
+"#993399">0.5</font><font color=
+"#990000">,</font> fields<font color=
+"#990000">[</font>ax_num<font color="#990000">],</font>
+            horizontalalignment<font color=
+"#990000">=</font><font color="#FF0000">'center'</font><font color=
+"#990000">,</font> verticalalignment<font color=
+"#990000">=</font><font color="#FF0000">'center'</font><font color=
+"#990000">,</font>
+            transform <font color="#990000">=</font> ax<font color=
+"#990000">.</font>transAxes<font color="#990000">)</font>
+<!-- -->
+pyplot<font color="#990000">.</font><b><font color=
+"#000000">savefig</font></b><font color=
+"#990000">(</font><font color=
+"#FF0000">'sample-sbet-graph.png'</font><font color=
+"#990000">)</font></tt>
+</pre>
+<img width="600" height="450" title="SBET by field plot"
+withgrayborder="True" src=
+"../attachments/2011-11/sample-sbet-graphs.png" /><br />
+
+<br />
+This works great for files with only one type of record, but I have
+yet to figure out how to handle something like the typical
+multibeam file formats like the Reson and Simrad/Kongsberg raw all
+format that have many packet/datagram types and some of which are
+variable size.<br />
+<br />
+Sources: <a href=
+"http://docs.scipy.org/doc/numpy/reference/arrays.dtypes.html">NumPy
+Data type objects (dtype)</a><br />
+<a href="http://www.scipy.org/Cookbook/InputOutput">SciPy Cookbook
+/ InputOutput</a><br />
+<a href=
+"http://matplotlib.sourceforge.net/users/text_props.html">Matplotlib
+Text properties and layout</a><br />
+<a href=
+"http://stackoverflow.com/questions/2176424/hiding-axis-text-in-matplotlib-plots">
+Hiding axis text in matplotlib plots</a> on Stackoverflow.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-26T12_57_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-27T08_43_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-26T08_31_13.txt" name=
+"e2011-11-26T08_31_13.txt"></a>
+<h2 class="date">11.26.2011 08:31</h2>
+<div class="blogbody">
+<h3 class="title">Google Oceans</h3>
+<div class="item-description">Since I will be starting into Google
+Oceans in 2012, I figured I would take a quick peak into what
+Wikipedia says about <a href=
+"http://en.wikipedia.org/wiki/Google_Ocean#Water_and_ocean">Google
+Ocean on the Google Earth entry</a>.<br />
+<br />
+<pre>
+Water and ocean
+<!-- -->
+Introduced in version 5.0 (February 2009), the Google Ocean feature
+allows users to zoom below the surface of the ocean and view the 3D
+bathymetry beneath the waves. Supporting over 20 content layers, it
+contains information from leading scientists and oceanographers.[30]
+On April 14, 2009, Google added underwater terrain data for the Great
+Lakes.[31] In 2010, Google added underwater terrain data for Lake
+Baikal. 
+<!-- -->
+In June 2011, higher resolution of some deep ocean floor areas
+increased in focus from 1-kilometer grids to 100 meters thanks to a
+new synthesis of seafloor topography released through Google
+Earth.[32] The high resolution features were developed by
+oceanographers at Columbia University&acirc;&Auml;&ocirc;s Lamont-Doherty Earth
+Observatory from scientific data collected on research cruises. The
+sharper focus is available for about 5 percent of the oceans (an area
+larger than North America). Underwater scenery can be seen of the
+Hudson Canyon off New York City, the Wini Seamount near Hawaii, and
+the sharp-edged 10,000-foot-high Mendocino Ridge off the U.S Pacific
+Coast. There is a Google 2011 Seafloor Tour for those interested in
+viewing ocean deep terrain.
+</pre>
+There are three links in the Ocean section including this one to a
+LDEO press release from June 2011: <a href=
+"http://www.earth.columbia.edu/articles/view/2814">New Google Ocean
+Maps Dive Deep: Up Close and Personal With Landscapes of the
+Abyss</a>. The Earth team has done some pretty amazing stuff with
+the world ocean data and I can't wait to add to what has already
+been started and to help people all over the world to add and
+promote ocean content for Earth, Maps and many other tools.<br />
+<br />
+<a href=
+"http://www.google.com/gadgets/directory?synd=earth&amp;preview=on&amp;cat=ocean&amp;url=http://maps.google.com/maps/gx?oe%3Dutf-8%26output%3Dghapi%26q%3Dhttps://sites.google.com/site/gismaterials/Home/GMRTCriuseTracks.kmz">
+Columbia Ocean Terrain Synthesis</a><br />
+<br />
+<img width="600" height="515" title=
+"Columbia Ocean Terrain Synthesis" withgrayborder="True" src=
+"../attachments/2011-11/ldeo-cruise-tracks.png" />
+<br />
+<br />
+And in other exciting ocean news (of which there are just too many
+cool things going on right now)... <a href=
+"http://tech.slashdot.org/story/11/11/22/1611211/4-wave-gliders-begin-their-autonomous-pacific-crossing-attempt">
+4 Wave Gliders Begin Their Autonomous Pacific Crossing Attempt</a>
+by <a href="http://liquidr.com/">Liquid Robotics</a>. And the
+Liquid Robotics crew just gave me a demo of <a href=
+"http://coastwatch.pfeg.noaa.gov/erddap/">NOAA's ERDDAP
+software</a> (the Environmental Research Division's Data Access
+Program). I need to spend some time with ERDDAP to understand what
+really is going on under the hood.<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/18xZoXu1USM" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-26T08_31_13.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-26T12_57_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-25T16_11_42.txt" name=
+"e2011-11-25T16_11_42.txt"></a>
+<h2 class="date">11.25.2011 16:11</h2>
+<div class="blogbody">
+<h3 class="title">Mars Science Laboratory launching</h3>
+<div class="item-description">Curiosity (Mars Science Laboratory;
+MSL) is set to launch tomorrow. Landing will be in August, 2012. If
+only we could have a camera on Mars to watch the crazy sky crane
+landing. On the mission, there is a <a href=
+"http://marsprogram.jpl.nasa.gov/msl/mission/timeline/">timeline
+page</a>. A nice link posted by Vandi: <a href=
+"http://www.universetoday.com/91254/how-will-msl-navigate-to-mars-very-precisely/">
+How Will MSL Navigate to Mars? Very Precisely</a>.<br />
+<br />
+<a href=
+"http://photojournal.jpl.nasa.gov/targetFamily/Mars?subselect=Mission%3AMars+Science+Laboratory+%28MSL%29%3A">
+MSL in the Planetary Photojournal</a><br />
+<br />
+<img width="600" height="354" title="MSL landing sequence"
+withgrayborder="True" src=
+"../attachments/2011-11/mars-science-laboratory-PIA13282.jpg" />
+<br />
+<br />
+I still have this strange desire to write a <a href=
+"http://www.ccsds.org">CCSDS</a> parser in python.<br />
+<br />
+Update 2011-Nov-26: <a href=
+"http://www.digitaljournal.com/article/315072">Mars Science
+Laboratory launches</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-25T16_11_42.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-26T08_31_13.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-24T00_13_38.txt" name=
+"e2011-11-24T00_13_38.txt"></a>
+<h2 class="date">11.24.2011 00:13</h2>
+<div class="blogbody">
+<h3 class="title">RT 24 - Python Binary Files part 4 - command line
+args</h3>
+<div class="item-description">Topics include "What is GIS," using
+glob.glob to expand file names with "*", using sys.argv directly to
+list input files and using argparse to properly handle command line
+arguments.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/24-python-binary-files-part-4.html">
+html</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/present/24-python-binary-files-part-4.pdf">
+pdf</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/audio/24-python-binary-files-part-4.mp3">
+mp3</a> and <a href=
+"https://bitbucket.org/schwehr/researchtools/src/tip/class/24-python-binary-files-part-4.org">
+org (in BitBucket hg)</a>.<br />
+<br />
+Comment here: <a href=
+"http://schwehr.blogspot.com/2011/11/rt-24-part-4-parsing-binary-sbet-files.html">
+rt 24 comments</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-24T00_13_38.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-25T16_11_42.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-20T20_14_34.txt" name=
+"e2011-11-20T20_14_34.txt"></a>
+<h2 class="date">11.20.2011 20:14</h2>
+<div class="blogbody">
+<h3 class="title">Every blip counts - super small seismic
+sensor</h3>
+<div class="item-description"><a href=
+"http://rockethub.com/projects/3744-every-blip-counts-low-cost-seismic-sensors">
+Every Blip Counts - Low Cost Seismic Sensors</a> by Debi Kilb of
+SIO.<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/IoBdd90DYEs" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-20T20_14_34.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-24T00_13_38.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-19T08_36_40.txt" name=
+"e2011-11-19T08_36_40.txt"></a>
+<h2 class="date">11.19.2011 08:36</h2>
+<div class="blogbody">
+<h3 class="title">RT 23 - Part 3: Parsing binary SBET files with
+python's struct</h3>
+<div class="item-description">In this class, we do our first
+mercurial pull of changes. We then add helper functions to our
+sbet.py module to give us the number of datagrams in an sbet file,
+tell us at what offset any particular datagram is located and add a
+<b>generator</b> function allowing cleaner for loops over sbet
+files.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/%7Eschwehr/Classes/2011/esci895-researchtools/23-python-binary-files-part-3.html">
+23-python-binary-files-part-3.html</a>, <a href=
+"http://vislab-ccom.unh.edu/%7Eschwehr/Classes/2011/esci895-researchtools/audio/23-python-binary-files-part-3.mp3">
+mp3</a>, <a href=
+"http://vislab-ccom.unh.edu/%7Eschwehr/Classes/2011/esci895-researchtools/present/23-python-binary-files-part-3.pdf">
+pdf</a> and <a href=
+"http://schwehr.blogspot.com/2011/11/rt-23-part-3-parsing-binary-sbet-files.html">
+comments go here</a>.<br />
+<br />
+Remember that at this point, you should be getting the org mode
+formatted class notes via mercurial (hg). To get set up:
+<pre>
+mkdir ~/projects
+cd ~/projects
+sudo apt-get install mercurial # Install hg on ubuntu &amp; debian linux
+hg clone https://bitbucket.org/schwehr/researchtools
+</pre>
+And every time you start working on the class, do a pull and update
+to get the latest versions.
+<pre>
+cd ~/projects/researchtools
+hg pull   # Bring the changes down to the local "repo"
+hg update # Change the working files to have the latest changes
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-19T08_36_40.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-20T20_14_34.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-16T10_55_20.txt" name=
+"e2011-11-16T10_55_20.txt"></a>
+<h2 class="date">11.16.2011 10:55</h2>
+<div class="blogbody">
+<h3 class="title">Joining Google for Oceans</h3>
+<div class="item-description">Some really big news about me... I'll
+be joining Google in January 2012 to work as a GIS Data Engineer on
+Oceans!</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-16T10_55_20.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-19T08_36_40.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-16T10_49_20.txt" name=
+"e2011-11-16T10_49_20.txt"></a>
+<h2 class="date">11.16.2011 10:49</h2>
+<div class="blogbody">
+<h3 class="title">RT 22 - Part 2: Parsing binary SBET files with
+python's struct</h3>
+<div class="item-description"><a href=
+"http://waage.sr.unh.edu/~braswell/">Rob Braswell</a> has
+tentatively agreed to give us a lecture on Data Analysis with
+<a href="http://www.r-project.org/">R</a> on Nov. 29th. Rob taught
+EOS 864 while he was a full-time Research Professor at UNH. I
+haven't done any work with R myself, but I've seen some really
+great work done with it. I'm super excited to sit in on his
+class.<br />
+<br />
+Notes for the class should now be retrieved via mercurial/hg from
+<a href=
+"https://bitbucket.org/schwehr/researchtools">https://bitbucket.org/schwehr/researchtools</a>.
+The rest of the material is in the usual locations in the <a herf=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/">
+class directory</a>: <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/audio/22-python-binary-files-part-2.mp3">
+mp3</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/present/22-python-binary-files-part-2.pdf">
+pdf</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/22-python-binary-files-part-2.html">
+html</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-16T10_49_20.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-16T10_55_20.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-15T06_33_11.txt" name=
+"e2011-11-15T06_33_11.txt"></a>
+<h2 class="date">11.15.2011 06:33</h2>
+<div class="blogbody">
+<h3 class="title">Apples Sandbox in 10.7</h3>
+<div class="item-description">I had a network failure with my
+VMWare Fusion 3.1.3 Ubuntu 11.04 instance this morning and in the
+process of trying to debug what when wrong I ran into this in my
+/var/log/syslog
+<pre>
+Nov 15 06:20:23 Catbox4-MBAir sandboxd[362] ([48]): ntpd(48) deny file-write-create /private/var/log/ntpstats/peerstats.20111115
+Nov 15 06:20:23 Catbox4-MBAir ntpd[48]: can't open /var/log/ntpstats/peerstats.20111115: Operation not permitted
+</pre>
+What? Apple has sandboxed their setup of ntpd? This is the first
+time I had seen anything with their sandbox setup. I did an "mdfind
+ntpd.sb" and found the config file. Here is a partial sample of
+/usr/share/sandbox/ntpd.sb:
+<pre>
+;;
+;; ntpd - sandbox profile
+;; Copyright (c) 2006-2009 Apple Inc.  All Rights reserved.
+;;
+;; WARNING: The sandbox rules in this file currently constitute 
+;; Apple System Private Interface and are subject to change at any time and
+;; without notice. The contents of this file are also auto-generated and not
+;; user editable; it may be overwritten at any time.
+;;
+(version 1)
+<!-- -->
+(deny default)
+<!-- -->
+(allow process-fork)
+<!-- -->
+(allow iokit-open (iokit-user-client-class "RootDomainUserClient"))
+<!-- -->
+;;; Allow NTP specific files
+(allow file-read-data file-read-metadata
+       (literal "/private/etc/ntp-restrict.conf")
+       (regex "^/private/etc/ntp\\.(conf|keys)$")
+       (literal "/private/var/mobile/Library/Preferences/ntp.conf")
+       (regex "^/private/etc/(services|hosts)$")
+       (regex "^/private/var/run/tmpntp.conf.*"))
+<!-- -->
+(allow file-write* file-read-data file-read-metadata
+       (literal "/private/var/run/ntpd.pid")
+       (regex "^/private/var/(db|mobile/Library/Preferences)/ntp\\.drift(\\.TEMP)?$")
+       (subpath "/private/tmp")
+       (subpath "/private/var/tmp"))
+; ... snip ...
+</pre>
+So a couple of observations. First, if this is autogenerated, what
+should I be editing to allow ntpd to write log files? Second, this
+looks like LISP!!! Third, the copyrights are 2006-2009! I went back
+and looked at 10.5 and 10.6 machines that I still have up and
+running. They both have sandbox and ntpd.sb. So for the last bunch
+of years, I've never really understood why ntpd wouldn't write the
+stats... now I know why.<br />
+<br />
+So what is the correct way to setup ntpd with stats on a Mac???
+Things I don't have time for right now.
+<pre>
+man -k sandbox
+asctl(1)                 - App Sandbox Control Tool
+sandbox(7)               - overview of the sandbox facility
+sandbox-exec(1)          - execute within a sandbox
+sandbox-simplify(1)      - simplify a sandbox profile created by a trace directive
+sandbox_init(3), sandbox_free_error(3) - set process sandbox
+sandboxd(8)              - sandbox daemon
+</pre>
+At least a full reboot fixed whatever what wrong with VMWare's
+networking.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-15T06_33_11.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-16T10_49_20.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-13T08_55_18.txt" name=
+"e2011-11-13T08_55_18.txt"></a>
+<h2 class="date">11.13.2011 08:55</h2>
+<div class="blogbody">
+<h3 class="title">Research Tools Mercurial (hg) release</h3>
+<div class="item-description">I had originally hoped to cover
+<a href=
+"http://en.wikipedia.org/wiki/Distributed_revision_control">distributed
+version control systems</a> (DVCS) using <a href=
+"http://mercurial.selenic.com/">Mercurial</a> (hg), during the
+first two weeks of the course, but then I realized that makes
+little sense when the class is command line focused and many people
+taking the course have no prior exposure to the command line. As a
+result, I also never got around to setting up a hg repository
+(repo) and pushing it to someplace public. I've been stuck in my
+<a href="http://subversion.apache.org/">Subversion</a> (svn) rut.
+While svn is rock solid and much better than the old concurrent
+version system (CVS), DVCS systems make much more sense, especially
+for people who spend a lot of time working without normal internet
+access (e.g. on research vessels out on the oceans). While I've
+been using <a href="http://git-scm.com/">git</a> for most of my
+work (<a href="https://github.com/schwehr/">schwehr@github</a>),
+mercurial seems to be cleaner/simpler and thus a better choice for
+most programming scientists. Plus, if you know git or hg, switching
+from one to the other isn't hard and the core commands are very
+similar. To top it off, CCOM is switching from svn to hg as the
+version control system that they recommend for new projects
+(<a href="http://rhodecode.org/">RhodeCode</a>).<br />
+<br />
+Also, since I've been using github and bitbucket a lot, I am trying
+to mix things up by using BitBucket for this project.
+Unfortunately, the audio, video and examples are too big for this
+repository, so you'll have to get them from the class website or
+YouTube.<br />
+<br />
+What is a good solution for hosting the lecture/class audio files?
+It does not seem right to just drop the audio into YouTube unless I
+put slides to go with it. I just don't have the time to pull that
+off.<br />
+<br />
+I'm very much interested in improving this material, so please
+clone this repository, make changes and send me "pull requests"
+when you have an improvement or addition that you think is worth
+pushing back into the material.<br />
+<br />
+<a href=
+"https://bitbucket.org/schwehr/researchtools/src">https://bitbucket.org/schwehr/researchtools/src</a><br />
+
+<br />
+So, please clone this repo!
+<pre>
+hg clone https://bitbucket.org/schwehr/researchtools
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-13T08_55_18.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-15T06_33_11.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-11T18_14_40.txt" name=
+"e2011-11-11T18_14_40.txt"></a>
+<h2 class="date">11.11.2011 18:14</h2>
+<div class="blogbody">
+<h3 class="title">Research Tools Lecture 21 - Parsing binary data
+using python struct module - SBETs</h3>
+<div class="item-description">Using struct to decode Applanix
+POSPAC SBET navigation files:<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/src/21-python-binary-files.org">
+21-python-binary-files.org</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/21-python-binary-files.html">
+html</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/audio/21-python-binary-files.mp3">
+mp3</a> and <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/present/21-python-binary-files.pdf">
+pdf</a><br />
+<br />
+<a href=
+"http://schwehr.blogspot.com/2011/11/rt-21-parsing-binary-sbet-files-with.html">
+comment here</a><br />
+<br />
+See also, my much more complete (but not yet finished)
+document:<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/python-binary-files.org">
+python-binary-files.org</a> / <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/python-binary-files.html">
+python-binary-files.html</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-11T18_14_40.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-13T08_55_18.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-10T14_44_14.txt" name=
+"e2011-11-10T14_44_14.txt"></a>
+<h2 class="date">11.10.2011 14:44</h2>
+<div class="blogbody">
+<h3 class="title">National Academy Report on Deepwater Horizon
+(DWH)</h3>
+<div class="item-description">Just out today. I've had zero input
+into any of the reports out there. This report is chaired by Larry
+Mayer, the director of the Center for Coastal and Ocean Mapping
+(CCOM) at UNH.<br />
+<br />
+<a href=
+"http://www8.nationalacademies.org/onpinews/newsitem.aspx?RecordID=13141">
+New Report Offers Broad Approach to Assessing Impacts of Ecological
+Damage From Deepwater Horizon Oil Spill</a><br />
+<br />
+<a href="http://www.nap.edu/catalog.php?record_id=13141">Approaches
+for Ecosystem Services Valuation for the Gulf of Mexico After the
+Deepwater Horizon Oil Spill: Interim Report</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-10T14_44_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-11T18_14_40.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-09T16_44_46.txt" name=
+"e2011-11-09T16_44_46.txt"></a>
+<h2 class="date">11.09.2011 16:44</h2>
+<div class="blogbody">
+<h3 class="title">MIT Open Course Ware (OCW) - Intro to Computer
+Science in Python</h3>
+<div class="item-description">This is a fairly different style to
+what I've been doing this semester, which makes it a valuable
+resource for people going through my Research Tools course. While
+I'm blown away with 500 views so far on my first video, I have to
+say I'm impress and a bit jealous with his ~15000 views on lecture
+18 that I link to below and the 715000 views of lecture 1...<br />
+<br />
+<a href=
+"http://www.youtube.com/playlist?list=PL4C4720A6F225E074">MIT 6.00
+Intro to Computer Science &amp; Programming, Fall 2008</a> with 20
+hours of video. That's right, you could watch this whole course in
+one day with an insane marathon session. I have to admit that I've
+only watched about 10 minutes of Lecture 18, so I can't say that I
+really know how good this class is, but I'd wager that it's
+impressive.
+<pre>
+This subject is aimed at students with little or no programming
+experience. It aims to provide students with an understanding of the
+role computation can play in solving problems. It also aims to help
+students, regardless of their major, to feel justifiably confident of
+their ability to write small programs that allow them to accomplish
+useful goals. The class will use the Python programming
+language. Instructors: Prof. Eric Grimson, Prof. John Guttag View the
+complete course at: http://ocw.mit.edu/6-00F08 License: Creative
+Commons BY-NC-SA More information at http://ocw.mit.edu/terms More
+courses at http://ocw.mit.edu
+</pre>
+<a href="http://youtu.be/QJ_MPc0TobI">Lecture 18: Presenting
+simulation results, Pylab, plotting</a><br />
+<br />
+<iframe width="420" height="315" src=
+"http://www.youtube.com/embed/QJ_MPc0TobI" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-09T16_44_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-10T14_44_14.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-08T09_39_31.txt" name=
+"e2011-11-08T09_39_31.txt"></a>
+<h2 class="date">11.08.2011 09:39</h2>
+<div class="blogbody">
+<h3 class="title">RT Video 18 - Heading BAG bathymetry with h5py in
+python</h3>
+<div class="item-description">Using h5py, numpy and matplotlib from
+within ipython:<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/dEtC6bRcjvc" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-08T09_39_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-09T16_44_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-07T17_38_14.txt" name=
+"e2011-11-07T17_38_14.txt"></a>
+<h2 class="date">11.07.2011 17:38</h2>
+<div class="blogbody">
+<h3 class="title">RT Video 17 - emacs query-replace, HDF5 BAGs and
+ISO XML Metadata</h3>
+<div class="item-description"><iframe width="560" height="315" src=
+"http://www.youtube.com/embed/Nd-cBRpszdc" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-07T17_38_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-08T09_39_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-02T16_02_35.txt" name=
+"e2011-11-02T16_02_35.txt"></a>
+<h2 class="date">11.02.2011 16:02</h2>
+<div class="blogbody">
+<h3 class="title">RT Lectures 16 and 18 - matplotlib, BAGs, HDF5
+and XML</h3>
+<div class="item-description">h5py for HDF5 BAGs in lecture
+18:<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/src/18-bag-hdf-xml.org">
+18-bag-hdf-xml.org</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/audio/18-bag-hdf-xml.mp3">
+mp3</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/present/18-bag-hdf-xml.pdf">
+pdf</a><br />
+<br />
+Also, I somehow missed posting about lecture 16, which covered
+matplotlib histograms and loadtxt with GPS data that I had already
+preprocessed into space separated files.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/src/16-matplotlib-2.org">
+org</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/audio/16-matplotlib-2.mp3">
+mp3</a>, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/present/16-matplotlib-2.pdf">
+pdf</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-02T16_02_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-07T17_38_14.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2011-11-01T09_16_00.txt" name=
+"e2011-11-01T09_16_00.txt"></a>
+<h2 class="date">11.01.2011 09:16</h2>
+<div class="blogbody">
+<h3 class="title">Wherecamp Boston and G+ permalinks</h3>
+<div class="item-description">Is this how you link to a G+ article?
+<a href=
+"https://plus.google.com/u/0/102101513984015207006/posts/YYTHdoJZs2J">
+https://plus.google.com/u/0/102101513984015207006/posts/YYTHdoJZs2J</a>.
+Not the most friendly link.<br />
+<br />
+I wanted to share my post and get people to post what they think
+are good iOS or Droid apps for science.
+<pre>
+Had a great time at Where Camp Boston day 1 on Saturday! A big
+part of the entertainment was the trip down and back. Awesome fall
+colors on the way down, severe winter storm with 6+ inches of snow on
+the way back with Amtrak having all the crossing signals broken in
+NH... nothing like gates stuck part way down and red lights flashing
+with or without trains. Ben, Monica and I had great (and geeky)
+conversations the whole way. I so need to work up a document going
+through how to use iOS devices for science.
+<!-- -->
+What is your favorite iOS use for science? And droid users... someone
+should definitely start the same for Android!
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2011-11.html#e2011-11-01T09_16_00.txt">Permalink</a> 
+<!-- <br /><a href="archives/2011-11-02T16_02_35.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">November 2011</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-01T09_16_00.txt">1</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-02T16_02_35.txt">2</a></span></td>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar">5</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-07T17_38_14.txt">7</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-08T09_39_31.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-09T16_44_46.txt">9</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-10T14_44_14.txt">10</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-11T18_14_40.txt">11</a></span></td>
+<td align="center"><span class="calendar">12</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-13T08_55_18.txt">13</a></span></td>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-15T06_33_11.txt">15</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-16T10_55_20.txt">16</a></span></td>
+<td align="center"><span class="calendar">17</span></td>
+<td align="center"><span class="calendar">18</span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-19T08_36_40.txt">19</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-20T20_14_34.txt">20</a></span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-24T00_13_38.txt">24</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-25T16_11_42.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-26T12_57_16.txt">26</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-27T22_32_30.txt">27</a></span></td>
+<td align="center"><span class="calendar">28</span></td>
+<td align="center"><span class="calendar">29</span></td>
+<td align="center"><span class="calendar"><a href=
+"2011-11.html#e2011-11-30T14_59_08.txt">30</a></span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

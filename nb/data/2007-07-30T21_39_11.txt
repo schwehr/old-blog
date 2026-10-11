@@ -1,0 +1,66 @@
+TITLE: python unittest trick
+AUTHOR: Kurt
+DATE: 07.30.2007 21:39
+DESC: bogus pass class
+-----
+BODY:
+I am writing a gridding class in python that is starting to have quite
+a few test TestCase classes.  I couldn't thing of a really good way to
+turn off most of the test cases so that I can more easily focus on the
+cases that are breaking.  I finally settled on using inheritance to
+turn off the classes of tests that I am not interested in using.  Here
+is an example of a working test case that I would like to turn off for
+a short time.
+<pre>
+from grid import Grid
+import unittest
+<b>class TestGrid(unittest.TestCase):</b>
+    def testInit10(self):
+        'init with unit grid'
+        g = Grid(0,0, 1,1, 1)
+        self.failUnlessEqual(g.xNumCells,1)
+        self.failUnlessEqual(g.yNumCells,1)
+        self.failUnlessAlmostEqual(g.maxx,1)
+        self.failUnlessAlmostEqual(g.maxy,1)
+</pre>
+Using inheritance, I can turn off everything in test grid by creating
+a dummy bogus_unittest.py.  I am not currently using many features in the
+TestCase class, so this is pretty simple.
+<pre>
+'''
+Dummy standin for unittest so that some groups of test do not get run
+when they inherit this module instead of the normal unittest.
+'''
+class TestCase:
+    def failUnlessEqual():
+        pass
+    def failUnlessAlmostEqual():
+        pass
+</pre>
+Now, I tweak my test cases such that the groups that I don't want to run
+inherit from bogus_unittest.TestCase.
+<pre>
+from grid import Grid
+import unittest
+import bogus_unittest
+<b>class TestGrid(bogus_unittest.TestCase):</b>
+    def testInit10(self):
+        'init with unit grid'
+        g = Grid(0,0, 1,1, 1)
+        self.failUnlessEqual(g.xNumCells,1)
+        self.failUnlessEqual(g.yNumCells,1)
+        self.failUnlessAlmostEqual(g.maxx,1)
+        self.failUnlessAlmostEqual(g.maxy,1)
+</pre>
+Now everything in the TestGrid class is not being run when I fire off
+the unittests.  I still have issues with execution order, which is why
+my individual tests have names line testInit<b>10</b>.  What is a good
+technique to order tests such that the complicated, far reaching stuff
+is run after the basics?
+
+NOTE: I got some feedback on this one here... <a
+href="http://zcologia.com/news/527/selectively-running-python-tests/">Selectively
+Running Python Tests</a> [Sean at zcologia.com].  Sorry about the no comment
+thing.  I need to get around to using something other than nanoblogger.
+
+-----

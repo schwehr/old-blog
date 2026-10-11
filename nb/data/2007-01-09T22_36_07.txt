@@ -1,0 +1,75 @@
+TITLE: Simplest python C module
+AUTHOR: Kurt
+DATE: 01.09.2007 22:36
+DESC: just the basics
+-----
+BODY:
+Here is about the simplest possible C module (taken from <a
+href="http://www.pyzine.com/Issue001/Section_Articles/article_EPwCPartI.html">Extending
+Python with C: Part 1</a>[pyzine].  First the C source (tiny.c):
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;Python.h&gt;</font></strong></font>
+<font color="#444444">/* the function that is callable from python */</font>
+<strong>static</strong> <font color="#2040a0">PyObject</font><font color="4444FF">*</font>
+<font color="#2040a0">tiny</font><font color="4444FF">(</font><font color="#2040a0">PyObject</font><font color="4444FF">*</font> <font color="#2040a0">self</font>, <font color="#2040a0">PyObject</font><font color="4444FF">*</font> <font color="#2040a0">args</font><font color="4444FF">)</font>   <font color="#444444">/* proto for all exposed funcs */</font>
+<font color="4444FF"><strong>{</strong></font>
+    <strong>if</strong><font color="4444FF">(</font><font color="4444FF">!</font><font color="#2040a0">PyArg_ParseTuple</font><font color="4444FF">(</font><font color="#2040a0">args</font>, <font color="#008000">&quot;&quot;</font><font color="4444FF">)</font><font color="4444FF">)</font>    <font color="#444444">/* receive arguments (no args) */</font>
+	<strong>return</strong> <font color="#FF0000">0</font><font color="4444FF">;</font>                      <font color="#444444">/* propagate error if any */</font>
+    <strong>return</strong> <font color="#2040a0">Py_BuildValue</font><font color="4444FF">(</font><font color="#008000">&quot;s&quot;</font>,<font color="#008000">&quot;it works!&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#444444">/* build and return result */</font>
+<font color="4444FF"><strong>}</strong></font>
+<font color="#444444">/* Lookup table of functions */</font>
+<strong>static</strong> <font color="#2040a0">PyMethodDef</font> <font color="#2040a0">tinyMethods</font><font color="4444FF">[</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF"><strong>{</strong></font>   <font color="#444444">/* methods exposed from module */</font>
+    <font color="4444FF"><strong>{</strong></font><font color="#008000">&quot;tiny&quot;</font>, <font color="#2040a0">tiny</font>, <font color="#2040a0">METH_VARARGS</font>, <font color="#008000">&quot;A tiny function&quot;</font><font color="4444FF"><strong>}</strong></font>,    <font color="#444444">/* descriptor */</font>
+    <font color="4444FF"><strong>{</strong></font><font color="#FF0000">0</font><font color="4444FF"><strong>}</strong></font>                                                 <font color="#444444">/* sentinel   */</font>
+<font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+<font color="#444444">/*  Hook into python */</font>
+<strong>void</strong>
+<font color="#2040a0">inittiny</font><font color="4444FF">(</font><strong>void</strong><font color="4444FF">)</font>                             <font color="#444444">/* called by Python on import */</font>
+<font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">Py_InitModule</font><font color="4444FF">(</font><font color="#008000">&quot;tiny&quot;</font>, <font color="#2040a0">tinyMethods</font><font color="4444FF">)</font><font color="4444FF">;</font>  <font color="#444444">/* init module with methods */</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Here is the distutils based setup.py file that compiles the code.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">distutils</font>.<font color="#2040a0">core</font> <strong>import</strong> <font color="#2040a0">setup</font>, <font color="#2040a0">Extension</font>
+<font color="#2040a0">setup</font><font color="4444FF">(</font>
+    <font color="#2040a0">name</font><font color="4444FF">=</font><font color="#008000">&quot;samples&quot;</font>, 
+    <font color="#2040a0">version</font><font color="4444FF">=</font><font color="#008000">&quot;0.1&quot;</font>,
+    <font color="#2040a0">ext_modules</font> <font color="4444FF">=</font> <font color="4444FF">[</font>
+	<font color="#2040a0">Extension</font><font color="4444FF">(</font><font color="#008000">&quot;tiny&quot;</font>,<font color="4444FF">[</font><font color="#008000">&quot;tiny.c&quot;</font><font color="4444FF">]</font><font color="4444FF">)</font>
+	<font color="4444FF">]</font>
+    <font color="4444FF">)</font>
+</pre>
+Now install and run the module.  This is for python2.5 on fink/mac
+osx.  The path will be different on other systems.
+<pre>
+chmod +x setup.py
+mkdir inst
+./setup.py install --root=inst
+  running install
+  running build
+  running build_ext
+  building 'tiny' extension
+  gcc -fno-strict-aliasing -Wno-long-double -no-cpp-precomp -mno-fused-madd -DNDEBUG -g -O3 -Wall -Wstrict-prototypes -I/sw/include/python2.5 -c tiny.c -o build/temp.macosx-10.4-ppc-2.5/tiny.o
+g  cc -L/sw/lib -bundle -undefined dynamic_lookup build/temp.macosx-10.4-ppc-2.5/tiny.o -o build/lib.macosx-10.4-ppc-2.5/tiny.so
+  running install_lib
+  copying build/lib.macosx-10.4-ppc-2.5/tiny.so -> inst/sw/lib/python2.5/site-packages
+  running install_egg_info
+  Removing inst/sw/lib/python2.5/site-packages/samples-0.1-py2.5.egg-info
+  Writing inst/sw/lib/python2.5/site-packages/samples-0.1-py2.5.egg-info
+
+PYTHONPATH=inst/sw/lib/python2.5/site-packages ipython
+In [1]: import tiny
+In [2]: tiny.tiny()
+Out[2]: 'it works!'
+</pre>
+Tiny has limited documentation.
+<pre>
+help (tiny.tiny)
+Help on built-in function tiny in module tiny:
+
+tiny(...)
+    A tiny function
+</pre>
+-----

@@ -1,0 +1,87 @@
+TITLE: updated info for gmtplus
+AUTHOR: Kurt
+DATE: 03.10.2005 08:38
+DESC: if the blueberries could talk
+-----
+BODY:
+Just updated the install info for gmtplus.
+<pre>
+&nbsp;&nbsp;<a href="http://schwehr.org/software/gmtplus/">My gmtplus web page</a>
+</pre>
+Apple has a web page on installing and running X11.  It even talks
+through fink! Cool.  Just avoid using xhost if you can.  Much better
+to tunnel X11 over ssh with the -X ssh option.
+<pre>
+&nbsp;&nbsp;<a href="http://developer.apple.com/darwin/runningx11.html">Runnin X11</a>
+</pre>
+Just read this over on a public mars rover discussion.  It made me
+smile.  That is the nice thing about public discussions.  I would just
+dismiss the possibility that these things are alive.  But it never
+hurts to play what if.  This could be the basis for a nice SciFi story
+:)  If you make these discussions public (which they are not for those
+on the inside of the MER teams) then you can get feedback from experts
+from all sorts of fields.
+<pre>
+  <a
+  href="http://www.markcarey.com/mars/discuss-23686-back-to-the-live-blueberry-thesis.html">Live Blueberries</a>
+
+  For the few Biologists out there who have examined fungal initials
+  being formed on solid media. Please tell me what is wrong, purely on
+  the visual evidence, not your belief that conditions on Mars cannot
+  allow life to exist on the surface, with the interpretation that
+  clear indications are evident in this picture that the blueberries
+  are being formed from the aggregation of large cell like structures
+  in the ground matrix. 
+</pre>
+Here are some notes about fink-a-frying a new 10.3.8 box.  Woo hoo
+800MHz G4. Ouch that is slow!  But slow and steady wins the race.
+There will be a blend of apt-get and fink for installing as I try to
+jump start this as fast as possible.  Some of these programs take
+hours to build.  If you have the time, use "fink install" and not
+apt-get install to get the latest stuff since you will have to rebuild
+much anyways down the road.
+<pre>
+  sudo emacs /sw/etc/fink.conf
+  # Add unstable/main and unstable/crypto to Trees
+  fink index
+  fink selfupdate
+  sudo apt-get install emacs21  gnuplot gv wget-ssl doxygen gsl gengetopt imagemagick
+  sudo apt-get install qt3
+  fink install postgresql73-ssl  python24 python24-socket-ssl scietificpython-py24 sqlite
+  fink install density # This is a couple hours
+  fink install postgresql73-ssl
+  fink install sqlite
+  fink install python24
+  fink install python
+  fink install pysqlite-py24  
+  fink install sqlite3
+  fink install biggles-py24 f2py-py24 gnuplot-py24 numarray-py24
+  fink install proj
+  fink install gsl
+  fink install gdal
+  fink install mbsystem
+  fink install pmag
+  fink install tksu  # you will have to answer some questions for it to build.
+  #fink install weka  # Errr... this is currently broken.  Sorry.
+  fink install xtermcontrol g3data
+  fink install pdflib-py24 
+  fink install density soxt3
+  fink install scipy-py24 scientificpython-py24
+  fink install pygsl-py24
+  fink install tksu # brings cwp-su (seismic unix)
+  fink install twisted-py24
+  fink install wxpython-py24
+  fink install pyxml-py24
+  fink install rpy-py24
+  fink install octave # Very much link matlab
+  fink install gdl # Very much like IDL
+  fink install matplotlib-py24
+  fink install ipython-py24
+  fink install povray graphviz
+
+  # finish up...
+  fink clean
+  fink scanpackages
+</pre>
+This was hobbled together so it may not be perfect.  There are many packages which can not be installed in the same install line due to different versions of ncurses dev and readline dev that have to be temporarily installed.  You are on your own to get sioseis and pltsegy since they are not in fink.
+-----

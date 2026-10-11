@@ -1,0 +1,64 @@
+TITLE: swish-e never ends
+AUTHOR: Kurt
+DATE: 01.09.2005 17:13
+DESC: Close but not perfect
+-----
+BODY:
+I am getting closer to getting swish-e working for my blog.  I have
+been working on my laptop to get this going.  It was not supposed to
+take this long.  It was supposed to be a time saver.  Doh!  Here is a
+bit of what I have done so far on Mac OSX 10.3.7.
+
+I now have it so that searches work but are not pretty.  I have the
+three info files installed: swish-e.info, swish-e-pm.info, and
+html-fillinform-pm.info.  For the two perl ones, I am using pm584.
+For testing, I have BLOG_DIR=/Users/schwehr/Sites/blog which gives a
+URL of:
+<pre>
+http://localhost/~schwehr/blog/
+</pre>
+Then I made a directory ${BLOG_DIR}/cgi-bin and then added these lines
+to end of /sw/etc/apache2/httpd.conf:
+<pre>
+<Directory "/Users/schwehr/Sites/blog/cgi-bin">
+        Options ExecCgi
+	SetHandler cgi-script
+</Directory>
+</pre>
+Then restart apache2 from fink like this: <b>sudo /sw/sbin/apachectl
+restart</b>
+
+Now copy in the original search file: <b>cp /sw/lib/swish-e/search.cgi
+$BLOG_DIR/cgi-bin</b>.  You then need to change the perl being used on
+the first list of search.cgi in your cgi-bin dir.  The first line of
+mine looks like this:
+<pre>
+#!/sw/bin/perl5.8.4
+</pre>
+If you do not do this, you will get an internal server error.
+
+I then added some html for the search text box on the right to the
+template/main_index.htm file right before the contact entry:
+<pre>
+&lt;div class=&quot;sidetitle&quot;&gt;Search&lt;/div&gt;
+&lt;div class=&quot;side&quot;&gt;
+&lt;form action=&quot;cgi-bin/search.cgi&quot; method=&quot;get&quot;&gt;&lt;input type=&quot;text&quot;
+name=&quot;query&quot; class=&quot;input&quot; /&gt; &lt;input type=&quot;submit&quot; value=&quot;Search&quot;
+class=&quot;input&quot; /&gt;&lt;/form&gt;
+&lt;/div&gt;
+</pre>
+In the cgi-bin dir (this is not the best place), I greated the swish-e index:
+<pre>
+  cd ${BLOG_DIR}/cgi-bin
+  cat swish-e.conf
+    IndexOnly .htm .html
+    DefaultContents HTML*
+    StoreDescription HTML* <body>
+    metanames swishtitle swishdocpath
+  swish-e -c swish-e.conf -i ../archive ../articles
+  open http://localhost/~schwehr/blog/
+  http://localhost/~schwehr/blog/cgi-bin/search.cgi?query=kangaroo
+</pre>
+Now I need to constumize search.cgi since it comes up whacky buy
+reading <b>cd BLOG_DIR/cgi-bin && perldoc search.cgi</b>
+-----

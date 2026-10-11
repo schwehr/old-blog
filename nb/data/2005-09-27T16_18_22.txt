@@ -1,0 +1,50 @@
+TITLE: XStar NMEA weirdness
+AUTHOR: Kurt
+DATE: 09.27.2005 16:18
+DESC: arg
+-----
+BODY:
+I was trying to plot the raw xstar longitudes and latitudes (after
+deviding by 1000), but I was getting a step function that was really
+nasty.  I figured it was time to finally check out what the values in
+NMEALong, NMEALongSmall, NMEALat, and NMEALatSmall look like.  The
+answer is not good.  It is very possible that this is a bug in my
+code, but it might not be.  The longitude values are ok, but the
+latitude functions seems to be experiencing some rounding or update
+issues.  
+<pre>
+./nav.py  | head -10
+-448195 -74699200 147016 373 -- -124.49861111 -124.49866667 40.83777778
+-448195 -74699200 147016 373 -- -124.49861111 -124.49866667 40.83777778
+-448195 -74699200 147016 373 -- -124.49861111 -124.49866667 40.83777778
+-448195 -74699220 147016 373 -- -124.49861111 -124.49870000 40.83777778
+-448195 -74699220 147016 373 -- -124.49861111 -124.49870000 40.83777778
+-448195 -74699230 147016 373 -- -124.49861111 -124.49871667 40.83777778
+-448195 -74699230 147016 373 -- -124.49861111 -124.49871667 40.83777778
+-448195 -74699230 147016 373 -- -124.49861111 -124.49871667 40.83777778
+-448195 -74699260 147016 373 -- -124.49861111 -124.49876667 40.83777778
+-448195 -74699260 147016 373 -- -124.49861111 -124.49876667 40.83777778
+</pre>
+The code that basically generated the above is this bit-o-python
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sqlite</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>import</strong> <font color="#2040a0">math</font>
+<font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#008000">'segy.db'</font><font color="4444FF">)</font>
+<font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">'SELECT NMEALong, NMEALongSmall, NMEALat, NMEALatSmall from segyTrace'</font><font color="4444FF">)</font>
+
+<strong>for</strong> <font color="#2040a0">row</font> <strong>in</strong> <font color="#2040a0">cu</font>.<font color="#2040a0">fetchall</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALong'</font><font color="4444FF">]</font>, <font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALongSmall'</font><font color="4444FF">]</font>, <font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALat'</font><font color="4444FF">]</font>, <font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALatSmall'</font><font color="4444FF">]</font>, <font color="#008000">'   ----    '</font>,
+    <strong>print</strong> <font color="4444FF">(</font><font color="#008000">&quot;%15.8f&quot;</font> <font color="4444FF">%</font> <font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALong'</font><font color="4444FF">]</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.<font color="4444FF">)</font><font color="4444FF">)</font>, <font color="4444FF">(</font><font color="#008000">&quot;%15.8f&quot;</font> <font color="4444FF">%</font><font color="4444FF">(</font><font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALongSmall'</font><font color="4444FF">]</font>/<font color="#FF0000">600000</font>.<font color="4444FF">)</font><font color="4444FF">)</font>,
+    <strong>print</strong> <font color="4444FF">(</font><font color="#008000">&quot;%15.8f&quot;</font> <font color="4444FF">%</font> <font color="4444FF">(</font><font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALat'</font><font color="4444FF">]</font>/<font color="#FF0000">3600</font>.<font color="4444FF">)</font><font color="4444FF">)</font>, <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">row</font><font color="4444FF">[</font><font color="#008000">'NMEALatSmall'</font><font color="4444FF">]</font><font color="4444FF">)</font>/<font color="#FF0000">600000</font>.
+</pre>
+NMEALatSmall looks complete screwed up with that constant value of
+373.  At least NMEALonSmall works better than X or NMEALon.  What to
+do?
+Here is what I have right now for looks:
+
+<a href="http://schwehr.org/blog/attachments/2005-09/xstar-nmea.gif">
+-----

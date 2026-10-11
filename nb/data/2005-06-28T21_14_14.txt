@@ -1,0 +1,180 @@
+TITLE: Adding a command line ui to a python program
+AUTHOR: Kurt
+DATE: 06.28.2005 21:14
+DESC: optparse is good
+-----
+BODY:
+
+<b>Update:</b> Get the code <a
+href="http://schwehr.org/blog/attachments/2005-06/JillWranglesPython.tar.bz2">here</a>.
+
+Jill (unintentionally) gave me a challenge today that I could not pass
+up.  She had a little bit of python that needed an interface to make
+it usable for her.  She is used to matlab, but has done no python.  I
+said that this would be a 10 minute fix when I saw the code.  Well I
+failed.  I started at 4:55 when I got the email from her and I sent
+her the solution at 5:15.  So it took 20 minutes.  Bugger.  It does
+make a nice example of adding a command line user interface and adding
+documentation.  Small examples are usually the best for learning from
+and this one is pretty small.  Let me give a quick rundown of the 20
+minutes.  It will probably take me more time to write up what I did
+than to actually send her the solution :)
+
+The posed problem:  Lisa sent Jill a bit of python code to generate
+random points on a sphere.  I am not quite sure how the code is
+working and what exact kind of distribution this is going to
+generate.  But here is the email complete with some indentation
+problems probably from Apple's Mail.app - some lines are spaces and
+some have spaces and tabs.
+<pre>
+#!/usr/local/bin/python
+from math import pi,cos,sin,sqrt
+from random import randint
+from sys import argv
+N=int(argv[1])
+nmax,k,npts=5550,66,0
+xn=[0. for i  in range(nmax)]
+yn=[0.  for i in range(nmax)]
+zn=[1.  for i in range(nmax)]
+for  i in range(1,k):
+    m = int(2*float(k)*sin(pi*float(i)/float(k)))
+    for j in range(m):
+        npts=npts+1
+        x=sin(pi*float(i)/float(k))*cos(2.*pi*float(j)/float(m))
+        y=sin(pi*float(i)/float(k))*sin(2.*pi*float(j)/float(m))
+        z=cos(pi*float(i)/float(k))
+    	r=sqrt(x**2+y**2+z**2)
+        xn[npts]=x/r
+        yn[npts]=y/r
+        zn[npts]=z/r
+for i in range(N):
+    pick=randint(0,nmax-1)
+    print xn[pick],yn[pick],zn[pick]
+</pre>
+She wants to be able to do something in matlab with a bunch of random
+datasets with a range of number of points in them (N).  If you are not
+used to python, the indenting instead of begin/end is enough to
+totally throw you off and you might not key into <em>argv[1]</em>
+telling you to pass in a parameter.
+
+What this program needs is a user interface (UI) and a little bit of
+documentation.  This is where python just complete kicks butt (well,
+at least version 2.4 is better than sliced bread).
+
+I pulled open a program I wrote a couple weeks ago and pasted in some
+optparse code to create a commandline.  Then I turned the above code
+into a function - just add a def line and add "    " to the beginning
+of each line.  A snap in emacs.  M-x replace-string C-q enter enter
+C-q enter "    " enter.  That "    " means hit the space bar 4 times.
+Then change the #! line to be /usr/bin/env python and bam, one
+program.  I love cut and paste!
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+Program from Lisa to Jill to Kurt.  Generate random points on a sphere.
+
+run this command to get help with the command line options:
+
+  ./pointsOnASphere.py --help
+
+Sample run from 300 to 310 points:
+
+  ./pointsOnASphere.py -s 300 -e 310 -b testrun
+
+&quot;</font><font color="#008000">&quot;&quot;</font>
+<font color="#2040a0">__version__</font> <font color="4444FF">=</font> <font color="#008000">&quot;0.1&quot;</font>
+<font color="#2040a0">__author__</font> <font color="4444FF">=</font> <font color="#008000">'Bunch of people including Lisa and Kurt'</font>
+
+<strong>from</strong> <font color="#2040a0">math</font> <strong>import</strong> <font color="#2040a0">pi</font>,<font color="#2040a0">cos</font>,<font color="#2040a0">sin</font>,<font color="#2040a0">sqrt</font>
+<strong>from</strong> <font color="#2040a0">random</font> <strong>import</strong> <font color="#2040a0">randint</font>
+<strong>from</strong> <font color="#2040a0">sys</font> <strong>import</strong> <font color="#2040a0">argv</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">makePoints</font><font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="#2040a0">N</font><font color="4444FF">=</font><font color="#FF0000">1000</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    Generate N random points on a sphere.  Uses the default python
+    random number generator.
+    filename - file to write out the results to
+    N - number of points
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <font color="#444444">#N=int(argv[1]) # Now from the N parameter passed in.</font>
+    <font color="#2040a0">out</font> <font color="4444FF">=</font> <font color="#2040a0">open</font> <font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+    <font color="#2040a0">nmax</font>,<font color="#2040a0">k</font>,<font color="#2040a0">npts</font><font color="4444FF">=</font><font color="#FF0000">5550</font>,<font color="#FF0000">66</font>,<font color="#FF0000">0</font>
+    <font color="#2040a0">xn</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="#FF0000">0</font>. <strong>for</strong> <font color="#2040a0">i</font>  <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">nmax</font><font color="4444FF">)</font><font color="4444FF">]</font>
+    <font color="#2040a0">yn</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="#FF0000">0</font>.  <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">nmax</font><font color="4444FF">)</font><font color="4444FF">]</font>
+    <font color="#2040a0">zn</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="#FF0000">1</font>.  <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">nmax</font><font color="4444FF">)</font><font color="4444FF">]</font>
+    <strong>for</strong>  <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">k</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">m</font> <font color="4444FF">=</font> <font color="#2040a0">int</font><font color="4444FF">(</font><font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">k</font><font color="4444FF">)</font><font color="4444FF">*</font><font color="#2040a0">sin</font><font color="4444FF">(</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">k</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <strong>for</strong> <font color="#2040a0">j</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">m</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">npts</font><font color="4444FF">=</font><font color="#2040a0">npts</font><font color="4444FF">+</font><font color="#FF0000">1</font>
+            <font color="#2040a0">x</font><font color="4444FF">=</font><font color="#2040a0">sin</font><font color="4444FF">(</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">k</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">*</font><font color="#2040a0">cos</font><font color="4444FF">(</font><font color="#FF0000">2</font>.<font color="4444FF">*</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">j</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">m</font><font color="4444FF">)</font><font color="4444FF">)</font>
+            <font color="#2040a0">y</font><font color="4444FF">=</font><font color="#2040a0">sin</font><font color="4444FF">(</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">k</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">*</font><font color="#2040a0">sin</font><font color="4444FF">(</font><font color="#FF0000">2</font>.<font color="4444FF">*</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">j</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">m</font><font color="4444FF">)</font><font color="4444FF">)</font>
+            <font color="#2040a0">z</font><font color="4444FF">=</font><font color="#2040a0">cos</font><font color="4444FF">(</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">k</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#444444"># FIX: is there something missing here?  r was indented funny</font>
+            <font color="#2040a0">r</font><font color="4444FF">=</font><font color="#2040a0">sqrt</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">*</font><font color="4444FF">*</font><font color="#FF0000">2</font><font color="4444FF">+</font><font color="#2040a0">y</font><font color="4444FF">*</font><font color="4444FF">*</font><font color="#FF0000">2</font><font color="4444FF">+</font><font color="#2040a0">z</font><font color="4444FF">*</font><font color="4444FF">*</font><font color="#FF0000">2</font><font color="4444FF">)</font>
+            <font color="#2040a0">xn</font><font color="4444FF">[</font><font color="#2040a0">npts</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#2040a0">x</font>/<font color="#2040a0">r</font>
+            <font color="#2040a0">yn</font><font color="4444FF">[</font><font color="#2040a0">npts</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#2040a0">y</font>/<font color="#2040a0">r</font>
+            <font color="#2040a0">zn</font><font color="4444FF">[</font><font color="#2040a0">npts</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#2040a0">z</font>/<font color="#2040a0">r</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">N</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">pick</font><font color="4444FF">=</font><font color="#2040a0">randint</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#2040a0">nmax</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+        <font color="#444444">#print xn[pick],yn[pick],zn[pick]</font>
+        <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">xn</font><font color="4444FF">[</font><font color="#2040a0">pick</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">yn</font><font color="4444FF">[</font><font color="#2040a0">pick</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">zn</font><font color="4444FF">[</font><font color="#2040a0">pick</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+
+<strong>from</strong> <font color="#2040a0">optparse</font> <strong>import</strong> <font color="#2040a0">OptionParser</font>
+<font color="#2040a0">myparser</font> <font color="4444FF">=</font> <font color="#2040a0">OptionParser</font><font color="4444FF">(</font><font color="#2040a0">usage</font><font color="4444FF">=</font><font color="#008000">&quot;%prog [options]&quot;</font>, <font color="#2040a0">version</font><font color="4444FF">=</font><font color="#008000">&quot;%prog &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">__version__</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-s'</font>,<font color="#008000">'--start'</font>,<font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">&quot;store&quot;</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'start'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'10'</font>,
+                    <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'starting N to use [default: %default]'</font>,
+                    <font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'int'</font><font color="4444FF">)</font>
+<font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-e'</font>,<font color="#008000">'--end'</font>,<font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">&quot;store&quot;</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'end'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'20'</font>,
+                    <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'ending N to use [default: %default]'</font>,
+                    <font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'int'</font><font color="4444FF">)</font>
+
+<font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-b'</font>,<font color="#008000">'--base-filename'</font>,<font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">&quot;store&quot;</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'basename'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'points'</font>,
+                    <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'base filename to use when creating output files [default: %default]'</font><font color="4444FF">)</font>
+
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <font color="4444FF">(</font><font color="#2040a0">options</font>,<font color="#2040a0">args</font><font color="4444FF">)</font> <font color="4444FF">=</font> <font color="#2040a0">myparser</font>.<font color="#2040a0">parse_args</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">options</font>.<font color="#2040a0">start</font>,<font color="#2040a0">options</font>.<font color="#2040a0">end</font><font color="4444FF">+</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">filename</font> <font color="4444FF">=</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">options</font>.<font color="#2040a0">basename</font><font color="4444FF">)</font> <font color="4444FF">+</font> <font color="4444FF">(</font><font color="#008000">&quot;%04d&quot;</font> <font color="4444FF">%</font> <font color="#2040a0">i</font><font color="4444FF">)</font> <font color="4444FF">+</font> <font color="#008000">&quot;.dat&quot;</font>
+        <strong>print</strong> <font color="#008000">&quot;Beginning &quot;</font>,<font color="#2040a0">i</font>, <font color="#008000">&quot;      Writing to&quot;</font>,<font color="#2040a0">filename</font>
+        <font color="#2040a0">makePoints</font><font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="#2040a0">i</font><font color="4444FF">)</font>
+</pre>
+While I was at it, I added some doc strings in the above code.  Now to
+setup the world:
+<pre>
+   chmod +x pointsOnASphere.py
+   pydoc -w pointsOnASphere     # make an html web page for the code
+   open pointsOnASphere.html    # check out the docs
+   ./pointsOnASphere.py --help  # See the command line help
+
+usage: pointsOnASphere.py [options]
+
+options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -s START, --start=START
+                        starting N to use [default: 10]
+  -e END, --end=END     ending N to use [default: 20]
+  -b BASENAME, --base-filename=BASENAME
+                        base filename to use when creating output files
+                        [default: points]
+</pre>
+Now run the program and look at some data.
+<pre>
+./pointsOnASphere.py -s 30 -e 32
+Beginning  30       Writing to points0030.dat
+Beginning  31       Writing to points0031.dat
+Beginning  32       Writing to points0032.dat
+
+&gt; head -4 points0030.dat 
+0.435022885952 -0.578399556198 0.690079011482
+-0.727951684069 0.576153941854 -0.37166245566
+-0.166026277422 0.849961925739 0.5
+-0.011976943121 0.998795531688 -0.0475819158237
+
+&gt; gnuplot
+gnuplot&gt; plot 'points0032.dat' using 1 with lp
+gnuplot&gt; plot 'points0032.dat' using 1:2 with lp 
+gnuplot&gt; splot 'points0032.dat'
+</pre>
+Looks pretty random to me!  Took me 25 minutes to write it all up.
+-----

@@ -1,0 +1,52 @@
+TITLE: MakeLine PostGIS slow with 180K points
+AUTHOR: Kurt
+DATE: 07.08.2007 15:10
+DESC: what will make it faster?
+-----
+BODY:
+I got frustrated with my PL/pgsql command that I generated before.  I
+ran it for several hours on my 4.5M point database and finally just
+killed it.  I had no idea how far it had gotten.  <b>raise notice
+'somehow put the transit number here';</b> would be a good addition to
+that stored procedure.
+
+I rewrote the code in python using psycopg2.  I discovered that the
+behavior of MakeLine is not linear with the number of points.  1K
+points was a fraction of a second, 15k points was about 15 seconds,
+and 188K points didn't finish in 20 minutes.
+
+My first thought was that I need to commit the previous changes before
+doing the MakeLine so that all buffers are flushed and free for new
+data, but that had no noticable effect.
+
+Then I thought that it might be the available shared memory that
+PostgreSQL is always complaining about on startup.  I went for it and
+changed /etc/rc to make the shared memory space larger (but could not
+find documentation on what each field is really doing).  Here is my
+before:
+<pre>
+sysctl -a | grep shm
+kern.sysv.shmmax: 4194304
+kern.sysv.shmmin: 1
+kern.sysv.shmmni: 32
+kern.sysv.shmseg: 8
+kern.sysv.shmall: 1024
+</pre>
+Only a reboot can change these values in Mac OSX 10.4.x.  I edited /etc/rc and changed the sysctl line for shared memory to be like this:
+<pre>
+sysctl -w kern.sysv.shmmax=33554432 kern.sysv.shmmin=1 kern.sysv.shmmni=64 kern.sysv.shmseg=32 kern.sysv.shmall=32768
+</pre>
+Then I rebooted with fears of problems on startup in my mind.  But it did come right back up and here are my new settings in action:
+<pre>
+sysctl -a | grep shm
+kern.sysv.shmmax: 33554432
+kern.sysv.shmmin: 1
+kern.sysv.shmmni: 64
+kern.sysv.shmseg: 32
+kern.sysv.shmall: 32768
+</pre>
+Now I am rerunning the python script, but it is again stuck on the
+180K point MakeLine.  there is no noticable speedup.  I am currently looking
+into building the WKB (Well Known Binary) on the python side using PCL-Core to
+see if that is faster.
+-----

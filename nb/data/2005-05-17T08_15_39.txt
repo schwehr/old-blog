@@ -1,0 +1,93 @@
+TITLE: SQL delete
+AUTHOR: Kurt
+DATE: 05.17.2005 08:15
+DESC: database commands get longer and longer
+-----
+BODY:
+This was my first chance to use the SQL DELETE command.  Up until now,
+the only removal I needed to do was to delete the <b>entire</b>
+database as I regenerate it in about 30 sections from all of the flat
+file data tables.  Now my problem is that I am on a deadline and
+crafting a way to compose a graph of remeasured data is a bit of a
+challenge (to me at least).  I do not want to comment out the older
+values from the weights table that now how new measurements, but if I
+remove them from the table, I can later remove one function call from
+python to nuke that remove set of calls.
+
+Here is one of the removes that I would like to do.  For all of
+section 2 of core 3, I want to remove the first drying where the
+samples were just set out at room temp to dry (step=1).  Since then, I
+dried the samples in the Norris and Jackson ovens at 50 &deg;C for 2.75
+days:
+
+<b>Update 2009-Jan-29</b>: The new URL... <a href="http://vislab-ccom.unh.edu/~schwehr/Gaviota/bpsio-Aug04/measuring/">http://vislab-ccom.unh.edu/~schwehr/Gaviota/bpsio-Aug04/measuring/</a>
+
+<a
+href="http://schwehr.org/Gaviota/bpsio-Aug04/measuring/2005-May-16-drying/">2005-May-16-drying
+photos</a>
+
+By the way, drying in the fume hood was only started the samples
+drying.  Two days in the fume hood or the vacuum chambers only removed
+a small fraction of the water.
+
+So how to make the query?  Here are the schemas for the weights and
+the ams tables.  I need the ams table since weights does not know
+about sections, cores, and other handy stuff:
+<pre>
+  sqlite db ".schema weights"
+
+  CREATE TABLE weights (id INTEGER PRIMARY KEY, samplename
+  VARCHAR(40), weight REAL, timeMeasured TIMESTAMP, status
+  VARCHAR(20), operator VARCHAR(20), sticker VARCHAR(15), step
+  INTEGER);
+
+  sqlite db ".schema ams"
+
+  CREATE TABLE ams (id INTEGER PRIMARY KEY, samplename VARCHAR(40),
+  user VARCHAR(40), datemeasured TIMESTAMP, cruise VARCHAR(20),
+  corenum INTEGER, coretype VARCHAR(1), corehalf VARCHAR(1), section
+  INTEGER, sectionoffset REAL, depth REAL,counts INTEGER, sampleholder
+  REAL  ... and so forth
+</pre>
+The final delete query:
+<pre>
+  sqlite db "DELETE FROM weights WHERE weights.id IN (SELECT\
+  weights.id FROM weights,ams WHERE weights.samplename=ams.samplename\
+  AND corenum=3 AND section=2 AND weights.step=1);"
+</pre>
+Before I deleted the samples, I can see lots of the ones I want to be
+rid of.  There should only be 
+<pre>
+  sqlite db "select weights.id,weights.samplename,weights.step from\
+  weights,ams where weights.samplename=ams.samplename AND corenum=3\
+  and section=2 AND weights.step=1;" | tail -6
+
+310|bp04-3gw-s2-132|1
+311|bp04-3gw-s2-135|1
+312|bp04-3gw-s2-138|1
+313|bp04-3gw-s2-141|1
+314|bp04-3gw-s2-144|1
+315|bp04-3gw-s2-147|1
+</pre>
+After the delete call here is what I see.  All is well I hope!
+<pre>
+  sqlite db "select weights.* FROM weights,ams WHERE weights.samplename=ams.samplename AND step=1 AND corenum=3 AND section=2"
+
+<b>Nothing</b>
+
+  sqlite db "select weights.* FROM weights,ams WHERE \
+  weights.samplename=ams.samplename AND step=1 AND corenum=3" | head -3
+
+316|bp04-3gw-s1-004|9.7838|2005-04-25 10:30:00|wet|schwehr|no-sticker|1
+317|bp04-3gw-s1-007|9.8447|2005-04-25 10:30:00|wet|schwehr|no-sticker|1
+318|bp04-3gw-s1-010|9.9916|2005-04-25 10:30:00|wet|schwehr|no-sticker|1
+
+  sqlite db "select weights.* FROM weights,ams WHERE \
+  weights.samplename=ams.samplename AND step=2 AND corenum=3" | head -3
+
+561|bp04-3gw-s2-123|5.9082|2005-05-16 09:14:00|dry|schwehr|sticker|2
+562|bp04-3gw-s2-126|5.8825|2005-05-16 09:14:00|dry|schwehr|sticker|2
+563|bp04-3gw-s2-141|5.5927|2005-05-16 09:14:00|dry|schwehr|sticker|2
+</pre>
+Now I need to account for the weight of the stickers.
+-----

@@ -1,0 +1,170 @@
+TITLE: SNMP monitoring on a Mac
+AUTHOR: Kurt
+DATE: 06.17.2010 10:35
+DESC: kickstart
+-----
+BODY:
+This blog post mainly comes from help given by Jordan.  I am a
+beginner at using the <a
+href="http://en.wikipedia.org/wiki/Simple_Network_Management_Protocol">Simple
+Network Management Protocol (SNMP)</a>.  We are looking to use SNMP to
+drive <a href="http://www.nagios.org/">Nagios</a> monitoring of our
+AIS infrastructure.  The idea is to query snmp and have it give you
+the status of the AIS feed by returning the number of ships heard on
+the feed in the last 10 minutes.  Because this feed covers a large
+region, this should work pretty well.  If this were for Great and
+Little Bays in NH, where we sometime have no ships with AIS, then Nagios
+would think that the AIS system was always down.  This example is done on
+a Mac running 10.6 (also tested on 10.5 Server).  Linux systems may be
+slightly different.  This is using the less secure snmp version 2 protocol.
+<pre>cd /etc/snmp</pre>
+Edit snmpd.conf, create the users in the com2sec section and comment
+out the original entries.  Forgetting to comment out the default entries
+will cause the daemon to start but be non-functional.
+<pre>#com2sec local     localhost       COMMUNITY
+#com2sec mynetwork NETWORK/24      COMMUNITY
+com2sec ais       localhost       aiscom
+com2sec ais2      nagiosserver.unh.edu ais2com</pre>
+Now that you have two user/communities defined, we need to create the groups and tell
+snmpd which version of the snmp protocol to listen to.
+<pre>#             	sec.model  sec.name
+#group MyRWGroup	v1         local
+#group MyRWGroup	v2c        local
+#group MyRWGroup	usm        local
+#group MyROGroup v1         mynetwork
+#group MyROGroup v2c        mynetwork
+#group MyROGroup usm        mynetwork
+<!-- -->
+group AisGroup v2c         ais
+group AisGroup v2c         ais2</pre>
+I left the views alone.  Then I created the access for the group.
+<pre>#                context sec.model sec.level match  read   write  notif
+#access MyROGroup ""      any       noauth    exact  all    none   none
+#access MyRWGroup ""      any       noauth    exact  all    all    none
+<!-- -->
+access AisGroup ""       v2c       noauth    exact  all    none   none</pre>
+I then went through several iterations of starting snmpd and
+discovered complaints in /var/log/snmpd.log.  These probably could have been
+left in, but I always think it is better to get rid of all warnings.  Here 
+are the things I had to comment out:
+<pre># proc httpd
+# exec echotest /bin/echo hello world
+# exec web_status /usr/sbin/serveradmin status web
+# exec wo_status /usr/sbin/serveradmin status webobjects</pre>
+Then I started snmpd.  The -A prevents it from overwriting the snmpd.log and the -c explicitly
+says which config file to use.
+<pre><b>sudo /usr/sbin/snmpd -A -c /etc/snmp/snmpd.conf</b></pre>
+Once snmpd is running, you can send it a SIGHUP (kill -1) to cause it to reload
+its config files or you can kill it with a SIGQUIT (kill -3).  
+
+Now that the snmpd daemon is running, we need to test it:
+<pre><b>snmpwalk -c aiscom -v 2c localhost</b>
+snmpwalk -c aiscomm -v 2c localhost
+SNMPv2-MIB::sysDescr.0 = STRING: Darwin snipe.ccom.nh 10.4.0 Darwin Kernel Version 10.4.0: Fri Apr 23 18:28:53 PDT 2010; root:xnu-1504.7.4~1/RELEASE_I386 i386
+SNMPv2-MIB::sysObjectID.0 = OID: NET-SNMP-MIB::netSnmpAgentOIDs.255
+DISMAN-EVENT-MIB::sysUpTimeInstance = Timeticks: (6675) 0:01:06.75
+SNMPv2-MIB::sysContact.0 = STRING: Administrator <postmaster@example.com>
+SNMPv2-MIB::sysName.0 = STRING: snipe.ccom.nh
+SNMPv2-MIB::sysLocation.0 = STRING: Right here, right now.
+SNMPv2-MIB::sysServices.0 = INTEGER: 76
+SNMPv2-MIB::sysORLastChange.0 = Timeticks: (7) 0:00:00.07
+SNMPv2-MIB::sysORID.1 = OID: SNMP-FRAMEWORK-MIB::snmpFrameworkMIBCompliance
+SNMPv2-MIB::sysORID.2 = OID: SNMP-MPD-MIB::snmpMPDCompliance
+...
+HOST-RESOURCES-MIB::hrSWRunPerfMem.39056 = INTEGER: 22028 KBytes
+HOST-RESOURCES-MIB::hrSWRunPerfMem.39059 = INTEGER: 4492 KBytes
+HOST-RESOURCES-MIB::hrSWRunPerfMem.39070 = INTEGER: 1408 KBytes
+HOST-RESOURCES-MIB::hrSWRunPerfMem.39071 = INTEGER: 1084 KBytes
+Timeout: No Response from localhost</pre>
+snmpwalk will only wait for so long to get data.  That is what is causing the timeout at the end.
+To get a single value, try this:
+<pre><b>snmpget -c aiscom -v 2c localhost hrSystemUptime.0</b>
+HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (8520654) 23:40:06.54</pre>
+On debian linux systems, you can get the snmp tools by doing <b>sudo
+apt-get install snmp</b>, while on RedHat/CentOS systems, do <b>sudo
+yum install snmp-net</b>.
+
+At this point, we needed to call a script to inspect the database.  We
+couldn't figure out how to call python directly, so we first have this
+entry in /etc/snmp/snmpd.conf:
+<pre>exec ais_pg_status /bin/bash /usr/local/bin/nagios_pg_ais.sh</pre>
+That script is pretty simple:
+<pre>#!/bin/bash
+/sw/bin/python /usr/local/bin/nagios_pg_ais.py -u aisuser</pre>
+The python code is not as flexible as we would like, but it basically prints the number of ships that have been seen in the last ten minutes.  I have a little issue with my timezones, so I have to query out into the future, but hopefully you get the idea.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> __future__ <b><font color="#000080">import</font></b> print_function
+<b><font color="#000080">import</font></b> psycopg2
+<b><font color="#000080">import</font></b> sys<font color="#990000">,</font> os
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">get_parser</font></b><font color="#990000">():</font>
+    <b><font color="#000080">from</font></b> optparse <b><font color="#000080">import</font></b> OptionParser
+    parser <font color="#990000">=</font> <b><font color="#000000">OptionParser</font></b><font color="#990000">(</font>usage<font color="#990000">=</font><font color="#FF0000">"%prog [options] "</font><font color="#990000">,</font>version<font color="#990000">=</font><font color="#FF0000">"%prog "</font><font color="#990000">+</font>__version__<font color="#990000">)</font>
+<!-- -->
+    parser<font color="#990000">.</font><b><font color="#000000">add_option</font></b><font color="#990000">(</font><font color="#FF0000">'-d'</font><font color="#990000">,</font><font color="#FF0000">'--database-name'</font><font color="#990000">,</font>default<font color="#990000">=</font><font color="#FF0000">'realtime_ais'</font>
+                      <font color="#990000">,</font>help<font color="#990000">=</font><font color="#FF0000">'Name of database within the postgres server [default: %default]'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_option</font></b><font color="#990000">(</font><font color="#FF0000">'-D'</font><font color="#990000">,</font><font color="#FF0000">'--database-host'</font><font color="#990000">,</font>default<font color="#990000">=</font><font color="#FF0000">'localhost'</font>
+                      <font color="#990000">,</font>help<font color="#990000">=</font><font color="#FF0000">'Host name of the computer serving the dbx [default: %default]'</font><font color="#990000">)</font>
+    defaultUser <font color="#990000">=</font> os<font color="#990000">.</font><b><font color="#000000">getlogin</font></b><font color="#990000">()</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_option</font></b><font color="#990000">(</font><font color="#FF0000">'-u'</font><font color="#990000">,</font><font color="#FF0000">'--database-user'</font><font color="#990000">,</font>default<font color="#990000">=</font>defaultUser
+                      <font color="#990000">,</font>help<font color="#990000">=</font><font color="#FF0000">'Host name of the to access the database with [default: %default]'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_option</font></b><font color="#990000">(</font><font color="#FF0000">'-p'</font><font color="#990000">,</font><font color="#FF0000">'--database-passwd'</font><font color="#990000">,</font>default<font color="#990000">=</font>None
+                      <font color="#990000">,</font>help<font color="#990000">=</font><font color="#FF0000">'Password to access the database with [default: None]'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_option</font></b><font color="#990000">(</font><font color="#FF0000">'-v'</font><font color="#990000">,</font><font color="#FF0000">'--verbose'</font><font color="#990000">,</font>default<font color="#990000">=</font>False<font color="#990000">,</font>action<font color="#990000">=</font><font color="#FF0000">'store_true'</font>
+                      <font color="#990000">,</font>help<font color="#990000">=</font><font color="#FF0000">'Make program output more verbose info as it runs'</font><font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">return</font></b> parser
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+    <font color="#990000">(</font>options<font color="#990000">,</font>args<font color="#990000">)</font> <font color="#990000">=</font> <b><font color="#000000">get_parser</font></b><font color="#990000">().</font><b><font color="#000000">parse_args</font></b><font color="#990000">()</font>
+    v <font color="#990000">=</font> options<font color="#990000">.</font>verbose
+<!-- -->
+    options_dict <font color="#990000">=</font> <b><font color="#000000">vars</font></b><font color="#990000">(</font>options<font color="#990000">)</font> <i><font color="#9A1900"># Turn options into a real dictionary</font></i>
+    cx_str <font color="#990000">=</font> <font color="#FF0000">"dbname='{database_name}' user='{database_user}' host='{database_host}'"</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font>options_dict<font color="#990000">)</font>
+    <b><font color="#0000FF">if</font></b> v<font color="#990000">:</font> <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'cx_str:'</font><font color="#990000">,</font>cx_str<font color="#990000">)</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+		cx <font color="#990000">=</font> psycopg2<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font>cx_str<font color="#990000">)</font>
+		cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+		cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">"SELECT count(*) FROM vessel_pos WHERE time_stamp&gt;(now() + interval '3 hours 50 minutes');"</font><font color="#990000">)</font>
+		row <font color="#990000">=</font> cu<font color="#990000">.</font><b><font color="#000000">fetchone</font></b><font color="#990000">()</font>
+		count <font color="#990000">=</font> row<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font>
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+		<b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'-1'</font><font color="#990000">)</font>
+		sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">)</font>
+        
+    <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'{count}'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>count<font color="#990000">=</font>count<font color="#990000">))</font>
+    <b><font color="#0000FF">if</font></b> count <font color="#990000">&lt;</font> <font color="#993399">100</font><font color="#990000">:</font> sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font>
+    <b><font color="#0000FF">if</font></b> count <font color="#990000">&lt;</font> <font color="#993399">1000</font><font color="#990000">:</font> sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font>
+    sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    <b><font color="#000000">main</font></b><font color="#990000">()</font></tt></pre>
+We used a snmpwalk to find the location of the end point.  We can now query via snmp:
+<pre><b>snmpget -c ais2com -v 2c aisserver.unh.edu .1.3.6.1.4.1.2021.8.1.101.1</b>
+UCD-SNMP-MIB::extOutput.1 = STRING: 2961</pre>
+The nagios entry in /etc/nagios/GROUP/services.cfg:
+<pre>define service{
+        host_name               server.unh.edu        service_description     AIS_FEED        check_command           get_snmp_oid!.1.3.6.1.4.1.2021.8.1.101.1!ais2com!1000:!100:!'new records in last 10 minutes'         max_check_attempts      5        normal_check_interval   10
+        retry_check_interval    1
+        check_period            24x7
+        notification_interval   120
+        notification_period     24x7
+        notification_options    w,u,c,r,f,s
+        contact_groups          ais
+}</pre>
+The check on the server now looks like this (with a ping and ssh check too):
+
+<img title="Nagios status" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/ais-server-nagios.png"/>
+
+Jordan has nagiosgrapher setup so now we have a nice view of vessels seen over time:
+
+<img title="nagiosgrapher showing vessels in the last 10 minutes plotted for every 10 minutes" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/ais-feed-nagios.png"/>
+
+Above, we started snmpd by hand.  Apple's methods for starting daemons
+has been a moving target.  You can use fink's net-snmp-unified package
+and daemonic:
+<pre><b>daemonic dump | grep -i snmp</b>
+<b>daemonic install net-snmp-unified</b></pre>
+The current Apple way is:
+<pre><b>sudo launchctl load -w /System/Library/LaunchDaemons/org.net-snmp.snmpd.plist</b></pre>
+-----

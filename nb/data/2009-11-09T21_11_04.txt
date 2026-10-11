@@ -1,0 +1,24 @@
+TITLE: Port tunneling with socat, not netcat or ssh tunneling
+AUTHOR: Kurt
+DATE: 11.09.2009 21:11
+DESC: more better
+-----
+BODY:
+Chaoyi pointed me at <a href="http://www.dest-unreach.org/socat/">socat</a> for network plumbing issues.  I just gave
+it a go forwarding AIS data from one machine to another and it work
+great!  On the gateway:
+<pre>socat TCP4-LISTEN:9999 TCP4:aissource:12345</pre>
+Then, the outside host gets the data like this:
+<pre><b>socat - TCP4:gateway:9999</b>
+!AIVDM,1,1,,A,15MpsWgP2=Ji0APGRhsefOwP2L0`,0*4A,d-111,S1765,t015347.00,T47.08294235,r003669959,1257818027
+!AIVDM,1,1,,B,15Mvw:0P43rjsePFl?J4;?wN0@Lp,0*74,d-090,S1773,t015347.00,T47.28274625,r003669959,1257818028
+!AIVDM,1,1,,B,35PlLL0OhbJlcK:G7FS:1`GT20u0,0*04,d-096,S1876,t015350.00,T50.02859357,r01SSHI1,1257818030
+!AIVDM,1,1,,B,16H;FR002lrn2DLG77oSL2kN0D0R,0*0B,d-091,S1879,t015350.00,T50.1100255,r01SSHI1,1257818030
+!AIVDM,1,1,,B,403OwoiuVm1mjrdhThG&gt;od700D2`,0*45,d-108,S1881,t015350.00,T50.16316332,r01SSHI1,1257818030
+!AIVDM,1,1,,A,15Mvw:0P43rjsk6Fl??T;?wR08N0,0*2C,d-100,S1882,t015350.00,T50.20326732,r01SSHI1,1257818030
+!AIVDM,1,1,,B,16K&gt;Rf002JrpQs8G49edq9OP00SF,0*0A,d-085,S1776,t015347.00,T47.37663907,r003669959,1257818028
+...</pre>
+socat even has options to do ssl over the tunnel if I need to protect the
+stream.  Nice!  I thought <a href="http://netcat.sourceforge.net/">netcat</a> was powerful, but socat is even better.  I could have also used something like
+<a href="http://sourceforge.net/projects/proxy/">proxy</a>, but why not just learn socat and head towards all the power of socat?
+-----

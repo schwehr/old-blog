@@ -1,0 +1,951 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<title>JabRef References output</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script type="text/javascript">
+<!--
+// QuickSearch script for JabRef HTML export 
+// Version: 2.0
+//
+// Copyright (c) 2006-2008, Mark Schenk
+//
+// This software is distributed under a Creative Commons Attribution 3.0 License
+// http://creativecommons.org/licenses/by/3.0/
+
+// Some features:
+// + optionally searches Abstracts and Reviews
+// + allows RegExp searches
+//   e.g. to search for entries between 1980 and 1989, type:  198[0-9]
+//   e.g. for any entry ending with 'symmetry', type:  symmetry$
+//   e.g. for all reftypes that are books: ^book$, or ^article$
+//   e.g. for entries by either John or Doe, type john|doe
+// + easy toggling of Abstract/Review/BibTeX
+
+// Search settings
+var searchAbstract = true;
+var searchReview = true;
+
+// Speed optimisation introduced some esoteric problems with certain RegExp searches
+// e.g. if the previous search is 200[-7] and the next search is 200[4-7] then the search doesn't work properly until the next 'keyup'
+// hence the searchOpt can be turned off for RegExp adepts
+var searchOpt = true;
+
+if (window.addEventListener) {
+	window.addEventListener("load",initSearch,false); }
+else if (window.attachEvent) {
+	window.attachEvent("onload", initSearch); }
+
+function initSearch() {
+	// basic object detection
+	if(!document.getElementById || !document.getElementsByTagName) { return; }
+	if (!document.getElementById('qstable')||!document.getElementById('qs')) { return; }
+
+	// find QS table and appropriate rows
+	searchTable = document.getElementById('qstable');
+	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+	// split all rows into entryRows and infoRows (e.g. abstract, review, bibtex)
+	entryRows = new Array();
+	infoRows = new Array(); absRows = new Array(); revRows = new Array();
+
+	for (var i=0, k=0, j=0; i<allRows.length;i++) {
+		if (allRows[i].className.match(/entry/)) {
+			entryRows[j++] = allRows[i];
+		} else {
+			infoRows[k++] = allRows[i];
+			// check for abstract/review
+			if (allRows[i].className.match(/abstract/)) {
+				absRows.push(allRows[i]);
+			} else if (allRows[i].className.match(/review/)) {
+				revRows.push(allRows[i]);
+			}
+		}
+	}
+
+	//number of entries and rows
+	numRows = allRows.length;
+	numEntries = entryRows.length;
+	numInfo = infoRows.length;
+	numAbs = absRows.length;
+	numRev = revRows.length;
+
+	//find the query field
+	qsfield = document.getElementById('qsfield');
+
+	// previous search term; used for speed optimisation
+	prevSearch = '';
+
+	//find statistics location
+	stats = document.getElementById('stat');
+	setStatistics(-1);
+
+	// creates the appropriate search settings
+	createQSettingsDialog();
+
+	// shows the searchfield
+	document.getElementById('qs').style.display = 'block';
+	document.getElementById('qsfield').onkeyup = testEvent;
+}
+
+function quickSearch(tInput){
+
+	 if (tInput.value.length == 0) {
+		showAll();
+		setStatistics(-1);
+		qsfield.className = '';
+		return;
+	} else {
+		// only search for valid RegExp
+		try {
+			var searchText = new RegExp(tInput.value,"i")
+			closeAllInfo();
+			qsfield.className = '';
+		}
+		catch(err) {
+			prevSearch = tInput.value;
+			qsfield.className = 'invalidsearch';
+			return;
+		}
+	}
+	
+	// count number of hits
+	var hits = 0;
+
+	// start looping through all entry rows
+	for (var i = 0; cRow = entryRows[i]; i++){
+
+		// only show search the cells if it isn't already hidden OR if the search term is getting shorter, then search all
+		// some further optimisation is possible: if the search string is getting shorter, and the row is already visible, skip it. Then be careful with hits!
+		if(!searchOpt || cRow.className.indexOf('noshow')==-1 || tInput.value.length <= prevSearch.length){
+			var found = false; 
+
+			var inCells = cRow.getElementsByTagName('td');
+			var numCols = inCells.length;
+				
+			for (var j=0; j<numCols; j++) {
+				cCell = inCells[j];
+				var t = cCell.innerText?cCell.innerText:getTextContent(cCell);
+				if (t.search(searchText) != -1){ 
+					found=true; 
+					break;
+				} 
+			}
+
+			// look for further hits in Abstract and Review
+			if(!found) {
+				var articleid = cRow.id;
+				if(searchAbstract && (abs = document.getElementById('abs_'+articleid))) {
+					if (getTextContent(abs).search(searchText) != -1){ found=true; } 
+				}
+				if(searchReview && (rev = document.getElementById('rev_'+articleid))) {
+					if (getTextContent(rev).search(searchText) != -1){ found=true; } 
+				}
+			}
+			
+			if(found) {
+				cRow.className = 'entry show';
+				hits++;
+			} else {
+				cRow.className = 'entry noshow';
+			}
+		}
+	}
+
+	// update statistics
+	setStatistics(hits)
+	
+	// set previous search value
+	prevSearch = tInput.value;
+}
+
+function toggleInfo(articleid,info) {
+
+	var entry = document.getElementById(articleid);
+	var abs = document.getElementById('abs_'+articleid);
+	var rev = document.getElementById('rev_'+articleid);
+	var bib = document.getElementById('bib_'+articleid);
+	
+	if (abs && info == 'abstract') {
+		if(abs.className.indexOf('abstract') != -1) {
+		abs.className.indexOf('noshow') == -1?abs.className = 'abstract noshow':abs.className = 'abstract';
+		}
+	} else if (rev && info == 'review') {
+		if(rev.className.indexOf('review') != -1) {
+		rev.className.indexOf('noshow') == -1?rev.className = 'review noshow':rev.className = 'review';
+		}
+	} else if (bib && info == 'bibtex') {
+		if(bib.className.indexOf('bibtex') != -1) {
+		bib.className.indexOf('noshow') == -1?bib.className = 'bibtex noshow':bib.className = 'bibtex';
+		}		
+	} else { 
+		return;
+	}
+
+	// check if one or the other is available
+	var revshow = false;
+	var absshow = false;
+	var bibshow = false;
+	(abs && abs.className.indexOf('noshow') == -1)? absshow = true: absshow = false;
+	(rev && rev.className.indexOf('noshow') == -1)? revshow = true: revshow = false;	
+	(bib && bib.className == 'bibtex')? bibshow = true: bibshow = false;
+	
+	// highlight original entry
+	if(entry) {
+		if (revshow || absshow || bibshow) {
+		entry.className = 'entry highlight show';
+		} else {
+		entry.className = 'entry show';
+		}		
+	}
+	
+	// When there's a combination of abstract/review/bibtex showing, need to add class for correct styling
+	if(absshow) {
+		(revshow||bibshow)?abs.className = 'abstract nextshow':abs.className = 'abstract';
+	} 
+	if (revshow) {
+		bibshow?rev.className = 'review nextshow': rev.className = 'review';
+	}
+	
+}
+
+function setStatistics (hits) {
+	if(hits < 0) { hits=numEntries; }
+	if(stats) { stats.firstChild.data = hits + '/' + numEntries}
+}
+
+function getTextContent(node) {
+	// Function written by Arve Bersvendsen
+	// http://www.virtuelvis.com
+	
+	if (node.nodeType == 3) {
+	return node.nodeValue;
+	} // text node
+	if (node.nodeType == 1) { // element node
+	var text = [];
+	for (var chld = node.firstChild;chld;chld=chld.nextSibling) {
+		text.push(getTextContent(chld));
+	}
+	return text.join("");
+	} return ""; // some other node, won't contain text nodes.
+}
+
+function showAll(){
+	// first close all abstracts, reviews, etc.
+	closeAllInfo();
+
+	for (var i = 0; i < numEntries; i++){
+		entryRows[i].className = 'entry show'; 
+	}
+}
+
+function closeAllInfo(){
+	for (var i=0; i < numInfo; i++){
+		if (infoRows[i].className.indexOf('noshow') ==-1) {
+			infoRows[i].className = infoRows[i].className + ' noshow';
+		}
+	}
+}
+
+function testEvent(e){
+	if (!e) var e = window.event;
+	quickSearch(this);
+}
+
+function clearQS() {
+	qsfield.value = '';
+	quickSearch(qsfield);
+}
+
+function redoQS(){
+	showAll();
+	quickSearch(qsfield);
+}
+
+// Create Search Settings
+
+function toggleQSettingsDialog() {
+
+	var qssettings = document.getElementById('qssettings');
+	
+	if(qssettings.className.indexOf('active')==-1) {
+		qssettings.className = 'active';
+
+		if(absCheckBox && searchAbstract == true) { absCheckBox.checked = 'checked'; }
+		if(revCheckBox && searchReview == true) { revCheckBox.checked = 'checked'; }
+
+	} else {
+		qssettings.className= '';
+	}
+}
+
+function createQSettingsDialog(){
+	var qssettingslist = document.getElementById('qssettings').getElementsByTagName('ul')[0];
+	
+	if(numAbs!=0) {
+		var x = document.createElement('input');
+		x.id = "searchAbs";
+		x.type = "checkbox";
+		x.onclick = toggleQSetting;
+		var y = qssettingslist.appendChild(document.createElement('li')).appendChild(document.createElement('label'));
+		y.appendChild(x);
+		y.appendChild(document.createTextNode('search abstracts'));		
+	}
+	if(numRev!=0) {
+		var x = document.createElement('input');
+		x.id = "searchRev";
+		x.type = "checkbox";		
+		x.onclick = toggleQSetting;
+		var y = qssettingslist.appendChild(document.createElement('li')).appendChild(document.createElement('label'));		
+		y.appendChild(x);		
+		y.appendChild(document.createTextNode('search reviews'));
+	}
+		
+	// global variables
+	absCheckBox = document.getElementById('searchAbs');
+	revCheckBox = document.getElementById('searchRev');
+	
+	// show search settings
+	if(absCheckBox||revCheckBox) {
+		document.getElementById('qssettings').style.display = 'block';
+	}
+}
+
+function toggleQSetting() {
+	if(this.id=='searchAbs') { searchAbstract = !searchAbstract; }
+	if(this.id=='searchRev') { searchReview = !searchReview; }
+	redoQS()
+} 
+-->
+</script>
+<style type="text/css">
+body { background-color: white; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 12px; line-height: 1.2; padding: 1em; color: #2E2E2E; }
+
+#qs { width: auto; border-style: solid; border-color: gray; border-width: 1px 1px 0px 1px; padding: 0.5em 0.5em; display:none; position:relative; }
+#qs form { padding: 0px; margin: 0px; }
+#qs form p { padding: 0px; margin: 0px; }
+
+.invalidsearch { background-color: red; }
+
+table { border: 1px gray solid; width: 100%; empty-cells: show; }
+th, td { border: 1px gray solid; padding: 0.5em; vertical-align: top;  }
+td { text-align: left; vertical-align: top; }
+th { background-color: #EFEFEF; }
+
+td a { color: navy; text-decoration: none; }
+td a:hover  { text-decoration: underline; }
+
+tr.noshow { display: none;}
+
+tr.highlight td { background-color: #F1F1F1; border-top: 2px black solid; font-weight: bold; }
+tr.abstract td, tr.review td, tr.bibtex td { background-color: #F1F1F1; border-bottom: 2px black solid; }
+tr.nextshow td { border-bottom: 1px gray solid; }
+
+tr.bibtex pre { width: 100%; overflow: auto;}
+
+p.infolinks { margin: 0.5em 0em 0em 0em; padding: 0px; }
+
+#qssettings { padding: 0.5em; position: absolute; top: 0.2em; right: 0.2em; border: 1px gray solid; background-color: white; display: none; }
+#qssettings p { font-weight: bold; cursor: pointer; }
+#qssettings ul { display: none; list-style-type: none; padding-left: 0; margin: 0; }
+#qssettings.active ul { display: block; }
+
+@media print {
+	p.infolinks, #qssettings, #qs { display: none !important; }
+	table { border-width: 0px; }
+	tr { page-break-inside: avoid; }
+	tr > * + * + * + * + * {display: none; }
+	thead tr::before { content: "Reference"; border: 1px gray solid; padding: 0.5em; vertical-align: top; font-weight: bold; text-align: center; display: table-cell; background-color: #EFEFEF; }
+	tr[id]::before { content: attr(id); display: table-cell; border: 1px gray solid; padding: 0.5em; vertical-align: top; font-style: italic; }
+}
+</style>
+</head>
+<body>
+
+<div id="qs">
+	<form action="">
+	<p>QuickSearch: <input type="text" name="qsfield" id="qsfield" autocomplete="off" title="Allows plain text as well as RegExp searches" /><input type="button" onclick="clearQS()" value="clear" />&nbsp; Number of matching entries: <span id="stat">0</span>.</p>
+	<div id="qssettings">
+		<p onclick="toggleQSettingsDialog()">Search Settings</p>
+		<ul></ul>
+	</div>
+	</form>
+</div>
+<table id="qstable" border="1">
+<thead><tr><th width="20%">Author</th><th width="30%">Title</th><th width="5%">Year</th><th width="30%">Journal/Proceedings</th><th width="10%">Reftype</th><th width="5%">DOI/URL</th></tr></thead>
+<tbody><tr id="Alexander2011" class="entry">
+	<td>Alexander, L.</td>
+	<td>Providing Meteorological and Hydrographic Information via AIS Application Specific Messages: Challenges and Opportunities <p class="infolinks">[<a href="javascript:toggleInfo('Alexander2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Alexander2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Alexander2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: AIS Application-Specific Messages (ASMs) transmitted in binary format will be increasingly used to digitally communicate maritime safety/security information between participating vessels and shore stations. This includes time-sensitive metrological and hydrographic (met/hydro) information that is critical for safe vessel transits and efficient ports/waterways management. IMO recently published a new Safety-of-Navigation Circular (SN.1./Circ.289) that includes a number of meteorological and hydrographic message applications and data parameters. While there are no specific display standards for AIS ASMs on shipborne or shore-based systems, IMO Has also issued general guidance for the presentation/display of ASMs (SN.1/Circ.290). It includes specific mention of conforming to the e-Navigation concept-of-operation. For any new IHO S-57 or S-100-related product specifications dealing with dynamic met/hydro information, IHO and its Member States should use the same data content fields and parameters that are defined in IMO SN.1/Circ.289. Also, there is a need to consider the implications of IMO guidance regarding the presentation/display of AIS ASMs on ECDIS.</td>
+</tr>
+<tr id="bib_Alexander2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Alexander2011,
+  author = {Lee Alexander},
+  title = {Providing Meteorological and Hydrographic Information via AIS Application Specific Messages: Challenges and Opportunities},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Beaudoin2011" class="entry">
+	<td>Beaudoin, J., Smyth, S., Furlong, A., Floc'h, H. &amp; Lurton, X.</td>
+	<td>Streamlining Sound Speed Profile Pre-Processing: Case Studies and Field Trials <p class="infolinks">[<a href="javascript:toggleInfo('Beaudoin2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Beaudoin2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Beaudoin2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: High rate sound speed profiling systems have the potential to maximize the efficiency of multibeam echosounder systems (MBES) by increasing the accuracy at the outer edges of the swath where refraction effects are at their worst. In some cases, high rate sampling on the order of tens of casts per hour is required to capture the spatio-temporal oceanographic variability and this increased sampling rate can challenge the data acquisition workflow if refraction corrections are to be applied in real-time. Common bottlenecks result from sound speed profile (SSP) pre- processing requirements, e.g. file format conversion, cast extension, reduction of the number of points in the cast, filtering, etc. Without the ability to quickly pre-process SSP data, the MBES operator can quickly become overwhelmed with SSP related tasks, potentially to the detriment of their other duties.<br>A series of algorithms are proposed in which SSPs are automatically pre-processed to meet input criteria of MBES acquisition systems, specifically the problems of cast extrapolation and thinning are addressed. The algorithmic performance will be assessed in terms of sounding uncertainty through a series of case studies in a variety of oceanographic conditions and water depths. Results from a field trial in the French Mediterranean will be used to assess the improvement in real-time MBES acquisition workflow and survey accuracy and will also highlight where further improvements can be made in the pre-processing pipeline.</td>
+</tr>
+<tr id="bib_Beaudoin2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Beaudoin2011,
+  author = {Jonathan Beaudoin and Steve Smyth and Arnold Furlong and Henri Floc'h and Xavier Lurton},
+  title = {Streamlining Sound Speed Profile Pre-Processing: Case Studies and Field Trials},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Bernstein2011" class="entry">
+	<td>Bernstein, D.J., Sumners, B.W., Freeman, C.W. &amp; Mitasova, H.</td>
+	<td>Modern Techniques for Improved Topo/Bathy Elevation Modeling of Tidal Inlets <p class="infolinks">[<a href="javascript:toggleInfo('Bernstein2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Bernstein2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Bernstein2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Coastal scientists recognize that while it is critical to quantify volumetric and repeatable spatio-temporal change near tidal inlets, various physical and morphological factors make these areas perhaps the most challenging regions to map. It has been well established that traditionally spaced transects perpendicular to the morphology do not accurately represent complex terrain when interpolated into a digital elevation model (DEM), regardless of gridding algorithm. Purpose-built acquisition platforms paired with modern singlebeam, multibeam and topographic instrumentation are necessary for accurate surveys of this environment. Equally important to the accuracy of the final DEM is survey planning such that potential sources of survey uncertainty are minimized. Remote sensing techniques and observational data (e.g., aerial photography, nautical charts and existing data) are used to develop predictions of the anticipated terrain. Customized survey designs increase survey efficiency and allow users more flexibility in gridding methods and contribute to the overall accuracy of the modeled surface geometry. The selection of gridding parameters depends largely on the spatial distribution of the input data, resolution of the output grid and the characteristics of the modeled terrain. Survey design, instrumentation and interpolation methods are of principal importance when constructing accurate and seamless topo/bathy elevation models of these challenging environments.</td>
+</tr>
+<tr id="bib_Bernstein2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Bernstein2011,
+  author = {David J. Bernstein and Benjamin W. Sumners and Christopher W. Freeman and Helena Mitasova},
+  title = {Modern Techniques for Improved Topo/Bathy Elevation Modeling of Tidal Inlets},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Calder2011" class="entry">
+	<td>Calder, B.R. &amp; Rice, G.</td>
+	<td>Design and Implementation of an Extensible Variable Resolution Bathymetric Estimator <p class="infolinks">[<a href="javascript:toggleInfo('Calder2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Calder2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Calder2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: For grid-based bathymetric estimation techniques, determining the right resolution at which to work is essential. Appropriate grid resolution can be related, roughly, to data den- sity and thence to sonar characteristics, survey methodology, and depth. It is therefore variable in almost all survey scenarios, and methods of addressing this problem can have enormous impact on the correctness and efficiency of computational schemes of this kind.<br>This paper describes the design and implementation of a bathymetric depth estimation algorithm that attempts to address this problem by combining the computational efficiency of locally regular grids with piecewise-variable estimation resolution to provide a single logical data structure and associated algorithms that can adjust to local data conditions, change resolution where required to best support the data, and operate over essentially arbitrarily large areas as a single unit. The algorithm, which is in part a development of CUBE, is modular and extensible, and is structured as a client-server application to support different implementation modalities. The algorithm is called "CUBE with Hierarchical Resolution Techniques", or CHRT.</td>
+</tr>
+<tr id="bib_Calder2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Calder2011,
+  author = {B. R. Calder and G. Rice},
+  title = {Design and Implementation of an Extensible Variable Resolution Bathymetric Estimator},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Casey2011" class="entry">
+	<td>Casey, M.</td>
+	<td>The Effects of Climate Change and Peak Oil on Marine Shipping, Navigation and Hydrography <p class="infolinks">[<a href="javascript:toggleInfo('Casey2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Casey2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Casey2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Whether or not you believe in human-caused Climate Change it is clear by common consensus that the world's climate is changing and that burning carbon-based fuels cannot help and might even accelerate changes in the climate. Any mitigation efforts to stave off the worst effects of Climate Change (sea level flooding, drought- driven starvation etc.) will involve substantial investments across the globe and without question will cause increased energy costs.<br>Coupled with the Climate Change regime is the issue of Peak Oil. Carbon-based energy resources were all created millions of years ago and they are, by definition, in finite supply. Existing known fields are running out driving the costs of energy higher.<br>The search for more fields takes us farther and farther offshore and the consequences of that kind of exploitation are now well known to the residents of the US Gulf Coast. The age of easy-to-find and cheap-to-exploit carbon-based energy reserves is over. You can drill but you will pay dearly for it.<br>In our globalized world cheap transportation is a given and we have re-engineered our world around the fact that someone else builds the stuff we consume and ships it to us cheaply and efficiently. So now what?<br>The paper outlines the scenario as transportation costs approach the limit of economic viability, the impact on marine shipping and how navigation systems and, by extension hydrography, can play a critical role in making the industry more energy efficient while the world adapts to the new reality.</td>
+</tr>
+<tr id="bib_Casey2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Casey2011,
+  author = {Michael Casey},
+  title = {The Effects of Climate Change and Peak Oil on Marine Shipping, Navigation and Hydrography},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="JohnHughesClarke2011" class="entry">
+	<td>Clarke, J.H., Cartwright, D., Brucker, S., Church, I. &amp; Muggah, J.</td>
+	<td>The Squamish Delta Repetitive Survey Program: A Simultaneous Investigation of Prodeltaic Sedimentation and Integrated System Accuracy <p class="infolinks">[<a href="javascript:toggleInfo('JohnHughesClarke2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('JohnHughesClarke2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_JohnHughesClarke2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The Squamish River discharges into the head of Howe Sound in British Columbia. The submerged section of the delta (the prodelta) extends from the low water line to over 200m depth. On average, the delta front progrades ~ 4m per year and the upper prodelta accretes 50cm to 1m each year. Superimposed on the long term accretion is very localized slumping and bedform translation in channels on the prodelta front.<br>Repetitive surveys conducted 6 to 24 months apart over the past 6 years, have clearly indicated that certain sections of the prodelta are intermittently active and inactive over such timescales. In order to better understand the short period evolution of the prodelta, a new program has been initiated which will use monthly surveys over the less active winter months, followed by semi-weekly surveys during the peak river discharge period.<br>While any gross change is easy to resolve, much of the scale of natural seabed change on the Squamish prodelta is close to the limits of the total propagated error in the integrated system. It is thus hard to distinguish real change from artefacts due to implementation biases. Therefore any experiment aimed at assessing seabed change must be able to quantify the nature of typical resulting errors (systematic biases and/or random errors).</td>
+</tr>
+<tr id="bib_JohnHughesClarke2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{JohnHughesClarke2011,
+  author = {John Hughes Clarke and Doug Cartwright and Steve Brucker and Ian Church and James Muggah},
+  title = {The Squamish Delta Repetitive Survey Program: A Simultaneous Investigation of Prodeltaic Sedimentation and Integrated System Accuracy},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Eisenberg2011" class="entry">
+	<td>Eisenberg, J., Davidson, M., Beaudoin, J. &amp; Brodet, S.</td>
+	<td>Rethinking the Patch Test for Phase Measuring Bathymetric Sonars <p class="infolinks">[<a href="javascript:toggleInfo('Eisenberg2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Eisenberg2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Eisenberg2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: While conducting hydrographic survey operations in the Florida Keys, NOAA Ship Thomas Jefferson served as a test platform for the initial operational implementation of an L-3 Klein HydroChart 5000 Swath Bathymetry Sonar System1, a hull-mounted phase measuring bathymetric sonar (PMBS). During the project it became apparent that the traditional patch test typically utilized for multibeam echosounder (MBES) systems was poorly suited to the HydroChart - and perhaps other PMBS systems as well. These systems have several inherent characteristics that make it difficult to isolate and subsequently solve for biases under the traditional patch test paradigm: presence of a nadir gap, wide swaths (typically greater than 6 times water depth), and relatively poor object-detection capability in the outer swath. After "rethinking" the patch test to account for these characteristics, the authors propose a new patch test paradigm that is better suited to the HydroChart and other PMBS systems.</td>
+</tr>
+<tr id="bib_Eisenberg2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Eisenberg2011,
+  author = {Janice Eisenberg and Michael Davidson and Jonathan Beaudoin and Steve Brodet},
+  title = {Rethinking the Patch Test for Phase Measuring Bathymetric Sonars},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Greene2011" class="entry">
+	<td>Greene, C.T.</td>
+	<td>ENC to Paper: Changing workflows, charting specifications and COTS software <p class="infolinks">[<a href="javascript:toggleInfo('Greene2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Greene2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Greene2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: As hydrographic offices begin to adopt technology that utilizes a central database concept, where one data source can be used to create both ENC and Paper Chart products, software companies and hydrographic offices alike must face the inherent difficulties associated with using ENC data to support Paper Chart production.<br>This paper outlines the potential obstacles and inherent challenges associated with using ENC data as a source for Paper Chart production. It focuses on how the central database approach inverts the traditional relationship between ENCs and Paper Charts, as well as the difficulties associated with using the existing paper charting specifications as a resource to map S-57 attribution to S-4, or INT1.</td>
+</tr>
+<tr id="bib_Greene2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Greene2011,
+  author = {Craig T. Greene},
+  title = {ENC to Paper: Changing workflows, charting specifications and COTS software},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Hare2011" class="entry">
+	<td>Hare, R., Eakins, B., Amante, C. &amp; Taylor, L.A.</td>
+	<td>Modeling bathymetric uncertainty <p class="infolinks">[<a href="javascript:toggleInfo('Hare2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Hare2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Hare2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Modeling the measurement uncertainty of depth measurement systems, e.g. single-beam and multibeam echosounders, has become common practice since the release of S-44 4th Edition in 1998. Hydrographic Offices have also attempted to model the uncertainty of legacy bathymetric data sets, in order to provide sufficient metadata for users to determine fitness for non-traditional or non-navigation purposes. In addition to estimating the measurement uncertainties associated with depth and position of point soundings, additional uncertainty can be introduced into representative bathymetry models - used in modeling of coastal processes - by various gridding or interpolation methods.<br>We will begin by briefly reviewing the sources of measurement uncertainty and look at methods for estimating uncertainty in legacy data sets. Next, we look at the uncertainty that is introduced into bathymetry models by various gridding techniques, in essence, estimating the uncertainty of bathymetric values in areas without depth measurements. We will conclude by looking at potential applications of modeled bathymetric uncertainty, including tsunami inundation modeling.</td>
+</tr>
+<tr id="bib_Hare2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Hare2011,
+  author = {Rob Hare and Barry Eakins and Chris Amante and Lisa A. Taylor},
+  title = {Modeling bathymetric uncertainty},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Hiller2011" class="entry">
+	<td>Hiller, T., Reed, T.B. &amp; Steingrimsson, A.</td>
+	<td>Producing Chart Data from Interferometric Sonars on Small AUVs <p class="infolinks">[<a href="javascript:toggleInfo('Hiller2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Hiller2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Hiller2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: High frequency (100kHz to 500kHz) 'interferometric' or phase measuring sonars are a common tool for boat-mounted hydrographic surveys. Recent improvements in technology have resulted in leaps in data quality: 2005 saw the first interferometric survey accepted for charting by the UK Hydrographic office. In parallel with this there have been improvements in man-portable autonomous underwater vehicle (AUV) technology. There are now growing numbers of small AUVs running bathymetric surveys worldwide. The ability to access hazardous areas, provide cost-effective force-multiplication, and acquire higher resolution data from deeper water has proven very attractive.<br>This paper describes the path from vehicle launch to chartable data, concentrating on how swath bathymetric data acquired by interferometric sonars on small AUVs can be processed and qualified for hydrographic charting. Commercial AUV capabilities are illustrated using data collected by a 7-inch diameter Gavia AUV (Teledyne Gavia, Iceland) carrying a 500kHz GeoSwath sonar (GeoAcoustics, UK). Error budgets are discussed, showing that existing technology is capable of achieving IHO S-44 ed.5 Special Order surveys, within certain operational limits.<br>Possible future improvements in data analysis methods are mentioned, including the use of SLAM (Simultaneous Localisation and Mapping) methods to improve navigation. This is illustrated using sample data processed in CleanSweep software (OIC Inc., Hawaii).</td>
+</tr>
+<tr id="bib_Hiller2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Hiller2011,
+  author = {Tom Hiller and Thomas B. Reed and Arnar Steingrimsson},
+  title = {Producing Chart Data from Interferometric Sonars on Small AUVs},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Kearns2011" class="entry">
+	<td>Kearns, T., Brinton, L., Crandall, J. &amp; Gee, L.</td>
+	<td>Managing and Serving BAGs and BAGs of Data <p class="infolinks">[<a href="javascript:toggleInfo('Kearns2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Kearns2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Kearns2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: As hydrographic offices evolve from managing discrete point data (soundings) that represent depths to gridded data, the challenges have resulted in evolving approaches to data management. Modern GIS based technology enables hydrographic offices to manage large volumes of bathymetric data, yet preserve all the requisite metadata that is essential for decision making and generation of products from a navigation surface.<br>This paper addresses how the concerns of a modern hydrographic organization are handled in the areas of metadata persistence, managing large volumes of Bathymetric Attributed Grids (BAGs) in a relational database, access and sharing of BAG data through thin clients. The combined technologies developed by IVS 3D and Esri are providing a means to solve these challenges in a GIS based server environment with a flexible architecture. This unique design to modeling, preserving and sharing BAG data has the potential to revolutionize how modern hydrographic offices approach their data management and methods for deployment of bathymetric information.</td>
+</tr>
+<tr id="bib_Kearns2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Kearns2011,
+  author = {Tim Kearns and Lee Brinton and Jamie Crandall and Lindsay Gee},
+  title = {Managing and Serving BAGs and BAGs of Data},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Klippen2011" class="entry">
+	<td>Klippen, J.K.</td>
+	<td>Managing changes to nautical products <p class="infolinks">[<a href="javascript:toggleInfo('Klippen2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Klippen2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Klippen2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Nautical products are mainly maintained based on Notice to Mariners information and other prepared/derived publications.<br>This have been sufficient to keep paper charts maintained and up-to-date.<br>This approach was primarily established to provide mariners with corrective information so that products can be maintained and kept updated.<br>It's also common that the same information is used by the HO themselves to do product maintenance on their own products.</td>
+</tr>
+<tr id="bib_Klippen2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Klippen2011,
+  author = {John K Klippen},
+  title = {Managing changes to nautical products},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Lesnikowski2011" class="entry">
+	<td>Lesnikowski, N., Groot, M., Noble, K. &amp; Hutsell, S.</td>
+	<td>Multiple Hydrographic Sensor Mapping OF THE Howard Hanson Dam IN Support OF THE Right Abutment Integrity Assessment <p class="infolinks">[<a href="javascript:toggleInfo('Lesnikowski2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="bib_Lesnikowski2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Lesnikowski2011,
+  author = {Nicholas Lesnikowski and Mark Groot and Kurtis Noble and Steve Hutsell},
+  title = {Multiple Hydrographic Sensor Mapping OF THE Howard Hanson Dam IN Support OF THE Right Abutment Integrity Assessment},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Lockhart2011" class="entry">
+	<td>Lockhart, C., Gee, L. &amp; Kearns, T.</td>
+	<td>Mapping the Coastal Zone: Pulse to Products <p class="infolinks">[<a href="javascript:toggleInfo('Lockhart2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="bib_Lockhart2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Lockhart2011,
+  author = {Carol Lockhart and Lindsay Gee and Tim Kearns},
+  title = {Mapping the Coastal Zone: Pulse to Products},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Mayer2011" class="entry">
+	<td>Mayer, L.</td>
+	<td>Keynote: Acoustic Search for Gas and Oil during the Deepwater Horizon incident (FIX!) <p class="infolinks">[<a href="javascript:toggleInfo('Mayer2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="bib_Mayer2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Mayer2011,
+  author = {Larry Mayer},
+  title = {Keynote: Acoustic Search for Gas and Oil during the Deepwater Horizon incident (FIX!)},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Nelson2011" class="entry">
+	<td>Nelson, K.A., Westington, M. &amp; Turner, P.</td>
+	<td>Developing Maritime Navigation Products and Tools to Support Marine Spatial Planning <p class="infolinks">[<a href="javascript:toggleInfo('Nelson2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Nelson2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Nelson2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: "Coastal Marine Spatial Planning (CMSP) is a comprehensive, adaptive, integrated, ecosystem-based, and transparent spatial planning process, based on sound science, for analyzing current and anticipated uses of ocean, coastal, and Great Lakes areas. CMSP identifies areas most suitable for various types or classes of activities in order to reduce conflicts among uses, reduce environmental impacts, facilitate compatible uses, and preserve critical ecosystem services to meet economic, environmental, security, and social objectives."<br>The Office of Coast Survey (OCS) plays a key role in supporting the National Oceanic and Atmospheric Administration (NOAA) function of understanding ecosystems, ocean uses, and spatial management. One way this is accomplished is by engaging key constituencies. OCS maintains expertise in data acquisition, management, and dissemination, as well as in the development of mapping and interpretative products and tools. The skills required to maintain and advance this expertise is of considerable value to NOAA, and to the broader seafloor mapping community. Leveraging that value, OCS is committed to meeting NOAA's national objectives by deploying new missions and expanding areas of service, while maintaining its world-class level of traditional services to the navigation community.</td>
+</tr>
+<tr id="bib_Nelson2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Nelson2011,
+  author = {Kurt A. Nelson and Meredith Westington and Paul Turner},
+  title = {Developing Maritime Navigation Products and Tools to Support Marine Spatial Planning},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Powell2011" class="entry">
+	<td>Powell, J.</td>
+	<td>The New Electronic Chart Product Specification S-101: An Overview <p class="infolinks">[<a href="javascript:toggleInfo('Powell2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Powell2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Powell2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The development of S-101 represents a major step forward in product specifications for Electronic Navigational Charts (ENC). Based on the IHO geospatial framework standard S- 100, S-101 will become the eventual replacement to S-57 ENCs. This paper will discuss the phased development approach that will lead to an ENC with improved functionality and better data handling throughout the ENC supply chain from producer to end-user, and will touch on several transition options that are under development.</td>
+</tr>
+<tr id="bib_Powell2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Powell2011,
+  author = {Julia Powell},
+  title = {The New Electronic Chart Product Specification S-101: An Overview},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Quintal2011" class="entry">
+	<td>Quintal, R., Byrne, J.S., Parker, J. &amp; Smith, D.</td>
+	<td>Results and Metrics from an Automated Approach to Detection of Contacts in Side-Scan Imagery <p class="infolinks">[<a href="javascript:toggleInfo('Quintal2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Quintal2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Quintal2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Many hydrographic surveys require acquisition of bathymetric data and side-scan imagery data acquired from separate sonar systems. While modern bathymetric data processing techniques allow for a level of automation to produce the bathymetric model of the seafloor, data processing techniques for side-scan sonar data remain primarily manual. Processing side-scan data is time-consuming and prone to missing contacts, which has led to a two-pass process with an initial review by a hydrographer and then a second, quality control review in order to mitigate the risk of missing an object. Science Applications International Corporation (SAIC) has completed a research and development effort to automate side-scan sonar contact detection for commercial hydrographic surveys. This capability is integrated into version 5.0 of SAIC's Survey Analysis and area Based EditoR (SABER) post-processing software. This article presents the results of applying automatic detection algorithms to side-scan sonar data. Baseline results obtained from a traditional, manual, two-pass data processing pipeline are compared with the results obtained from the automated first pass approach, followed by a hydrographer quality control pass. Metrics are presented to detail the results obtained.</td>
+</tr>
+<tr id="bib_Quintal2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Quintal2011,
+  author = {Rebecca Quintal and John Shannon Byrne and Jeffrey Parker and Deborah Smith},
+  title = {Results and Metrics from an Automated Approach to Detection of Contacts in Side-Scan Imagery},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Reed2011" class="entry">
+	<td>Reed, T.</td>
+	<td>AIS TideMet Binary Message update - IMO SN.1/Circ.289 <p class="infolinks">[<a href="javascript:toggleInfo('Reed2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Reed2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Reed2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: This short presentation is a review, from a commercial perspective, of the recent changes to the transmission of information by way of AIS binary messages. The changes introduced by IMO SN.1/Circ 289 and Circ.290 are reviewed and the implications for software used to decode and present the embedded message data to the AIS user. Ohmex is a manufacturer of AIS tide and weather equipment so particular attention is given to the ?TideMet? binary message used to transmit current Tide and Weather information. The topic is of particular interest to VTS authorities for the safe navigation relating to ports and harbours using ECDIS equipment. The presentation includes data from a recent survey of the use of these messages and considers the reason why a fundamental standard navigation message has not, as yet, been adhered to on a regional or global basis.</td>
+</tr>
+<tr id="bib_Reed2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Reed2011,
+  author = {Ted Reed},
+  title = {AIS TideMet Binary Message update - IMO SN.1/Circ.289},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Schmidt2011" class="entry">
+	<td>Schmidt, V. &amp; Byrne, J.S.</td>
+	<td>An Extension to the Generic Sensor Format to Support Sidescan Sonar Data <p class="infolinks">[<a href="javascript:toggleInfo('Schmidt2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Schmidt2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Schmidt2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The Generic Sensor Format (GSF) is a vendor-neutral, open architecture, sonar data file format designed by Science Applications International Corporation (SAIC) for the Naval Oceanographic Office. The data from many common single-beam and multibeam bathymetric sonar systems may be converted into GSF and many hydrographic software vendors support GSF to some degree. In addition to providing generic support for bathymetry data, GSF also provides a generic approach to storing a single average amplitude value for each bathymetry receive beam and a time series of imagery values for each bathymetry receive beam. A generic sidescan data format, however, is not directly supported and is needed within the coastal- and ocean-mapping community. This paper details the proposed extensions to GSF to support sidescan data. The proposed extension creates two new records within the GSF standard - a sidescan parameters record (gsfSSParams) containing installation metadata about the sonar and a sidescan ping record (gsfSwathSSPing) containing navigation, attitude and ancillary information along with the sonar data itself. The extension defines "channels" into which sidescan data are populated. These may be defined as data recorded from a single stave, or alternately, as data from a group of staves, which are to be processed as a single unit.</td>
+</tr>
+<tr id="bib_Schmidt2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Schmidt2011,
+  author = {Val Schmidt and John Shannon Byrne},
+  title = {An Extension to the Generic Sensor Format to Support Sidescan Sonar Data},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Schwehr2011b" class="entry">
+	<td>Schwehr, K.</td>
+	<td>Vessel Tracking Using the Automatic Identification System (AIS) During Emergency Response: Lessons from the Deepwater Horizon Incident <p class="infolinks">[<a href="javascript:toggleInfo('Schwehr2011b','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Schwehr2011b','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>U.S. Hydro, pp. 14&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://vislab-ccom.unh.edu/~schwehr/papers/2011-schwehr-ushydro-dwh.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Schwehr2011b" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: What does the marine Automatic Identification System (AIS) vessel tracking mean for mariners at sea and operations staff on shore during emergency response operations? Real-time AIS and e-Navigation related technologies enable closer coordination between all involved parties. Recorded historical AIS data give insight into what occurred before, during, and after an incident. Historical AIS analysis facilitates planning for future situations by creating a baseline model of operational procedures, as they currently exist. Mariner and responder safety can be an issue from sudden and drastic alteration of ship traffic patterns caused by emergencies. By planning ahead, the community can mitigate these risks and improve the efficiency of the response at the same time. AIS has limitations for both real-time tracking and historical analysis that must be understood by all involved. However, when used appropriately, AIS is an effective emergency response tool.<br>The Deepwater Horizon (DWH) oil spill was the first major oil spill where the US Coast Guard's AIS ship tracking data was released to the public in real-time, and many response vessels were equipped with AIS transceivers. The Environmental Response Management Application (ERMA) provided the official Common Operational Picture (COP) to responders. The system archived more than 100 GB of AIS vessel positions reports from the Gulf of Mexico during the incident. This paper presents the history of the AIS tools behind ERMA, the initial investigations into how oil spill response operations progressed, and some initial lessons learned to improve future response efforts.</td>
+</tr>
+<tr id="bib_Schwehr2011b" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Schwehr2011b,
+  author = {Kurt Schwehr},
+  title = {Vessel Tracking Using the Automatic Identification System (AIS) During Emergency Response: Lessons from the Deepwater Horizon Incident},
+  booktitle = {U.S. Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  pages = {14},
+  url = {http://vislab-ccom.unh.edu/~schwehr/papers/2011-schwehr-ushydro-dwh.pdf}
+}
+</pre></td>
+</tr>
+<tr id="Seamount2011" class="entry">
+	<td>Seamount, D.</td>
+	<td>Evaluation of ESRI Software for Management of Survey Data <p class="infolinks">[<a href="javascript:toggleInfo('Seamount2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="bib_Seamount2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Seamount2011,
+  author = {Daniel Seamount},
+  title = {Evaluation of ESRI Software for Management of Survey Data},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+<tr id="Waddington2011" class="entry">
+	<td>Waddington, T.</td>
+	<td>High-Resolution Acoustic Multibeam Surveys for Bridge Assessment <p class="infolinks">[<a href="javascript:toggleInfo('Waddington2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Waddington2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx#9">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Waddington2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Though it has not been a widely used technique within the general bridge engineering community, multibeam surveying has begun to find a role in a few specific bridge-related applications. In recent years, multibeam surveying has been used as an assessment tool for periodic underwater bridge inspections and also to meet pre- and post-construction design and planning requirements in support of new bridge construction. Though there are tens of thousands of highway and railroad bridges over water in the United States, only a relatively small subset of these bridges occur in environments where multibeam surveying might be considered as an applicable technique. However, in areas with certain environmental characteristics (e.g., deep water, complex bottom topography, limited visibility, strong currents, etc.) multibeam surveying offers a number of unique benefits relative to other assessment techniques. This paper will provide an overview of multibeam surveying, as well as other acoustic bridge monitoring techniques, and then present a discussion on specific bridge-related multibeam applications.</td>
+</tr>
+<tr id="bib_Waddington2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Waddington2011,
+  author = {Tom Waddington},
+  title = {High-Resolution Acoustic Multibeam Surveys for Bridge Assessment},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx#9}
+}
+</pre></td>
+</tr>
+<tr id="Ward2011" class="entry">
+	<td>Ward, K.R. &amp; Gallagher, B.</td>
+	<td>Utilizing Vessel Traffic and Historical Bathymetric Data to Prioritize Hydrographic Surveys <p class="infolinks">[<a href="javascript:toggleInfo('Ward2011','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Ward2011','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>US Hydro&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.hypack.com/ushydro/2011/program.aspx">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Ward2011" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Using a risk based approach OCS has initiated a project utilizing AIS vessel traffic data and historical sounding data to update the NOAA Hydrographic Survey Priorities document. This document, created in 1994, prioritized areas for hydrographic survey on a national level Currently this document is based document was primarily based on maritime community input and survey age. Utilizing vessel traffic data and historical bathymetry data, both recently made accessible via spatial databases, a probability of grounding value and associated risk can be calculated. This value can be applied to prioritize hydrographic survey operations in a repeatable unbiased way to best serve the maritime community.<br>This paper will describe the process to utilize NAIS (National Automatic Identification System) data and historical bathymetry data to calculate traffic volumes, sounding density and under keel clearance. It will subsequently address how these data can be combined to calculate an overall risk of grounding. The results of this analysis will be discussed and presented in graphical format. Finally this paper will describe how this analysis can be utilized to aid the Coastal and Marine Spatial planning process.</td>
+</tr>
+<tr id="bib_Ward2011" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Ward2011,
+  author = {Kyle R. Ward and Barry Gallagher},
+  title = {Utilizing Vessel Traffic and Historical Bathymetric Data to Prioritize Hydrographic Surveys},
+  booktitle = {US Hydro},
+  publisher = {The Hydrographic Society of America},
+  year = {2011},
+  url = {http://www.hypack.com/ushydro/2011/program.aspx}
+}
+</pre></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+ <small>Created by <a href="http://jabref.sourceforge.net">JabRef</a> on 28/04/2011.</small>
+</p>
+
+</body>
+</html>
+
+<!-- File generated by JabRef ; Export Filter written by Mark Schenk -->

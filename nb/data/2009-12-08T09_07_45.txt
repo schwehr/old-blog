@@ -1,0 +1,43 @@
+TITLE: wget to pull BAGs
+AUTHOR: Kurt
+DATE: 12.08.2009 09:07
+DESC: hacked but works
+-----
+BODY:
+Try as I might, I wasn't able to get wget to do what I want on its
+own.  I wanted it to walk the NGDC Hydrographic survey directory and
+pull all of the BAGs for the Demo next week.  I thought this should
+work great, but it doesn't.  It does not pull the BAGs and it does not
+seem to respect the no parent flag
+<pre><b>wget -l10 -I /mgg/NOS/coast/H10001-H12000 \
+          -X "/mgg/NOS/coast/H10001-H12000/H10*" 
+     --no-parent -nH --cut-dirs=3 -A.bag.gz -c -r 
+     http://surveys.ngdc.noaa.gov/mgg/NOS/coast/H10001-H12000/</b></pre>
+The "-l10" says to recurse down up to 10 levels.  Is this from "/" or from
+the starting location?  The -I says to include this directory, while -X
+says to exclude some older surveys that do not have BAGs.  The --no-parent
+option tries to prevent wget from looking up the tree.  It did not seem to
+be working, so that is why I have the -I include flag.  The -nH removes
+the ngdc host name, while --cur-dirs removes the "mgg/NOS/coast".  "-c" says
+to continue on files that have only been partially downloaded and "-r" is 
+recursive through the structure.  
+
+If anyone has a suggestion about what I did wrong in the above
+command, please let me know!
+
+This does work, but only for one survey:
+<pre><b>wget --no-parent -nH --cut-dirs=3 --accept bag.gz,BAG -c -r \
+        http://surveys.ngdc.noaa.gov/mgg/NOS/coast/H10001-H12000/H11580/</b></pre>
+It is faily easy to combine this with python to pull a range of surveys:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> os
+<!-- -->
+<b><font color="#0000FF">for</font></b> i <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">11500</font><font color="#990000">,</font><font color="#993399">11510</font><font color="#990000">):</font>
+    cmd <font color="#990000">=</font> <font color="#FF0000">'wget -c --no-parent -nH --cut-dirs=3 --accept bag.gz,BAG -c -r http://surveys.ngdc.noaa.gov/mgg/NOS/coast/H10001-H12000/H{surveynum}/'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>surveynum<font color="#990000">=</font>i<font color="#990000">)</font>
+    os<font color="#990000">.</font><b><font color="#000000">system</font></b><font color="#990000">(</font>cmd<font color="#990000">)</font></tt></pre>
+Just be prepaired to have enough disk space.
+
+NOTE: We would have rather used rsync if we had more time.  In the
+past, I have setup rsync with NGDC to send data there way.  Rsync is
+definitely lower overhead for this kind of thing (and less quirky).
+-----

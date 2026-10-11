@@ -1,0 +1,35 @@
+TITLE: SoQt from CVS builds on Mac OSX 10.4/fink 10.4-transitional
+AUTHOR: Kurt
+DATE: 03.04.2006 20:46
+DESC: yeah
+-----
+BODY:
+Kyrah got me to back up and start with the configure problem and that
+looks like was the key to getting shared libs to build for SoQt from
+cvs using Mac OSX 10.4.5/fink 10.4-transitional.  Here is how what I
+did that works for me with Coin 2.4.4 installed from
+10.4-transitional.  This requires you to be using bash as your shell.
+I remember no to long ago when this kind of syntax made no sense to
+me!  This forces the use of GCC 3.3 for the compilers.
+<pre>
+wget http://ftp.coin3d.org/coin/src/snapshots/SoQt-latest.tar.gz
+tar xf SoQt-latest.tar.gz
+cd SoQt
+QTDIR=/sw <b>CC=gcc-3.3 CXX=g++-3.3</b> ./configure --without-framework \
+  --enable-darwin-x11 --with-qt=/sw --enable-shared
+make
+
+ls src/Inventor/Qt/.libs/*.dylib
+  src/Inventor/Qt/.libs/libSoQt.20.3.1.dylib
+  src/Inventor/Qt/.libs/libSoQt.20.dylib
+  src/Inventor/Qt/.libs/libSoQt.dylib
+
+otool -L src/Inventor/Qt/.libs/libSoQt.dylib 
+  src/Inventor/Qt/.libs/libSoQt.dylib:
+        /usr/local/lib/libSoQt.20.dylib (compatibility version 24.0.0, current version 24.1.0)
+        /sw/lib/libqt-mt.3.dylib (compatibility version 3.3.0, current version 3.3.5)
+</pre>
+The question is now, can I make both shared and static libraries at
+the same time?  Looks like appending --enable-static turns off shared 
+library generation right now.
+-----

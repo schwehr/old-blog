@@ -1,0 +1,51 @@
+TITLE: Better gnuplotting
+AUTHOR: Kurt
+DATE: 04.18.2007 11:00
+DESC: more and better
+-----
+BODY:
+Thanks to Val, I went and looked up how to convert from seconds since
+the Epoch in UTC to date/time.  Here is what I did:
+<pre>
+set xdata time
+set format x "%d-%b-%Y"
+set timefmt "%s"
+plot 'temp.dat' using 1:2 with l, 'waterlevel.dat' using 1:2 with l
+</pre>
+
+<img src="http://schwehr.org/blog/attachments/2007-04/jel-with-date.png">
+
+Ah, and the script...
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">'Quick hack to allow for plotting'</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<font color="#2040a0">w</font> <font color="4444FF">=</font> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#008000">'waterlevel.dat'</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+<font color="#2040a0">t</font> <font color="4444FF">=</font> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#008000">'temp.dat'</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+<font color="#2040a0">timestamp</font> <font color="4444FF">=</font> <font color="#2040a0">None</font>
+<strong>for</strong> <font color="#2040a0">filename</font> <strong>in</strong> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">filename</font>
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#444444">#print line</font>
+        <strong>if</strong> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'#'</font> <strong>and</strong> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">2</font><font color="4444FF">]</font> <strong>in</strong> <font color="4444FF">[</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font> <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">10</font><font color="4444FF">)</font> <font color="4444FF">]</font><font color="4444FF">:</font>
+            <font color="#444444"># found timestamp</font>
+            <font color="#2040a0">timestamp</font> <font color="4444FF">=</font> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">2</font><font color="4444FF">:</font><font color="4444FF">]</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="#008000">'.'</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+            <strong>continue</strong>
+        <strong>if</strong> <font color="4444FF">-</font><font color="#FF0000">1</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">find</font><font color="4444FF">(</font><font color="#008000">'level'</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">w</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">timestamp</font><font color="4444FF">+</font><font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">3</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+            <strong>continue</strong>
+        <strong>if</strong> <font color="4444FF">-</font><font color="#FF0000">1</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">find</font><font color="4444FF">(</font><font color="#008000">'temp'</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">t</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">timestamp</font><font color="4444FF">+</font><font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">3</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+</pre>
+And here is what my not so nice format looks like...
+<pre>
+# 1176861556.7
+Date/Time:  7.04.18  2:53:04
+# 1176861556.75
+01 Reference             736
+# 1176861560.75
+02 Water level             1.93 m
+# 1176861564.78
+03 Water temperature       4.80 Deg.C
+</pre>
+-----

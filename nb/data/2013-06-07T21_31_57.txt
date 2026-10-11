@@ -1,0 +1,178 @@
+TITLE: NMEA Transport, Annotate and Group (TAG) block encoding
+AUTHOR: Kurt
+DATE: 06.07.2013 21:31
+DESC: the new encoding for nmea
+-----
+BODY:
+Before I start, there are so many strange things in the NMEA specification,
+but this is one of my favorites:
+<pre>Since there is no provision for guaranteed delivery of messages and
+only limited error checking capability, this standard should be used
+with caution in all safety applications.</pre>
+Wahoo!  And off we go with safety of life applications without additional thought.
+
+I finally started looking at the NMEA TAG block specification.  I paid
+for version 4.0 of the spec, so I should use it, right?  I have to say
+it is slightly painful.   I'll do my best to describe what TAG block
+is, the issues that it is trying to address, and how well the authors
+did in their design.  I really hate how standards often do not list
+the authors / contributors.  No way to start up a discussion.
+
+<b>The motivation for a format change.</b>
+
+The basic NMEA 0183 (3.0 and lower) sentence is missing some things.  First, it is
+limited to 79 characters per line.  Therefore, there are many times
+that one line is too short for all that you would like to send.  AIS
+introduced the concept of messages that span multiple lines with
+fields to help re-assemble the total message.  This falls apart if
+you have a single feed coming from multiple devices that may all be
+doing the same thing giving intermixed multi-line messages.  If we
+can identify the source of the message, then we can re-assemble these
+multi-line messages without fear of mixing unrelated parts.
+
+The next issue is the lack of metadata in the NMEA0183 message format.
+Unless the message has a timestamp built in, there is no standard way
+to log the time.  We may have additional metadata requirements and
+there is no place to put them.
+
+<b>History</b>
+
+The USCG created an initial metadata format somewhere in the pre-2005
+time frame that appended fields after the existing message.  I've
+documented that format elsewhere, but to summarize, it consists of
+comma separated fields that start with a letter code except the last
+field, which is the unix UTC timestamp.  It works and that is what
+I've used since 2006 for my logging and processing in software line
+ais-py, noaadata-py and libais.
+
+I created a python regular expression that parses the basic structure of these
+"old USCG format" messages.  Here is an example message and the regular expression
+being used to pull apart the fields.
+<pre><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> re
+<!-- -->
+nmea_re <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b> <font color="#990000">(</font>r<font color="#FF0000">'''^!(?P&lt;talker&gt;AI)(?P&lt;string_type&gt;VD[MO])</font>
+<font color="#FF0000">,(?P&lt;total&gt;\d?)</font>
+<font color="#FF0000">,(?P&lt;sen_num&gt;\d?)</font>
+<font color="#FF0000">,(?P&lt;seq_id&gt;[0-9]?)</font>
+<font color="#FF0000">,(?P&lt;chan&gt;[AB])</font>
+<font color="#FF0000">,(?P&lt;body&gt;[;:=@a-zA-Z0-9&lt;&gt;\?\'\`]*)</font>
+<font color="#FF0000">,(?P&lt;fill_bits&gt;\d)\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])</font>
+<font color="#FF0000">(</font>
+<font color="#FF0000">  (,S(?P&lt;slot&gt;\d*))</font>
+<font color="#FF0000">  | (,s(?P&lt;s_rssi&gt;\d*))</font>
+<font color="#FF0000">  | (,d(?P&lt;signal_strength&gt;[-0-9]*))</font>
+<font color="#FF0000">  | (,t(?P&lt;t_recver_hhmmss&gt;(?P&lt;t_hour&gt;\d\d)(?P&lt;t_min&gt;\d\d)(?P&lt;t_sec&gt;\d\d.\d*)))</font>
+<font color="#FF0000">  | (,T(?P&lt;time_of_arrival&gt;[^,]*))</font>
+<font color="#FF0000">  | (,x(?P&lt;x_station_counter&gt;[0-9]*))</font>
+<font color="#FF0000">  | (,(?P&lt;station&gt;(?P&lt;station_type&gt;[rbB])[a-zA-Z0-9_]*))</font>
+<font color="#FF0000">)*</font>
+<font color="#FF0000">,(?P&lt;time_stamp&gt;\d+([.]\d+)?)?'''</font><font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">)</font>
+<!-- -->
+match <font color="#990000">=</font> nmea_re<font color="#990000">.</font><b><font color="#000000">match</font></b><font color="#990000">(</font><font color="#FF0000">'!AIVDM,1,1,,A,14eG&gt;3@01kqiIs8ICROownFn0D03,0*02,d-106,S0993,t140726.00,T26.49646933,r09STWO1,1370786847'</font><font color="#990000">)</font>
+<!-- -->
+msg <font color="#990000">=</font> match<font color="#990000">.</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">for</font></b> key<font color="#990000">,</font> val <b><font color="#0000FF">in</font></b> msg<font color="#990000">.</font><b><font color="#000000">iteritems</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'%s: %s'</font> <font color="#990000">%</font> <font color="#990000">(</font>key<font color="#990000">,</font> val<font color="#990000">)</font>
+<!-- -->
+<i><font color="#9A1900"># result:</font></i>
+<i><font color="#9A1900">'''</font></i>
+<i><font color="#9A1900">body: 14eG&gt;3@01kqiIs8ICROownFn0D03</font></i>
+<i><font color="#9A1900">slot: 0993</font></i>
+<i><font color="#9A1900">t_sec: 26.00</font></i>
+<i><font color="#9A1900">t_min: 07</font></i>
+<i><font color="#9A1900">station_type: r</font></i>
+<i><font color="#9A1900">seq_id: </font></i>
+<i><font color="#9A1900">t_hour: 14</font></i>
+<i><font color="#9A1900">chan: A</font></i>
+<i><font color="#9A1900">string_type: VDM</font></i>
+<i><font color="#9A1900">fill_bits: 0</font></i>
+<i><font color="#9A1900">sen_num: 1</font></i>
+<i><font color="#9A1900">s_rssi: None</font></i>
+<i><font color="#9A1900">t_recver_hhmmss: 140726.00</font></i>
+<i><font color="#9A1900">station: r09STWO1</font></i>
+<i><font color="#9A1900">time_of_arrival: 26.49646933</font></i>
+<i><font color="#9A1900">talker: AI</font></i>
+<i><font color="#9A1900">checksum: 02</font></i>
+<i><font color="#9A1900">time_stamp: 1370786847</font></i>
+<i><font color="#9A1900">x_station_counter: None</font></i>
+<i><font color="#9A1900">total: 1</font></i>
+<i><font color="#9A1900">signal_strength: -106</font></i>
+<i><font color="#9A1900">'''</font></i></pre>
+Remember that you can use <a href="http://kodos.sourceforge.net/">kodos</a> to try out python regular expressions.
+
+<b>TAG block</b>
+
+Apparently, that style was not good enough.  So some group of people
+tried to create something better.  I'm going to ignore the control aspect.
+I typically only deal with logs from devices that are out of my influence.  
+We get what we get.
+
+The basic structure of TAG is to put additional data in the front of
+the original NMEA 0183 messages between two "\" characters.  This
+is extra interesting in that most programming languages use the back-slash
+to start escape codes (e.g. "\n" and "\r"; c.f. "man ascii" and "man printf").
+
+An example to show what this looks like.  I got this chunk back in 2009.
+<pre>\g:1-2-73874,n:157036,s:r003669945,c:1241544035*4A\!AIVDM,1,1,,B,15N4cJ`005Jrek0H@9n`DW5608EP,0*13
+\g:2-2-73874,n:157037*1D\$ARVSI,r003669945,,172036.69698935,1376,-095,0*15
+\g:1-2-73875,n:157038,s:r003669945,c:1241544035*45\!AIVDM,1,1,,B,15NEcU0001JriI4H@2DEN038069@,0*00
+\g:2-2-73875,n:157039*12\$ARVSI,r003669945,,172036.77711928,1379,-097,0*1B
+\g:1-2-5624390,n:2281546,s:r003669959,c:1241544037*7D\!AIVDM,1,1,,A,15PlLL@P1@JmA=DGWcw9M?w:069@,0*1D
+\g:2-2-5624390,n:2281547*25\$ARVSI,r003669959,,246060,9999,-094,0*34
+\g:1-2-5624393,n:2281555,s:r003669959,c:1241544037*7C\!AIVDM,1,1,,A,15PlLL0OhgJn2ORG`TQ6nEC:28ES,0*3F
+\g:2-2-5624393,n:2281556*26\$ARVSI,r003669959,,246060,9999,-077,0*39
+\g:1-2-5624394,n:2281557,s:r003669959,c:1241544037*79\!AIVDM,1,1,,A,18KKL00025rsc0&lt;G&lt;pMbI8E80@ET,0*73
+\g:2-2-5624394,n:2281558*2F\$ARVSI,r003669959,,246060,9999,-112,0*3B
+\g:1-2-5624396,n:2281561,s:r003669959,c:1241544037*7E\!AIVDM,1,1,,B,181:JhP025Jl`t8Fo0U3c2q80&lt;01,0*02
+\g:2-2-5624396,n:2281562*24\$ARVSI,r003669959,,246060,9999,-117,0*3E
+\g:1-2-5624398,n:2281566,s:r003669959,c:1241544037*77\!AIVDM,1,1,,A,13:4&lt;:002CJniU4G;qe:MHG40@E`,0*00
+\g:2-2-5624398,n:2281567*2F\$ARVSI,r003669959,,246060,9999,-114,0*3D
+\g:1-2-5624421,n:2281618,s:r003669959,c:1241544037*78\!AIVDM,1,1,,A,15N9wuUPAJJnNGrGV&gt;8J983:0D04,0*23
+\g:2-2-5624421,n:2281619*20\$ARVSI,r003669959,,246060,9999,-053,0*3F
+\g:1-3-60450,n:131065,s:r003669946,c:1241544038*4B\!AIVDM,2,1,9,A,55MwpAh000000000000&lt;OCO;GF2222222222220k1H4,0*2C
+\g:2-3-60450,n:131066*10\!AIVDM,2,2,9,A,3140002P00000000000000000000,2*79
+\g:3-3-60450,n:131067*10\$ARVSI,r003669946,9,172038.11029899,1429,-091,0*2C
+\g:1-3-60451,n:131068,s:r003669946,c:1241544038*47\!AIVDM,2,1,0,B,55MwpAh000000000000&lt;OCO;GF2222222222220k1H4,0*26
+\g:2-3-60451,n:131069*1E\!AIVDM,2,2,0,B,3140002P00000000000000000000,2*73</pre>
+Pretty overwhelming and hard to read.  Let's start off by creating and
+decoding a message that gives the Unix UTC timestamp, which is indicated by a 'c:' character.
+We won't give a NMEA 0183 msg to go with it.  My reading is also that the checksum within
+a TAG block ( "\\[^/+]\\" ) is optional, but I will start off with including the checksum.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> operator <b><font color="#000080">import</font></b> xor
+<b><font color="#000080">import</font></b> time
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">checksum</font></b><font color="#990000">(</font>sentence<font color="#990000">):</font>
+  <b><font color="#0000FF">return</font></b> <font color="#990000">(</font><font color="#FF0000">'%02x'</font> <font color="#990000">%</font> <b><font color="#000000">reduce</font></b><font color="#990000">(</font>xor<font color="#990000">,</font> <b><font color="#000000">map</font></b><font color="#990000">(</font>ord<font color="#990000">,</font> sentence<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'*'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#993399">1</font><font color="#990000">:]))).</font><b><font color="#000000">upper</font></b><font color="#990000">()</font>
+<!-- -->
+timestamp <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>time<font color="#990000">.</font><b><font color="#000000">time</font></b><font color="#990000">())</font>
+<i><font color="#9A1900"># 137079172</font></i>
+<!-- -->
+body <font color="#990000">=</font> <font color="#FF0000">'c:%d'</font> <font color="#990000">%</font> timestamp
+msg <font color="#990000">=</font> <font color="#FF0000">'\\{body}*{checksum}\\'</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> msg<font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>body<font color="#990000">=</font>body<font color="#990000">,</font> checksum<font color="#990000">=</font><b><font color="#000000">checksum</font></b><font color="#990000">(</font>body<font color="#990000">))</font>
+<i><font color="#9A1900"># \c:1370791724*31\</font></i></tt></pre>
+We now need to start creating the regular expression to parse these TAG things.
+Let's start without worrying about the internal fields.  I came up with
+<pre>\\.*\*(?P&lt;checksum&gt;[0-9A-F]{2})?\\.*</pre>
+The back-slashes need to be escaped, so a single back-slash gets written as "\\" in the regex string.
+Now we can add the section for the timestamp.  Sadly, the spec asserts that the timestamp is an integer.  They then
+add the twist that the value can be either seconds or milliseconds, but does not give us an indicator for which.  Ouch.
+Not like they had run out of letter codes.  Currently, timestamps have 10 digits and TAG block started in 2008.
+<pre>int(1e9)
+# 1000000000
+<!-- -->
+datetime.datetime.utcfromtimestamp(1e9)
+# datetime.datetime(2001, 9, 9, 1, 46, 40)</pre>
+Therefore, we need our integer to have 10 or more digits for the timestamp.  I came up with this regex:
+<pre>\\c:(?P&lt;timestamp&gt\d{10,15})\*(?P&lt;checksum&gt;[0-9A-F]{2})?\\.*</pre>
+Viewed in kodos:
+
+<img width="600" height="411" title="Unix UTC timestamp" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-06/kodos-nmea-tag-block-unix-time.png"/>
+
+So we have a start!  More in a future post.
+-----

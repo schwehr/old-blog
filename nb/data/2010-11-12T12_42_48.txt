@@ -1,0 +1,195 @@
+TITLE: First impressions of Fortran 2008
+AUTHOR: Kurt
+DATE: 11.12.2010 12:42
+DESC: say what?
+-----
+BODY:
+Feed back and suggestions can go here: <a href="http://schwehr.blogspot.com/2010/11/fortran-2008-demo-template-file.html">Fortran 2008 demo / template file?</a>
+
+I gave a quick try at picking up Fortran 2008 this week to try to be
+able to explain the basics to science students who want to pick up
+some basic programming.  My original arguments against Fortran were
+based on FORTRAN 77, which is a pretty brain dead language.  Things
+like COMMON BLOCKS, the WRITE statement, lack of pointers, and the
+massive reliance on line and file numbers make the language a bad
+choice, in my mind, for a first or primary language.  Writing clean
+and maintainable Fortran 77 is very doable, but is just plain hard.
+
+A common argument for Fortran against this was that, for scientific
+programming, Fortran is the fastest language on the planet according
+to some.  This might be true in some special circumstances for super
+computers, but in most cases, the ability of C or C++ to build
+efficient data structures allows for much faster programs than the
+equivalent Fortran.  For most coding projects, the time to write the
+program is the largest cost and I suggest python as an excellent
+balance between speed of coding and speed that the code runs.  Plus,
+with python, it is easy to replace sections with C or C++ code that is
+optimized to run fast.
+
+Fortran 90, 95, 2003, and 2008 have added many features to the
+language that attempt to alleviate these concerns.  In fact, reading
+modern Fortran 2008, it only vaguely resembles old school Fortran 77.
+There are now functions, modules, pointers, IEEE floating point (can't
+believe that was missing), commenting with the bang ("!"), etc.  There
+is even access to C functions and the command line arguments in the
+language.  No longer is it a hack to be able to link C and Fortran
+code together.
+
+I figured I'd give a look at a modern Fortran compiler available to the
+common person for free.  gfortran is available as a part of the GNU
+Compiler Collection (GCC).  I've never written modern Fortran, so I
+tried googling for a good Fortran 2008 tutorial or something to get me
+started.  Pretty much everything I found was fatally flawed for one
+reason or another.  I really wanted to have just a basic program that
+works with command line arguments, uses a function or two, and gives
+me a sense of what the language is about.  I don't need to dig into
+pointers, modules, and lots of other features.  This took me a lot
+longer than I expected and I don't have a feeling if this is good or
+bad code.  Also note that gfortran does not yet support all of the
+features in Fortran 2003 and 2008.  Work is still on going.
+
+My first issue was figuring out how to call gfortran.  There wasn't
+obvious documentation as to how the files should be named.  I tried
+".f" and was soundly rebuffed by the compiler thinking I was passing
+Fortran 77 files.  After a little digging, I went looking in the GCC
+testsuite to see what were accepted extensions.
+<pre><b>wget ftp://ftp.gnu.org/gnu/gcc/gcc-4.5.1/gcc-testsuite-4.5.1.tar.bz2
+cd gcc-4.5.1/gcc/testsuite/gfortran.dg
+ls *.f* | cut -d. -f 2 | sort -u</b>
+f
+f03
+f08
+f90
+f95</pre>
+That helped.  Once I realized that I should be calling my files foo.f08, the
+compiler was a lot happier.
+
+Next I wanted to figure out what command line options I should be
+giving to make sure I was generating reasonable code.  As with gcc for
+C, C++ and ObjC code, I definitely want <i>-g</i> for debugging, <i>-Wall</i> for
+all standard warnings, and <i>-pedantic</i> to be more aggressive.  The manual says
+that pedantic is not really that helpful, but might as well add it.
+
+There are a couple extra options that I think should be included.
+First, <i>-Wsurprising</i> warns on code that is legal, but people have found
+is usually associated with bugs in code.  Then <i>-fbounds-check</i> adds a
+runtime check to make sure that array accesses don't go out of range.
+Finally, the most critical (in my opinion) is to have
+<b>-fimplicit-none</b>.  Old style Fortran relied on a convention that
+variables are integers if they start with the letters i-n (as in
+INtegers; any variable starting with i, j, k, l, m, or n) and that all other variables are reals (that means double).
+With statically typed languages, I think it is super important to
+declare all of your variables.  Fortran 2008 has a language construct,
+"implicit none," that goes in your code, but I like have the compiler
+option that doesn't let you forget.  
+
+Here is what I finally came up with for a good compilation line that
+gives me confidence that I'm getting the compiler to try pretty hard
+to keep me from being stupid.  I also threw in a (probably redundant)
+<i>-std=f2008</i> to make sure the compiler is checking against the latest
+definition of the language.
+<pre><b>gfortran -std=f2008 -g -Wsurprising -Wall -pedantic -fbounds-check  -fimplicit-none -o demo demo.f08</b></pre>
+Is there a Fortran 2008 lint program to evaluate code? (e.g. like
+pylint that compares my python code to a guide to good python).
+
+I attempted to write a good example program, but I have definitely
+failed to create a good sample program in the time I had available.
+Here is what I came up with.  I encourage others to one up me, which
+shouldn't be too difficult.  And yes, my max_val function is pretty lame.
+<pre><tt><font color="#000000">01:</font> <i><font color="#9A1900">! -*- fortran -*- tell emacs that this is Fortran.</font></i>
+<font color="#000000">02:</font> 
+<font color="#000000">03:</font> <font color="#009900">integer</font> <b><font color="#0000FF">function</font></b> <b><font color="#000000">max_val</font></b><font color="#990000">(</font>a<font color="#990000">,</font>b<font color="#990000">)</font>
+<font color="#000000">04:</font>       <font color="#009900">integer</font> <font color="#990000">::</font> a<font color="#990000">,</font> b
+<font color="#000000">05:</font>       <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>a <font color="#990000">.</font>gt<font color="#990000">.</font> b<font color="#990000">)</font> <b><font color="#0000FF">then</font></b>
+<font color="#000000">06:</font>          max_val <font color="#990000">=</font> a
+<font color="#000000">07:</font>       <b><font color="#0000FF">else</font></b>
+<font color="#000000">08:</font>          max_val <font color="#990000">=</font> b
+<font color="#000000">09:</font>       <b><font color="#0000FF">end</font></b> <b><font color="#0000FF">if</font></b>
+<font color="#000000">10:</font> <b><font color="#0000FF">end</font></b> <b><font color="#0000FF">function</font></b> max_val   
+<font color="#000000">11:</font> 
+<font color="#000000">12:</font> <b><font color="#0000FF">program</font></b> printmess
+<font color="#000000">13:</font>       <i><font color="#9A1900">! This is the same as -fimplicit-none on the compile line</font></i>
+<font color="#000000">14:</font>       <b><font color="#0000FF">implicit</font></b> none
+<font color="#000000">15:</font> 
+<font color="#000000">16:</font>       <font color="#009900">integer</font> max_val <i><font color="#9A1900">! this seems like a bad way to specify a function return type</font></i>
+<font color="#000000">17:</font> 
+<font color="#000000">18:</font>       <font color="#009900">integer</font> <font color="#990000">::</font> a<font color="#990000">,</font> b <i><font color="#9A1900">! Declare two integers</font></i>
+<font color="#000000">19:</font>       <font color="#009900">real</font> <font color="#990000">::</font> c<font color="#990000">=</font><font color="#993399">1.2</font>   <i><font color="#9A1900">! All declarations of variables have to be at the top of blocks.  Bummer</font></i>
+<font color="#000000">20:</font>       <font color="#009900">real</font> <font color="#990000">::</font> theta1<font color="#990000">=</font><font color="#993399">0.1</font><font color="#990000">,</font> ctheta1<font color="#990000">=</font><font color="#993399">1.2</font><font color="#990000">,</font> stheta1<font color="#990000">=</font><font color="#993399">2.3</font><font color="#990000">,</font> ttheta1<font color="#990000">=</font><font color="#993399">2.4</font>
+<font color="#000000">21:</font>       <font color="#009900">character</font> <font color="#990000">(</font>len <font color="#990000">=</font> <font color="#993399">30</font><font color="#990000">)</font> <font color="#990000">::</font> <b><font color="#0000FF">fmt</font></b> <font color="#990000">=</font> <font color="#FF0000">"(f5.1, 2f7.6, f8.4)"</font>
+<font color="#000000">22:</font> 
+<font color="#000000">23:</font>       <b><font color="#0000FF">print</font></b> <font color="#990000">*,</font><font color="#FF0000">"Max: "</font><font color="#990000">,</font><b><font color="#000000">max_val</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">3</font><font color="#990000">)</font>
+<font color="#000000">24:</font> 
+<font color="#000000">25:</font>       a <font color="#990000">=</font> <font color="#993399">1</font>
+<font color="#000000">26:</font>       b <font color="#990000">=</font> a <font color="#990000">+</font> <font color="#993399">2</font>
+<font color="#000000">27:</font>       <b><font color="#0000FF">print</font></b> <font color="#990000">*,</font>a<font color="#990000">,</font>b
+<font color="#000000">28:</font> 
+<font color="#000000">29:</font>       <b><font color="#0000FF">print</font></b> <font color="#990000">*,</font><font color="#FF0000">"C ="</font><font color="#990000">,</font>c
+<font color="#000000">30:</font>       
+<font color="#000000">31:</font>       <b><font color="#0000FF">do</font></b> <b><font color="#0000FF">while</font></b> <font color="#990000">(</font> a <font color="#990000">&lt;</font> <font color="#993399">10</font> <font color="#990000">)</font>
+<font color="#000000">32:</font>          a <font color="#990000">=</font> a <font color="#990000">+</font> <font color="#993399">1</font>
+<font color="#000000">33:</font>          <b><font color="#0000FF">print</font></b> <font color="#990000">*,</font>a
+<font color="#000000">34:</font>       <b><font color="#0000FF">end</font></b> <b><font color="#0000FF">do</font></b>
+<font color="#000000">35:</font> 
+<font color="#000000">36:</font>       <i><font color="#9A1900">! Reals are no longer allowed in loops</font></i>
+<font color="#000000">37:</font>       <b><font color="#0000FF">do</font></b> a <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">10</font><font color="#990000">,</font> <font color="#993399">2</font>
+<font color="#000000">38:</font>          <b><font color="#0000FF">print</font></b> <font color="#990000">*,</font>a
+<font color="#000000">39:</font>       <b><font color="#0000FF">end</font></b> <b><font color="#0000FF">do</font></b>
+<font color="#000000">40:</font> 
+<font color="#000000">41:</font>       <i><font color="#9A1900">! todo: this format is broken</font></i>
+<font color="#000000">42:</font>       <b><font color="#0000FF">print</font></b> <font color="#FF0000">"(f2.3,1x,f1.3)"</font><font color="#990000">,</font> theta1<font color="#990000">,</font> ctheta1
+<font color="#000000">43:</font> 
+<font color="#000000">44:</font>       <i><font color="#9A1900">! todo: this format is broken</font></i>
+<font color="#000000">45:</font>       <b><font color="#0000FF">print</font></b> <b><font color="#0000FF">fmt</font></b><font color="#990000">,</font> theta1<font color="#990000">,</font> ctheta1<font color="#990000">,</font> stheta1<font color="#990000">,</font> ttheta1
+<font color="#000000">46:</font> 
+<font color="#000000">47:</font> <b><font color="#0000FF">end</font></b> <b><font color="#0000FF">program</font></b> printmess
+<font color="#000000">48:</font> </tt></pre>
+I ran into all sorts of problems, most of which I am not sure what they were and can't totally remember what happend.  Here are some key ones.
+
+First, gfortran and source-highlight are perfectly happy with .f08 as
+the file extension, but emacs doesn't know, so I have to force it into
+fortran-mode with line 1.  The unix file command has different take:
+<pre><b>file demo.f08</b> 
+demo.f08: ASCII Pascal program text</b></pre>
+I can live with that, but it's a bummer that there isn't something
+obvious that can uniquely identify fortran code.  The next big problem
+I ran into was trying to figure out how to properly define and use a
+function.  I never found a really good discussion of functions outside
+of modules and I didn't see a simple example in the GCC test suite, so
+I might be doing this wrong.  It seams really strange that when I
+define an integer function, I have to write "integer max_val" down in
+the program at line 16.  That is going to cause errors.  Also, I tried
+passing the fmt string to the max_val function and it happy took it
+and ran.  If this were python, I would be okay with that, but this is
+a statically typed langage and I've declared the arguments to the
+function as integers.  I might expect a float to get automatically
+converted to a integer, but not a string.  I should at least have seen
+a compiler warning.
+
+Then at lines 41-45, I had trouble making the format strings work in
+the way that I found in a number of tutorials on the web.  I've only
+used the <i>write</i> subroutine before, so maybe I am
+misunderstanding print.  I really wish that fortran (and C++) came
+with man pages to properly document the standard library (e.g. man 3
+printf for C).
+
+I also didn't find any examples of the command line interface that is
+now in Fortran 2008.  This would be a huge step up from all the
+horrible Fortran command line programs that require you to type in
+data by using the <i>read</i> subroutine or use control files where
+you have to magically know the exact structure of all the entries.
+
+My conclusion based on this short experience is that Fortran 2008 is
+radically improved from Fortran 77, but lack of good internet
+accessible documentation, no man pages with the compilers, the poor
+quality of examples currently out there, and some of the strange
+structuring of the language still make it a poor choice for a first
+language to use.  Using old working Fortran 77 is still a great thing,
+but think twice before writing your next program in any Fortran
+variant.
+
+Hopefully, Fortran 2008 will reduce the percentage of code out there
+that has gotos and relies on line numbers.  And good riddance to the
+not so useful comment column and required minimum indenting of Fortran
+77 and older.
+-----

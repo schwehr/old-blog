@@ -1,0 +1,408 @@
+TITLE: New IMO circulars on AIS Binary Messages
+AUTHOR: Kurt
+DATE: 07.01.2010 11:10
+DESC: finally!
+-----
+BODY:
+It's been a long road, but I am very excited to see that the work on
+AIS binary messages for right whale notices (zones) and a new water
+level report has made it to published IMO Circulars.  You will see
+a few figures in the document that first appeared here on my blog  :)
+
+The two new circulars:
+<ul>
+<li><a href="http://vislab-ccom.unh.edu/~schwehr/papers/2010-IMO-SN.1-Circ.289.pdf">Circ 289</a> - Guidance on the Use of AIS Application-Specific Messages</li>
+<li><a href="http://vislab-ccom.unh.edu/~schwehr/papers/2010-IMO-SN.1-Circ.290.pdf">Circ 290</a> - Guidance for the Presentation and Display of AIS Application-Specific Messages Information</li>
+</ul>
+First, the whales message is a part of the new zone/area notice.  I started working on the whale notice in the fall of 2006.  In fact, here is my oldest draft of the message.  I was able to define the message back then with my XML language for AIS messages (which I can't do with the complexity of the new message).
+
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>AIS message number.  Must be 8</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Indicated how many times a message has been repeated<br><b>0</b>: default<br><b>3</b>: do not repeat any more</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Unique ship identification number (MMSI)</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved for definition by a regional authority.</td>
+</tr>
+<tr>
+<td>dac</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Designated Area Code - 366 for the United States</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Functional IDentifier - 63 for the Whale Notice</td>
+</tr>
+<tr>
+<td>day</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time of most recent whale detection.  UTC day of the month 1..31</td>
+</tr>
+<tr>
+<td>hour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time of most recent whale detection.  UTC hours 0..23</td>
+</tr>
+<tr>
+<td>min</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time of most recent whale detection.  UTC minutes</td>
+</tr>
+<tr>
+<td>stationid</td>
+<td>8</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Identifier of the station that recorded the whale.  Usually a number.</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>28</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Center of the detection zone.  East West location</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>27</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Center of the detection zone.  North South location</td>
+</tr>
+<tr>
+<td>timetoexpire</td>
+<td>16</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>Minutes from the detection time until the notice expires</td>
+</tr>
+<tr>
+<td>radius</td>
+<td>16</td>
+<td></td>
+<td>uint</td>
+<td>m</td>
+<td>Distance from center of detection zone (lat/lon above)</td>
+</tr>
+</table>
+
+The new zone messages (Circ 289, Section 11, page 28) are termed "Area
+notice"and are quite a bit more flexible.  The AppId for the message
+is a DAC or 001 and an FI of 22.  Greg and I spent a lot of time
+trying to technically handle all of the additional feature requests.
+The whale notices for the Boston area will still use the 0 and 1
+values of the zones that I've had all along, but the terms are now
+more general to not just include whales.
+
+<img title="Zone types" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/circ289-zones.png"/>
+
+I have reference software and sample messages available for the zone
+message as it was last summer.  These might be slightly out of date.
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/">ais-areanotice-py</a>
+
+Thanks go to Lee for making sure that the two key examples that we have from the Boston right whale notices made it into the standard document.
+
+<img title="Area examples" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/circ290-zone-examples.png"/>
+
+The next message that I want to mention is the new Environmental
+message that can do a lot more than the original met/hydro message and
+is super flexible (perhaps to a fault).  I haven't really figured out
+how I am going to represent this message in terms of a C++ data
+structure and SQL table(s).
+
+Here is my original water level message.  We presented this working
+with Pydro in the Spring of 2007 for the Elizabeth River, VA using actual
+realtime NOAA COOPS water level data.
+
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>AIS message number.  Must be 8</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Indicated how many times a message has been repeated<br><b>0</b>: default<br><b>3</b>: do not repeat any more</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Unique ship identification number (MMSI)</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved for definition by a regional authority.</td>
+</tr>
+<tr>
+<td>dac</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Designated Area Code</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Functional Identifier</td>
+</tr>
+<tr>
+<td>efid</td>
+<td>12</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>extended functional identifier</td>
+</tr>
+<tr>
+<td>month</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time the measurement represents  month 1..12</td>
+</tr>
+<tr>
+<td>day</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time the measurement represents  day of the month 1..31</td>
+</tr>
+<tr>
+<td>hour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time the measurement represents  UTC hours 0..23</td>
+</tr>
+<tr>
+<td>min</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time the measurement represents  minutes</td>
+</tr>
+<tr>
+<td>sec</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time the measurement represents  seconds</td>
+</tr>
+<tr>
+<td>stationid</td>
+<td>6</td>
+<td>7</td>
+<td>aisstr6</td>
+<td></td>
+<td>Character identifier of the station.  Usually a number.</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>28</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of the sensor taking the water level measurement or position of prediction.  East West location</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>27</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of the sensor taking the water level measurement or position of prediction.  North South location</td>
+</tr>
+<tr>
+<td>waterlevel</td>
+<td>16</td>
+<td></td>
+<td>int</td>
+<td>cm</td>
+<td>Water level in centimeters</td>
+</tr>
+<tr>
+<td>datum</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>What reference datum applies to the value<br><b>0</b>: MLLW<br><b>1</b>: IGLD-85<br><b>2</b>: WaterDepth<br><b>3</b>: STND<br><b>4</b>: MHW<br><b>5</b>: MSL<br><b>6</b>: NGVD<br><b>7</b>: NAVD<br><b>8</b>: WGS-84<br><b>9</b>: LAT</td>
+</tr>
+<tr>
+<td>sigma</td>
+<td>32</td>
+<td></td>
+<td>float</td>
+<td>m</td>
+<td>Standard deviation of 1 second samples used to compute the water level height</td>
+</tr>
+<tr>
+<td>o</td>
+<td>8</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Count of number of samples that fall outside a 3-sigma band about the mean</td>
+</tr>
+<tr>
+<td>levelinferred</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td></td>
+<td>indicates that the water level value has been inferred</td>
+</tr>
+<tr>
+<td>flat_tolerance_exceeded</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td></td>
+<td>flat tolerance limit was exceeded.  Need better descr</td>
+</tr>
+<tr>
+<td>rate_tolerance_exceeded</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td></td>
+<td>rate of change tolerance limit was exceeded</td>
+</tr>
+<tr>
+<td>temp_tolerance_exceeded</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td></td>
+<td>temperature difference tolerance limit was exceeded</td>
+</tr>
+<tr>
+<td>expected_height_exceeded</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td></td>
+<td>either the maximum or minimum expected water level height limit was exceeded</td>
+</tr>
+<tr>
+<td>link_down</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td></td>
+<td>Unable to communicate with the tide system.  All data invalid</td>
+</tr>
+<tr>
+<td>timeLastMeasured</td>
+<td>12</td>
+<td></td>
+<td>udecimal</td>
+<td>hours</td>
+<td>Time relative since the timetag that the station actually measured a value.</td>
+</tr>
+</table>
+
+The new message (DAC 001, FI 26) doesn't have all the quality control
+flags and values that I would like, but it is definitely an
+improvement over the Circ 236 water level.  The new message has a
+water level report payload (type 3).  The new message contains water
+level type (which I wish were blended into the vertical datums field),
+a 10 cm resolution water depth, trend (increasing/decreasing),
+vertical datum (e.g. MLLW, NAVD-88, WGS-84, etc), sensor type (odd
+name - represents raw realtime, realtime with QC, predicted, forecast,
+nowcast),
+
+These are definitely not perfect, but this is moving in the right
+direction.  There are some seriously strange conventions that have
+crept into the standard.  For example, if there is no water level data, why would we want to send a water level payload inside an Environmental message and set the type of data to "0 no data" and possibly waste a slot? 
+
+Also, these documents do not talk about the new AIS binary message
+types that have communications state and play better with the VDL (VHF
+data link channels) to avoid reserved slots to prevent packet
+collision.
+-----

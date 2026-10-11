@@ -1,0 +1,78 @@
+TITLE: Transfering X11 Applications menu for the mac
+AUTHOR: Kurt
+DATE: 02.01.2009 19:29
+DESC: 
+-----
+BODY:
+This is a quick tutorial on how to copy the X11 Applications menu from
+one mac to another.  I'm using Xquartz 2.3.1, your milage may vary
+with other X11's on the mac.
+
+First, make a backup of your original plist on the target machine, just in case:
+<pre>% <b>cp ~/Library/Preferences/org.x.X11.plist ~/Desktop/</b></pre>
+Now, go to the machine with the Applications menu setup the way you want it to be and run this command:
+<pre>% <b>defaults read org.x.x11 apps_menu &gt; apps_menu.txt</b></pre>
+The apps_menu.txt file should look something like this:
+<pre>(
+        (
+        Terminal,
+        "xterm -sl 1000 -sb -s -j -bg black -fg white",
+        n
+    ),
+        (
+        xlogo,
+        xlogo,
+        ""
+    )
+)</pre>
+The contents should make sense with what you setup.  Copy apps_menu.txt to the 
+target machine and run this:
+<pre>% <b>defaults write org.x.x11 apps_menu '(
+           (
+           Terminal,
+           "xterm -sl 1000 -sb -s -j -bg black -fg white",
+           n
+       ),
+           (
+           xlogo,
+           xlogo,
+           ""
+       )
+)'</b></pre>
+Take a look at the results.  This should come up in the plist editor.
+<pre>% <b>open ~/Library/Preferences/org.x.X11.plist</b></pre>
+<img title="Plist editor" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-02/plist-editor-org.x.x11.png"/>
+
+I'm trying to streamline the answer:
+
+<a href="http://forums.macosxhints.com/showthread.php?p=516784">defaults write with complex input</a> [macosxhints forum]
+
+<b>Update 03-Feb-2009: <font color="red">WARNING:</font> Everything
+below is likely to erase your apps_menu items.  It will likely make
+the plist key a string rather than an array.</b> I've sent in a
+feedback request to apple for stdin reading of text to allow cat to
+just work for <i>defaults write</i>.  Until then, biovizier on
+macosxhints forums, this appears to work for me.  I've not run
+commands like that in bash in my memory.
+<pre>% <b>defaults write org.x.X11 apps_menu "$(cat apps_menu.txt)"</b></pre>
+Older ideas...
+
+So Far, I have this.  However, I makes the apps_menu.txt very hard to read.
+<pre>% <b>perl -pi -e "s|^\(|\'(|g" apps_menu.txt</b>
+% <b>perl -pi -e "s|^\)$|\)'|g" apps_menu.txt</b>
+% <b>perl -pi -e 's|\n||g' apps_menu.txt</b>
+% <b>perl -pi -e 's| ||g' apps_menu.txt</b>
+% <b>defaults write org.x.x11 apps_menu `cat apps_menu.txt`</b></pre>
+Where apps_menu.txt looks like this after all the perl statements:
+<pre>'((Terminal,"xterm -sl 1000 -sb -s -j -bg black -fg white",n),(xlogo,xlogo,""))'</pre>
+If there were a lot of items and you wanted to customize the settings a bit, 
+it would be difficult in this form.
+
+Suggestions?
+
+Alex (ACD) suggested xargs.  That got me to this which works:
+
+<pre>% <b>cat apps_menu.txt | perl -pe "s|^\(|\'(|g" | perl -pe "s|^\)$|\)'|g" | xargs -0 defaults write org.x.x11 apps_menu</b></pre>
+The xargs <i>-O</i> flag tells xargs that newlines and spaces are not separators between args... only the \0 (end of string) character.  This causes xargs
+to treat the whole apps_menu.txt as one argument.
+-----

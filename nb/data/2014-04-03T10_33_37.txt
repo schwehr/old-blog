@@ -1,0 +1,24 @@
+TITLE: Disabling autologin on a mac from the command line
+AUTHOR: Kurt
+DATE: 04.03.2014 10:33
+DESC: more better
+-----
+BODY:
+Just did this remotely on a mac.  I had historically left autologin
+running.  This was blocking some system admin tasks.  Here is what I
+did to kick myself out from the commandline on an ancient install of
+Mac OSX 10.6.  10.9 likely has things the same.
+
+<a href="http://www.cnet.com/news/how-to-disable-automatic-log-in-via-the-command-line-in-os-x/">how-to-disable-automatic-log-in-via-the-command-line-in-os-x/</a> and <a href="http://superuser.com/questions/40061/what-is-the-mac-os-x-terminal-command-to-log-out-the-current-user">what-is-the-mac-os-x-terminal-command-to-log-out-the-current-user
+</a>
+<pre><b>ssh myhost
+ps -aux | grep $USER | wc -l</b>
+24
+<b>defaults read  /Library/Preferences/com.apple.loginwindow autoLoginUser</b>
+schwehr
+<b>sudo defaults delete /Library/Preferences/com.apple.loginwindow autoLoginUser
+sudo osascript -e 'tell application "System Events" to log out'
+ps -Ajc | grep loginwindow | awk '{print $2}' | sudo xargs kill
+ps aux | grep $USER | wc -l</b>
+4</pre>
+-----

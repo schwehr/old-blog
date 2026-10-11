@@ -1,0 +1,68 @@
+TITLE: regex for tide data
+AUTHOR: Kurt
+DATE: 06.10.2009 23:46
+DESC: trouble
+-----
+BODY:
+I spent some time with tide data today that came from two separate
+sensors spliced together into one serial stream.  I again used regular
+expressions to pull them apart.  Here are two reports together: water
+level and a Seabird conductivity/temp sensor.
+<pre>Date/Time:  9.06.09 15:04:08
+00 Battery Voltage        10.2  Volt 
+01 Reference              76    77   
+02 Water level             2.46 m    
+03 Water temperature       7.84 Deg.C
+04 Pressure               11.74 kPa  
+# 12.5633, 3.60414, 09 Jun 2009, 15:10:47</pre>
+Here is parsing them in python:
+<pre><tt><b><font color="#000080">import</font></b> re
+<!-- -->
+aanderraa_date_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''Date/Time:\s+(?P&lt;datetime&gt;\d{1,2}.\d{1,2}.\d{1,2}\s+\d{1,2}:\d{1,2}:\d{1,2})'''</font>
+aanderraa_battery_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''(?P&lt;entry_num&gt;\d\d)\s+Battery\s+Voltage\s+(?P&lt;voltage&gt;\d+(\.\d*)?)\s+(?P&lt;units&gt;Volt)'''</font>
+aanderraa_reference_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''(?P&lt;entry_num&gt;\d\d)\s+Reference\s+(?P&lt;r1&gt;\d+)\s+(?P&lt;r2&gt;\d+)'''</font>
+aanderraa_waterlevel_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''(?P&lt;entry_num&gt;\d\d)\s+Water\s+level\s+(?P&lt;water_level&gt;\d*(\.\d*))\s+(?P&lt;units&gt;[a-z]+)'''</font>
+aanderraa_watertemp_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''(?P&lt;entry_num&gt;\d\d)\s+Water\s+temperature\s+(?P&lt;water_temp&gt;\d*(\.\d*))\s+(?P&lt;units&gt;[.A-Za-z]+)'''</font>
+aanderraa_waterpressure_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''(?P&lt;entry_num&gt;\d\d)\s+Pressure\s+(?P&lt;water_pressure&gt;\d*(\.\d*))\s+(?P&lt;units&gt;[.A-Za-z]+)'''</font>
+seabird_ct_date_strptime <font color="#990000">=</font> <font color="#FF0000">'%d %b %Y, %H:%M:%S'</font>
+seabird_ct_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''\#\s+</font>
+<font color="#FF0000">(?P&lt;temp_c&gt;\d+(\.\d*)?),\s+</font>
+<font color="#FF0000">(?P&lt;conducitivity_sm&gt;\d+(\.\d*)?),\s+</font>
+<font color="#FF0000">(?P&lt;datetime&gt;\d{1,2}\s+\w+\s+\d{2,4},\s+ \d{1,2}:\d{1,2}:\d{1,2})'''</font>
+<!-- -->
+regex_dict <font color="#990000">=</font> <font color="#990000">{</font>
+    <font color="#FF0000">'aand_date'</font><font color="#990000">:</font>re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>aanderraa_date_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">),</font>
+    <font color="#FF0000">'aand_bat'</font><font color="#990000">:</font>re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>aanderraa_battery_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">),</font>
+    <font color="#FF0000">'aand_ref'</font><font color="#990000">:</font>re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>aanderraa_reference_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">),</font>
+    <font color="#FF0000">'aand_lvl'</font><font color="#990000">:</font>re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>aanderraa_waterlevel_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">),</font>
+    <font color="#FF0000">'aand_tmp'</font><font color="#990000">:</font>re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>aanderraa_watertemp_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">),</font>
+    <font color="#FF0000">'aand_prs'</font><font color="#990000">:</font>re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>aanderraa_waterpressure_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">),</font>
+    <font color="#FF0000">'seabird_ct'</font><font color="#990000">:</font>re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>seabird_ct_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">),</font>
+<font color="#990000">}</font>
+<!-- -->
+matches <font color="#990000">=</font> <font color="#990000">[]</font>
+<b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> regex_dict<font color="#990000">:</font>
+    match <font color="#990000">=</font> regex_dict<font color="#990000">[</font>key<font color="#990000">].</font><b><font color="#000000">search</font></b><font color="#990000">(</font>line<font color="#990000">)</font>
+    <b><font color="#0000FF">if</font></b> match <b><font color="#0000FF">is</font></b> <b><font color="#0000FF">not</font></b> None<font color="#990000">:</font>
+        <b><font color="#0000FF">break</font></b>
+    <b><font color="#0000FF">if</font></b> match <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font>
+        <b><font color="#0000FF">continue</font></b>
+    match <font color="#990000">=</font> match<font color="#990000">.</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font>
+    matches<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">((</font>key<font color="#990000">,</font>match<font color="#990000">))</font>
+</tt></pre>
+I wish all sensor systems like this that have a component at the
+surface would include a GPS or CDMA chip and the option to get time
+from it.  You can see here that the sensors differ by more than 6
+minutes in their sense of time.
+
+Trey offers up a better way to do this if you only need to pass over
+the data once:
+<pre><tt><i><font color="#9A1900"># ifilter is lazy -- returns iterator</font></i>
+regexesMatchingLine <font color="#990000">=</font> itertools<font color="#990000">.</font><b><font color="#000000">ifilter</font></b><font color="#990000">(</font><b><font color="#0000FF">lambda</font></b> key<font color="#990000">,</font> regex<font color="#990000">:</font> regex<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>line<font color="#990000">),</font>
+                                        regex_dict<font color="#990000">.</font><b><font color="#000000">iteritems</font></b><font color="#990000">())</font>
+<!-- -->
+<i><font color="#9A1900"># next() gets first match, raises StopIteration if none.</font></i>
+key<font color="#990000">,</font> regex <font color="#990000">=</font> regexesMatchingLine<font color="#990000">.</font><b><font color="#000000">next</font></b><font color="#990000">()</font>
+matchDict <font color="#990000">=</font> regex<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>line<font color="#990000">).</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font>
+</tt></pre>
+-----

@@ -1,0 +1,168 @@
+TITLE: matlab publish command
+AUTHOR: Kurt
+DATE: 03.26.2011 12:15
+DESC: matlab good, but could be much better
+-----
+BODY:
+Matlab has a feature much like <a
+href="http://www.gnu.org/software/emacs/">emacs</a> <a
+href="http://orgmode.org/">org-mode</a> and <a href="http://orgmode.org/worg/org-contrib/babel/">org-babel</a> that lets
+you create a nice document from your matlab script.  However, it has
+some serious flaws the way it is implemented right now.  Tables have
+to be specified only in html or latex so that tables don't show up in
+all reports and you can't reference variables in the workspace in the
+text and have the values dropped into the text.  First here is a document
+I created that shows off most of the markup features in the current
+implementation.  By using "<b>%%</b>" to mark sections, this also lets
+you execute sections of code as you work on them (Command-Enter on the
+Mac). 
+
+This is a great way to aim for <a
+href="http://www.reproducibleresearch.net/">Reproducable Research</a>
+where your end document and your code live together, which is not really
+that different from Knuth's <a
+href="http://en.wikipedia.org/wiki/Literate_programming">Literate
+Programming</a>.  Matlab done this way would be flagged as [<b>CR</b>]
+(having Conditional Reproducibility)
+by <a
+href="http://sepwww.stanford.edu/data/media/public/sep/jon/repropreface.html">Claerbout's tagging
+rr scheme</a>.  For Students: If you are turning in homework that is not
+reproducable, you might be loosing points or have a hard time arguing
+a regrade. 
+
+This publish language is basically a <a
+href="http://en.wikipedia.org/wiki/Category:Lightweight_markup_languages">lightwight
+markup language</a>.
+
+This is just a template of things to try.  I will not attempt to
+document what they do here beyond giving a link to a pdf and html
+version of the publish.  Note: Word Doc exporting does not work on
+non-Windows computers.
+
+<a href="http://schwehr.org/blog/attachments/2011-03/myscript.html">myscript.html</a><br/>
+<a href="http://schwehr.org/blog/attachments/2011-03/myscript.pdf">myscript.pdf</a>
+<pre><tt><b><font color="#000080">%%</font></b> DOCUMENT TITLE
+<font color="#990000">%</font> INTRODUCTORY TEXT
+<b><font color="#000080">%%</font></b>
+<!-- -->
+<font color="#990000">%%</font> SECTION TITLE
+<font color="#990000">%</font> DESCRIPTIVE TEXT
+<!-- -->
+<font color="#990000">%</font> create a report <font color="#008080">like</font> <b><font color="#0000FF">this</font></b><font color="#990000">:</font>
+<font color="#990000">%</font> <b><font color="#000000">publish</font></b><font color="#990000">(</font><font color="#FF0000">'myscript.m'</font><font color="#990000">,</font> <font color="#FF0000">'html'</font><font color="#990000">)</font>
+<!-- -->
+<font color="#990000">%%</font>
+<font color="#990000">%</font> <font color="#990000">*</font><font color="#008080">BOLD</font> TEXT<font color="#990000">*</font> 
+<!-- -->
+<font color="#990000">%%</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font>  PREFORMATTED
+<font color="#990000">%</font>  TEXT
+<font color="#990000">%</font> 
+<font color="#990000">%</font> That was with two spaces after <font color="#008080">the</font> <b><font color="#000000">percent</font></b> <font color="#990000">(%)</font>
+<!-- -->
+<font color="#990000">%%</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font> <font color="#008080">An</font> image<font color="#990000">:</font>
+<font color="#990000">%</font>
+<font color="#990000">%</font> <font color="#990000">&lt;&lt;</font>FILENAME<font color="#990000">.</font>PNG<font color="#990000">&gt;&gt;</font>
+<font color="#990000">%</font> 
+<!-- -->
+<font color="#990000">%%</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font> <font color="#990000">*</font> ITEM1
+<font color="#990000">%</font> <font color="#990000">*</font> ITEM2
+<font color="#990000">%</font> 
+<!-- -->
+<font color="#990000">%%</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font> # ITEM1
+<font color="#990000">%</font> 
+<font color="#990000">%</font> <font color="#990000">&lt;</font>html<font color="#990000">&gt;</font>
+<font color="#990000">%</font> <font color="#990000">&lt;</font><font color="#008080">table</font> border<font color="#990000">=</font><font color="#993399">1</font><font color="#990000">&gt;&lt;</font>tr<font color="#990000">&gt;&lt;</font>td<font color="#990000">&gt;</font>one<font color="#990000">&lt;/</font>td<font color="#990000">&gt;&lt;</font>td<font color="#990000">&gt;</font>two<font color="#990000">&lt;/</font>td<font color="#990000">&gt;&lt;/</font>tr<font color="#990000">&gt;&lt;/</font>table<font color="#990000">&gt;</font>
+<font color="#990000">%</font> <font color="#990000">&lt;/</font>html<font color="#990000">&gt;</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font> # ITEM2
+<font color="#990000">%</font> 
+<!-- -->
+<font color="#990000">%%</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font> Latex table
+<font color="#990000">%</font>
+<font color="#990000">%</font> <font color="#990000">&lt;</font>latex<font color="#990000">&gt;</font>
+<font color="#990000">%</font> <font color="#990000">\</font>begin<font color="#FF0000">{</font>tabular<font color="#FF0000">}{</font><font color="#990000">|</font>c<font color="#990000">|</font>c<font color="#990000">|</font><font color="#FF0000">}</font> <font color="#990000">\</font>hline
+<font color="#990000">%</font> $n$ <font color="#990000">&amp;</font> $n<font color="#990000">!</font>$ <font color="#990000">\\</font> <font color="#990000">\</font>hline
+<font color="#990000">%</font> <font color="#993399">1</font> <font color="#990000">&amp;</font> <font color="#993399">1</font> <font color="#990000">\\</font>
+<font color="#990000">%</font> <font color="#993399">2</font> <font color="#990000">&amp;</font> <font color="#993399">2</font> <font color="#990000">\\</font>
+<font color="#990000">%</font> <font color="#993399">3</font> <font color="#990000">&amp;</font> <font color="#993399">6</font> <font color="#990000">\\</font> <font color="#990000">\</font>hline
+<font color="#990000">%</font> <font color="#990000">\</font>end<font color="#FF0000">{</font>tabular<font color="#FF0000">}</font>
+<font color="#990000">%</font> <font color="#990000">&lt;/</font>latex<font color="#990000">&gt;</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font> End of latex table
+<!-- -->
+<font color="#990000">%%</font>
+<font color="#990000">%</font> 
+<font color="#990000">%</font> $$e<font color="#990000">^</font><font color="#FF0000">{</font><font color="#990000">\</font><font color="#008080">pi</font> i<font color="#FF0000">}</font> <font color="#990000">+</font> <font color="#993399">1</font> <font color="#990000">=</font> <font color="#993399">0</font>$$
+<font color="#990000">%</font> 
+<!-- -->
+<font color="#990000">%</font> snapnow<font color="#990000">;</font>
+<!-- -->
+<font color="#990000">%%</font> Trying stuff on my own
+<font color="#990000">%</font> <font color="#990000">*</font><font color="#008080">In</font> star<font color="#990000">*</font> and _<font color="#008080">under</font> <font color="#008080">bars_</font> and <font color="#990000">|</font><font color="#008080">vertical</font> bars<font color="#990000">|</font>
+<!-- -->
+<font color="#990000">%%</font> display <b><font color="#0000FF">for</font></b> output
+<font color="#990000">%</font> 
+<font color="#990000">%</font> Perhaps what I really want is a notebook that lets me include output from
+<font color="#990000">%</font> <font color="#008080">matlab</font> commands<font color="#990000">.</font>  But notebook is only available on windows
+<!-- -->
+<font color="#990000">%</font> If you put a <font color="#008080">blank</font> line<font color="#990000">,</font> it goes back to doing regular matlab comments
+<!-- -->
+<font color="#990000">%</font> If I want to put text into the <font color="#008080">output</font> stream<font color="#990000">,</font> <font color="#008080">display</font> works<font color="#990000">,</font> but the
+<font color="#990000">%</font> display is in the resulting code
+<!-- -->
+<b><font color="#000000">display</font></b><font color="#990000">(</font><font color="#FF0000">'hello world'</font><font color="#990000">)</font>
+<b><font color="#000000">display</font></b><font color="#990000">(</font><font color="#FF0000">'hello world with ;'</font><font color="#990000">);</font>
+<!-- -->
+<font color="#990000">%%</font> <font color="#990000">&lt;</font>http<font color="#990000">:</font><i><font color="#9A1900">//www.mathworks.com/help/techdoc/ref/sprintf.html sprintf&gt; can help</font></i>
+<!-- -->
+val1 <font color="#990000">=</font> <font color="#993399">0.123456789</font><font color="#990000">;</font> <font color="#990000">%</font> <font color="#990000">;</font> suppresses putting the result value into the publish output
+val2 <font color="#990000">=</font> <font color="#993399">3.14</font> <font color="#990000">%</font> This will be in the publish
+<!-- -->
+<b><font color="#000000">display</font></b><font color="#990000">(</font><b><font color="#000000">sprintf</font></b><font color="#990000">(</font><font color="#FF0000">'Values: %0.3f %d %d'</font><font color="#990000">,</font>val1<font color="#990000">,</font>val2<font color="#990000">,</font> <font color="#993399">3</font><font color="#990000">))</font>
+<!-- -->
+<b><font color="#000000">sprintf</font></b><font color="#990000">(</font><font color="#FF0000">'Values: %0.3f %d %d'</font><font color="#990000">,</font>val1<font color="#990000">,</font>val2<font color="#990000">,</font> <font color="#993399">3</font><font color="#990000">)</font>
+<!-- -->
+<font color="#990000">%%</font> References
+<font color="#990000">%</font>
+<font color="#990000">%</font> This has a table of markups at the very bottom of <font color="#008080">the</font> page<font color="#990000">.</font>  Put links in angle brackets
+<font color="#990000">%</font> <font color="#990000">&lt;</font>http<font color="#990000">:</font><i><font color="#9A1900">//www.mathworks.com/help/techdoc/matlab_env/f6-30186.html Marking Up MATLAB Comments for Publishing&gt;</font></i></tt></pre>
+I put in a request to the Mathworks to improve the markup to really
+allow this publish mode to really take off.  If you are a windows
+user, you can use the <b>notebook</b> functionality in Microsoft Word,
+but I really don't like that it takes you far away from your
+programming environment and without Mac and Linux support, I'm not
+going to use notebook.
+
+I created a little sample using the org-mode markup for the table and
+the python <a href="http://docs.python.org/library/stdtypes.html#string-formatting">string .format</a> (<a href="http://www.python.org/dev/peps/pep-3101/">PEP 3101</a>) template variable access showing what it
+might be like to have this markup.
+<pre><tt><b><font color="#990000">%%</font></b> Section 4 report
+<font color="#990000">%</font> The ray tracing for the layers can be summarized by the following
+<font color="#990000">%</font> table
+<font color="#990000">%</font>
+<font color="#990000">%</font> <font color="#990000">|</font> Layer <font color="#990000">|</font> Velocity <font color="#990000">(</font>km<font color="#990000">/</font>s<font color="#990000">)</font> <font color="#990000">|</font> Thickness <font color="#990000">(</font>m<font color="#990000">)</font> <font color="#990000">|</font> Angle <font color="#990000">(</font>deg<font color="#990000">)</font>   <font color="#990000">|</font> Dist in Layer <font color="#990000">|</font> Time in Layer <font color="#990000">(</font>s<font color="#990000">)</font> <font color="#990000">|</font>
+<font color="#990000">%</font> <font color="#990000">|-------+-----------------+---------------+---------------+---------------+-------------------|</font>
+<font color="#990000">%</font> <font color="#990000">|</font>     1 <font color="#990000">|</font> <font color="#009900">{v1}</font>            <font color="#990000">|</font> <font color="#009900">{d1}</font>          <font color="#990000">|</font> <font color="#009900">{angle_1_deg}</font> <font color="#990000">|</font> <font color="#009900">{s1}</font>          <font color="#990000">|</font> <font color="#009900">{t1}</font>              <font color="#990000">|</font>
+<font color="#990000">%</font> <font color="#990000">|</font>     2 <font color="#990000">|</font> <font color="#009900">{v2}</font>            <font color="#990000">|</font> <font color="#009900">{d2}</font>          <font color="#990000">|</font> <font color="#009900">{angle_2_deg}</font> <font color="#990000">|</font> <font color="#009900">{s2}</font>          <font color="#990000">|</font> <font color="#009900">{t2}</font>              <font color="#990000">|</font>
+<font color="#990000">%</font> <font color="#990000">|</font>     3 <font color="#990000">|</font> <font color="#009900">{v3}</font>            <font color="#990000">|</font> <font color="#009900">{d3}</font>          <font color="#990000">|</font> <font color="#009900">{angle_3_deg}</font> <font color="#990000">|</font> <font color="#009900">{s3}</font>          <font color="#990000">|</font> <font color="#009900">{t3}</font>              <font color="#990000">|</font>
+<font color="#990000">%</font>
+<font color="#990000">%</font> The ray will travel for <font color="#009900">{twtt}</font> seconds before returning to the
+<font color="#990000">%</font> surface at a distance of <font color="#009900">{x}</font> from the source<font color="#990000">.</font>
+<font color="#990000">%</font></tt></pre>
+There are many many <a
+href="http://en.wikipedia.org/wiki/Category:Markup_languages">Markup
+Languages</a> and <a
+href="http://en.wikipedia.org/wiki/Category:Template_engines">Template
+engines</a> out there, so hopefully Mathworks will look around and try
+to do some smart adoption.
+-----

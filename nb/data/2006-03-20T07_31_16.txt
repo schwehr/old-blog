@@ -1,0 +1,83 @@
+TITLE: python asserts
+AUTHOR: Kurt
+DATE: 03.20.2006 07:31
+DESC: how to make safer code
+-----
+BODY:
+I'm trying to build a flexible parser for AIS.  There are a number of
+issues with the AIS specification that make it hard to parse.  AIS is
+definitely NOT something that a normal grammar parser can handle
+(e.g. LALR and friends).  One example is the region section of the
+position messages which are 1, 2, and 3.  One of the fields is a
+region specific 4 byte value.  How is the parser to know what region
+it is in?  And then there is the "bit stuffing" mode that I have not
+gotten to yet where the message must have extra bits "stuffed" in
+there.  I have yet to figure out why this is, but I am suspecting that
+certain bit patterns will be misconstrued as the training dataset at
+the beginning of each AIS message.
+
+I've decided to go the route of a large setup of lookup tables that
+embed parse functions that know what to do with a chunk of bits.  This
+is going to get challenging when the fields have interdependencies,
+but I will just have to refactor at that point.
+
+To make my life safer, I am applying asserts to many of the functions
+to validate all the input and make python a bit more type safe.  I
+know, this is not very pythonic, but I like to catch errors early.  
+This is currently my function to build one table entry.
+<pre>
+<font color="#2040a0">fieldTypes</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="#008000">'int'</font><font color="4444FF">]</font>
+<font color="#2040a0">def</font> <font color="#2040a0">makeEntry</font><font color="4444FF">(</font><font color="#2040a0">offset</font>, <font color="#2040a0">fieldname</font>, <font color="#2040a0">numbits</font>, <font color="#2040a0">description</font><font color="4444FF">=</font><font color="#008000">'N/A'</font>, <font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'int'</font>, <font color="#2040a0">parseFunction</font><font color="4444FF">=</font><font color="#2040a0">parseInt</font>, <font color="#2040a0">units</font><font color="4444FF">=</font><font color="#008000">'N/A'</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Create the lookup table entry
+
+    offset - index of the first bit
+    fieldname - what is this field called.  e.g. FIX
+    numbits - number of bits for this field.  FIX: what if variable??  Scary.
+    type - dict, int, float??, string, ?? what else.  Standard types that are handled.
+        dict must have a parseFunction!
+    parseFunction - function that handles the contents of these bits
+    units - the units after being converted... e.g. degrees/minute
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">&lt;</font><font color="#FF0000">1000</font><font color="4444FF">)</font> <font color="#FF8800"># FIX: what is the max offset?</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">&gt;</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">)</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">numbits</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">)</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">numbits</font><font color="4444FF">&lt;</font><font color="#FF0000">1000</font><font color="4444FF">)</font> <font color="#FF8800"># FIX: what is the max message size?</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">fieldTypes</font>.<font color="#2040a0">__contains__</font><font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">)</font><font color="4444FF">)</font>  <font color="#FF8800"># Make sure this is allowed</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">parseFunction</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">None</font><font color="4444FF">)</font>
+    <strong>import</strong> <font color="#2040a0">types</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">isinstance</font><font color="4444FF">(</font><font color="#2040a0">parseInt</font>,<font color="#2040a0">types</font>.<font color="#2040a0">FunctionType</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#FF8800"># Build the entry now that the world is safe</font>
+    <font color="#2040a0">entry</font> <font color="4444FF">=</font> <font color="4444FF"><strong>{</strong></font><font color="#008000">'fieldname'</font><font color="4444FF">:</font><font color="#2040a0">fieldname</font>,
+	     <font color="#008000">'startOffset'</font><font color="4444FF">:</font> <font color="#2040a0">offset</font>,
+	     <font color="#008000">'endOffset'</font><font color="4444FF">:</font> <font color="#2040a0">offset</font><font color="4444FF">+</font><font color="#2040a0">numbits</font><font color="4444FF">-</font><font color="#FF0000">1</font>,
+	     <font color="#008000">'numbits'</font><font color="4444FF">:</font> <font color="#2040a0">numbits</font>,
+	     <font color="#008000">'description'</font><font color="4444FF">:</font><font color="#2040a0">description</font>,
+	     <font color="#008000">'type'</font><font color="4444FF">:</font> <font color="#2040a0">type</font>,
+	     <font color="#008000">'parseFunction'</font><font color="4444FF">:</font><font color="#2040a0">parseFunction</font><font color="4444FF"><strong>}</strong></font>
+    <strong>return</strong><font color="4444FF">(</font><font color="#2040a0">entry</font>,<font color="#2040a0">offset</font><font color="4444FF">+</font><font color="#2040a0">numbits</font><font color="4444FF">)</font>
+</pre>
+The first few asserts just check the range of the offset and numbits.
+These need to be constrained to the maximum sizes of AIS packets.
+For the 'type' value, this has to be something the code knows about.
+I want to be able to expose a list of known types to people using this
+library - the 'fieldTypes' variable.
+
+The trickiest bit is making sure parseFunction is an executable
+function.  I would rather fail when building the table than go a long
+time before some rare message hits a bad value for the parseFunction.
+
+And units... I have got to track these.  It is critical to know what
+units a value has.  There are too many running around in the marine
+world.  SI, CGS, and nautical.  What if someone assumed a depth was in
+fathoms and it really is feet?  That would be 'bad'.
+
+To build up a message dictionary, I do something like this:
+<pre>
+    msg={}
+    offset=0
+    name='MessageID'; entry,offset=makeEntry(offset,name,6); msg[name]=entry
+    name='RepeatIndicator'; entry,offset=makeEntry(offset,name,2); msg[name]=entry
+    name='UserID'; entry,offset=makeEntry(offset,name,30,'MMSI ship id'); msg[name]=entry
+    name='NavStatus'; entry,offset=makeEntry(offset,name,4); msg[name]=entry
+</pre>
+-----

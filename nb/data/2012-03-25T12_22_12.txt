@@ -1,0 +1,54 @@
+TITLE: Roland cranking on AIS
+AUTHOR: Kurt
+DATE: 03.25.2012 12:22
+DESC: aishub and nais
+-----
+BODY:
+Roland has been taking over some of the stuff that I did at CCOM with
+AIS and making some serious progress.  He setup the CCOM Newcastle, NH
+station as an AISHub node.  Roland created an OpenGL tool to display
+AIS receives as they come in.  Each realtime position report from a
+combination of NAIS and AISHub is shown as a bright spot that fades.
+You can make out the shape of the US and Europe in the twinkling of 
+ship position reports.  
+
+Make sure you set the quality to HD and make the video full screen.
+
+<iframe width="420" height="315" src="http://www.youtube.com/embed/fztYMYpJbVI" frameborder="0" allowfullscreen></iframe>
+
+Sadely, the NMEA feed from AISHub does not include the station
+information or the local receive time.  This is not a huge problem for
+just simple realtime displays, but precludes all kind of possible
+analysis including, but not limited to: detecting station outages, per
+station propagation analysis, some deduplication algorithms, knowing when 
+a position report was actually received for ships with bad timestamps, proper handling
+of multiline binary messages if they get interleaved, etc.
+<pre>!AIVDM,2,1,6,A,569&lt;knP1uK1L8HiF2208TpP4V3;K&gt;2222222221J18j764fDN&lt;m0CQim,0*0A
+!AIVDM,2,2,6,A,H88888888888880,2*52
+!AIVDM,1,1,,A,33aJHWPP00PBo?:MfUS3c?wn239C,0*4A
+!AIVDM,1,1,,B,11n9Tv0P008dDQ@F?MAVegwn08Rt,0*2F
+!AIVDM,1,1,,A,13aI8fwP00PIKAjMbIr00?wnR8S3,0*34
+!AIVDM,1,1,,A,1SPqcD?P06wRV5nQhmw=Cgwn2000,0*22
+!AIVDM,1,1,,B,13aEQ`@P00PDGKDMDNq00?wn20RQ,0*6F
+!AIVDM,1,1,,A,16:&gt;KsP000`W688DUTW3i8un06sd,0*06
+!AIVDM,1,1,,A,;03t?IQuhsosr`Rj?`&gt;p1ao00000,0*0B
+!AIVDM,1,1,,A,168sgUg000`ccc8EOT=eF4un2@Rc,0*18
+</pre>
+Roland followed my lead on the logging and is adding raishub as the
+station and the CCOM received timestamp (who knows the delay some
+messages might have).
+<pre>head 2012-03-24_aishub
+!AIVDM,2,1,6,A,569&lt;knP1uK1L8HiF2208TpP4V3;K&gt;2222222221J18j764fDN&lt;m0CQim,0*0A,raishub,1332547200
+!AIVDM,2,2,6,A,H88888888888880,2*52,raishub,1332547200
+!AIVDM,1,1,,A,33aJHWPP00PBo?:MfUS3c?wn239C,0*4A,raishub,1332547200
+!AIVDM,1,1,,B,11n9Tv0P008dDQ@F?MAVegwn08Rt,0*2F,raishub,1332547200
+!AIVDM,1,1,,A,13aI8fwP00PIKAjMbIr00?wnR8S3,0*34,raishub,1332547200
+!AIVDM,1,1,,A,1SPqcD?P06wRV5nQhmw=Cgwn2000,0*22,raishub,1332547200
+!AIVDM,1,1,,B,13aEQ`@P00PDGKDMDNq00?wn20RQ,0*6F,raishub,1332547200
+!AIVDM,1,1,,A,16:&gt;KsP000`W688DUTW3i8un06sd,0*06,raishub,1332547200
+!AIVDM,1,1,,A,;03t?IQuhsosr`Rj?`&gt;p1ao00000,0*0B,raishub,1332547200
+!AIVDM,1,1,,A,168sgUg000`ccc8EOT=eF4un2@Rc,0*18,raishub,1332547200</pre>
+<a href="http://aishub.net/source-statistics.html?source=2349">http://aishub.net/source-statistics.html?source=2349</a>
+
+<img width="600" height="301" title="AISHub station display for Newcastle, NH" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-03/0325-aishub-newcastle-nh.png"/>
+-----

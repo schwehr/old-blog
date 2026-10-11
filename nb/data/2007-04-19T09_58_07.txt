@@ -1,0 +1,35 @@
+TITLE: UnitTest++ simple example and fink info file
+AUTHOR: Kurt
+DATE: 04.19.2007 09:58
+DESC: testing made easy
+-----
+BODY:
+I finally got around to trying out <a href="http://unittest-cpp.sourceforge.net/">UnitTest++</a> with some of my code.  I
+am really in need of testing right now in some of my development.
+Somehow, I had the impression that using ut++ might be a bit
+complicated.  For simple tests, it is really easy!  Check this out...
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;UnitTest++.h&gt;</font></strong></font>
+<font color="#444444">// Some tests</font>
+<font color="#2040a0">TEST</font><font color="4444FF">(</font><font color="#2040a0">Boom</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">CHECK</font><font color="4444FF">(</font><strong>false</strong><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font> 
+<font color="#2040a0">TEST</font><font color="4444FF">(</font><font color="#2040a0">Yeah</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">CHECK</font><font color="4444FF">(</font><strong>true</strong><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<font color="#444444">// Make it all go from main</font>
+<strong>int</strong> <font color="#2040a0">main</font><font color="4444FF">(</font><strong>int</strong>, <strong>char</strong> <font color="4444FF">*</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>return</strong> <font color="#2040a0">UnitTest</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">RunAllTests</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Now compiling and running the tests.  One test should success and other fail.
+<pre>
+g++ try-ut.cxx -o try-ut -I/sw/include/UnitTest++ -L/sw/lib -lUnitTest++
+/try-ut
+try-ut.cxx:4: error: Failure in Boom: false
+FAILURE: 1 out of 2 tests failed (1 failures).
+Test time: 0.00 seconds.
+</pre>
+I have put together an info file for Mac OSX fink users:
+<a href="http://schwehr.org/blog/attachments/2007-04/unittest++.info">unittest++.info</a>
+-----

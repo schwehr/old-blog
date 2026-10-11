@@ -1,0 +1,33 @@
+TITLE: Streamlining segy sample reading - power of open source
+AUTHOR: Kurt
+DATE: 01.29.2009 16:36
+DESC: more better
+-----
+BODY:
+The day after I posted <a href="http://vislab-ccom.unh.edu/~schwehr/software/simplesegy/">simplesegy</a>, I got a patch from Vesa Hautsalo.
+The true power of open source.  Hi patch fix a bug with extended
+headers and suggested a speedup of reading samples with struct:
+<pre><tt><font color="#0000FF">199d198</font>
+<font color="#FF0066">&lt;                 samples = []</font>
+<font color="#0000FF">202,206c201,204</font>
+<font color="#FF0066">&lt;                 for i in range(self.trace_samples):</font>
+<font color="#FF0066">&lt;                     start = base+i*self.sample_size</font>
+<font color="#FF0066">&lt;                     end = start+self.sample_size</font>
+<font color="#FF0066">&lt;                     samples.append( struct.unpack(code,self.data[start:end])[0] )</font>
+<font color="#FF0066">&lt;                 self.samples = samples # Cache it</font>
+---
+<font color="#009900">&gt;                 end = base + self.trace_samples * self.sample_size</font>
+<font color="#009900">&gt;                 fmt = '&gt;%d%s' % (self.trace_samples, code[1:])</font>
+<font color="#009900">&gt;                 samples = list(struct.unpack(fmt, self.data[base:end]))</font>
+<font color="#009900">&gt;                 self.samples = samples</font>
+<font color="#0000FF">348c346</font>
+<font color="#FF0066">&lt;             self.extended_text_hdrs.append = decode_text(data[file_pos:file_pos+3200])</font>
+---
+<font color="#009900">&gt;             self.extended_text_hdrs.append(decode_text(data[file_pos:file_pos+3200]))</font>
+</tt></pre>
+I didn't know that you could pass a number of elements to a struct
+code to read that many elements.  That saves trace reading a lot of string passing.
+In the case of my test file, this replaces 22K loops on the python side with 1.
+<pre>% <b>opendiff simplesegy-0.3/simplesegy/segy.py segy.py</b></pre>
+<img title="Apple FileMerge/opendiff" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/segy-patch.png"/>
+-----

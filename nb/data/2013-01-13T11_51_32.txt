@@ -1,0 +1,92 @@
+TITLE: On what to learn or not learn
+AUTHOR: Kurt
+DATE: 01.13.2013 11:51
+DESC: advice
+-----
+BODY:
+I often see people make statements like they are really glad they are
+learning awk and sed.  Rather than throw unasked for advice directly at
+them, I'll give you, the reader of my blog, advice that you didn't ask for.
+Rambling opinions follow as I procrastinate another task.
+
+First, awk, sed, etc are super powerful and time tested tools.  But if
+you are not already an ace at them, I encourage you to not learn them
+or if you must, learn to read them.  But do not waste your time
+learning them.  Your time available to learn skills is limited, so
+spend it jealously.  You could be learning and using perl, or better
+yet, python.  Yes, sed and awk are the kings of one liners, but they
+are just not worth your time.  If you stumble into older code, you may
+have to learn them, but don't add to the global pool of code that uses
+them.  Open up an ipython shell or use the iPython Notebook mode.  You
+can to everything that is possible in in sed, awk etc in a more modern
+language and you will be increasing your skill in a much more capable
+skill.  I feel less that way about grep, but really, just get yourself
+kodos, turn on the verbose mode so you can have multiline regular
+expressions, and you will be setting yourself up for amazing text
+parsing power that really much useable than awk and sed.  If you use
+named fields and the groupdict() call, you can access fields by name.
+And if a regex is too much, python has all kinds of nice string
+searching and manipulation methods.
+
+The example that triggered this was trying to rename a directory full
+of files.  Normally, that's not worth much of a post, but this particular
+list of files was trouble.  It was foo.xyz_bar.xyz and 1.xyz_2.xyz.  How to
+get rid of that internal .xyz?
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+ <!-- -->
+<b><font color="#000080">import</font></b> glob
+<b><font color="#000080">import</font></b> os
+<!-- -->
+<b><font color="#0000FF">for</font></b> filename <b><font color="#0000FF">in</font></b> glob<font color="#990000">.</font><b><font color="#000000">glob</font></b><font color="#990000">(</font><font color="#FF0000">'*.xyz*.xyz'</font><font color="#990000">):</font>
+  <i><font color="#9A1900"># Replace the first occurance with an empty string</font></i>
+  newname <font color="#990000">=</font> filename<font color="#990000">.</font><b><font color="#000000">replace</font></b><font color="#990000">(</font><font color="#FF0000">'.xyz'</font><font color="#990000">,</font> <font color="#FF0000">''</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">)</font>
+  os<font color="#990000">.</font><b><font color="#000000">rename</font></b><font color="#990000">(</font>filename<font color="#990000">,</font> newname<font color="#990000">)</font>
+</tt></pre>
+Yeah, I know that's not a one liner, but it's easy to read.  And if you
+work inside of ipython and turn on logging, you will have a record of it.
+Yes, there are ways to turn this into a one liner, but at the sacrifice 
+of clarity.
+
+What you learn first and what you spend large amounts of time on
+influences how you see the world.  Python has awesome libraries for
+tons of tasks and is free (you don't have to buy it and some
+corporation can't take it away).  So please, don't spend your
+first time or the majority of your time with tools like sed and awk.
+The same goes for Fortran, Matlab, and IDL.  Your brain is more valuable
+than that.
+
+If you are going to learn a set of tools for general scientific
+computation, I highly recommend starting with python and using git for
+version control.  I wish I had started there.  My progression was HP
+Terminal Basic, MS Basic, Pascal, Fortran, C (lots and lots of C), 68k
+assembler (and later a few other assembly languages), csh, C++, ML,
+LISP, Ada, Prolog, GNU Make, Arc Macro Language, Verilog, Matlab, Tcl,
+IDL, Python, bash, Java, sed/awk, SQL and then a zillion other things.
+I'm part computer scientist, so I do just like to play with languages
+(yeah, I'm way too entertained by GNU Make).  And languages like Perl
+and JavaScript are things that I often see, but don't do much more
+than skim them when needed.
+
+When I watch people who learn better languages first, I am jealous of
+how they develop good habits right from the start.  They see that life
+doesn't have to be painful and the some languages just easier to use
+and maintain code in than others, especially for certain tasks.  You can
+write a graphical interface in Fortran (I did it), but you don't want to.
+
+So if you aren't going to be a computer scientist, pick a good all
+around language that can stick with you throughout your career even if
+you use some other language for most of your "primary work."  I think
+python is an excellent choice.  Languages like sed, awk, fortran, and
+matlab/octave are particular bad languages for this.
+
+And if you really get into heavy lifting with data, please do yourself
+and your collaborators a favor and take the first 2 or 3 classes in
+computer science.  You'll learn about linked lists, binary search, and
+other basics of datastructures that will change how you approach data.
+I have many times shown a very senior professor in geophysics that their
+"hard" computational problem is not actually hard if you have the correct
+data structure.
+
+And learn and git for your revision control system.  Even the smallest code 
+bits belong checked in to something.
+-----

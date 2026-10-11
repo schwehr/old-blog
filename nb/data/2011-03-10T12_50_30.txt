@@ -1,0 +1,52 @@
+TITLE: NMEA AIS Frame Summary Report
+AUTHOR: Kurt
+DATE: 03.10.2011 12:50
+DESC: could be useful
+-----
+BODY:
+I just tried to figure out what the NMEA string ARFSR is.  I have a
+station where ARFSR is the only thing that I'm receiving:
+<pre>$ARFSR,b20036699983,20100828001600,X,0,0,,,,,*5B,b20036699983,1282954560
+$ARFSR,b20036699983,20100828001600,Y,0,0,,,,,*5A,b20036699983,1282954560</pre>
+Turns out that this is a report of the number of slots used and reserved during
+the last frame.  I was hoping it would be a station location, but no such 
+luck.  I grabbed a bunch to use in creating a parser.
+<pre>$ARFSR,r07SFTP1,20100828000002,B,0021,0,0031,,,-120,*6F,r07SFTP1,1282953602
+$ARFSR,r11CCHB1,20100828000003,A,0013,0,0028,,,-128,*70,r11CCHB1,1282953603
+$ARFSR,r11CCHB1,20100828000003,B,0016,0,0028,,,-129,*77,r11CCHB1,1282953603
+$ARFSR,b003669974,20100828000004,X,121,0,,,,,*59,b003669974,1282953604
+$ARFSR,b003669974,20100828000004,Y,99,0,,,,,*6A,b003669974,1282953604
+$ARFSR,b003669975,20100828000004,X,129,0,,,,,*50,b003669975,1282953604
+$ARFSR,r08SFRE1,20100828000027,A,0085,0,0069,,,-122,*76,r08SFRE1,1282953627
+$ARFSR,r08SFRE1,20100828000027,B,0083,0,0069,,,-122,*73,r08SFRE1,1282953627</pre>
+I purchased the NMEA 4.00 spec last year, so I looked up the message and
+gave it a spin in kodos.  I presume that 'IEC 61162-1 "null field"' for unknown values means
+that they are blank.  Right?  Also, the "AR" talker stands for AIS Receiver station.
+<pre><tt>[$](?P&lt;talker&gt;[A-Z][A-Z])(?P&lt;sentence&gt;FSR),
+(?P&lt;station&gt;[a-zA-Z0-9_-]*),
+(?P&lt;uscg_date&gt;(?P&lt;year&gt;\d\d\d\d)(?P&lt;month&gt;\d\d)(?P&lt;day&gt;\d\d))?
+(?P&lt;time_utc&gt;(?P&lt;hours&gt;\d\d)(?P&lt;minutes&gt;\d\d)(?P&lt;seconds&gt;\d\d)(?P&lt;decimal_sec&gt;\.\d\d)?),
+(?P&lt;channel&gt;[ABXY]),
+(?P&lt;slots_rx_last_frame&gt;\d+),
+(?P&lt;slots_tx_last_frame&gt;\d+),
+(?P&lt;crc_errors_last_frame&gt;\d+)?,
+(?P&lt;ext_slots_res_cur_frame&gt;\d+)?,
+(?P&lt;local_slots_res_cur_frame&gt;\d+)?,
+(?P&lt;avg_noise_dbm&gt;-?\d+)?,
+(?P&lt;rx_10dbm_over_avg_noise&gt;\d+)?
+\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])</tt></pre>
+Turns out the USCG NAIS gear is violating the NMEA spec in a couple ways.
+
+First, the time field is supposed to be hhmmss.ss and the USCG NAIS
+data has yyyymmddhhmmss, so I called the date section uscg_date and I
+had to make the decimal seconds be optional.  Second, the channel can only
+be A or B.  I'm seeing that, but I also see channels X and Y.  I presume that
+is X for channel A and Y for channel B.
+
+This is what happens where standards are pay-walled and conformance
+tests are not published and freely available!
+
+Some of the new changes in NMEA messages are detailed in this document (including TAG Blocks):
+<a href="http://www.nmea.org/Assets/0183_advancements_nmea_oct_1_2010%20(2).pdf">NMEA 0183 ADVANCEMENTS
+This Standard's Evolution Continues</a> by Lee Luft of the USCG R&amp;D Center.
+-----

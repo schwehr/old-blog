@@ -1,0 +1,40 @@
+TITLE: mapserver hello world
+AUTHOR: Kurt
+DATE: 01.25.2008 09:42
+DESC: simple
+-----
+BODY:
+I figured I had better get the basics down if I am going to debug some
+projection issues, so here is my "hello world" for mapserver.  It would
+be better if I had "hello world" written out, but this is pretty simple.
+<pre>
+% http://edcftp.cr.usgs.gov/pub/data/nationalatlas/statesp020.tar.gz
+% (mkdir statesp020 && cd statesp020 && tar xf ../statesp020.tar.gz)
+</pre>
+Now make this mapfile as mapserver-helloworld.map:
+<pre>
+MAP
+  SIZE 512 512
+  EXTENT -71.25 42.5 -70.25  43.5
+  LAYER
+    NAME states
+    TYPE POLYGON
+    STATUS DEFAULT
+    DATA statesp020/statesp020.shp
+    CLASS
+      STYLE
+        OUTLINECOLOR 100 100 100
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+END<font color="orange"> # MAP</font>
+</pre>
+Now, make the map:
+<pre>
+% shp2img -m mapserver-helloworld.map -o mapserver-helloworld.png -i png
+% display mapserver-helloworld.png
+</pre>
+Now you should see a map of the NH Sea Coast area.
+
+<img src="http://schwehr.org/blog/attachments/2008-01/mapserver-helloworld.png"/>
+-----

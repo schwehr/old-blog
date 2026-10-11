@@ -1,0 +1,44 @@
+TITLE: python dap - serving netCDF to Google Earth
+AUTHOR: Kurt
+DATE: 03.03.2007 10:15
+DESC: how do I do this?
+-----
+BODY:
+Hopefully, I will get a chance to try this out ASAP.  Rob wrote up
+some instructions on how to serve up netCDF files to Google Earth
+using WMS.  This sounds so awesome!
+
+Google pydap Group <a href="http://groups.google.com/group/pydap/msg/7b577400041f46b3">post by Rob</a>
+
+<pre>
+...
+AnD now we can install pydap, the netCDF plugin and the WMS/KML responses:
+
+    $ easy_install dap.plugins.netcdf dap.responses.wms
+
+With the WMS response, pydap will behave like a (simple) WMS server,
+generating the images that will be requested by Google Earth.
+
+Once we have installed everything we need, we should create a server
+"instance", ie, a directory with a configuration file, template and a
+place to put our data:
+
+    $ paster create -t dap_server myserver project=My-Server
+
+This will create a directory called ``myserver``. Your netCDF files
+should go inside ``myserver/data`` (you can put them inside
+subdirectories there, as you wish).
+
+Now you should edit the ``myserver/template/index.tmpl`` template.
+This is a Cheetah template, but it's pretty easy to understand it;
+where going to add a link to the KML file for each file in the server.
+Just add the following line:
+
+    &lt;td&gt;&lt;a href="${file}.kml"&gt;[Google Earth]&lt;/a&gt;&lt;/td&gt;
+
+Beneath the DAS and DDS lines. We're all set! To run the server just type:
+
+    $ paster serve myserver/server.ini
+...
+</pre>
+-----

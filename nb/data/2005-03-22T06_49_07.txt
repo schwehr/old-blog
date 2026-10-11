@@ -1,0 +1,55 @@
+TITLE: ISIS Update
+AUTHOR: Kurt
+DATE: 03.22.2005 06:49
+DESC: things looking up
+-----
+BODY:
+So things are looking up for the next Mars landers having ISIS in
+fink.
+<pre>
+I thought I'd add some comments on this thread. First off we haven't
+made an official port of Isis 3 to MacOS X and the post by Kris is in
+regards to Isis 2. We are planning to have a fully native port for
+Isis 3 completed before October 2005. In terms of dependencies, we
+use:
+
+qt 
+image magick 
+xerces 
+xalan 
+doxygen 
+tnt/jama 
+camgraph 
+naif toolkit (cspice only) 
+gmake 
+g++/gcc 
+rsync 
+
+Isis 3 does not have any proprietary software so that shouldn't be a
+concern and we hope to eliminate camgraph and xerces by using
+equivalent functions in qt (although I can't say when this will
+happen).
+
+Since I'm Mac-illiterate I can't really weigh in on fink, although I
+suspect we will not use it in the port. However, to me it sounds like
+all you wanted was a network accessable tarball of our source
+tree. This is something that might be easily done on our part. I'm a
+little leary because we do have a required data area and it is quite
+large. I think to house both rsync'able and tarballs of the same data
+might be questionable.
+
+This could be addressed in the make system for Isis 3. I'm hoping that
+in the future, we can integrate the selection and installation of the
+data (base system and mission specific) through make. This, along with
+the tarball of the source, which includes the make files, might be
+just what you need to build your fink files.
+
+In your case, fink would grab the source tarball and execute the make
+command to build Isis 3 binaries and download the base data area. Then
+allow the user to choose which mission-specific data areas to make.
+
+If this scenario might work for you please let us know. 
+
+Cheers, Jeff Anderson
+</pre>
+-----

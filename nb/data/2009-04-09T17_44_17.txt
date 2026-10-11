@@ -1,0 +1,25 @@
+TITLE: sqlite3 python - better way to pull a lookup table?
+AUTHOR: Kurt
+DATE: 04.09.2009 17:44
+DESC: found
+-----
+BODY:
+In python, is there a better way to build a dictionary for a lookup table pulled
+from sqlite3?  Yup! It's a little weird, but this makes it a one
+liner (aside from the imports and db setup):
+<pre>import sqlite3
+<!-- -->
+cx = sqlite3.connect('classb.db3')
+cx.row_factory = sqlite3.Row 
+<!-- -->
+mmsi_prefixes = dict([tuple(row) for row in  cx.execute('SELECT code,country FROM mmsi_prefix;')])</pre>
+The resulting dictionary:
+<pre>{
+  512: u'New Zealand', 
+  750: u'Guyana', 
+  514: u'Cambodia (Kingdom of)', 
+  515: u'Cambodia (Kingdom of)', 
+  516: u'Christmas Island (Indian Ocean)', 
+  ...
+}</pre>
+-----

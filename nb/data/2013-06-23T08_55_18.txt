@@ -1,0 +1,78 @@
+TITLE: NMEA TAG blocks part 2
+AUTHOR: Kurt
+DATE: 06.23.2013 08:55
+DESC: continuing on
+-----
+BODY:
+In my previous post of NMEA TAG block encoded data, I discussed my
+parsing of the USCG old style NMEA metadata, how to calculate NMEA
+checksums, and parsing the timestamp.  
+Here are the complete list of codes for the TAG components:
+<table border="2" cellspacing="0">
+<tbody>
+<tr><td><b>Letter code</b></td><td><b>NMEA Config Msg</b></td><td><b>Description</b></td><td><b>type</b></td></tr>
+<tr><td>c</td><td>CPC</td><td>UNIX time in seconds or millisec</td><td>int</td></tr>
+<tr><td>d</td><td>CPD</td><td>Destination</td><td>string</td></tr>
+<tr><td>g</td><td>CPG</td><td>Grouping param</td><td>?</td></tr>
+<tr><td>n</td><td>CPN</td><td>line-count</td><td>int</td></tr>
+<tr><td>r</td><td>CPR</td><td>relative time (Units?)</td><td>int</td></tr>
+<tr><td>s</td><td>CPS</td><td>Source / station</td><td>string</td></tr>
+<tr><td>t</td><td>CPT</td><td>Text string</td><td>string</td></tr>
+</tbody>
+</table>
+Before, we had:
+<pre>\\c:(?P&lt;timestamp&gt\d{10,15})\*(?P&lt;checksum&gt;[0-9A-F]{2})?\\.*</pre>
+Now, we would like to add the rest.  We start by adding a 2nd by
+creating a string with a destination ("d") entry.  The spec says this
+is an alphanumeric string up to 15 charactions.  What exactly can be,
+I'm not totally sure.  I presume that it can't have either a star
+('*'), comma (','), and backslash ('\'), but am unsure about
+characters in the ASCII printable set.  
+<pre>body_parts = ['c:%d' % time.time(), 'd:%s' % 'MyStation12345']
+body = ','.join(body_parts); body
+# 'c:1372002373,d:MyStation12345'
+<!-- -->
+'\{body}*{checksum}\\'.format(body=body, checksum=checksum(body))
+# \c:1372002373,d:MyStation12345*15\</pre>
+We can get the destination with theis regex string: 'd:[^*,\\]{1,15}'.  
+It needs to be named and if we turn on "Verbose," kodos allows us
+to have the regular expression span multiple lines. 
+<pre>\\
+c:(?P&lt;timestamp&gt;\d{10,15}),
+d:(?P&lt;dest&gt;[^*,\\]{1,15})
+\*(?P&lt;checksum&gt;[0-9A-F]{2})?\\.*</pre>
+What if the order were reversed?  And what if either of the two
+entries was missing?  Please note in this next code block that I have
+setup the regex to take either a common or star between any parameter.
+This will let through '*' between parameters, which is not correct.  I
+am sure there is a way to make the regex such that commas between
+elements and the start is outside of the repeated block, but I haven't figured
+it out yet.
+<pre>\\
+(
+ (
+  c:(?P&lt;timestamp&gt;\d{10,15}) |
+  d:(?P&lt;dest&gt;[^*,\\]{1,15})
+ )[,*]
+)
+(?P&lt;checksum&gt;[0-9A-F]{2})?\\.*</pre>
+Now we need to flush out for the rest of the options.  Grouping has substructure to it:  
+
+SentenceNum-TotalSentences-IntegerIdentifyingTheGroup
+<pre>g:(?P&lt;group&gt;(?P&lt;sent_num&gt;\d)-(?P&lt;sent_tot&gt;\d)-(?P&lt;group_id&gt;\d+))</pre>
+Then n for line number and r for relative time are just an integer for each.
+<pre>\\
+(
+ (
+  c:(?P&lt;time&gt;\d{10,15}) |
+  d:(?P&lt;dest&gt;[^*,\\]{1,15}) |
+  g:(?P&lt;group&gt;(?P&lt;sent_num&gt;\d)-(?P&lt;sent_tot&gt;\d)-(?P&lt;group_id&gt;\d+)) |
+  n:(?P&lt;line_num&gt;\d+) |
+  r:(?P&lt;rel_time&gt;\d+) |
+  s:(?P&lt;src&gt;[^$*,!\\]{1,15}) |
+  t:(?P&lt;text&gt;[^$*,!\\]+)
+ )[,*]
+)+
+(?P&lt;checksum&gt;[0-9A-F]{2})?\\(?P&lt;nmea_msg&gt;.*)</pre>
+At this point, we can parse any tag block in the front.
+-----

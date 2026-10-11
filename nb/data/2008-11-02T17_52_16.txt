@@ -1,0 +1,60 @@
+TITLE: fink... php5, apache2, python2
+AUTHOR: Kurt
+DATE: 11.02.2008 17:52
+DESC: progress
+-----
+BODY:
+Looks like we now have Python 2.6 (python26) in fink!  dmacks had me
+give a go for setuptools-py26.  Seems to work when I tested it with
+magicdate-py26.  I don't use the whole ball 'o wax, so if anybody
+wants to give it a runthrough, please let me know how it went and how
+you tested it so I can hopefully repeat the tests in the future.
+
+So, I finally just nuked my fink /sw tree on my laptop (actually, I
+just moved it to /old-sw).  I had wedged it many different ways while
+trying some crazy things that mostly didn't work and/or others did
+better than I could.  The key thing I wanted is to be able to run php5
+via apache2.  With some work, I finally have hello world working.  I
+want to get gallery2 installed so I can check out how it works.  We need
+something like that for django.  Here is what I have so far...
+
+<a href="http://codex.gallery2.org/Gallery2:">How_do_I_Install_Gallery2</a>
+<pre>
+# Wiped fink
+% fink configure
+# use unstable
+% fink selfupdate-rsync # (I use cvs rather than rsync for devel)
+% fink install apache2
+% fink install imagemagick
+% fink install libapache2-mod-php5
+% fink install php5-apache2-ssl-pgsql
+% fink install netpbm-bin
+</pre>
+Then setup the environment...
+<pre>% sudo daemonic enable postgresql83
+% sudo -u postgres initdb -D /sw/var/postgresql-8.3/data # Did I have to do this before?
+% sudo -u postgres createuser -U postgres -W $USER -P
+% sudo pgsql.sh start
+% createdb gallery2 -E UNICODE
+% createuser -l -P gallery2</pre>
+I then untarrged the gallery2 full tar into /sw/var/www.  I did an "open http://localhost/gallery2/install"... but nothin.
+<pre>% sudo tail -1 /sw/var/log/apache2/error.log
+[Sun Nov 02 17:17:28 2008] [notice] child pid 58410 exit signal Segmentation fault (11)</pre>
+What?  So I tried hello world and that died to.  I tried the cli:
+<pre>% fink install php5-cli
+% cat &lt;&lt; EOF &gt; hello.php
+#!/usr/bin/env php5 
+&lt;?php
+Print "Hello world";
+?&gt;
+% chmod +x hello.php
+% ./hello.php
+PHP Warning:  PHP Startup: Unable to load dynamic library '/sw/lib/php5/20060613/pdo.so' - (null) in Unknown on line 0
+PHP Warning:  PHP Startup: Unable to load dynamic library '/sw/lib/php5/20060613/pdo_pgsql.so' - (null) in Unknown on line 0
+PHP Warning:  PHP Startup: Unable to load dynamic library '/sw/lib/php5/20060613/pgsql.so' - (null) in Unknown on line 0
+Hello world
+</pre>
+Well that sort of worked.  I did an <b>apache2ctl restart</b> and then
+hello world worked from with apache2.  And with that, I have to put
+this on hold for a bit.
+-----

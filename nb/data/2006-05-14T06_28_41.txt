@@ -1,0 +1,29 @@
+TITLE: quickstart trac demo
+AUTHOR: Kurt
+DATE: 05.14.2006 06:28
+DESC: As simple as it gets
+-----
+BODY:
+If you want to try out trac using a Mac OSX system with fink
+installed, it is pretty easy.  Here are detailed instructions on the
+wiki (<a
+href="http://projects.edgewall.com/trac/wiki/TracOnOsx">TracOnOsx</a>,
+but this should work too.
+<pre>
+  fink install svn-ssl svn-client-ssl
+  fink install pysqlite2-py24
+  fink install trac-py24
+  mkdir ~/trac-foo && cd ~/trac-foo
+  svnadmin create $HOME/trac-foo/svn
+  trac-admin $HOME/trac-foo/myproj initenv
+    Project Name> myproj
+    Database connection string>  # just hit enter
+    Path to repository> /Users/schwehr/trac-foo/svn # Replace /Users/schwehr!
+    Templates directory> # just hit enter
+  tracd --port 9000 $HOME/trac-foo/myproj
+</pre>
+Now in a new terminal/xterm (or in your browser):
+<pre>
+  open http://localhost:9000/
+</pre>
+-----

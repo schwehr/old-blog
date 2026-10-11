@@ -1,0 +1,30 @@
+TITLE: Filling time between position report commstate time reports
+AUTHOR: Kurt
+DATE: 09.01.2009 16:41
+DESC: slow and steady progress
+-----
+BODY:
+I'm still slowly working through the AIS position reports to give them
+the best estimate of time that I can muster.  The current step that I
+took here was to look for neighboring position reports with the full
+commstate timestamps from one vessel that are within 60 seconds of
+each other.  Then any position reports from that ship are sure to be in that
+time range and I can use the neighbors plus the pos report's UTC seconds
+to compute a reasonable timestamp for that packet.  Before I ran this algorithm,
+I already used my sliding window to invalidate some commstates as unreliable.
+
+The top graph is USCG seconds in red and cyan from bottom left to top
+right, while the red and green are relative offsets in seconds between
+USCG time and basestations (green) &amp; pos reports with estimated
+time (labeled on the right).  It looks like the time estimates are
+doing a good job of tracking the two basestations' time reports.
+
+The bottom graph is again the UTC seconds for each position report.
+
+There clearly is a lot more work to do to get most of the packets
+tagged with a usable time.  It also looks like I have been rejecting a
+lot of the commstate time packets.  I will have to look into why!
+<pre>SELECT COUNT(*) FROM position WHERE commstate_utc_hour IS NOT NULL AND est_sec IS NULL;
+COUNT(*)65</pre>
+<img title="Filling with the neighbor reports" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-09/ais-position-report-timefill.png"/>
+-----

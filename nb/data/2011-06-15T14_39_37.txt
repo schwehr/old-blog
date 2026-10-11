@@ -1,0 +1,470 @@
+TITLE: fink and update-alternatives
+AUTHOR: Kurt
+DATE: 06.15.2011 14:39
+DESC: long winded
+-----
+BODY:
+This article is excessively long and runs out of steam near the bottom
+when things are the most important.  Sorry.
+
+Update-alternatives (u-a, <a
+ href="http://anonscm.debian.org/gitweb/?p=dpkg/dpkg.git;a=blob;f=utils/update-alternatives.c;h=c707bd55a31ab4a292ea58cd8a5c736fe96c2475;hb=HEAD">src</a>)
+is a style for handling multiple versions of one software package or
+multiple software packages that provide the same file.  It is a part
+of the Debian Linux project's <a
+ href="http://wiki.debian.org/Teams/Dpkg">dpkg</a> (<a
+ href="http://packages.qa.debian.org/d/dpkg.html">alt-link</a>)
+manager for software.  This program has been around since 1995, but I
+only started using it some time around 2005 in fink.  This program has
+confused quite a few people over the years and I haven't seen too much
+good documentation, so here is my take for understanding u-a from a
+fink packager and user's perspective.  First a quick link to other
+documentation:
+
+Debian Administration has an article called <a
+ href="http://www.debian-administration.org/articles/91">Using the
+Debian alternatives system</a> that uses the "editor" example that I
+was thinking about as a first case to illustrate the concept.  But
+really, the editor example is bad.  You should not be forcing a global
+editor example.
+
+The is a man page, but I did not find it very helpful and there were
+no examples.
+
+Here is my key use case for u-a: I often have python packages in fink
+that we want to have available in the many "variants" of python.
+Right now that range is python 2.4, 2.5, 2.6, 2.7, 3.1, and 3.2.  If
+that package has executable programs, we want to default to picking
+the program from the newest python possible (software isn't all ready
+for python 3.x yet), but let the user pick a preference if necessary.
+A typical use case for the user picking a specific version is where a
+computer is setup with a large project and wants to stick to a
+specific version of python and associated tools (say 2.6).  However,
+the developers on the machine want to be able to experiment with newer
+versions of python.
+
+I am going to use the <a href="http://gpsd.berlios.de/">gpsd</a>
+package as my example.  It comes with python modules for clients to
+access a gpsd server that is managing <a
+ href="http://en.wikipedia.org/wiki/Global_Positioning_System">GPS</a>
+or <a
+ href="http://en.wikipedia.org/wiki/Automatic_Identification_System">AIS</a>
+devices.  gpsd has a number of programs that are installed.  Some of
+these are written in python.  For example, "gpscat" is written in
+python.  It must have a gpsd-py installed, but which one?  If I
+install the python 2.6 version and that installs a program in
+/sw/bin/gpscat, I can't also have gpsd-py for python 2.7 also
+installed.  I might need to be able to access either.  Let's take a
+quick peak at the gpsd packages available in fink:
+<pre><b>fink list gpsd</b></pre>
+The results:
+
+<table  border="1" cellspacing="0" cellpadding="6" rules="all" frame="all">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Package</th><th scope="col" class="left">Version</th><th scope="col" class="left">Description</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">gpsd</td><td class="left">2.96bis-1</td><td class="left">Daemon that monitors one or more GPS/AIS receivers</td></tr>
+<tr><td class="left">gpsd-dev</td><td class="left">2.96bis-1</td><td class="left">Headers and libraries for gpsd</td></tr>
+<tr><td class="left">gpsd-py26</td><td class="left">2.96bis-1</td><td class="left">Gpsd client and programs GPS/AIS receivers in python</td></tr>
+<tr><td class="left">gpsd-py27</td><td class="left">2.96bis-1</td><td class="left">Gpsd client and programs GPS/AIS receivers in python</td></tr>
+<tr><td class="left">gpsd-shlibs</td><td class="left">2.96bis-1</td><td class="left">Shared libraries for gpsd</td></tr>
+</tbody>
+</table>
+
+<h3>The old way</h3>
+
+In earlier days of python, the strategy for handling these binaries
+was to have a "-bin" package that you could install.  If you installed
+a particular one, it would force out any other colliding bin.  This
+worked sometimes, but things got really screwy with dependencies.  And
+what if you needed to specifically use two different versions at the
+same for some reason?  Here is the process:
+<pre><b>fink list pylint</b>
+Information about 10325 packages read in 1 seconds.
+ i   pylint-py25                 0.23.0-1             Analyzes Python code for bugs and quality
+     pylint-py25-bin             0.23.0-1             Analyzes Python code - main binary
+ i   pylint-py26                 0.23.0-1             Analyzes Python code for bugs and quality
+     pylint-py26-bin             0.23.0-1             Analyzes Python code - main binary
+ i   pylint-py27                 0.23.0-1             Analyzes Python code for bugs and quality
+     pylint-py27-bin             0.23.0-1             Analyzes Python code - main binary</pre>
+Now installing pylint-py26-bin works:
+<pre><b>fink install pylint-py26-bin</b>
+Information about 10325 packages read in 1 seconds.
+The following package will be installed or updated:
+ pylint-py26-bin
+Reading buildlock packages...
+/sw/bin/dpkg-lockwait -i /sw/fink/di [ snip ]
+Selecting previously deselected package pylint-py26-bin.
+(Reading database ... 185854 files and directories currently installed.)
+Unpacking pylint-py26-bin (from .../pylint-py26-bin_0.23.0-1_darwin-i386.deb) ...
+Setting up pylint-py26-bin (0.23.0-1) ...</pre>
+However, installing pylint-py27-bin blows up!
+<pre><b>fink install pylint-py27-bin</b>
+Information about 10325 packages read in 1 seconds.
+The following package will be installed or updated:
+ pylint-py27-bin
+Reading buildlock packages...
+/sw/bin/dpkg-lockwait -i /sw/fink/dists/unstable/main/binary-darwin-i386/devel/pylint-py27-bin_0.23.0-1_darwin-i386.deb
+Selecting previously deselected package pylint-py27-bin.
+(Reading database ... 185862 files and directories currently installed.)
+Unpacking pylint-py27-bin (from .../pylint-py27-bin_0.23.0-1_darwin-i386.deb) ...
+/sw/bin/dpkg: error processing /sw/fink/dists/unstable/main/binary-darwin-i386/devel/pylint-py27-bin_0.23.0-1_darwin-i386.deb (--install):
+ trying to overwrite '/sw/bin/pylint', which is also in package pylint-py26-bin
+Errors were encountered while processing:
+ /sw/fink/dists/unstable/main/binary-darwin-i386/devel/pylint-py27-bin_0.23.0-1_darwin-i386.deb
+### execution of /sw/bin/dpkg-lockwait failed, exit code 1
+Failed: can't install package pylint-py27-bin-0.23.0-1</pre>
+Whoops!  The author of the pylint package (me!) forgot to add
+statements to the package that you can't have ("Conflicts") both
+pylint-py26-bin and pylint-py27-bin installed at the same time.  I
+also forgot to add the Replace statement that tells fink and the
+debian package tools that the can be swapped for each other.
+<pre># So totally broken!
+Conflicts: %N-py25-bin, %N-py24-bin
+Replaces: %N-py25, %N-py24-bin</pre>
+I went off and fixed that oversight, but really, I need to
+switch the package to stop using this old style.  The new file looks
+like this ( and I had to add one to the <b>Revision</b> field).
+<pre>Conflicts: pylint-py27-bin, pylint-py26-bin, pylint-py25-bin
+Replaces: pylint-py27-bin, pylint-py26-bin, pylint-py25-bin</pre>
+I then have to do a fink update-all.  Now I should be able to
+install pylint-py26-bin with pylint-py27-bin.
+<pre><b>fink update-all</b>
+[ snip ]
+<b>fink list pylint</b>
+Information about 10325 packages read in 2 seconds.
+ i   pylint-py25                 0.23.0-2             Analyzes Python code for bugs and quality
+     pylint-py25-bin             0.23.0-2             Analyzes Python code - main binary
+ i   pylint-py26                 0.23.0-2             Analyzes Python code for bugs and quality
+ i   pylint-py26-bin             0.23.0-2             Analyzes Python code - main binary
+ i   pylint-py27                 0.23.0-2             Analyzes Python code for bugs and quality
+     pylint-py27-bin             0.23.0-2             Analyzes Python code - main binary
+<!-- -->
+<b>fink install pylint-py26-bin</b>
+[ snip ]
+Setting up pylint-py26-bin (0.23.0-2) ...
+<!-- -->
+<b>fink install pylint-py27-bin</b>
+[ snip ]
+dpkg: considering removing pylint-py26-bin in favour of pylint-py27-bin ...
+dpkg: yes, will remove pylint-py26-bin in favour of pylint-py27-bin.
+Unpacking pylint-py27-bin (from .../pylint-py27-bin_0.23.0-2_darwin-i386.deb) ...
+Setting up pylint-py27-bin (0.23.0-2) ...</pre>
+It worked, but every time the variants change, we have to edit
+the python version lists in multiple places.  It's error prone and
+just a pain!
+
+If you want to see how a package is actually set up for Conflicts and
+Replaces, try something like this:
+<pre>for deb in /sw/fink/debs/pylint-py2[67]-bin*.deb; do 
+  echo "$deb"
+  dpkg -I $deb | egrep 'Conflicts|Replaces'
+done</pre>
+Which shows you that they look okay now:
+<pre>/sw/fink/debs/pylint-py26-bin_0.23.0-2_darwin-i386.deb
+ Replaces: pylint-py27-bin, pylint-py25-bin
+ Conflicts: pylint-py27-bin, pylint-py25-bin
+<!-- -->
+/sw/fink/debs/pylint-py27-bin_0.23.0-2_darwin-i386.deb
+ Replaces: pylint-py26-bin, pylint-py25-bin
+ Conflicts: pylint-py26-bin, pylint-py25-bin</pre>
+But before, they were totally messed up and it was this way for years!
+<pre>/sw/fink/debs/pylint-py26-bin_0.23.0-1_darwin-i386.deb
+ Replaces: pylint-py26-py25, pylint-py26-py24-bin
+ Conflicts: pylint-py26-py25-bin, pylint-py26-py24-bin
+<!-- -->
+/sw/fink/debs/pylint-py27-bin_0.23.0-1_darwin-i386.deb
+ Replaces: pylint-py27-py25, pylint-py27-py24-bin
+ Conflicts: pylint-py27-py25-bin, pylint-py27-py24-bin</pre>
+
+<h3>New way - use update-alternatives </h3>
+
+The new way is to use u-a.  I will walk you through it first from the
+user perspective.  For u-a, the gpsd python executables are bookmarked
+under <b>gpscat</b>.  I realize this is confusing and at the end I will
+talk about switching it to gpsd-py.  First we need to learn how to
+look around the system, but to do that, we need at least one version
+of gpsd-py installed.
+<pre><b>fink install gpsd-py26</b>
+[ snip ]  <span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">&lt;- I will use this to show were I've removed text</span></pre>
+We need to find the name of the package (pretend I didn't just tell
+you that it is <b>gpscat</b>).  Take a look in u-a's database.  This is how
+you can find out from the packaging system where things are.
+<pre><span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">Where is the u-a program?</span>
+<b>type update-alternatives</b>
+update-alternatives is hashed (/sw/sbin/update-alternatives)
+<!-- -->
+<span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">Which package owns the update-alternatives program?</span>
+<b>dpkg -S /sw/sbin/update-alternatives</b>
+dpkg: /sw/sbin/update-alternatives
+<!-- -->
+<span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">What files are in the package related to u-a?</span>
+<b>dpkg -L dpkg | egrep -i 'update|alternatives'</b>
+/sw/etc/alternatives
+/sw/etc/alternatives/README
+/sw/sbin/update-alternatives
+[ snip ]
+/sw/share/man/man8/update-alternatives.8
+/sw/share/man/pt_BR/man8/update-alternatives.8
+/sw/var/lib/dpkg/alternatives
+/sw/var/lib/dpkg/updates</pre>
+The 2nd to the last line has our answer (it is also in "man
+update-alternatives"): /sw/var/lib/dpkg/alternatives
+<pre><b>ls -l /sw/var/lib/dpkg/alternatives/*gps*</b>
+-rw-r--r-- 1 root admin 299 Jun 15 12:56 /sw/var/lib/dpkg/alternatives/gpsd-py</pre>
+Here is the overview of update-alternatives:
+<pre><b>update-alternatives --help</b>
+Debian update-alternatives 1.10.21.
+[snip]
+Usage: update-alternatives --install &lt;link&gt; &lt;name&gt; &lt;path&gt; &lt;priority&gt;
+                          [--slave &lt;link&gt; &lt;name&gt; &lt;path&gt;] ...
+       update-alternatives --remove &lt;name&gt; &lt;path&gt;
+       update-alternatives --remove-all &lt;name&gt;
+       update-alternatives --auto &lt;name&gt;
+       update-alternatives --display &lt;name&gt;
+       update-alternatives --list &lt;name&gt;
+       update-alternatives --config &lt;name&gt;
+       update-alternatives --set &lt;name&gt; &lt;path&gt;
+       update-alternatives --all
+&lt;name&gt; is the name in /etc/alternatives.
+&lt;path&gt; is the name referred to.
+&lt;link&gt; is the link pointing to /etc/alternatives/&lt;name&gt;.
+&lt;priority&gt; is an integer; options with higher numbers are chosen.
+<!-- -->
+Options:  --verbose|--quiet  --test  --help  --version
+          --altdir &lt;directory&gt;  --admindir &lt;directory&gt;</pre>
+We can use the <b>display</b> and <b>list</b> options to examine gpsd's
+alternatives.  List is simpler, so start with that.
+<pre><b>update-alternatives --list gpsd-py</b>
+/sw/bin/gpscat-py26
+<!-- -->
+<b>update-alternatives --display gpsd-py</b>
+gpsd-py - status is auto.
+ link currently points to /sw/bin/gpscat-py26
+/sw/bin/gpscat-py26 - priority 26
+ slave gpsfake: /sw/bin/gpsfake-py26
+ slave xgps: /sw/bin/xgps-py26
+ slave gpsprof: /sw/bin/gpsprof-py26
+ slave xgpsspeed: /sw/bin/xgpsspeed-py26
+Current <span style="color: #fa8072;">'best'</span> version is /sw/bin/gpscat-py26.</pre>
+That's a lot of information.  First, the "auto" says that fink is
+allowed to move up to a newer version of the alternatives if one comes
+along.  If it were "manual", that means it is up to you as a user to 
+change the symbolic links.
+
+The next key point is the <b>priority</b> of "26".  In fink, we have a
+convention that the python version (major.minor) without the "." is 
+the priority.  Fink will set automatically pick a newer ("better") 
+version of these files if we install a higher version python.  Let's
+try installing the gpsd-py27 package and see what happens.  Note that
+I've add <b>&ndash;verbose</b> to the update-alternative command in the
+gpsd-py.info package.  That will make the fink install much more
+talkative.
+<pre><b>fink install gpsd-py27</b>
+The following package will be installed or updated:
+ gpsd-py27
+Reading buildlock packages...
+/sw/bin/dpkg-lockwait -i /sw/fink/dists/unstable/main/binary-darwin-i386/sci/gpsd-py27_2.96bis-2_darwin-i386.deb
+Selecting previously deselected package gpsd-py27.
+(Reading database ... 185921 files and directories currently installed.)
+Unpacking gpsd-py27 (from .../gpsd-py27_2.96bis-2_darwin-i386.deb) ...
+Setting up gpsd-py27 (2.96bis-2) ...
+update-alternatives --verbose --install /sw/bin/gpscat gpsd-py /sw/bin/gpscat-py27 27 --slave /sw/bin/gpsfake gpsfake /sw/bin/gpsfake-py27 
+Checking available versions of gpsd-py, updating links in /sw/etc/alternatives ...
+(You may modify the symlinks there yourself if desired - see <span style="color: #fa8072;">'man ln'</span>.)
+Updating gpsd-py (/sw/bin/gpscat) to point to /sw/bin/gpscat-py27.
+Updating gpsfake (/sw/bin/gpsfake) to point to /sw/bin/gpsfake-py27.
+Updating xgps (/sw/bin/xgps) to point to /sw/bin/xgps-py27.
+Updating gpsprof (/sw/bin/gpsprof) to point to /sw/bin/gpsprof-py27.
+Updating xgpsspeed (/sw/bin/xgpsspeed) to point to /sw/bin/xgpsspeed-py27.</pre>
+What does update-alternatives display give us?
+<pre><b>update-alternatives --display gpsd-py</b>
+<!-- -->
+gpsd-py - status is auto.
+ link currently points to /sw/bin/gpscat-py27
+<!-- -->
+/sw/bin/gpscat-py26 - priority 26
+ slave gpsfake: /sw/bin/gpsfake-py26
+ slave xgps: /sw/bin/xgps-py26
+ slave gpsprof: /sw/bin/gpsprof-py26
+ slave xgpsspeed: /sw/bin/xgpsspeed-py26
+<!-- -->
+/sw/bin/gpscat-py27 - priority 27
+ slave gpsfake: /sw/bin/gpsfake-py27
+ slave xgps: /sw/bin/xgps-py27
+ slave gpsprof: /sw/bin/gpsprof-py27
+ slave xgpsspeed: /sw/bin/xgpsspeed-py27
+Current <span style="color: #fa8072;">'best'</span> version is /sw/bin/gpscat-py27.</pre>
+Now you can see both the py26 alternative at priority 26 and the py27
+alternative installed because is has a priority of 27.  If we don't
+like the python 2.7 version, we can easily back off:
+<pre><b>fink remove gpsd-py27</b>
+/sw/bin/dpkg-lockwait --remove gpsd-py27
+Removing gpsd-py27 ...
+Checking available versions of gpsd-py, updating links in /sw/etc/alternatives ...
+(You may modify the symlinks there yourself if desired - see <span style="color: #fa8072;">'man ln'</span>.)
+Alternative /sw/share/doc/gpsd-py27 for gpsd-py not registered, not removing.
+Leaving gpsd-py (/sw/bin/gpscat) pointing to /sw/bin/gpscat-py27.
+Leaving gpsfake (/sw/bin/gpsfake) pointing to /sw/bin/gpsfake-py27.
+Leaving xgps (/sw/bin/xgps) pointing to /sw/bin/xgps-py27.
+Leaving gpsprof (/sw/bin/gpsprof) pointing to /sw/bin/gpsprof-py27.
+Leaving xgpsspeed (/sw/bin/xgpsspeed) pointing to /sw/bin/xgpsspeed-py27.</pre>
+
+<h3>Exploring the symlinks created by u-a</h3>
+
+Now is a great time to check out the symbolic links.  At first look,
+it seems like a twisty maze, but it actually works quite well.  Make
+sure that you have both the 26 and 27 versions of gpsd and the gpsd
+main package installed.
+<pre><b>fink install gpsd-py26 gpsd-py27 gpsd</b></pre>
+Now we can start in /sw/bin and look at the mix of C/C++ binaries
+and python scripts in gpsd.
+<pre><b>cd /sw/bin
+ls -l *gps* | cut -c 1-11,44-</b>
+-rwxr-xr-x cgps
+lrwxr-xr-x gpscat -&gt; /sw/etc/alternatives/gpscat
+-rwxr-xr-x gpscat-py26
+-rwxr-xr-x gpscat-py27
+-rwxr-xr-x gpsctl
+-rwxr-xr-x gpsdecode
+lrwxr-xr-x gpsfake -&gt; /sw/etc/alternatives/gpsfake
+-rwxr-xr-x gpsfake-py26
+-rwxr-xr-x gpsfake-py27
+-rwxr-xr-x gpsmon
+-rwxr-xr-x gpspipe
+lrwxr-xr-x gpsprof -&gt; /sw/etc/alternatives/gpsprof
+-rwxr-xr-x gpsprof-py26
+-rwxr-xr-x gpsprof-py27
+-rwxr-xr-x lcdgps
+lrwxr-xr-x xgps -&gt; /sw/etc/alternatives/xgps
+-rwxr-xr-x xgps-py26
+-rwxr-xr-x xgps-py27
+lrwxr-xr-x xgpsspeed -&gt; /sw/etc/alternatives/xgpsspeed
+-rwxr-xr-x xgpsspeed-py26
+-rwxr-xr-x xgpsspeed-py27</pre>
+You can see that for programs like cgps, there is only one file.
+However for gpsfake, which is a python script, there are 3 files:
+<pre><b>file gpsfake*</b>
+<!-- -->
+gpsfake:      symbolic link to'/sw/etc/alternatives/gpsfake'
+gpsfake-py26: a /sw/bin/python2.6 script text executable
+gpsfake-py27: a /sw/bin/python2.7 script text executable</pre>
+The "gpsfake" program is the default program, but it's actually a
+symbolic link that we can track through the system.  We are going to
+find that it is indirectly linked to <i>gpsfake-py27</i>, which is the
+highest priority alternative to gpsfake.
+<pre><b>cd /sw/etc/alternatives
+ls -l *gpsfake*</b>
+lrwxr-xr-x 1 root admin 22 Jun 15 12:59 gpsfake -&gt; /sw/bin/gpsfake-py27</pre>
+
+<h3>Setting things up in fink for update-alternatives </h3>
+
+The hard part is getting the fink info file for gpsd's python package
+correct.  Here is a walk through of the issues with a focus on the
+python specific handling of alternatives.
+
+First, we have to tell fink that this is going to be a python
+package.  We are going to use features that were not in the original
+fink "Info" format, so we wrap the whole setup in "Info2"
+<pre>Info2: &lt;&lt;
+<!-- -->
+[ snip ]
+<!-- -->
+# Info2
+&lt;&lt;</pre>
+Then we have to make the name depend on the type of python and to list
+the "variant" types of python that are allowed:
+<pre>Package: gpsd-py%type_pkg[python]
+Type: python (2.6 2.7)
+</pre>
+Then, in the install portion (InstallScript) of the info file, we have to rename the
+python scripts to have a "26" or "27" after then:
+<pre>for file in gpscat gpsfake gpsprof xgps xgpsspeed ; do
+  mv %i/bin/${file} %i/bin/${file}-py%type_pkg[python]
+done</pre>
+We then need to add the alternatives handling in a script that runs
+just after the package is installed.  I am using the documentation
+directory to provide the "gpsd-py" name to alternatives, as there is
+not actual "gpsd" or "gpsd-py" file that I can use to setup the
+alternatives.
+<pre>PostInstScript: &lt;&lt;
+  update-alternatives --verbose 
+       --install %p/bin/gpscat gpsd-py %p/bin/gpscat-py%type_pkg[python] %type_pkg[python] <span style="color: #ffa07a;">\</span>
+       --slave   %p/bin/gpsfake gpsfake %p/bin/gpsfake-py%type_pkg[python] <span style="color: #ffa07a;">\</span>
+       --slave   %p/bin/gpsprof gpsprof %p/bin/gpsprof-py%type_pkg[python] <span style="color: #ffa07a;">\</span>
+<span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">[ snip ]
+</span>&lt;&lt;
+PreRmScript: &lt;&lt;
+</pre>
+First the <b>master</b>:
+
+The PostInstScript is run right after the files from the deb package
+are loaded.  In this "&ndash;install" command the 4 items in the same line
+setup the tree of this alternative.  The first item is the path to the
+file that will server as the master.  The second item ("gpsd-py") is
+the name that it will aliased to.  The 3rd item is the source file.
+Finally, the last item is an integer number that is the priority.
+Here is what the actual command looks like that is run:
+<pre>update-alternatives --verbose 
+     --install /sw/bin/gpscat gpsd-py /sw/bin/gpscat-py27 27 <span style="color: #ffa07a;">\</span>
+     --slave   /sw/bin/gpsfake gpsfake /sw/bin/gpsfake-py27 <span style="color: #ffa07a;">\</span>
+<span style="color: #ff7f24;"># </span><span style="color: #ff7f24;">[ snip ]</span></pre>
+Then come all the <b>slaves</b>:
+
+These files will change along with the master file in a
+follow-the-leader style.  They are the target url, the name, and the
+path to the source.
+
+<h3>Cleanup up after removing the package </h3>
+
+With fink, you have to keep a tidy house.  That means that you need to
+get rid of the symbolic links after a package is removed.  We can do
+that in a a PreRmScript that gets rid of the links (and redirects them
+if there is a fallback).
+<pre>PreRmScript: &lt;&lt;
+  if [ $<span style="color: #eedd82;">1</span> != <span style="color: #ffa07a;">"upgrade"</span> ]; then
+    update-alternatives --verbose --remove gpsd-py %p/bin/gpscat-py%type_pkg[python]
+  fi
+&lt;&lt;</pre>
+Here is how things look through the removal process:
+<pre><b>ls -l /sw/var/lib/dpkg/alternatives/*gps* | wc -l</b>
+1
+<!-- -->
+<b>ls /sw/bin/*gps* | wc -l</b>
+21
+<!-- -->
+<b>ls -l /sw/etc/alternatives/*gps* | wc -l</b>
+5</pre>
+Now remove gpsd-py27:
+<pre><b>fink remove gpsd-py27</b>
+<!-- -->
+<b>ls -l /sw/var/lib/dpkg/alternatives/*gps* | wc -l</b>
+1
+<!-- -->
+<b>ls /sw/bin/*gps* | wc -l</b>
+16
+<!-- -->
+<b>ls -l /sw/etc/alternatives/*gps* | wc -l</b>
+5</pre>
+Now remove the rest:
+<pre><b>fink remove gpsd gpsd-py26</b>
+<!-- -->
+<b>ls -l /sw/var/lib/dpkg/alternatives/*gps* | wc -l</b>
+0
+<!-- -->
+<b>ls /sw/bin/*gps* | wc -l</b>
+0
+<!-- -->
+<b>ls -l /sw/etc/alternatives/*gps* | wc -l</b>
+0
+<!-- -->
+<b>update-alternatives --display gpsd-py</b>
+No alternatives for gpsd-py.</pre>
+Hopefully you feel a little more comfortable with update-alternatives
+after reading through the above, but I worry that people will just get
+more turned around.  I encourage others to do their own 
+writeups to improve apon the documentation and examples.
+-----

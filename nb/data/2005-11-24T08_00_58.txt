@@ -1,0 +1,53 @@
+TITLE: debian and python eggs
+AUTHOR: Kurt
+DATE: 11.24.2005 08:00
+DESC: trouble with eggs
+-----
+BODY:
+There is a monster discussion on python eggs yesterday and today on
+python eggs and Debian.  The only reason I am subscribed to that list
+is to try to figure out how to cope with eegs in fink.  I still have
+no clue what to do about them.  I need to see what is in dh_python.
+It would be nice to have a what to have a package say what
+dependencies it really has so that I can put them in the fink info
+file, but I do NOT want eggs to mess with other packages.  That will
+break fink.
+<pre>
+From: Josselin Mouette 
+Subject: Re: [Distutils] formencode as .egg in Debian ??
+
+Phillip J. Eby a ?crit :
+&gt; And over the last few months, I believe we've also succeeded in stomping
+&gt; most of the issues that people had with getting solid non-root
+&gt; installations on their Linux distributions.  So the reasons for developers
+&gt; to prefer their dependencies to be managed as eggs will only improve over
+&gt; time, as the egg system allows Python developers to control and introspect
+&gt; their dependencies, rather than keeping that information hidden behind
+&gt; diverse platform-specific packaging tools.
+
+This is useful for non-root installations, but it is only a hassle when
+you are making .deb's. Here, dependencies are already handled, and you
+rely on the system to provide correct versions for packages you depend
+upon.
+
+&gt; It's only "competitive" if you feel that there must be only one way to do
+&gt; it.  (And if you do feel that way, then it also should be obvious that eggs
+&gt; are the superior solution, since they don't take away any capabilities of
+&gt; the old, only provide new ones.)
+
+They only introduce more complexity, instead of bringing real features.
+
+&gt; Obviously, every individual distribution would like to have Python packages
+&gt; conform to their individual system.  However, on the whole, it is clearly
+&gt; better for the Python developer to have practical dependency management
+&gt; that doesn't tie their efforts to a single platform, packaging system, or
+&gt; distribution.
+
+And that's why there are things like <b>dh_python</b> to adapt python distutils
+installations to be compliant to the Debian way of things. However, eggs
+make it so complicated that the adaptation layer would be
+unmaintainable. This is a good reason to think the whole egg system
+should be avoided.
+</pre>
+I also saw something about <b>easy_deb</b> in eggs.
+-----

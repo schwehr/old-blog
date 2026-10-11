@@ -1,0 +1,36 @@
+TITLE: ObjC properties with C types
+AUTHOR: Kurt
+DATE: 10.11.2009 08:02
+DESC: more for less
+-----
+BODY:
+Thanks to Loic for pointing out that C types can definitely be used in
+ObjC properties.  Copy is for objects.  See the @property and
+@synthesize lines.
+<pre><tt><b><font color="#000080">#import</font></b> <font color="#990000">&lt;</font>Foundation<font color="#990000">/</font>NSObject<font color="#990000">.</font>h<font color="#990000">&gt;</font>
+<b><font color="#000080">#import</font></b> <font color="#990000">&lt;</font>stdio<font color="#990000">.</font>h<font color="#990000">&gt;</font>
+<!-- -->
+@<font color="#008080">interface</font> Fraction<font color="#990000">:</font> NSObject <font color="#FF0000">{</font>
+    <font color="#009900">int</font> numerator<font color="#990000">;</font>
+    <font color="#009900">int</font> denominator<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> print<font color="#990000">;</font>
+@<b><font color="#000000">property</font></b><font color="#990000">(</font>readwrite<font color="#990000">,</font>assign<font color="#990000">)</font> <font color="#009900">int</font> numerator<font color="#990000">,</font> denominator<font color="#990000">;</font>
+@end
+<!-- -->
+@implementation Fraction
+@<font color="#008080">synthesize</font> numerator<font color="#990000">,</font> denominator<font color="#990000">;</font>
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> print <font color="#FF0000">{</font> <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%i/%i"</font><font color="#990000">,</font>  numerator<font color="#990000">,</font> denominator<font color="#990000">);</font> <font color="#FF0000">}</font>
+@end
+<!-- -->
+<font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">(</font><font color="#009900">int</font> argc<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>argv<font color="#990000">[])</font> <font color="#FF0000">{</font>
+    <font color="#008080">Fraction</font> <font color="#990000">*</font>frac <font color="#990000">=</font> <font color="#990000">[[</font><font color="#008080">Fraction</font> alloc<font color="#990000">]</font> init<font color="#990000">];</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> setNumerator<font color="#990000">:</font> <font color="#993399">1</font><font color="#990000">];</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> setDenominator<font color="#990000">:</font> <font color="#993399">3</font><font color="#990000">];</font>
+    <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"The fraction is: "</font><font color="#990000">);</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> print<font color="#990000">];</font>
+    <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> release<font color="#990000">];</font>
+    <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<font color="#FF0000">}</font></tt></pre>
+-----

@@ -1,0 +1,86 @@
+TITLE: Parsing AIS NMEA strings with Python regular expressions
+AUTHOR: Kurt
+DATE: 06.22.2008 09:47
+DESC: sweet!
+-----
+BODY:
+I've been meaning to push my skills with python regular expressions
+(regex) for a while and parsing AIS USCG NMEA strings looked like a
+good way to practice.  I've created a 'verbose' regex that saves each
+of the fields such that they can be easily accessed.  The kodos regex
+tool made this a lot easier to accomplish.  Here is the sample code
+I ended up with:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">re</font>
+#
+<font color="#2040a0">rawstr</font> <font color="4444FF">=</font> <font color="#2040a0">r</font><font color="#008000">&quot;&quot;</font><font color="#008000">&quot;^[!$](?P&lt;prefix&gt;AI)(?P&lt;stringType&gt;VD[MO])
+,(?P&lt;total&gt;<font color="#77dd77">\d</font>?)
+,(?P&lt;senNum&gt;<font color="#77dd77">\d</font>?)
+,(?P&lt;seqId&gt;[0-9]?)
+,(?P&lt;chan&gt;[AB])
+,(?P&lt;body&gt;[a-zA-Z0-9&lt;&gt;<font color="#77dd77">\?</font><font color="#77dd77">\'</font><font color="#77dd77">\`</font>]*)
+,(?P&lt;fillBits&gt;<font color="#77dd77">\d</font>)<font color="#77dd77">\*</font>(?P&lt;checksum&gt;[0-9A-F][0-9A-F])
+(  
+  (S(?P&lt;slot&gt;<font color="#77dd77">\d</font>*))?
+  | (,s(?P&lt;s&gt;<font color="#77dd77">\d</font>*))?
+  | (,d(?P&lt;signal_strength&gt;[-0-9]*))?
+  | (,T(?P&lt;time_of_arrival&gt;[0-9.]*))?
+  | (,x(?P&lt;x&gt;[0-9]*))
+  | (,(?P&lt;station&gt;(?P&lt;station_type&gt;[rb])[a-zA-Z0-9]*))?
+)*
+,(?P&lt;timeStamp&gt;<font color="#77dd77">\d</font>+)
+$&quot;</font><font color="#008000">&quot;&quot;</font>
+<font color="#444444">#</font>
+<font color="#2040a0">matchstr</font> <font color="4444FF">=</font> <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;!AIVDM,3,4,,A,14hv0F8000Jrht&lt;H?9Oaw2f`00Rn,0*44,s27706,d-102,T43.56976333,x155601,r003669945,1214092819&quot;</font><font color="#008000">&quot;&quot;</font>
+<font color="#444444">#</font>
+<font color="#2040a0">compile_obj</font> <font color="4444FF">=</font> <font color="#2040a0">re</font>.<font color="#2040a0">compile</font><font color="4444FF">(</font><font color="#2040a0">rawstr</font>,  <font color="#2040a0">re</font>.<font color="#2040a0">VERBOSE</font><font color="4444FF">)</font>
+<font color="#2040a0">match_obj</font> <font color="4444FF">=</font> <font color="#2040a0">compile_obj</font>.<font color="#2040a0">search</font><font color="4444FF">(</font><font color="#2040a0">matchstr</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="#008000">'         prefix = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'prefix'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'     stringType = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'stringType'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'          total = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'total'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'         senNum = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'senNum'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'          seqId = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'seqId'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'           chan = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'chan'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'           body = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'body'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'       fillBits = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'fillBits'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'       checksum = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'checksum'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'           slot = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'slot'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'              s = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'s'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'signal_strength = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'signal_strength'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'time_of_arrival = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'time_of_arrival'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'              x = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'x'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'        station = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'station'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'   station_type = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'station_type'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'      timeStamp = '</font>, <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'timeStamp'</font><font color="4444FF">)</font>
+</pre>
+There are a few fields that can use better representations, but this
+is a good start.  Here is a sample run:
+<pre>% <b>./retest.py </b>
+         prefix =  AI
+     stringType =  VDM
+          total =  3
+         senNum =  4
+          seqId =  
+           chan =  A
+           body =  14hv0F8000Jrht&lt;H?9Oaw2f`00Rn
+       fillBits =  0
+       checksum =  44
+           slot =  None
+              s =  27706
+signal_strength =  -102
+time_of_arrival =  43.56976333
+              x =  155601
+        station =  r003669945
+   station_type =  r
+      timeStamp =  1214092819</pre>
+That's a pretty hard to read block of regular expressions, but it
+already works lot better than the code I have in noaadata, which is
+getting very painful.
+
+Kodos has a help page and I also used the <a
+href="http://www.amk.ca/python/howto/regex/">Regular Expression
+HOWTO</a>.  I don't have time to totally explain the above, so it is
+left to the reader as an excercise to walk through the regex.
+-----

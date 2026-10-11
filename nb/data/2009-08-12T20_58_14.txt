@@ -1,0 +1,28 @@
+TITLE: pbzip2 for parallel compression
+AUTHOR: Kurt
+DATE: 08.12.2009 20:58
+DESC: pthreads good
+-----
+BODY:
+I just heard about <a href="http://compression.ca/pbzip2/">pbzip2</a>,
+which does parallel compressing of files using pthreads.  I gave the
+same 4.4G file to both bzip2 and pbzip2 on an 8-way linux box with
+pbzip2 using 7 threads.  The original way I compress data:
+<pre><b>time bzip2 -9 b</b>
+real    17m19.233s
+user    16m41.131s
+sys     0m8.296s</pre>
+The new parallel way:
+<pre>time pbzip2 -9 -p7 a
+real    2m45.526s
+user    18m33.926s
+sys     0m13.202s</pre>
+17:19 became 2:45.  Not bad speedup.  The compressed file sizes are not
+quite the same.
+<pre>842988852 Aug 12 23:19 a.bz2
+841630033 Aug 12 23:19 b.bz2</pre>
+I uncompressed the file that I compress with pbzip2 using bzip2 to make
+sure there is no loss or incompatibility and it checks out with the original
+using <i>cmp</i>.  For now, I'm going to stick with bzip2 for my critical data,
+but if I have to move fast, I might go for pbzip2.
+-----

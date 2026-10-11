@@ -1,0 +1,139 @@
+TITLE: building a Ubuntu debian package from a source deb
+AUTHOR: Kurt
+DATE: 08.11.2009 19:28
+DESC: mostly there
+-----
+BODY:
+<a href="http://www.cs.cmu.edu/~trey/">Trey</a> and I are working to get some stuff packaged for Ubuntu.  What follows
+is not totally perfect.  If anyone has corrections or suggestions, please
+email me!
+
+We started from the Ubuntu <a
+href="https://wiki.ubuntu.com/PackagingGuide/HandsOn">Hands On
+Packaging Guide</a>.  My initial attempt at packaging something focus
+on <a href="http://openlayers.org/">OpenLayers</a> and I used <a
+href="https://launchpad.net/ubuntu/jaunty/+source/jquery/1.2.6-2ubuntu1">jquery/1.2.6-2ubuntu1</a>
+as a guide.
+
+Setup the initial world:
+<pre><b>sudo apt-get install libjpeg-dev libpng-dev libblas-dev autoconf libtool \
+  build-essential iblapack-dev libboost-dev imagemagick libexpat1-dev python-numpy \
+  apache2 libapache2-mod-wsgi libreadline-dev flex</b> # For GeoCam
+<b>sudo apt-get install devscripts build-essential wget fakeroot cdbs patchutils debhelper # debian install tools</b></pre>
+Now, pull down the source debian for jquery.  The dget and apt-get source command appear to be the same, except dget pulls a particular version.
+<pre><b>mkdir -p deb_pkgs/jquery</b>
+<b>cd !$</b>
+<b>dget -xu https://launchpad.net/ubuntu/jaunty/+source/jquery/1.2.6-2ubuntu1/+files/jquery_1.2.6-2ubuntu1.dsc</b>
+# apt-get source jquery ### Instead of dget, you can do this line
+<b>cd ..</b>
+<b>mkdir hello-debhelper</b>
+<b>cd !$</b>
+<b>apt-get source hello-debhelper</b>
+<b>cd ..</b></pre>
+Now that we have the two examples, it's time to get going on openlayers.
+<pre><b>mkdir openlayers-2.8</b>
+<b>cd !$</b>
+<b>wget http://openlayers.org/download/OpenLayers-2.8.tar.gz</b>
+<b>cp OpenLayers-2.8.tar.gz openlayers_2.8.orig.tar.gz</b>
+<b>mkdir -p debian/openlayers-2.8</b>
+<b>cd debian/openlayers-2.8</b>
+<b>dh_make -e kurtschwehr@yahoo.com</b> # Puts a ton of stuff in the debian directory
+<b>cd debian</b>
+<b>rm *.ex *.EX</b> # Remove un-need template files</pre>
+Openlayers is a pretty simple package (but not as simple as jquery).
+We need to adjust the makefile in the debian directory named
+<i>rules</i>.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/make -f</font></i>
+<i><font color="#9A1900"># -*- makefile -*-</font></i>
+<i><font color="#9A1900"># Uncomment this to turn on verbose mode.</font></i>
+<i><font color="#9A1900">#export DH_VERBOSE=1</font></i>
+<!-- -->
+<font color="#990000">build:</font> 
+	<font color="#990000">(</font>cd build<font color="#990000">;</font> <font color="#990000">.</font>/build.py<font color="#990000">)</font>
+	rm -f tools<font color="#990000">/*</font>.pyc # Fails to build without this cleanup
+<!-- -->
+<font color="#990000">clean:</font> 
+	dh_testdir
+	dh_testroot
+	dh_clean 
+<!-- -->
+<font color="#990000">install:</font>
+<!-- -->
+<font color="#990000">binary-indep:</font> install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_install
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+<!-- -->
+<font color="#990000">binary-arch:</font>
+<!-- -->
+<font color="#990000">binary:</font> binary-indep
+<!-- -->
+<b><font color="#000080">.PHONY:</font></b> build clean binary-indep binary-arch binary install</tt></pre>
+OpenLayers needs to construct a "minified" library, so the build rule
+has to go into the build directory that comes with OpenLayers and run the
+build python script.  However, this leaves python compiled files (pyc).
+These cause the debian create process to be unhappy.
+
+The next file to modify in the debian directory is the <i>control</i> file.
+<pre>Source: openlayers
+Section: web
+Priority: extra
+Maintainer: Kurt Schwehr <kurtschwehr@yahoo.com>
+Depends: ${misc:Depends}
+Suggests: javascript-common
+Build-Depends: debhelper (>= 6)
+Standards-Version: 3.8.0
+Homepage: http://openlayers.org/
+<!-- -->
+Package: <b>libjs-openlayers</b>
+Architecture: all
+Description: JavaScript web mapping
+  OpenLayers makes it easy to put a dynamic map in any web page. It
+  can display map tiles and markers loaded from any source. MetaCarta
+  developed the initial version of OpenLayers and gave it to the
+  public to further the use of geographic information of all
+  kinds. OpenLayers is completely free, Open Source JavaScript,
+  released under a BSD-style License.</pre>
+In the control file, the blank line matters, the long description must
+be indented, and there must be a new line at the end of the file.
+
+I am not sure what ${misc:Depends} does and note that the Package name
+is different.  This libjs will let people search for all the
+JavaScript libraries.
+
+The next step for me was to setup a <a href="http://gnupg.org">GNU
+Privacy Guard</a> key to sign the package as described in the online
+book <a href="http://www.gnupg.org/gph/en/manual.html">The GNU Privacy
+Handbook</a>
+<pre><b>gpg --gen-key # Use all the default values</b>
+<b>gpg --output kurtschwehr.gpg --export kurtschwehr@yahoo.com</b> # Put in your name and email here
+<b>scp kurtschwehr.gpg schwehr.org:www/</b> # Put your public key somewhere for people be able to get it</pre>
+The debian directory really does have to be inside the unpacked source tree.
+
+Now we are ready to build the file.  
+<pre><b>cd ~/deb_pkgs/openlayers-2.8/openlayers-2.8</b>
+<b>debuild</b>
+# enter your password 2 times to sign the package
+<b>ls -l libjs-openlayers_2.8-1_all.deb</b></pre>
+This builds a binary deb that we can install in a moment.  First we want to build the source debian.
+<pre><b>debuild -S</b>
+<b>ls -l ../openlayers_2.8-1.diff.gz</b></pre>
+At this point we tried to test the package with pbuilder in it's own little space but
+never succeeded.
+<pre><b>sudo pbuilder --create</b> # Takes a while
+<b>sudo pbuilder build ../*.dsc</b></pre>
+But this kept failing.  First it complained about no debhelper 7 or greater, so I
+backed off to requiring debhelper 6 or greater.  However, I still got this:
+<pre>pbuilder-satisfydepends-dummy: Depends: debhelper (&gt;= 7) but it is not installable</pre>
+To finish it all off:
+<pre><b>sudo dpkg -i libjs-openlayers_2.8-1_all.deb</b></pre>
+-----

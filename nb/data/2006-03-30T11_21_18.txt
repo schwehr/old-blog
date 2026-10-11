@@ -1,0 +1,88 @@
+TITLE: First database creation with sqlalchemy
+AUTHOR: Kurt
+DATE: 03.30.2006 11:21
+DESC: starting up
+-----
+BODY:
+A quick look in the sqlite driver within sqlalchemy show that it is
+using the pysqlite2 driver (for sqlite3) and if not, it falls back on
+pysqlite which is will only generate sqlite2 databases.  sqlite2 is
+pretty clunky, so I need to get the pysqlite2 drivers into fink soon!
+Here is how they do conditional driver loading.  An interesting read:
+<pre>
+try:
+    from pysqlite2 import dbapi2 as sqlite
+except:
+    try:
+        sqlite = __import__('sqlite') # skip ourselves
+    except:
+        sqlite = None
+</pre>
+Now here is my first attempt at creating a database via sqlalchemy:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">''</font><font color="#008000">'Use SQLAlchemy to create/add data to a database'</font><font color="#008000">''</font>
+<strong>from</strong> <font color="#2040a0">sqlalchemy</font> <strong>import</strong> <font color="4444FF">*</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+<strong>if</strong> <font color="#2040a0">os</font>.<font color="#2040a0">access</font><font color="4444FF">(</font><font color="#008000">'ais.db'</font>,<font color="#2040a0">os</font>.<font color="#2040a0">W_OK</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">os</font>.<font color="#2040a0">remove</font><font color="4444FF">(</font><font color="#008000">'ais.db'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">db</font> <font color="4444FF">=</font> <font color="#2040a0">create_engine</font><font color="4444FF">(</font><font color="#008000">'sqlite://filename=ais.db'</font>,<font color="#2040a0">echo</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">msg1table</font> <font color="4444FF">=</font> <font color="#2040a0">Table</font><font color="4444FF">(</font><font color="#008000">'msg1'</font>, <font color="#2040a0">db</font>,
+		  <font color="#444444">#  unique index</font>
+		  <font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'messageId'</font>, <font color="#2040a0">Integer</font>,<font color="#2040a0">unique</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'mmsi'</font>,<font color="#2040a0">Integer</font>, <font color="#2040a0">index</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lon'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lat'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'SOG'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'ROT'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'time'</font>,<font color="#2040a0">TIMESTAMP</font><font color="4444FF">)</font>
+		  <font color="4444FF">)</font>.<font color="#2040a0">create</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Running it looks like this.  The key is the "echo=True".
+<pre>
+./ais-sqlalchemy
+[2006-03-30 11:18:44,781] [engine]: 
+CREATE TABLE msg1(
+	messageId INTEGER, 
+	mmsi INTEGER, 
+	lon NUMERIC(10, 2), 
+	lat NUMERIC(10, 2), 
+	SOG NUMERIC(10, 2), 
+	ROT NUMERIC(10, 2), 
+	time TIMESTAMP
+)
+
+
+[2006-03-30 11:18:44,803] [engine]: None
+[2006-03-30 11:18:44,838] [engine]: CREATE UNIQUE INDEX ux_messageId ON msg1 (messageId)
+[2006-03-30 11:18:44,838] [engine]: None
+[2006-03-30 11:18:44,842] [engine]: CREATE INDEX ix_mmsi ON msg1 (mmsi)
+[2006-03-30 11:18:44,842] [engine]: None
+</pre>
+Since I don't have the newer driver, the above code generates and
+sqlite2 database.
+<pre>
+less ais.db
+
+** This file contains an SQLite 2.1 database **^@
+...
+
+sqlite ais.db '.tables'
+msg1
+
+sqlite ais.db '.schema msg1'
+CREATE TABLE msg1(
+        messageId INTEGER, 
+        mmsi INTEGER, 
+        lon NUMERIC(10, 2), 
+        lat NUMERIC(10, 2), 
+        SOG NUMERIC(10, 2), 
+        ROT NUMERIC(10, 2), 
+        time TIMESTAMP
+);
+CREATE INDEX ix_mmsi ON msg1 (mmsi);
+CREATE UNIQUE INDEX ux_messageId ON msg1 (messageId);
+</pre>
+-----

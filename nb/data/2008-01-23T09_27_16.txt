@@ -1,0 +1,126 @@
+TITLE: RTCM AIS binaries for VTS meeting yesterday
+AUTHOR: Kurt
+DATE: 01.23.2008 09:27
+DESC: prototype of new xml
+-----
+BODY:
+Yesterday was the RTCM SC121 Working Group on Expanded Use of AIS
+within VTS meeting at the USCG RDC in Groton, CT.  We had a very
+productive meeting that covered a wide range of topics.  Most
+importantly for me, there was a big discussion on three proposed AIS
+binary messages.  We focused on the meteorology and hydrography
+(met/hydro) message.  The group has decided to create a message that
+can roll up a set of various sensor measurements from a station.  The
+message will have a variable number of reports and the censor type for
+each sub-report can be variable.  This is going to force me to extend
+my XML description language, which is something I needed to do anyway.
+I need a "switch" construct to handle the communications state in the
+position reports anyway.  
+
+I am currently thinking along the following lines.  <b>Please give me
+feedback on this!</b>
+
+For arrays, there are two possible cases.  I think it is always better
+to specify how many groups there are going to be.  The code then will
+just loop through the data.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;some_number&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;3&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Number of data items in the array<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">arraygroup</font> <font color="#2040a0">name=</font><font color="#008000">&quot;sensor_report&quot;</font> <font color="#2040a0">length=</font><font color="#008000">&quot;some_number&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Some description<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;field1&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;5&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Some sensor value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;field2&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;6&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Another sensor value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/arraygroup</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+In some of the existing binary messages, the authors counted on the
+length of the data received to figure out how many groups there will
+be.  Please do not create any more of these types, but here is how I
+would code these messages:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">arraygroup</font> <font color="#2040a0">name=</font><font color="#008000">&quot;_GUESS_&quot;</font> <font color="#2040a0">length=</font><font color="#008000">&quot;some_number&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;field1&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;5&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Some sensor value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;field2&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;6&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Another sensor value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/switch</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+For the <b>switch</b> construct, I had something like this flat structure
+before.  This made parsing easier than a deep structure.  However,
+I don't think this will work for all of the ways the group wants
+to represent data.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;slotoffset&quot;</font> <font color="#2040a0">start=</font><font color="#008000">&quot;154&quot;</font> <font color="#2040a0">end=</font><font color="#008000">&quot;167&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;14&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>In what slot will the next transmission occur<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">case</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldname</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>slottimeout<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/fieldname</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">values</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>0<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/values</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/case</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">range</font> <font color="#2040a0">min=</font><font color="#008000">&quot;0&quot;</font> <font color="#2040a0">max=</font><font color="#008000">&quot;2249&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font> 
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font> 
+</pre>
+I am thinking more along these lines that will be more familar to
+programmers.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;some_number&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;4&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Which item to use in the switch<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">switch</font> <font color="#2040a0">name=</font><font color="#008000">&quot;switchname&quot;</font> <font color="#2040a0">use=</font><font color="#008000">&quot;some_number&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">case</font> <font color="#2040a0">values=</font><font color="#008000">&quot;0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;field1&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;5&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Some sensor value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/case</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">case</font> <font color="#2040a0">values=</font><font color="#008000">&quot;1 3&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;field2&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;6&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Illustrating multiple values for a case as in commstate<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">case</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">case</font> <font color="#2040a0">values=</font><font color="#008000">&quot;2&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;field2&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;6&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;unsigned int&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Another sensor value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">case</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/arraygroup</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+One big problem with the above changes comes with automatic SQL
+database table creation.  Do I fully expand all possible columns for a
+table resulting in a very wide database table that is mostly empty?
+Or do I split each case into a separate table?  In this case receiving
+a 3 sub-report met/hydro message would result in a SQL block with
+inserts into three separate tables.  I think that I should add a
+hinting tag on how to handle sql tables.
+
+This is going to take some serious coding effort on my part.  The
+way I have my compiler structured, it is going to be almost a complete
+rewrite.  Maybe I will start to output C++ code this time around in
+addition to python.
+
+D. Pietraszewski gave us a quick run through on AIS message types 25
+and 26.  I have not read through the ITU 1371-3 specification yet, so
+this was really helpful for me.  Message 25 is especially interesting.
+It is designed to fit in exactly one slot and allows for units to do
+a carrier sense (CS) before transmitting a binary message.  This will
+allow units to play nicer with the VHF Data Link and cause fewer
+packet collisions.  However, that doesn't give us very many bits for
+application data.  It can be either addressed for 98 bits of data or
+broadcast for 128 bits of payload.
+
+Message 26 is another binary message type.  This addressed or
+broadcast message like message 25, but adds multiple slots and
+communications state.  I wish they had put the comm state before the
+variable length binary data, but nobody asked me.  Adding the
+communications state will allow broadcast messages to be scheduled
+into slots such that all transponders in a cell will know when to
+expect the next broadcast message.
+
+Somewhere on 395 in CT:
+
+<img src="http://schwehr.org/blog/attachments/2008-01/ct.jpg"/>
+-----

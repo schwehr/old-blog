@@ -1,0 +1,192 @@
+<html>
+<head>
+  <title>ams.py</title>
+</head>
+<body bgcolor="#000000"  text="#C0C0C0" vlink="#FFFFFF" alink="#00FF00" link="#FFFFFF">
+<pre>
+<a name="line1" href="#line1">  1</a> <font color="#909000">#!/usr/bin/env python</font>
+<a name="line2" href="#line2">  2</a> <font color="yellow">&quot;&quot;</font><font color="yellow">&quot;Pmag python library - Kurt's draft version
+<a name="line3" href="#line3">  3</a> 
+<a name="line4" href="#line4">  4</a> Hext - statistics for Anisotropy
+<a name="line5" href="#line5">  5</a> s_Matrix - the diagonalized s matrix
+<a name="line6" href="#line6">  6</a> 
+<a name="line7" href="#line7">  7</a> Right now this just wraps k15_hext, k15_s, s_eigs, etc
+<a name="line8" href="#line8">  8</a> 
+<a name="line9" href="#line9">  9</a> &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line10" href="#line10"> 10</a> 
+<a name="line11" href="#line11"> 11</a> <font color="#909000"># $Id: ams.py,v 1.6 2005/02/22 00:54:48 schwehr Exp $</font>
+<a name="line12" href="#line12"> 12</a> 
+<a name="line13" href="#line13"> 13</a> <font color="#909000">######################################################################</font>
+<a name="line14" href="#line14"> 14</a> <font color="#909000">#     Copyright (C) 2005  Kurt Schwehr</font>
+<a name="line15" href="#line15"> 15</a> <font color="#909000">#</font>
+<a name="line16" href="#line16"> 16</a> <font color="#909000">#    This program is free software; you can redistribute it and/or modify</font>
+<a name="line17" href="#line17"> 17</a> <font color="#909000">#    it under the terms of the GNU General Public License as published by</font>
+<a name="line18" href="#line18"> 18</a> <font color="#909000">#    the Free Software Foundation; either version 2 of the License, or</font>
+<a name="line19" href="#line19"> 19</a> <font color="#909000">#    (at your option) any later version.</font>
+<a name="line20" href="#line20"> 20</a> <font color="#909000">#</font>
+<a name="line21" href="#line21"> 21</a> <font color="#909000">#    This program is distributed in the hope that it will be useful,</font>
+<a name="line22" href="#line22"> 22</a> <font color="#909000">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</font>
+<a name="line23" href="#line23"> 23</a> <font color="#909000">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</font>
+<a name="line24" href="#line24"> 24</a> <font color="#909000">#    GNU General Public License for more details.</font>
+<a name="line25" href="#line25"> 25</a> <font color="#909000">#</font>
+<a name="line26" href="#line26"> 26</a> <font color="#909000">#    You should have received a copy of the GNU General Public License</font>
+<a name="line27" href="#line27"> 27</a> <font color="#909000">#    along with this program; if not, write to the Free Software</font>
+<a name="line28" href="#line28"> 28</a> <font color="#909000">#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</font>
+<a name="line29" href="#line29"> 29</a> <font color="#909000">######################################################################</font>
+<a name="line30" href="#line30"> 30</a> 
+<a name="line31" href="#line31"> 31</a> <strong>import</strong> <font color="#B0B0B0">popen2</font>,<font color="#B0B0B0">string</font>
+<a name="line32" href="#line32"> 32</a> <strong>import</strong> <font color="#B0B0B0">sqlite</font> <font color="#909000"># for DepthLookup</font>
+<a name="line33" href="#line33"> 33</a> 
+<a name="line34" href="#line34"> 34</a> <strong>class</strong> <font color="#B0B0B0">S_Matrix</font><font color="darkCyan">:</font>
+<a name="line35" href="#line35"> 35</a>     <font color="yellow">&quot;&quot;</font><font color="yellow">&quot; k15_s wrapper &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line36" href="#line36"> 36</a> <strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,k15_lines)</font>:
+<a name="line37" href="#line37"> 37</a> </strong>        <font color="yellow">&quot;&quot;</font><font color="yellow">&quot; Take 4 lines of k15 data and fill in the object&quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line38" href="#line38"> 38</a>         <strong>assert</strong> <font color="#FF0000">4</font> <font color="darkCyan">=</font><font color="darkCyan">=</font> <font color="#B0B0B0">len</font><font color="darkCyan">(</font><font color="#B0B0B0">k15_lines</font><font color="darkCyan">)</font>
+<a name="line39" href="#line39"> 39</a> 
+<a name="line40" href="#line40"> 40</a>         <font color="#909000"># Use Lisa's k15_hext for now.  FIX to use all python code</font>
+<a name="line41" href="#line41"> 41</a>         <font color="#909000"># FIX: make sure the lines all have \n at the end</font>
+<a name="line42" href="#line42"> 42</a>         <font color="#B0B0B0">fin</font>,<font color="#B0B0B0">fout</font><font color="darkCyan">=</font><font color="#B0B0B0">popen2</font>.<font color="#B0B0B0">popen2</font><font color="darkCyan">(</font><font color="yellow">&quot;k15_s&quot;</font><font color="darkCyan">)</font>
+<a name="line43" href="#line43"> 43</a>         <strong>for</strong> <font color="#B0B0B0">l</font> <strong>in</strong> <font color="#B0B0B0">range</font><font color="darkCyan">(</font><font color="#FF0000">4</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line44" href="#line44"> 44</a>             <font color="#B0B0B0">fout</font>.<font color="#B0B0B0">write</font><font color="darkCyan">(</font><font color="#B0B0B0">k15_lines</font><font color="darkCyan">[</font><font color="#B0B0B0">l</font><font color="darkCyan">]</font><font color="darkCyan">)</font>
+<a name="line45" href="#line45"> 45</a>         <font color="#B0B0B0">fout</font>.<font color="#B0B0B0">close</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line46" href="#line46"> 46</a>         <font color="#B0B0B0">line</font> <font color="darkCyan">=</font> <font color="#B0B0B0">fin</font>.<font color="#B0B0B0">readline</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line47" href="#line47"> 47</a>         <font color="#B0B0B0">self</font>.<font color="#B0B0B0">values</font> <font color="darkCyan">=</font> <font color="#B0B0B0">line</font>.<font color="#B0B0B0">split</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line48" href="#line48"> 48</a>         <strong>for</strong> <font color="#B0B0B0">i</font> <strong>in</strong> <font color="#B0B0B0">range</font><font color="darkCyan">(</font><font color="#FF0000">7</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line49" href="#line49"> 49</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">values</font><font color="darkCyan">[</font><font color="#B0B0B0">i</font><font color="darkCyan">]</font> <font color="darkCyan">=</font> <font color="#B0B0B0">float</font><font color="darkCyan">(</font><font color="#B0B0B0">self</font>.<font color="#B0B0B0">values</font><font color="darkCyan">[</font><font color="#B0B0B0">i</font><font color="darkCyan">]</font><font color="darkCyan">)</font>
+<a name="line50" href="#line50"> 50</a>         <font color="#B0B0B0">self</font>.<font color="#B0B0B0">sigma</font> <font color="darkCyan">=</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">values</font><font color="darkCyan">[</font><font color="#FF0000">6</font><font color="darkCyan">]</font>
+<a name="line51" href="#line51"> 51</a>         <font color="#909000">#print line, self.values</font>
+<a name="line52" href="#line52"> 52</a> 
+<a name="line53" href="#line53"> 53</a> <strong>class</strong> <font color="#B0B0B0">Hext</font><font color="darkCyan">:</font>
+<a name="line54" href="#line54"> 54</a>     <font color="yellow">&quot;&quot;</font><font color="yellow">&quot; Handle Lisa's k15_hext output &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line55" href="#line55"> 55</a>     <font color="#B0B0B0">maxpos</font> <font color="darkCyan">=</font> <font color="#FF0000">0</font>
+<a name="line56" href="#line56"> 56</a>     <font color="#B0B0B0">intpos</font> <font color="darkCyan">=</font> <font color="#FF0000">1</font>
+<a name="line57" href="#line57"> 57</a>     <font color="#B0B0B0">minpos</font> <font color="darkCyan">=</font> <font color="#FF0000">2</font>
+<a name="line58" href="#line58"> 58</a> <strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,k15_lines)</font>:
+<a name="line59" href="#line59"> 59</a> </strong>        <font color="yellow">&quot;&quot;</font><font color="yellow">&quot;Take 4 lines of k15 Kappabridge data and create a Hext stats object &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line60" href="#line60"> 60</a>         <strong>assert</strong> <font color="#FF0000">4</font> <font color="darkCyan">=</font><font color="darkCyan">=</font> <font color="#B0B0B0">len</font><font color="darkCyan">(</font><font color="#B0B0B0">k15_lines</font><font color="darkCyan">)</font>
+<a name="line61" href="#line61"> 61</a> 
+<a name="line62" href="#line62"> 62</a>         <font color="#909000"># Use Lisa's k15_hext for now.  FIX to use all python code</font>
+<a name="line63" href="#line63"> 63</a>         <font color="#909000"># FIX: make sure the lines all have \n at the end</font>
+<a name="line64" href="#line64"> 64</a>         <font color="#B0B0B0">fin</font>,<font color="#B0B0B0">fout</font><font color="darkCyan">=</font><font color="#B0B0B0">popen2</font>.<font color="#B0B0B0">popen2</font><font color="darkCyan">(</font><font color="yellow">&quot;k15_hext&quot;</font><font color="darkCyan">)</font>
+<a name="line65" href="#line65"> 65</a>         <strong>for</strong> <font color="#B0B0B0">l</font> <strong>in</strong> <font color="#B0B0B0">range</font><font color="darkCyan">(</font><font color="#FF0000">4</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line66" href="#line66"> 66</a>             <font color="#B0B0B0">fout</font>.<font color="#B0B0B0">write</font><font color="darkCyan">(</font><font color="#B0B0B0">k15_lines</font><font color="darkCyan">[</font><font color="#B0B0B0">l</font><font color="darkCyan">]</font><font color="darkCyan">)</font>
+<a name="line67" href="#line67"> 67</a>         <font color="#B0B0B0">fout</font>.<font color="#B0B0B0">close</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line68" href="#line68"> 68</a>         <font color="#B0B0B0">lines</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font>
+<a name="line69" href="#line69"> 69</a>         <strong>for</strong> <font color="#B0B0B0">l</font> <strong>in</strong> <font color="#B0B0B0">range</font><font color="darkCyan">(</font><font color="#FF0000">5</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line70" href="#line70"> 70</a>             <font color="#B0B0B0">lines</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">fin</font>.<font color="#B0B0B0">readline</font><font color="darkCyan">(</font><font color="darkCyan">)</font><font color="darkCyan">)</font>
+<a name="line71" href="#line71"> 71</a>         <font color="#909000">#print lines</font>
+<a name="line72" href="#line72"> 72</a>         <font color="#909000"># d is for dummy positions of things we want to just drop</font>
+<a name="line73" href="#line73"> 73</a>         <font color="#B0B0B0">self</font>.<font color="#B0B0B0">sampleName</font>,<font color="#B0B0B0">d</font>,<font color="#B0B0B0">d</font>,<font color="#B0B0B0">d</font>,<font color="#B0B0B0">self</font>.<font color="#B0B0B0">bulk_susc</font> <font color="darkCyan">=</font> <font color="#B0B0B0">lines</font><font color="darkCyan">[</font><font color="#FF0000">0</font><font color="darkCyan">]</font>.<font color="#B0B0B0">split</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line74" href="#line74"> 74</a>         <font color="#909000">#print self.sampleName, self.bulk_susc</font>
+<a name="line75" href="#line75"> 75</a> 
+<a name="line76" href="#line76"> 76</a>         <font color="#B0B0B0">d</font>,<font color="#B0B0B0">d</font>, <font color="#B0B0B0">self</font>.<font color="#B0B0B0">F</font>, <font color="#B0B0B0">d</font>,<font color="#B0B0B0">d</font>, <font color="#B0B0B0">self</font>.<font color="#B0B0B0">F12</font>,<font color="#B0B0B0">d</font>,<font color="#B0B0B0">d</font>,<font color="#B0B0B0">self</font>.<font color="#B0B0B0">F23</font> <font color="darkCyan">=</font> <font color="#B0B0B0">lines</font><font color="darkCyan">[</font><font color="#FF0000">1</font><font color="darkCyan">]</font>.<font color="#B0B0B0">split</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line77" href="#line77"> 77</a>         <font color="#909000">#print self.F,self.F12,self.F23</font>
+<a name="line78" href="#line78"> 78</a>         <font color="#B0B0B0">self</font>.<font color="#B0B0B0">tau</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">dec</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">inc</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font>
+<a name="line79" href="#line79"> 79</a>         <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eij</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eij_dec</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eij_inc</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font>
+<a name="line80" href="#line80"> 80</a>         <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eik</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eik_dec</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eik_inc</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font><font color="darkCyan">;</font>
+<a name="line81" href="#line81"> 81</a> 
+<a name="line82" href="#line82"> 82</a>         <strong>for</strong> <font color="#B0B0B0">i</font> <strong>in</strong> <font color="#B0B0B0">range</font><font color="darkCyan">(</font><font color="#FF0000">3</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line83" href="#line83"> 83</a>             <font color="#B0B0B0">tau</font>, <font color="#B0B0B0">dec</font>, <font color="#B0B0B0">inc</font>, <font color="#B0B0B0">Eij</font>, <font color="#B0B0B0">Eij_dec</font>, <font color="#B0B0B0">Eij_inc</font>, <font color="#B0B0B0">Eik</font>, <font color="#B0B0B0">Eik_dec</font>, <font color="#B0B0B0">Eik_inc</font> <font color="darkCyan">=</font> <font color="#B0B0B0">lines</font><font color="darkCyan">[</font><font color="#B0B0B0">i</font><font color="darkCyan">+</font><font color="#FF0000">2</font><font color="darkCyan">]</font>.<font color="#B0B0B0">split</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line84" href="#line84"> 84</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">tau</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">tau</font><font color="darkCyan">)</font>
+<a name="line85" href="#line85"> 85</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">dec</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">dec</font><font color="darkCyan">)</font>
+<a name="line86" href="#line86"> 86</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">inc</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">inc</font><font color="darkCyan">)</font>
+<a name="line87" href="#line87"> 87</a> 
+<a name="line88" href="#line88"> 88</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eij</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">Eij</font><font color="darkCyan">)</font>
+<a name="line89" href="#line89"> 89</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eij_dec</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">Eij_dec</font><font color="darkCyan">)</font>
+<a name="line90" href="#line90"> 90</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eij_inc</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">Eij_inc</font><font color="darkCyan">)</font>
+<a name="line91" href="#line91"> 91</a> 
+<a name="line92" href="#line92"> 92</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eik</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">Eik</font><font color="darkCyan">)</font>
+<a name="line93" href="#line93"> 93</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eik_dec</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">Eik_dec</font><font color="darkCyan">)</font>
+<a name="line94" href="#line94"> 94</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">Eik_inc</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font><font color="#B0B0B0">Eik_inc</font><font color="darkCyan">)</font>
+<a name="line95" href="#line95"> 95</a> 
+<a name="line96" href="#line96"> 96</a> 
+<a name="line97" href="#line97"> 97</a> <strong>class</strong> <font color="#B0B0B0">SampleName</font><font color="darkCyan">:</font>
+<a name="line98" href="#line98"> 98</a>     <font color="yellow">&quot;&quot;</font><font color="yellow">&quot; Parse a Kurt style pmag sample cube name &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line99" href="#line99"> 99</a> <strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,nameString=&quot;&quot;)</font>:
+<a name="line100" href="#line100">100</a> </strong>        <strong>if</strong> <font color="#FF0000">0</font><font color="darkCyan">=</font><font color="darkCyan">=</font><font color="#B0B0B0">len</font><font color="darkCyan">(</font><font color="#B0B0B0">nameString</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line101" href="#line101">101</a>             <font color="#909000"># Make a blank object</font>
+<a name="line102" href="#line102">102</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">cruise</font><font color="darkCyan">=</font><font color="yellow">&quot;None&quot;</font>
+<a name="line103" href="#line103">103</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">coreNum</font><font color="darkCyan">=</font><font color="darkCyan">-</font><font color="#FF0000">1</font>
+<a name="line104" href="#line104">104</a>         <strong>else</strong><font color="darkCyan">:</font>
+<a name="line105" href="#line105">105</a>             <font color="#909000">#self.cruise,core,section,self.depthOffset=nameString.split(&quot;-&quot;)</font>
+<a name="line106" href="#line106">106</a>             <font color="#B0B0B0">lst</font> <font color="darkCyan">=</font> <font color="#B0B0B0">nameString</font>.<font color="#B0B0B0">split</font><font color="darkCyan">(</font><font color="yellow">&quot;-&quot;</font><font color="darkCyan">)</font>
+<a name="line107" href="#line107">107</a> 
+<a name="line108" href="#line108">108</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">cruise</font><font color="darkCyan">=</font><font color="#B0B0B0">lst</font><font color="darkCyan">[</font><font color="#FF0000">0</font><font color="darkCyan">]</font>
+<a name="line109" href="#line109">109</a>             <font color="#909000"># FIX: handle core numbers greater than 9</font>
+<a name="line110" href="#line110">110</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">coreNum</font><font color="darkCyan">=</font><font color="#B0B0B0">int</font><font color="darkCyan">(</font><font color="#B0B0B0">lst</font><font color="darkCyan">[</font><font color="#FF0000">1</font><font color="darkCyan">]</font><font color="darkCyan">[</font><font color="#FF0000">0</font><font color="darkCyan">]</font><font color="darkCyan">)</font>
+<a name="line111" href="#line111">111</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">coreType</font><font color="darkCyan">=</font><font color="#B0B0B0">lst</font><font color="darkCyan">[</font><font color="#FF0000">1</font><font color="darkCyan">]</font><font color="darkCyan">[</font><font color="#FF0000">1</font><font color="darkCyan">]</font>
+<a name="line112" href="#line112">112</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">coreHalf</font><font color="darkCyan">=</font><font color="#B0B0B0">lst</font><font color="darkCyan">[</font><font color="#FF0000">1</font><font color="darkCyan">]</font><font color="darkCyan">[</font><font color="#FF0000">2</font><font color="darkCyan">]</font>
+<a name="line113" href="#line113">113</a> 
+<a name="line114" href="#line114">114</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">section</font><font color="darkCyan">=</font><font color="#B0B0B0">int</font><font color="darkCyan">(</font><font color="#B0B0B0">lst</font><font color="darkCyan">[</font><font color="#FF0000">2</font><font color="darkCyan">]</font><font color="darkCyan">[</font><font color="#FF0000">1</font><font color="darkCyan">]</font><font color="darkCyan">)</font>
+<a name="line115" href="#line115">115</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">depthOffset</font><font color="darkCyan">=</font><font color="#B0B0B0">float</font><font color="darkCyan">(</font><font color="#B0B0B0">lst</font><font color="darkCyan">[</font><font color="#FF0000">3</font><font color="darkCyan">]</font><font color="darkCyan">)</font>
+<a name="line116" href="#line116">116</a>             <font color="#909000"># FIX: check for optional part</font>
+<a name="line117" href="#line117">117</a>             <strong>if</strong> <font color="#FF0000">4</font><font color="darkCyan">=</font><font color="darkCyan">=</font><font color="#B0B0B0">len</font><font color="darkCyan">(</font><font color="#B0B0B0">lst</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line118" href="#line118">118</a>                 <font color="#909000"># There was no L,C,R tag for left, center, right</font>
+<a name="line119" href="#line119">119</a>                 <font color="#B0B0B0">self</font>.<font color="#B0B0B0">horizPart</font><font color="darkCyan">=</font><font color="#B0B0B0">None</font>
+<a name="line120" href="#line120">120</a>             <strong>else</strong><font color="darkCyan">:</font>
+<a name="line121" href="#line121">121</a>                 <font color="#B0B0B0">self</font>.<font color="#B0B0B0">horizPart</font><font color="darkCyan">=</font><font color="#B0B0B0">lst</font><font color="darkCyan">[</font><font color="#FF0000">4</font><font color="darkCyan">]</font>
+<a name="line122" href="#line122">122</a> 
+<a name="line123" href="#line123">123</a> <strong>   <font color="ff0000"> def</font><font color="ff0000"> __str__</font><font color="2040a0">(self)</font>:
+<a name="line124" href="#line124">124</a> </strong>        <font color="yellow">&quot;&quot;</font><font color="yellow">&quot; Reconstruct the original sample name string &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line125" href="#line125">125</a>         <font color="#B0B0B0">tmpStr</font><font color="darkCyan">=</font><font color="#B0B0B0">self</font>.<font color="#B0B0B0">cruise</font><font color="darkCyan">+</font><font color="yellow">&quot;-&quot;</font><font color="darkCyan">+</font><font color="darkCyan">(</font><font color="yellow">&quot;%d&quot;</font><font color="darkCyan">%</font><font color="#B0B0B0">self</font>.<font color="#B0B0B0">coreNum</font><font color="darkCyan">)</font><font color="darkCyan">+</font><font color="#B0B0B0">self</font>.<font color="#B0B0B0">coreType</font><font color="darkCyan">+</font><font color="#B0B0B0">self</font>.<font color="#B0B0B0">coreHalf</font>
+<a name="line126" href="#line126">126</a>         <font color="#B0B0B0">tmpStr</font><font color="darkCyan">+</font><font color="darkCyan">=</font><font color="yellow">&quot;-s&quot;</font> <font color="darkCyan">+</font> <font color="darkCyan">(</font><font color="yellow">&quot;%d&quot;</font> <font color="darkCyan">%</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">section</font><font color="darkCyan">)</font> <font color="darkCyan">+</font> <font color="yellow">&quot;-&quot;</font>
+<a name="line127" href="#line127">127</a>         <font color="#B0B0B0">o</font> <font color="darkCyan">=</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">depthOffset</font>
+<a name="line128" href="#line128">128</a>         <strong>if</strong> <font color="darkCyan">(</font> <font color="darkCyan">(</font><font color="#B0B0B0">round</font><font color="darkCyan">(</font><font color="#B0B0B0">o</font><font color="darkCyan">)</font><font color="darkCyan">-</font><font color="#FF0000">0.01</font><font color="darkCyan">&lt;</font><font color="#B0B0B0">o</font><font color="darkCyan">)</font> <font color="darkCyan">&amp;</font> <font color="darkCyan">(</font><font color="#B0B0B0">round</font><font color="darkCyan">(</font><font color="#B0B0B0">o</font><font color="darkCyan">)</font><font color="darkCyan">+</font><font color="#FF0000">0.01</font><font color="darkCyan">&gt;</font><font color="#B0B0B0">o</font><font color="darkCyan">)</font> <font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line129" href="#line129">129</a>             <font color="#B0B0B0">tmpStr</font><font color="darkCyan">+</font><font color="darkCyan">=</font><font color="yellow">&quot;%03d&quot;</font> <font color="darkCyan">%</font> <font color="#B0B0B0">int</font><font color="darkCyan">(</font><font color="#B0B0B0">o</font><font color="darkCyan">)</font>
+<a name="line130" href="#line130">130</a>         <strong>else</strong><font color="darkCyan">:</font>
+<a name="line131" href="#line131">131</a>             <font color="#B0B0B0">tmpStr</font><font color="darkCyan">+</font><font color="darkCyan">=</font><font color="yellow">&quot;%03.1f&quot;</font> <font color="darkCyan">%</font> <font color="#B0B0B0">o</font>
+<a name="line132" href="#line132">132</a>         <strong>if</strong> <font color="darkCyan">(</font><font color="#B0B0B0">self</font>.<font color="#B0B0B0">horizPart</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line133" href="#line133">133</a>             <font color="#B0B0B0">tmpStr</font><font color="darkCyan">+</font><font color="darkCyan">=</font><font color="yellow">&quot;-&quot;</font><font color="darkCyan">+</font><font color="#B0B0B0">self</font>.<font color="#B0B0B0">horizPart</font>
+<a name="line134" href="#line134">134</a>         <strong>else</strong><font color="darkCyan">:</font>
+<a name="line135" href="#line135">135</a>             <strong>pass</strong> <font color="#909000"># Then just drop it</font>
+<a name="line136" href="#line136">136</a>         <strong>return</strong> <font color="#B0B0B0">tmpStr</font>
+<a name="line137" href="#line137">137</a> 
+<a name="line138" href="#line138">138</a> 
+<a name="line139" href="#line139">139</a> <strong>class</strong> <font color="#B0B0B0">DepthLookup</font><font color="darkCyan">:</font>
+<a name="line140" href="#line140">140</a> <strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self, db_cx)</font>:
+<a name="line141" href="#line141">141</a> </strong>        <font color="yellow">&quot;&quot;</font><font color="yellow">&quot; Lookup the section table and make a dictionary.  Loads from the database section table &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line142" href="#line142">142</a>         <font color="#B0B0B0">cu</font> <font color="darkCyan">=</font> <font color="#B0B0B0">db_cx</font>.<font color="#B0B0B0">cursor</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line143" href="#line143">143</a>         <font color="#B0B0B0">cu</font>.<font color="#B0B0B0">execute</font> <font color="darkCyan">(</font><font color="yellow">&quot;SELECT cruise,corenum,section,sectopdepth FROM sections&quot;</font><font color="darkCyan">)</font>
+<a name="line144" href="#line144">144</a>         <font color="#B0B0B0">self</font>.<font color="#B0B0B0">table</font> <font color="darkCyan">=</font> <font color="darkCyan"><strong>{</strong></font><font color="darkCyan"><strong>}</strong></font>
+<a name="line145" href="#line145">145</a>         <strong>for</strong> <font color="#B0B0B0">row</font> <strong>in</strong> <font color="#B0B0B0">cu</font>.<font color="#B0B0B0">fetchall</font><font color="darkCyan">(</font><font color="darkCyan">)</font><font color="darkCyan">:</font>
+<a name="line146" href="#line146">146</a>             <font color="#B0B0B0">key</font> <font color="darkCyan">=</font> <font color="#B0B0B0">row</font>.<font color="#B0B0B0">cruise</font> <font color="darkCyan">+</font> <font color="yellow">&quot;-&quot;</font> <font color="darkCyan">+</font> <font color="#B0B0B0">str</font><font color="darkCyan">(</font><font color="#B0B0B0">row</font>.<font color="#B0B0B0">corenum</font><font color="darkCyan">)</font> <font color="darkCyan">+</font> <font color="yellow">&quot;-&quot;</font> <font color="darkCyan">+</font> <font color="#B0B0B0">str</font><font color="darkCyan">(</font><font color="#B0B0B0">row</font>.<font color="#B0B0B0">section</font><font color="darkCyan">)</font>
+<a name="line147" href="#line147">147</a>             <font color="#909000">#print &quot;key=&quot;,key</font>
+<a name="line148" href="#line148">148</a>             <font color="#B0B0B0">self</font>.<font color="#B0B0B0">table</font><font color="darkCyan">[</font><font color="#B0B0B0">key</font><font color="darkCyan">]</font> <font color="darkCyan">=</font> <font color="#B0B0B0">row</font>.<font color="#B0B0B0">sectopdepth</font>
+<a name="line149" href="#line149">149</a> 
+<a name="line150" href="#line150">150</a> <strong>   <font color="ff0000"> def</font><font color="ff0000"> lookup</font><font color="2040a0">(self, sampleNameStr)</font>:
+<a name="line151" href="#line151">151</a> </strong>        <font color="yellow">&quot;&quot;</font><font color="yellow">&quot; return the depth in cm &quot;</font><font color="yellow">&quot;&quot;</font>
+<a name="line152" href="#line152">152</a>         <font color="#B0B0B0">sn</font> <font color="darkCyan">=</font> <font color="#B0B0B0">SampleName</font><font color="darkCyan">(</font><font color="#B0B0B0">sampleNameStr</font><font color="darkCyan">)</font>
+<a name="line153" href="#line153">153</a>         
+<a name="line154" href="#line154">154</a>         <font color="#B0B0B0">key</font> <font color="darkCyan">=</font> <font color="#B0B0B0">sn</font>.<font color="#B0B0B0">cruise</font> <font color="darkCyan">+</font> <font color="yellow">&quot;-&quot;</font> <font color="darkCyan">+</font> <font color="#B0B0B0">str</font><font color="darkCyan">(</font><font color="#B0B0B0">sn</font>.<font color="#B0B0B0">coreNum</font><font color="darkCyan">)</font> <font color="darkCyan">+</font> <font color="yellow">'-'</font> <font color="darkCyan">+</font> <font color="#B0B0B0">str</font><font color="darkCyan">(</font><font color="#B0B0B0">sn</font>.<font color="#B0B0B0">section</font><font color="darkCyan">)</font>
+<a name="line155" href="#line155">155</a>         <font color="#B0B0B0">depth</font> <font color="darkCyan">=</font> <font color="#B0B0B0">self</font>.<font color="#B0B0B0">table</font><font color="darkCyan">[</font><font color="#B0B0B0">key</font><font color="darkCyan">]</font> <font color="darkCyan">+</font> <font color="#B0B0B0">sn</font>.<font color="#B0B0B0">depthOffset</font>
+<a name="line156" href="#line156">156</a>         <font color="#909000">#print &quot;Found: &quot;,key, depth, &quot;(&quot;,self.table[key],&quot;+&quot;,sn.depthOffset,&quot;)&quot;</font>
+<a name="line157" href="#line157">157</a>         <strong>return</strong> <font color="#B0B0B0">depth</font>
+<a name="line158" href="#line158">158</a> 
+<a name="line159" href="#line159">159</a> 
+<a name="line160" href="#line160">160</a> <font color="#909000"># Test code</font>
+<a name="line161" href="#line161">161</a> <strong>if</strong> <font color="#B0B0B0">__name__</font> <font color="darkCyan">=</font><font color="darkCyan">=</font> <font color="yellow">'__main__'</font><font color="darkCyan">:</font>
+<a name="line162" href="#line162">162</a>     <font color="#B0B0B0">testname1</font><font color="darkCyan">=</font><font color="yellow">&quot;bp04-6gw-s1-064.5-L&quot;</font>
+<a name="line163" href="#line163">163</a>     <font color="#B0B0B0">testname2</font><font color="darkCyan">=</font><font color="yellow">&quot;bp04-6gw-s1-064.5&quot;</font>
+<a name="line164" href="#line164">164</a>     <font color="#B0B0B0">testname3</font><font color="darkCyan">=</font><font color="yellow">&quot;bp04-6gw-s1-064&quot;</font>
+<a name="line165" href="#line165">165</a>     <font color="#B0B0B0">name0</font><font color="darkCyan">=</font><font color="#B0B0B0">SampleName</font><font color="darkCyan">(</font><font color="darkCyan">)</font>
+<a name="line166" href="#line166">166</a>     <font color="#B0B0B0">name</font><font color="darkCyan">=</font><font color="#B0B0B0">SampleName</font><font color="darkCyan">(</font><font color="#B0B0B0">testname1</font><font color="darkCyan">)</font><font color="darkCyan">;</font> <strong>print</strong> <font color="#B0B0B0">name</font>
+<a name="line167" href="#line167">167</a>     <font color="#B0B0B0">name</font><font color="darkCyan">=</font><font color="#B0B0B0">SampleName</font><font color="darkCyan">(</font><font color="#B0B0B0">testname2</font><font color="darkCyan">)</font><font color="darkCyan">;</font> <strong>print</strong> <font color="#B0B0B0">name</font>
+<a name="line168" href="#line168">168</a>     <font color="#B0B0B0">name</font><font color="darkCyan">=</font><font color="#B0B0B0">SampleName</font><font color="darkCyan">(</font><font color="#B0B0B0">testname3</font><font color="darkCyan">)</font><font color="darkCyan">;</font> <strong>print</strong> <font color="#B0B0B0">name</font>
+<a name="line169" href="#line169">169</a>     
+<a name="line170" href="#line170">170</a>     <font color="#B0B0B0">k15_lines</font><font color="darkCyan">=</font><font color="darkCyan">[</font><font color="darkCyan">]</font>
+<a name="line171" href="#line171">171</a>     <font color="#B0B0B0">k15_lines</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font> <font color="yellow">&quot;bp04-6gw-s1-141.2	schwehr	1/3/05	4:33 PM	 1716	 -4.75<font color="#77dd77">\n</font>&quot;</font><font color="darkCyan">)</font>
+<a name="line172" href="#line172">172</a>     <font color="#B0B0B0">k15_lines</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font> <font color="yellow">&quot;9.3800E+1	9.2950E+1	9.3550E+1	9.3550E+1	9.2950E+1<font color="#77dd77">\n</font>&quot;</font> <font color="darkCyan">)</font>
+<a name="line173" href="#line173">173</a>     <font color="#B0B0B0">k15_lines</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font> <font color="yellow">&quot;8.9150E+1	8.9100E+1	9.2900E+1	8.9150E+1	8.8900E+1<font color="#77dd77">\n</font>&quot;</font> <font color="darkCyan">)</font>
+<a name="line174" href="#line174">174</a>     <font color="#B0B0B0">k15_lines</font>.<font color="#B0B0B0">append</font><font color="darkCyan">(</font> <font color="yellow">&quot;8.9950E+1	8.8750E+1	8.5100E+1	8.9950E+1	8.8800E+1<font color="#77dd77">\n</font>&quot;</font> <font color="darkCyan">)</font>
+<a name="line175" href="#line175">175</a>     
+<a name="line176" href="#line176">176</a>     <font color="#B0B0B0">hext</font> <font color="darkCyan">=</font> <font color="#B0B0B0">Hext</font><font color="darkCyan">(</font><font color="#B0B0B0">k15_lines</font><font color="darkCyan">)</font>
+<a name="line177" href="#line177">177</a>     <strong>print</strong> <font color="yellow">&quot;Tau 1 (max) = &quot;</font>, <font color="#B0B0B0">hext</font>.<font color="#B0B0B0">tau</font><font color="darkCyan">[</font><font color="#B0B0B0">Hext</font>.<font color="#B0B0B0">maxpos</font><font color="darkCyan">]</font>
+<a name="line178" href="#line178">178</a>     <strong>print</strong> <font color="yellow">&quot;Tau 2 (int) = &quot;</font>, <font color="#B0B0B0">hext</font>.<font color="#B0B0B0">tau</font><font color="darkCyan">[</font><font color="#B0B0B0">Hext</font>.<font color="#B0B0B0">intpos</font><font color="darkCyan">]</font>
+<a name="line179" href="#line179">179</a>     <strong>print</strong> <font color="yellow">&quot;Tau 3 (min) = &quot;</font>, <font color="#B0B0B0">hext</font>.<font color="#B0B0B0">tau</font><font color="darkCyan">[</font><font color="#B0B0B0">Hext</font>.<font color="#B0B0B0">minpos</font><font color="darkCyan">]</font>
+<a name="line180" href="#line180">180</a>     
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>

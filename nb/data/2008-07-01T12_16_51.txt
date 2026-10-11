@@ -1,0 +1,30 @@
+TITLE: Whale research
+AUTHOR: Kurt
+DATE: 07.01.2008 12:16
+DESC: whale whacking
+-----
+BODY:
+The R/V Auk and R/V Foster are busy researching whales.  Here are some
+quick database shell tricks for working with the AIS data.  First the Auk:
+<pre>
+% <b>echo "select userid,name from shipdata;" | psql ais | grep -i auk | tail -1</b>
+ 369871000 | R/V AUK
+% <b>echo "select userid,AsText(position) from position where userid='369871000';" | psql ais | tail -1</b>
+ 369871000 | POINT(-70.4727383333333 42.4551733333333)
+</pre>
+And for the Foster...
+<pre>
+% <b>echo "select userid,name from shipdata;" | psql ais | grep -i foster | tail -1</b>
+ 369912000 | NANCY FOSTER@@@@@@@@
+% <b>echo "select userid,AsText(position) from position where userid='369912000';" | psql ais | tail -1 </b>
+ 369912000 | POINT(-70.394915 42.4191533333333)
+</pre>
+It is interesting that the Auk space pads their vessel name and the
+Foster does not ('@' signals the end of string) and the Foster leaves
+off the R/V.
+
+I leave it as an excercise for the reader to use pyproj to calculate the
+distance between the vessels.
+
+<img src="http://schwehr.org/blog/attachments/2008-07/erma-whale-tagging.png"/>
+-----

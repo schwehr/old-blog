@@ -1,0 +1,64 @@
+TITLE: Sqlite tricks - .sqliterc and html mode
+AUTHOR: Kurt
+DATE: 08.14.2009 15:12
+DESC: bash hacks
+-----
+BODY:
+I am doing yet more work with sqlite and was getting annoyed with having to
+setup sqlite how I like it.  The '|' is not the most friendly separator;
+I do like having the column names at the top; and the NULL value should be some form of "Null" or "NULL".  I usually do:
+<pre>sqlite3 foo.db
+.header ON
+.separator "\t"
+.nullvalue "Null"</pre>
+I looked at the man page for sqlite3, and it indeed does respect a .sqliterc.
+I'm much happier with those defaults in there.  I also noticed that there are 
+"csv" and "html" modes.  The html mode outputs the table rows, but not the
+overall table, so I have to wrap the command in two echo's to get a working
+(but not complete html file):
+<pre>( \
+  echo "&lt;table&gt;"; \
+  sqlite -html 20090506-2.db3 'SELECT name,shipandcargo FROM shipdata LIMIT 10;' \
+     | grep -v 'Loading resources' \
+     | tr '@' ' '; \
+  echo "&lt;/table&gt;" \
+)  > foo.html</pre>
+There are two quirks here.  First, sqlite prints out a status line that it is reading the
+init script to stdout even when in non interactive mode:
+<pre>-- Loading resources from /Users/schwehr/.sqliterc</pre>
+Second, I'm dealing with AIS strings that have not had the no character designator, '@', scrubed
+from the database.  tr does a nice job of turning those into spaces.  The results:
+<table>
+<TR><TH>name</TH><TH>shipandcargo</TH></TR>
+<TR><TD>HELEN MORAN         </TD>
+<TD>52</TD>
+</TR>
+<TR><TD>SHARON BRUSCO       </TD>
+<TD>52</TD>
+</TR>
+<TR><TD>CECIL               </TD>
+<TD>32</TD>
+</TR>
+<TR><TD>RAZORBACK           </TD>
+<TD>52</TD>
+</TR>
+<TR><TD>LADY KATHRYN III    </TD>
+<TD>37</TD>
+</TR>
+<TR><TD>BW HELIOS           </TD>
+<TD>84</TD>
+</TR>
+<TR><TD>TOMMY CENAC         </TD>
+<TD>52</TD>
+</TR>
+<TR><TD>LOCHNESS            </TD>
+<TD>81</TD>
+</TR>
+<TR><TD>ST. PADRE PIO       </TD>
+<TD>32</TD>
+</TR>
+<TR><TD>TERN                </TD>
+<TD>70</TD>
+</TR>
+</table>
+-----

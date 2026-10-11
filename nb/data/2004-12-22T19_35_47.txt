@@ -1,0 +1,78 @@
+TITLE: xtermcontrol
+AUTHOR: Kurt
+DATE: 12.22.2004 19:35
+DESC: Render works again
+-----
+BODY:
+Just added xtermcontrol to fink's x11 unstable tree.  Nice to not have
+to lookup the special xterm escape codes.  Now it is easy to do
+something like iconify a script running in a window and then
+de-iconify and raise it when an error occurs.  Plus the title and
+color are generally very handy.
+
+<pre>
+  xtermcontrol --title='Doh\!'
+  xtermcontrol --lower
+  xtermcontrol --raise
+  xtermcontrol --iconify
+  xtermcontrol --de-iconify
+  xtermcontrol --file=FILE    # Use a config file
+</pre>
+
+Writing more on the thesis.  The poster went pretty well at AGU.  That
+basically is what I would like to write for this current paper.  I
+think all of the figures are there now.
+
+Tried to debug offscreen rendering some more today.  Does not work on
+Lisa's G5  (also Darwin 7.7.0 - 10.3.7).  No joy.  Same problem.  I
+can see it in the png file sizes so there is no need to pull over the
+images and look at them.  Was using render 1.9 with 
+
+<pre>
+  otool -L render_bin 
+  render_bin:
+        /sw/lib/libsimage.20.dylib    (compat ver 27.0.0, cur ver 27.0.0)
+        /sw/lib/libCoin.40.dylib      (compat ver 44.0.0, cur ver 44.0.0)
+        /sw/lib/libSimVoleon.40.dylib (compat ver 41.0.0, cur ver 41.0.0)
+        /usr/lib/libSystem.B.dylib    (compat ver  1.0.0, cur ver 71.1.1)
+</pre>
+
+I love that must run as root to remotely run the offscreen only
+render.  I need to figure out how to avoid this.  I really hope that
+is possible!  Here is the error I get:
+
+<pre>
+  kCGErrorRangeCheck : Window Server communications from outside of
+  session allowed for root and console user only
+
+  Coin error in aglglue_create_offscreen_context(): Couldn't create
+  AGL Pixelformat: invalid pixel format attribute
+
+  Coin warning in aglglue_context_create_offscreen(): Couldn't get
+  RGBA AGL pixelformat.
+</pre>
+
+Hmmm... I thought that I was able to run render remotely as root
+earlier today and now I get this:
+
+<pre>
+  Coin error in aglglue_context_make_current(): aglSetPBbuffer failed:
+  invalid drawable
+</pre>
+
+
+Using my laptop, I am going to try using SIMVoleon-2.0.1 which is just
+out.  I have a fink package for it, but I am holding off until I get
+the documentation situation figured out.  The doxygen files did not
+make it into the release tar ball.  I do like that the tar now expands
+with the version number in the directory which is pretty standard for
+GNU-ish software.  WOO HOO!  It works again.  I should really commit
+the 2.0.1 SIMVoleon and deal with the doc troubles later.
+
+Now I need to finish my gnuplot spinning program, do a lot of lab
+work, write 3 or 4 papers and graduate.  No problemo.
+
+Made Bailey a natural snowcone today from fresh snow on the outside
+banister.  He made the funniest face when I gave it to him.
+He got a whole fluffy chunk in his mouth which surprised him.
+-----

@@ -1,0 +1,67 @@
+TITLE: Google Earth Browser Plugin - Hello World
+AUTHOR: Kurt
+DATE: 01.20.2009 18:26
+DESC: possibilities
+-----
+BODY:
+Matt and I gave a first go at looking into working with the Google
+Earth Browser Plugin.  I like what I see so far.  I took Christiana's
+Highland Light and exported a kmz from Google Sketchup Pro.  We
+started working from the <a
+href="http://code.google.com/apis/earth/">Google Earth API</a> page.
+I threw the model kmz on a server and added it to the <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/helloearth/index.html">Hello Earth</a>
+example on the <a href="http://code.google.com/apis/earth/documentation/examples.html">examples page</a>.
+
+<img title="Hello World" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/ge-browser-plugin-hello-world.png"/>
+<pre><tt><b><font color="#000080">&lt;!DOCTYPE</font></b> <font color="#009900">html</font> <font color="#009900">PUBLIC</font> <font color="#FF0000">"-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</font><b><font color="#000080">&gt;</font></b><b><font color="#0000FF">&lt;html&gt;</font></b>
+  <b><font color="#0000FF">&lt;meta</font></b> <font color="#009900">http-equiv</font><font color="#990000">=</font><font color="#FF0000">"content-type"</font> <font color="#009900">content</font><font color="#990000">=</font><font color="#FF0000">"text/html; charset=utf-8"</font> <b><font color="#0000FF">/&gt;</font></b>
+  <b><font color="#0000FF">&lt;head&gt;</font></b>
+    <b><font color="#0000FF">&lt;title&gt;</font></b>Hello Google Earth!<b><font color="#0000FF">&lt;/title&gt;</font></b>
+    <b><font color="#0000FF">&lt;script</font></b> <font color="#009900">src</font><font color="#990000">=</font><font color="#FF0000">"http://www.google.com/jsapi?key=ABQIAAAAM1F8u7ITEI-8fznypC4hMhRvjyYGNOjAIS98eSpdzWedmD3E9BTd8wbBTwPfUiqpY0mIBlJTwIDOMQ"</font><b><font color="#0000FF">&gt;&lt;/script&gt;</font></b>
+    <b><font color="#0000FF">&lt;script&gt;</font></b>
+google.load("earth", "1");
+<!-- -->
+var ge = null;
+<!-- -->
+function init() {
+  google.earth.createInstance("map3d", initCB, failureCallback);
+}
+<!-- -->
+function initCB(object) {
+  ge = object;
+  ge.getWindow().setVisibility(true);
+<!-- -->
+  var networkLink = ge.createNetworkLink("");
+  networkLink.setFlyToView(true);
+  var link = ge.createLink("");
+<!-- -->
+  link.setHref("http://132.177.103.241/kurt/highland-light.kmz");
+  networkLink.setLink(link);
+  ge.getFeatures().appendChild(networkLink);
+<!-- -->
+  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+}
+<!-- -->
+function failureCallback(object) {
+}
+    <b><font color="#0000FF">&lt;/script&gt;</font></b>
+<!-- -->
+  <b><font color="#0000FF">&lt;/head&gt;</font></b>
+  <b><font color="#0000FF">&lt;body</font></b> <font color="#009900">onload</font><font color="#990000">=</font><font color="#009900">'init()'</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#009900">'body'</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;center&gt;</font></b>
+      <b><font color="#0000FF">&lt;div&gt;</font></b>
+        Hello, Earth!
+      <b><font color="#0000FF">&lt;/div&gt;</font></b>
+<!-- -->
+      <b><font color="#0000FF">&lt;div</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#009900">'map3d_container'</font>
+           <font color="#009900">style</font><font color="#990000">=</font><font color="#009900">'border:</font> <font color="#009900">1px</font> <font color="#009900">solid</font> <font color="#009900">silver;</font> <font color="#009900">height:</font> <font color="#009900">600px;</font> <font color="#009900">width:</font> <font color="#009900">800px;'</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;div</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#009900">'map3d'</font> <font color="#009900">style</font><font color="#990000">=</font><font color="#009900">'height:</font> <font color="#009900">100%;'</font><b><font color="#0000FF">&gt;&lt;/div&gt;</font></b>
+      <b><font color="#0000FF">&lt;/div&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;/center&gt;</font></b>
+  <b><font color="#0000FF">&lt;/body&gt;</font></b>
+<b><font color="#0000FF">&lt;/html&gt;</font></b>
+</tt></pre>
+Google has created some great demos.  For instance, check out the <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/drive-simulator/index.html">Drive Simulator</a>:
+<img title="GE Plugin - Drive Simulator" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/ge-plugin-driving-simulator.png"/>
+-----

@@ -1,0 +1,138 @@
+TITLE: Using mdbtools to read MS Access Jet DB files from NOAA AWOIS
+AUTHOR: Kurt
+DATE: 03.04.2008 21:50
+DESC: did it - at least the first step
+-----
+BODY:
+The <a href="http://chartmaker.ncd.noaa.gov/hsd/hsd-3.html">NOAA Automated
+Wreck and Obstruction Information System</a> looks like it has some
+really useful information about objects that might hang up an
+emergency response team.  The EarthNC KML is pretty cool, but I need
+to get this data into PostGIS if I am going to use in in our tools.  I
+got a bit of a surprise when I found that the online data files are MS
+Access.  I'm primarily a Mac/Linux user and even though we have
+Windows boxes all over the building, I'd like to get things automated
+and working without running any proprietary systems.  Finding a
+library that can read MS Access databases turned out to be tough.
+I haven't directly worked with Access before.  Here is what I found in
+the zip:
+<pre>
+% <b>strings sec1.mdb | head -2</b>
+Standard Jet DB
+gr@?
+</pre>
+Someone on IRC suggested that I use unixODBC.  That is great, but it
+looks like unixODBC uses a library that is not compiled into fink.
+Turns out that the library is <a
+href="http://mdbtools.sourceforge.net/">mdbtools</a>.  This package
+hasn't had a release in almost 4 years.  I failed horribly with
+versions 0.5 and 0.6pre1.  I finally checked out the code from CVS and
+made a snapshot.  I then had to get the autoconf/libtool/automake
+business work.  I installed libtool2 (2.2-1), automake1.9 (1.8.6-3) and
+autoconf (2.60-4) from fink.  That didn't work until I edited autogen.sh
+to change libtool to glibtool to pick up the fink libtool.  Complicated
+enough.  Finally after ./autogen.sh && ./configure 
+--prefix=some-random-place, I had a working mdbtools.  Whew.
+
+Now for a little on using the program...
+
+Check out the database type:
+<pre>
+% <b>./mdb-ver sec1.mdb</b>
+JET4
+</pre>
+What tables do we have?
+<pre>
+% <b>./mdb-tables sec1.mdb</b>
+Section 1 
+</pre>
+Only one?  Time to see what is inside that table.
+<pre>
+% <b>./mdb-sql -H -p sec1.mdb</b>
+1 =&gt; <b>describe table "Section 1"</b>
+2 =&gt; <b>go</b>
+RECRD   Long Integer    4
+VESSLTERMS      Text    40
+CHART   Text    16
+AREA    Text    2
+CARTOCODE       Text    8
+SNDINGCODE      Text    6
+DEPTH   Double  8
+NATIVLAT        Text    22
+NATIVLON        Text    24
+LAT83   Text    22
+LONG83  Text    24
+LATDEC  Double  8
+LONDEC  Double  8
+NATIVDATUM      Text    4
+CONVERT83       Text    2
+GPACCURACY      Text    4
+GPQUALITY       Text    12
+GPSOURCE        Text    12
+QUADRANT        Text    2
+History Memo/Hyperlink  0      # What is this???
+REFERENCE       Text    80
+YEARSUNK        Text    8
+SYSTEMNUM       Long Integer    4
+23 Rows retrieved
+</pre>
+If we ask for a generic create statement, it looks pretty good.  There are lots of
+issues to be solved.  For example, table names with spaces...
+<pre>
+% <b>./mdb-schema sec1.mdb</b>
+CREATE TABLE Section 1
+ (
+        RECRD                   Long Integer, 
+        VESSLTERMS              Text (40), 
+        CHART                   Text (16), 
+        AREA                    Text (2), 
+        CARTOCODE               Text (8), 
+        SNDINGCODE              Text (6), 
+        DEPTH                   Double, 
+        NATIVLAT                Text (22), 
+        NATIVLON                Text (24), 
+        LAT83                   Text (22), 
+        LONG83                  Text (24), 
+        LATDEC                  Double, 
+        LONDEC                  Double, 
+        NATIVDATUM              Text (4), 
+        CONVERT83               Text (2), 
+        GPACCURACY              Text (4), 
+        GPQUALITY               Text (12), 
+        GPSOURCE                Text (12), 
+        QUADRANT                Text (2), 
+        History                 Memo/Hyperlink (255), 
+        REFERENCE               Text (80), 
+        YEARSUNK                Text (8), 
+        SYSTEMNUM               Long Integer
+);
+</pre>
+The text dump/export is not really what I want.  Maybe the sql export will be better.
+<pre>
+% <b>./mdb-export -I sec1.mdb "Section 1" &gt; foo.sql</b>
+INSERT INTO Section 1 (RECRD, VESSLTERMS, CHART, AREA, CARTOCODE, SNDINGCODE, 
+DEPTH, NATIVLAT, NATIVLON, LAT83, LONG83, LATDEC, LONDEC, NATIVDATUM, CONVERT83, 
+GPACCURACY, GPQUALITY, GPSOURCE, QUADRANT, History, REFERENCE, YEARSUNK, SYSTEMNUM) 
+VALUES (2126,"VAN","13200","A","102",NULL,0,"42/26/24.00","070/40/16.00",
+"42/26/24.35","070/40/14.15",42.4400972222222,70.6705972222222,"6","C","83",
+"Low",NULL,"2","
+ DESCRIPTION                                  
+    24     NO.210; CARGO; SUNK 5/16/35; POSITION ACCURACY WITHIN 1 MILE             
+    27     NO.143; FTR., REPORTED THRU ESF ANTI-SUBM. WARFARE UNIT","20",NULL,2044)
+</pre>
+Missing the ';' at the end of each insert.  It also does not do
+anything to encode things like degree symbols.  Hmmm.  Much more to
+do.
+
+The source: <a href="http://vislab-ccom.unh.edu/~schwehr/software/fink/mdbtools-0.6pre1-20080304.tar.bz2">mdbtools-0.6pre1-20080304.tar.bz2</a>
+
+P.S.  Dear Apple, why am I getting these errors from emacs all of a sudden?
+<pre>
+Xlib: sequence lost (0x11a0e > 0xeadf) in reply type 0x0!
+Xlib: sequence lost (0x10000 > 0xeae0) in reply type 0x0!
+Xlib: sequence lost (0x10000 > 0xeae8) in reply type 0x1!
+Error: Couldn't find per display information
+</pre>
+I rebuilt emacs, but that only reduced the frequency of the problem.
+Looks like restarting X11 did the trick.  What's up?
+-----

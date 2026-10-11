@@ -1,0 +1,30 @@
+TITLE: OpenVAS - scanning computers
+AUTHOR: Kurt
+DATE: 08.13.2010 15:53
+DESC: nessus and other scanning tools
+-----
+BODY:
+I'm doing work for a goverment agency where I have to scan servers for
+vulnerabilities.  We have been thinking about purchasing <a
+href="http://www.nessus.org/">Nessus</a> for our IT team, but in the
+meantime, I've been trying out <a
+href="http://www.openvas.org/">OpenVAS</a> (Open Vulnerability
+Assessment System) to at least get some scans done in addition to the
+nmaps that we normally do.  OpenVAS is a fork of Nessus when it went
+proprietary starting with Nessus 3.x.  Here is what I did on a Ubuntu
+10.04 machine.  First make sure I have a up-to-date machine:
+<pre><b>sudo apt-get update
+sudo apt-get upgrade
+sudo reboot</b></pre>
+Then install everything:
+<pre><b>sudo apt-get install openvas-client openvas-server
+sudo openvas-mkcert
+sudo openvas-adduser</b>
+  # when it asks for the user rules:
+<b>default accept</b></pre>
+Now get things ready and run it.  <b>/etc/init.d/openvas-server start</b> hung for me, so I started the server by hand.
+<pre><b>sudo openvas-nvt-sync</b> # this took a while
+<b>sudo /usr/sbin/openvasd -q -p 9391 -D -a 127.0.0.1
+openvas-client</b></pre>
+<img title="OpenVAS scanning a machine" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/OpenVAS-scan.png"/>
+-----

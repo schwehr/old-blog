@@ -1,0 +1,65 @@
+TITLE: seismic unix tutorial
+AUTHOR: Kurt
+DATE: 09.11.2005 17:47
+DESC: first explorations
+-----
+BODY:
+I took a short break from dealing with the seismic data for my thesis
+and gave the Seismic Unix tutorial a go.  I figured this is something
+that is still along the lines of processing my data, so I'm not
+wasting too much energy :)
+
+I played around with the tsa script in Chapter 3 and had some fun.
+First I wanted to see how to get the generated spikes into gnuplot
+which needs ascii data.  SU writes a binary file format and I don't
+want to parse that.  The trick is to use <b>suascii bare=1</b>.  The
+bare=1 prevents the time index column and the header from being
+written.  I don't mind the time index, but the header confuses
+gnuplot.
+<pre>
+suspike <font color="#2040a0">nt</font>=<font color="#2040a0">$nt</font> <font color="#2040a0">dt</font>=<font color="#2040a0">$dt</font> <font color="#2040a0">ntr</font>=1 <font color="#2040a0">nspk</font>=1 <font color="#2040a0">ix1</font>=1 <font color="#2040a0">it1</font>=20  | sugain <font color="#2040a0">scale</font>=0.9 &gt; spike1.data
+echo -n '#' &gt; spike1.xy
+suascii &lt; spike1.data &gt;&gt; spike1.xy
+
+gnuplot
+plot 'spike1.xy' with lp
+</pre>
+Then I got to the part where the tutorial plots up the results.  I
+would have never guessed what suxwigb does, but it is pretty handy and
+makes a pleasing graph:<br>
+<img src="http://schwehr.org/blog/attachments/2005-09/autocorr-su.png"><br>
+Here is the script I ended up with...
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+
+<font color="#2040a0">nt</font>=251 
+<font color="#2040a0">dt</font>=0.001
+
+suspike <font color="#2040a0">nt</font>=<font color="#2040a0">$nt</font> <font color="#2040a0">dt</font>=<font color="#2040a0">$dt</font> <font color="#2040a0">ntr</font>=1 <font color="#2040a0">nspk</font>=1 <font color="#2040a0">ix1</font>=1 <font color="#2040a0">it1</font>=20  | sugain <font color="#2040a0">scale</font>=0.9 &gt; spike1.data
+echo -n '#' &gt; spike1.xy
+suascii &lt; spike1.data &gt;&gt; spike1.xy
+
+suspike <font color="#2040a0">nt</font>=<font color="#2040a0">$nt</font> <font color="#2040a0">dt</font>=<font color="#2040a0">$dt</font> <font color="#2040a0">ntr</font>=1 <font color="#2040a0">nspk</font>=1 <font color="#2040a0">ix1</font>=1 <font color="#2040a0">it1</font>=60  | sugain <font color="#2040a0">scale</font>=0.6 &gt; spike2.data
+suspike <font color="#2040a0">nt</font>=<font color="#2040a0">$nt</font> <font color="#2040a0">dt</font>=<font color="#2040a0">$dt</font> <font color="#2040a0">ntr</font>=1 <font color="#2040a0">nspk</font>=1 <font color="#2040a0">ix1</font>=1 <font color="#2040a0">it1</font>=120 | sugain <font color="#2040a0">scale</font>=0.4 &gt; spike3.data
+suspike <font color="#2040a0">nt</font>=<font color="#2040a0">$nt</font> <font color="#2040a0">dt</font>=<font color="#2040a0">$dt</font> <font color="#2040a0">ntr</font>=1 <font color="#2040a0">nspk</font>=1 <font color="#2040a0">ix1</font>=1 <font color="#2040a0">it1</font>=190 | sugain <font color="#2040a0">scale</font>=0.5 &gt; spike4.data
+
+susum spike1.data spike2.data &gt; a.tmp
+susum spike3.data spike4.data &gt; b.tmp
+susum a.tmp b.tmp &gt; spike.data
+rm -f [ab].tmp spike?.data
+
+echo -n '#' &gt; spike.xy
+suascii &lt; spike.data &gt;&gt; spike.xy
+
+suvibro <font color="#2040a0">dt</font>=<font color="#2040a0">$dt</font> <font color="#2040a0">tv</font>=0.06 <font color="#2040a0">t1</font>=0 <font color="#2040a0">t2</font>=0.05 <font color="#2040a0">phz</font>=-33 &gt; sweep.data
+suascii <font color="#2040a0">bare</font>=1 &lt; sweep.data &gt; sweep.z
+
+suconv &lt; spike.data <font color="#2040a0">sufile</font>=sweep.data | sushift <font color="#2040a0">tmin</font>=0 <font color="#2040a0">tmax</font>=0.251 &gt; conv.data
+suascii <font color="#2040a0">bare</font>=1 &lt; conv.data &gt; conv.z
+
+suxcor &lt; conv.data <font color="#2040a0">sufile</font>=conv.data | sushift <font color="#2040a0">tmin</font>=0.251 <font color="#2040a0">tmax</font>=0.502 &gt; acor.data
+suascii <font color="#2040a0">bare</font>=1 &lt; acor.data &gt; acor.z
+
+suxwigb &lt; acor.data <font color="#2040a0">wbox</font>=300 <font color="#2040a0">hbox</font>=500 <font color="#2040a0">title</font>=<font color="#008000">&quot;Autocorrelation&quot;</font> <font color="#2040a0">xbox</font>=10 <font color="#2040a0">ybox</font>=10
+</pre>
+-----

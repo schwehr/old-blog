@@ -1,0 +1,51 @@
+TITLE: fink update-alternatives
+AUTHOR: Kurt
+DATE: 01.27.2008 17:02
+DESC: smokin!
+-----
+BODY:
+I finally did my first fink package using update-alternatives as
+opposed to using a -bin package.  The idea here is to be able to
+have multiple versions of grass installed at the same time and 
+have a default "best" version installed.  Then if the user wishes,
+they can tell the system to switch to a different version if they
+need it.  From my draft fink info file for grass62:
+<pre>
+PostInstScript: &lt;&lt;
+ <font color="orange"> # assumes that the name has the version at the end... %n is grass62</font>
+  update-alternatives --install <font color="#008000">&quot;%p/bin/grass&quot;</font> grass <font color="#008000">&quot;%p/bin/%n&quot;</font> 62
+&lt;&lt;
+PreRmScript: &lt;&lt;
+  if [ <font color="#2040a0">$1</font> != <font color="#008000">&quot;upgrade&quot;</font> ]; then
+    update-alternatives --remove grass <font color="#008000">&quot;%p/bin/%n&quot;</font>
+  fi
+&lt;&lt;
+</pre>
+From "man update-alternatives":
+<pre>
+  update-alternatives  [options]  --install  link  name path priority [--slave
+       link name path]...
+</pre>
+Here is setting up the link, checking it, and removing it all by the
+system administrator.
+<pre>
+% <b>ls -l /sw/bin/grass*</b>
+-rwxr-xr-x 1 root admin 1094 Jan 27 15:38 /sw/bin/grass62
+% <b>sudo update-alternatives --install /sw/bin/grass grass /sw/bin/grass62 62</b>
+% <b>ls -l /sw/bin/grass*</b>
+lrwxr-xr-x 1 root admin   26 Jan 27 16:55 /sw/bin/grass -&gt; /sw/etc/alternatives/grass
+-rwxr-xr-x 1 root admin 1094 Jan 27 15:38 /sw/bin/grass62
+% <b>update-alternatives --display grass</b>
+grass - status is auto.
+ link currently points to /sw/bin/grass62
+/sw/bin/grass62 - priority 62
+Current `best' version is /sw/bin/grass62.
+% <b>sudo update-alternatives --remove grass /sw/bin/grass62 --verbose</b>
+Checking available versions of grass, updating links in /sw/etc/alternatives ...
+(You may modify the symlinks there yourself if desired - see `man ln'.)
+Last package providing grass (/sw/bin/grass) removed, deleting it.
+% <b>ls -l /sw/bin/grass*</b>
+-rwxr-xr-x 1 root admin 1094 Jan 27 15:38 /sw/bin/grass62
+</pre>
+Pretty cool stuff!  Just remember to only use integers for the priority.
+-----

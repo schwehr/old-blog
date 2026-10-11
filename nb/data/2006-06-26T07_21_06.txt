@@ -1,0 +1,39 @@
+TITLE: macosx dhcp servering strangeness
+AUTHOR: Kurt
+DATE: 06.26.2006 07:21
+DESC: internet sharing
+-----
+BODY:
+Last week, I ran into some odd behavior from the mac.  I wanted to hook up
+a machine to the internet via the 2nd ethernet port on my desktop machine.
+I opened up the System Preferences application and went to
+networking.  I use the en0 ethernet interface for the my connection
+inside the work firewall, so I need a different subnet.  10.x.x.x
+should be fine, so I setup en1 as 10.0.0.1.  Then I went to
+Sharing-Internet and turned it on.  Then I got a message saying that I
+have to turn on "Personal Web Sharing" so that the shared network can
+use the web.  <b>WHAT?</b>.  That is crazy.  I then took a look at the
+output from ifconfig and discovered that dhcp has setup this new box
+at 192.168.2.3 (not on 10.0.0.x like I wanted).  Look below and see
+that en1 has both 192.168.2.1 and 10.0.0.1.  I now know that the mac
+can support multiple IP addresses on the same interface, but that was
+not what I was trying to do.  At least it works for this instance.  But
+what happens if in the future I must be able to pick the address range
+for dhcp?  I guess this is when Apple tries to make me buy OSX
+Server.  They should just roll the server capabilities into standard
+OSX and do away with making admin life difficult.
+<pre>
+en1: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+        inet 192.168.2.1 netmask 0xffffff00 broadcast 192.168.2.255
+        inet6 fe80::216:cbff:fe37:6daf%en1 prefixlen 64 scopeid 0x5 
+        inet 10.0.0.1 netmask 0xffffff00 broadcast 10.0.0.255
+        ether 00:xx:xx:xx:xx:xx 
+        media: autoselect (100baseTX <full-duplex>) status: active
+        supported media: none autoselect 10baseT/UTP <half-duplex> 
+              ...  1000baseT <full-duplex,flow-control>
+en2: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+        ether 00:xx:xx:xx:xx:xx 
+        media: autoselect (<unknown type>) status: inactive
+        supported media: autoselect
+</pre>
+-----

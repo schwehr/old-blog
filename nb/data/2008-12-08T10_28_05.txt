@@ -1,0 +1,38 @@
+TITLE: Fink dependency magic for django
+AUTHOR: Kurt
+DATE: 12.08.2008 10:28
+DESC: fancy
+-----
+BODY:
+Charles Lepple found a bug in my Django packaging that broke the -py26
+variant.  He also suggested that I do a better job of the dependencies in
+general.  Python 2.5 and Python 2.6 both already come with sqlite3, so
+there is no requirement for any extra database interfaces.  Here is
+a clip from django-py.info:
+<pre>Depends: &lt;&lt;
+  python%type_pkg[python],  
+  docutils-py%type_pkg[python], 
+  (%type_raw[python] = 2.4) pysqlite2-py%type_pkg[python] | (%type_raw[python] = 2.4) mysql-python-py%type_pkg[python] | (%type_raw[python] = 2.4) psycopg2-py%type_pkg[python] 
+&lt;&lt;
+BuildDepends: setuptools-py%type_pkg[python] (>= 0.6c2-1)
+<!-- -->
+Recommends: &lt;&lt;
+  (%type_raw[python] = 2.5) mysql-python-py%type_pkg[python], 
+  (%type_raw[python] = 2.5) psycopg2-py%type_pkg[python],
+  (%type_raw[python] = 2.6) mysql-python-py%type_pkg[python], 
+  (%type_raw[python] = 2.6) psycopg2-py%type_pkg[python]
+&lt;&lt;</pre>
+Then AKH pointed out that I can check the fink side of the house
+for the dependencies:
+<pre>% <b>fink dumpinfo -fdepends django-py24</b>
+Information about 7551 packages read in 1 seconds.
+depends: python24, docutils-py24, pysqlite2-py24 | mysql-python-py24 | psycopg2-py24
+<!-- -->
+% <b>fink dumpinfo -fdepends django-py25</b>
+Information about 7551 packages read in 0 seconds.
+depends: python25, docutils-py25
+<!-- -->
+% <b>fink dumpinfo -fdepends django-py26</b>
+Information about 7551 packages read in 1 seconds.
+depends: python26, docutils-py26</pre>
+-----

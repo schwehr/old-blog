@@ -1,0 +1,59 @@
+TITLE: AIS NMEA message lookup table
+AUTHOR: Kurt
+DATE: 03.12.2009 08:11
+DESC: handy reference for egrep
+-----
+BODY:
+The first letter of the 6th field of an AIS AIVDM NMEA string
+determines the message type (at least for the the first scentence of a
+message).  For single sentence (aka line) messages, this makes using egrep
+really easy.  The class A position reports start with 1, 2, or 3.  Here is
+a little bashism to loop over log files and get the position records
+<pre>for file in log-20??-??-??; do
+    egrep 'AIVDM,1,1,[0-9]?,[AB],[1-3]' $file &gt; ${file}.123
+done</pre>
+Here is my handy table of first characters:
+<pre>
+Msg# 1st Char     Message type
+===  ===          ============ 
+ 0   0            Not used 
+ 1   1            Position report Class A
+ 2   2            Position report Class A (Assigned schedule)
+ 3   3            Position report Class A (Response to interrogation)
+ 4   4            Base station report
+ 5   5            Ship and voyage data
+ 6   6            Addressed binary message (ABM)
+ 7   7            Binary ack for addressed message
+ 8   8            Binary broadcast message (BBM)
+ 9   9            Airborn SAR position report
+10   :            Request UTC date
+11   ;            Current UTC date
+12   &lt;            Addressed safety message
+13   =            Addressed safety ack
+14   &gt;            Broadcast safety message
+15   ?            Interrogation request for a specific message
+16   @            Assignment of report behavior
+17   A            DGNSS corrections from a basestation
+18   B            Position report Class B
+19   C            Position report Class B, Extended w/ static info
+20   D            Reserve slots for base stations
+21   E            Aid to Navigation (AtoN) status report
+22   F            Channel management 
+23   G            Group assignment for reporting
+24   H            Static data report.  A: Name, B: static data
+25   I            Binary message, single slot (addressed or broadcast)
+26   J            Multislot binary message with comm status (Addr or Brdcst)</pre>
+Things get a bit more tricky with multi-scentence messages.  You have
+to normalize the ais messages to collapse the several lines into one
+very long line that violates the NMEA specification, which is in my
+opinion a very good thing to do.
+<pre>% <b>egrep -v 'AIVDM,1,1,[0-9]?,[AB]' file.ais | ais_normalize.py &gt; file.ais.norm<b></pre>
+Now apply grep like I showed above on the normalized file that only
+has the multi scentence messages.
+
+I created the above table like this using my noaadata python package:
+<pre>% <b>ipython</b>
+import ais.binary
+for i in range (30):
+    print i,ais.binary.encode[i]</pre>
+-----

@@ -1,0 +1,58 @@
+TITLE: Adding date range selection to ais gridding
+AUTHOR: Kurt
+DATE: 09.15.2007 10:58
+DESC: crafty queries
+-----
+BODY:
+Often I have trouble thinking in terms of SQL queries.  It took me far
+longer than it should have to craft this query.  Leila requested
+gridding of date ranges.  That makes sense and up until now, I always
+gridded tracks for the whole time range and my original import of data
+constrained the time.  That is fine for one or two little projects,
+but stops me from being able to do things like month to month plots
+without generating an entire pile of databases in PostgresSQL.  Right
+now, this just constrains the start of the track.  It will be trickier
+to clip lines with time.  I will have to regenerate the lines perhaps in
+a temporary view.
+<pre>
+<strong>SELECT</strong> AsText<strong>(</strong>Transform<strong>(</strong>track<strong>,</strong>32619))
+   <strong>FROM</strong> 
+       tpath
+       ,<strong>(</strong><strong>SELECT</strong> userid <strong>FROM</strong> summary2006 <strong>WHERE</strong> catagory=<font color="#008000">'tanker'</font>) <strong>AS</strong> ships
+       ,<strong>(</strong><strong>SELECT</strong> id 
+         <strong>FROM</strong> positi<strong>on</strong><strong>,</strong>transit 
+         <strong>WHERE</strong> startpos<strong>=</strong><strong>key</strong> 
+               <strong>AND</strong> cg_timestamp &gt; <font color="#008000">'2006-05-06'</font> 
+               <strong>AND</strong> cg_timestamp &lt; <font color="#008000">'2006-05-07'</font> 
+        ) <strong>AS</strong> track_id 
+   <strong>WHERE</strong> ships.userid<strong>=</strong>tpath.userid <strong>AND</strong> tpath.id<strong>=</strong>tracks_id.id;
+</pre>
+I added three options to ais_pg_grid.  The dry-run prints out the SQL query and quits.
+<pre>
+  --dry-run             Print the SQL query and quit.
+  --start-date=STARTDATE
+                        Restrict query to begin at this date [default: None]
+  --end-date=ENDDATE    Restrict date to not extent to more recent than this
+                        date [default: None]
+</pre>
+
+<b>Update:</b> I don't have comments on my blog, but I do get emails.
+Rob De Ameida (the guy responsible for creating pyDAP) dropped me a
+line that I want to add here.  When I have live feeds running, this
+kind of suggestion would be perfect for a cronjob that asked to make a
+plot of "yesterday".  I was thinking that I would have to code that
+up.  Not hard but many little easy things can quickly add up to an
+overload.  
+<pre>
+Just a small comment about your post on date range selection. I've
+written a small Python module called magicdate:
+.
+  <a href="http://cheeseshop.python.org/pypi/magicdate">http://cheeseshop.python.org/pypi/magicdate</a>
+.
+If you use optparse to parse the options in your ais_pg_grid you can
+use magicdate to specify dates such as "today", "last wed", "march 23"
+(as well as more common ones like "2007-01-01") on the command
+line. Silly, but handy. ;)
+</pre>
+Thanks Rob!
+-----

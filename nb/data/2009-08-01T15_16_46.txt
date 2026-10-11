@@ -1,0 +1,71 @@
+TITLE: AIS duplicate removal
+AUTHOR: Kurt
+DATE: 08.01.2009 15:16
+DESC: thinking through decimation
+-----
+BODY:
+This post is about post-processing AIS logs.
+
+I've been thinking through the process of removing duplicate receive
+messages for the situate where I've got multiple receivers with
+partially overlapping coverage and vessels are transiting across the
+area.  My first thought was to use time slices.  If I know when the
+messages went out, then I should be able to get just look at time
+window and remove other packets from that vessel at that time.
+However, if timestamping isn't completely accurate, this method breaks
+down.  Turns out that there should be a simpler method to decimating
+packets.  If I totally ignore the metadata and just use the NMEA data
+payload text fields as a hash, I should be able to see if I have
+already passed through a packet with that hash and drop it if it's
+already come through.
+
+I see two risks with this method.  First, the table of hashes has to
+be bound.  If I need to keep 5 million hashes around and search this
+set for each new packet, the decimation process is going to get very
+slow.  It should be possible to calculate a reasonable FIFO length of
+hashes based on the number of stations reporting AIS data.  When a new
+packet comes in and the queue gets longer than the maximum number of
+hashes, we simply drop the oldest hash.  If necessary, this can be
+augmented to be a FIFO for each message number to speed up the
+searching.  
+
+The second problem is a little more trouble.  What if we get two
+messages with the same hash that are really are at different times?
+This can happen with vessels that are working in a constrained area,
+e.g. operating in dynamic positioning (DP) mode or tied to a dock.
+With the LNG construction off of Boston, is is possible to get repeats
+of the position.  However, it takes more than a repeat in the
+longitude and latitude.  The ROT, SOG, heading, and commstate all have
+to be these same.  These fields are likely changing, although there
+should be lots of repeats in commstate for SOTDMA.  ITDMA position
+messages will not have as much variation in the commstate as SOTDMA,
+but these packets are less common.  One strategy would be to track the
+receive station with the hash and emit the new message if it is a
+repeat of that heard from the same station.  The hash strategy should
+work for most packets, but may have undesired results for tracking
+repeating notices where the content is the same (e.g. right whale
+notices where the buoy status has not changed).  If I felt that I
+could trust time, some of these issues would go away.
+<pre><tt>o <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'unique.ais'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+<!-- -->
+dropped <font color="#990000">=</font> <font color="#993399">0</font>
+<b><font color="#0000FF">for</font></b> line_num<font color="#990000">,</font> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font><b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'20080407.log.norm'</font><font color="#990000">)):</font>
+    <b><font color="#0000FF">if</font></b> line_num <font color="#990000">%</font> <font color="#993399">10000</font> <font color="#990000">==</font> <font color="#993399">0</font><font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'line_num:'</font><font color="#990000">,</font>line_num<font color="#990000">,</font> <font color="#FF0000">'  dropped:'</font><font color="#990000">,</font>dropped
+    <b><font color="#0000FF">if</font></b> <font color="#FF0000">'!AIVD'</font> <font color="#990000">!=</font> line<font color="#990000">[:</font><font color="#993399">5</font><font color="#990000">]:</font>
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>line<font color="#990000">)</font>
+    fields <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">','</font><font color="#990000">)</font>
+    payload <font color="#990000">=</font> fields<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">]</font>
+    <b><font color="#0000FF">if</font></b> payload <b><font color="#0000FF">in</font></b> payloads<font color="#990000">:</font>
+        dropped <font color="#990000">+=</font> <font color="#993399">1</font>
+        <b><font color="#0000FF">continue</font></b>
+    <b><font color="#0000FF">if</font></b> <b><font color="#000000">len</font></b><font color="#990000">(</font>payloads<font color="#990000">)</font> <font color="#990000">&gt;</font> lookback_dist<font color="#990000">:</font>
+        payloads<font color="#990000">.</font><b><font color="#000000">pop</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font>
+    payloads<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>payload<font color="#990000">)</font>
+    o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font>line<font color="#990000">)</font></tt></pre>
+Running this on 262000 messages from 3 receivers in the Boston approaches dropped 89000 messages (34%).
+
+Here is OpenDiff showing the change from the original (on the left) to the version without the duplicates on the right.
+
+<img title="OpenDiff showing removed duplicates" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/ais-decimation.png"/>
+-----

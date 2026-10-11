@@ -1,0 +1,84 @@
+TITLE: JEL datalogger for AIS and waterlevel
+AUTHOR: Kurt
+DATE: 09.01.2007 21:03
+DESC: Back to logging AIS
+-----
+BODY:
+Last week, I finally noticed that the AIS receiver was not returning
+any data.  I drove down to JEL and found that in mid July, the inline
+fuse holder for the SR162 had broken.  The fuse was fine, but the
+plastic gave way.  Probably a combination of UV and heat from sitting
+in the window sill.  I swapped in the power cord and wall pack from my
+other AIS receiver and I think it is back in business (not that it
+receives much in the way of VHF traffic.)
+
+The AIS antenna and receiver sit in the window at the top of the
+building marked with an orange arrow.
+
+<img src="http://schwehr.org/blog/attachments/2007-09/jel-ais.png">
+
+Also, here is an image of the data logger box at the end of the pier.
+Andy M is about to switch it to a buried cable that was placed about
+two weeks ago.
+
+<img src="http://schwehr.org/blog/attachments/2007-09/jel-waterlevel.JPG">
+
+I really need to get automatic monitoring software in place for these
+stations.  It is a bit hard to know if the AIS station is working
+without much traffic.  I wish the SR162 put out a more frequency AITXT
+message.  I thought about using the statserial command, but the
+results seem the same when the device is off or on.  Perhaps it would
+be better to check from pyserial in the datalogger?  
+<pre>
+<b>statserial /dev/ttyS2</b>
+Device: /dev/ttyS2
+Signal  Pin  Pin  Direction  Status  Full
+Name    (25) (9)  (computer)         Name
+=----   ---  ---  ---------  ------  -----
+FG       1    -      -           -   Frame Ground
+TxD      2    3      out         -   Transmit Data
+RxD      3    2      in          -   Receive  Data
+RTS      4    7      out         1   Request To Send
+CTS      5    8      in          1   Clear To Send
+DSR      6    6      in          1   Data Set Ready
+GND      7    5      -           -   Signal Ground
+DCD      8    1      in          0   Data Carrier Detect
+DTR     20    4      out         1   Data Terminal Ready
+RI      22    9      in          0   Ring Indicator
+</pre>
+After I fixed the power and the device is back on.
+<pre>
+Device: /dev/ttyS2
+Signal  Pin  Pin  Direction  Status  Full
+Name    (25) (9)  (computer)         Name
+=----   ---  ---  ---------  ------  -----
+FG       1    -      -           -   Frame Ground
+TxD      2    3      out         -   Transmit Data
+RxD      3    2      in          -   Receive  Data
+RTS      4    7      out         1   Request To Send
+CTS      5    8      in          1   Clear To Send
+DSR      6    6      in          1   Data Set Ready
+GND      7    5      -           -   Signal Ground
+DCD      8    1      in          0   Data Carrier Detect
+DTR     20    4      out         1   Data Terminal Ready
+RI      22    9      in          0   Ring Indicator
+</pre>
+For completeness, here is the wireless serial device from the tide
+gauge:
+<pre>
+Device: /dev/ttyS1
+Signal  Pin  Pin  Direction  Status  Full
+Name    (25) (9)  (computer)         Name
+=----   ---  ---  ---------  ------  -----
+FG       1    -      -           -   Frame Ground
+TxD      2    3      out         -   Transmit Data
+RxD      3    2      in          -   Receive  Data
+RTS      4    7      out         1   Request To Send
+CTS      5    8      in          0   Clear To Send
+DSR      6    6      in          0   Data Set Ready
+GND      7    5      -           -   Signal Ground
+DCD      8    1      in          0   Data Carrier Detect
+DTR     20    4      out         1   Data Terminal Ready
+RI      22    9      in          0   Ring Indicator
+</pre>
+-----

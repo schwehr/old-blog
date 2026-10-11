@@ -1,0 +1,23 @@
+TITLE: More on handling XML namespaces
+AUTHOR: Kurt
+DATE: 07.11.2010 10:57
+DESC: awkward
+-----
+BODY:
+First, I thought that XML required an xml tag to start off any XML
+file.  I've getting getting GeoRSS and KML files that do not have that first
+line.  xmllint doesn't complain, but I don't think that means much.
+
+But, the main thing I wanted to write about is XML namespaces.  If you
+didn't know ahead of time how someone is handling the namespaces ahead
+of time, what are really supposed to do?  What is if their prefix what
+"grss" instead of "georss" before the equals?  This is the first line of
+the georss that I am working on parsing:
+<pre><tt><b><font color="#0000FF">&lt;rss</font></b> <font color="#009900">xmlns:georss</font><font color="#990000">=</font><font color="#FF0000">"http://www.georss.org/georss"</font> <font color="#009900">xmlns:gml</font><font color="#990000">=</font><font color="#FF0000">"http://www.opengis.net/gml"</font> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"2.0"</font><b><font color="#0000FF">&gt;</font></b></tt></pre>
+I want to at least build the lxml namespace variable that I am passing in.
+I need to have a dictionary that looks like this:
+<pre><tt><font color="#990000">{</font><font color="#FF0000">'georss'</font><font color="#990000">:</font> <font color="#FF0000">'http://www.georss.org/georss'</font><font color="#990000">,</font> <font color="#FF0000">'gml'</font><font color="#990000">:</font> <font color="#FF0000">'http://www.opengis.net/gml'</font><font color="#990000">}</font></tt></pre>
+I came up with this hideous mess to convert the first line of xml to a namespace dict.  It's ugly and brittle:
+<pre><tt>namespaces <font color="#990000">=</font> <b><font color="#000000">dict</font></b> <font color="#990000">([</font> <font color="#990000">[</font> <font color="#990000">(</font>val<font color="#990000">.</font><b><font color="#000000">strip</font></b><font color="#990000">(</font><font color="#FF0000">'"'</font><font color="#990000">)</font> <b><font color="#0000FF">if</font></b> val<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]==</font><font color="#FF0000">'"'</font> <b><font color="#0000FF">else</font></b> val<font color="#990000">.</font><b><font color="#000000">strip</font></b><font color="#990000">(</font><font color="#FF0000">"'\""</font><font color="#990000">).</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">':'</font><font color="#990000">)[-</font><font color="#993399">1</font><font color="#990000">])</font> <b><font color="#0000FF">for</font></b> val <b><font color="#0000FF">in</font></b> entry<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'='</font><font color="#990000">)]</font> <b><font color="#0000FF">for</font></b> entry</tt></pre>
+Yuck!  There really has to be a better way to do this.
+-----

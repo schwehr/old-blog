@@ -1,0 +1,193 @@
+TITLE: Django 1.0.2 with mysql library
+AUTHOR: Kurt
+DATE: 03.18.2009 10:37
+DESC: admin interface
+-----
+BODY:
+Here is taking a quick look at the mysql database with Django.  This
+is using the library database dump from before.  I used the draft
+version of the <a href="http://djangobook.com/en/2.0/">2.0 Django
+Book</a>.  Turns out this database isn't very interested.  All but
+the primary keys are varchar, so I can't show cool foreign key stuff.
+You will need fink unstable for this.
+
+Note that the database shown here is not how I would design things.
+It needs foreign keys for authors and others, date types for dates, and
+a few other things before it would be something I would want to use.
+<pre>% <b>fink install django-py26 mysql-python-py26</b></pre>
+Now start working on the django project:
+<pre>% <b>django-admin.py startproject ccom_library</b>
+% <b>cd ccom_library</b>
+% <b>python manage.py startapp library</b>
+% <b>echo $USER</b></pre>
+Now edit settings.py and change these lines:
+<pre>DATABASE_ENGINE = 'mysql'
+DATABASE_NAME = 'library'
+DATABASE_USER = 'YourShortUsernameHere' # what $USER returned</pre>
+To the INSTALLED_APPS section, add these lines:
+<pre>    'django.contrib.admin',
+    'ccom_library.library',</pre>
+Now edit urls.py so that it looks like this:
+<pre><tt><b><font color="#000080">from</font></b> django<font color="#990000">.</font>conf<font color="#990000">.</font>urls<font color="#990000">.</font>defaults <b><font color="#000080">import</font></b> <font color="#990000">*</font>
+<!-- -->
+<b><font color="#000080">from</font></b> django<font color="#990000">.</font>contrib <b><font color="#000080">import</font></b> admin
+admin<font color="#990000">.</font><b><font color="#000000">autodiscover</font></b><font color="#990000">()</font>
+<!-- -->
+urlpatterns <font color="#990000">=</font> <b><font color="#000000">patterns</font></b><font color="#990000">(</font><font color="#FF0000">''</font><font color="#990000">,</font>
+    <font color="#990000">(</font>r<font color="#FF0000">'^admin/(.*)'</font><font color="#990000">,</font> admin<font color="#990000">.</font>site<font color="#990000">.</font>root<font color="#990000">),</font>
+<font color="#990000">)</font></tt></pre>
+Now get the models from the database.
+<pre>% <b>python manage.py inspectdb > library/models.py</b></pre>
+In my case, I had to edit the resulting library/models.py to remove some
+old crusty tables.  Here is the models.py:
+<pre><tt><i><font color="#9A1900"># This is an auto-generated Django model module.</font></i>
+<i><font color="#9A1900"># You'll have to do the following manually to clean this up:</font></i>
+<i><font color="#9A1900">#     * Rearrange models' order</font></i>
+<i><font color="#9A1900">#     * Make sure each model has one field with primary_key=True</font></i>
+<i><font color="#9A1900"># Feel free to rename the models, but don't rename db_table values or field names.</font></i>
+<i><font color="#9A1900">#</font></i>
+<i><font color="#9A1900"># Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'</font></i>
+<i><font color="#9A1900"># into your database.</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> django<font color="#990000">.</font>db <b><font color="#000080">import</font></b> models
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">Author</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    authorid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    fullname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">765</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    firstname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">150</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    middlename <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">150</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    lastname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">150</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    surname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">15</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    organization <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">300</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'author'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">Bookformat</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    bfid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    bookformat <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">135</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'bookformat'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">Library</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    libitemid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    title <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">(</font>blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    author <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">(</font>blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    isbn <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">192</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    publisher <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    bookformat <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">135</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    first <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">6</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    signed <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">6</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    pubdate <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">96</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    pubplace <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">192</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    rating <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">36</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    condition <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">36</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    category <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    value <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">18</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    copies <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>null<font color="#990000">=</font>True<font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    read <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">6</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    print_field <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">6</font><font color="#990000">,</font> db_column<font color="#990000">=</font><font color="#FF0000">'print'</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font> <i><font color="#9A1900"># Field renamed because it was a Python reserved word. Field name made lowercase.</font></i>
+    htmlexport <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">6</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    comment <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">(</font>blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    dateentered <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">36</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    source <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    cart <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">6</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    ordered <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">6</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    lccn <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">36</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    dewey <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">36</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    copyrightdate <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">96</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    valuedate <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">72</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    location <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">135</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    pages <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>null<font color="#990000">=</font>True<font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    series <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">(</font>blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    keywords <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">(</font>blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    dimensions <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">192</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    author2 <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    author3 <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    author4 <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    author5 <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    author6 <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">384</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    isbn13 <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">96</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    ccomlocid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">30</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    issn <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">60</font><font color="#990000">,</font> blank<font color="#990000">=</font>True<font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'library'</font>
+<!-- -->
+    <b><font color="#0000FF">def</font></b> <b><font color="#000000">__unicode__</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+        <b><font color="#0000FF">return</font></b> self<font color="#990000">.</font>title</tt></pre>
+Then you have to create a library/admin.py to tell the admin app which models to bring in.
+<pre><tt><b><font color="#000080">from</font></b> django<font color="#990000">.</font>contrib <b><font color="#000080">import</font></b> admin
+<b><font color="#000080">from</font></b> ccom_library<font color="#990000">.</font>library<font color="#990000">.</font>models <b><font color="#000080">import</font></b> Author<font color="#990000">,</font> Bookformat<font color="#990000">,</font> Library
+<!-- -->
+admin<font color="#990000">.</font>site<font color="#990000">.</font><b><font color="#000000">register</font></b><font color="#990000">(</font>Author<font color="#990000">)</font>
+admin<font color="#990000">.</font>site<font color="#990000">.</font><b><font color="#000000">register</font></b><font color="#990000">(</font>Bookformat<font color="#990000">)</font>
+admin<font color="#990000">.</font>site<font color="#990000">.</font><b><font color="#000000">register</font></b><font color="#990000">(</font>Library<font color="#990000">)</font></tt></pre>
+
+<img title="Django admin library" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/django-library-1.png"/>
+
+<img title="Django admin library" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/django-library-2.png"/>
+
+<img title="Django admin library" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/django-library-3.png"/>
+
+And for reference, here are the CREATE statements for the tables grabbed from
+the dump.
+<pre><tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> <font color="#FF0000">`author`</font> <font color="#990000">(</font>
+  <font color="#FF0000">`authorid`</font> <font color="#009900">int</font><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">)</font> <font color="#009900">unsigned</font> <b><font color="#0000FF">NOT</font></b> <b><font color="#0000FF">NULL</font></b> <b><font color="#0000FF">auto_increment</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`fullname`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`firstname`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">50</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`middlename`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">50</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`lastname`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">50</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`surname`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`organization`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">100</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b>  <font color="#990000">(</font><font color="#FF0000">`authorid`</font><font color="#990000">)</font>
+<font color="#990000">)</font> ENGINE<font color="#990000">=</font>InnoDB <b><font color="#0000FF">AUTO_INCREMENT</font></b><font color="#990000">=</font><font color="#993399">754</font> <b><font color="#0000FF">DEFAULT</font></b> CHARSET<font color="#990000">=</font>utf8<font color="#990000">;</font>
+<!-- -->
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> <font color="#FF0000">`bookformat`</font> <font color="#990000">(</font>
+  <font color="#FF0000">`bfid`</font> <font color="#009900">int</font><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">)</font> <font color="#009900">unsigned</font> <b><font color="#0000FF">NOT</font></b> <b><font color="#0000FF">NULL</font></b> <b><font color="#0000FF">auto_increment</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`bookformat`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">45</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b>  <font color="#990000">(</font><font color="#FF0000">`bfid`</font><font color="#990000">)</font>
+<font color="#990000">)</font> ENGINE<font color="#990000">=</font>InnoDB <b><font color="#0000FF">AUTO_INCREMENT</font></b><font color="#990000">=</font><font color="#993399">75</font> <b><font color="#0000FF">DEFAULT</font></b> CHARSET<font color="#990000">=</font>utf8<font color="#990000">;</font>
+<!-- -->
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> <font color="#FF0000">`library`</font> <font color="#990000">(</font>
+  <font color="#FF0000">`libitemid`</font> <font color="#009900">int</font><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">)</font> <font color="#009900">unsigned</font> <b><font color="#0000FF">NOT</font></b> <b><font color="#0000FF">NULL</font></b> <b><font color="#0000FF">auto_increment</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`title`</font> <font color="#009900">text</font><font color="#990000">,</font>
+  <font color="#FF0000">`author`</font> <font color="#009900">text</font><font color="#990000">,</font>
+  <font color="#FF0000">`isbn`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">64</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`publisher`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`bookformat`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">45</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`first`</font> <font color="#009900">char</font><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`signed`</font> <font color="#009900">char</font><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`pubdate`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">32</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`pubplace`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">64</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`rating`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">12</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`condition`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">12</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`category`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`value`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`copies`</font> <font color="#009900">int</font><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">)</font> <font color="#009900">unsigned</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`read`</font> <font color="#009900">char</font><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`print`</font> <font color="#009900">char</font><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`htmlexport`</font> <font color="#009900">char</font><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`comment`</font> <font color="#009900">text</font><font color="#990000">,</font>
+  <font color="#FF0000">`dateentered`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">12</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`source`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`cart`</font> <font color="#009900">char</font><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`ordered`</font> <font color="#009900">char</font><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`lccn`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">12</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`dewey`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">12</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`copyrightdate`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">32</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`valuedate`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">24</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`location`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">45</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`pages`</font> <font color="#009900">int</font><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">)</font> <font color="#009900">unsigned</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`series`</font> <font color="#009900">text</font><font color="#990000">,</font>
+  <font color="#FF0000">`keywords`</font> <font color="#009900">text</font><font color="#990000">,</font>
+  <font color="#FF0000">`dimensions`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">64</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`author2`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`author3`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`author4`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`author5`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`author6`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">128</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`isbn13`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">32</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`ccomlocid`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <font color="#FF0000">`issn`</font> <font color="#009900">varchar</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> <b><font color="#0000FF">default</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+  <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b>  <font color="#990000">(</font><font color="#FF0000">`libitemid`</font><font color="#990000">)</font>
+<font color="#990000">)</font> ENGINE<font color="#990000">=</font>InnoDB <b><font color="#0000FF">AUTO_INCREMENT</font></b><font color="#990000">=</font><font color="#993399">19135</font> <b><font color="#0000FF">DEFAULT</font></b> CHARSET<font color="#990000">=</font>latin1<font color="#990000">;</font></tt></pre>
+-----

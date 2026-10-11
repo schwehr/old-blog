@@ -1,0 +1,57 @@
+TITLE: LaTeX pdf tricks
+AUTHOR: Kurt
+DATE: 08.17.2005 14:37
+DESC: hyperref
+-----
+BODY:
+I wanted to be able to add notes or comments to PDF documents from
+LaTeX, but I have not figured out how to do that.  If someone knows,
+<b>please</b> email me a small sample that works with pdflatex.  Maybe
+I have to use the funky \special commands or something?
+
+While looking, I did figure out how to add pdf document properties.
+Here is a short example.  run "pdflatex example.tex" and then "open
+example.pdf".  Then in Acrobat, do File-&gt;Document Properties to see
+these fields filled in.
+<pre>
+\documentclass[9pt,letterpaper ]{article} 
+\usepackage{hyperref}
+\hypersetup{
+  pdftitle = My title,
+  pdfauthor = Kurt Schwehr,
+  pdfsubject = the subject,
+  pdfkeywords = keyword1 word one two
+}
+
+\begin{document} 
+\url{http://schwehr.org/}
+\end{document}</pre>
+</pre>
+
+Watch out!  This will make all of your references hyperlinks.  That
+may not be what you want.  I added this to make my links blue which is
+common for journals like Marine Geology.
+<pre>
+\hypersetup{
+    colorlinks = true, 
+    linkcolor = red,
+    anchorcolor = red,
+    citecolor = blue, 
+    filecolor = red, 
+    pagecolor = red,
+    urlcolor = red
+}
+</pre>
+This works great by doing latex to make a dvi and then dvipdfm on the
+dvi, but I am using pdflatex, where I don't know how to make this work.
+<pre>
+\documentclass[dvipdfm]{article} 
+\begin{document} 
+Test PDF document with annotations. 
+\special{pdf: ann width 3.0in height 36pt 
+&lt;&lt; /Type /Annot /Subtype /Text 
+/Contents (This is a /Text Annotation that looks like a sticky 
+note.) &gt;&gt;} 
+\end{document} 
+</pre>
+-----

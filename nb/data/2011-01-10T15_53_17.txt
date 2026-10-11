@@ -1,0 +1,71 @@
+TITLE: Setting up yasnippets
+AUTHOR: Kurt
+DATE: 01.10.2011 15:53
+DESC: kickstart
+-----
+BODY:
+I've got the basics of yasnippets going and Ben Smith gave me a quick
+tutorial of his tweaks to his .emacs and org-mode snippets.  I couldn't
+get Ben's tweak to use '=' to be the completion character to avoid clashing
+with TAB in org-mode, but luckily, the <a href="http://yasnippet.googlecode.com/svn/trunk/doc/faq.html">yasnippet FAQ</a> has an entry that
+got me setup.  Here is what I've added to my .emacs:
+<pre><tt><i><font color="#9A1900">;;; YASnippet</font></i>
+<font color="#FF0000">(</font>add-to-list <font color="#009900">'load-path</font>
+                  <font color="#FF0000">"~/.emacs.d/plugins/yasnippet-0.6.1c"</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font>require <font color="#009900">'yasnippet</font><font color="#FF0000">)</font> <i><font color="#9A1900">;; not yasnippet-bundle, which did not work for meb</font></i>
+<font color="#FF0000">(</font>yas/initialize<font color="#FF0000">)</font>
+<font color="#FF0000">(</font>yas/load-directory <font color="#FF0000">"~/.emacs.d/plugins/yasnippet-0.6.1c/snippets"</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font>yas/load-directory <font color="#FF0000">"~/projects/src/elisp/snippets"</font><font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font>add-hook <font color="#009900">'org-mode-hook</font>
+          <font color="#FF0000">(</font><b><font color="#0000FF">let</font></b> <font color="#FF0000">((</font>original-command <font color="#FF0000">(</font>lookup-key org-mode-map [tab]<font color="#FF0000">)))</font>
+            `<font color="#FF0000">(</font>lambda <font color="#FF0000">()</font>
+               <font color="#FF0000">(</font>setq yas/fallback-behavior
+                     '<font color="#FF0000">(</font>apply ,original-command<font color="#FF0000">))</font>
+               <font color="#FF0000">(</font>local-set-key [tab] <font color="#009900">'yas/expand</font><font color="#FF0000">))))</font></tt></pre>
+I created a place for yasnippets:
+<pre><b>cd
+mkdir -p .emacs.d/plugins
+cd .emacs.d/plugins
+wget http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2
+tar xf yasnippet-0.6.1c.tar.bz2</b></pre>
+Then I put Ben's example org-mode snippets into my own svn area.
+<pre><b>mkdir ~/projects/src/elisp/snippets/org-mode</b></pre>
+Here is the demo snippet that Ben showed me.  It's about the perfect level for me to start at.
+<pre><tt>#- yasnippet
+# key: begin
+# name: begin
+# --
+#+BEGIN_${1:SRC} $<font color="#993399">2</font>
+$<font color="#993399">0</font>
+#+END_$<font color="#993399">1</font></tt></pre>
+The snippet is triggered by typing "begin" in org-mode and hitting
+TAB.  The "${1:SRC}" is the first area that will get filled in and
+I've changed his EXAMPLE to SRC.  I can backspace and edit the SRC to
+be VERSE or EXAMPLE if I want.  Pressing TAB again will take me to $2
+where I can type in the language.  When I'm done, I hit TAB again and
+yasnippet will leave me at $0 ready to paste in the source code.  
+
+I have a day based logging style in my org-mode journal file (one file
+per year).  These seemed like a great place to start my snippet
+building.  I want an entry that looks like this:
+<pre>* Jan 10, CCOM, Durham, NH &lt;2011-01-10 Mon&gt;                              :day:</pre>
+It took some help from the folks on the &#35;org-mode channel on IRC, but
+I now have this snippet:
+<pre><tt>#- yasnippet
+# key: day
+# name: day
+# contributor: Kurt Schwehr 
+# --
+* `<font color="#FF0000">(</font>format-time-string <font color="#FF0000">"%b %d"</font> <font color="#FF0000">(</font>current-time<font color="#FF0000">))</font>`, $<font color="#993399">1</font> `<font color="#FF0000">(</font>org-insert-time-stamp nil nil nil nil nil nil<font color="#FF0000">)</font>` <b><font color="#000080">:day</font></b>:</tt></pre>
+I type "day[TAB]" and then type my location followed by [TAB] and then
+[TAB] again and I have a day heading.
+
+Benny on &#35;org-mode suggested looking at org-datetree.  I found <a
+href="http://members.optusnet.com.au/~charles57/GTD/datetree.html">Capture
+mode and Date Trees in org-mode</a> by <a
+href="http://members.optusnet.com.au/~charles57/GTD/index.html">Charles
+Cave</a>, who has created <a
+href="http://members.optusnet.com.au/~charles57/GTD/orgnode.html">orgnode</a>
+for handling org-mode files from python.
+-----

@@ -1,0 +1,95 @@
+TITLE: beamer from org mode to create presentations
+AUTHOR: Kurt
+DATE: 01.06.2010 11:36
+DESC: feel the power
+-----
+BODY:
+I just started using <a href="http://orgmode.org/">org mode</a> with beamer (<a href="http://orgmode.org/worg/org-tutorials/org-beamer.php">org-beamer</a>)to create presentations.
+There is not as much control and fiddle potential as PowerPoint or
+KeyNote, but the idea of creating a presentation from org-mode is
+pretty exciting.  On my Mac, I had to install some stuff to get beamer
+and to have an org-mode that is new enough to know how to do beamer.
+<pre>fink install latex-beamer
+wget http://orgmode.org/org-latest.tar.gz
+tar xf org-latest.tar.gz
+cd org-mode
+make
+make install  prefix=~/.emacs-lisp
+ls ~/.emacs-lisp/share/emacs/site-lisp
+mv ~/.emacs-lisp/share/emacs/site-lisp /Users/schwehr/.emacs-lisp/org
+</pre>
+I then added this to my ~/.emacs:
+<pre>(setq load-path (cons "~/.emacs-lisp/org" load-path))</pre>
+Now to create a quick presentation:
+<pre>#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [presentation]
+#+BEAMER_FRAME_LEVEL: 1
+#+BEAMER_HEADER_EXTRA: \usetheme{default}\usecolortheme{default}
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Env Args) %4BEAMER_col(Col) %8BEAMER_extra(Extra)
+<!-- -->
+* Is this a slide
+ - Some bulleted items
+ - Two 
+ - Three
+* How about a slide with a picture
+[[/Users/schwehr/projects/blog/nb/attachments/2009-12/gdal-color-relief-bag-overview.png]]</pre>
+Then I built the presenation by doing <b>C-c C-e d</b>, which is the
+normal command to create a LaTeX pdf.  Here is the LaTeX source that
+org-mode created to do the beamer presentation:
+<pre><tt><i><font color="#9A1900">% Created 2010-01-06 Wed 11:27</font></i>
+<b><font color="#0000FF">\documentclass</font></b><font color="#993399">[presentation]</font><font color="#009900">{beamer}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#993399">[utf8]</font><font color="#009900">{inputenc}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#993399">[T1]</font><font color="#009900">{fontenc}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#009900">{graphicx}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#009900">{longtable}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#009900">{float}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#009900">{wrapfig}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#009900">{soul}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#009900">{amssymb}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#009900">{hyperref}</font>
+<!-- -->
+<b><font color="#0000FF">\title</font></b><font color="#009900">{beamer}</font>
+<b><font color="#0000FF">\author</font></b><font color="#009900">{Kurt Schwehr}</font>
+<b><font color="#0000FF">\date</font></b><font color="#009900">{06 January 2010}</font>
+<!-- -->
+<b><font color="#0000FF">\usetheme</font></b><font color="#009900">{default}</font><b><font color="#0000FF">\usecolortheme</font></b><font color="#009900">{default}</font>
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{document}</font>
+<!-- -->
+<b><font color="#0000FF">\maketitle</font></b>
+<!-- -->
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{frame}</font>
+<b><font color="#0000FF">\frametitle</font></b><font color="#009900">{Outline}</font>
+<b><font color="#0000FF">\setcounter</font></b><font color="#009900">{tocdepth}{3}</font>
+<b><font color="#0000FF">\tableofcontents</font></b>
+<b><font color="#0000FF">\end</font></b><font color="#009900">{frame}</font>
+<!-- -->
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{frame}</font>
+<b><font color="#0000FF">\frametitle</font></b><font color="#009900">{Is this a slide}</font>
+<b><font color="#0000FF">\label</font></b><font color="#009900">{sec-1}</font>
+<!-- -->
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{itemize}</font>
+<b><font color="#0000FF">\item</font></b> Some bulleted items
+<b><font color="#0000FF">\item</font></b> Two
+<b><font color="#0000FF">\item</font></b> Three
+<b><font color="#0000FF">\end</font></b><font color="#009900">{itemize}</font>
+<b><font color="#0000FF">\end</font></b><font color="#009900">{frame}</font>
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{frame}</font>
+<b><font color="#0000FF">\frametitle</font></b><font color="#009900">{How about a slide with a picture}</font>
+<b><font color="#0000FF">\label</font></b><font color="#009900">{sec-2}</font>
+<!-- -->
+<b><font color="#0000FF">\includegraphics</font></b><font color="#993399">[width=10em]</font><font color="#009900">{/Users/schwehr/projects/blog/nb/attachments/2009-12/gdal-color-relief-bag-overview.png}</font>
+ 
+<b><font color="#0000FF">\end</font></b><font color="#009900">{frame}</font>
+<!-- -->
+<b><font color="#0000FF">\end</font></b><font color="#009900">{document}</font></tt></pre>
+The presentation viewed in Preview:
+
+<img title="A view of a org to beamer presentation" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-01/org-beamer-presentation.png"/>
+
+That's pretty basic, but with beamer is is possible to make some
+pretty impressive slides.  <a
+href="http://www.math.umbc.edu/~rouben/beamer/quickstart-Z-H-30.html">Beamer
+slide gallery</a>:
+
+<img title="From the gallery" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-01/beamer-gallery15.png"/>
+-----

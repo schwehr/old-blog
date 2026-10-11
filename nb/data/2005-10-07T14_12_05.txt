@@ -1,0 +1,133 @@
+TITLE: projecting cores into the time domain
+AUTHOR: Kurt
+DATE: 10.07.2005 14:12
+DESC: meters and offsets to get cores on the grid
+-----
+BODY:
+I want to be able to show cores in the time domain of my seismic
+lines.  Here is how I went about it. First I measured the length of
+the core from the photographs with xcore (I did this a couple years
+ago).
+<pre>
+core  length (cm)
+ 7     757 
+ 2     782
+ 1     583
+</pre>
+Now use segy-py in python to project from length to time.
+<pre>
+ipython   # Igor says, "ipython good!"
+
+In [1]: import projections
+
+In [4]: projections.meters2twtt(5.83)
+Out[4]: 0.0077733333333333335
+
+In [5]: projections.meters2twtt(7.82)
+Out[5]: 0.010426666666666667
+
+In [6]: projections.meters2twtt(7.57)
+Out[6]: 0.010093333333333334
+</pre>
+Then I regenerated the water bottom picks.
+<pre>
+segywaterbottom.py -t 5000 -d xstar -k Shotpoint --time -O 143 -f
+EEL5kL03.xstar --noisy -n 
+
+head wbt.dat
+# FILE: EEL5kL03.xstar
+# traceNumber Shotpoint time(s) 
+
+1 83542 0.155436
+2 83543 0.155313
+3 83543 0.155313
+4 83544 0.155395
+5 83544 0.155518
+6 83545 0.155395
+7 83545 0.1556
+</pre>
+Grrr.  It seems like -n does not do what I think it does.  Bugglet.
+At least the 2nd column is shot number and the 3rd is the two way
+travel time from the fish to water bottom and back.  I then layed in
+my 177 shot offset values from yesterday and plotted them.  I tweaked
+the gnuplot file until the top (smaller) time matched the water
+bottom.  Then I added the time size of the core to the start time and
+came up with this nice file for use in gnuplot:
+<pre>
+# With length from gps to block
+# core 7 - 757 cm - .0101 sec
+88942 .4205
+88942 .4306
+
+# core 2 - 782 cm - .0104 sec
+88979 .421
+88979 .4314
+
+# core 1 - 583 cm - .00777 sec
+89027 .424
+89027 .43177
+</pre>
+Now some gnuplot magic:
+<pre>
+gnuplot
+
+gnuplot&gt; set label 1 "1" at 89027,.421 center
+gnuplot&gt; set label 2 "2" at 88979,.419 center 
+gnuplot&gt; set label 7 "7" at 88942,.419 center 
+
+gnuplot&gt; set xlabel 'Shotpoint'
+gnuplot&gt; set ylabel 'TWTT (seconds)' 
+gnuplot&gt; set yrange [*:*] reverse 
+gnuplot&gt; set xrange [90000:88500] 
+gnuplot&gt; plot 'wbt.dat' using 2:3 with l, 'cores-shots-177-time.dat' with l
+
+gnuplot&gt; set terminal gif
+gnuplot&gt; set output 'core-location-time.gif'
+gnuplot&gt; replot
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-10/core-location-time.gif"><br>
+Now I'll use the illustrator overlay technique to give myself a guide
+to annotating the nice figure for the paper.
+
+<img src="http://schwehr.org/blog/attachments/2005-10/xstar-cores-timedomain.png">
+
+<b>Warning:</b> gnuplot has a little trouble flushing pdf plots to
+disk if you finish a plot, hit Ctrl-Z and do an
+<pre>
+open -a /Applications/Adobe\ Illustrator\ CS/Illustrator\ CS.app  foo.pdf
+</pre>
+You can either quit gnuplot first or set the output to something else
+and replot.  That seems to flush the pdf to disk.
+
+We do not know the exact wireout, so the 40&deg; is an estimate
+based on times where the wireout and speed were known.  It is
+important to give an estimate of the range of laybacks that are
+possible.  A reasonable range is 30&deg; to 45&deg;.  Here is the
+python to get the range of shot offsets.  Remember that shot spacing
+is only aproximately constant and only that when the ship is driving a
+constant speed in a straight line (and has been doing so for a while).
+<pre>
+ipython
+
+import projections
+import layback
+mps = projections.metersPerShot(87542,(-124.4866666,40.835555555),
+                                89042,(-124.5052777,40.839166666),
+                                utmZone=10)
+# 1.07985
+#
+laybackMeters = (
+       layback.angledepthLayback(143,gpsoffset=projections.feet2meters(69),
+                                 cableangle=45),
+       layback.angledepthLayback(143,gpsoffset=projections.feet2meters(69),
+                                 cableangle=30)
+  )
+#
+# (164.03120000000004, 268.71446548234945)
+#
+laybackShots = (laybackMeters[0] / mps, laybackMeters[1]/mps)
+#
+# (151.90179979198766, 248.84418901349753)  &lt;--- this is it!
+</pre>
+Then I plot it with as a line over the cores.
+-----

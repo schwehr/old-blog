@@ -1,0 +1,42 @@
+TITLE: Converting python 2.x to 3
+AUTHOR: Kurt
+DATE: 01.28.2009 07:20
+DESC: opensource development
+-----
+BODY:
+Vesa H. just got me to look at converting my code from python 2 to
+python 3.  I am still unsure what are the things that will impact me
+and fink has yet to get a python30 package.  I am really still trying
+to catch up on my packaging of python 2.6 packages for fink.
+Python 2.6 comes with a program called 2to3.  Here is it running on  
+segy.py from simplesegy 0.3:
+<pre><tt><font color="#FF6600">--- segy.py (original)</font>
+<font color="#009900">+++ segy.py (refactored)</font>
+<font color="#0000FF">@@ -210,7 +210,7 @@</font>
+             val = struct.unpack(struct_code,self.data[self.offset+start:end+self.offset])[0]
+             self.__dict__[name] = val
+             return val
+<font color="#FF6600">-        raise AttributeError, name</font>
+<font color="#009900">+        raise AttributeError(name)</font>
+ <!-- -->
+     def datetime(self):
+         '''
+<font color="#0000FF">@@ -261,7 +261,7 @@</font>
+     def __iter__(self):
+         return self
+ <!-- -->
+<font color="#FF6600">-    def next(self):</font>
+<font color="#009900">+    def __next__(self):</font>
+         if self.cur_pos &gt; self.size-1:
+             raise StopIteration
+         trace = Trace(self.data,self.sample_type,self.cur_pos)</tt></pre>
+This is what open source is all about.  Vesa sent me a patch file to fix some bugs the day
+after I released simplesegy to pypi.  Rock on!
+
+Some readings on converting code from 2 to 3:
+
+<a href="http://lucumr.pocoo.org/2008/12/7/porting-to-python-3:-dos-and-donts">Porting to Python 3: Do's and Don'ts</a> by Armin Ronacher
+
+<a href="http://docs.python.org/dev/3.0/whatsnew/3.0.html">What's new in Python 3.0</a> - 
+<a href="http://docs.python.org/whatsnew/2.6.html">What's new in Python 2.6</a>
+-----

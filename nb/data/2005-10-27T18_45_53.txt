@@ -1,0 +1,68 @@
+TITLE: Python destructors
+AUTHOR: Kurt
+DATE: 10.27.2005 18:45
+DESC: what's up?
+-----
+BODY:
+How does python's destruction system work?  I am cookin up a little
+pdflib wrapper and am having some strange behavior on cleanup.  Yes, I
+do know that pdflib is up to 6.0.2 and fink only has 5.0.3.  Soon, I
+promiss.  
+
+It seems like the pdf object was already garbage collected when
+__del__ was being reached, so the pdf cleanup is freaking out.  This
+little python snippet proves taht objects are not eaten by the great
+GC monster before my __del__ code gets run.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>class</strong> <font color="#2040a0">destroy</font><font color="4444FF">:</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">a</font> <font color="4444FF">=</font> <font color="#FF0000">1</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __del__</font><font color="2040a0">(self)</font>:
+</strong>        <strong>print</strong> <font color="#2040a0">self</font>.<font color="#2040a0">a</font>
+        <strong>del</strong><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">a</font><font color="4444FF">)</font>
+        <strong>print</strong> <font color="#2040a0">self</font>.<font color="#2040a0">a</font>
+<font color="orange"># Try it...</font>
+<font color="#2040a0">d</font> <font color="4444FF">=</font> <font color="#2040a0">destroy</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>del</strong><font color="4444FF">(</font><font color="#2040a0">d</font><font color="4444FF">)</font>
+</pre>
+I expect the 2nd print of self.a to throw an exception.  And that is
+what happens.
+<pre>
+./destroy.py 
+1
+Exception exceptions.AttributeError: "destroy instance has no 
+  attribute 'a'" in &lt;bound method destroy.__del__ of 
+  &lt;__main__.destroy instance at 0x38ce90&gt;&gt; ignored
+</pre>
+Aha!!!  I figured the bugger out.  It was not my pdf object that was
+gone when my code got to __del__, rather pdflib_py was already gone.
+Doing another import  did the trick, but is that okay?  It feels
+REALLY WRONG to do this sort of thing.  Shouldn't the pdf object be
+holding up the reference count on the <em>import pdflib_py</em>
+instance?  Perhaps the pdflib python interface is missing a reference
+count?  Or is this how python is supposed to work?
+<pre>
+    def __del__(self):
+        print 'running __del__', type(self.pdf), self.pdf
+        import pdflib_py
+        pdflib_py.PDF_end_page(self.pdf)
+        pdflib_py.PDF_close(self.pdf)
+        pdflib_py.PDF_delete(self.pdf)
+</pre>
+I am leaning towards a missing refcount in the pdflib_py library.  I
+tried this little snippet and it prints out 3.1415... just fine.
+<pre>
+#!/usr/bin/env python
+import math
+class destroy2:
+    def __init__(self):
+        return
+    def __del__(self):
+        print math.pi
+d = destroy2()
+</pre>
+BTW,  No luck trying to figure out what is wrong with mapserver.  It
+seems to get confused and think that my mac needs -arch i386 and -arch
+ppc.  Not gonna work like that.  How to make the linker confused.
+-----

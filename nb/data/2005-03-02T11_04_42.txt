@@ -1,0 +1,114 @@
+TITLE: SGI raid troubles
+AUTHOR: Kurt
+DATE: 03.02.2005 11:04
+DESC: blasted crummy expensive computer hardware
+-----
+BODY:
+Becca noticed that the console on the RAID on our SGI file server says
+too many bad sectors on a drive and that it needs to be replaced.
+Here is a quick excerpt of the /var/adm/SYSLOG... where the heck am I
+supposed to be notified about these.  Just on a little LCD display is
+idiotic from a copmany that claimed it produces enterprise class
+systems.  I have removed duplicated messages of those that are not
+relevant:
+
+<pre>
+Feb 28 23:19:25 3D:stowe autofsd[264]: getmapent_uns: matlab5.2 automount:auto.net returned NS_NOTFOUND
+Feb 28 23:19:25 3D:stowe autofsd[264]: mount of /net/matlab5.2 failed
+Feb 28 23:19:41 6D:stowe inetd[325]: received SIGHUP: reconfiguring
+
+   Is this automated or was an SA on the system?
+
+Feb 28 23:20:24 6C:stowe sendmail[312938]: j217KOqY312938: localhost.ucsd.edu [127.0.0.1] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA-v4
+Feb 28 23:22:49 6A:stowe unix: pkgadjust: core file access error
+   
+   What is this?
+
+Feb 28 23:23:38 6C:stowe sendmail[313858]: j217Nbud313858: from=root, size=453, class=0, nrcpts=1, msgid=<200503010723.j217Nbud313858@stowe.ucsd.edu>, relay=root@loca
+lhost
+Feb 28 23:23:38 6C:stowe sendmail[313713]: j217NcqY313713: from=<root@stowe.ucsd.edu>, size=756, class=0, nrcpts=1, msgid=<200503010723.j217Nbud313858@stowe.ucsd.edu>
+, proto=ESMTP, daemon=MTA-v4, relay=localhost.ucsd.edu [127.0.0.1]
+Feb 28 23:23:38 6C:stowe sendmail[313858]: j217Nbud313858: to=croncrap@igpp.ucsd.edu, ctladdr=root (0/0), delay=00:00:01, xdelay=00:00:00, mailer=relay, pri=30066, re
+lay=localhost.ucsd.edu. [127.0.0.1], dsn=2.0.0, stat=Sent (j217NcqY313713 Message accepted for delivery)
+Feb 28 23:23:38 6C:stowe sendmail[313903]: j217NcqY313713: to=<croncrap@igpp.ucsd.edu>, ctladdr=<root@stowe.ucsd.edu> (0/0), delay=00:00:00, xdelay=00:00:00, mailer=e
+smtp, pri=120369, relay=igpp.ucsd.edu. [132.239.152.7], dsn=2.0.0, stat=Sent (j217Ncar021999 Message accepted for delivery)
+Mar  1 01:02:14 6E:stowe rshd[314430]: root@sole.ucsd.edu as root: cmd='sh /export/stowe/BACKUP/stowe.day'
+Mar  1 12:53:22 4A:stowe unix: WARNING: ARP: got MAC address 0:3:93:6:c1:b2 on ef for BCAST IP address 0.0.0.0
+
+... many complaints about matlab
+
+Mar  1 23:33:24 3D:stowe autofsd[264]: getmapent_uns: matlab5.2 automount:auto.net returned NS_NOTFOUND
+Mar  1 23:33:24 3D:stowe autofsd[264]: mount of /net/matlab5.2 failed
+Mar  1 23:33:39 6D:stowe inetd[325]: received SIGHUP: reconfiguring
+
+    This has to be a cron thing
+
+Mar  1 23:34:22 6C:stowe sendmail[320889]: j227YMqY320889: localhost.ucsd.edu [127.0.0.1] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA-v4
+Mar  1 23:36:50 6A:stowe unix: pkgadjust: core file access error
+
+    Grr
+
+Mar  1 23:37:44 6C:stowe sendmail[321070]: j227biHZ321070: from=root, size=603, class=0, nrcpts=1, msgid=<200503020737.j227biHZ321070@stowe.ucsd.edu>, relay=root@loca
+lhost
+Mar  1 23:37:44 6C:stowe sendmail[319122]: j227biqY319122: from=<root@stowe.ucsd.edu>, size=904, class=0, nrcpts=1, msgid=<200503020737.j227biHZ321070@stowe.ucsd.edu>
+, proto=ESMTP, daemon=MTA-v4, relay=localhost.ucsd.edu [127.0.0.1]
+Mar  1 23:37:44 6C:stowe sendmail[321070]: j227biHZ321070: to=croncrap@igpp.ucsd.edu, ctladdr=root (0/0), delay=00:00:00, xdelay=00:00:00, mailer=relay, pri=30066, re
+lay=localhost.ucsd.edu. [127.0.0.1], dsn=2.0.0, stat=Sent (j227biqY319122 Message accepted for delivery)
+Mar  1 23:37:44 6C:stowe sendmail[320233]: j227biqY319122: to=<croncrap@igpp.ucsd.edu>, ctladdr=<root@stowe.ucsd.edu> (0/0), delay=00:00:00, xdelay=00:00:00, mailer=e
+smtp, pri=120367, relay=igpp.ucsd.edu. [132.239.152.7], dsn=2.0.0, stat=Sent (j227biar001845 Message accepted for delivery)
+Mar  2 01:15:48 6E:stowe rshd[320770]: root@sole.ucsd.edu as root: cmd='sh /export/stowe/BACKUP/stowe.day'
+Mar  2 18:40:59 6E:stowe sshd[323119]: Accepted publickey for schwehr from 67.120.232.149 port 55834 ssh2
+</pre>
+
+There is no hint in there that there is disk trouble.  It is nice to
+see daily backups and it is amusing that the alias for that is named
+"croncrap@igpp".  The is one of the reasons I never want to use an SGI
+again:
+<pre>
+man -k raid
+No manual entries seem appropriate for raid.
+
+# schwehr@stowe 12 $ cd /var/adm && locate RAID
+bash: locate: command not found
+</pre>
+Wait, what is this file from August 2004?
+<pre>
+# schwehr@stowe 16 $ cd /var/adm && head 20040817.SYSLOG 
+Aug 15 01:01:06 6F:stowe syslogd: restart
+Aug 15 01:01:35 6A:stowe unix: ql3d3: <6>Selection timeout
+Aug 15 01:01:35 6A:stowe unix: dksc3d3s7: SCSI driver error: device does not respond to selection
+Aug 15 01:01:35 1A:stowe unix: ALERT: I/O error in filesystem ("/stoweraid") meta-data dev 0xe2 block 0x40 ("xfs_trans_read_buf")
+Aug 15 01:02:05 6A:stowe unix: ql3d3: <6>Selection timeout
+Aug 15 01:02:05 6A:stowe unix: dksc3d3s7: SCSI driver error: device does not respond to selection
+Aug 15 01:02:05 1A:stowe unix: ALERT: I/O error in filesystem ("/stoweraid") meta-data dev 0xe2 block 0x40 ("xfs_trans_read_buf")
+Aug 15 01:02:35 6A:stowe unix: ql3d3: <6>Selection timeout
+Aug 15 01:02:35 6A:stowe unix: dksc3d3s7: SCSI driver error: device does not respond to selection
+Aug 15 01:02:35 1A:stowe unix: ALERT: I/O error in filesystem ("/stoweraid") meta-data dev 0xe2 block 0x40 ("xfs_trans_read_buf")
+</pre>
+Oh, that was AFTER the primary raid completely dead when a bad drive
+was not replaced right away.  At that point it was too late to just
+swap the bad drive in and have a happy system rebuild the raid array.
+
+Just found out via IM that apparently this message has been there
+since November and that it is "ok" according to the admin.  Note that
+this was found out word of mouth.  There is no note on the machine.
+Supposedly because of the card that was bought for the raid.  Time to
+throw the whole chain off the pier.  I can't find squat about squat in
+the logs:
+<pre>
+egrep -i "raid|stowe|disk" [a-jl-x]* | egrep -v\
+'auto\.net|matlab|NOUSER|export|sendmail|password|Illegal\
+user|SIGHUP|MAC|pkgadjust|freespace|account is locked|stack limit\
+exceeded|startino|rc failed|identification string'\
+
+oSYSLOG:Feb 20 01:01:06 6F:stowe syslogd: restart
+oSYSLOG:Feb 20 03:00:06 6B:stowe fsr[247588]: no rw efs file systems in mtab 
+oSYSLOG:Feb 20 03:00:06 6B:stowe fsr[247543]: fsr_xfs -m /etc/mtab -t 7200 -f /var/tmp/.fsrlast_xfs ... 
+oSYSLOG:Feb 20 05:29:37 6B:stowe fsr[248630]: fsr_xfs startpass 2, endpass 3, time 8971 seconds 
+</pre>
+Blasted thing.  I used to love IRIX compared to the other unix
+systems.  I can figure out how to do all this with Linux or OSX raid
+arrays just fine.
+
+End grumpy mode :) Now returning to real work.
+-----

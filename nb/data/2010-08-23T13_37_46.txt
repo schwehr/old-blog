@@ -1,0 +1,86 @@
+TITLE: Quakes, Volcanoes, and plate Margins
+AUTHOR: Kurt
+DATE: 08.23.2010 13:37
+DESC: looking pretty good - plate tectonics
+-----
+BODY:
+I've fixed up my quake visualization some, added volcanoes and added
+plate boundaries.  I think it's starting to look pretty good.  First, the
+volcanoes.  I downloaded the Excel spreadsheet (ahem... not a great way to
+publish data) and did a save as CSV.  I then used the python <b>csv</b> module
+to read in the volcanoes and spit out KML.  I had made my own icon, but decided
+that Google's looks tons better.  The plate boundaries took a little more work.
+<pre><b>wget http://serc.carleton.edu/files/eet/seismicwave/plates_quakes_countries.zip
+unzip plates_quakes_countries.zip
+ogr2ogr -f SQLite plates.sqlite plat_lin.shp
+./platesdb2kml.py
+sqlite3 plates.sqlite .schema</b></pre>
+The trickiest part is that the geometry is stored in the SQLite database as <a href="http://en.wikipedia.org/wiki/Well-known_text">WKB</a> (Well Known Binary).  The database schema:
+<pre><tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> geometry_columns <font color="#990000">(</font>
+     f_table_name <font color="#009900">VARCHAR</font><font color="#990000">,</font>
+     f_geometry_column <font color="#009900">VARCHAR</font><font color="#990000">,</font>
+     geometry_type INTEGER<font color="#990000">,</font>
+     coord_dimension INTEGER<font color="#990000">,</font>
+     srid INTEGER<font color="#990000">,</font>
+     geometry_format <font color="#009900">VARCHAR</font>
+<font color="#990000">);</font>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> <font color="#FF0000">'plat_lin'</font> <font color="#990000">(</font>
+     OGC_FID INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+     GEOMETRY <font color="#009900">BLOB</font><font color="#990000">,</font>
+     <font color="#FF0000">'margin_typ'</font> <font color="#009900">VARCHAR</font>
+<font color="#990000">);</font>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> spatial_ref_sys <font color="#990000">(</font>
+     srid INTEGER <b><font color="#0000FF">UNIQUE</font></b><font color="#990000">,</font>
+     auth_name <font color="#009900">TEXT</font><font color="#990000">,</font>
+     auth_srid <font color="#009900">TEXT</font><font color="#990000">,</font>
+     srtext <font color="#009900">TEXT</font>
+<font color="#990000">);</font></tt></pre>
+I used <a href="http://pypi.python.org/pypi/Shapely/">shapely</a> to parse the WKB.  It's a little tricky as some items come back as LineString objects and others as MultiLineStringObjects (with more than one line in them).  I'm not a huge fan of ESRI shape files (shp).
+<pre><tt><b><font color="#000080">import</font></b> sqlite3
+<b><font color="#000080">from</font></b> shapely <b><font color="#000080">import</font></b> wkb
+<b><font color="#000080">import</font></b> shapely
+<!-- -->
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'plates.sqlite'</font><font color="#990000">)</font>
+cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+margin_types <font color="#990000">=</font> <font color="#990000">[</font>item<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <b><font color="#0000FF">for</font></b> item <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT DISTINCT(margin_typ) FROM plat_lin;'</font><font color="#990000">)]</font>
+<!-- -->
+o <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'margins.kml'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> margin <b><font color="#0000FF">in</font></b> margin_types<font color="#990000">:</font>
+    o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'&lt;Folder&gt;&lt;name&gt;{margin}&lt;/name&gt;\n'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>margin<font color="#990000">=</font>margin<font color="#990000">))</font>
+    <b><font color="#0000FF">for</font></b> section <b><font color="#0000FF">in</font></b> cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT ogc_fid, geometry FROM plat_lin WHERE margin_typ= :margin;'</font><font color="#990000">,{</font><font color="#FF0000">'margin'</font><font color="#990000">:</font>margin<font color="#990000">}):</font>
+        geom <font color="#990000">=</font> wkb<font color="#990000">.</font><b><font color="#000000">loads</font></b><font color="#990000">(</font><b><font color="#000000">str</font></b><font color="#990000">(</font>section<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]))</font>
+        lines <font color="#990000">=</font> <font color="#990000">[]</font>
+        <b><font color="#0000FF">if</font></b> <b><font color="#000000">isinstance</font></b><font color="#990000">(</font>geom<font color="#990000">,</font> shapely<font color="#990000">.</font>geometry<font color="#990000">.</font>linestring<font color="#990000">.</font>LineString<font color="#990000">):</font>
+            <i><font color="#9A1900"># single line</font></i>
+            lines<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>geom<font color="#990000">.</font>xy<font color="#990000">)</font>
+            <b><font color="#0000FF">pass</font></b>
+        <b><font color="#0000FF">elif</font></b> <b><font color="#000000">isinstance</font></b><font color="#990000">(</font>geom<font color="#990000">,</font> shapely<font color="#990000">.</font>geometry<font color="#990000">.</font>multilinestring<font color="#990000">.</font>MultiLineString<font color="#990000">):</font>
+            <i><font color="#9A1900"># multiline</font></i>
+            <b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> geom<font color="#990000">:</font>
+                lines<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>line<font color="#990000">.</font>xy<font color="#990000">)</font>
+        <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+            sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#FF0000">'Whoops'</font><font color="#990000">)</font>
+<!-- -->
+        <b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> lines<font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#FF0000">'len_line:'</font><font color="#990000">,</font><b><font color="#000000">len</font></b><font color="#990000">(</font>line<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])</font>
+            o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'''&lt;Placemark&gt;</font>
+<font color="#FF0000">  &lt;styleUrl&gt;#{margin}&lt;/styleUrl&gt;</font>
+<font color="#FF0000">  &lt;LineString&gt;&lt;altitudeMode&gt;absolute&lt;/altitudeMode&gt;&lt;coordinates&gt;\n'''</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>margin<font color="#990000">=</font>margin<font color="#990000">))</font>
+            <b><font color="#0000FF">for</font></b> i <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>line<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])):</font>
+                x <font color="#990000">=</font> line<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">][</font>i<font color="#990000">]</font>
+                y <font color="#990000">=</font> line<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">][</font>i<font color="#990000">]</font>
+                z <font color="#990000">=</font> <font color="#993399">700000</font>
+                <b><font color="#0000FF">print</font></b> <font color="#FF0000">'\t'</font><font color="#990000">,</font>x<font color="#990000">,</font>y<font color="#990000">,</font>z
+                o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'\t\t{x},{y},{z}\n'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>x<font color="#990000">=</font>x<font color="#990000">,</font>y<font color="#990000">=</font>y<font color="#990000">,</font>z<font color="#990000">=</font>z<font color="#990000">))</font>
+            o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'  &lt;/coordinates&gt;&lt;/LineString&gt;&lt;/Placemark&gt;'''</font><font color="#990000">)</font>
+            
+    o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'\n&lt;/Folder&gt; &lt;!-- {margin} --&gt;\n\n'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>margin<font color="#990000">=</font>margin<font color="#990000">))</font></tt></pre>
+More images from the visualization as it evolves... Margaret suggested switching the quake color scheme to be white to blue, which helps the volcanoes stand out separately from the quakes.
+
+<img title="North Western United States up through Alaska" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/quakes-volcanoes-margins-1.png"/>
+
+<img title="Central America" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/quakes-volcanoes-margins-2.png"/>
+
+<img title="Chile" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/quakes-volcanoes-margins-3.png"/>
+-----

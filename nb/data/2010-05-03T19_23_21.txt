@@ -1,0 +1,22 @@
+TITLE: Supporting Python 2.6 and 3.1 for a C extension/module
+AUTHOR: Kurt
+DATE: 05.03.2010 19:23
+DESC: an accomplishment
+-----
+BODY:
+I just managed to make my python extension in libais work with both
+python 2.6 and python 3.  I followed the well hidden guide on the
+python web page: <a
+href="http://docs.python.org/howto/cporting.html">Porting Extension
+Modules to 3.0</a>.  It basically boils down to these two changes for me:
+<ul>
+<li>PyString_FromString -&gt; PyUnicode_FromString</li>
+<li>PyInt_FromLong -&gt; PyLong_FromLong</li>
+</ul>
+I then copied in their example module initialization code.  Then I
+convered "myextension" to "ais" and commented out their example
+error_out function and myextension_methods.  I then hacked up my
+makefile and it worked, once I had my python path pointing at the
+right .so.  You most definitely will get an error message when trying
+to load a 2.6 module in 3.
+-----

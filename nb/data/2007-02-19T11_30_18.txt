@@ -1,0 +1,38 @@
+TITLE: ntp setup
+AUTHOR: Kurt
+DATE: 02.19.2007 11:30
+DESC: when is now?
+-----
+BODY:
+I have been using the apple NTP (network time protocol) server and the
+results and been not good.  With some help from Val, I am now synced
+to the big North American NTP pool with logging enabled so that I can
+see how things are going.  This is what my /etc/ntp.conf was"
+<pre>
+server time.apple.com minpoll 12 maxpoll 17
+</pre>
+I changed the above to this new setup based on Val's recommendations:
+<pre>server 0.north-america.pool.ntp.org
+server 1.north-america.pool.ntp.org
+server 2.north-america.pool.ntp.org
+      
+# --- Generate some Statistics ---
+statsdir /var/log/ntpstats/
+filegen peerstats file peerstats type day enable
+filegen loopstats file loopstats type day enable
+filegen clockstats file clockstats type day enable
+</pre>
+I did a "sudo mkdir /var/log/ntpstats" and restarted ntp with first a
+kill, then "ntpd -f /var/run/ntp.drift -p /var/run/ntpd.pid".  Now my
+system is actually on the same minute as my cell phone (it was about
+3-4 minutes off before).
+<pre>
+ntpq -p
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
++jeo.wendtwerks. chronos.ev1serv  3 u   27   64  377  169.634  -12.843  13.992
++webly.coleman.e clepsydra.dec.c  2 u    6   64  377   88.133  -68.372   0.270
+*dsl081-199-165. .GPS.            1 u   28   64  377   32.692  -62.057   8.041
+</pre>
+<a href="http://www.pool.ntp.org/use.html">http://www.pool.ntp.org/use.html</a>
+-----

@@ -1,0 +1,60 @@
+TITLE: LaTeX error messages
+AUTHOR: Kurt
+DATE: 08.13.2008 11:28
+DESC: ouch
+-----
+BODY:
+I'm not sure what is going on with my LaTeX document...
+<pre>
+&lt;Figures/santabarbC_bath-v6.pdf, id=279, 451.6875pt x 325.215pt&gt;
+&lt;use Figures/santabarbC_bath-v6.pdf&gt; [6
+! pdfTeX error (ext4): \pdfendlink ended up in different nesting level than \pd
+fstartlink.
+&lt;to be read again&gt;
+                   \endgroup \set@typeset@protect 
+l.633 
+!  ==&gt; Fatal error occurred, the output PDF file is not finished!
+Transcript written on seismic-py.log.
+make: *** [force] Error 1
+</pre>
+This happens when I add a \cite{swig} later in my document, but not early
+on.  My bib entry isn't that interesting:
+<pre>@article{swig,
+  title = {Feeding a Large--scale Physics Application to Python},
+  author = {D M Beazley and P S Lomdhal},
+  year = {1997},
+  journal = {International Python Conference},
+  volume = {6},
+}</pre>
+I really like the way LaTeX does so many things, but its error reporting is
+often beyond me.  At least the great google knows...
+
+<a href="http://ftp.tug.org/mail-archives/pdftex/2002-February/002216.html">pdflatex/natbib: \pdfendlink ended up in different nesting level than \pdfstartlink</a>
+<pre>
+I've found that pdflatex from tetex 1.0.7 aborts when natbib
+author-name citations are split across a page boundary in twocolumn
+mode.  I've attached a test case and the output.
+.
+Heiko Oberdiek confirms that the same thing happens with TeXLive 6 and
+pdfTeX 1.00a.  For technical reasons, he expects that it will be very
+difficult to fix.
+.
+Of course, the workaround is to adjust the spacing or linebreaking to
+avoid the troublesome linebreak.  However, this can be difficult
+because no PDF output is generated when pdflatex aborts, and the error
+message does not list the line or section of the source file that
+would need to be changed.
+.
+Luckily, there's a solution: when this error occurs, write down the
+page number where pdflatex aborted, then add the "draft" option to
+hyperref:
+.
+  \usepackage[draft]{hyperref}
+</pre>
+In draft mode, I see that this reference puts a later citation over a
+boundary.  That was some serious frustration.  Time to finish the
+paper in draft mode and then see if I get lucky.  Otherwise, I will be
+adding some padding or figuring out how to prevent LaTeX from splitting 
+particular references.  I was sure I was doing something dumb in my BibTeX 
+file.  Nice to know that I was doing the right thing.
+-----

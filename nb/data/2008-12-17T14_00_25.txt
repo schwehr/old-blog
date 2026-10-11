@@ -1,0 +1,28 @@
+TITLE: cvs2svn
+AUTHOR: Kurt
+DATE: 12.17.2008 14:00
+DESC: best approach?
+-----
+BODY:
+Val and I have been looking at how to properly convert a cvs
+filesystem to svn.  We don't want to loose any of the revision info
+and we'd like to keep the history clean, but I keep running into
+trouble.  The trouble is that you can only specify one directory
+<pre>% <b>cvs2svn --svnrepos ~/mbsvn root</b></pre> That makes a tree
+that looks like <i>root/{mb-cookbook,mbsystem,util}</i>.  I can just
+to three svn mv's.  I have since been trying to add things by pieces
+such that I don't have to rearrange things to get rid of the root.
+<pre>% <b>cvs2svn --svnrepos ~/mbsvn mb-cookbook</a>
+% <b>cvs2svn --existing-svnrepos --svnrepos ~/mbsvn mbsystem</b>
+% <b>cvs2svn --cvs-revnums --existing-svnrepos --svnrepos ~/mbsvn mbsystem</b>
+===== pass 15 (OutputPass) ====
+Starting Subversion Repository.
+Starting Subversion r1 / 7
+Starting Subversion r2 / 7
+Starting Subversion r3 / 7
+Starting Subversion r4 / 7
+Starting Subversion r5 / 7
+ERROR: svnadmin failed with the following output while loading the dumpfile:
+svnadmin: File already exists: filesystem '/Users/schwehr/mbsvn/db', transaction '107-2z', path 'trunk'</pre>
+Anybody have a suggestion on how best to do this?
+-----

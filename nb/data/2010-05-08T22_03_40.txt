@@ -1,0 +1,23 @@
+TITLE: When you know you have a memory leak...
+AUTHOR: Kurt
+DATE: 05.08.2010 22:03
+DESC: oops
+-----
+BODY:
+<pre>python(9483,0xa0ae34e0) malloc: *** mmap(size=262144) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug
+python(9483,0xa0ae34e0) malloc: *** mmap(size=262144) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug
+Traceback (most recent call last):
+  File "./ais2pg.py", line 233, in <module>
+    match = uscg_ais_nmea_regex.search(line).groupdict()
+python(9483,0xa0ae34e0) malloc: *** mmap(size=262144) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug
+MemoryError
+</pre>
+This probably comes from me missing something with python's reference counting.
+Clearly switching from pure python brings with it some risks :)
+-----

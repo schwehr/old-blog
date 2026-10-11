@@ -1,0 +1,80 @@
+TITLE: xml acryonym soup
+AUTHOR: Kurt
+DATE: 04.05.2006 13:39
+DESC: saved?
+-----
+BODY:
+
+I feel like I am lost in NASA documentation where I need a lookup
+table of acronyms to understand what I am reading about.  What am I
+trying to do?  I just want to create an xml schema that can validate a
+new xml fomatted config file that I am working on.  How hard can that
+be?  Well, I got lost for a couple hours.  Then I found <a
+href="http://xmlstar.sourceforge.net/doc/xmlstarlet.txt">xmlstartlet.txt</a>.
+What is so good about it?  Just the existance of test cases that work
+from the command line...  and it provides the input files.
+<pre>
+   xml val -s xsd/table.xsd xml/table.xml
+</pre>
+I was trying to write a schema and all xmllint would tell me is that
+it thought my file was not a schema.  Thanks.
+
+For your viewing pleasure, here is the table example xsd (the schema
+to validate against) and a sample document.  table.xsd:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:schema</font> <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;xml&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;table&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;rec&quot;</font> <font color="#2040a0">maxOccurs=</font><font color="#008000">&quot;unbounded&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;numField&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xsd:int&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;stringField&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xsd:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;id&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xsd:NMTOKEN&quot;</font> <font color="#2040a0">use=</font><font color="#008000">&quot;required&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+and table.xml
+<pre>
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xml</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">table</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">rec</font> <font color="#2040a0">id=</font><font color="#008000">&quot;1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>123<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>String Value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/rec</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">rec</font> <font color="#2040a0">id=</font><font color="#008000">&quot;2&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>346<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Text Value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/rec</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">rec</font> <font color="#2040a0">id=</font><font color="#008000">&quot;3&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>-23<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>stringValue<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/rec</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/table</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xml</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Maybe now I can make some progress!
+
+xmlstarlet looks like it does quite a bit of jobs with xml.  I have a
+feeling that I will be using it a fair bit in the near future.  Maybe
+I can make a few schemas for geozui if they do not already exist.
+
+<a href="http://freshmeat.net/projects/xsddoc/">xsddoc</a> might also
+be handy, but being that it is in java, I need to hold off a bit
+before packaging it.  The output is nice.
+-----

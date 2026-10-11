@@ -1,0 +1,99 @@
+TITLE: fink mod_python
+AUTHOR: Kurt
+DATE: 01.11.2009 16:58
+DESC: the next step in web python
+-----
+BODY:
+I've covered CGI's, so now it is time to explore <a
+href="http://modpython.org/">mod_python</a> as I climb up the stack
+back towards Django.  Again, this is using fink's apache2 on Mac OSX
+10.5.6 (uname -r returns 9.6.0, fink --version gives 0.28.6).  First,
+we need to install mod python:
+<pre>% <b>fink install libapache2-mod-python-py26</b>
+% <b>sudo a2enmod python2.6</b>
+% <b>sudo apache2ctl restart</b></pre>
+This time, I'm going to use .htaccess in a test directory to control apache2's loading of python.
+<pre>% <b>mkdir ~/Sites/test2 && cd ~/Sites/test2</b>
+% <b>cat &lt;&lt; EOF &gt; .htaccess</b>
+AddHandler mod_python .py
+PythonHandler mptest
+PythonDebug On
+EOF
+% <b>cat &lt;&lt; EOF &gt; mptest.py</b>
+from mod_python import apache
+def handler(req):
+    req.content_type = 'text/plain'
+    req.write("Hello World!")
+    return apache.OK
+EOF
+% <b>open http://localhost/~$USER/test2/mptest.py</b></pre>
+You should now be looking at a <i>Hello World!</i> in your web browser.
+
+Time to switch to a real handler.  The publisher.
+<pre>% <b>mkdir ~/Sites/test3 && cd ~/Sites/test3</b>
+% <b>cat &lt;&lt; EOF &gt; .htaccess</b>
+AddHandler mod_python .py
+PythonHandler mod_python.publisher
+PythonDebug On
+EOF
+% <b>cat &lt;&lt; EOF &gt; hello.py</b>
+def index():
+   s = '''&lt;html&gt;
+&lt;body&gt;
+&lt;h2&gt;Hello World! mod python publisher&lt;/h2&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+'''
+   return s
+EOF
+% <b>open http://localhost/~$USER/test3/hello.py</b></pre>
+You can then add a page indexing into functions in hello.py.  Add this method:
+<pre>def another_page():
+    return 'yup, another page'</pre>
+Then check out this new URL:
+<pre>% <b>open http://localhost/~$USER/test3/hello.py/another_page</b></pre>
+Or add any object that has a string representation.  Add these strings to hello.py
+<pre>foo = 'bar'
+_fubar = 'not visible'</pre>
+Now try these two URLs:
+<pre>% <b>open http://localhost/~$USER/test3/hello.py/foo</b>
+% <b>open http://localhost/~$USER/test3/hello.py/fubar</b></pre>
+Any object that starts with an underscore is not visible and returns a mod python error in debug mode.
+<pre>MOD_PYTHON ERROR
+<!-- -->
+ProcessId:      78240
+Interpreter:    '127.0.0.1'
+<!-- -->
+ServerName:     '127.0.0.1'
+DocumentRoot:   '/sw/var/www/'
+<!-- -->
+URI:            '/~schwehr/test3/hello.py/fubar'
+Location:       None
+Directory:      '/Users/schwehr/Sites/test3/'
+Filename:       '/Users/schwehr/Sites/test3/hello.py'
+PathInfo:       '/fubar'
+<!-- -->
+Phase:          'PythonHandler'
+Handler:        'mod_python.publisher'
+<!-- -->
+Traceback (most recent call last):
+...</pre>
+Now to add form handling.  Create form.py:
+<pre><tt><b><font color="#000080">import</font></b> cgi
+<b><font color="#000080">import</font></b> urllib
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">handle_form</font></b><font color="#990000">(</font>req<font color="#990000">):</font>
+    form <font color="#990000">=</font> req<font color="#990000">.</font>form
+    s <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'&lt;html&gt;&lt;body&gt;&lt;b&gt;Form fields:&lt;/b&gt;&lt;ul&gt;'</font><font color="#990000">,]</font>
+    <b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> form<font color="#990000">:</font>
+        s<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font><font color="#FF0000">'  &lt;li&gt;%s - %s&lt;/li&gt;'</font> <font color="#990000">%</font> <font color="#990000">(</font>key<font color="#990000">,</font>cgi<font color="#990000">.</font><b><font color="#000000">escape</font></b><font color="#990000">(</font>urllib<font color="#990000">.</font><b><font color="#000000">unquote</font></b><font color="#990000">(</font>form<font color="#990000">[</font>key<font color="#990000">]))))</font>
+    s<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font><font color="#FF0000">'&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;'</font><font color="#990000">)</font>
+    <b><font color="#0000FF">return</font></b> <font color="#FF0000">'\n'</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>s<font color="#990000">)</font></tt></pre>
+And open it:
+<pre>% <b>open http://localhost/~$USER/test3/form.py/handle_form\?first=one&second=two</b></pre>
+The results should look like this:
+<pre><b>Form fields:</b>
+<!-- -->
+    * second - two
+    * first - one</pre>
+-----

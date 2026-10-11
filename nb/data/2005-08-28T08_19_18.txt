@@ -1,0 +1,37 @@
+TITLE: bash booleans
+AUTHOR: Kurt
+DATE: 08.28.2005 08:19
+DESC: true/false
+-----
+BODY:
+In my older bash scripts I used an == comparison to wrap blocks in a
+conditional if block that I could turn on or off.  Just now I found
+out that there is a better way to do this!  true and false are a part
+of the bash language.  When did this happen?  This is great!!!
+
+My old may:
+<pre>
+#!/bin/bash
+if [ 0 == 1 ]; then
+  echo This does not get run
+fi
+if [ 0 == 0 ]; then
+  echo This DOES RUN!
+fi
+</pre>
+That was pretty ugly.  Now I can do this:
+<pre>
+#!/bin/bash
+if [ false ]; then
+  echo This does not get run
+fi
+if [ true ]; then
+  echo This DOES RUN!
+fi
+</pre>
+This should be much easier for people to understand right off and less
+twisted than seeing large blocks of commented code.  Bash just keeps
+getting better.  Yes, I do know that perl, python, etc are way better
+for most of these tasks.  Calling lots of binaries through system
+calls in these languages is just not very fun.
+-----

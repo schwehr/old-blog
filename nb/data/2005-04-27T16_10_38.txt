@@ -1,0 +1,334 @@
+TITLE: Making an xcore photo description file
+AUTHOR: Kurt
+DATE: 04.27.2005 16:10
+DESC: cookbook entry
+-----
+BODY:
+I am going back through my older data generating xpd (xcore
+description files) so that I can put photos next to some of my new
+measurements for TTN136B.  Here are some notes on how I am currently
+making these files.  This is not the best way, but it works for now.
+
+This is for piston core 2 from TTN136b (a.k.a. ttn136b-2p or 02PC)
+
+I start by using the ImageMagick program <b>identify</b>.  Identify
+gives the size of the image so that we can setup the coordinate frame
+in the next step.
+<pre>
+  identify 02pcArchivesBW.jpg 
+  02pcArchivesBW.jpg JPEG 1935x2874 PseudoClass 256c 1.1mb 0.420u 0:01
+</pre>
+I then subtract one from the width and hight.  Those go into a
+Makefile entry for processing these images as the WIDTH2 and HEIGHT2
+<pre>
+<font color="2040a0">WIDTH2  :=</font> 1934 <font color="#444444"># 1935</font>
+<font color="2040a0">HEIGHT2 :=</font> 2873 <font color="#444444"># 2874</font>
+<font color="8b2252"><strong>designate-points-2</strong>:</font> 2p.pgm designate-instructions
+	g3data -scroll -coords 0 <font color="2040a0">${HEIGHT2}</font> <font color="2040a0">${WIDTH2}</font> 0 <font color="4080ff">$&lt;</font> -scale 1
+<font color="8b2252">
+<strong>02pcArchivesBW.jpg</strong>:</font>
+	wget http://schwehr.org/TTN136B/Data/CorePhotos/02pcArchivesBW.jpg
+<font color="8b2252"><strong>2p.pgm</strong>:</font> 02pcArchivesBW.jpg
+	convert 02pcArchivesBW.jpg 2p.pgm
+<font color="8b2252"><strong>2p-gray-total.png</strong>:</font> 2p.pgm 2p.xpd
+	processCore <font color="4080ff">$&lt;</font> 2p.xpd 2p-gray
+	convert 2p-gray-total.pgm 2p-gray-total.png
+	open -a /Applications/Adobe\ Photoshop\ CS/Adobe\ Photoshop\ CS.app 2p-gray-total.png
+</pre>
+The next step is to run <b>make desinate-points-2</b>.  This starts
+g3data with a pre-defined coordinate frame for the image.  Go through
+and click first on the top right corner of all the n*10 cm ticks
+(0,10,...,140,150) for the left ruler and then the right ruler.  Make
+sure to go from 0..150 in order.  Then for each section click on the
+four corners starting with the bottom left and going counter
+clockwise.  Leave out the empty liner or edges unless you really want
+them to be a part of your core photo.
+
+<img src="http://schwehr.org/blog/attachments/2005-04/g3data-core2.png">
+
+Warning, try not to make too many mistakes.  Erasing points has a
+tendency to crash g3data later on when saving.  I have not found time
+to track down this bug.
+
+When done selecting points, select <b>Export point data</b>.  Clock on
+"Export data file file" and enter 2-g3data.dat.  Then press the Print
+button.  Strange, but does the trick.  Here is what the data file
+looks like when I did it:
+<pre>
+348  293
+350  443
+350  593
+351  743
+352  893
+353  1044
+352  1193
+352  1343
+351  1493
+351  1643
+350  1793
+348  1943
+346  2095
+344  2245
+343  2396
+340  2545
+1736  285
+1736  434
+1736  583
+1736  732
+1737  881
+1738  1031
+1739  1180
+1741  1330
+1743  1479
+1744  1630
+1746  1780
+1747  1930
+1749  2080
+1750  2229
+1752  2379
+1754  2526
+383  1241
+531  1237
+537  304
+388  303
+624  2484
+779  2485
+773  287
+620  288
+861  2519
+1014  2520
+1006  280
+856  278
+1103  2573
+1255  2575
+1255  286
+1102  285
+1301  554
+1457  553
+1455  286
+1300  290
+1300  2353
+1456  2354
+1460  605
+1307  602
+1536  2402
+1692  2402
+1675  288
+1523  287
+</pre>
+Now use my little python script to create an xpd file that processCore
+needs:
+<pre>
+  ./xpd_from_g3data.py 2-g3data.dat 2p.xpd
+</pre>
+After adding ls -l, md5, and identify comments to the end, here is
+what 2p.xpd looks like:
+<pre>
+<font color="#FF0000">#XCore-v1.0 -*- shell-script -*-
+# Core Description File - coordinates in the image.
+# Kurt Schwehr</font>
+<font color="#FF0000"># ./xpd_from_g3data.py
+# File format:</font>
+<font color="#FF0000">#   SecNum llx lly lrx lry urx ury ulx uly
+#   MISSING SecNum LengthCM
+</font>
+
+<font color="#FF0000">######################################################################</font>
+SECTIONS
+<font color="#FF0000"># Always missing section 0.  No such thing</font>
+MISSING 0 -1
+1 383 1241 531 1237 537 304 388 303
+2 624 2484 779 2485 773 287 620 288
+3 861 2519 1014 2520 1006 280 856 278
+4 1103 2573 1255 2575 1255 286 1102 285
+5 1301 554 1457 553 1455 286 1300 290
+6 1300 2353 1456 2354 1460 605 1307 602
+7 1536 2402 1692 2402 1675 288 1523 287
+END SECTIONS
+
+<font color="#FF0000">######################################################################</font>
+LEFT SCALE
+0 348 293
+10 350 443
+20 350 593
+30 351 743
+40 352 893
+50 353 1044
+60 352 1193
+70 352 1343
+80 351 1493
+90 351 1643
+100 350 1793
+110 348 1943
+120 346 2095
+130 344 2245
+140 343 2396
+150 340 2545
+END LEFT SCALE
+
+<font color="#FF0000">######################################################################</font>
+RIGHT SCALE
+0 1736 285
+10 1736 434
+20 1736 583
+30 1736 732
+40 1737 881
+50 1738 1031
+60 1739 1180
+70 1741 1330
+80 1743 1479
+90 1744 1630
+100 1746 1780
+110 1747 1930
+120 1749 2080
+130 1750 2229
+140 1752 2379
+150 1754 2526
+END RIGHT SCALE
+
+<font color="#FF0000"># ls-l: 1139788 Feb 10  2003 02pcArchivesBW.jpg</font>
+<font color="#FF0000"># MD5 (02pcArchivesBW.jpg) = 3e3f174b175c6443d7409ed05d7ba8eb</font>
+<font color="#FF0000"># identify: 02pcArchivesBW.jpg JPEG 1935x2874 PseudoClass 256c 1.1mb 0.430u 0:01
+# wget http://schwehr.org/TTN136B/Data/CorePhotos/02pcArchivesBW.jpg</font>
+</pre>
+Use the makefile to fire off processCore:
+<pre>
+  make 2p-gray-total.png
+
+processCore 2p.pgm 2p.xpd 2p-gray
+P5
+255
+Found Missing: MISSING 0 -1
+cm/pix l,r: 0.066607 0.0669322
+
+  PROCESSING
+  ----------
+Doing Section 0
+Doing Section 1
+Doing Section 2
+Doing Section 3
+Doing Section 4
+Doing Section 5
+Doing Section 6
+Doing Section 7
+ToAveFile: pixelsPerCMLeft = 0.066607
+Length of core in pixels: 11793
+Length of core in cm: 785.497
+numSections: 8
+convert 2p-gray-total.pgm 2p-gray-total.png
+open -a /Applications/Adobe\ Photoshop\ CS/Adobe\ Photoshop\ CS.app 2p-gray-total.png
+</pre>
+That last line should open the new png image in Photoshop for you to
+look at.
+
+For completeness, here is the python script that takes the clicks and
+converts them into an xpd file.  Not the most exciting program, nor is
+the documentation any good, but python makes this easy to do!
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+Take all the points from g3data clicking on the left ruler, right
+ruler, and sections to produce an xpd file.
+
+This is for TTN136B Nov 6-11th 2001.
+
+$Id: xpd_from_g3data.py,v 1.2 2005/04/27 23:40:40 schwehr Exp $
+
+Copyright (C) 2005  Kurt Schwehr.  GPL
+&quot;</font><font color="#008000">&quot;&quot;</font>
+
+<font color="#2040a0">__author__</font> <font color="4444FF">=</font> <font color="#008000">&quot;Kurt Schwehr&quot;</font>
+
+<strong>import</strong> <font color="#2040a0">sys</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">readRuler</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">ruler</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+    <font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">file</font><font color="4444FF">:</font>
+        <strong>if</strong> <font color="#008000">'#'</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">:</font> <strong>continue</strong> <font color="#444444"># skip comments</font>
+        <font color="#2040a0">x</font>,<font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">y</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">ruler</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">count</font>,<font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">count</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">10</font>
+        <strong>if</strong> <font color="#2040a0">count</font> <font color="4444FF">&gt;</font> <font color="#FF0000">150</font><font color="4444FF">:</font> <strong>break</strong> <font color="#444444"># All done</font>
+    <strong>return</strong> <font color="#2040a0">ruler</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">readSections</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    Does not handle missing sections
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <font color="#2040a0">sections</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+    <font color="#2040a0">secCount</font><font color="4444FF">=</font><font color="#FF0000">1</font>   <font color="#444444"># Never have a section 0... how very non-cs like</font>
+    <font color="#2040a0">pointCount</font><font color="4444FF">=</font><font color="#FF0000">0</font> <font color="#444444"># which point for the current section</font>
+    <font color="#2040a0">points</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">file</font><font color="4444FF">:</font>
+        <strong>if</strong> <font color="#008000">'#'</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">:</font> <strong>continue</strong> <font color="#444444"># skip comments</font>
+        <font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">y</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">points</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">pointCount</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+        <strong>if</strong> <font color="#2040a0">pointCount</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">4</font><font color="4444FF">:</font>
+            <font color="#444444"># Add the end of one section, so save it</font>
+            <font color="#2040a0">sections</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">secCount</font>,<font color="#2040a0">points</font><font color="4444FF">)</font><font color="4444FF">)</font>
+            <font color="#2040a0">secCount</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+            <font color="#2040a0">pointCount</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+            <font color="#2040a0">points</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+    <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">points</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#008000">&quot;ERROR: expecting an even multiple of 4 for sections&quot;</font>
+        <strong>print</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">points</font><font color="4444FF">)</font>
+        <strong>print</strong> <font color="#2040a0">sections</font>
+        <strong>print</strong> <font color="#2040a0">points</font>
+        <font color="#2040a0">sys</font>.<font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#008000">&quot;I give up&quot;</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">sections</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">writeSections</font><font color="4444FF">(</font><font color="#2040a0">file</font>,<font color="#2040a0">sections</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;<font color="#77dd77">\n</font>######################################################################<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;SECTIONS<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# Always missing section 0.  No such thing<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;MISSING 0 -1<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">sec</font> <strong>in</strong> <font color="#2040a0">sections</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#008000">&quot;SEC = &quot;</font>,<font color="#2040a0">sec</font>
+        <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">sec</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <strong>for</strong> <font color="#2040a0">point</font> <strong>in</strong> <font color="#2040a0">sec</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">:</font>
+            <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot; &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">point</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">point</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;END SECTIONS<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">writeScale</font><font color="4444FF">(</font><font color="#2040a0">file</font>,<font color="#2040a0">scaleStr</font>,<font color="#2040a0">scale</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;<font color="#77dd77">\n</font>######################################################################<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">scaleStr</font><font color="4444FF">+</font><font color="#008000">&quot; SCALE<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">items</font> <strong>in</strong> <font color="#2040a0">scale</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#2040a0">items</font>
+        <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">items</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">items</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">items</font><font color="4444FF">[</font><font color="#FF0000">2</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;END &quot;</font><font color="4444FF">+</font><font color="#2040a0">scaleStr</font><font color="4444FF">+</font><font color="#008000">&quot; SCALE<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">&quot;__main__&quot;</font><font color="4444FF">:</font>
+    <font color="#2040a0">file</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font>
+    <font color="#2040a0">left</font> <font color="4444FF">=</font> <font color="#2040a0">readRuler</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">)</font>
+    <font color="#2040a0">right</font> <font color="4444FF">=</font> <font color="#2040a0">readRuler</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">left</font><font color="4444FF">)</font>,<font color="#2040a0">left</font>,<font color="#008000">&quot;<font color="#77dd77">\n</font><font color="#77dd77">\n</font>&quot;</font>
+    <strong>print</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">right</font><font color="4444FF">)</font>,<font color="#2040a0">right</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#FF0000">16</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">left</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#FF0000">16</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">right</font><font color="4444FF">)</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">sections</font> <font color="4444FF">=</font> <font color="#2040a0">readSections</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#008000">&quot;<font color="#77dd77">\n</font>sections&quot;</font>,<font color="#2040a0">sections</font>,<font color="#008000">&quot;<font color="#77dd77">\n</font><font color="#77dd77">\n</font>&quot;</font>
+
+    <font color="#2040a0">out</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">2</font><font color="4444FF">]</font>,<font color="#008000">&quot;w&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;#XCore-v1.0 -*- shell-script -*-<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# Core Description File - coordinates in the image.<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# &quot;</font> <font color="4444FF">+</font><font color="#2040a0">__author__</font><font color="4444FF">+</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# &quot;</font> <font color="4444FF">+</font><font color="#2040a0">__file__</font><font color="4444FF">+</font><font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# File format:<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;#   SecNum llx lly lrx lry urx ury ulx uly<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;#   MISSING SecNum LengthCM<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">writeSections</font><font color="4444FF">(</font><font color="#2040a0">out</font>,<font color="#2040a0">sections</font><font color="4444FF">)</font>
+    <font color="#2040a0">writeScale</font><font color="4444FF">(</font><font color="#2040a0">out</font>,<font color="#008000">&quot;LEFT&quot;</font>,<font color="#2040a0">left</font><font color="4444FF">)</font>
+    <font color="#2040a0">writeScale</font><font color="4444FF">(</font><font color="#2040a0">out</font>,<font color="#008000">&quot;RIGHT&quot;</font>,<font color="#2040a0">right</font><font color="4444FF">)</font>
+</pre>
+-----

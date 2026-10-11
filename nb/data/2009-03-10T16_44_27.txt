@@ -1,0 +1,110 @@
+TITLE: Managing distributed XML document editing for nautical publications
+AUTHOR: Kurt
+DATE: 03.10.2009 16:44
+DESC: What to do?
+-----
+BODY:
+I am looking for comments and discussion about this post.  Please see <a href="http://goatbar.livejournal.com/1275.html">my LiveJournal post</a> to make comments.
+
+<b>Warning:</b>  This is a thought experiment meant to generate conversation.  It's in no way polished.
+
+Recently, I posted how Matt and I think the XML markup might look for a geospatially enabled nautical publication.  There are details missing including the geographic feature table.  <a href="http://vislab-ccom.unh.edu/GeoZui4D/">GeoZui</a> was originally built with Tcl/Tk, so it was easiest for Matt to his familiarity with Tcl to build a quick table.  There is an even bigger issue looming to the general problem.  The traditional view of updating nautical publications seems to be very much like the traditional linear model of a book.  There is a key author at the Hydrographic Organization (HO) and maybe some editors.  This has worked effectively for the last century.  We could take the current PDF and paper product and convert it to a new XML format and use traditional tools such as text editors and revision control (e.g. <a href="http://subversion.tigris.org/">subversion [svn]</a>) or a database and make it work.
+
+However, I'd like to take a step back and imagine that we are starting from scratch with no pre-existing infrastructure.  Throw away any constraints that particular countries might have and ask:  What would be the best system that we could build now that would work for the next century?  I know this is a bit ridiculous, but humor me for now.
+
+<b>A use case</b>
+
+NOTE: There should be many more use cases for this topic, but let's start with one.
+
+What I think there needs to be is a traceable cycle of information.  In the field or on the ship, anyone should be able to make a note and/or take a picture and submit an error, update, addition, or suggestion back to the HO.  Let me give an example to illustrate how the cycle might work.  A mariner enters a port and sees that there is a new pier on the south side of the harbor replacing an older pier with a different configuration.  The person pulls out their mobile phone (iPhone, Android, CrackBerry, etc) and runs a submit Coast Pilot (CP) note application.  The app uses the phone's builtin camera to grab a picture, tags the picture with the GPS position from the builtin GPS, then queues the update.  Later, when the mobile phone detects the person is no longer moving, the phone puts up a notice that there is a submission waiting.  The user takes a moment to write that the pier is different and hits the send button.  The phone sends the update to a public website for review.  Local mariners comment on the website that the pier is indeed different and give the name of the company working on the pier.  The HO is notified of the update, reviews the extra comments, and spends a little bit of money for an up-to-date satellite orthophoto.  The HO digitizes the pier and sends notices to the charting branch and the nautical publications.  In the nautical publications group, an author calls up a list of all the sections of text that refer to the pier and makes any changes necessary after talking to the pier authorities.  The text changes are tagged with all the information about the edit including references to the initial submission in the field.  The changes are passed to the editor for review.  Once these changes are accepted a new coast pilot is generated, the submission note is marked as finished, and all the systems that use the coast pilot see the update and adjust their products.
+
+This above is just an instance of what is called a "use case" in software engineering terminology.   Try not get hung up on the details such as construction permitting in some countries already mandates submitting changes to the HO.  The goal is to think about what a workflow might look like and what tools could support the process.  How can we work with a marked up text document that makes it easy for the people editing and allows us to see where any of the text came from (aka provenance)?  I don't know what the answer is, but talking to people at SNPWG brought up a number of ideas.  Here are some of the thoughts that I've had and I would really like to hear what others think.
+
+<b>What this post is not</b>
+
+This is in no way a complete run through what needs to be discussed!
+
+Another important topic is managing image submissions.  We would like to be able to avoid trouble with copyright or at least track who controls the rights.  Georeferencing, feature identification and tagging will be important.  I will try to talk more about this some other time.
+
+These are in no particular order and I'm leaving out a number of commercial solutions (e.g. <a href="msdn.microsoft.com/en-us/teamsystem"/>Visual Studio Team Solution</a>.  And I'm mixing types of technology.
+
+<b>The Usual Suspects</b>
+
+These are tools that have been used in the last 20 years to produce nautical publications.  This is probably a fairly traditional style of creating publications.
+
+Microsoft Word has been used to create all sorts of documents.  It can do indexing, change tracking, comments, and all sorts of other fancy things.  It tries to be everything to everybody, but trying to manage large teams using track changes is enough to make me go crazy.  Plus, you never know what Microsoft will decide to do with Word in the future.  I've seen people who are power users of Word and they do amazing things.  But can a Word document handle 20 years of change tracking?
+
+Adobe <a href="http://www.adobe.com/products/framemaker/">FrameMaker</a> (or just Frame) has been the solution for team based, large document generation.  I've used Frame and seen groups such as Netscape's directory server (slapd) Team produce incredibly intricate documents.  MS Word is still trying to catch up to the power of Frame in 1997.  And that's before XML came into the core of Frame.  However, it does seem like Adobe really doesn't want to keep Frame alive.   Frame supports DITA, which I will talk about later.
+
+Several people have told me that they see Adobe replacing Frame with <a href=http://www.adobe.com/products/indesignInDesign>InDesign</a>.  I really do not see how InDesign can cope with the workflow of a constantly updating document such as a Coast Pilot.  Perhaps there is more to InDesign than I realize.
+<pre><b>InDesign enables you to automate your publishing workflow</b>
+Automate workflows by minimizing repetitive tasks so you can focus on
+what you love to do - design pages. Use text variables to dynamically
+create running headers and footers and automatically generate advanced
+bullets and numbering as well as tables of contents. InDesign also
+enables a wide variety of XML-based publishing workflows. Support for
+InDesign Markup Language (IDML), a new XML-based filed format, lets
+developers and systems integrators programmatically create, modify,
+and deconstruct InDesign documents outside the context of InDesign to
+more quickly create custom publishing workflows. Comprehensive
+scripting support for JavaScript, AppleScript, and VBScript enables
+you to not only automate tedious tasks, but also build complex
+automated workflows.</pre>
+What other systems have been in use?  If you are willing to share, please send me an email or post a comment.
+
+<b>Revision Control Systems</b>
+	
+With my background, the first thing that came to my mind is some sort of distributed revision control system / source control system (SCM).  My experience has been mostly with RCS, CVS, and SVN, which are centralized systems.  Therefore, I am a bit out of my league here.  There are a number of open source implementations: <a href=http://git-scm.com/>git</a>,  <a href=http://www.gnu.org/software/gnu-arch/>GNU arch</a>, <a href=http://www.selenic.com/mercurial/wiki/>Mercurial (hg)</a>, <a href=http://bazaar-vcs.org/>Bazaar</a>, <a href=http://www.darcs.net/>darcs</a>, <a href=http://www.monotone.ca/>monotone</a>, svn+<a href="http://svk.bestpractical.com/view/HomePage">svk</a>, and a host of others.  Perhaps one of these really is the best solution if it were to be integrated with a nice editor and interfaces to easily allow tracing of the origin of the text.  Can we add functionality to record that a particular change in the text goes to a particular change submission from the field?  <a href="http://trac.edgewall.org/">Trac</a> does something similar with svn repositories.  If you commit a change to svn, you can reference a ticket in Trac.  Adding Trac tickets in commits is not enforced or supported in any of the interfaces, so you have to know how to tag ticket references.  If this is the right solution, how do we build a system that keeps the writers from having to become a pro at version control systems?  The HO staff should be focused on the maritime issues and their skills should be focused on the writing. 
+
+Or could this be done on top of a non-distributed version control system?  I am learning towards rejecting the idea of something like straight svn.  You would like to be able to send nautical publications writers out in the field and be able to have them commit changes without having to have internet access.  This is especially important in polar regions.  You can not always count on internet access and Iridium's bandwidth is just not large.  The "svn blame" command illustrates a little bit of the idea of being able to see the source of text.
+
+If I were to ask a number of people at NASA who I've worked with in the past, I'm sure they would tell me they could build the killer nautical publications collaboration system on top of Eclipse complete with resource management, fuel budgets, and AI to try to detect issues in the text.
+
+<b>Sharepoint</b>
+
+Microsoft <a href="http://www.microsoft.com/Sharepoint/">SharePoint</a> appears at first look to be the sort of tool that the community needs to manage nautical publications.  Documents can be edited on the server (windows only), checked out, tracked, and so forth.  However, the versioning of SharePoint and the documents it contains are not really linked.  Can SharePoint be made to understand what is different about files and can it build workflows?  My experience with SharePoint has been very frustrating.  If feels like a funky front end to a version control system that doesn't have all the features of version control that people count on.
+
+There are a whole slew of SharePoint clones or workalikes (e.g. <a href=http://freshmeat.net/projects/drs/>Document Repository System</a> or <a href="http://www.opendocman.com/">OpenDocMan</a>).  This is definitely a space to watch for innovation.
+
+<b>DocBook</b>
+
+Looking at technologies such as LaTeX are traditionally combined to write papers and work well with being tracked in a revision control system.  LaTeX does not have the mechanism to store extra information such as provenance or location, so it doesn't make sense.  What would Donald Knuth say about a geospatially aware LaTeX?
+
+Perhaps another possibility it to work with the tools around DocBook?  There are many tools built around DocBook.  For example, <a href=http://trac.calenco.com/>calenco</a> is a collaborative editing web platform.  I have no experience with kind of thing, but perhaps the DocBook tools could work with other XML types such as a nautical publication schema.  Another tool that looks like it hasn't seen any update in a long time is:  <a href=http://code.google.com/p/owed/>OWED - Online Wiki Editor for DocBook</a>
+
+There many other document markup languages (e.g. <a href="http://en.wikipedia.org/wiki/S1000D">S1000D</a>).  Are any of them useful to this kind of process?  Wikipedia has a <a href="http://en.wikipedia.org/wiki/Comparison_of_document_markup_languages">Comparison of document markup languages</a> that cover many more.
+
+<b>Databases</b>
+
+What support do traditional relational databases have for this kind of task?  I've looked at how wikis such as Trac or Mediawiki store their entries and they are fairly simple systems that store many copies of a document each with a revision tag: <a href="http://schwehr.org/blog/archives/2008-09.html#e2008-09-05T07_50_45.txt">Trac schema</a> and <a href="http://schwehr.org/blog/archives/2009-03.html#e2009-03-10T15_51_11.txt">Mediawiki schemas</a>
+
+Perhaps there are better technologies built directly into database systems?  There is <a href="http://en.wikipedia.org/wiki/SQL/XML">SQL/XML</a> [ISO International Standard ISO/IEC 9075-14:2003]
+ (<a href="http://www.stylusstudio.com/sqlxml_tutorial.html">SQL/XML Tutorial</a>), which might have useful functionality, but I have not had time to look into it.
+
+Oracle has <a href="http://www.oracle.com/products/middleware/content-management/index.html">Content Management</a>, <a href="http://www.oracle.com/technology/tech/xml/">XML</a>, and <a href="http://www.oracle.com/technology/products/text/">Text</a>.  I don't use Oracle and don't know much about what they have to offer.
+
+PostgreSQL has a lot of powerful features including <a href="http://www.throwingbeans.org/postgresql_and_xml.html">XML Support</a> with the <a href="http://www.postgresql.org/docs/current/static/datatype-xml.html">XML Type</a>
+
+<b>Content Management Systems (CMS)</b>
+
+This topic sounds exactly like what we need, but having used a number of these systems, I think they miss out on many of the tracking features that are needed and they are mostly focused on the HTML output side of things.  There are a huge number of systems to choose from as shown by  Wikipedia's <a href="http://en.wikipedia.org/wiki/List_of_content_management_systems">List of content management systems</a>.  The run the range from wikis (e.g. <a href="http://twiki.org/">TWiki</a>) to easy to deploy web systems (e.g. <a href="http://www.joomla.org">Joomla!</a>), all the way to frameworks that have you build up your own system (e.g. <a href="http://www.djangoproject.com">Django</a> or <a href="http://rubyonrails.org">Ruby on Rails</a>).  I don't think the prebuilt systems are really up for this kind of task, but combining a powerful framework with the right database technology or version control system might well be a good answer.
+
+<b>Darwin Information Typing Architecture (DITA)</b>
+
+<a href="http://en.wikipedia.org/wiki/Darwin_Information_Typing_Architecture
+">DITA</a> sounds very interesting, but might not be capable of helping documents like nautical publications that have less structure.
+
+<b>Closing thoughts</b>
+
+As you can see from the above text, my ideas on this topic are far from fully formed.  I want to leave you with a couple wikipedia topics:
+<ul>
+  <li><a href="http://en.wikipedia.org/wiki/Collaborative_writing">Collaborative writing</a>
+  <li><a href="http://en.wikipedia.org/wiki/Collaborative_editing">Collaborative editing</a>
+  <li><a href="http://en.wikipedia.org/wiki/Distributive_writing">Distributed writing</a>
+  <li><a href="http://en.wikipedia.org/wiki/Collaborative_software">Collaborative software</a>
+</ul>
+I looking for opinions on all sides of the technology and editing spectrum.  I am sure many publishers have faced and survived this problem over the years.  I definitely ran out of steam on this post and it's probably my largest post where I'm not quoting some large document or code.  Hopefully the above made some sense.
+
+<b>Update 2009-Mar-14:</b> Ask Slashdot has a similar topic - <a href="http://ask.slashdot.org/article.pl?sid=09/03/13/1925238">Collaborative Academic Writing Software?</a>.  And thanks go to Trey and MDP for positing comments on the
+live journal post.
+-----

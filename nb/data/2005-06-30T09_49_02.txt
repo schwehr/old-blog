@@ -1,0 +1,121 @@
+TITLE: LaTeX AGU better style
+AUTHOR: Kurt
+DATE: 06.30.2005 09:49
+DESC: rought template
+-----
+BODY:
+<a
+href="http://schwehr.org/blog/attachments/2005-06/agu-tex-snapshot.tar.bz2">agu-tex-snapshot.tar.bz2</a>
+
+This snapshot is stuff Lisa gave me yesterday for working with
+pdflatex.  My paper suddently looks much more professional.  Nice!
+Thanks Lisa!  This puts the paper in 2 column mode and does a better
+job with authors.
+
+The fron of my paper looks a little different now:
+<pre>
+\documentclass[agupp]{aguplus}
+\usepackage{graphicx}
+
+\def\arar {$^{40}$Ar/$^{39}$Ar }
+
+\let\cross=\times\lefthead{Schwehr et al.}
+\righthead{Santa Barbara AMS - draft $Revision:$ $Date:$ \today}
+
+\begin{document}
+
+\title{Title of the paper}
+
+\author {Kurt Schwehr, Neal Driscoll, Lisa Tauxe}
+\affil{Scripps Institution of Oceanography, University of California, San Diego}
+
+\date{$Revision:$ for G-cubed}
+
+\authoraddress{
+K. Schwehr,  Scripps Institution of Oceanography, 
+  La Jolla,CA 92093-0220, USA (e-mail: schwerhr@gmail.com);  
+N. Driscoll, 
+  Scripps Institution of Oceanography, 
+  La Jolla,CA 92093-0220, USA (e-mail: ltauxe@ucsd.edu);  
+L. Tauxe,    
+  Scripps Institution of Oceanography, 
+  La Jolla,CA 92093-0220, USA (e-mail: ndriscoll@ucsd.edu);  
+}
+
+\begin{abstract}
+This is the abstract.
+\begin{verbatim}
+$Id: mypaper.tex,v 1.25 2005/06/29 22:22:19 schwehr Exp $
+\end{verbatim}
+\end{abstract}
+
+\begin{article}
+\section {Introduction}
+
+Talk until I am blue in the face.
+...
+
+
+\section{Discussion}
+
+\section{Conclusions}
+
+Witty memorable statements go here.
+
+% this uses mypaper.bib
+\bibliography{mypaper}
+\bibliographystyle{agu}
+\end{article}   
+
+%======================================================================
+%======================================================================
+%======================================================================
+
+
+\begin{figure}
+\includegraphics{Figures2/core6}
+\caption{ Say something insightful here.
+}
+\label{fig:core6}
+\end{figure}
+
+\end{document}
+\end
+</pre>
+That is the rough layout of the paper.  To make the paper, here is
+what I run:
+<pre>
+  pdflatex mypaper.tex
+  bibtex mypaper.aux
+  pdflatex mypaper.tex
+  open mypaper.pdf
+</pre>
+Happy writing!
+
+I had an idea the might help editing.  What if I have mypaper.tex.in?
+In that file, I put a @PARAGRAPH_COUNT@ at the beginning of each
+paragraph.  Then I write a little python script to process the .tex.in
+into a .tex file with each paragraph count marker replaced with the
+paragraph number?  Something like this:
+<pre>
+<b>foo.tex.in:</b>
+@PARAGRAPH_COUNT@The first paragraph.
+
+@PARAGRAPH_COUNT@Another paragraph yammering on.
+
+@PARAGRAPH_COUNT@The end.
+
+<em>numberParagraphs foo.tex.in foo.tex</em>
+
+<b>foo.tex:</b>
+[1] The first paragraph.
+
+[2] Another paragraph yammering on.
+
+[3] The end.
+</pre>
+I am sure there is a way to do this in latex/tex, but I am not going
+to try to figure out how when I can just use python with
+<em>line.find('@PARAGRAPH_COUNT@')</em>.  Unless someone wants to tell
+me the latex solution :)
+-----

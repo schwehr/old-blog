@@ -1,0 +1,74 @@
+TITLE: Handling ODEC Bath 2000 subbottom data
+AUTHOR: Kurt
+DATE: 02.11.2009 16:28
+DESC: help!
+-----
+BODY:
+Based on what I've seen, I would recommend avoiding Bath2000 systems.
+Or is there some way to configure the system to write proper segy?
+
+I've been spending some time with ODEC Bathy 2000 seismic data.
+Thanks to Paul Henkart for helping me understand the ODEC format.
+ODEC .dat files are SEG-Y like files.  They use coordinate units 3,
+but set the field to 0.  The x and y are IEEE float numbers.  All byte
+orders are backwards.  Each trace has a trailer of 320 bytes.  I don't
+have info on what is in those bytes.  There appears to be some other
+sort of data between traces in some ODEC files.  Both simplesegy and sioseis
+do not read past whatever it is.  Sonarweb does read the file.
+
+If anyone cares, I have sample file that works for sonarweb but not
+the others: <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/simplesegy/data/y0902-01.dat.bz2">y0902-01.dat.bz2</a>
+
+The command that I used to read odec as follows.  The <i>-T 320</i> and <i>-B</i>
+<pre>% <b>segy-info -s -T 320 -B Bathy2000/y0902-01.dat -f kml > y0902-01.dat.kml</a></b></pre>
+Here is what I got with simplesegy and sioseis converted segy.
+<img title="Bathy 2000" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-02/odec-bathy2000-ge.png"/>
+
+Here is the conversion from .dat ODEC to segy with sioseis:
+<pre>!/usr/bin/env bash
+<!-- -->
+sioseis &lt;&lt;EOF
+procs diskin header diskoa end
+diskin
+   ipath y0902-01.dat format odec end
+end
+header
+    i45 = 3 end
+end
+prout
+      indices l3 l4 l19 l20 l21 l22
+   format (6(1x,F15.0))
+   fno 0 lno 10
+  end
+end
+diskoa
+   opath y0902-01.segy end
+end
+end
+EOF</pre>
+And looking at the data:
+<pre>% <b>lsd y0902-01.segy 1 20 1 | grep xy</b>
+  Source and receiver xy coordinates: -65.52282 39.458923 0. 0.
+  Source and receiver xy coordinates: -65.52223 39.4592 0. 0.
+  Source and receiver xy coordinates: -65.52164 39.45948 0. 0.
+  Source and receiver xy coordinates: -65.52104 39.45975 0. 0.
+  Source and receiver xy coordinates: -65.520454 39.460026 0. 0.
+  Source and receiver xy coordinates: -65.51987 39.460297 0. 0.
+  Source and receiver xy coordinates: -65.519264 39.460567 0. 0.
+  Source and receiver xy coordinates: -65.518684 39.460842 0. 0.
+  Source and receiver xy coordinates: -65.5181 39.461117 0. 0.
+  Source and receiver xy coordinates: -65.5175 39.461384 0. 0.
+  Source and receiver xy coordinates: -65.51691 39.461647 0. 0.
+  Source and receiver xy coordinates: -65.51632 39.46192 0. 0.
+  Source and receiver xy coordinates: -65.51573 39.462196 0. 0.
+  Source and receiver xy coordinates: -65.515144 39.462467 0. 0.
+  Source and receiver xy coordinates: -65.51456 39.46274 0. 0.
+  Source and receiver xy coordinates: -65.51397 39.463013 0. 0.
+  Source and receiver xy coordinates: -65.51338 39.463287 0. 0.
+  Source and receiver xy coordinates: -65.51279 39.46356 0. 0.
+  Source and receiver xy coordinates: -65.51221 39.46384 0. 0.
+  Source and receiver xy coordinates: -65.51161 39.464108 0. 0.
+</pre>
+sioseis, dutil and lsd can be had on the <a href="http://sioseis.ucsd.edu/bin/">sioseis binaries page</a>
+-----

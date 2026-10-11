@@ -1,0 +1,48 @@
+TITLE: ClamXav
+AUTHOR: Kurt
+DATE: 11.28.2005 13:47
+DESC: works
+-----
+BODY:
+On Nathan's suggestion I just gave <a
+href="http://www.clamxav.com">ClamXav</a> a try.  Not bad.  I still
+may end up going with an anacron job and/or checking out the daemon
+package in fink.
+
+Also, I did a quick test with a demo virus file to make sure that the
+fink ClamAV is actually doing anything (I've never had it find
+anything).  I used Nathan's suggestion for a test virus and got this:
+<pre>
+open http://www.eicar.org/anti_virus_test_file.htm
+# Down load the eicar.com test virus to my desktop
+/sw/bin/clamscan --bell -r --log=/Users/schwehr/Desktop/virus-scan.txt \
+     -i /Users/schwehr/Desktop/eicar.com
+cat ~/Desktop/virus-scan.txt
+
+========================================
+Scan started: Mon Nov 28 13:42:05 2005
+
+/Users/schwehr/Desktop/eicar.com: Eicar-Test-Signature FOUND
+
+== summary ==
+Known viruses: 41289
+Engine version: 0.87.1
+Scanned directories: 0
+Scanned files: 1
+Infected files: 1
+Data scanned: 0.00 MB
+Time: 3.130 sec (0 m 3 s)
+</pre>
+Yeah!  It actually did something.  If I use anacron, I am thinking of
+something like this as the script.
+<pre>
+/sw/bin/fink update clamav clamav-dev clamav-shlibs
+/sw/bin/freshclam
+/sw/bin/clamscan --bell -r --log=/Users/schwehr/Desktop/virus-scan.txt -i /
+if [ $? != 0]; then
+  somescript that notifies me obnoxiously if there is a virus found
+  maybe use growl
+  maybe touch "/Users/schwehr/Desktop/VIRUS_FOUND"
+fi
+</pre>
+-----

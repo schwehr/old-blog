@@ -1,0 +1,68 @@
+TITLE: ais base station powerup messages
+AUTHOR: Kurt
+DATE: 02.23.2007 10:28
+DESC: and we are off to get basestation support going
+-----
+BODY:
+Want to know what an AIS basestation sends on power up?  This unit is
+sitting on my desk without the required interfaces.  I only have a
+serial line hooked up to the presentation interface (PI).  Missing are
+the GPS antenna and the VHF antenna.  I have done nothing to configure
+the box.  As is expected, the box is saying that it is not ready to go.
+This is using my simple serial logger script in the noaadata python
+package.
+<pre>
+./serial_logger.py -v -u -s unhtest
+cat log.2007-02-23 
+# START LOGGING UTC seconds since the epoch: 1172243679.96
+# SPEED: 38400
+# PORT:  /dev/tty.KeySerial1
+# TIMEOUT:  300.0
+# STATIONID:  unhtest
+$AIALR,000000.00,001,V,V,AIS: Tx malfunction*4B,runhtest,1172243685.94
+$AITXT,1,1,007,AIS: UTC clock lost*08,runhtest,1172243685.95
+$AIALR,000000.00,002,V,V,AIS: Antenna VSWR exceeds limit*45,runhtest,1172243686.02
+$AIALR,000000.00,003,V,V,AIS: Rx channel 1 malfunction*1D,runhtest,1172243686.05
+$AIALR,000000.00,004,V,V,AIS: Rx channel 2 malfunction*19,runhtest,1172243686.06
+$AIALR,000000.00,005,V,V,AIS: Rx channel 70 malfunction*2D,runhtest,1172243686.08
+$AIALR,000000.00,006,V,V,AIS: General Failure*14,runhtest,1172243686.09
+$AIALR,000000.00,008,V,V,AIS: MKD connection lost*7C,runhtest,1172243686.11
+$AIALR,000000.00,025,V,V,AIS: External EPFS lost*1A,runhtest,1172243686.13
+$AIALR,000000.00,026,V,V,AIS: No sensor position in use*6A,runhtest,1172243686.14
+$AIALR,000000.00,029,V,V,AIS: No valid SOG information*6F,runhtest,1172243686.16
+$AIALR,000000.00,030,V,V,AIS: No valid COG information*77,runhtest,1172243686.17
+$AIALR,000000.00,032,V,V,AIS: Heading lost/invalid*17,runhtest,1172243686.19
+$AIALR,000000.00,035,V,V,AIS: No valid ROT information*70,runhtest,1172243686.21
+$AIALR,000000.00,051,V,V,AIS: IEC Comm Error*1B,runhtest,1172243686.22
+$AIALR,152433.00,052,A,V,AIS: UTC Lost*70,runhtest,1172243686.24
+$AIALR,152433.00,052,A,V,AIS: UTC Lost*70,runhtest,1172243713.95
+$AIALR,152433.00,052,A,V,AIS: UTC Lost*70,runhtest,1172243743.95
+!AIBRF,0000012345,,0*43,runhtest,1172243745.36
+$AIALR,152534.00,002,A,V,AIS: Antenna VSWR exceeds limit*56,runhtest,1172243746.97
+!AIVDO,1,1,,B,D000h&gt;@00000,0*75,runhtest,1172243746.98
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243746.99
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.0
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.01
+!AIVDO,1,1,,A,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;701P00,0*37,runhtest,1172243747.03
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.04
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.05
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.07
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.08
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.09
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.11
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.12
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.13
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243747.14
+!AIVDO,1,1,,B,F000h&gt;B2N2P3D73EB6`&gt;6bT20000,0*75,runhtest,1172243748.04
+!AIVDO,1,1,,B,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;707T00,0*36,runhtest,1172243757.0
+!AIVDO,1,1,,A,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;705`00,0*03,runhtest,1172243767.0
+!AIVDO,1,1,,B,D000h&gt;@00000,0*75,runhtest,1172243773.6
+$AIALR,152534.00,001,A,V,AIS: Tx malfunction*58,runhtest,1172243773.96
+$AIALR,152534.00,002,A,V,AIS: Antenna VSWR exceeds limit*56,runhtest,1172243773.97
+$AIALR,152433.00,052,A,V,AIS: UTC Lost*70,runhtest,1172243773.98
+!AIVDO,1,1,,B,F000h&gt;B2N2P3D73EB6`&gt;6bT20000,0*75,runhtest,1172243774.68
+!AIVDO,1,1,,B,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;707T00,0*36,runhtest,1172243777.0
+!AIVDO,1,1,,A,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;707P00,0*31,runhtest,1172243787.0
+</pre>
+Now I need to update my code to handle messages 4 and 22 ('F').
+-----

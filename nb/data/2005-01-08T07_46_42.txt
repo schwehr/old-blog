@@ -1,0 +1,103 @@
+TITLE: Current rainfall
+AUTHOR: Kurt
+DATE: 01.08.2005 07:46
+DESC: 2.5 inches so far & swish-e for fink
+-----
+BODY:
+At 7:40 AM PST I measure 2.5 inches of rain with a highly scientific
+device: a plastic tub of butter container outside my front door.  One
+minor detail is that there are a bunch of plants in the tub.
+
+I got some feedback this morning from my twisted python email to their
+list.  Thanks to Philipp Schmidt, I will double check my info files
+and commit them.  He even created an info file for akaDAV.  These
+python programs with a setup.py seem to work really well!  I was
+terrible trying to setup new modules in the python 1.5 days.  There
+was no standard way of coping.
+
+Thanks to B10m for his post on <a
+href="http://menno.b10m.net/nb/archives/2005-01-08T11_30_30.html">how
+to setup Swish-E</a>.  Looks like it is not to bad and it gets even
+better:  2.4.3 now using the GNU autoconf system so it should work
+nicely in fink!  That will be nice.  My blog is getting long enough
+that I am starting to have trouble finding entries that I need to get
+back to for whatever reason.
+
+Just found a website called MARS GEOlogy:  <a
+href="http://www.marsgeo.com/">marsgeo.com</a>.  I have no idea on the
+quality of information, but the author seems to have interesting posts
+on a mars discussion group.  I have not yet found a bio on the author,
+Aldo.
+
+Info on how to turn a pdf into a text file on your pdf can by found on
+<a
+href="http://www.macdevcenter.com/pub/a/mac/2005/01/07/ipod_reader.html?CMP=ILC-macrss&ATT=Build+an+eDoc+Reader+for+Your+iPod+Part+3">macdevcenter
+- build an eDoc Reader</a>
+
+Does gengetopt now have specific c++ support?  Strange log messages on
+the fink commits mailing list.  Doh!  The info file for gengetopt does
+not seem to get installed into the info directory?
+
+Posted by Aldo:
+<pre>
+  ... describes the geological history of the Gusev area. It outlines
+  paleolake boundaries south of Gusev, describes how Ma'adim Vallis was
+  carved, how Gusev was flooded, at what flow rates, what volumes of
+  water would've been required, how long the flooding event might've
+  lasted and so on.
+
+  Rossman Irwin III, Alan Howard, Ted Maxwell: Geomorphology of Ma'adim
+  Vallis, Mars, and Associated Paleolake Basins. Journal of Geophysical
+  Research, December 30, 2004
+</pre>
+Started working on a draft <a
+href="http://schwehr.org/software/info/swish-e.info">swish-e.info</a>
+file.  It still needs split-offs for -dev and -shlibs.
+<pre>
+  otool -L /sw/lib/libswish-e.2.0.0.dylib 
+  /sw/lib/libswish-e.2.0.0.dylib:
+        /sw/lib/libswish-e.2.dylib (compat ver 3.0.0, cur ver 3.0.0)
+        ...
+</pre>
+
+I spent a while trying to figure out how to setup swish-e.  It works
+fine from the command line, but I can not use the -e option to make it
+conserve ram.  It writes out too many tmp files and runs out of file
+descriptors.  Then I tried to get the cgi-bin search to work.  That
+does not work since I can not control where the perl files go.  They
+end up not in the PERL5LIB path.  Perhaps I have to make a separate
+perl module info file that goes into swish-e-2.4.3/perl and does the
+whole perl versioning thing.  Here are a bunch of notes: 
+<pre>
+cat swish-e.config
+IndexOnly .htm .html .shtml
+DefaultContents HTML*
+StoreDescription HTML* <body>
+metanames swishtitle swishdocpath
+
+swish-e -c swish-e.config -i ../Viz04
+
+swish-e -c swish-e.config -w "Santa Barbara"
+
+# SWISH format: 2.4.3
+# Search words: Santa Barbara
+# Removed stopwords: 
+# Number of hits: 5
+# Search time: 0.018 seconds
+# Run time: 0.061 seconds
+1000 ../Viz04/resume_print.html "Kurt Schwehr | Resume" 9756
+1000 ../Viz04/resume.html "Kurt Schwehr | Resume" 10729
+633 ../Viz04/pop1.shtml "Kurt Schwehr | Presentation" 2818
+633 ../Viz04/index_print.html "Kurt Schwehr | Home" 5960
+633 ../Viz04/index.html "Kurt Schwehr | Home" 6099
+
+&lt;Directory "/Users/schwehr/Sites/cgi-bin"&gt;
+        Options ExecCgi Includes MultiViews Indexes
+	SetHandler cgi-script
+&lt;/Directory&gt;
+
+./search.cgi 
+Can't locate SWISH/API.pm in @INC 
+</pre>
+Back to writing the thesis...
+-----

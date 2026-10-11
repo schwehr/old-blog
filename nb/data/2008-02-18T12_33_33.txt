@@ -1,0 +1,41 @@
+TITLE: Upgrading Ubuntu to 7.10 ... the next server
+AUTHOR: Kurt
+DATE: 02.18.2008 12:33
+DESC: closer
+-----
+BODY:
+This is a little Dell 745 box.  The update to 7.10 is now complete and
+the station responds to ssh.  Last Friday, I did the update process:
+<pre>
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install update-manager-core
+sudo do-release-upgrade
+</pre>
+I rebooted on Saturday and the machine never came back.  There was a
+strange kernel panic VFS error on the screen.  I booted to an older
+kernel in rescue mode via Grub (hit the ESC key).  I then got the
+machine to a console.  apt-get update gave an error, so I redid the
+whole config which takes about 20 minutes.
+<pre>
+dpkg --configure -a
+apt-get update
+apt-get upgrade
+</pre>
+I rebooted and the machine seems okay now.  I then tried to install the keyspan driver that I got on the net, but the deb revision numbers are different.  I forced the install...
+<pre>
+dpkg --force-depends -i keyspan-ubuntu-2.6.22.47.deb
+</pre>
+It was confusing with the 4 port keyspan, so I swapped it for my 1 port keyspan.  Then configured the serial device:
+<pre>
+mknod /dev/ttyUSB0 c 188 0
+chgrp dialout /dev/ttyUSB?
+chmod g+w /dev/ttyUSB?
+</pre>
+Remotely connect and start the logger...
+<pre>
+ssh -p xxx somewhere -v
+~schwehr/projects/noaadata/scripts/serial_logger.py --port=/dev/ttyUSB0
+</pre>
+I the future, we need to buy only Linux friendly usb-serial devices.
+-----

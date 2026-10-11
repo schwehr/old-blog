@@ -1,0 +1,21 @@
+TITLE: Python database API specification
+AUTHOR: Kurt
+DATE: 11.27.2005 09:31
+DESC: better inserts
+-----
+BODY:
+From Diez B. Roggisch: (and a similiar comment by Fredrik Lundh)
+<pre>
+Use paramtetrized cursor.execute(..) That is instead of doing
+  c.execute("insert into foo values ('%s')" % mytext)
+do
+  c.execute("insert into foo values (?)", mytext)
+Attention, the actual style of a parameter is dependand on your
+database, e.g. oracle uses a differnet one:
+  c.execute("insert into foo values (:mytext)", dict(mytext=mytext))
+The actual style to use is given in the docs, or can be queried with
+connection.paramstyle.  I recommend reading the DB-API 2.0 specs.
+</pre>
+<a href="http://www.python.org/peps/pep-0249.html">PEP 0249</a> -
+Python Database API Specification v2.0 (07 Apr 1999)
+-----

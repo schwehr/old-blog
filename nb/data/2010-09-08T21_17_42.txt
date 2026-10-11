@@ -1,0 +1,29 @@
+TITLE: django 1.2.2 - security update
+AUTHOR: Kurt
+DATE: 09.08.2010 21:17
+DESC: update now
+-----
+BODY:
+If you are using django through fink, you should do a "fink selfupdate", "fink list -o", and update your fink django packages to 1.2.2.
+
+<a href="http://www.djangoproject.com/weblog/2010/sep/08/security-release/">Security release issued</a>
+
+<pre>As of the 1.2 release, the core Django framework includes a
+system, enabled by default, for detecting and preventing cross-site
+request forgery (CSRF) attacks against Django-powered
+applications. Previous Django releases provided a different,
+optionally-enabled system for the same purpose.
+<!-- -->
+The Django 1.2 CSRF protection system involves the generation of a
+random token, inserted as a hidden field in outgoing forms. The same
+value is also set in a cookie, and the cookie value and form value are
+compared on submission.
+<!-- -->
+The provided template tag for inserting the CSRF token into forms --
+{% csrf_token %} -- explicitly trusts the cookie value, and displays
+it as-is. Thus, an attacker who is able to tamper with the value of
+the CSRF cookie can cause arbitrary content to be inserted, unescaped,
+into the outgoing HTML of the form, enabling cross-site scripting
+(XSS) attacks.
+...</pre>
+-----

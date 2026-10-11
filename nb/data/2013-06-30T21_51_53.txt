@@ -1,0 +1,234 @@
+TITLE: A simple library autoconf example
+AUTHOR: Kurt
+DATE: 06.30.2013 21:51
+DESC: starting to move faster
+-----
+BODY:
+I know there are a lot of other autoconf examples out there, but these
+are mine.  The process of creating the examples is me learning about
+autoconf.  I'm a long way from my first attempt at writing autoconf
+for netcat in 1999 before netcat was rewritten.
+
+I have started pushing my examples to github.  I would like it if the
+code in my examples could be used in any project without attribution.
+I just don't want the collection as a whole to get taken without
+attribution.
+
+<a href="https://github.com/schwehr/autoconf_samples">https://github.com/schwehr/autoconf_samples</a>
+
+This example is a stripped down C++ library with a single function and
+builds a binary that uses that library.  I'm a little surprised that
+it does a static link by default.  I'm trying to increment simple_lib
+just a little beyond the endian example.
+<pre><b>ls -l</b>
+total 56
+-rw-r--r--  1 schwehr  5000    0 Jun 30 15:42 AUTHORS
+-rw-r--r--  1 schwehr  5000    0 Jun 30 15:42 ChangeLog
+-rw-r--r--  1 schwehr  5000  271 Jun 30 15:54 Makefile.am
+-rw-r--r--  1 schwehr  5000    0 Jun 30 15:42 NEWS
+-rw-r--r--  1 schwehr  5000    0 Jun 30 15:42 README
+-rwxr-xr-x  1 schwehr  5000   99 Jun 30 15:41 autogen.sh
+-rwxr-xr-x  1 schwehr  5000  140 Jun 30 16:04 clean.sh
+-rw-r--r--  1 schwehr  5000  401 Jun 30 18:35 configure.ac
+-rw-r--r--  1 schwehr  5000  102 Jun 30 16:08 simple.cc
+-rw-r--r--  1 schwehr  5000   14 Jun 30 15:46 simple.h
+-rw-r--r--  1 schwehr  5000   60 Jun 30 15:52 simple_prog.cc</pre>
+First, the configure:
+<pre>AC_PREREQ([2.65])
+LT_PREREQ([2.4.2])
+<!-- -->
+AC_CONFIG_MACRO_DIR(m4)
+<!-- -->
+AC_INIT([simple],[1.0])
+LT_INIT
+<!-- -->
+AM_INIT_AUTOMAKE
+AM_MAINTAINER_MODE
+AC_PROG_CXX
+<!-- -->
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_HEADERS([config.h])
+<!-- -->
+AC_OUTPUT
+<!-- -->
+AS_ECHO
+AS_ECHO([Results])
+AS_ECHO
+AS_ECHO([<font color="#FF0000">"$PACKAGE_STRING will be installed in: ${prefix}"</font>])
+AS_ECHO([<font color="#FF0000">"Use shared libs: $enable_shared"</font>])
+AS_ECHO([<font color="#FF0000">"Use static libs: $enable_static"</font>])</pre>
+A quick tour of the changes... First, I added libtool macros.  The
+LT_INIT sets up everything needed to build static and shared
+libraries.  I added AC_CONFIG_MACRO_DIR to try to hide more of the
+autoconf/libtools stuff under a m4 directory.  Then I added
+AM_MAINTAINER_MODE, but that doesn't actually seem to add much.  Then
+I switch the AM C compiler macro with AC_PROG_CXX.  Finally, I wanted
+to demonstrate having a results summary section.  The autoconf manuals
+say that we should not use the shell echo command directly, so I used
+AS_ECHO to print out the key results of the configure stage.
+
+The Makefile.am gets much more complicated.  I'm not 100% sure that I
+have this right.  If anyone has a better way to specify and track the
+library version info, please let me know.  I do know that you are
+supposed to refer to the locally built libraries with libFOO.la (not
+-lFOO) and let autoconf/automake do the right thing.
+<pre><font color="#009900">ACLOCAL_AMFLAGS =</font> -I m4
+<!-- -->
+<font color="#009900">include_HEADERS =</font> simple.h
+<!-- -->
+<font color="#009900">lib_LTLIBRARIES =</font> libsimple.la
+<!-- -->
+<font color="#009900">libsimple_la_LDFLAGS =</font> -no-undefined -version-info <font color="#993399">0</font><font color="#990000">:</font><font color="#993399">0</font><font color="#990000">:</font><font color="#993399">0</font>
+<font color="#009900">libsimple_la_SOURCES =</font> simple.cc
+<!-- -->
+<font color="#009900">bin_PROGRAMS =</font> simple_prog
+<font color="#009900">simple_prog_SOURCES =</font> simple_prog.cc
+<font color="#009900">simple_prog_LDADD =</font> simple.lo</pre>
+I'm using a fully automatic config.h (I have no config.h.in), so I need to include
+the config.h in simple.cc:
+<pre><b><font color="#000080">#include</font></b> <font color="#FF0000">"config.h"</font>
+<!-- -->
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;iostream&gt;</font>
+<!-- -->
+<font color="#009900">void</font> <b><font color="#000000">hello</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+  std<font color="#990000">::</font>cout <font color="#990000">&lt;&lt;</font> <font color="#FF0000">"Hello world from a lib</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">;</font>
+<font color="#FF0000">}</font></pre>
+Pretty boring library, but it does demonstrate the library.
+
+I have two helper scripts.  First is an extention of the autogen.sh script.  It makes sure
+there is an m4 directory and tells autoreconf to put what it can in that directory.
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+<!-- -->
+<b><font color="#0000FF">if</font></b> <font color="#990000">[</font> <font color="#990000">!</font> -d m4 <font color="#990000">];</font> <b><font color="#0000FF">then</font></b>
+  echo mkdir
+  mkdir m4
+<b><font color="#0000FF">fi</font></b>
+<!-- -->
+autoreconf --force --install -I m4</tt></pre>
+The 2nd script is clean.  It uses the maintainer-clean in the Makefile, but there is still a lot
+of autogenerated stuff, so I also rm the left overs.
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+<!-- -->
+make maintainer-clean
+rm -rf INSTALL Makefile<font color="#990000">.</font><b><font color="#0000FF">in</font></b> aclocal<font color="#990000">.</font>m4 compile config<font color="#990000">.*</font>
+rm -rf configure depcomp install-sh ltmain<font color="#990000">.</font>sh m4 missing</tt></pre>
+To build everything, here is what I do:
+<pre><b>./autogen.sh</b>
+mkdir
+libtoolize: putting auxiliary files in `.'.
+libtoolize: copying file `./ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIR, `m4'.
+libtoolize: copying file `m4/libtool.m4'
+libtoolize: copying file `m4/ltoptions.m4'
+libtoolize: copying file `m4/ltsugar.m4'
+libtoolize: copying file `m4/ltversion.m4'
+libtoolize: copying file `m4/lt~obsolete.m4'
+configure.ac:7: installing './config.guess'
+configure.ac:7: installing './config.sub'
+configure.ac:9: installing './install-sh'
+configure.ac:9: installing './missing'
+Makefile.am: installing './INSTALL'
+Makefile.am: installing './COPYING' using GNU General Public License v3 file
+Makefile.am:     Consider adding the COPYING file to the version control system
+Makefile.am:     for your code, to avoid questions about which license your project uses
+Makefile.am: installing './depcomp'
+<b>./configure --enable-maintainer-mode --enable-dependency-tracking</b>
+checking build system type... x86_64-apple-darwin12.4.0
+checking host system type... x86_64-apple-darwin12.4.0
+checking how to print strings... printf
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking for a sed that does not truncate output... /sw/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by gcc... /usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld
+checking if the linker (/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld) is GNU ld... no
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm
+checking the name lister (/usr/bin/nm) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 196608
+checking whether the shell understands some XSI constructs... yes
+checking whether the shell understands "+="... yes
+checking how to convert x86_64-apple-darwin12.4.0 file names to x86_64-apple-darwin12.4.0 format... func_convert_file_noop
+checking how to convert x86_64-apple-darwin12.4.0 file names to toolchain format... func_convert_file_noop
+checking for /usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld option to reload object files... -r
+checking for objdump... no
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for ar... ar
+checking for archiver @FILE support... no
+checking for strip... strip
+checking for ranlib... ranlib
+checking for gawk... gawk
+checking command to parse /usr/bin/nm output from gcc object... ok
+checking for sysroot... no
+checking for mt... no
+<!-- -->
+[snip]
+<!-- -->
+checking how to run the C++ preprocessor... g++ -E
+checking for ld used by g++... /usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld
+checking if the linker (/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld) is GNU ld... no
+checking whether the g++ linker (/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld) supports shared libraries... yes
+checking for g++ option to produce PIC... -fno-common -DPIC
+checking if g++ PIC flag -fno-common -DPIC works... yes
+checking if g++ static flag -static works... no
+checking if g++ supports -c -o file.o... yes
+checking if g++ supports -c -o file.o... (cached) yes
+checking whether the g++ linker (/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld) supports shared libraries... yes
+checking dynamic linker characteristics... darwin12.4.0 dyld
+checking how to hardcode library paths into programs... immediate
+checking dependency style of g++... gcc3
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: executing libtool commands
+config.status: executing depfiles commands
+<!-- -->
+Results
+<!-- -->
+simple 1.0 will be installed in: /usr/local
+Use shared libs: yes
+<!-- -->
+<b>make</b>
+make  all-am
+/bin/sh ./libtool --tag=CXX   --mode=compile g++ -DHAVE_CONFIG_H -I.     -g -O2 -MT simple.lo -MD -MP -MF .deps/simple.Tpo -c -o simple.lo simple.cc
+libtool: compile:  g++ -DHAVE_CONFIG_H -I. -g -O2 -MT simple.lo -MD -MP -MF .deps/simple.Tpo -c simple.cc  -fno-common -DPIC -o .libs/simple.o
+libtool: compile:  g++ -DHAVE_CONFIG_H -I. -g -O2 -MT simple.lo -MD -MP -MF .deps/simple.Tpo -c simple.cc -o simple.o >/dev/null 2>&1
+mv -f .deps/simple.Tpo .deps/simple.Plo
+/bin/sh ./libtool --tag=CXX   --mode=link g++  -g -O2 -no-undefined -version-info 0:0:0  -o libsimple.la -rpath /usr/local/lib simple.lo  
+libtool: link: g++ -dynamiclib  -o .libs/libsimple.0.dylib  .libs/simple.o    -O2   -install_name  /usr/local/lib/libsimple.0.dylib -compatibility_version 1 -current_version 1.0 -Wl,-single_module
+libtool: link: (cd ".libs" && rm -f "libsimple.dylib" && ln -s "libsimple.0.dylib" "libsimple.dylib")
+libtool: link: ar cru .libs/libsimple.a  simple.o
+libtool: link: ranlib .libs/libsimple.a
+libtool: link: ( cd ".libs" && rm -f "libsimple.la" && ln -s "../libsimple.la" "libsimple.la" )
+g++ -DHAVE_CONFIG_H -I.     -g -O2 -MT simple_prog.o -MD -MP -MF .deps/simple_prog.Tpo -c -o simple_prog.o simple_prog.cc
+mv -f .deps/simple_prog.Tpo .deps/simple_prog.Po
+/bin/sh ./libtool --tag=CXX   --mode=link g++  -g -O2   -o simple_prog simple_prog.o simple.lo 
+libtool: link: g++ -g -O2 -o simple_prog simple_prog.o .libs/simple.o -Wl,-bind_at_load</pre>
+Now the results:
+<pre><b>otool -L simple_prog</b>
+simple_prog:
+	/usr/lib/libstdc++.6.dylib (compatibility version 7.0.0, current version 56.0.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 169.3.0)
+<b>./simple_prog</b>
+Hello world from a lib
+<b>ls -l .libs/</b>
+total 144
+-rwxr-xr-x  1 schwehr  5000   9508 Jun 30 19:20 libsimple.0.dylib
+-rw-r--r--  1 schwehr  5000  23376 Jun 30 19:20 libsimple.a
+lrwxr-xr-x  1 schwehr  5000     17 Jun 30 19:20 libsimple.dylib -> libsimple.0.dylib
+lrwxr-xr-x  1 schwehr  5000     15 Jun 30 19:20 libsimple.la -> ../libsimple.la
+-rw-r--r--  1 schwehr  5000    922 Jun 30 19:20 libsimple.lai
+-rw-r--r--  1 schwehr  5000  23184 Jun 30 19:20 simple.o</pre>
+-----

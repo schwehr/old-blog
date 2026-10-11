@@ -1,0 +1,1404 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: March 2010 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2010-03-31T15_26_52.txt" name=
+"e2010-03-31T15_26_52.txt"></a>
+<h2 class="date">03.31.2010 15:26</h2>
+<div class="blogbody">
+<h3 class="title">Debugging AIS AtoNs</h3>
+<div class="item-description">This week, Ted Reed from Ohmex paid a
+visit to CCOM. We spent some time trying to debug why we could not
+receive messages from an <a href=
+"http://www.ohmex.com/tidemet.htm">Ohmex TideMet AIS AtoN
+station</a> on our test bench. We tried a lot of combinations and
+without proper RF test gear (which we do not own), it is hard to
+know what is going on. The LED on the TideMet said it was
+transmitting, but we did not receive anything. After exploring all
+the options we could think of, we tore down the test setup and
+moved it to our highbay. Right off it worked. We figured out after
+some more testing that we had two fatal problems on our test bench.
+First, the power supply we were using said that it could handle the
+TideMet, but it definitely can not handle the brief peak loads. We
+switched to a battery pack and a different (more robust) power
+supply and it worked like a champ. The 2nd problem was the roof of
+our building. GPS reception from the roof is great, but the
+building construction almost totally blocks any signals from
+getting down to the test area and we may also have a lot of noise
+in the test area. To compound all of this, the AIS ATON
+specifications makes it a challenge to work with type approved
+devices. There are a lot of restrictions placed on how the units
+work that make debugging difficult.<br />
+<br />
+Here is our test setup. I had my Mac with an SR162g (a very wimpy
+AIS receiver), goSerial, and my python based serial logging and AIS
+decoding software. Ted had the Ohmex monitoring and display
+software on his laptop with a very cool <a href=
+"http://www.ohmex.com/aism8.htm">USB powered Ohmex AIS
+receiver</a>. Next to the laptops are a L3 stock AIS AtoN and a
+Ohmex TideMet.<br />
+<br />
+<img title="Hi-bay test setup for AIS AtoNs" withgrayborder="True"
+src=
+"../attachments/2010-03/aton-debugging.jpg" /><br />
+
+<br />
+For those who don't have one, here is what the L3 board
+configuration looks like (on port P2), when you press
+"<b>c</b>":<br />
+<br />
+<pre>
+L3 AT91 AtoN Project, [Rev 1.15J of 21-Aug-08]
+*** System Time: 000:01:03.128 ***
+<!-- -->
+*** System Configuration Menu ***
+<!-- -->
+   1. Show Current Configuration Info
+   2. Set Unit MMSI
+   3. Set Configured Lat and Lon
+   4. Show Current Transmit Schedule
+   5. Create New Transmit Schedule
+   6. Set Attributes for Scheduled Binary Msg Types
+   7. Set System Startup Time (following Standby)
+   8. Enable or Disable 62320-2 FDIS Mode
+   9. Enable or Disable Standby Operation
+   a. Enable or Disable Acquisition Subsystem Control
+   b. Enable or Disable SART Relay Feature
+   c. Set SART Relay Mode Parameters
+   d. Enable or Disable DGNSS Serial Input
+   e. Enable or Disable Message 17 Transmit
+   f. Enable or Disable Off Position Algorithm
+   g. Set Tx Test Mode Parameters
+</pre>
+And here is what the unit looks like in the test configuration
+using my test MMSI.
+<pre>
+Software [Rev 1.15J of 21-Aug-08]
+*** AtoN Configuration is [L3 Communications Type 3]
+*** Serial Number is [000xxxxxx]
+*** MMSI [338040883], Base Station MMSI [0]
+*** AtoN Name is [UNH_OHMEX]
+*** Configured Lat/Lon [43 8.1320 N, 70 56.3690 W]
+*** Base Startup Time is [10] Secs
+*** Receiver Operation is [Enabled]
+*** RATDMA Support is [Enabled]
+*** Standby Operation is [Disabled]
+*** Acquisition Subsystem Ctl is [Enabled]
+*** SART Relay Feature is [Disabled]
+*** DGNSS Input is [Disabled]
+*** Message 17 Transmit is [Disabled]
+*** IEC 62320-2 Sentence Mode is [FDIS]
+*** Off Position Algorithm is [Disabled]
+*** Flash/SDRAM CheckSums [7928, 7928]
+*** Code/Data Size [238149, 0x0003A245] Bytes
+</pre>
+As the unit boots up, I get this stream of NMEA:
+<pre>
+!ANVDO,1,1,,X,E52HH&lt;h:W4?WT6Rd00000000000=M`Oe&lt;Ema@00000bP20,4*72
+!ANVDO,1,1,,X,E52HH&lt;h:W4?WT6Rd00000000000MM`Og&lt;Em`800000g020,4*1C
+!ANVDM,1,1,,B,39NS7FE001rsr8hHbdnadIdP0000,0*4B
+...
+!ANVDO,1,1,,Y,E52HH&lt;h:W4?WT6Rd00000000000MM`Os&lt;EmVP00000TP20,4*04
+!ANVDO,1,1,,A,E52HH&lt;h:W4?WT6Rd00000000000MM`On&lt;EmVh00000uP20,4*18
+</pre>
+The first messages with ',<b>X</b>,' say that the device is booting
+up. There is an AIS position message in there (',B<b>,3</b>').
+Then, once the unit is up with a good GPS fix, it starts putting
+out ',<b>Y</b>,' messages. When it transmits, it replaces the Y
+with an A or B to denote which channel it just transmitted on. Here
+is one of the messages that I received being decoded by my noaadata
+package:
+<pre>
+ais_msg_21.py -d '!AIVDM,1,1,,A,E52HH&lt;h:W4?WT6Rd00000000000MM`OJ&lt;Emc@00000uP20,4*24,1269951900.77'
+<!-- -->
+AidsToNavReport:
+        MessageID:           21
+        RepeatIndicator:     0
+        UserID:              338040883
+        type:                0
+        name:                UNH-OHMEX
+        PositionAccuracy:    1
+        longitude:           -70.93937
+        latitude:            43.1357233
+        dim:                 0
+        FixType:             1
+        timestamp:           59
+        OffPosition:         False
+        RegionalApp:         0
+        RAIM:                True
+        virtual_aton_flag:   False
+        assigned_mode_flag:  False
+        spare:               0
+        extended_name:       
+</pre>
+Or in a HTML table view with LUT values:<br />
+<br />
+<table border="1">
+<tr bgcolor="orange">
+<th align="left">Field Name</th>
+<th align="left">Type</th>
+<th align="left">Value</th>
+<th align="left">Value in Lookup Table</th>
+<th align="left">Units</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>uint</td>
+<td>21</td>
+<td>21</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>uint</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>uint</td>
+<td>338040883</td>
+<td>338040883</td>
+</tr>
+<tr>
+<td>type</td>
+<td>uint</td>
+<td>0</td>
+<td>Default, Type of A to N not specified</td>
+</tr>
+<tr>
+<td>name</td>
+<td>aisstr6</td>
+<td>UNH-OHMEX@@@@@@@@@@@</td>
+<td>UNH-OHMEX</td>
+</tr>
+<tr>
+<td>PositionAccuracy</td>
+<td>uint</td>
+<td>1</td>
+<td>high (less than 10 m)</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>decimal</td>
+<td>-70.93937</td>
+<td>-70.93937</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>decimal</td>
+<td>43.135723333</td>
+<td>43.135723333</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>dim</td>
+<td>uint</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>FixType</td>
+<td>uint</td>
+<td>1</td>
+<td>GPS</td>
+</tr>
+<tr>
+<td>timestamp</td>
+<td>uint</td>
+<td>59</td>
+<td><i>Missing LUT entry</i></td>
+</tr>
+<tr>
+<td>OffPosition</td>
+<td>bool</td>
+<td>False</td>
+<td>On position</td>
+</tr>
+<tr>
+<td>RegionalApp</td>
+<td>uint</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>RAIM</td>
+<td>bool</td>
+<td>True</td>
+<td>in use</td>
+</tr>
+<tr>
+<td>virtual_aton_flag</td>
+<td>bool</td>
+<td>False</td>
+<td>Unit physically exists</td>
+</tr>
+<tr>
+<td>assigned_mode_flag</td>
+<td>bool</td>
+<td>False</td>
+<td>autonomous and continuous mode</td>
+</tr>
+<tr>
+<td>spare</td>
+<td>uint</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</table>
+<br />
+<br />
+Watch out when writing decoders for Msg 21, as the message might
+contain a "Name of Aid-to-Navigation Extension" of up to 14
+characters at the end. The L3 and Ohmex units do not use this
+extension, but GPSD's test dataset has a message that comes with an
+extension. Also, ITU 1371 <b>Rev 3</b> changed the 3 spare bits in
+revision 1 to be two flags (virtual aton and assigned mode) and 1
+spare.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-31T15_26_52.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-02T11_10_01.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-31T14_28_26.txt" name=
+"e2010-03-31T14_28_26.txt"></a>
+<h2 class="date">03.31.2010 14:28</h2>
+<div class="blogbody">
+<h3 class="title">sioseis in fink on the mac!</h3>
+<div class="item-description">A couple of weeks ago, Paul Henkart
+was at CCOM for a meeting. We got to talking about his <a href=
+"http://sioseis.ucsd.edu/">SIOSEIS</a> seismic processing software.
+We decided to team up to get it into fink. After a couple of
+iterations, Paul has SIOSEIS setup to be a snap to package in fink
+and SIOSEIS has a BSD license. I've got it working on 10.5 (Intel
+and PPC) and 10.5 (32 and 64bit).
+<pre>
+fink selfupdate
+fink install sioseis
+</pre>
+I would be interested in hearing if people see speedups now that
+sioseis is being built with more optimizations in gcc and gfortran
+enabled. Right now, it has these compiler flags:
+<pre>
+-O2 -funroll-loops -fexpensive-optimizations -ffast-math
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-31T14_28_26.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-31T15_26_52.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-28T18_36_59.txt" name=
+"e2010-03-28T18_36_59.txt"></a>
+<h2 class="date">03.28.2010 18:36</h2>
+<div class="blogbody">
+<h3 class="title">AIS release - what were they thinking?</h3>
+<div class="item-description">When you create a <b>public
+broadcast</b> system, it is by definition public. Statements like
+this are pretty useless. Anyone with a receiver can get this
+message traffic. I think this is from 2005 or 2006. And these are
+really transmitters, <b>not</b> <a href=
+"http://en.wikipedia.org/wiki/Transponder">transponders</a>.<br />
+<br />
+<a href="http://www.imo.org/Safety/mainframe.asp?topic_id=754">IMO
+on AIS transponders</a>
+<pre>
+...
+Maritime security - AIS ship data
+At its 79th session in December 2004, the Maritime Safety Committee
+(MSC) agreed that, in relation to the issue of freely available
+automatic information system (AIS)-generated ship data on the
+world-wide web, the publication on the world-wide web or elsewhere of
+AIS data transmitted by ships could be detrimental to the safety and
+security of ships and port facilities and was undermining the efforts
+of the Organization and its Member States to enhance the safety of
+navigation and security in the international maritime transport
+sector.
+<!-- -->
+The Committee condemned the regrettable publication on the world-wide
+web, or elsewhere, of AIS data transmitted by ships and urged Member
+Governments, subject to the provisions of their national laws, to
+discourage those who make available AIS data to others for publication
+on the world-wide web, or elsewhere from doing so.
+<!-- -->
+In addition, the Committee condemned those who irresponsibly publish
+AIS data transmitted by ships on the world-wide web, or elsewhere,
+particularly if they offer services to the shipping and port
+industries.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-28T18_36_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-31T14_28_26.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-25T19_00_16.txt" name=
+"e2010-03-25T19_00_16.txt"></a>
+<h2 class="date">03.25.2010 19:00</h2>
+<div class="blogbody">
+<h3 class="title">SONS 2010 wrap up</h3>
+<div class="item-description"><b>Update 2010-Mar-29</b>: Michele
+sent me a correction on WebEOC and let me know that 65 people at
+SONS had ERMA accounts. I have a <a href=
+"http://delicious.com/goatbar/sons">SONS Delicious tag</a> that has
+all of my bookmarks related the drill. <a href=
+"http://www.flickr.com/photos/aspect_ratio16x9/">CascoBayBoaters</a>
+has an excellent set of <a href=
+"http://www.flickr.com/photos/aspect_ratio16x9/sets/72157623560476477/">
+photos from the field on Day 2</a>.<br />
+<br />
+SONS 2010 was just a one day event for me. My goal was to get a
+sense of how the command center for an oil spill would actually
+work. It was a fantastic learning experience. It looked like the
+social communications aspect of spill response was the big benefit
+from the drill for the participants. Having people know each other
+from these events will have tremendous payback during actual
+events. Just for myself, I am starting to recognize more people
+from the NOAA and FEMA teams. This visit was especially good for me
+because I can compare and contrast to what I've seen visiting the
+Napa/Sonoma <a href=
+"http://disastercam.blogspot.com/2009/08/sonoma-air-attack-20090807.html">
+Air Attack stations</a> for fires and NASA mission control centers
+(e.g. <a href=
+"../archives/2008-06.html#e2008-06-13T16_24_48.txt">
+Last week's phoenix press conference</a> [2008-06], <a href=
+"../archives/2008-05.html#e2008-05-01T19_28_31.txt">
+Blast Off!</a>, <a href=
+"../archives/2007-07.html#e2007-07-20T12_17_05.txt">
+ORT4 is done</a>). I would equate this exercise to an Operational
+Readiness Test (ORT) for a NASA Mission.<br />
+<br />
+<img title="SONS 2010 This is an excercise" withgrayborder="True"
+src=
+"../attachments/2010-03/sons-this-is-an-exercise.jpg" />
+<br />
+<br />
+However, I have to be careful with my conclusions, as it is clear
+that this drill is pretty far away from how an actual response
+might happen. Much of what I am used to is real AIS and
+environmental data that is pretty challenging to simulate and the
+there were different data sets for different groups to allow
+everyone to participate. For example, winds were tailored for the
+oil movement simulations to push the oil down to NH and get it into
+the <a href=
+"http://en.wikipedia.org/wiki/Seabrook_Station_Nuclear_Power_Plant">
+Seabrook power plant</a> intakes, but that wind would have
+prevented skimmers from acting. The skimmer planners were given
+wind profiles that let them "send out" skimmers.<br />
+<br />
+AIS was particularly challenging. In the event of a real event, I
+could have broken out Aldebaran and shown real time data with live
+ships and whale detections. Put that up on a big projector and
+suddenly everyone would have a big boost in their MDA (maritime
+domain awareness). ERMA would have shown live ships too. After the
+fact, I can see from the <a href=
+"http://gcaptain.com/maritime/blog/sons-2010-spill-of-national-significance-exercise-in-portland-maine-day-two/">
+photos at gCaptain</a> that there were indeed vessels out doing
+simulated response work, specifically the Maine Responder, but
+their AIS is not properly configured for the vessel size and they
+have too many spaces in the name (not as big a deal as the
+dimensions).<br />
+<br />
+<table border="1" cellspacing="0" cellpadding="6" rules="all"
+frame="all">
+<tbody>
+<tr>
+<td>mmsi</td>
+<td>imonumber</td>
+<td>callsign</td>
+<td>name</td>
+<td>dima</td>
+<td>dimb</td>
+<td>dimc</td>
+<td>dimd</td>
+</tr>
+<tr>
+<td>366599000</td>
+<td>9043902</td>
+<td>WBO8583</td>
+<td>MAINE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RESPONDER</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<br />
+<br />
+These are possible USCG vessels involved, but I don't see the USCG
+vessesl that I know were involved: 65609, 554, and Shackle.<br />
+<br />
+<table border="1" cellspacing="0" cellpadding="6" rules="all"
+frame="all">
+<tbody>
+<tr>
+<td>COAST GUARD 902</td>
+<td>COAST GUARD 906</td>
+<td>COAST GUARD 907</td>
+<td>COAST GUARD 908</td>
+<td>COAST GUARD 909</td>
+</tr>
+<tr>
+<td>GUARDIAN SPIRIT</td>
+<td>GUARDIAN LEADER</td>
+<td>NRC GUARDIAN</td>
+<td>U S COAST GUARD 905</td>
+<td>USCG 41321</td>
+</tr>
+<tr>
+<td>USCG 41411</td>
+<td>USCG PENDANT 65608</td>
+<td>USCG-THUNDER BAY</td>
+<td>USCGC EAGLE</td>
+</tr>
+</tbody>
+</table>
+<br />
+<br />
+It also did not help that I don't have access to the <a href=
+"http://www.webeoc.com/webeoc_community/">WebEOC</a> (by <a href=
+"http://www.esi911.com/">ESI</a> system that contained many
+messages going between the teams. Just standing in the middle of
+the room with 200 people in it, I hardly had any idea what is going
+on. There are a few status printouts on a wall up front, but not
+many people look at them. There were a lot of paper notes and
+8.5x11" maps being passed around. There were confusions about names
+of places in the field that made finding the place hard. I ended up
+contributing a little to the exercise (despite my observer roll -
+should have been doing nothing): using the USGS GNIS and Google
+Earth to find locations for the GIS technicians and to put up ERMA
+displays on one of the two dynamic displays in the whole room when
+Michele was in the midst of ArcGIS processing. The other one was
+being run by Amy who was also showing ERMA displays.<br />
+<br />
+I had a strange conversation with Navy guys at the event. I showed
+them the AIS display in ERMA and talked about N-AIS. They love AIS
+for their work, but were unaware of N-AIS or MISLE. They had only
+used commercial services to track vessels. We really should get
+N-AIS into daily government use so that in times of crisis, people
+aren't learning about things for the first time and they already
+have a built in intuitive understanding of the capabilities of
+systems.<br />
+<br />
+Observations:
+<ol>
+<li>As I have seen elsewhere, dealing with location names is
+challenging with spelling issues, the telephone game (where
+information is lost or altered as it is passed), and colloquial
+names.</li>
+<li>Faking data for a simulation is harder than collecting real
+data</li>
+<li>ERMA (and other systems) need automatic scrolling updates of
+events and additions</li>
+<li>Time replay to give a sense of motion is critical. Movies need
+to have an integrated view of vessels, oil, and weather, not just
+one of these at a time.</li>
+<li>Even the small vessels need to have AIS and the USCG needs to
+disable their blue force encryption when responding to events</li>
+<li>Field personnel need to have cross platform mobile phone data
+entry system to report status (iPhone, Android, Crackberry, etc).
+There were just too many rumors running around of reports. This
+would allow us to judge the source in a report (private citizen,
+local government staff, professional emergency responder).</li>
+<li>Large name badges are essential. The job tags on peoples back
+are good, but how about the name too? I had to say "Some planning
+guy" was looking for help... there were 10 of them all in the same
+uniform.</li>
+<li>Meeting more python programmers at NOAA is awesome. I loved
+hearing how they are using TurboGears.</li>
+<li>The CRRC was taking detailed notes about how the command was
+interacting with all of the teams. Can't wait to see that
+analysis!</li>
+<li>There was too much focus on making plots and getting printers
+to work. They really should focus on large computer driven
+displays.</li>
+<li>The wifi network was way overloaded. I was able to be on the
+whole time, but the Windows users were on again / off again.</li>
+<li>The command team holed up in another room for most of the day.
+This makes it difficult other others to follow along. I know
+interruptions were a concern, but it seemed that everyone was very
+conscious about trying not to interrupt too much.</li>
+<li>There was very little use of NOAA Charts or the Coast Pilot in
+areas where I was. ERMA desperately needs a "send this layer to the
+back" option for charts.</li>
+</ol>
+I used the NOAA Coast Pilot Volume 1 and the USGS GNIS to locate
+some features that were shouted out or handed to the group as text.
+One example was first past to me as "Marcus Rock". I couldn't find
+that. Then later I overheard "Moores". After I guessed the
+spelling, I found it: <a href=
+"http://geonames.usgs.gov/pls/gnispublic/f?p=127:3:1867293185067759::NO::P3_FID,P3_TITLE:581831,Moores%20Rock">
+Moores Rock in GNIS</a>. Matt Plumlee showed me GNIS when he was
+working on the GeoCoastPilot.<br />
+<br />
+<img title="SONS 2010 - GNIS location lookup" withgrayborder="True"
+src=
+"../attachments/2010-03/sons-2010-usgs-gnis.png" />
+<br />
+<br />
+This is one of the screens that I put up from ERMA that shows the
+area of observed oil from an "over flight" and both an early vessel
+exclusion area and a later exclusion area that banned non-responder
+traffic from a huge area. These exclusion areas would be great
+things to send out using AIS binary messages using the Zone Message
+(other than the overly complicated geometry, which would take too
+many bits).<br />
+<br />
+<img title="SONS 2010 " withgrayborder="True" src=
+"../attachments/2010-03/sons-2010-erma-display.png" />
+<br />
+<br />
+<img title="SONS 2010 " withgrayborder="True" src=
+"../attachments/2010-03/sons-logistics.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-25T19_00_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-28T18_36_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-24T15_01_26.txt" name=
+"e2010-03-24T15_01_26.txt"></a>
+<h2 class="date">03.24.2010 15:01</h2>
+<div class="blogbody">
+<h3 class="title">UNH Manchester - Open Access and Open Content
+Thursday</h3>
+<div class="item-description">Tomorrow (Thurs) at UNH Manchester...
+come join the discussion.
+<pre>
+<b>Worldwide Collaboration through Technology</b>
+<!-- -->
+Manchester, NH -- The Internet has provided a pathway to a global
+community where people can share information and ideas. In a new
+movement called Open Access and Open Content, educators are looking to
+the Internet as a means to share information and an opportunity to
+build on the knowledge of their colleagues and students.
+<!-- -->
+UNH Manchester will host a panel discussion on Open Access and Open
+Content in Education, on in the third floor auditorium. Offered as
+part of the Saul O Sidore Lecture Series: Living in a Digital World, a
+panel of experts will discuss how education can be improved by open
+access and open content and how resources, including lectures,
+learning modules, textbooks, research projects, and software tools,
+are moving toward online availability and are generating more
+interactivity and participation. The panel's topics include: The
+panel's topics include:
+<!-- -->
+* Future learning in a sustainable culture of free software, free
+  standards, and free data
+* Open courseware and blogging by researchers and educators
+* Designing open virtual learning and research environments to support
+  collaboration, build community, and ensure privacy 
+* Benefits of open access to researchers, publishers copyright
+  policies, author rights, and peer review
+* Balancing virtual technologies and human interaction
+<!-- -->
+The panel will be moderated by Mihaela Sabin, associate professor and
+coordinator of the computer information systems program. Panelists
+will include Jason Alexander, principal, Alexander Technology Group
+and board member of the NH High-Tech Council; Jon "Maddog" Hall,
+former executive director of Linux International; Kurt Schwehr,
+research assistant professor, Center for Coastal and Ocean Mapping;
+Sherry Vellucci, dean, UNH Dimond Library, and Robert Wolff,
+information technologist in the Library Systems Department, UNH Dimond
+Library. 
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-24T15_01_26.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-25T19_00_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-24T12_59_37.txt" name=
+"e2010-03-24T12_59_37.txt"></a>
+<h2 class="date">03.24.2010 12:59</h2>
+<div class="blogbody">
+<h3 class="title">More images from SONS</h3>
+<div class="item-description">A couple more images from SONS.<br />
+<br />
+There is still a lot of use of paper and pencil...<br />
+<br />
+<img title="SONS 2010 " withgrayborder="True" src=
+"../attachments/2010-03/sons2010-old-school.jpg" />
+<br />
+<br />
+A simulated press conference with ERMA in the foreground...<br />
+<br />
+<img title="SONS 2010 " withgrayborder="True" src=
+"../attachments/2010-03/sons2010-press-conference.jpg" />
+<br />
+<br />
+An ERMA display in use by some of the team.<br />
+<br />
+<img title="SONS 2010 " withgrayborder="True" src=
+"../attachments/2010-03/sons2010-erma.jpg" /><br />
+
+<br />
+<a href=
+"http://www.incidentnews.gov/incident/8038?f=789539665">DRILL --
+SONS 2010 Exercise</a> [NOAA's Incident News]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-24T12_59_37.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-24T15_01_26.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-24T08_57_16.txt" name=
+"e2010-03-24T08_57_16.txt"></a>
+<h2 class="date">03.24.2010 08:57</h2>
+<div class="blogbody">
+<h3 class="title">Start of SONS2010 day 1</h3>
+<div class="item-description">Yesterday was training that I didn't
+get to participate in. This morning, I got dropped into the middle
+of things. I am not sure what I'm an observerving at this point. I
+tried to grab some quick pictures right away.<br />
+<br />
+The unified command gathering together:<br />
+<br />
+<img title="SONS 2010 " withgrayborder="True" src=
+"../attachments/2010-03/sons2010-unified-command.jpg" />
+<br />
+<br />
+The env team in deep discussions:<br />
+<br />
+<img title="SONS 2010 " withgrayborder="True" src=
+"../attachments/2010-03/sons2010-env-discussions.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-24T08_57_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-24T12_59_37.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-23T20_56_45.txt" name=
+"e2010-03-23T20_56_45.txt"></a>
+<h2 class="date">03.23.2010 20:56</h2>
+<div class="blogbody">
+<h3 class="title">SONS 2010 starts tomorrow</h3>
+<div class="item-description">Tomorrow morning, I will be waking up
+early and heading north to Portland, ME to participate as an
+observer in the Spill of National Significance Drill. I helped
+create the Environmental Response Management Application that will
+be used in a part of the drill and is being respresented by NOAA's
+<a href="http://response.restoration.noaa.gov/">Office of Response
+and Restoration (OR&amp;R)</a><br />
+<br />
+The drill has a web page: <a href=
+"http://www.sons2010.com/">www.sons2010.com</a><br />
+<br />
+<img title="SONS 2010 graphic" withgrayborder="True" src=
+"../attachments/2010-03/sons-drill.png" /><br />
+
+<br />
+I expect we will hear more about the drill through gCaptain...
+<a href=
+"http://gcaptain.com/maritime/blog/sons-2010-spill-of-national-significance-exercise-in-portland-maine-day-one/">
+SONS 2010 - Spill of National Significance Exercise in Portland,
+Maine; Day One</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-23T20_56_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-24T08_57_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-23T20_43_08.txt" name=
+"e2010-03-23T20_43_08.txt"></a>
+<h2 class="date">03.23.2010 20:43</h2>
+<div class="blogbody">
+<h3 class="title">Research Blog of the Year (not my blog)</h3>
+<div class="item-description">This is an award that I'm never going
+to win with the kind of science and engineering blogging that I do,
+but it is interesting to see the winners.<br />
+<br />
+Research blog of the year apparently goes to: <a href=
+"http://scienceblogs.com/notrocketscience/2010/03/research_blog_of_the_year.php">
+Not Exactly Rocket Science</a>. There is a geology blog in the
+picks... one of the few that I read: <a href=
+"http://scienceblogs.com/highlyallochthonous/2010/03/research_blogging_likes_us.php">
+Highly Allochthonous</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-23T20_43_08.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-23T20_56_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-23T07_09_08.txt" name=
+"e2010-03-23T07_09_08.txt"></a>
+<h2 class="date">03.23.2010 07:09</h2>
+<div class="blogbody">
+<h3 class="title">NOAA surveying video</h3>
+<div class="item-description"><object width="640" height=
+"385"><param name="movie" value=
+"http://www.youtube.com/v/vo0t5_rWNnM&amp;hl=en_US&amp;fs=1&amp;color1=0x006699&amp;color2=0x54abd6" />
+<param name="allowFullScreen" value="true" />
+<param name="allowscriptaccess" value="always" />
+<embed src=
+"http://www.youtube.com/v/vo0t5_rWNnM&amp;hl=en_US&amp;fs=1&amp;color1=0x006699&amp;color2=0x54abd6"
+type="application/x-shockwave-flash" allowscriptaccess="always"
+allowfullscreen="true" width="640" height="385" /></object></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-23T07_09_08.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-23T20_43_08.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-22T22_22_17.txt" name=
+"e2010-03-22T22_22_17.txt"></a>
+<h2 class="date">03.22.2010 22:22</h2>
+<div class="blogbody">
+<h3 class="title">Spirit is driving like crazy on Mars</h3>
+<div class="item-description">If you like robotic explorers, I hope
+you are following Scott Maxwell's blog.<br />
+<br />
+<a href=
+"http://marsandme.blogspot.com/2010/03/opportunity-sol-412-spirit-sol-433.html">
+Opportunity Sol 412 (Spirit Sol 433)</a>
+<pre>
+... we drove a total of 843m last week, according to Charles. Heck, I'll
+have to take his word for it -- I lost track. But this is just
+absolutely amazing stuff, so far beyond what we thought these machines
+were capable of that it almost seems unreal. We're now only about 650m
+from the next big target, a pair of craters called "Viking" and
+"Voyager."  ...
+</pre>
+This was always the big research goal: be able to motor long
+distances to get to exciting new geologic targets. Robotic
+exploration is really the way to go for the forseable future.
+219.7m! Right on! I have to say that I prefer Scott's blogging to
+the press release process. Perhaps that comes from being a part of
+the all night discussions on just how to craft particular press
+releases. Or maybe it comes from me from being a former robot
+driver (Marsokhod and Nomad in Chile). Yeah, I'm biased.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-22T22_22_17.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-23T07_09_08.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-19T14_19_48.txt" name=
+"e2010-03-19T14_19_48.txt"></a>
+<h2 class="date">03.19.2010 14:19</h2>
+<div class="blogbody">
+<h3 class="title">Sensor data in GeoRSS?</h3>
+<div class="item-description"><a href=
+"http://schwehr.blogspot.com/2010/03/sensor-data-in-georss.html">Any
+discussions can go here...</a><br />
+<br />
+Chaoyi gave a go at publishing the CCOM weather (wx) station data
+in a GeoRSS and has brought up a number of issues. Line number
+referer to the example below (which we know is not right).
+<ol>
+<li>The OGC Atom+GeoRSS validation results are confusing. <a href=
+"http://feedvalidator.org/check.cgi?url=http%3A%2F%2Fschwehr.org%2Fblog%2Fattachments%2F2010-03%2Fweather-try1-georss.xml">
+Feed Validator</a> has a better presentation</li>
+<li>It loosk like the OGC version only supports GML</li>
+<li>How should the payload be encoded? This is the big question.
+See line 24, where we make hard to parse human readable text.</li>
+<li>I think the ID is wrong, but it still not clear to me how id's
+should be handled.</li>
+<li>How many data points should be in the feed? If we are
+collecting a point every 12 seconds, do we want to just have 120
+seconds of data? Do we need a realtime feed an one that is
+decimated? And if decimated, what is the "best" algorithm? I hate
+systems where you can't find out the actual algorithm used (Ahem!
+You know who you are!)</li>
+<li>Does anything actually pay attention to the syndication flags?
+We definitely need to have these match the data window (see
+previous point)</li>
+<li>And lots of other issues that escape me right now...</li>
+</ol>
+And is there an easy way from pure python to serve up a WFS?<br />
+<br />
+Example output from the OGC validator:
+<pre>
+Validation for 'weather-short.xml':
+<!-- -->
+There were 3 validation errors:
+1) Line 16, Column 14 - bad character content for element
+2) Line 35, Column 70 - bad character content for element
+3) Line 40, Column 12 - unfinished element
+</pre>
+Remember that the example here is not meant to be a best practices
+example. The full xml: <a href=
+"../attachments/2010-03/weather-try1-georss.xml">
+weather-try1-georss.xml</a><br />
+<br />
+A shortened example with just one entry:
+<pre>
+<font color="#000000">01:</font> <b><font color=
+"#000080">&lt;?xml</font></b> <font color=
+"#009900">version</font><font color="#990000">=</font><font color=
+"#FF0000">"1.0"</font> <font color=
+"#009900">encoding</font><font color="#990000">=</font><font color=
+"#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b> 
+<font color="#000000">02:</font> <b><font color=
+"#0000FF">&lt;feed</font></b> <font color=
+"#009900">xmlns:dc</font><font color="#990000">=</font><font color=
+"#FF0000">"http://purl.org/dc/elements/1.1/"</font> 
+<font color="#000000">03:</font>   <font color=
+"#009900">xmlns:georss</font><font color=
+"#990000">=</font><font color=
+"#FF0000">"http://www.georss.org/georss"</font> 
+<font color="#000000">04:</font>   <font color=
+"#009900">xmlns:sy</font><font color="#990000">=</font><font color=
+"#FF0000">"http://purl.org/rss/1.0/modules/syndication/"</font>
+<font color="#000000">05:</font>   <font color=
+"#009900">xmlns</font><font color="#990000">=</font><font color=
+"#FF0000">"http://www.w3.org/2005/Atom"</font><b><font color=
+"#0000FF">&gt;</font></b>
+<font color="#000000">06:</font> 
+<font color="#000000">07:</font>   <b><font color=
+"#0000FF">&lt;sy:updatePeriod&gt;</font></b>hourly<b><font color=
+"#0000FF">&lt;/sy:updatePeriod&gt;</font></b>
+<font color="#000000">08:</font>   <b><font color=
+"#0000FF">&lt;sy:updateFrequency&gt;</font></b>60<b><font color=
+"#0000FF">&lt;/sy:updateFrequency&gt;</font></b>
+<font color="#000000">09:</font> 
+<font color="#000000">10:</font>   <b><font color=
+"#0000FF">&lt;title&gt;</font></b>Weather data from serial port<b><font color="#0000FF">&lt;/title&gt;</font></b>   
+<font color="#000000">11:</font>   <b><font color=
+"#0000FF">&lt;link</font></b> <font color=
+"#009900">href</font><font color="#990000">=</font><font color=
+"#FF0000">"http://sardine.ccom.nh:8080/weather-rss/weather-latest.georss"</font> <font color="#009900">rel</font><font color="#990000">=</font><font color="#FF0000">"self"</font><b><font color="#0000FF">/&gt;</font></b>
+<font color="#000000">12:</font>   <b><font color=
+"#0000FF">&lt;id&gt;</font></b>http://sardine.ccom.nh:8080/weather-rss/<b><font color="#0000FF">&lt;/id&gt;</font></b>   
+<font color="#000000">13:</font>   <b><font color=
+"#0000FF">&lt;updated&gt;&lt;/updated&gt;</font></b>
+<font color="#000000">14:</font>   <b><font color=
+"#0000FF">&lt;generator</font></b> <font color=
+"#009900">uri</font><font color="#990000">=</font><font color=
+"#FF0000">"http://schwehr.org/"</font><b><font color=
+"#0000FF">&gt;</font></b>Kurt Schwehr<b><font color=
+"#0000FF">&lt;/generator&gt;</font></b>
+<font color="#000000">15:</font> 
+<font color="#000000">16:</font>   <b><font color=
+"#0000FF">&lt;entry&gt;</font></b>
+<font color="#000000">17:</font>     <b><font color=
+"#0000FF">&lt;title&gt;</font></b>Weather read from serial port<b><font color="#0000FF">&lt;/title&gt;</font></b>
+<font color="#000000">18:</font>     <b><font color=
+"#0000FF">&lt;author&gt;</font></b>       
+<font color="#000000">19:</font>       <b><font color=
+"#0000FF">&lt;name&gt;</font></b>UNH CCOM<b><font color=
+"#0000FF">&lt;/name&gt;</font></b>
+<font color="#000000">20:</font>     <b><font color=
+"#0000FF">&lt;/author&gt;</font></b> 
+<font color="#000000">21:</font>     <b><font color=
+"#0000FF">&lt;georss:point&gt;</font></b>43.135947,-70.939432<b><font color="#0000FF">&lt;/georss:point&gt;</font></b>
+<font color="#000000">22:</font>     <b><font color=
+"#0000FF">&lt;link</font></b> <font color=
+"#009900">href</font><font color="#990000">=</font><font color=
+"#FF0000">"http://sardine.ccom.nh:8080"</font><b><font color=
+"#0000FF">/&gt;</font></b>
+23:     <b><font color=
+"#0000FF">&lt;published&gt;</font></b>2009-10-02T13:01:00Z2010-03-18T20:47:29Z<b><font color="#0000FF">&lt;/published&gt;</font></b>     
+24:     <b><font color=
+"#0000FF">&lt;content</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"html"</font><b><font color="#0000FF">&gt;</font></b>&lt;![CDATA[wind speed is 2.09, wind gust is 3.72, air temperature is 14.8
+25: ]]&gt;<b><font color="#0000FF">&lt;/content&gt;</font></b>
+26:   <b><font color="#0000FF">&lt;/entry&gt;</font></b>
+27:
+28: <b><font color="#0000FF">&lt;/feed&gt;</font></b>
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-19T14_19_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-22T22_22_17.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-18T15_32_12.txt" name=
+"e2010-03-18T15_32_12.txt"></a>
+<h2 class="date">03.18.2010 15:32</h2>
+<div class="blogbody">
+<h3 class="title">Simili plot of the CCOM weather station</h3>
+<div class="item-description">Chaoyi has put together a first draft
+weather display using the MIT <a href=
+"http://www.simile-widgets.org/timeline/">Simili Timeline</a>
+javascript library.<br />
+<br />
+<a href=
+"../attachments/2010-03/ccom-wx-timeline">CCOM
+weather station</a> in Timeline.<br />
+<br />
+<img title="CCOM wx station shown in timeline" withgrayborder=
+"True" src=
+"../attachments/2010-03/ccom-wx-timeline.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-18T15_32_12.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-19T14_19_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-17T17_29_50.txt" name=
+"e2010-03-17T17_29_50.txt"></a>
+<h2 class="date">03.17.2010 17:29</h2>
+<div class="blogbody">
+<h3 class="title">USCG - SOA and LRIT</h3>
+<div class="item-description">It's too bad that the USCG has to get
+into <a href="http://en.wikipedia.org/wiki/LRIT">Long Range
+Information and Tracking</a> (LRIT). Satellite based AIS (S-AIS)
+makes LRIT pretty much pointless. LRIT sends a message from each
+ship every 6 hours with very little information compared to AIS.
+LRIT gives nothing back to the mariner. Too bad the US signed the
+treaty. At least the cost of sending LRIT messages over satellite
+are not paid by the mariners or vessel operators. LRIT is a legal
+mess. AIS is just a public broadcast and much better for <a href=
+"http://en.wikipedia.org/wiki/Maritime_Domain_Awareness">Maritime
+Domain Awareness</a> (MDA).<br />
+<br />
+<b>US Coast Guard Launches SOA Initiative with Fiorano SOA
+Platform</b> [fcw.com - artical was removed from the website-
+<a href=
+"http://74.125.93.132/search?q=cache:bzjZpeI2daQJ:www.fcw.com/Articles/2009/04/17/Web-tracking-ships.aspx+%22lrit%22+site:fcw.com">
+Google Cache</a>]
+<pre>
+...
+One of the first projects implemented using the new infrastructure was
+its Long Range Identification Tracking (LRIT) system. Proposed by the
+USCG in the aftermath of 9/11 to enhance security, the Fiorano ESB
+powered LRIT system of the Coast Guard, helps track over 6,000 ships
+in US coastal waters, facilitating coastal security of America.
+...
+</pre>
+SOA is <a href=
+"http://en.wikipedia.org/wiki/Service-oriented_architecture">Service-oriented
+architecture</a>... using <a href=
+"http://en.wikipedia.org/wiki/Enterprise_service_bus">Enterprise
+Service Bus</a> (ESB).<br />
+<br />
+<a href=
+"http://fcw.com/articles/2009/04/17/web-tracking-ships.aspx?sc_lang=en">
+GAO urges review of ship-tracking plans</a> [FCW.com April 2009]
+This review is still inprogress: <a href=
+"http://www.gao.gov/products/GAO-09-337">Recommendations for
+Executive Action</a> GAO<br />
+<br />
+<pre>
+<b>Recommendation:</b> To ensure efficient and effective use of Coast
+Guard resources available for long-range vessel tracking, upon
+completion of the commercially provided long-range AIS concept
+demonstration and the national AIS strategy and after the cost of
+commercially provided long-range AIS information becomes known, the
+Commandant of the Coast Guard should determine the extent to which
+duplicate vessel-tracking information from LRIT and commercially
+provided long-range AIS is needed to accomplish Coast Guard missions,
+particularly in light of information already available through
+national technical means.
+<!-- -->
+<b>Agency Affected:</b> Department of Homeland Security: United States Coast
+Guard
+<!-- -->
+<b>Status:</b> In process
+<!-- -->
+<b>Comments:</b> When we confirm what actions the agency has taken in
+response to this recommendation, we will provide updated information.
+</pre>
+There is that phrase again... <i>national technical means</i>.
+Perhaps this is what they are implying by that phrase:<br />
+<br />
+From the <a href="http://www.gao.gov/new.items/d09337.pdf">Full GAO
+report</a> [58 pages]
+<pre>
+...
+AIS provides extensive information but its use is limited to larger
+vessels while radar and video cameras, sensors that are located in
+some ports, provide limited information but can pick up varied
+vessels. Additionally, cameras can be affected by environmental
+conditions, unlike AIS and radar.
+</pre>
+Note, that AIS can track any size vessel if they carry an AIS
+transceiver, the transceiver working/configured correctly, and
+there a receiver that can see the transmissions.<br />
+<br />
+If you read the fine print in the table, you will find that most of
+the information in the right hand column is coming from the Notice
+of Arrival (NOA). Let me summarize the table in my own way, with
+oldest technology of the left to newest on the right:<br />
+<br />
+<table border="1" cellspacing="0" cellpadding="6" rules="all"
+frame="all">
+<colgroup>
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" /></colgroup>
+<tbody>
+<tr>
+<td>NOA</td>
+<td>AIS</td>
+<td>LRIT</td>
+<td>Total Data Types</td>
+</tr>
+<tr>
+<td>11</td>
+<td>12</td>
+<td><b>3</b></td>
+<td>19</td>
+</tr>
+</tbody>
+</table>
+<br />
+<br />
+<img title="GOA comparing LRIT and AIS" withgrayborder="True" src=
+"../attachments/2010-03/lrit-vrs-ais-gao.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-17T17_29_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-18T15_32_12.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-17T09_04_08.txt" name=
+"e2010-03-17T09_04_08.txt"></a>
+<h2 class="date">03.17.2010 09:04</h2>
+<div class="blogbody">
+<h3 class="title">Spill of National Significance (SONS) drill next
+week</h3>
+<div class="item-description">Looks like I will be observing the
+SONS drill on Wednesday next week in Portland, ME. It will be great
+to see how ERMA and N-AIS are used in the drill.<br />
+<br />
+<a href="http://www.piersystem.com/go/doc/778/261958/">Portland
+chosen for nation's largest oil spill exercise</a> [USCG Mar 2009
+announcement]<br />
+<br />
+<a href="http://fpc.state.gov/137023.htm">Covering the Spill of
+National Significance (SONS) Exercise</a> [US Department of
+State]<br />
+<br />
+<a href=
+"http://www.seacoastonline.com/articles/20100317-NEWS-3170379">Major
+disaster drill planned at sea</a> [SeaCoastOnline]
+<pre>
+...
+"It's basically an oil spill that blackens the Northeast. It is
+significant and it involves a lot of people," said Coast Guard Chief
+Petty Officer Jeff Hall of the District 1 Coast Guard in Boston, which
+is leading the drill's coordination.
+...
+The exercise begins March 22 in Portland with two days of tabletop
+preparation. Ships will head out March 23 to approximate the accident
+and containment measures. The storm model used is actually the
+Patriots Day storm of April 2007, Hall said.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-17T09_04_08.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-17T17_29_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-11T11_30_04.txt" name=
+"e2010-03-11T11_30_04.txt"></a>
+<h2 class="date">03.11.2010 11:30</h2>
+<div class="blogbody">
+<h3 class="title">Another big quake in Chile</h3>
+<div class="item-description">Since I got asked where someone could
+find the seismogram of today's 7.2 (smaller than the 8.8, but still
+very big) quake in Chile, here is the record from a station in
+Chile that I found through <a href="http://iris.edu/">iris</a> and
+the <a href="http://rev.seis.sc.edu/earthquakes.html">Earthquake
+View</a>: <a href=
+"http://rev.seis.sc.edu/es/earthquakes/2010/03/11/14/39/48/stations/GT/PLCA">
+Station PLCA</a> in Argentina.<br />
+<br />
+<img title="Chile's 2nd big quake in the last couple days."
+withgrayborder="True" src=
+"../attachments/2010-03/chile-7.2-quake-20100311.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-11T11_30_04.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-17T09_04_08.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-09T13_57_15.txt" name=
+"e2010-03-09T13_57_15.txt"></a>
+<h2 class="date">03.09.2010 13:57</h2>
+<div class="blogbody">
+<h3 class="title">ABE lost over the weekend</h3>
+<div class="item-description">Art just sent me an email about the
+loss of a WHOI AUV: <a href=
+"http://www.whoi.edu/sbl/liteSite.do?litesiteid=4050">ABE</a> will
+be missed. But with all AUVs, the risk of loss is a part of the
+process. If you don't use them, then you will not loose `em.
+<a href=
+"http://www.whoi.edu/page.do?pid=7545&amp;tid=282&amp;cid=70487&amp;ct=162">
+News Release : Pioneering Deep-Sea Robot Lost at Sea</a> [WHOI.edu]
+<pre>
+The Autonomous Benthic Explorer, ABE, was lost at sea over the weekend,
+during a research cruise off the coast of Chile.  ABE was a pioneering
+deep-sea exploration robot&#226;&#196;&#238;one of the first successful submersible
+vehicles that was both unmanned and untethered to surface ships.
+...
+</pre>
+It's rough loosing an underwater vehicle, but we get over it and
+move on to the next great project with many lessons learned.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-09T13_57_15.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-11T11_30_04.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-09T09_48_56.txt" name=
+"e2010-03-09T09_48_56.txt"></a>
+<h2 class="date">03.09.2010 09:48</h2>
+<div class="blogbody">
+<h3 class="title">Unknown vessels are a pain</h3>
+<div class="item-description">Vessels like this are a real pain.
+Someone was out off of Boston for a whole day in 2008 with a
+miss-configured Class A AIS unit. Type 30 is a fishing vessel. This
+vessel is not listed in the FCC register. This mmsi is still
+floating around with a report on 2009-10-10 based on <a href=
+"http://mmsispace.com">MMSIspace</a>. However, this vessel still
+has no name, IMO or callsign.<br />
+<br />
+<table border="1" cellspacing="0" cellpadding="6" rules="all"
+frame="all">
+<colgroup>
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" />
+<col align="left" /></colgroup>
+<thead>
+<tr border="2">
+<th scope="col">MMSI</th>
+<th scope="col">IMOnum</th>
+<th scope="col">callsign</th>
+<th scope="col">name</th>
+<th scope="col">shiptype</th>
+<th scope="col">dimA</th>
+<th scope="col">dimB</th>
+<th scope="col">dimC</th>
+<th scope="col">dimD</th>
+<th scope="col">draught</th>
+<th scope="col">dest</th>
+<th scope="col">cg_r</th>
+<th scope="col">cg_timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>338078447</td>
+<td>0</td>
+<td>@@@@@</td>
+<td>@@@@@</td>
+<td>30</td>
+<td>6</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>@@@@</td>
+<td>r003669946</td>
+<td>2008-10-15 01:41:39</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-09T09_48_56.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-09T13_57_15.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-05T17_16_18.txt" name=
+"e2010-03-05T17_16_18.txt"></a>
+<h2 class="date">03.05.2010 17:16</h2>
+<div class="blogbody">
+<h3 class="title">Panoram display on the cheap</h3>
+<div class="item-description">Roland and Colin setup the panoram
+display in the vislab using 4 projectors. Roland got the display up
+using static panoramas, GigaPan, and <a href=
+"http://www.flightgear.org/">FlightGear</a>.<br />
+<br />
+<img title="Roland showing off the 4 projectors" withgrayborder=
+"True" src=
+"../attachments/2010-03/panoram-roland.jpg" /><br />
+
+<br />
+<img title="Roland at the controls" withgrayborder="True" src=
+"../attachments/2010-03/panoram-operating.jpg" />
+<br />
+<br />
+Being that flight gear is based on open source toolkits, there is a
+good chance that we can hook our AIS feed to this and drive the
+ships around to match actual traffic.<br />
+<br />
+<img title="" withgrayborder="True" src=
+"../attachments/2010-03/panoram-flightsim-ship.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-05T17_16_18.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-09T09_48_56.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-05T09_37_29.txt" name=
+"e2010-03-05T09_37_29.txt"></a>
+<h2 class="date">03.05.2010 09:37</h2>
+<div class="blogbody">
+<h3 class="title">Flash back to MER</h3>
+<div class="item-description">Accidentially ran into a great blog
+by <a href="http://marsandme.blogspot.com/">Scott Maxwell</a> who
+has posted about his experiences work on the Mars Exploration
+Rovers. Extra bonus that I appear in at least one of his posts. I
+was working so many hours during MER, that I barely remember any of
+it. 12-16 hour days were typical. Being able to read Scott's
+adventure through MER is a real treat for people who just like
+planetary exploration or robots and for those working on research
+for robots and planetary exploration.<br />
+<br />
+<a href=
+"http://marsandme.blogspot.com/2009/01/spirit-sol-13.html">Spirit
+Sol 13</a>
+<pre>
+...
+Just as I arrive, I meet Kurt Schwehr, who asks if RSVP can produce
+animations. Boy, do I have great timing. It turns out that Kurt
+intends to record RSVP simulating the pre-egress turn, so that they
+can show it at the press conference. At the moment, he doesn't need
+our new feature where we write our animation to a file -- he's under
+time pressure and just wants to use the existing animation features,
+and just needs a little help figuring them out -- but he's interested
+in the new stuff and wants to hear more about it. Score!
+...
+</pre>
+I spent a lot of time with RSVP on MER and even more on
+Phoenix.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-05T09_37_29.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-05T17_16_18.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2010-03-01T21_41_35.txt" name=
+"e2010-03-01T21_41_35.txt"></a>
+<h2 class="date">03.01.2010 21:41</h2>
+<div class="blogbody">
+<h3 class="title">IODP Expedition 318 - Antarctica week 5</h3>
+<div class="item-description"><object width="640" height=
+"385"><param name="movie" value=
+"http://www.youtube.com/v/uvzrK24YJyQ&amp;hl=en_US&amp;fs=1&amp;color1=0x006699&amp;color2=0x54abd6" />
+<param name="allowFullScreen" value="true" />
+<param name="allowscriptaccess" value="always" />
+<embed src=
+"http://www.youtube.com/v/uvzrK24YJyQ&amp;hl=en_US&amp;fs=1&amp;color1=0x006699&amp;color2=0x54abd6"
+type="application/x-shockwave-flash" allowscriptaccess="always"
+allowfullscreen="true" width="640" height="385" /></object></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2010-03.html#e2010-03-01T21_41_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2010-03-05T09_37_29.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">March 2010</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-01T21_41_35.txt">1</a></span></td>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-05T17_16_18.txt">5</a></span></td>
+<td align="center"><span class="calendar">6</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar">8</span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-09T13_57_15.txt">9</a></span></td>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-11T11_30_04.txt">11</a></span></td>
+<td align="center"><span class="calendar">12</span></td>
+<td align="center"><span class="calendar">13</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-17T17_29_50.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-18T15_32_12.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-19T14_19_48.txt">19</a></span></td>
+<td align="center"><span class="calendar">20</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-22T22_22_17.txt">22</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-23T20_56_45.txt">23</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-24T15_01_26.txt">24</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-25T19_00_16.txt">25</a></span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar">27</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-28T18_36_59.txt">28</a></span></td>
+<td align="center"><span class="calendar">29</span></td>
+<td align="center"><span class="calendar">30</span></td>
+<td align="center"><span class="calendar"><a href=
+"2010-03.html#e2010-03-31T15_26_52.txt">31</a></span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

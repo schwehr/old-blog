@@ -1,0 +1,35 @@
+TITLE: Any easy way to decode AIS with gpsd (no python)
+AUTHOR: Kurt
+DATE: 01.20.2010 17:55
+DESC: great possibilities
+-----
+BODY:
+I didn't catch if Aaron or Dane pointed this out, but it's a great
+tool.  GPSd has a command line tool called <b>gpsdecode</b> that knows
+about AIS as of GPSd version 2.90.  Here I am using a svn trunk copy
+from yesterday.  gpsdecode can output JSON, so importing the data to a
+variet of tools should be fairly easy.  First some sample data from today:
+
+<pre><b>grep AIVDM gall-2010-01-20 | head -10 | tail -4</b>
+!AIVDM,1,1,,A,152JPuOP00JvJ8nHvW`0j?v020Sn,0*55,d-053,S2239,t235959.00,T59.70994503,r01SSSP1,1263945603
+!AIVDM,2,1,3,A,59NS7F@2=bJl7PHC:204i85:222222222222221AE`P,0*46,d-107,S2093,t235955.00,T55.82982737,r003669959,1263945597
+!AIVDM,2,2,3,A,G94N@0E@DVQEp;hC1iDR@H888880,2*4E,d-107,S2093,t235955.00,T55.82982737,r003669959,1263945597
+!AIVDM,1,1,,A,19NRpnh00SJq:;&lt;GkkNm?4Al0@QF,0*34,d-108,S2096,t235955.00,T55.90987913,r003669959,1263945597</pre>
+That should be a msg 1, msg 5 (that covers two parts), and a msg 1.
+
+Then decoding... a message 14 appears that should not be there, but
+the shipdata msg 5 is not.  Hopefully, this will give me a chance to
+contribute to Eric S. Raymond's (ESR) hard work adding AIS to GPSd
+(thanks Eric!)
+<pre><b>grep AIVDM gall-2010-01-20 | head -10 | tail -4 | gpsdecode -j | grep class</b>
+{"class":"AIS","type":1,"repeat":0,"mmsi":338075893,"scaled":true,
+ "status":"Not defined","turn":"nan","speed":0.0,"accuracy":false,
+ "lon":-70.2528,"lat":43.6530,"course":200,"heading":511,"second":0,
+ "maneuver":0,"raim":true,"radio":4588}
+{"class":"AIS","type":14,"repeat":1,"mmsi":223232012,"scaled":true,
+ "text":"L#X3NSP5MS$7CPBAR               TUZHE2QG$"}
+{"class":"AIS","type":1,"repeat":0,"mmsi":636008667,"scaled":true,
+ "status":"Under way using engine","turn":0,"speed":3.5,"accuracy":false,
+ "lon":-71.3995,"lat":41.6100,"course":1340,"heading":136,"second":58,
+ "maneuver":0,"raim":false,"radio":135340}</pre>
+-----

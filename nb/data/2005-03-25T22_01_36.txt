@@ -1,0 +1,44 @@
+TITLE: Makefile for pmag
+AUTHOR: Kurt
+DATE: 03.25.2005 22:01
+DESC: simple tar distribution Make rule
+-----
+BODY:
+Just ran into Lisa's new pmag-1.8.4. I realized that I had not made a
+nice make rule to build a tar without obj, executable, and tmp files.
+So I wrote up something quickly this evening:
+<pre>
+<strong>VERSION </strong>:</font>= <font color="2040a0">${shell cat VERSION}</font>
+<font color="2040a0">BASE    :=</font> /tmp/pmag-<font color="2040a0">${VERSION}</font>
+<font color="8b2252"><strong>tar</strong>:</font>
+	@echo
+	@echo &quot;   *** Building pmage release: <font color="2040a0">${VERSION}</font>  ***&quot;
+	@echo
+	rm -rf <font color="2040a0">${BASE}</font>.tar* <font color="2040a0">${BASE}</font>
+	mkdir /tmp/pmag-<font color="2040a0">${VERSION}</font>
+	(cd .. &amp;&amp;  cp -rp * <font color="2040a0">${BASE}</font>)
+	@echo
+	@echo &quot;Cleaning up the copy of the tree in <font color="2040a0">${BASE}</font>&quot;
+	rm -f <font color="2040a0">${BASE}</font>/bin/*
+	find <font color="2040a0">${BASE}</font> -name mypost\* | xargs rm -f 
+	find <font color="2040a0">${BASE}</font> -name .DS_Store | xargs rm -f 
+	find <font color="2040a0">${BASE}</font> -name fort\* | xargs rm -f 
+	find <font color="2040a0">${BASE}</font> -name core | xargs rm -f 
+	find <font color="2040a0">${BASE}</font> -name \*.bak | xargs rm -f 
+	(cd <font color="2040a0">${BASE}</font>/src &amp;&amp; make clean)
+	@echo
+	@echo &quot;Building the package&quot;
+	(cd <font color="2040a0">${BASE}</font>/.. &amp;&amp; tar cf pmag-<font color="2040a0">${VERSION}</font>.tar pmag-<font color="2040a0">${VERSION}</font>)
+	bzip2 -9 <font color="2040a0">${BASE}</font>.tar
+	@echo
+	@echo &quot;Done.  Cleaning up.&quot;
+	@echo
+	rm -rf <font color="2040a0">${BASE}</font>
+	@echo
+	mv <font color="2040a0">${BASE}</font>.tar.bz2 .
+	@echo
+	@echo &quot;Your tar is now available as pmag-<font color="2040a0">${VERSION}</font>.tar.bz2&quot;
+	@echo
+	@echo &quot;Remember to email Kurt to update the fink info file&quot;
+</pre>
+-----

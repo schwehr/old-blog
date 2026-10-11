@@ -1,0 +1,53 @@
+TITLE: How to check out a svn project from Eclipse
+AUTHOR: Kurt
+DATE: 08.20.2007 11:32
+DESC: hope this helps
+-----
+BODY:
+The initial task of checking out an existing project from svn for use
+in Eclipse is a little overwhelming.  I had to ask for help a couple
+time to get to this point.  Here is how I did it, but unless you are a
+CCOM person, you will have to use a different svn tree.  This is on a
+Mac running 10.4 with eclipse 3.3.0 configured how I discribed last
+month.
+
+First, we need to have python 2.5 and pylint installed.  Use fink:
+<pre>fink selfupdate && fink install pylint-py25-bin</pre>
+Now configure pydev:
+<pre>
+Eclipse - Preferences
+   Pydev
+     Interpreter - Python
+       "New..." to the right of Python interpreters
+           Harddisk /sw/bin/python2.5
+     Pylint
+         check use pylint
+	 location of pylint (lint.py)
+             /sw/bin/pylint
+   OK... takes about 30 seconds
+</pre>
+Now you need to open the repository for browsing:
+<pre>
+Window - Open Perspective
+  SVN Repository Exploring
+Right click in the SVN Repository
+   New - Repository Location
+      Url: https://cowfish.unh.edu/projects/schwehr/trunk/src/noaadata/
+</pre>
+Now you should see your repository.  Check it out.
+
+<img src="http://schwehr.org/blog/attachments/2007-08/eclipse-svn-checkout.png">
+<pre>
+Right click on the url in "SVN Repository..."
+   Checkout
+       Wizard
+          pydev
+	      pydev project
+	          project name: noaadata
+       		  Choose project type: python 2.5
+		  Uncheck create default src
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-08/eclipse-pydev.png">
+
+<img src="http://schwehr.org/blog/attachments/2007-08/eclipse-checkedout.png">
+-----

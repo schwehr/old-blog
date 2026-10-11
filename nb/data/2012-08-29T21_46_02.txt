@@ -1,0 +1,40 @@
+TITLE: Hacking on mb-system
+AUTHOR: Kurt
+DATE: 08.29.2012 21:46
+DESC: finally actually working on the mb-system code base
+-----
+BODY:
+I needed a bit of a change of pace for a little while, so I started
+working on my git clone of MB-system (multibeam sonar echo sounder
+processing software).  I've created an instance of the
+install_template Makefiles, got it building on my mac, and then
+removed libgsf.  I used emacs and git to really attack the code.  
+There are still GSF vestiges in the code that I need to remove (e.g. 
+MB_DATA_SUMMARY), but these will take more thought to make sure I'm removing
+the right code.  Some of the command that I ran: (grep's were with M-x grep in emacs).
+<pre><b># WARNING: this is an approximation</b>
+git clone git@github.com:schwehr/mb-system.git
+cd mb-system
+git checkout -b macosx_build # create a branch and go into it
+git branch # make sure I am in the branch
+perl -pi.bak -e  's|\@FINKPREFIX\@|/sw|g' install_makefiles # fixes the gmt error below
+./install_makefiles -Pmacosxfink
+make -j 4
+# fiddle a bit till it was ready to commit
+git checkout install_makefiles # drop the changes to this file
+git -a Makefile */Makefile */*/Makefile
+git commit -m "path tweaks by install_makefiles"
+git checkout -b rm_gsf # branch off of the first branch
+cd src
+git rm -r gsf
+find . -name "*.[ch]" | xargs egrep -i 'mb_data_summary|gsf'
+grep -nH -i -e gsf */Makefile */*/Makefile
+# Lots of hacking
+make -j5  # yup.  compiles!
+git commit -a -m "gsf does not have a license"
+git checkout master
+# edit .gitignore
+git commit -a -m "ignore more"
+git push --all # push master and all branches back to github</pre>
+<img width="542" height="321" title="MB-System github graph" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-08/mbsystem-hacking.png"/>
+-----

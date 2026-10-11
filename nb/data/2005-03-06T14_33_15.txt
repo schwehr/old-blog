@@ -1,0 +1,66 @@
+TITLE: afdemag components
+AUTHOR: Kurt
+DATE: 03.06.2005 14:33
+DESC: thoughts on db design
+-----
+BODY:
+I have being trying to think about how to handle components that I
+pick from the AF demag data that I have been collecting.  My first
+thought was a table that has each sample as a row and fill in as many
+components as I need up to some maximum with each component typed to
+be fit with a line, plane, or both.  A line is just a directional
+point on a stereonet, while a plane is an arc on a stereonet.  The
+following samples are hypothetical.
+<pre>
+  s = start, Indx = index, Trmt = treatment level
+
+  samplename type1 s1Indx s1Trmt e1Indx e1Trmt type2 s2Indx s2Trmt e2Indx e2Trmt
+
+  1gws2-030  line  1      5.0    4      15.0   plane 5      20     9      60
+  1gws2-033  both  0      0.0    5      20.0   line  3      10     10     80
+</pre>
+You can see from the example above that it is possible to have
+overlapping definitions.  However, it is hard to parse this table and
+I am limited by the number of components that I want to look at.  The
+alternative is to waste a lot of space and allow many components.
+Instead, I am liking an alternative treatment table:
+<pre>
+  samplename trmtIdNum type startIndx startTrmt endIndx endTrmt
+  1gws2-030  0         line   1          5.0       4      15.0
+  1gws2-030  1         plane  5         20.0       9      60.0
+  1gws2-030  2         line   0          0.0      -1      -1.0
+</pre>
+The last line would be fit a line (aka direction) to all of the
+samples from sample 1gws2-030.
+
+Then comes the issue of how to get this data into my sqlite database.
+I am leaning towards a new style that uses python code to store the
+data in a list.  If I keep it simple, I will be readable by other
+programming languages with a little bit of parsing, but not too much.
+If I specify both the index and the treatment, then hopefully I can
+double check and catch typos.  Maybe something like this:
+<pre>
+  tKeys=('er_specimen_name','trmtIdNum','type','startIndx','startTrmt','endIndx','endTrmt');
+  t=[]
+  t.append(('1gws2-030', 0, 'line',  1,   5.0,  4,  15.0))
+  t.append(('1gws2-030', 1, 'plane', 5,  20.0,  9,  60.0))
+  t.append(('1gws2-030', 2, 'line',  0,   0.0, -1,  -1.0))
+</pre>
+Note that I did not use the full sample name convention for my
+samples.  I would normally call 1gws2-030
+<pre>
+    bp04-1gw-s2-030
+</pre>
+
+<b>UPDATE:</b>
+
+Looking at Lisa's zeqplot_magic.py, it looks like the names for the
+fields above are:
+<pre>
+  measurement_step_min
+  measurement_step_max
+  specimen_calculation_type = l or p (but I will make them line or plane)
+  er_specimen_name
+  specimen_comp_name
+</pre>
+-----

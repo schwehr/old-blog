@@ -1,0 +1,24 @@
+TITLE: grace for data exploration
+AUTHOR: Kurt
+DATE: 11.06.2008 08:06
+DESC: troubles with date
+-----
+BODY:
+I've been trying to find a good data exploration tool for 2D plots.
+There are lots of options and I just tried another one that Jeff Gee
+introduced me to back in 2002 or so: <a href="http://plasma-gate.weizmann.ac.il/Grace/">Grace</a>.  
+
+I've got data that is time based.  It's a waterlevel pressure sensor
+that logs the time and water level in UNIX UTC seconds.  In python I
+convert the timestamps to be ISO 8601 dates for Grace:
+<pre>a_datetime = datetime.datetime.utcfromtimestamp(timestamp)
+a_datetime.strftime('%Y-%m-%dT%H:%M:%S') # ISO 8601</pre>
+Running grace in the GUI mode like this brings up the data:
+<pre>% <b>fink install grace</b>
+% <b>xmgrace event.dat</b></pre>
+I then see this.  I am not sure how to change the x-axis into
+something friendlier.  I added the circle in photoshop to highlight
+the data that I am trying to explore.
+
+<img title="water level event on Oct 28/29th in ME" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-11/grace-event.png"/>
+-----

@@ -1,0 +1,46 @@
+TITLE: offsetting a line until it matches the bathymetry
+AUTHOR: Kurt
+DATE: 10.03.2005 18:24
+DESC: Looks like a good match
+-----
+BODY:
+I am now able to shift the water bottom pick (wbt) to match fairly
+closely to the EM1000 multibeam/swath sonar geometry.  The EM1000 is
+hull mounted so there is no issue of wire out.
+
+In the figure, the red saw toothed (jaggly) line is from the EM1000
+data.  The green dashed line is the water bottom pick with a 143 meter
+fish depth.  Finally the blue is my best match of the chirp's water
+bottom to the EM1000 by shifting the data back to the left and up.
+
+<img src="http://schwehr.org/blog/attachments/2005-10/wbt-good-fit.gif">
+ 
+<pre>
+offset.py -i wbt.db.raw -p 750 -V '12.' > test.dat
+
+# Make a dashed line: 60 shots on, 60 off - blank line in between
+decimate.py -B -l 60 -L 60 wbt.db.raw > orig.skip
+
+gnuplot> set xlabel 'traceNumber'
+gnuplot> set ylabel 'altitude(m)'
+
+gnuplot> plot 'track.xyz' using 3 with l title 'track.xyz EM1000', \
+  'orig.skip' using 1:2 with l title 'orig.skip from wbt.db.raw', \
+  'test.dat' with l title 'test.dat w/ shift'
+</pre>
+On the right, the green and blue lines start really diverging from the
+sea floor on the turn as the fish goes up and down in the water
+column.  Here is looks like up in the water.  Perhaps they speed up
+for the turn or winched in.  I haven't looked at the header info and
+plots to see which.  This starts about traceNumber 12000.  Note that
+traceNumber is not related to Shotnumber.  traceNumber is just the
+offset for a trace from the beginning of the current SEG-Y file.
+
+This graph shows that the fish is approximately 750 traces
+behind the GPS.  In an xstar file, there are two traces for every
+shot, so the fish lags by 375 shots.
+
+<b>Update:</b> The winch only has something like 400 meters of wire,
+so there is no way that I have the right offset in this example, but
+the idea still seems right.  I must have miss matched the bumps.
+-----

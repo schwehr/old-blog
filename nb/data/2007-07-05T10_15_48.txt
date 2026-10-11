@@ -1,0 +1,49 @@
+TITLE: IBM Dev Works on Unattended Data Logging Scripts
+AUTHOR: Kurt
+DATE: 07.05.2007 10:15
+DESC: very helpful
+-----
+BODY:
+Val forwarded this on to me and it couldn't be more timely...
+
+<a href="http://www.ibm.com/developerworks/aix/library/au-satbuildscript.html">	System Administration Toolkit: Build intelligent, unattended scripts</a> [ibm developerworks</a>
+
+This article is about sh scripts for AIX but applies equally well to
+Linux systems and bash.  I have no idea what the default shell on AIX
+might be these days but it might be one of the ksh or zsh shells that 
+are not too different).
+
+An example of one of the listings:
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+<font color="#2040a0">LOGFILE</font>=/tmp/$$.log
+<font color="#2040a0">ERRFILE</font>=/tmp/$$.err
+<font color="#2040a0">ERRORFMT</font>=/tmp/$$.fmt
+<font color="#FF8800">#</font>
+{
+    set -e
+   <font color="#FF8800"> #</font>
+    cd /shared
+    rsync --delete --recursive . /backups/shared
+   <font color="#FF8800"> #</font>
+    cd /etc
+    rsync --delete --recursive . /backups/etc
+} &gt;<font color="#2040a0">$LOGFILE</font> 2&gt;<font color="#2040a0">$ERRFILE</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800">#</font>
+{
+    echo <font color="#008000">&quot;Reported output&quot;</font>
+    echo
+    cat /tmp/$$.log
+    echo <font color="#008000">&quot;Error output&quot;</font>
+    echo
+    cat /tmp/$$.err
+} &gt;<font color="#2040a0">$ERRORFMT</font> 2&gt;&amp;1
+<font color="#FF8800">#</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800">#</font>
+mailx -s 'Log output for backup' root &lt;<font color="#2040a0">$ERRORFMT</font>
+rm -f <font color="#2040a0">$LOGFILE</font> <font color="#2040a0">$ERRFILE</font> <font color="#2040a0">$ERRORFMT</font>
+</pre>
+-----

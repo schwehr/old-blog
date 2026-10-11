@@ -1,0 +1,33 @@
+TITLE: Time Machine excludes
+AUTHOR: Kurt
+DATE: 05.28.2010 09:00
+DESC: life savers
+-----
+BODY:
+Managing backups is always a tricky thing.  I really miss having AFS
+as my primary home filesystem.  I don't think it would work with my
+current laptop situation, but it was so nice to have the ability to go
+get accidentally deleted files from yesterday's backup without having
+to talk to an admin.  I created the equivalent at SIO with a 2nd
+Solaris 8 server doing rsync 2x per week and mounting the copy back
+read only.  I've been missing that until I got time machine up again.
+We have corporate offsite backups with EMC Networker (when it isn't
+being grouchy), but I could neither see the backup status nor easily
+grab or diff a file from EMC's system.  If the tape was already
+offsite, it becomes a major hassle.  Also, we really want to know what
+changes when Networker breaks.  So, I setup a time machine drive to
+backup my desktop.  The problem is that I have a 0.5TB USB drive
+backing up a 2TB internal drive.  What to do?  Well, networker really
+can not handle large churn in files, so I have already worked with our
+IT guy Will to have our Macs setup with /nobackup as a place for
+temporary files to go without triggering backup.  I typically have .2
+to 1.5 TB of data at any one time in that area and that can turn over
+day-to-day as I process data.  So, I just added that and the fink
+areas to the nobackup area.  I am thinking of putting /sw32 back into
+the backup pool as that removes the /sw32/var areas that contain
+things like PostgreSQL data.  I definitely want that backed up.  From
+System Preferences, select Time Machine and then Options. 
+
+<img title="Time Machine Excludes" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-05/timemachine-excludes.png"/>
+-----

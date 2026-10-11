@@ -1,0 +1,152 @@
+TITLE: xslt for ais
+AUTHOR: Kurt
+DATE: 09.28.2006 15:44
+DESC: nice
+-----
+BODY:
+I finally had to give XSLT a try and I am using my prototype XML
+language for the AIS binary messages (6 and 8).  The initial results
+are fantastic.  First, here is a stripped down message in XML format.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;utf-8&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+ <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml-stylesheet</font> <font color="#2040a0">type=</font><font color="#008000">&quot;text/xsl&quot;</font> <font color="#2040a0">href=</font><font color="#008000">&quot;ais.xsl&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font> 
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ais-binary-message</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">message</font> <font color="#2040a0">name=</font><font color="#008000">&quot;waterlevel&quot;</font> <font color="#2040a0">aismsgnum=</font><font color="#008000">&quot;8&quot;</font> <font color="#2040a0">dac=</font><font color="#008000">&quot;366&quot;</font> <font color="#2040a0">fid=</font><font color="#008000">&quot;63&quot;</font> <font color="#2040a0">efid=</font><font color="#008000">&quot;1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Water level report.  In this case from the NOAA Co-Ops 6 minute raw data<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Prototype only for the Hampton Roads/Elizabeth River 2007 demonstration project<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">see-also</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>http://opendap.co-ops.nos.noaa.gov/axis/<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/see-also</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;dac&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;16&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;uint&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Designated Area Code<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">required</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>366<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/required</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;fid&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;4&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;uint&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Functional Identifier<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">required</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>1<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/required</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;efid&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;12&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;uint&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>extended functional identifier<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">required</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>12<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/required</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;stationid&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;6&quot;</font> <font color="#2040a0">arraylength=</font><font color="#008000">&quot;7&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;aisstr6&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Character identifier of the station.  Usually a number.<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>station name should be taken from an external lookup table based on stationid<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">unavailable</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>@@@@@@@<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/unavailable</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;waterlevel&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;16&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;sdecimal&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Water level in centimeters<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">unavailable</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>-32768<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/unavailable</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;sigma&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;32&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;float&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Standard deviation of 1 second samples used to compute the water level height<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>could easily be make a more compact decimal<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">units</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>m<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/units</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">name=</font><font color="#008000">&quot;link_down&quot;</font> <font color="#2040a0">numberofbits=</font><font color="#008000">&quot;1&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;bool&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Unable to communicate with the tide system.  All data invalid<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/field</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/message</font><font color="4444FF"><strong>&gt;</strong></font></strong></font> <font color="#444444">&lt;!-- waterlevel --&gt;</font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ais-binary-message</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+That is not the most fun to read.  I then started to read the XSLT
+tutorial here:<a
+href="http://www.w3schools.com/xsl/xsl_value_of.asp">XSLT at
+w3schools.com</a>.  My first example stylesheet looks like this.  Note that I added a line to the above xml to use this stylessheet transformation.  ais.xsl:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;ISO-8859-1&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:stylesheet</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">xmlns:xsl=</font><font color="#008000">&quot;http://www.w3.org/1999/XSL/Transform&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:template</font> <font color="#2040a0">match=</font><font color="#008000">&quot;/&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">html</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">h2</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>AIS Message<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/h2</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">table</font> <font color="#2040a0">border=</font><font color="#008000">&quot;1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">tr</font> <font color="#2040a0">bgcolor=</font><font color="#008000">&quot;#9acd32&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">th</font> <font color="#2040a0">align=</font><font color="#008000">&quot;left&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Name<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/th</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">th</font> <font color="#2040a0">align=</font><font color="#008000">&quot;left&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>NumberOfBits<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/th</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">th</font> <font color="#2040a0">align=</font><font color="#008000">&quot;left&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>ArrayLength<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/th</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">th</font> <font color="#2040a0">align=</font><font color="#008000">&quot;left&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Type<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/th</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">th</font> <font color="#2040a0">align=</font><font color="#008000">&quot;left&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Description<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/th</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/tr</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:for-each</font> <font color="#2040a0">select=</font><font color="#008000">&quot;ais-binary-message/message/field&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">tr</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:value-of</font> <font color="#2040a0">select=</font><font color="#008000">&quot;@name&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:value-of</font> <font color="#2040a0">select=</font><font color="#008000">&quot;@numberofbits&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:value-of</font> <font color="#2040a0">select=</font><font color="#008000">&quot;@arraylength&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:value-of</font> <font color="#2040a0">select=</font><font color="#008000">&quot;@type&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsl:value-of</font> <font color="#2040a0">select=</font><font color="#008000">&quot;description&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/td</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/tr</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsl:for-each</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/table</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/html</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsl:template</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsl:stylesheet</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+To first look at the results, I just loaded the file into firefox.
+Then when it came to writing this up, I used
+<pre>xsltproc waterlevel.xml &gt; waterlevel.xml</pre>
+Here are the very nice looking results.  Hopefully the nanoblogger css does
+not mess with the look.
+<h2>AIS Message</h2>
+<br>
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>dac</td>
+<td>16</td>
+<td></td>
+<td>uint</td>
+<td>Designated Area Code</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td>Functional Identifier</td>
+</tr>
+<tr>
+<td>efid</td>
+<td>12</td>
+<td></td>
+<td>uint</td>
+<td>extended functional identifier</td>
+</tr>
+<tr>
+<td>stationid</td>
+<td>6</td>
+<td>7</td>
+<td>aisstr6</td>
+<td>Character identifier of the station.  Usually a number.</td>
+</tr>
+<tr>
+<td>waterlevel</td>
+<td>16</td>
+<td></td>
+<td>sdecimal</td>
+<td>Water level in centimeters</td>
+</tr>
+<tr>
+<td>sigma</td>
+<td>32</td>
+<td></td>
+<td>float</td>
+<td>Standard deviation of 1 second samples used to compute the water level height</td>
+</tr>
+<tr>
+<td>link_down</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td>Unable to communicate with the tide system.  All data invalid</td>
+</tr>
+</table>
+
+-----

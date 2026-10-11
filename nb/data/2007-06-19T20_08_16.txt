@@ -1,0 +1,28 @@
+TITLE: Counting distinct entries in a SQL table
+AUTHOR: Kurt
+DATE: 06.19.2007 20:08
+DESC: tricks are tricky
+-----
+BODY:
+While working over in Morse Hall today I learn a great SQL trick.
+This command counts the number of items of each value for a table.
+<pre>sqlite3 2007-05.db3
+SQLite version 3.3.12
+Enter ".help" for instructions
+sqlite&gt; <b>SELECT shipandcargo,count(*) FROM shipdata GROUP BY shipandcargo;</b>
+80|3
+81|2
+90|53</pre>
+Which leads me to realize that the following two commands are identical.
+<pre>sqlite&gt; <b>SELECT UserID FROM shipdata GROUP BY UserID</b> ORDER BY UserID;
+220396000
+338029917
+538001583
+636012377
+sqlite&gt; <b>SELECT DISTINCT(UserID) FROM shipdata</b> ORDER BY UserID;
+220396000
+338029917
+538001583
+636012377</pre>
+Now which one is faster?
+-----

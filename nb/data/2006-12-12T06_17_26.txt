@@ -1,0 +1,48 @@
+TITLE: case of the letters in the python hex function
+AUTHOR: Kurt
+DATE: 12.12.2006 06:17
+DESC: trouble in python city
+-----
+BODY:
+I reported a bug in the python <a href="http://cobweb.ecn.purdue.edu/~kak/dist/">BitVector</a> class a couple weeks ago and
+now that classes are finish, Avi has gotten back to me with the cause
+and patch.  Thanks Avi!
+<pre>
+  Please replace line (A37) by
+        hexVal = hex( intVal ).lower().rstrip('l')          #(A37)
+</pre>
+The bug occurs when I try to make BitVectors of very large integers
+(greater than int(2**31-1) ... 2147483647).  BitVector would throw an
+exception.
+<pre>
+BitVector(intVal=3000000000)
+==================================================
+exceptions.KeyError                                  Traceback (most recent call last)
+
+/sw/lib/python2.4/site-packages/BitVector.py in __init__(self, *args, **kwargs)
+    602                 bitlist = []                                 #(A41)
+    603                 for item in hexVal[:]:                       #(A42)
+==&gt; 604                     bitlist += _hexdict[item][:]             #(A43)
+    605                 bitlist =  map( lambda x: int(x), bitlist )  #(A44)
+    606                 i = 0                                        #(A45)
+</pre>
+The problem stems from the hex function as Avi found.  The case of
+A..F is different between integers less than 2**31.  Lower below and
+upper above in python 2.4:
+<pre>
+ipython2.4
+In [1]:  print hex(300000000)
+0x11e1a300
+In [2]:  print hex(3000000000)
+0xB2D05E00L
+</pre>
+When I try python 2.5, I see different behavior (which I think is more
+correct):
+<pre>
+ipython2.5
+In [1]: print hex(300000000)
+0x11e1a300
+In [2]: print hex(3000000000)
+0xb2d05e00L
+</pre>
+-----

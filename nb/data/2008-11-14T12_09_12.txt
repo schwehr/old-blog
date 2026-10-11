@@ -1,0 +1,59 @@
+TITLE: spidering a disk
+AUTHOR: Kurt
+DATE: 11.14.2008 12:09
+DESC: getting there
+-----
+BODY:
+I've been thinking about how to best spider a disk.  In python, there
+is the os.path command.  Combining that with the file python interface,
+we get the beginnings of a spider utility.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sys
+<b><font color="#000080">import</font></b> os<font color="#990000">.</font>path
+<b><font color="#000080">import</font></b> magic
+<!-- -->
+ms <font color="#990000">=</font> magic<font color="#990000">.</font><b><font color="#000000">open</font></b><font color="#990000">(</font>magic<font color="#990000">.</font>MAGIC_NONE<font color="#990000">)</font>
+ms<font color="#990000">.</font><b><font color="#000000">load</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">visit</font></b><font color="#990000">(</font>arg<font color="#990000">,</font> dirname<font color="#990000">,</font> names<font color="#990000">):</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">' '</font><font color="#990000">,</font>dirname
+    <b><font color="#0000FF">for</font></b> name <b><font color="#0000FF">in</font></b> names<font color="#990000">:</font>
+        file_type <font color="#990000">=</font> ms<font color="#990000">.</font><b><font color="#000000">file</font></b><font color="#990000">(</font>dirname<font color="#990000">+</font><font color="#FF0000">'/'</font><font color="#990000">+</font>name<font color="#990000">)</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">' '</font><font color="#990000">,</font>name<font color="#990000">,</font>file_type
+<!-- -->
+os<font color="#990000">.</font>path<font color="#990000">.</font><b><font color="#000000">walk</font></b><font color="#990000">(</font><font color="#FF0000">'.'</font><font color="#990000">,</font> visit<font color="#990000">,</font> <font color="#FF0000">'arg'</font><font color="#990000">)</font></tt></pre>
+This is similar to this shell command:
+<pre>% <b>find . | xargs file</b></pre>
+The above spider.py outputs something like this (but won't yet work on windows due to '/'):
+<pre>% <b>spider.py</b>
+ == . ==
+    acinclude.m4 ASCII M4 macro language pre-processor text
+    aclocal.m4 ASCII English text, with very long lines
+    AUTHORS ASCII text, with no line terminators
+    ChangeLog ISO-8859 English text
+    config.guess POSIX shell script text executable
+ == ./doc ==
+    file.man troff or preprocessor input text
+    libmagic.man troff or preprocessor input text
+    magic.man troff or preprocessor input text
+    Makefile.am ASCII text
+    Makefile.in ASCII English text
+ == ./magic ==
+    Header magic text file for file(1) cmd
+    Localstuff ASCII text
+    Magdir directory
+    Makefile.am ASCII English text
+    Makefile.in ASCII English text
+ == ./magic/Magdir ==
+    acorn ASCII English text
+    adi ASCII text
+    adventure ASCII English text
+    allegro ASCII text
+    alliant ASCII English text
+ == ./python ==
+    example.py ASCII Java program text
+    Makefile.am ASCII text
+    Makefile.in ASCII English text
+    py_magic.c ASCII C program text
+    py_magic.h ASCII C program text</pre>
+-----

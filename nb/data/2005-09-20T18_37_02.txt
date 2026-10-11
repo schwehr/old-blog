@@ -1,0 +1,49 @@
+TITLE: pygps, nmea-py, gps-py, pynmea
+AUTHOR: Kurt
+DATE: 09.20.2005 18:37
+DESC: global positioning system stuff in python
+-----
+BODY:
+<a href="http://en.wikipedia.org/wiki/NMEA">Wikipedia NMEA</a>
+
+I took a look in pygps and it looks a little different than what I was
+hoping.  What I was looking for was a solid library for talking to GPS
+data.  pygps does more and less.  It has a graphical interface which
+is more and it has minimal coverage of NMEA strings.
+
+<a
+href="http://gpsd.berlios.de/NMEA.txt">http://gpsd.berlios.de/NMEA.txt</a>
+has an excellent description of all the NMEA strings.
+
+The eventually I would like to extend this to cover AIS.
+
+FINK-TODO: <a href="http://gpsd.berlios.de/">gpsd</a>
+
+How would you define a NMEA library for GPS?
+
+My initial thoughts were a class that detects which message is in a
+string, calls a class method to convert the data to a dictionary with
+the name of the field as each key with the value from the string.
+This would do no translation or interpretation.  Coordinate transforms
+are up to you (using something like pyproj).
+
+Then we start adding some lookup tables for some of the enumerated
+values mean.  For example, GGA (Global Positioning System Fix Data)
+has field 6 for the GPS Quality indicator.  nmea-py should have a
+dictionary for converting the values like this:
+<pre>
+gpsQuality = {
+0: "fix not available",
+1: "GPS fix",
+2: "Differential GPS fix",
+3: "PPS fix",  # What does that mean?
+...
+}
+</pre>
+Then a separate module could be written that knows how to command each
+vendors GPS units doing things like uploading way points, commanding
+baud rates, modes, etc.
+
+Looks like the 'd' key on my keyboard is getting weak, my apologies
+for missing 'd' letters.
+-----

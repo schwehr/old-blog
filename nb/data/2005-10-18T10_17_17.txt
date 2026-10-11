@@ -1,0 +1,75 @@
+TITLE: mix and match agfm
+AUTHOR: Kurt
+DATE: 10.18.2005 10:17
+DESC: agfm.py and hystcrunch
+-----
+BODY:
+I don't really trust my agfm program correctly calcuate hysteresis
+parameters, so I am using Lisa's hystcrunch, but using agfm.py to
+flatten the curves.  I have converted my Makefile into a bash script here.
+<pre>
+<a name="line1"> 1</a> <font color="0000ff"><strong>#!/bin/bash</strong></font>
+<a name="line2"> 2</a> 
+<a name="line3"> 3</a> <font color="#2040a0">METHOD</font>=<font color="#008000">&quot;--dist-percent=0.2&quot;</font>
+<a name="line4"> 4</a> <font color="#FF8800"># flattened:</font>
+<a name="line5"> 5</a> for file in bp*.raw; do echo $file 
+<a name="line6"> 6</a>     agfm.py $file ${METHOD} -s ; mv $file.flat $file.flat.gnuplot
+<a name="line7"> 7</a>     agfm.py <font color="#2040a0">$file</font> ${METHOD} -s --agfm-format 
+<a name="line8"> 8</a> done
+<a name="line9"> 9</a> 
+<a name="line10">10</a> <font color="#FF8800"># hystcrunch-flattened:</font>
+<a name="line11">11</a> for file in bp*.raw.flat; do 
+<a name="line12">12</a>     echo <font color="#2040a0">$file</font> 
+<a name="line13">13</a>     hystcrunch -mal <font color="#2040a0">$file</font> &lt; <font color="#2040a0">$file</font> | plotxy
+<a name="line14">14</a>     mv mypost <font color="#2040a0">$file</font>.ps
+<a name="line15">15</a>     convert <font color="#2040a0">$file</font>.ps <font color="#2040a0">$file</font>.png 
+<a name="line16">16</a> done
+<a name="line17">17</a> 
+<a name="line18">18</a> <font color="#FF8800"># hystcrunch-flattened-data:</font>
+<a name="line19">19</a> rm -f flattened.hyst.dat
+<a name="line20">20</a> touch flattened.hyst.dat
+<a name="line21">21</a> echo <font color="#008000">&quot;# flattened.hyst.dat from ${METHOD} &quot;</font> &gt;&gt; flattened.hyst.dat
+<a name="line22">22</a> echo <font color="#008000">&quot;# filename sid s Ms Mr*Ms Bc Bcr Bcrn*1e-3&quot;</font> &gt;&gt; flattened.hyst.dat
+<a name="line23">23</a> for file in bp*.raw.flat; do 
+<a name="line24">24</a>     echo <font color="#2040a0">$file</font> 
+<a name="line25">25</a>     echo -n <font color="#008000">&quot;<font color="#2040a0">$file</font> &quot;</font> &gt;&gt; flattened.hyst.dat 
+<a name="line26">26</a>     hystcrunch -map &lt; <font color="#2040a0">$file</font> &gt;&gt; flattened.hyst.dat
+<a name="line27">27</a> done
+<a name="line28">28</a> 
+<a name="line29">29</a> <font color="#FF8800"># multipage:</font>
+<a name="line30">30</a> rm -f multipage.{ps,pdf,plotxy}
+<a name="line31">31</a> touch multipage.ps
+<a name="line32">32</a> for file in bp*flat.ps; do 
+<a name="line33">33</a>     echo <font color="#2040a0">$file</font> 
+<a name="line34">34</a>     cat <font color="#2040a0">$file</font> &gt;&gt; multipage.ps 
+<a name="line35">35</a> done
+<a name="line36">36</a> ps2pdf multipage.ps
+<a name="line37">37</a> open multipage.pdf
+</pre>
+The end result of this script is a data table like this:
+<pre>
+# flattened.hyst.dat from --dist-percent=0.2 
+# filename sid s Ms Mr*Ms Bc Bcr Bcrn*1e-3
+bp04-1gw-s2-026.raw.flat   -.602E-37 0.599E-07 0.130E-07 0.014 0.039 0.107
+bp04-1gw-s2-032.raw.flat   -.602E-37 0.106E-06 0.217E-07 0.013 0.038 0.109
+bp04-1gw-s2-053.raw.flat   -.602E-37 0.225E-07 0.314E-08 0.007 0.035 0.106
+bp04-1gw-s2-062.raw.flat   -.602E-37 0.362E-07 0.395E-08 0.006 0.034 0.111
+...
+</pre>
+For a change, I used code2html with '-n' to give line nubmers.  At
+line 3, I say that I want to use 20% of the each line segment for
+flattening the cure.  The default of 5% was very susceptible to noise.
+
+Then in line 10 I make a png of each hystcrunch image.
+
+In the data section (line18) I call hystcrunch in the <b>no plot</b>
+mode (-p) so that it will pass back the parameters.  I don't give
+anything for -l so the sid field is empty.
+
+Finally in the section starting at line 29, I use plotxy to make a
+multipage pdf.  plotxy has already made a postscript (ps) file for
+each hysteresis loop.  Then I just cat these together into a large
+postscript file and ps2pdf magically makes a 22 page pdf.  To make 8
+samples per piece of paper, I print them in acrobat with 4 per page
+and double sided.
+-----

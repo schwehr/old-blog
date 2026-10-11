@@ -1,0 +1,36 @@
+TITLE: noaadata-py-0.30 released
+AUTHOR: Kurt
+DATE: 11.07.2007 13:59
+DESC: more better
+-----
+BODY:
+In preparation for eNavigation, I've released version 0.30 of
+noaadata-py.  I have been looking at the proposed right whale notice
+with a number of people and have updated it to take 2 slots.  There is
+currently space for 21 bits at the end that I have booked with
+"Spare2."  Notice that in timetoexpireN that a value of 0 now means
+that a ring is not currently active (aka has no speed restriction).
+That allows electronic chart systems (ECS) to display the monitored
+zones that are currently clear without having to keep the regions in
+their software distributions.  Also, we have converted the buoy
+(stationid) from an AIS string 6 to an 8-bit unsigned integer.  This
+gives the option for 256 buoys in each region.
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/whalenotice2.html">whalenotice2.html</a>
+
+The changelog:
+  <ul>
+    <li>Pre eNavigation 2007 release</li>
+    <li>xymt2kml now an optparse program that plays nicer</li>
+    <li>svn propedit svn:keywords on all the scripts/*.py files for better tracking</li>
+    <li>Added IMO messages 13 and 14 for RTCM meeting</li>
+    <li>Reworking whalenotice message.  Added a whalenotice2.xml that fully fills two slots</li>
+    <li>Added basestation messages (msg 4) to the sqlite database</li>
+    <li>Added gridding code in scripts: ais_pg*.py</li>
+    <li>Added ais_traffic_analysis program</li>
+  </ul>
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.30.tar.bz2">noaadata-py-0.30.tar.bz2</a>
+
+Additionally, I have finally released a draft fink info file for the
+mac people out there.  This is not yet tested in any sort of way.
+-----

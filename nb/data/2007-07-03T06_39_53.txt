@@ -1,0 +1,258 @@
+TITLE: Grouping ship tracks based on time not seen
+AUTHOR: Kurt
+DATE: 07.03.2007 06:39
+DESC: what to do?
+-----
+BODY:
+This problem has been bugging me for a week now.  I want to create
+"ship transits" from a list of ship positions and time.  The
+definition of a transit is a series of points from one ship where that
+ship is not see in the region of interest for 60 minutes before or
+after that transit.
+
+I have two cases where I want to be creating these transits.  The
+first is to take an entire dataset (e.g. 4.5M points for one year in a
+marine sanctuary).  The code needs to generate a table of all transits
+through the area.  The second case is for building a live
+visualization system.  As each new ship position report comes in, the
+transit table needs to be updated with that ship either extending the
+most recent transit for that ship or, if enough time has elapsed since
+the previous transit, to start a new transit.  For this update case,
+it would be nice to set this up as a trigger on the database insert
+into position of a new location report.
+
+I had trouble trying to construct this query in SQL, so my initial
+solution is to use python/psycopg2 to call into the database for each
+ships list of positions and time.  I then walk the list looking for 60
+minute gaps and store the ship id, beginning key, and ending key for
+each transit that I find.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">os</font>,<font color="#2040a0">sys</font>
+
+<strong>if</strong> <font color="#2040a0">__name__</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>from</strong> <font color="#2040a0">optparse</font> <strong>import</strong> <font color="#2040a0">OptionParser</font>
+    <font color="#2040a0">parser</font> <font color="4444FF">=</font> <font color="#2040a0">OptionParser</font><font color="4444FF">(</font><font color="#2040a0">usage</font><font color="4444FF">=</font><font color="#008000">&quot;%prog [options] &quot;</font>,<font color="#2040a0">version</font><font color="4444FF">=</font><font color="#008000">&quot;%prog &quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-d'</font>,<font color="#008000">'--database-name'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'databaseName'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'ais'</font>,
+		      <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Name of database within the postgres server [default: %default]'</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-D'</font>,<font color="#008000">'--database-host'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'databaseHost'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'localhost'</font>,
+		      <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Host name of the computer serving the dbx [default: %default]'</font><font color="4444FF">)</font>
+    <font color="#2040a0">defaultUser</font> <font color="4444FF">=</font> <font color="#2040a0">os</font>.<font color="#2040a0">getlogin</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-u'</font>,<font color="#008000">'--database-user'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'databaseUser'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#2040a0">defaultUser</font>,
+		      <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Host name of the to access the database with [default: %default]'</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-C'</font>,<font color="#008000">'--with-create'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'createTables'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#2040a0">False</font>, <font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">'store_true'</font>,
+		      <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Do not create the tables in the database'</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-t'</font>,<font color="#008000">'--delta-time'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'deltaT'</font>
+		      ,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#FF0000">60</font><font color="4444FF">*</font><font color="#FF0000">60</font>
+		      ,<font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'int'</font>
+		      ,<font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Time gap in seconds that determines when a new transit starts [default: %default]'</font><font color="4444FF">)</font>
+
+    <font color="4444FF">(</font><font color="#2040a0">options</font>,<font color="#2040a0">args</font><font color="4444FF">)</font> <font color="4444FF">=</font> <font color="#2040a0">parser</font>.<font color="#2040a0">parse_args</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">deltaT</font> <font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">deltaT</font>
+    <strong>import</strong> <font color="#2040a0">psycopg2</font> <font color="#2040a0">as</font> <font color="#2040a0">psycopg</font>
+        
+    <font color="#2040a0">connectStr</font> <font color="4444FF">=</font> <font color="#008000">&quot;dbname='&quot;</font><font color="4444FF">+</font><font color="#2040a0">options</font>.<font color="#2040a0">databaseName</font><font color="4444FF">+</font><font color="#008000">&quot;'&quot;</font>
+    <font color="#2040a0">connectStr</font> <font color="4444FF">+</font><font color="4444FF">=</font><font color="#008000">&quot; user='&quot;</font> <font color="4444FF">+</font><font color="#2040a0">options</font>.<font color="#2040a0">databaseUser</font><font color="4444FF">+</font><font color="#008000">&quot;'&quot;</font>
+    <font color="#2040a0">connectStr</font> <font color="4444FF">+</font><font color="4444FF">=</font><font color="#008000">&quot; host='&quot;</font> <font color="4444FF">+</font><font color="#2040a0">options</font>.<font color="#2040a0">databaseHost</font><font color="4444FF">+</font><font color="#008000">&quot;'&quot;</font>
+
+    <font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">psycopg</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#2040a0">connectStr</font><font color="4444FF">)</font>
+    <font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+    <strong>if</strong> <font color="#2040a0">options</font>.<font color="#2040a0">createTables</font><font color="4444FF">:</font>
+        <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">''</font><font color="#008000">'
+CREATE TABLE transit
+(
+  id serial NOT NULL,
+  userid integer NOT NULL,
+  startpos integer NOT NULL,
+  endpos integer NOT NULL,
+  CONSTRAINT transit_pkey PRIMARY KEY (id)
+);
+'</font><font color="#008000">''</font><font color="4444FF">)</font>
+    <font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">'SELECT DISTINCT(userid) FROM position;'</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">ships</font><font color="4444FF">=</font> <font color="4444FF">[</font><font color="#2040a0">ship</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <strong>for</strong> <font color="#2040a0">ship</font> <strong>in</strong> <font color="#2040a0">cu</font>.<font color="#2040a0">fetchall</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">]</font>
+    <strong>for</strong> <font color="#2040a0">ship</font> <strong>in</strong> <font color="#2040a0">ships</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#008000">'Processing ship: '</font>,<font color="#2040a0">ship</font>
+        <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">'SELECT key,cg_sec FROM position WHERE userid=%s ORDER BY cg_sec'</font>,<font color="4444FF">(</font><font color="#2040a0">ship</font>,<font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">startKey</font>,<font color="#2040a0">startTime</font><font color="4444FF">=</font><font color="#2040a0">cu</font>.<font color="#2040a0">fetchone</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>print</strong> <font color="#2040a0">startKey</font>,<font color="#2040a0">startTime</font>
+        <font color="#2040a0">lastKey</font>,<font color="#2040a0">lastTime</font><font color="4444FF">=</font><font color="#2040a0">startKey</font>,<font color="#2040a0">startTime</font>
+        <font color="#2040a0">needFinal</font><font color="4444FF">=</font><font color="#2040a0">True</font>
+        <strong>for</strong> <font color="#2040a0">row</font> <strong>in</strong> <font color="#2040a0">cu</font>.<font color="#2040a0">fetchall</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">needFinal</font><font color="4444FF">=</font><font color="#2040a0">True</font>
+            <font color="#2040a0">key</font>,<font color="#2040a0">time</font> <font color="4444FF">=</font> <font color="#2040a0">row</font>
+            <strong>if</strong> <font color="#2040a0">time</font><font color="4444FF">&gt;</font><font color="#2040a0">lastTime</font><font color="4444FF">+</font><font color="#2040a0">deltaT</font><font color="4444FF">:</font>
+                <strong>print</strong>  <font color="#008000">'FOUND'</font>,<font color="#2040a0">startKey</font>,<font color="#2040a0">startTime</font>,<font color="#008000">'-&gt;'</font>,<font color="#2040a0">lastKey</font>,<font color="#2040a0">lastTime</font>
+                <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">'INSERT INTO transit (userid,startPos,endPos) VALUES (%s,%s,%s);'</font>,<font color="4444FF">(</font><font color="#2040a0">ship</font>,<font color="#2040a0">startKey</font>,<font color="#2040a0">lastKey</font><font color="4444FF">)</font><font color="4444FF">)</font>
+                <font color="#2040a0">startKey</font>,<font color="#2040a0">startTime</font><font color="4444FF">=</font><font color="#2040a0">key</font>,<font color="#2040a0">time</font>
+                <font color="#2040a0">needFinal</font><font color="4444FF">=</font><font color="#2040a0">False</font>
+            <font color="#2040a0">lastKey</font>,<font color="#2040a0">lastTime</font><font color="4444FF">=</font><font color="#2040a0">key</font>,<font color="#2040a0">time</font> <font color="#444444"># Save for the next loop</font>
+        <strong>if</strong> <font color="#2040a0">needFinal</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#008000">'Final transit...'</font>
+            <strong>print</strong> <font color="#008000">'FOUND'</font>,<font color="#2040a0">startKey</font>,<font color="#2040a0">startTime</font>,<font color="#008000">'-&gt;'</font>,<font color="#2040a0">lastKey</font>,<font color="#2040a0">lastTime</font>
+            <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">'INSERT INTO transit (userid,startPos,endPos) VALUES (%s,%s,%s);'</font>,<font color="4444FF">(</font><font color="#2040a0">ship</font>,<font color="#2040a0">startKey</font>,<font color="#2040a0">lastKey</font><font color="4444FF">)</font><font color="4444FF">)</font>
+            <font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+The trick to the above running in a few minutes instead of 10 hours is to setup the appropriate index.  In this case:
+<pre>CREATE INDEX userid_idx ON position (userid);</pre>
+I asked Jason Greenlaw what he throught and he passed the question on
+to Rob Greenlaw (his dad) who came back with this prototype code that
+I not yet sure how to use.
+<pre>
+<font color="#444444">/* This is just setting up a test table */</font>
+<strong>select</strong> 1 <strong>as</strong> <font color="#008000">'PK'</font><strong>,</strong>64 <strong>as</strong> <font color="#008000">'ID_Col'</font>,<font color="#008000">'x/y'</font> <strong>as</strong> <font color="#008000">'Position'</font>, 100 <strong>as</strong> <font color="#008000">'Time_Dur'</font>
+<strong>into</strong> #tmp_tbl
+<strong>insert</strong> <strong>into</strong> #tmp_tbl
+<strong>select</strong> 2 <strong>as</strong> <font color="#008000">'PK'</font><strong>,</strong>64 <strong>as</strong> <font color="#008000">'ID_Col'</font>,<font color="#008000">'x/y'</font> <strong>as</strong> <font color="#008000">'Position'</font>, 110 <strong>as</strong> <font color="#008000">'Time_Dur'</font>
+<strong>insert</strong> <strong>into</strong> #tmp_tbl
+<strong>select</strong> 3 <strong>as</strong> <font color="#008000">'PK'</font><strong>,</strong>64 <strong>as</strong> <font color="#008000">'ID_Col'</font>,<font color="#008000">'x/y'</font> <strong>as</strong> <font color="#008000">'Position'</font>, 130 <strong>as</strong> <font color="#008000">'Time_Dur'</font>
+<strong>insert</strong> <strong>into</strong> #tmp_tbl
+<strong>select</strong> 4 <strong>as</strong> <font color="#008000">'PK'</font><strong>,</strong>64 <strong>as</strong> <font color="#008000">'ID_Col'</font>,<font color="#008000">'x/y'</font> <strong>as</strong> <font color="#008000">'Position'</font>, 230 <strong>as</strong> <font color="#008000">'Time_Dur'</font>
+<strong>insert</strong> <strong>into</strong> #tmp_tbl
+<strong>select</strong> 5 <strong>as</strong> <font color="#008000">'PK'</font><strong>,</strong>64 <strong>as</strong> <font color="#008000">'ID_Col'</font>,<font color="#008000">'x/y'</font> <strong>as</strong> <font color="#008000">'Position'</font>, 270 <strong>as</strong> <font color="#008000">'Time_Dur'</font>
+<font color="#444444">--</font>
+<font color="#444444">/* Variables */</font>
+DECLARE	@GROUP_ID	INT;
+DECLARE @PK			INT;
+DECLARE @ID			INT;
+DECLARE @TIME		INT;
+DECLARE	@TMP_ID		INT;
+DECLARE	@TEMP_TIME	INT;
+DECLARE	@RANGE  	INT;
+<font color="#444444">--</font>
+<font color="#444444">/* Create temp table to hold results */</font>
+<strong>SELECT</strong> 0 <strong>AS</strong> <font color="#008000">'GROUP_ID'</font>, 0 <strong>AS</strong> <font color="#008000">'ID_COL'</font>, 0 <strong>AS</strong> <font color="#008000">'PK'</font>
+<strong>INTO</strong> #TMP_GROUP;
+<font color="#444444">--</font>
+<font color="#444444">/* Empty the results table for reloading with real data */</font>
+TRUNCATE <strong>TABLE</strong> #TMP_GROUP;
+<font color="#444444">--</font>
+<font color="#444444">/* Initialize Group Counter */</font>
+<strong>SELECT</strong> @GROUP_ID<strong>=</strong>1;
+<strong>SELECT</strong> @RANGE<strong>=</strong>60;
+<font color="#444444">--</font>
+DECLARE TIME_CUR CURS<strong>OR</strong> F<strong>OR</strong> 
+	<strong>SELECT</strong> PK, ID_Col, Time_Dur
+	<strong>FROM</strong> #tmp_tbl
+	<strong>ORDER BY</strong> ID_Col<strong>,</strong>PK ASC;
+<font color="#444444">--</font>
+	<strong>OPEN</strong> TIME_CUR; 
+<font color="#444444">--</font>
+	<strong>FETCH</strong> NEXT 
+	<strong>FROM</strong> TIME_CUR 
+	<strong>INTO</strong> @PK,@ID,@TIME;
+<font color="#444444">--</font>
+<font color="#444444">/* Set current ID group and time */</font>
+	<strong>SELECT</strong> @TMP_ID=@ID;
+	<strong>SELECT</strong> @TEMP_TIME=@TIME;
+<font color="#444444">--</font>
+	WHILE @@FETCH_STATUS = 0    
+	<strong>BEGIN</strong>
+<font color="#444444">/* Check if there is change in group due to time or ID */</font>
+		IF (@ID &lt;&gt; @TMP_ID) <strong>OR</strong> (@TIME &gt; (@TEMP_TIME + @RANGE))
+		<strong>BEGIN</strong>
+			<strong>SELECT</strong> @GROUP_ID=@GROUP_ID+1
+			<strong>SELECT</strong> @TMP_ID=@ID
+			<strong>SELECT</strong> @TEMP_TIME=@TIME
+		<strong>END</strong>
+<font color="#444444">/* Add to results table */</font>		
+		<strong>INSERT</strong> <strong>INTO</strong> #TMP_GROUP
+		<strong>SELECT</strong> @GROUP_ID,@ID,@PK
+<font color="#444444">--</font>
+<font color="#444444">-- Get the next row from the cursor				</font>
+		<strong>FETCH</strong> NEXT 
+		<strong>FROM</strong> TIME_CUR 
+		<strong>INTO</strong> @PK,@ID,@TIME;
+	<strong>END</strong>;
+	<strong>CLOSE</strong> TIME_CUR;        
+	DEALLOCATE TIME_CUR;
+<font color="#444444">--</font>
+<font color="#444444">/* Return the results */</font>
+<strong>SELECT</strong> * <strong>FROM</strong> #TMP_GROUP;
+<font color="#444444">--</font>
+<font color="#444444">/* delete the test tables */</font>
+drop <strong>table</strong> #tmp_tbl;
+DROP <strong>TABLE</strong> #TMP_GROUP;
+</pre>
+I posted the queston on the PostGIS to see what ideas I might get and Webb 
+Sprague came back with this idea:
+<pre>
+I have an untried, vaguely specified idea:
+.
+1.  Add a column for "consisent_track_id" - this will have a number
+for a "consistent track" - one formed by a set of points all within
+one hour of each other for a given ship.  This will be null at first.
+.
+2.  In a procedural language, grab a list of all the measurement
+points for a given ship *ordered by time*.  Start with the first one,
+give it an arbitrary unique ID for a "consistent track", store that ID
+in a variable.  Grab the next one measure point, and if the time
+difference < single hour assign the same ID to it, otherwise get a new
+"consistent track" id and start the process again.  This will fill the
+table with IDs that represent which "consistent track" a point belongs
+to.  (My logic may be slightly off, especially at the edges, but you
+get the idea.)
+.
+3.  Now it is easy:  use a GROUP BY consistent_track in a select to
+aggregate the points into LINESTRINGs.  Do a select into a new table.
+.
+4.  With a ship id, you could do this all in one table for all the
+ships and measurement points, which would be a little more graceful.
+The primary key would probably be (ship_id, measurement_timestamp).
+Have a separate table to store coalesced tracks.
+.
+5.  If you are streaming the measurement points, try to assign a
+consistent track ID as they come in, which would be easy.  Saves on
+query time.
+.
+6.  "Indexes", not "keys", are what (sometimes) speed up queries.
+</pre>
+Finally, I posted on comp.databases.postgres and got this from Laurenz Albe:
+<pre>
+This query definitely does NOT perform well, as it will execute several
+sequential scans on the table, but it should produce what you want
+(there may be errors if the time gap is exactly 60 minutes, but fixing
+those is left as an exercise to the reader):
+
+SELECT ship1.key AS startkey, ship2.key AS endkey
+FROM (SELECT s.key, s.cg_sec
+      FROM oneShip AS s
+      WHERE NOT EXISTS
+         (SELECT 1 FROM oneShip AS s2
+          WHERE (s.cg_sec > s2.cg_sec)
+            AND (s.cg_sec <= s2.cg_sec + 3600))) AS ship1,
+     (SELECT s.key, s.cg_sec
+      FROM oneShip AS s
+      WHERE NOT EXISTS
+         (SELECT 1 FROM oneShip AS s2
+          WHERE (s.cg_sec < s2.cg_sec)
+            AND (s.cg_sec >= s2.cg_sec - 3600))) AS ship2
+WHERE ship1.cg_sec < ship2.cg_sec
+  AND NOT EXISTS
+     (SELECT 1
+      FROM (SELECT s.key, s.cg_sec
+            FROM oneShip AS s
+            WHERE NOT EXISTS
+               (SELECT 1 FROM oneShip AS s2
+                WHERE (s.cg_sec < s2.cg_sec)
+                  AND (s.cg_sec >= s2.cg_sec - 3600))) AS ship3
+      WHERE (ship1.cg_sec < ship3.cg_sec)
+        AND (ship3.cg_sec < ship2.cg_sec));
+
+ startkey | endkey
+==========+========
+      251 |    260
+      266 |    267
+(2 rows)
+
+I would recommend to not code this as an SQL query because it can be
+done much easier and with better performance as a function
+RETURNS SETOF oneShip in PL/pgSQL or any language of your choice.
+</pre>
+It looks like I need to learn how to use one of the postgres embedded
+languages to write this to run from within just the postgreSQL server.
+
+As always, please email me if you have a better suggestion or critical tip!
+-----

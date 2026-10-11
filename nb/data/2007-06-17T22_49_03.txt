@@ -1,0 +1,78 @@
+TITLE: Weekend update - mapserver in fink
+AUTHOR: Kurt
+DATE: 06.17.2007 22:49
+DESC: more work to do
+-----
+BODY:
+I have been working some this weekend on getting mapserver setup with
+more capabilities enabled.  This is taking way more effort than I
+expected.  I am hoping that I can get the latest mapserver setup with
+php5-mapscript, python scripting, and tested postgis feeds.
+
+The trouble started with apache2.  That was a bad start.  For some
+reason, the apache2-common deb file has
+/sw/etc/apache2/{apache2,httpd}.conf, but something is preventing
+those files from getting installed in fink.  I went for a big hack to
+get apache2 installed...  these next few lines are really dangerous!
+<pre>
+fink install apache2-common
+cd /sw/etc/apache2
+sudo rm -rf * # danger!
+sudo dpkg -x /sw/fink/debs/apache2-common_2.0.59-11_darwin-powerpc.deb .
+sudo mv sw/etc/apache2/* .
+sudo rm -rf sw
+fink -y install apache2
+</pre>
+Then I had more trouble getting php5 to install.
+<pre>
+fink install libapache2-ssl-mod-php5
+fink install libapache2-mod-php5
+</pre>
+
+After all that, I am pretty sure that apache2 is not happy:
+<pre>
+sudo nmap -A -T4 localhost
+Starting Nmap 4.20 ( http://insecure.org ) at 2007-06-17 22:21 EDT
+Interesting ports on localhost (127.0.0.1):
+Not shown: 1456 closed ports, 234 filtered ports
+PORT     STATE SERVICE     VERSION
+22/tcp   open  ssh         OpenSSH 4.5 (protocol 1.99)
+80/tcp   open  http?
+631/tcp  open  ipp         CUPS 1.1
+1033/tcp open  rpc.unknown
+3689/tcp open  rendezvous  Apple iTunes 7.2
+6000/tcp open  X11          (access denied)
+9876/tcp open  sd?
+Device type: general purpose
+Running: Apple Mac OS X 10.4.X
+OS details: Apple Mac OS X 10.4.8 (Tiger)
+Network Distance: 0 hops
+Service Info: OSs: Mac OS X, Unix
+</pre>
+That "?" after http shows that apache is not correctly configured.  I am not really used to dealing with apache2, so I am not really sure what to expect.
+<pre>
+ps -aux | egrep 'apache|http'
+root      1831   0.0  0.3    57648   3424  ??  Ss    4:52PM   0:00.97 /sw/sbin/apache2 -k restart
+www      23498   0.0  0.1    60324   1464  ??  S    10:22PM   0:00.01 /sw/sbin/apache2 -k restart
+www      23499   0.0  0.1    60324   1240  ??  S    10:22PM   0:00.01 /sw/sbin/apache2 -k restart
+</pre>
+Or I could also do a "sudo lsof -nP | grep TCP"
+
+After that, I gave a look at getting mapserver going with php5.
+<pre>
+configure: checking whether we should enable debug features...
+configure: checking for PHP/MapScript module options...
+        PHP/MapScript module not configured.
+checking for g++ -dynamiclib ... yes
+configure: error:
+!!! The current version of PHP MapScript requires PHP4 configured as  !!!
+!!! a CGI and cannot be used with PHP4 configured as an Apache module,!!!
+!!! so you cannot use the --with-apxs option.                         !!!
+!!! See: http://mapserver.gis.umn.edu/cgi-bin/wiki.pl?PHPMapScriptCGI !!!
+make: *** No targets specified and no makefile found.  Stop.
+</pre>
+Doh!  But it looks like this is possible as Debian has got a
+php5-mapserver: <a
+href="http://packages.qa.debian.org/m/mapserver.html">http://packages.qa.debian.org/m/mapserver.html</a>.
+So maybe if I switch to the php5-cgi it will work?  I read through the diff at the bottom left of the page, but not much really jumped out at me.
+-----

@@ -1,0 +1,26 @@
+TITLE: python and numpy with slices
+AUTHOR: Kurt
+DATE: 07.31.2013 19:08
+DESC: finally - understanding
+-----
+BODY:
+I never really got python slices before now.
+I read <a href="http://docs.python.org/2/library/functions.html#slice">http://docs.python.org/2/library/functions.html#slice</a> and <a href="http://docs.python.org/2/library/itertools.html#itertools.islice">http://docs.python.org/2/library/itertools.html#itertools.islice</a>.  These 3 examples all make a hole
+in a np.zeros((10,10)) grid:
+<pre><tt>grid <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">zeros</font></b><font color="#990000">((</font><font color="#993399">10</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">))</font>
+grid<font color="#990000">[</font><b><font color="#000000">slice</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">),</font> <b><font color="#000000">slice</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">7</font><font color="#990000">)]</font> <font color="#990000">=</font> <font color="#993399">1</font>
+<!-- -->
+<i><font color="#9A1900"># is equivalent to:</font></i>
+<!-- -->
+grid <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">zeros</font></b><font color="#990000">((</font><font color="#993399">10</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">))</font>
+<b><font color="#0000FF">for</font></b> y <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">7</font><font color="#990000">):</font>
+    grid<font color="#990000">[</font><b><font color="#000000">slice</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">5</font><font color="#990000">),</font> y<font color="#990000">]</font> <font color="#990000">=</font> <font color="#993399">1</font>
+<!-- -->
+<i><font color="#9A1900"># and also:</font></i>
+<!-- -->
+grid <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">zeros</font></b><font color="#990000">((</font><font color="#993399">10</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">))</font>
+<b><font color="#0000FF">for</font></b> x <b><font color="#0000FF">in</font></b> <b><font color="#000000">xrange</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">):</font>
+    <b><font color="#0000FF">for</font></b> y <b><font color="#0000FF">in</font></b> <b><font color="#000000">xrange</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">7</font><font color="#990000">):</font>
+        grid<font color="#990000">[</font>x<font color="#990000">][</font>y<font color="#990000">]</font> <font color="#990000">=</font> <font color="#993399">1</font>
+</tt></pre>
+-----

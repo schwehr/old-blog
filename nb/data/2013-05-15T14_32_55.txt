@@ -1,0 +1,55 @@
+TITLE: Google API python client for fink on Mac OSX
+AUTHOR: Kurt
+DATE: 05.15.2013 14:32
+DESC: prep for talk
+-----
+BODY:
+To go with Google I/O and our Cloud Infrastructure talk "All the ships
+in the world," I've added oauth2client, uritemplate, gflags, and
+google-api-python-client to fink on Mac OSX 10.7/10.8.  This lets you
+use OAuth2 to access Google REST APIs.
+
+For example:
+<pre>from apiclient.discovery import build
+import apiclient.errors
+<!-- -->
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.file import Storage
+from oauth2client.tools import run
+<!-- -->
+storage = Storage('taskqueue_oauth.dat')
+credentials = storage.get()
+if not credentials or credentials.invalid:
+  flow = flow_from_clientsecrets('client_secrets.json',
+      scope='https://www.googleapis.com/auth/taskqueue',
+      message='can not find client secrets')
+  credentials = run(flow, storage)
+http = credentials.authorize(httplib2.Http())
+service = build('taskqueue', 'v1beta2', http=http)
+tasks = service.tasks()
+<!-- -->
+print tasks.list(project='s~my-appeng-project', taskqueue='myqueue')</pre>
+
+You can now install bigquery and gsutil (Google Cloud Storage) tools from fink.
+<pre>fink selfupdate
+fink install bigquery-py27 gsutil-py27</pre>
+There were a number of packages that I had to add to fink behind the scenes 
+and I updated boto.
+<pre>fink list -i oauth2client gsutil bigquery crcmod google-api-python boto socksipy google-apputil uritemplate
+<!-- -->
+ i   bigquery-py27           2.0.12-1          BigQuery database access
+ i   boto-py27               2.9.2-1           Python interface to Amazon Web Services
+ i   crcmod-py27             1.7-1             Cyclic Redundancy Check
+ i   google-api-python-clie  1.1-2             Access Google APIs via oauth2 and discovery
+ i   google-apputils-py27    0.3.0-1           Google command line utility helpers
+ i   gsutil-py27             3.29-2            Google cloud storage access
+ i   oauth2client-py27       1.1-1             Client library for OAuth 2.0
+ i   socksipy-py27           1.02-1            TCP interface to SOCKS4, SOCKS5 or HTTP proxy
+ i   uritemplate-py27        0.5.2-1           RFC6570 up to level 4
+<!-- -->
+/sw/bin/bq version
+This is BigQuery CLI v2.0.12
+<!-- -->
+/sw/bin/gsutil version
+gsutil version 3.29</pre>
+-----

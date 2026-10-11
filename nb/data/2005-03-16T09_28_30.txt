@@ -1,0 +1,30 @@
+TITLE: Disk mounting and Tracking mouse idle time
+AUTHOR: Kurt
+DATE: 03.16.2005 09:28
+DESC: nice little trick
+-----
+BODY:
+
+This was suggested by biovizier.  <b>UPDATE: It works!</b>.  Awesome.
+<pre>
+  sudo defaults write \
+  /Library/Preferences/SystemConfiguration/autodiskmount \
+  AutomountDisksWithoutUserLogin -bool true
+</pre>
+Aha!  Now I got a post that goes into a little more detail.  I think
+the above solution is  better than hand editing the xml prefence file.
+<a
+href="http://www.macosxhints.com/article.php?story=20031103155828117&query=automount">10.3:
+A fix for local drives not mounting until user login</a>
+
+Try this!  It tells you how long the keyboard/mouse have been idle.  I
+have never heardof /usr/sbin/ioreg before and the output from this
+program is strange, but the perl here cleans it up.  Found this on mac
+osx hints:
+<pre>
+  sleep 5; ioreg -c IOHIDSystem | \
+    perl -ane 'if (/Idle/) \
+    {$idle=int((pop @F)/1e9); print $idle,"\n"; last}'
+</pre>
+Run it and then do not touch anything until it returns.
+-----

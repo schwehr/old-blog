@@ -1,0 +1,45 @@
+TITLE: database filtering with shapely
+AUTHOR: Kurt
+DATE: 12.20.2009 23:47
+DESC: python point in polygon
+-----
+BODY:
+When not using PostGIS or SpatialLite (or another spatial db), you
+have to do filtering of points.  Today, I wanted to drop all the rows
+from the database that were not within a polygon.  I'm sure this can
+be written in a better form, but it works:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> shapely<font color="#990000">.</font>geometry <b><font color="#000080">import</font></b> Polygon<font color="#990000">,</font>Point
+<b><font color="#000080">import</font></b> sqlite3
+<!-- -->
+area <font color="#990000">=</font> <b><font color="#000000">Polygon</font></b><font color="#990000">((</font> <font color="#990000">(-</font><font color="#993399">75.04282375786718</font><font color="#990000">,</font><font color="#993399">38.43809074569604</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">74.95796038123665</font><font color="#990000">,</font><font color="#993399">38.44102042608007</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">74.94823032303307</font><font color="#990000">,</font><font color="#993399">38.64496780559742</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">74.98940280875983</font><font color="#990000">,</font><font color="#993399">38.77078838823093</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">75.04000276399186</font><font color="#990000">,</font><font color="#993399">38.87945317094139</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">75.17254471352614</font><font color="#990000">,</font><font color="#993399">39.05947158636056</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">75.27890489578456</font><font color="#990000">,</font><font color="#993399">39.22690584289197</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">75.40273240772274</font><font color="#990000">,</font><font color="#993399">39.33958192923748</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">75.48446139154538</font><font color="#990000">,</font><font color="#993399">39.38575022705258</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">75.52815268555506</font><font color="#990000">,</font><font color="#993399">39.43188933981689</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">75.554652567733</font><font color="#990000">,</font><font color="#993399">39.47595050434606</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">75.6072584927562</font><font color="#990000">,</font><font color="#993399">39.44816210957681</font><font color="#990000">),</font>  <font color="#990000">(-</font><font color="#993399">75.44439245681477</font><font color="#990000">,</font><font color="#993399">39.24926918128994</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">75.42646149407051</font><font color="#990000">,</font><font color="#993399">39.11998312534694</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">75.40876947833023</font><font color="#990000">,</font><font color="#993399">39.00435085478392</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">75.34251898512647</font><font color="#990000">,</font><font color="#993399">38.94179443498852</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">75.23133088017433</font><font color="#990000">,</font><font color="#993399">38.78501595331532</font><font color="#990000">),</font>
+<font color="#990000">(-</font><font color="#993399">75.15414556655479</font><font color="#990000">,</font><font color="#993399">38.63440794663666</font><font color="#990000">),</font> <font color="#990000">(-</font><font color="#993399">75.09618869312195</font><font color="#990000">,</font><font color="#993399">38.44710114662649</font><font color="#990000">),</font>
+<font color="#990000">))</font>
+<!-- -->
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'ais.db3'</font><font color="#990000">)</font>
+cx<font color="#990000">.</font>row_factory <font color="#990000">=</font> sqlite3<font color="#990000">.</font>Row <i><font color="#9A1900"># Allow access of fields by name</font></i>
+<!-- -->
+outside <font color="#990000">=</font> <font color="#993399">0</font>
+<!-- -->
+cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> i<font color="#990000">,</font>row <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT key, longitude AS x,latitude AS y FROM position;'</font><font color="#990000">)):</font>
+    pt <font color="#990000">=</font> <b><font color="#000000">Point</font></b><font color="#990000">(</font>row<font color="#990000">[</font><font color="#FF0000">'x'</font><font color="#990000">],</font>row<font color="#990000">[</font><font color="#FF0000">'y'</font><font color="#990000">])</font>
+    <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> area<font color="#990000">.</font><b><font color="#000000">contains</font></b><font color="#990000">(</font>pt<font color="#990000">):</font>
+        outside <font color="#990000">+=</font> <font color="#993399">1</font>
+        cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'DELETE FROM position WHERE key=%d;'</font> <font color="#990000">%</font> row<font color="#990000">[</font><font color="#FF0000">'key'</font><font color="#990000">])</font>
+        <b><font color="#0000FF">if</font></b> outside <font color="#990000">%</font> <font color="#993399">1000</font> <font color="#990000">==</font> <font color="#993399">1</font><font color="#990000">:</font>
+            cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font>
+<!-- -->
+cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font></tt></pre>
+Pretty basic stuff, but it gets the job done.
+-----

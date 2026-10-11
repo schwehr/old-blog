@@ -1,0 +1,108 @@
+TITLE: Emacs understands MS Word documents???
+AUTHOR: Kurt
+DATE: 07.07.2010 15:16
+DESC: and I actually like this!
+-----
+BODY:
+Another unintentional find in emacs...
+<pre>M Filemode      Length  Date         Time      File
+- ----------  --------  -----------  --------  ----------------------------
+  -rw-rw-rw-      1364   1-Jan-1980  00:00:00  [Content_Types].xml
+  -rw-rw-rw-       735   1-Jan-1980  00:00:00  _rels/.rels
+  -rw-rw-rw-       817   1-Jan-1980  00:00:00  word/_rels/document.xml.rels
+  -rw-rw-rw-     55091   1-Jan-1980  00:00:00  word/document.xml
+  -rw-rw-rw-      7559   1-Jan-1980  00:00:00  word/theme/theme1.xml
+  -rw-rw-rw-     83908   1-Jan-1980  00:00:00  docProps/thumbnail.jpeg
+  -rw-rw-rw-      2222   1-Jan-1980  00:00:00  word/settings.xml
+  -rw-rw-rw-      1521   1-Jan-1980  00:00:00  word/fontTable.xml
+  -rw-rw-rw-       276   1-Jan-1980  00:00:00  word/webSettings.xml
+  -rw-rw-rw-       769   1-Jan-1980  00:00:00  docProps/core.xml
+  -rw-rw-rw-     14675   1-Jan-1980  00:00:00  word/styles.xml
+  -rw-rw-rw-       726   1-Jan-1980  00:00:00  docProps/app.xml
+- ----------  --------  -----------  --------  ----------------------------
+                169663                         12 files</pre>
+Then I ran file on it and it turns out that this is yet another zip
+based format:
+<pre><b>file *.docx</b>
+Agenda.docx: Zip archive data, at least v2.0 to extract</pre>
+So it really is not that exciting, but now I know I can pull an image of the
+first page of a word document if I am on a machine without Word.
+
+This makes me wonder is pptx is the same... and it is.  This is great
+news for the ideas that Steve L and I were contemplating during the
+Phx mission for IPRW.  We had thoughts about suffering through some
+Microsoft OS machine running a service to make PPTs, but that was no
+fun.  We were also thinking about creating Keynote directory tree, but
+that was Mac specific.  It shouldn't be too hard to write out a
+working pptx that MS Office 2007+, OpenOffice, or Keynote can read.
+<pre>M Filemode      Length  Date         Time      File
+- ----------  --------  -----------  --------  ---------------------------------------------
+  -rw-rw-rw-      3309   1-Jan-1980  00:00:00  [Content_Types].xml
+  -rw-rw-rw-       738   1-Jan-1980  00:00:00  _rels/.rels
+  -rw-rw-rw-       446   1-Jan-1980  00:00:00  ppt/slides/_rels/slide1.xml.rels
+  -rw-rw-rw-      1138   1-Jan-1980  00:00:00  ppt/_rels/presentation.xml.rels
+  -rw-rw-rw-      3416   1-Jan-1980  00:00:00  ppt/presentation.xml
+  -rw-rw-rw-      1720   1-Jan-1980  00:00:00  ppt/slides/slide1.xml
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout7.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout11.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout5.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout8.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout10.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout9.xml.rels
+  -rw-rw-rw-      1991   1-Jan-1980  00:00:00  ppt/slideMasters/_rels/slideMaster1.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout1.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout2.xml.rels
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout3.xml.rels
+  -rw-rw-rw-      3240   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout11.xml
+  -rw-rw-rw-      3016   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout10.xml
+  -rw-rw-rw-      4652   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout9.xml
+  -rw-rw-rw-      2961   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout2.xml
+  -rw-rw-rw-      4352   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout1.xml
+  -rw-rw-rw-     11981   1-Jan-1980  00:00:00  ppt/slideMasters/slideMaster1.xml
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout6.xml.rels
+  -rw-rw-rw-      4436   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout3.xml
+  -rw-rw-rw-      4707   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout4.xml
+  -rw-rw-rw-      7218   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout5.xml
+  -rw-rw-rw-      2228   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout6.xml
+  -rw-rw-rw-      1890   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout7.xml
+  -rw-rw-rw-      4797   1-Jan-1980  00:00:00  ppt/slideLayouts/slideLayout8.xml
+  -rw-rw-rw-       311   1-Jan-1980  00:00:00  ppt/slideLayouts/_rels/slideLayout4.xml.rels
+  -rw-rw-rw-     51893   1-Jan-1980  00:00:00  <b>ppt/media/image1.png</b> # and here is my image!  Too bad the original name is lost
+  -rw-rw-rw-      7571   1-Jan-1980  00:00:00  ppt/theme/theme1.xml
+  -rw-rw-rw-     14107   1-Jan-1980  00:00:00  docProps/thumbnail.jpeg
+  -rw-rw-rw-      1039   1-Jan-1980  00:00:00  ppt/viewProps.xml
+  -rw-rw-rw-       182   1-Jan-1980  00:00:00  ppt/tableStyles.xml
+  -rw-rw-rw-       450   1-Jan-1980  00:00:00  ppt/presProps.xml
+  -rw-rw-rw-      1133   1-Jan-1980  00:00:00  docProps/app.xml
+  -rw-rw-rw-       677   1-Jan-1980  00:00:00  docProps/core.xml
+  -rw-rw-rw-      9419   1-Jan-1980  00:00:00  ppt/printerSettings/printerSettings1.bin
+- ----------  --------  -----------  --------  ---------------------------------------------
+                158128                         39 files</pre>
+And perhaps we could even write out a much more compact pptx without all the unused layouts.  Digging in to
+ppt/slides/slide1.xml, it does not look too bad!
+<pre><tt><b>...
+<font color="#0000FF">&lt;p:sp&gt;</font></b>
+  <b><font color="#0000FF">&lt;p:nvSpPr&gt;</font></b>
+    <b><font color="#0000FF">&lt;p:cNvPr</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"2"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"Title 1"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;p:cNvSpPr&gt;</font></b>
+      <b><font color="#0000FF">&lt;a:spLocks</font></b> <font color="#009900">noGrp</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/p:cNvSpPr&gt;</font></b>
+    <b><font color="#0000FF">&lt;p:nvPr&gt;</font></b>
+      <b><font color="#0000FF">&lt;p:ph</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"ctrTitle"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/p:nvPr&gt;</font></b>
+  <b><font color="#0000FF">&lt;/p:nvSpPr&gt;</font></b>
+  <b><font color="#0000FF">&lt;p:spPr/&gt;</font></b>
+  <b><font color="#0000FF">&lt;p:txBody&gt;</font></b>
+    <b><font color="#0000FF">&lt;a:bodyPr/&gt;</font></b>
+    <b><font color="#0000FF">&lt;a:lstStyle/&gt;</font></b>
+    <b><font color="#0000FF">&lt;a:p&gt;</font></b>
+      <b><font color="#0000FF">&lt;a:r&gt;</font></b>
+        <b><font color="#0000FF">&lt;a:rPr</font></b> <font color="#009900">lang</font><font color="#990000">=</font><font color="#FF0000">"en-US"</font> <font color="#009900">smtClean</font><font color="#990000">=</font><font color="#FF0000">"0"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;a:t&gt;</font></b>Hello world<b><font color="#0000FF">&lt;/a:t&gt;</font></b>
+      <b><font color="#0000FF">&lt;/a:r&gt;</font></b>
+      <b><font color="#0000FF">&lt;a:endParaRPr</font></b> <font color="#009900">lang</font><font color="#990000">=</font><font color="#FF0000">"en-US"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/a:p&gt;</font></b>
+  <b><font color="#0000FF">&lt;/p:txBody&gt;</font></b>
+<b><font color="#0000FF">&lt;/p:sp&gt;</font></b>
+...</tt></pre>
+-----

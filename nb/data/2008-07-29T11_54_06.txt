@@ -1,0 +1,113 @@
+TITLE: StarDot netcam - initial tests
+AUTHOR: Kurt
+DATE: 07.29.2008 11:54
+DESC: nice!
+-----
+BODY:
+I've done an initial test of the StarDot SC 5MP.  I've come to the
+conclusion that I need to clean the lens and clean my office window!
+
+First off, I used the video output with a standard def Sony TV monitor
+to get the rough focus.  SD is a bit tough to do the focus.
+Initially, the video would not really sync.  Rebooting the netcam got
+the video to work just fine.  No tripod, so this is blurry...
+
+<img src="http://schwehr.org/blog/attachments/2008-07/stardot-video-monitor.jpg"/>
+
+I setup the camera to take the full resolution images through the web interface:
+
+<img src="http://schwehr.org/blog/attachments/2008-07/stardot-web-ui.png"/>
+
+Here are two sample images from the camera.  I've downsampled them for
+my blog, but they illustrate the blurry image (from not cleaning
+everything), and the strong spherical distortion from the wide angle
+optics.  The results are pretty good.  Now I need a ladder and some
+Windex.
+
+<img src="http://schwehr.org/blog/attachments/2008-07/netcam-10.jpg"/>
+
+<img src="http://schwehr.org/blog/attachments/2008-07/netcam-11.jpg"/>
+
+Just a couple notes about the netcam system.  It is not strong on
+security.  You will need to put this behind a NAT or other firewall.
+The box runs a stripped down <a href="http://www.uclinux.org/">uCLinux</a> with <a href="http://busybox.net/">BusyBox</a>:
+<pre>
+% <b>telnet cam1</b>
+BusyBox v0.60.0 (2007.10.30-21:37+0000) Built-in shell (msh)
+% <b>uname -a</b>
+uClinux netcamsc 2.0.39.1 8118 Tue Oct 30 14:35:29 PDT 2007 m68knommu unknown
+</pre>
+The open ports:
+<pre>
+% <b>sudo nmap -sS -sR -sV -O -PI -PT cam1</b>
+PORT    STATE SERVICE  VERSION
+9/tcp   open  discard
+23/tcp  open  telnet   Linux telnetd
+80/tcp  open  http     Boa HTTPd 0.93.15
+512/tcp open  exec
+</pre>
+Thanks to Dale C., I was able to grab images with wget for testing:
+<pre>
+% <b>watch -n 10 wget http://camera/netcam.jpg</b>
+</pre>
+watch will run the wget command every 10 seconds.  Pretty simple way
+to grab some frames.
+
+Here are the details of an image (just because I can... )
+<pre>
+% <b>identify -verbose netcam-11.jpg</b>
+Image: netcam-11.jpg
+  Format: JPEG (Joint Photographic Experts Group JFIF format)
+  Class: DirectClass
+  Geometry: 2592x1944+0+0
+  Resolution: 72x72
+  Print size: 36x27
+  Units: Undefined
+  Type: TrueColor
+  Endianess: Undefined
+  Colorspace: RGB
+  Depth: 8-bit
+  Channel depth:
+    red: 8-bit
+    green: 8-bit
+    blue: 8-bit
+  Channel statistics:
+    red:
+      min: 0 (0)
+      max: 255 (1)
+      mean: 103.572 (0.406164)
+      standard deviation: 60.0907 (0.23565)
+    green:
+      min: 0 (0)
+      max: 255 (1)
+      mean: 102.451 (0.40177)
+      standard deviation: 65.5453 (0.25704)
+    blue:
+      min: 0 (0)
+      max: 255 (1)
+      mean: 104.497 (0.409791)
+      standard deviation: 63.6873 (0.249754)
+  Rendering intent: Undefined
+  Interlace: None
+  Background color: white
+  Border color: rgb(223,223,223)
+  Matte color: grey74
+  Transparent color: black
+  Page geometry: 2592x1944+0+0
+  Dispose: Undefined
+  Iterations: 0
+  Compression: JPEG
+  Quality: 77
+  Orientation: Undefined
+  Properties:
+    create-date: 2008-07-29T11:35:44-04:00
+    jpeg:colorspace: 2
+    jpeg:sampling-factor: 2x2,1x1,1x1
+    modify-date: 2008-07-29T11:35:44-04:00
+  Profiles:
+    Profile-APP10: 32 bytes
+  Tainted: False
+  Filesize: 887.096kb
+  Number pixels: 4.80542mb
+</pre>
+-----

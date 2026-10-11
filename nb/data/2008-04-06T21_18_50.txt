@@ -1,0 +1,181 @@
+TITLE: geodjango fink package
+AUTHOR: Kurt
+DATE: 04.06.2008 21:18
+DESC: part way there
+-----
+BODY:
+I've finally created a fink package for <a
+href="http://code.djangoproject.com/wiki/GeoDjango">GeoDjango</a> (aka
+django_gis).  GeoDjango requires libgeos3 (not libgeos2), therefor, I
+spent a bit of time creating postgis83 and gdal packages that use
+libgeos3.  I'm using a svn snapshot of GeoDjango that I created today.  The whole lot can be found here:
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/fink/geodjango/">http://vislab-ccom.unh.edu/~schwehr/software/fink/geodjango/</a>
+
+The only really tricky part was making sure that the python ctypes
+interface was able to find both gdal and libgeos3.  I added a patch
+script to the geodjango-py.info file:
+<pre>
+PatchScript: &lt;&lt;
+  perl -pi -e 's|libgdal.dylib|%p/lib/libgdal.1.dylib|g' django/contrib/gis/gdal/libgdal.py
+  perl -pi -e 's|libgeos_c.dylib|%p/lib/libgeos_c.1.4.1.dylib|g' django/contrib/gis/geos/libgeos.py
+&lt;&lt;
+</pre>
+The first thing to do is to get your databases up to this version of
+postgis with the right libraries.  I don't have an existing db on this
+machine right now, so I do not have the best notes for it.
+<pre>
+% <b>dropdb ais</b> # Danger... don't do this if you have valuable data in the db
+% <b>sudo daemonic disable postgresql82</b>
+% <b>fink install geodjango-py25</b>
+% <b>sudo daemonic enable  postgresql83</b>
+% <b>sudo  /sw/bin/pgsql.sh-8.2 stop</b>
+waiting for server to shut down.... done
+server stopped
+% <b>sudo  /sw/bin/pgsql.sh start</b>
+% <b>sudo -u postgres createuser -U postgres -W $USER -P</b>
+% <b>createdb ais</b>
+% <b>psql -f /sw/share/doc/postgis83/lwpostgis.sql -d ais</b>
+% <b>psql -f /sw/share/doc/postgis83/spatial_ref_sys.sql -d ais</b>
+</pre>
+Load some pre normalized AIS data and build the tables at the
+same time.
+<pre>
+% <b>ais_build_postgis.py -C log.2008-03-12.norm</b>
+</pre>
+Now test the databzse:
+<pre>
+ais=# select AsText(position) from position limit 10;
+                  astext                   
+==========================================
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(181 91)
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(-70.8807183333333 43.2045316666667)
+ POINT(-70.8807183333333 43.2045316666667)
+(10 rows)
+</pre>
+Since I already have a database setup, I can have django output what
+it things the model file should look like.  Apparently, this does not
+know about the postgis extra tables and field types.  It creates
+models for SpatialRefSys and GeometryColumns that I do not need.  I
+only have one spatial field in the position table called
+<i>position</i>.  Note that it outputs it as a <i>TextField</i>.
+<pre>
+% <b>python manage.py inspectdb &gt; priliminary_models.py</b>
+class Position(models.Model):
+    key = models.IntegerField(primary_key=True)
+    messageid = models.IntegerField()
+    repeatindicator = models.IntegerField()
+    userid = models.IntegerField()
+    navigationstatus = models.IntegerField()
+    rot = models.IntegerField()
+    sog = models.DecimalField(max_digits=4, decimal_places=1)
+    positionaccuracy = models.IntegerField()
+    cog = models.DecimalField(max_digits=4, decimal_places=1)
+    trueheading = models.IntegerField()
+    timestamp = models.IntegerField()
+    regionalreserved = models.IntegerField()
+    spare = models.IntegerField()
+    raim = models.BooleanField()
+    state_syncstate = models.IntegerField()
+    state_slottimeout = models.IntegerField()
+    state_slotoffset = models.IntegerField()
+    cg_r = models.CharField(max_length=15)
+    cg_sec = models.IntegerField()
+    cg_timestamp = models.DateTimeField()
+    position = <b>models.TextField()</b> <font color="orange"># This field type is a guess.</font>
+    class Meta:
+        db_table = u'position'
+</pre>
+I need a django application to put this in:
+<pre>
+% <b>python manage.py startapp ais_msgs</b>
+% <b>cd ais_msgs</b>
+</pre>
+I then modified the models.py.  In bold are all the lines that are
+different from the priliminary version.
+<pre>
+<b>from django.contrib.gis.db import models</b>
+# Leave out SpatialRefSys?
+class Position(models.Model):
+    key = models.IntegerField(primary_key=True)
+    messageid = models.IntegerField()
+    repeatindicator = models.IntegerField()
+    userid = models.IntegerField()
+    navigationstatus = models.IntegerField()
+    rot = models.IntegerField()
+    sog = models.DecimalField(max_digits=4, decimal_places=1)
+    positionaccuracy = models.IntegerField()
+    cog = models.DecimalField(max_digits=4, decimal_places=1)
+    trueheading = models.IntegerField()
+    timestamp = models.IntegerField()
+    regionalreserved = models.IntegerField()
+    spare = models.IntegerField()
+    raim = models.BooleanField()
+    state_syncstate = models.IntegerField()
+    state_slottimeout = models.IntegerField()
+    state_slotoffset = models.IntegerField()
+    cg_r = models.CharField(max_length=15)
+    cg_sec = models.IntegerField()
+    cg_timestamp = models.DateTimeField()
+    <b>position = models.PointField(srid=4326)
+    #
+    objects = models.GeoManager() <font color="orange"># Required for geodjango</font>
+    #</b>
+    class Meta:
+        db_table = u'position'
+</pre>
+
+The most important change is to switch out the first line and import
+the models from geodjango.  Otherwise, things like PointField will not
+be understood.  Then position gets an overhall.  I changed it from a
+TextField to a PointField and added a srid/EPSG of 4326 to say that it
+is geographic WGS84.
+
+Then it is time to turn the tables and see what geodjango thinks the
+database should look like:
+<pre>
+% <b>python manage.py sqlall ais_msgs</b>
+BEGIN;
+CREATE TABLE "position" (
+    "key" integer NOT NULL PRIMARY KEY,
+    "messageid" integer NOT NULL,
+    "repeatindicator" integer NOT NULL,
+    "userid" integer NOT NULL,
+    "navigationstatus" integer NOT NULL,
+    "rot" integer NOT NULL,
+    "sog" numeric(4, 1) NOT NULL,
+    "positionaccuracy" integer NOT NULL,
+    "cog" numeric(4, 1) NOT NULL,
+    "trueheading" integer NOT NULL,
+    "timestamp" integer NOT NULL,
+    "regionalreserved" integer NOT NULL,
+    "spare" integer NOT NULL,
+    "raim" boolean NOT NULL,
+    "state_syncstate" integer NOT NULL,
+    "state_slottimeout" integer NOT NULL,
+    "state_slotoffset" integer NOT NULL,
+    "cg_r" varchar(15) NOT NULL,
+    "cg_sec" integer NOT NULL,
+    "cg_timestamp" timestamp with time zone NOT NULL
+)
+;
+SELECT AddGeometryColumn('position', 'position', 4326, 'POINT', 2);
+ALTER TABLE "position" ALTER "position" SET NOT NULL;
+CREATE INDEX "position_position_id" ON "position" USING GIST ( "position" GIST_GEOMETRY_OPS );
+COMMIT;
+</pre>
+Nice!  I have a bunch more to do to make this into a full application.
+
+The install is able to run the above commands and passed the three
+tests at the bottom of the <a
+href="http://code.djangoproject.com/wiki/GeoDjangoInstall">GeoDjangoInstall</a>
+page.  However, that doesn't test actually working with the
+coordinates.
+-----

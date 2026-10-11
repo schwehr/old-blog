@@ -1,0 +1,95 @@
+TITLE: NAMSS and segy python example
+AUTHOR: Kurt
+DATE: 05.26.2005 09:16
+DESC: seismic data from Santa Barbara
+-----
+BODY:
+NOTE: For the USGS maps, you will need a working SVG plugin.  Firefox
+has one built in, while you will have to install one from Adobe for
+Safari.
+
+I talked to Hart and Childs this morning about the <a
+href="http://walrus.wr.usgs.gov/NAMSS/">National Archive of Marine
+Seismic Surveys</a> or NAMSS.  What really caught my eye on their
+poster was the Santa Barbara Basin!
+
+From the <a
+href="http://walrus.wr.usgs.gov/NAMSS/uswest_tracklines.html">uswest</a>
+page there are a number of marked surveys in the Santa Barbara area.
+The red dots are not yet available, but the green are available!
+<ul>
+<li><a
+href="http://walrus.wr.usgs.gov/infobank/w/w1377sc/html/w-13-77-sc.seis.html">USGS
+CMG W-13-77-SC Seismic</a></li>
+<li><a
+href="http://walrus.wr.usgs.gov/infobank/w/w4085sc/html/w-40-85-sc.seis.html">USGS
+CMG W-40-85-SC Seismic</a></li>
+</ul>
+
+Now back to <b>segy python</b>!  I now have a working shot location
+dumper.  I was caught off guard by the X,Y not changing in the first
+few traces, but I should have remembered that is the case.  The traces
+always have the last available X,Y such that it looks like traces do
+not move for a while unit the next GPS data.  I need to make some sort
+of interpolation function for this.  Here is my simple trace,
+shotpoint, x and y dumper program.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">segy</font> <strong>import</strong> <font color="#2040a0">Segy</font>
+<font color="#2040a0">xstar</font> <font color="4444FF">=</font> <font color="#2040a0">Segy</font><font color="4444FF">(</font><font color="#008000">'bpsio01L00.xstar'</font><font color="4444FF">)</font>
+
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(1,</font><font color="#2040a0">xstar</font>.<font color="#2040a0">getNumberOfTraces</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">traceHdr</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">shot</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Shotpoint'</font><font color="4444FF">)</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'X'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Y'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+    <strong>print</strong> <font color="#2040a0">shot</font>,<font color="#008000">&quot;: &quot;</font>,<font color="#2040a0">x</font>,<font color="#2040a0">y</font>
+
+</pre>
+Creating a Segy option with a filename loads up the datafile as a very
+efficient memory map.  This way the data from the file only comes into
+memory when needed.  The hope if that if you are only reading, say,
+one trace, the file header and that trace are paged in, but thing
+else.
+
+Then the code loops over all the traces.  The range must have a "1,"
+in it as there is no trace 0 in the SEGY specification.  If you ask
+for trace 0, you will get garbage.
+
+For each loop, the getTraceHdr(i), pulls out another mmap'ed reference
+to a particular trace.  From the trace reference, I can then ask for
+the X,Y, and shotpoint fields.  I know from prior knowledge (but you
+could look at the header fields too) that these X,Y pairs are in
+seconds of arc.  To get decimal lat/long, I divide by 3600.  Then I
+print it out.  That is it!  Here is the beginning and end of the
+output:
+<pre>
+./segy_sql.py
+
+  1 13961172 :  -120.101111111 34.4061111111
+  2 13961172 :  -120.101111111 34.4061111111
+  3 13961172 :  -120.101111111 34.4061111111
+  4 13961172 :  -120.101111111 34.4061111111
+  5 13961172 :  -120.101111111 34.4061111111
+  6 13961172 :  -120.101111111 34.4061111111
+  7 13961172 :  -120.101111111 34.4061111111
+  8 13961172 :  -120.101111111 34.4061111111
+  9 13961172 :  -120.101111111 34.4061111111
+  10 13961172 :  -120.101111111 34.4061111111
+  ...
+  13540 13961172 :  -120.1275 34.4308333333
+  13541 13961172 :  -120.1275 34.4308333333
+  13542 13961172 :  -120.1275 34.4308333333
+  13543 13961172 :  -120.1275 34.4308333333
+  13544 13961172 :  -120.1275 34.4308333333
+  13545 13961172 :  -120.1275 34.4308333333
+  13546 13961172 :  -120.1275 34.4308333333
+  13547 13961172 :  -120.1275 34.4308333333
+  13548 13961172 :  -120.1275 34.4308333333
+  13549 13961172 :  -120.1275 34.4308333333
+</pre>
+
+Other news:  <a href="http://www.sciencedaily.com/releases/2005/05/050526092730.htm">New Method For Imaging Dec. 26 Indian Ocean Earthquake Yields Unprecedented Results</a>.  Mentions Scripps and IGPP
+-----
+  

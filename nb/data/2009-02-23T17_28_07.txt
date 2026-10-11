@@ -1,0 +1,89 @@
+TITLE: Merging multiple databases all with the same table
+AUTHOR: Kurt
+DATE: 02.23.2009 17:28
+DESC: not elegant
+-----
+BODY:
+In processing AIS, I created a sqlite3 database for each data of data.
+This is mostly because my ais parsing code is slow.  I wanted to be able
+to merge all those databases into one big one.  My first attempt was to
+run dump on each one and combine the INSERTS.
+<pre><tt><i><font color="#9A1900">#!/bin/sh</font></i>
+<!-- -->
+<font color="#009900">out</font><font color="#990000">=</font>dump<font color="#990000">.</font>sql
+rm -f <font color="#009900">$out</font>
+<!-- -->
+<font color="#009900">afile</font><font color="#990000">=</font>`ls -<font color="#993399">1</font> log<font color="#990000">*</font>bbox<font color="#990000">.</font>db3 <font color="#990000">|</font> head -<font color="#993399">1</font>`
+<!-- -->
+sqlite3 <font color="#009900">$afile</font> <font color="#990000">.</font>dump <font color="#990000">|</font> grep CREATE <font color="#990000">&gt;&gt;</font> <font color="#009900">$out</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> file <b><font color="#0000FF">in</font></b> log<font color="#990000">*.</font>db3<font color="#990000">;</font> <b><font color="#0000FF">do</font></b>
+    echo <font color="#009900">$file</font>
+    sqlite3 <font color="#009900">$file</font> <font color="#990000">.</font>dump <font color="#990000">|</font> grep -v CREATE <font color="#990000">&gt;&gt;</font> <font color="#009900">$out</font>
+<b><font color="#0000FF">done</font></b></tt></pre>
+However, they primary keys get in the way.  For each day, the primary keys
+start over and clash with the other days.  There is probably a better way,
+but I wrote this python to rip out the primary keys and write the entries 
+to a new database.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> sqlite3<font color="#990000">,</font>sys<font color="#990000">,</font>os
+<!-- -->
+outdbname <font color="#990000">=</font> os<font color="#990000">.</font>path<font color="#990000">.</font><b><font color="#000000">basename</font></b><font color="#990000">(</font>os<font color="#990000">.</font><b><font color="#000000">getcwd</font></b><font color="#990000">())+</font><font color="#FF0000">'.db3'</font>
+outdb <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font>outdbname<font color="#990000">)</font>
+outcur <font color="#990000">=</font> outdb<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+<!-- -->
+<i><font color="#9A1900"># Truncated for clarity</font></i>
+outcur<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'CREATE TABLE position ( key INTEGER PRIMARY KEY, MessageID INTEGER, RepeatIndicator INTEGER, UserID INTEGER, ... );'</font><font color="#990000">)</font>
+outdb<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font>
+<!-- -->
+fields <font color="#990000">=</font> <font color="#990000">[</font>
+    <font color="#FF0000">'MessageID'</font><font color="#990000">,</font>
+    <font color="#FF0000">'RepeatIndicator'</font><font color="#990000">,</font>
+    <font color="#FF0000">'UserID'</font><font color="#990000">,</font>
+    <font color="#FF0000">'NavigationStatus '</font><font color="#990000">,</font>
+    <font color="#FF0000">'ROT'</font><font color="#990000">,</font>
+    <font color="#FF0000">'SOG'</font><font color="#990000">,</font>
+    <font color="#FF0000">'PositionAccuracy'</font><font color="#990000">,</font>
+    <font color="#FF0000">'longitude'</font><font color="#990000">,</font>
+    <font color="#FF0000">'latitude'</font><font color="#990000">,</font>
+    <font color="#FF0000">'COG'</font><font color="#990000">,</font>
+    <font color="#FF0000">'TrueHeading'</font><font color="#990000">,</font>
+    <font color="#FF0000">'TimeStamp'</font><font color="#990000">,</font>
+    <font color="#FF0000">'RegionalReserved'</font><font color="#990000">,</font>
+    <font color="#FF0000">'Spare'</font><font color="#990000">,</font>
+    <font color="#FF0000">'RAIM'</font><font color="#990000">,</font>
+    <font color="#FF0000">'state_syncstate'</font><font color="#990000">,</font>
+    <font color="#FF0000">'state_slottimeout'</font><font color="#990000">,</font>
+    <font color="#FF0000">'state_slotoffset'</font><font color="#990000">,</font>
+    <font color="#FF0000">'cg_r'</font><font color="#990000">,</font>
+    <font color="#FF0000">'cg_sec'</font><font color="#990000">,</font>
+    <font color="#FF0000">'cg_timestamp'</font><font color="#990000">]</font>
+<!-- -->
+values <font color="#990000">=</font> <font color="#FF0000">','</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">([</font><font color="#FF0000">'?'</font><font color="#990000">]*</font><b><font color="#000000">len</font></b><font color="#990000">(</font>fields<font color="#990000">))</font>
+<!-- -->
+sqlstring<font color="#990000">=</font><font color="#FF0000">'INSERT INTO position ('</font> <font color="#990000">+</font> <font color="#FF0000">','</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>fields<font color="#990000">)</font> <font color="#990000">+</font> <font color="#FF0000">') VALUES ('</font> <font color="#990000">+</font> values <font color="#990000">+</font> <font color="#FF0000">');'</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> sqlstring
+<!-- -->
+<b><font color="#0000FF">for</font></b> filename <b><font color="#0000FF">in</font></b> sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">:]:</font>
+    <b><font color="#0000FF">print</font></b> filename
+    db <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font>filename<font color="#990000">)</font>
+    cur <font color="#990000">=</font> db<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+    cur<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT * FROM position;'</font><font color="#990000">)</font>
+    <b><font color="#0000FF">for</font></b> i<font color="#990000">,</font>row <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>cur<font color="#990000">):</font>
+        <b><font color="#0000FF">if</font></b> i<font color="#990000">%</font><font color="#993399">20000</font><font color="#990000">==</font><font color="#993399">0</font> <b><font color="#0000FF">and</font></b> i <font color="#990000">!=</font> <font color="#993399">0</font><font color="#990000">:</font>
+            outdb<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font>
+            <b><font color="#0000FF">print</font></b> i
+        outcur<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font>sqlstring<font color="#990000">,</font>row<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">:])</font>
+    db<font color="#990000">.</font><b><font color="#000000">close</font></b><font color="#990000">()</font>
+    outdb<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font></tt></pre>
+Now I have one large database file for the month 2008-10.
+<pre>% <b>sqlite 2008-10.db3 'SELECT COUNT(key) FROM position;'</b>
+3194510
+% <b>sqlite 2008-10.db3 'SELECT COUNT(DISTINCT(UserID)) FROM position;'</b>
+662</pre>
+I've got 3.1M position reports from 662 MMSI's.  It would be better to
+have a solution that looked at the table and dropped any keys, but that would
+have been more work.
+-----

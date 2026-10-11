@@ -1,0 +1,81 @@
+TITLE: Finding duplicate files with python
+AUTHOR: Kurt
+DATE: 03.09.2007 13:18
+DESC: ugly code
+-----
+BODY:
+We all know the problem.  As you go about working on data on your
+computer, you often end up with many copies of the same file, but in
+different places and those files might not have the same name.  I
+probably have a good 10-20 GB on my desktop that I could ditch.
+(Hmmm... This morning, Val was talking to me about techniques for
+organizing file systems for data processing.  Point taken!)
+
+Here is fugly bit of python to chug through my disk.  It is going to
+go pretty slow, but it will get the job done.  Here is how you might
+call it:
+<pre>
+locate `echo ~` | grep "^`echo ~`" | findcopies.py | sort -n
+</pre>
+
+How does it work?  It takes a list of file names on stdin and
+calculates a checksum.  I used the aldler32 checksum in zlib as I've
+read that it is reasonably fast.  I use that checksum as a key in a
+dictionary.  For that key, I build a list of keys with that checksum.
+This gets me a list of files that are probably all the same.  
+
+The danger is that there might be a collision.  I use md5 as a second
+checksum to make sure that the files are really unique.  The code then
+prints out the filenames for each unique md5 on the list of files that
+all the sample adler32.  Before each group of files, I stat the file
+and get the number of bytes.  By making the filesize be the first
+number, it is then easy to sort by filesize.
+
+The code does not check for multiple hard links on the same file.
+That could be done by comparing inode values and only printing
+one file name per uniqe inode.  That might not work on MS-Windows.  
+Is there an inode function on windows and what does it return?
+
+The code:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">''</font><font color="#008000">'
+@see: http://www.peterbe.com/plog/using-md5-to-check-equality-between-files
+'</font><font color="#008000">''</font>
+<strong>import</strong> <font color="#2040a0">sys</font>, <font color="#2040a0">zlib</font>, <font color="#2040a0">md5</font>, <font color="#2040a0">os</font>, <font color="#2040a0">stat</font>
+<font color="#2040a0">files</font><font color="4444FF">=</font><font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font> <font color="#444444"># Dictionary with the key being the adler 32 checksum</font>
+<strong>for</strong> <font color="#2040a0">filename</font> <strong>in</strong> <font color="#2040a0">sys</font>.<font color="#2040a0">stdin</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">filename</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'\n'</font><font color="4444FF">:</font>
+        <font color="#2040a0">filename</font> <font color="4444FF">=</font> <font color="#2040a0">filename</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+    <font color="#2040a0">mode</font> <font color="4444FF">=</font> <font color="#2040a0">os</font>.<font color="#2040a0">lstat</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#2040a0">stat</font>.<font color="#2040a0">ST_MODE</font><font color="4444FF">]</font>
+    <strong>if</strong> <strong>not</strong> <font color="#2040a0">stat</font>.<font color="#2040a0">S_ISREG</font><font color="4444FF">(</font><font color="#2040a0">mode</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <strong>continue</strong>
+    <strong>try</strong><font color="4444FF">:</font>
+        <font color="#2040a0">a</font> <font color="4444FF">=</font> <font color="#2040a0">zlib</font>.<font color="#2040a0">adler32</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>.<font color="#2040a0">read</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <strong>except</strong><font color="4444FF">:</font>
+        <strong>continue</strong>
+    <strong>if</strong> <font color="#2040a0">a</font> <strong>not</strong> <strong>in</strong> <font color="#2040a0">files</font><font color="4444FF">:</font>
+        <font color="#2040a0">files</font><font color="4444FF">[</font><font color="#2040a0">a</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#2040a0">filename</font><font color="4444FF">]</font>
+        <strong>continue</strong>
+    <font color="#2040a0">files</font><font color="4444FF">[</font><font color="#2040a0">a</font><font color="4444FF">]</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>
+<font color="#2040a0">multiples</font><font color="4444FF">=</font><font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font>
+<strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">files</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">files</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">&lt;</font><font color="#FF0000">2</font><font color="4444FF">:</font> <strong>continue</strong>
+    <font color="#2040a0">md5s</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="4444FF">]</font>
+    <font color="#2040a0">filenames</font> <font color="4444FF">=</font> <font color="#2040a0">files</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font>
+    <strong>for</strong> <font color="#2040a0">filename</font> <strong>in</strong> <font color="#2040a0">filenames</font><font color="4444FF">:</font>
+       <font color="#2040a0">md5s</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#2040a0">md5</font>.<font color="#2040a0">new</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>.<font color="#2040a0">read</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>.<font color="#2040a0">hexdigest</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#2040a0">s</font> <font color="4444FF">=</font> <font color="#2040a0">set</font><font color="4444FF">(</font><font color="#2040a0">md5s</font><font color="4444FF">)</font> <font color="#444444"># Unique list of checksums</font>
+    <strong>for</strong> <font color="#2040a0">sum</font> <strong>in</strong> <font color="#2040a0">s</font><font color="4444FF">:</font>
+        <font color="#2040a0">filesize</font><font color="4444FF">=</font><font color="#2040a0">False</font>
+        <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">filenames</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <strong>if</strong> <font color="#2040a0">sum</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">md5s</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">:</font>
+                <strong>if</strong> <strong>not</strong> <font color="#2040a0">filesize</font><font color="4444FF">:</font>
+                    <font color="#2040a0">filesize</font><font color="4444FF">=</font><font color="#2040a0">True</font>
+                    <strong>print</strong> <font color="#2040a0">os</font>.<font color="#2040a0">stat</font><font color="4444FF">(</font><font color="#2040a0">filenames</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">)</font>.<font color="#2040a0">st_size</font>,
+                <strong>print</strong> <font color="#2040a0">filenames</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font>,
+        <strong>print</strong>
+<font color="#444444"># FIX: Drop multiple hard links</font>
+<font color="#444444"># os.stat('zzz')[stat.ST_INO] inode</font>
+</pre>
+-----

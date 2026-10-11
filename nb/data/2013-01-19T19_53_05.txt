@@ -1,0 +1,30 @@
+TITLE: lxml etree iterparse or xpath, xml namespaces, and python generators
+AUTHOR: Kurt
+DATE: 01.19.2013 19:53
+DESC: woot.  finally something nice
+-----
+BODY:
+I've been going round in circles trying to parse XML in python for MSL.  Everything I've done in the past has been a nasty hack.  Today, I tried to figure out how to cleanly deal with the namespaces and was foiled.  It seems crazy that lxml doesn't have a something that returns to you the namespace dictionary.  But maybe that isn't even possible.  So, in the past, I've had things like this:
+<pre>utm_coords = root.xpath('//*/gml:coordinates', namespaces={'gml':"http://www.opengis.net/gml"})[0].text</pre>
+Ick.  I really do not like the whole namespace URL thing.  Why does my code care where the gml spec is?  Today, I finally found a way that you can do xpath searches that ignore the namespace.  e.g. If want to find all the &lt;Node&gt; entries in a document:
+<pre>et.xpath("//*[local-name()='Node']")
+Out[47]: [&lt;Element {RPK}Node at 0x103c9ca50&gt;]</pre>
+This works fine for small documents.  But really I should be using iterparse to deal with one chunk at a time.  Some documents have one &lt;Node&gt;, but others have 10's of thousands of nodes and several hundred thousand child nodes.  xpath just gets slow.  It turns out that using lxml etree iterparse plus a python generator makes for compact code that doesn't make my head hurt.  I'm sure it's not the easiest to understand if you are not the author, but check it out:
+<pre>from lxml import etree
+<!-- -->
+# This is a python generator... note the "yield"
+def RksmlNodes(rksml_source):
+    for event, element in etree.iterparse(rksml_source, tag='{RPK}Node'):
+        knots = dict([(child.attrib['Name'], float(child.text)) for child in element])
+        yield knots</pre>
+Then if you want to get all the nodes in a file, you can do something like this:
+<pre>nodes = [node for node in rksml.RksmlNodes('data/00048/rksml_playback.rksml')]
+len(nodes)
+nodes[0]</pre>
+And that gives you something like this:
+<pre>Out[8]: 20129
+Out[9]: {'RSM_AZ': 2.1, 'RSM_EL': 0.321}</pre>
+And I didn't have to hard code the fields that are the child of each &lt;Node&gt;.  This is all find until 
+somebody changes the namespace alias in a RKSML file to something other than RPK.  In the past, I would
+read each file and rewrite it without the namespace.
+-----

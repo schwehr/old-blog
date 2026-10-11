@@ -1,0 +1,30 @@
+TITLE: Converting old Arc/Info V7 Coverages
+AUTHOR: Kurt
+DATE: 01.18.2009 22:36
+DESC: progress
+-----
+BODY:
+I've got two geologic maps from the Great Basin National Park (GBNP)
+that I worked hard to put into Arc/Info back in 1994-5.  With help
+from <a href="http://pubpages.unh.edu/~mlg52/">Monica</a>, I've at least got some of the data back.  My archived
+data is tar'ed in gbnp-1995.tar.bz2 which can be found in my <a
+href="http://vislab-ccom.unh.edu/~schwehr/data/1995-gbnp/">GBNP
+archive</a> Back in 1995, I did a whole series of 3D visualizations
+using GRASS on an SGI.  The results were really good!  I wish I had
+managed to save the grass project.
+
+<img title="Visualized in GRASS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/wheeler-peak-gbnp-grass.png"/>
+
+I could not figure out how ot get gdal to read the Arc/Info V7 project
+with the <a href="http://www.gdal.org/ogr/drv_avcbin.html">avcbin</a>
+driver.  Monica used <a
+href="http://avce00.maptools.org/avce00/index.html">AVCE00</a> to
+convert the files to e00.  I took a converted e00 file and ran it
+though gdal:
+<pre>% <b>ogr2ogr -f KML minerva-canyon.{kml,e00}</b></pre>
+After a little bit of tweaking, here is the view in Google Earth with only a few of the placemarks.
+
+<img title="In Google Earth" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/minerva-canyon-gbnp-ge.png"/>
+
+How do you parse the INFO database files?  Perhaps this: <a href="http://avce00.maptools.org/docs/v7_bin_cover.html#ARC.DAT">v7_bin_cover.html#ARC.DAT</a>
+-----

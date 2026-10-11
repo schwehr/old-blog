@@ -1,0 +1,111 @@
+TITLE: floating point exceptions
+AUTHOR: Kurt
+DATE: 09.06.2005 09:30
+DESC: broken code
+-----
+BODY:
+<b>UPDATE</b>: <font color="orange">THIS IS ALL WRONG... There is something not right about
+this!</font>
+
+I think that maybe catching sigfpe may be the way to go?  But I wonder
+if that signal is even being sent on mac osx???
+
+<hr>
+
+<b>This does not work...</b>
+
+Yesterday, Jeff Gee and I worked through an interesting little
+problem.  How do you detect floating point exceptions in a numerical
+program?  Checking every possible point in a set of equations will be
+slow and make the code nearly impossible to comprehend.  There are
+also invisible temporary variables created by the compilers that are
+impossible to see.  Jeff started with this web page:
+
+<a
+href="http://gcc.gnu.org/onlinedocs/gcc-3.4.1/g77/Floating-point-Exception-Handling.html#Floating-point%20Exception%20Handling">G77
+manual - Floating-point Exception Handling</a>
+
+This page says to write some whacko c code with a <b>static void
+__attribute__ ((constructor))</b>.  Then call feenableexcept.  That
+call is in the headers, but I have no idea where that code is in the
+libraries.  The final part is to compile the code with -trapfpe flag
+when linking.  Well, g77 3.4.3 on darwin 7.9.0 (mac osx 10.3.9)  does
+not have that flag.
+
+After a little looking around, I wrote up a little demo program that
+uses some of the calls in fenv.h to check for exceptions.  It appears
+that catching floating point exceptions is enabled by default with
+this setup.
+
+check_f_except.c:
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;fenv.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdio.h&gt;</font></strong></font>
+
+<font color="0000ff"><strong>#define FALSE (0==1)</strong></font>
+<font color="0000ff"><strong>#define TRUE (0==0)</strong></font>
+<strong>void</strong> <font color="#2040a0">check_f_except__</font> <font color="4444FF">(</font><strong>int</strong> <font color="4444FF">*</font><font color="#2040a0">result</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <strong>int</strong> <font color="#2040a0">found</font><font color="4444FF">=</font><font color="#2040a0">FALSE</font><font color="4444FF">;</font>
+
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">fetestexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_INEXACT</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">found</font><font color="4444FF">=</font><font color="#2040a0">TRUE</font><font color="4444FF">;</font>
+    <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;underflow<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">feclearexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_INEXACT</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">fetestexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_DIVBYZERO</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">found</font><font color="4444FF">=</font><font color="#2040a0">TRUE</font><font color="4444FF">;</font>
+    <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;divbyzero<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">feclearexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_DIVBYZERO</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">fetestexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_UNDERFLOW</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">found</font><font color="4444FF">=</font><font color="#2040a0">TRUE</font><font color="4444FF">;</font>
+    <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;underflow<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">feclearexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_UNDERFLOW</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">fetestexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_OVERFLOW</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">found</font><font color="4444FF">=</font><font color="#2040a0">TRUE</font><font color="4444FF">;</font>
+    <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;overflow<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">feclearexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_OVERFLOW</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">fetestexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_INVALID</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">found</font><font color="4444FF">=</font><font color="#2040a0">TRUE</font><font color="4444FF">;</font>
+    <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;invalid<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">feclearexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_INVALID</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">fetestexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_ALL_EXCEPT</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">found</font><font color="4444FF">=</font><font color="#2040a0">TRUE</font><font color="4444FF">;</font>
+    <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;all<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">feclearexcept</font><font color="4444FF">(</font><font color="#2040a0">FE_ALL_EXCEPT</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+
+  <font color="4444FF">*</font><font color="#2040a0">result</font> <font color="4444FF">=</font> <font color="#2040a0">found</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+
+test_fpe.f:
+<pre>
+      double precision d
+
+      i = 999
+      call check_f_except(i)
+      write (*,*) 'result = ',i
+
+      d = (1.0d+00 - 1.0d+00)
+      i = 999
+      call check_f_except(i)
+      write (*,*) 'result = ',i
+
+      end
+</pre>
+The 999's are just markers to set a default value for i.
+check_f_except(i) should set i to  1 for no exception and 0 for an
+exception.  These are due to C's concept of true and false.
+
+<pre>
+underflow
+divbyzero
+invalid
+ result =  1
+ result =  0
+</pre>
+-----

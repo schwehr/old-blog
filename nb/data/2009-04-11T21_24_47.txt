@@ -1,0 +1,30 @@
+TITLE: gnuplot with sqlite
+AUTHOR: Kurt
+DATE: 04.11.2009 21:24
+DESC: what the heck is in this graph?
+-----
+BODY:
+When I'm trying to work fast, I often revert to my old methods.  I'm
+doing some plots of N-AIS station data that I have in a database.
+Here I've split the Class A and Class B data into two groups.  I want
+to do a SQL query from the two databases and plot the data.  I could
+do this in a shell script, but it is nicer to work in the emacs gnuplot mode.
+The "!" provides access to the shell, so I can make a sqlite3 call to
+pull the needed day.  Too bad gnuplot can't directly use sqlite3.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env gnuplot</font></i>
+<!-- -->
+<font color="#990000">!</font>echo <font color="#FF0000">""</font> <font color="#990000">&gt;</font> a-r<font color="#993399">003669930</font><font color="#990000">.</font>dat
+<font color="#990000">!</font>sqlite3 classa-3station<font color="#990000">.</font>db3 <font color="#FF0000">'SELECT day_number, pos_total, pos_us, mmsi_total, mmsi_us FROM classa_summary WHERE station="r003669930";'</font> <font color="#990000">|</font> tr <font color="#FF0000">'|'</font> <font color="#FF0000">' '</font> <font color="#990000">&gt;&gt;</font> a-r<font color="#993399">003669930</font><font color="#990000">.</font>dat
+<!-- -->
+<font color="#990000">!</font>echo <font color="#FF0000">""</font> <font color="#990000">&gt;</font> b-r<font color="#993399">003669930</font><font color="#990000">.</font>dat
+<font color="#990000">!</font>sqlite3          classb<font color="#990000">.</font>db3 <font color="#FF0000">'SELECT day_number, pos_total, pos_us, mmsi_total, mmsi_us FROM classb_summary WHERE station="r003669930";'</font> <font color="#990000">|</font> tr <font color="#FF0000">'|'</font> <font color="#FF0000">' '</font> <font color="#990000">&gt;&gt;</font> b-r<font color="#993399">003669930</font><font color="#990000">.</font>dat
+<!-- -->
+<b><font color="#0000FF">set</font></b> xlabel <font color="#FF0000">'Day number - 2008-01-01 to 2009-04-04'</font>
+<b><font color="#0000FF">set</font></b> logscale y
+<!-- -->
+<b><font color="#0000FF">set</font></b> title <font color="#FF0000">'MMSI/day for station r003669930 New York / CT?'</font>
+<b><font color="#0000FF">set</font></b> ylabel <font color="#FF0000">'Distinct MMSI / day'</font>
+plot <font color="#FF0000">'a-r003669930.dat'</font> using <font color="#993399">1</font><font color="#990000">:</font><font color="#993399">4</font> with l title <font color="#FF0000">'Class A Total'</font><font color="#990000">,</font> <font color="#FF0000">'a-r003669930.dat'</font> using <font color="#993399">1</font><font color="#990000">:</font><font color="#993399">5</font> with p title <font color="#FF0000">'Class A US'</font> <font color="#990000">,</font> <font color="#990000">\</font>
+     <font color="#FF0000">'b-r003669930.dat'</font> using <font color="#993399">1</font><font color="#990000">:</font><font color="#993399">4</font> with l title <font color="#FF0000">'Class B Total'</font><font color="#990000">,</font> <font color="#FF0000">'b-r003669930.dat'</font> using <font color="#993399">1</font><font color="#990000">:</font><font color="#993399">5</font> with p title <font color="#FF0000">'Class B US'</font></tt></pre>
+<img title="One N-AIS station" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/ais-class-a-compared-to-b.png"/>
+-----

@@ -1,0 +1,69 @@
+TITLE: Generic Sensor Format (GSF) meeting
+AUTHOR: Kurt
+DATE: 10.25.2008 08:23
+DESC: the skinny on the meeting
+-----
+BODY:
+At the end of the Shallow Survey 2008 Conference there were two
+concurrent sessions: Survey to Chart Workshop and GSF Workshop.  I
+picked going to the GSF Workshop, but would have liked to have been
+able to attend the other. SAIC did a good job of presenting <a
+href="http://www.saic.com/maritime/gsf/">Generic Sensor Format
+(GSF)</a>
+<pre>Generic Sensor Format (GSF) has become a standard file format for
+bathymetry data and is widely used in the maritime community. This
+single-file format is one of the U.S. Department of Defense
+Bathymetric Library (DoDBL) processing formats and is currently
+version-controlled jointly by Science Applications International
+Corporation (SAIC) and the U.S. Navy.
+<!-- -->
+GSF is designed to efficiently store and exchange information produced
+by geophysical measurement systems before it has been processed into
+either vector or raster form. The structure is particularly useful for
+data sets created by systems such as multibeam echosounders that
+collect a large quantity of data. GSF is designed to be modular and
+adaptable to meet the unique requirements of a variety of sensors.</pre>
+Val Schmidt also presented his ideas on a Sidescan addition to GSF.
+
+Here is my list of items covered from the end of meeting summary:
+<ul>
+  <li>Best practices documents - 
+      List of standard comments</li>
+  <li>Questions about defining order of rotations... see best practices</li>
+  <li>Cleanup of spec document - Create a list of mandatory fields</li>
+  <li>Performance caching - Mark and Kurt will try to do some testing</li>
+  <li>native OS verses POSIX accessing of files performance difference?</li>
+  <li>64 bit file support</li>
+  <li>Long term growth of sensor specific growth... generalization -
+   understanding how to keep complexity down</li>
+  <li>Add Separately navigation for - surface vessel and tow fish</li>
+  <li>Copyright cleanup and add license (BSD?)</li>
+  <li>Formalize conf management (CM) process for how changes are proposed</li>
+  <li>Put the GSF regression tests on the site</li>
+  <li>Horizontal datum - WGS84 has several ellipsoids that change with time... clarify which</li>
+  <li>Expand attitude to handle multiple sensors and uncertainty</li>
+  <li>Possibly add a Schema</li>
+  <li>CTD - save all, not just sound speed.</li>
+  <li>request to increase the stored heading precision, however the group thought that current precision is okay</li>
+</ul>
+While at the meeting, I was looking at the GSF code and put together a 
+quick makefile.  There was a comment that a fresh implementation of 
+GSF decoding done in Java was faster than the C code.  Perhaps the 
+wrong compile flags for GCC?  It would good to profile the GSF code
+and see where most of the time is going.
+<pre><tt><font color="#990000">CC :=</font> gcc-<font color="#993399">4</font> <i><font color="#9A1900"># Only needed if you want to get the latest GCC on a mac with fink</font></i>
+<font color="#990000">CFLAGS :=</font> -O<font color="#993399">3</font> -funroll-loops -fexpensive-optimizations -DNDEBUG
+CFLAGS <font color="#990000">+=</font> -ffast-math
+CFLAGS <font color="#990000">+=</font> -Wall -Wimplicit -W -pedantic  -Wredundant-decls -Wimplicit-int 
+CFLAGS <font color="#990000">+=</font> -Wimplicit-function-declaration -Wnested-externs
+CFLAGS <font color="#990000">+=</font> -march<font color="#990000">=</font>core2 <i><font color="#9A1900"># And likely to make the code not work for other CPUs</font></i>
+<!-- -->
+<font color="#990000">SRCS:=</font><font color="#009900">${</font>wildcard <font color="#990000">*</font>.c}
+<font color="#990000">OBJS:=</font><font color="#009900">${SRCS:.c=.o}</font>
+<!-- -->
+<font color="#990000">libgsf.a:</font> <font color="#009900">${OBJS}</font>
+	ar -rs <font color="#009900">$@</font> <font color="#009900">$+</font>
+<!-- -->
+<font color="#990000">clean:</font>
+	-rm <font color="#990000">*</font>.o</tt></pre>
+-----

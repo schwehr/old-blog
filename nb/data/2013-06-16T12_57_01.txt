@@ -1,0 +1,211 @@
+TITLE: autoconf/automake changes to mb-system for conditionally removing GSF
+AUTHOR: Kurt
+DATE: 06.16.2013 12:57
+DESC: phew!
+-----
+BODY:
+This is my first really deep dive into autoconf / automake.  I have
+been a heavy user of configure scripts and could sort of hack my way
+through minor changes, but I feel like I can actually do some useful
+work on autoconf and automake scripts now.  I just posted a very large
+patch on the mb-system mailing list that lets people use --without-gsf
+to build mb-system without the Generic Sensor Format library by SAIC,
+code which has no license.  Here is a version of that email.
+
+<a href="https://gist.github.com/schwehr/5792674">https://gist.github.com/schwehr/5792674</a>
+
+This is a first step towards removing GSF to allow MB-system to be
+packaged by Hamish for submission to RedHat linux and Debian linux.  I
+think this should make copyright sanitization job of the packaging
+just require deleting the gsf subdir, making a new tar, and then
+including --without-gsf in the build process.
+
+I've got a patch that I believe successfully builds with or without gsf.  Would really appreciate very detailed review of this patch.  It builds for me on Mac OSX 10.8 and the present of libgsf in the shared libraries list looks okay, but I haven't tried running any files through yet.  Watch through of the patch below.  I'm super detailed below to hopefully help in the review and because this is the first time I've done something like this with autoconf/automake and I'm double checking what I did.
+
+The patch is kind of large because it contains deleting mb_config.h which shows as a "-" changes for the entire file.
+
+<b>Notes from Hamish about GSF issues of being unlicensed and submission to deb & rhel/fedora</b>
+
+Kurt, the optional-system's proj4 and GFS switches will certainly not
+get past the debian ftp masters, actually the deb packaging will need
+to rip out any license problematic stuff and make a new tarball, since
+all original code packages are hosted on the debian servers, and they
+as a legal entity need to be able to guarantee that they've got full
+copyright clearance for anything they redistribute.
+
+<b>TODO - header.h.in conversion</b>
+
+I did not convert any of the C headers that have to change to their respective .in template version.  e.g.
+
+mb_format.h -&gt; mb_format.h.in
+
+That means that building against installed headers & libs is not going to work right.  e.g. 
+
+WITHOUT gsf means that prototype for mbr_register_gsfgenmb should not be in mb_format.h at all (or it should at least be commented out)
+
+<b>TODO - should we delete, rename or leave alone structure members for gsf?</b>
+
+In order to catch the use of gsfid, I renamed this struct member to _gsfid_placeholder when GSF not defined:
+<pre>#ifdef WITH_GSF
+        int     gsfid;          /* GSF datastream ID */
+#else
+        int     _gsfid_placeholder;
+#endif</pre>
+Would it be better to leave it alone or could we just drop it like this, which would change the size of the structure (possibly causing problems with things like what ???):
+<pre>#ifdef WITH_GSF
+        int     gsfid;          /* GSF datastream ID */
+#endif</pre>
+<b>mb_config.h</b>
+
+This file should not be checked into svn.  It doesn't cause trouble if
+you build on top of the source tree, but if you do VPATH style
+building, it gets included before the new mb_config.h that gets
+written into the build tree.
+
+<b>How I was building</b>
+<pre>svn co svn://svn.ilab.ldeo.columbia.edu/repo/mb-system/trunk mb-system
+cp -rp mb-system{,.orig}
+<!-- -->
+mkdir build
+cd build</pre>
+WITHOUT gsf
+<pre>(cd ../mb-system; ./autogen.sh); rm -rf src Makefile config.{status,log}; \
+../mb-system/configure --with-netcdf-include=/sw/include --with-gmt-lib=/sw/lib \
+--with-gmt-include=/sw/include --disable-static --without-gsf && make -j 2
+<!-- -->
+(cd ../mb-system; ./autogen.sh); rm -rf src Makefile config.{status,log}; \
+../mb-system/configure --with-netcdf-include=/sw/include --with-gmt-lib=/sw/lib \
+--with-gmt-include=/sw/include --disable-static --with-gsf=no && make -j 2</pre>
+WITH gsf (no option, means include/build with gsf)
+<pre>(cd ../mb-system; ./autogen.sh); rm -rf src Makefile config.{status,log}; \
+../mb-system/configure --with-netcdf-include=/sw/include --with-gmt-lib=/sw/lib \
+--with-gmt-include=/sw/include --disable-static && make -j 2
+<!-- -->
+(cd ../mb-system; ./autogen.sh); rm -rf src Makefile config.{status,log}; \
+../mb-system/configure --with-netcdf-include=/sw/include --with-gmt-lib=/sw/lib \
+--with-gmt-include=/sw/include --disable-static --with-gsf && make -j 2
+<!-- -->
+(cd ../mb-system; ./autogen.sh); rm -rf src Makefile config.{status,log}; \
+../mb-system/configure --with-netcdf-include=/sw/include --with-gmt-lib=/sw/lib \
+--with-gmt-include=/sw/include --disable-static --with-gsf=yes && make -j 2</pre>
+Check for libgsf shared library being linked in as a double check
+<pre># WITHOUT gsf
+otool -L src/utilities/.libs/mbinfo  | grep gsf
+<!-- -->
+# WITH
+otool -L src/utilities/.libs/mbinfo  | grep gsf
+#	/usr/local/lib/libmbgsf.0.dylib (compatibility version 1.0.0, current version 1.0.0)
+</pre>
+<b>Building the patch</b>
+<pre>cd ../mb-system
+<!-- -->
+# revert files with don't need to patch
+find . -name Makefile.in | xargs rm
+rm -rf configure autom4te.cache aclocal.m4 
+svn up
+<!-- -->
+# this file needs to leave svn!
+rm src/mbio/mb_config.h
+<!-- -->
+cd ..
+diff -ruN --exclude=.svn mb-system.orig mb-system > mb-with-gsf.patch</pre>
+<b>Changes to how configure.in and the resulting configure</b>
+
+The options now look like this:
+<pre>  --with-otps_dir=DIR        Location of OSU Tidal Prediction Software
+  --without-gsf           Disable unlicensed SAIC Generic Sensor Format (GSF)
+  --with-netcdf-lib=DIR	Location of NetCDF library</pre>
+The configure.in changes:
+<pre>AC_MSG_CHECKING([whether to build with Generic Sensor Format (GSF)])
+AC_ARG_WITH([gsf], AS_HELP_STRING([--without-gsf], [Disable unlicensed SAIC Generic Sensor Format (GSF)]), [ ], [with_gsf=yes])
+AC_MSG_RESULT([$with_gsf])
+<!-- -->
+AS_IF([test x"$with_gsf" = xyes], [AC_DEFINE(WITH_GSF, 1, [Build with GSF])])
+AM_CONDITIONAL([BUILD_GSF], [test x"$with_gsf" = xyes])</pre>
+The above is different than all the other options.  I tried to use the provided autoconf and automake macros as much as possible.  The above does 3 things:
+<ul>
+<li>convert the "#undef WITH_GSF" in mb_config.h.in to "#define WITH_GSF 1" or nothing.</li>
+<li>Set the value of BUILD_GSF so that the Makefile.am files are properly converted to Makefiles with control of the "if BUILD_GSF" tweaks</li>
+<li>The combination of using all the AS_ macros means that --quiet can work as intended. </li>
+<li>Anything other than no option, --with-gsf, or --with-gsf=yes is treated as a leave out GSF</li>
+</ul>
+TODO: should we rename BUILD_GSF to WITH_GSF so that they match?
+
+The final line of configure.in shows how autoconf wants us to print summaries:
+<pre>AS_ECHO(["Build with Generic Sensor Format (GSF) Support: $with_gsf"])</pre>
+is a lot simpler than:
+<pre>if test x"$with_gsf" = xyes ; then
+	echo "Generic Sensor Format (GSF) Support: Enabled"
+else
+	echo "Generic Sensor Format (GSF) Support: Disabled"
+fi</pre>
+<b>Do not build the gsf subdirectory</b>
+
+In src/Makefile.am, I conditionally insert the gsf directory into SUBDIRS.  I normally use "SUBDIRS +=", but I wanted to follow the convention already used in the file.
+<pre>if BUILD_GSF
+  XBUILD_SUB_GSF = gsf
+endif
+<!-- -->
+SUBDIRS = $(XBUILD_SUB_GSF) surf mr1pr proj mbio mbaux utilities gmt otps macros $(XBUILD_SUB) $(XBUILD_SUB_GL) man html ps share</pre>
+<b>conditionally add gsf files</b>
+
+I put gsf only source files in with the "+=" syntax of Makefile.am.  e.g. in mb-system/src/mbio/Makefile.am:
+<pre>include_HEADERS = mb_config.h \
+        mb_format.h mb_status.h \
+        mb_io.h mb_swap.h \
+<snip>
+        mbf_mbarirov.h mbf_mbarrov2.h \
+        mbf_mbpronav.h mbf_xtfr8101.h
+<!-- -->
+if BUILD_GSF
+  include_HEADERS += mbsys_gsf.h mbf_gsfgenmb.h
+endif</pre>
+<b>use mb_config.h to conditionally compile code</b>
+
+For example in mb_close:
+<pre>#include "gsf.h"</pre>
+Becomes:
+<pre>#ifdef WITH_GSF
+#  include "gsf.h"
+#endif</pre>
+<b>The include guard situation in mb_system is a little inconsistent</b>
+
+The normal style of include guards is that the actual head should do the include guard, not the file that does the #include.
+<pre>-#ifndef MB_DEFINE_DEF
++#include "mb_config.h"
+ #include "mb_define.h"
+-#endif
+-
+-#ifndef MB_STATUS_DEF
+ #include "mb_status.h"
+-#endif</pre>
+<b>As discussed above, I did this in mb_io.h to help make sure I didn't miss anything</b>
+<pre>+#ifdef WITH_GSF
+ 	int	gsfid;		/* GSF datastream ID */
++#else
++        int     _gsfid_placeholder;
++#endif</pre>
+I then #ifdefined WITH_GSF around any gsf related code
+
+This is where I could really use others taking a close look.  e.g.
+<pre>+#ifdef WITH_GSF
+ 	mb_io_ptr->gsfid = 0;
++#else
++        /* TODO: possibly set to -666 */
++#endif</pre>
+and
+<pre>@@ -3072,6 +3086,7 @@
+ 	return(status);
+ }
+ /*--------------------------------------------------------------------*/
++#ifdef WITH_GSF
+ int mbcopy_reson8k_to_gsf(int verbose,
+ 		void *imbio_ptr,
+ 		void *ombio_ptr,
+@@ -3479,4 +3494,5 @@
+ 	/* return status */
+ 	return(status);
+ }
++#endif
+ /*--------------------------------------------------------------------*/</pre>
+-----

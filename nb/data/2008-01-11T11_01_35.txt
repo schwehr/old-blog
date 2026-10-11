@@ -1,0 +1,35 @@
+TITLE: noaadata 0.32
+AUTHOR: Kurt
+DATE: 01.11.2008 11:01
+DESC: close to realtime
+-----
+BODY:
+I am very close to having realtime updates working for AIS in postgis.
+There have been a lot of changes to noaadata since the last release in
+early December.  Here is the ChangeLog message:
+<ul> 0.32 - 2008-Jan-11 - <a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.32.tar.bz2">noaadata-py-0.32.tar.bz2</a>
+    <li>Preliminary release of live AIS feeds</li>
+    <li>Lots of documentation cleanup</li>
+    <li>Added ais_db.py for creating and destroying database tables</li>
+    <li>ais/__init__.py changed to provide lists of messages for more automation</li>
+    <li>Added ais message 15 - interrogation</li>
+    <li>Now builds with ais messages 15, 23-26</li>
+    <li>Added timed_circular_notice.xml to replace the right whale specific message</li>
+    <li>Fixed messages 15 and 22 so the do not have field collisions</li>
+    <li>All ais messages now have a dbTableName in their module</li>
+    <li>cleanup xymt2kml.py</li>
+    <li>port-server renamed to port_server</li>
+    <li>ais_build_{sqlite3,postgis} are getting better, but still need work to handle more message types</li>
+    <li>ais_build_sqlite3 uses the python 2.5 built in sqlite interface.  Better than using pysqlite2</li>
+    <li>Added ais_port_forward.py and ais_net_to_postgis.py to scraps.  These will get moved over to scripts soon</li>
+    <li>Added uscg.py to aisutils for parsing the uscg fields from nmea strings</li>
+    <li>Added database.py to aisutils.  Makes working with ais and databases much simpler</li>
+    <li>Fixed the serial logger to report 'r' in front of station.  Doesn't yet handle r or b</li>
+</ul>
+And I am now using svn much more effectively for diffs with this
+command, but the diffs for this verson run way longer than the xterm
+scrollback buffer.
+<pre>
+svn diff -r {2007-12-05} | colordiff
+</pre>
+-----

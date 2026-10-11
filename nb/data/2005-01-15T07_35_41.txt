@@ -1,0 +1,85 @@
+TITLE: Mac OSX for Mars lander missions
+AUTHOR: Kurt
+DATE: 01.15.2005 07:35
+DESC: Things that would get Macs into flight operations
+-----
+BODY:
+It looks like my previous entry about setting up fink for a large
+number of machines got snagged by the spam filters.  Before I write to
+the fink lists again, I want to briefly add to those questions with a
+list of the things that I believe it will take to make Mac OSX the
+dominate OS for the next Mars lander mission.  For MER, Linux (RedHat
+7.2) was the OS for about 80% of the machines inside the flight
+firewall.  There rest were almost all SunOS 5.9 (Solaris 9) boxes.
+The primary file server was a two refrigerator sized Sun (I'll save
+the performance comments for another day - summary: "Not Good").  I
+also saw two full sized rack SGIs.  No one I talked to knew what they
+were for.  I believe they were Origins running IRIX.  They lived not
+in the server room, but in the FAX room.  There were a number of G5
+OSX 10.3 machines, but they were all outside the firewall, not as
+banded as Windows and the foreign nationals, but not in for the main
+party.  What will Mac OSX need to be able to do to dominate next time?
+<ul>
+<li>Stabilize 10.4 quickly.  The OS tends to be locked down a year or
+two before landing to avoid surprises both in security and stability.</li>
+<li>Better graphics card support.  We need to be able to use the top
+of the line pro graphics cards for 3D models.  If Linux has better
+support, then that is what will be used.</li>
+<li>Be able to drive 3D stereo shutter in a window.  Every other OS
+does.  And be able to do this in both X windows and Aqua.</li>
+<li>Get SGI to port Performer to OSX.  RSVP uses Performer on Linux
+right now.</li>
+<li>Make sure Java 3D is fully supported and fast.  The science
+interface (formerly WITS) uses Java 3D</li>
+<li>Push fink even farther in terms of packages supported and improved
+testing.  There needs to be guidelines and documentation of how fink
+has been deployed across 200+ machines at one site.</li>
+<li>Being able to make sure that all relevant fink packages are able
+to be build optimized if possible.  Having fink on a G5 with code not
+taking full advantage of the compiler optimizations will frustrate the
+team.</li>
+<li>Improved support for clustering, especially for render farms.  It
+should not require Xserves.</li>
+<li>Get OpenAFS shipping with OSX (and not just osx server).  Many
+flight people count on AFS up to the transition to the flight line
+activities.  Then they have to drop back to NFS for flight ops.</li>
+<li>Go for more CPUs in one box... how about 4?</li>
+<li>Really push 64bit support into more of the os and get way beyond
+8GB of RAM per machine.  We want 32GB and more soon.</li>
+<li>Support the big Panoram displays.</li>
+<li>Start shipping OSX with fugu preinstalled and do everything to
+make secure systems easy on the admins and users.</li>
+<li>Make sure that there is good support for the VxWorks tools on
+OSX.  I have not touched VxWorks since 2000, but since this is what is
+on the flight vehicles, all the cross compilers and tools need to work
+well on OSX.  That will make testing easier.  The Windows boxes that
+many people use for VxWorks are not allowed inside the flight systems.
+</li>
+</ul>
+Those are the main things I can think of right now.  I really would
+like to see OSX and fink taking a bit part in the next missions.
+
+<b>Additional notes:</b>
+
+Forgot to mention that these are my personal opinions and ideas.
+These posts in no way represent the ideas of any institution!  Nor do
+I have any say about the makeup of the flight computers.
+
+Some more things OSX could do:
+
+<ul>
+<li>Stop the distinction between OSX Server and standard OSX.</li>
+<li>Make sharing home directories between disparate Macs super easy.
+I have seen too many weird hacks to make this work right.</li>
+<li>Provide something like SGI's FAM.  This would make programs like
+the Collaborative Information Portal (CIP) easier to implement and
+easier of the servers.  The idea is a filesystem change notification
+system.  Some programs need to watch for changes in large/deep
+filesystems.  Stat'ing large parts of a tree is totally
+unacceptable.</li>
+<li>Make deploying servers with raid arrays in the 100's of terrabytes
+easy.  5.6 TB is not really that much storage for a mission these
+days.  That's scratch space for just a couple of people processing
+stereo 3D data.  Plus make backup easy.</li>
+</ul>
+-----

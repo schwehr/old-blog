@@ -1,0 +1,99 @@
+TITLE: Network Time Protocol on Windows
+AUTHOR: Kurt
+DATE: 03.30.2009 12:06
+DESC: meinberg software
+-----
+BODY:
+Here are some notes on installing the client side of the Network Time Protocol (NTP) on MS Windows.  Windows comes with the W32Time service, but it has repeatedly been shown to be unhelpful. <a href="http://en.wikipedia.org/wiki/Network_Time_Protocol">Wikipedia on NTP</a>: 
+<pre>However, the Windows Time Service cannot maintain the system time more
+accurately than about a 1-2 second range. Microsoft "[does] not
+guarantee and [does] not support the accuracy of the W32Time service
+between nodes on a network. The W32Time service is not a full-featured
+NTP solution that meets time-sensitive application needs."</pre>
+First install <a
+href="http://www.meinberg.de/english/sw/ntp.htm#ntp_nt_stable">Meinberg's
+free NTP</a>.  When the configuration part starts, select the correct
+pool for your location.
+
+<img title="NTP Pool selection" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-pool.png"/>
+
+I work in the continental US, so I selected "United States of Amera".
+I also added the local UNH time server wilmot.  Note - the UNH time
+server is overly great (stratum 2) and why is it not called time, ntp,
+or even bigben?  I turned on iburst mode.  Is that a good thing?
+
+<img title="NTP configuration" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-config.png"/>
+
+I setup ntp to run as the user "ntp".
+
+<img title="2nd page of config options for NTP" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-config2.png"/>
+
+You can restart the service from the start menu.  Or you can install the free <a href="http://www.meinberg.de/english/sw/time-server-monitor.htm">Meinberg NTP Time Server Monitor</a>.
+
+<img title="Windows Start Menu for NTP" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-start-menu.png"/>
+
+Run the Time Server Monitor:
+
+<img title="NTP Time Server Monitor" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-status-1.png"/>
+
+Go to the configuration tab and select:
+<pre>Show advanced tabs
+Activate logging
+Enable DNS Lookup
+External NTP Server: wilmot.unh.edu   (if you are at UNH)</pre>
+<img title="NTP Monitor - Configuration" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-config-tab.png"/>
+
+Now you can check out how the time servers are doing.
+
+<img title="NTP server status" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-status-0.png"/>
+
+Here is the legend to go with the above display:
+
+<img title="NTP status legend" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-status-legend.png"/>
+
+Enable statistics generation so you can see how the system is
+performing.  It needs to run for a while before the graph is
+interesting.
+
+<img title="NTP status graph" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/ntp-graph.png"/>
+
+Here is the final ntp.conf file that I generated.  I added a couple
+extra ntp pool servers.
+<pre>
+server 127.127.1.0
+# but it operates at a high stratum level to let the clients know and force them to
+# use any other timesource they may have.
+fudge 127.127.1.0 stratum 12 
+<!-- -->
+# Use a NTP server from the ntp pool project (see http://www.pool.ntp.org)
+# Please note that you need at least four different servers to be at least protected against
+# one falseticker. If you only rely on internet time, it is highly recommended to add
+# additional servers here. 
+# The 'iburst' keyword speeds up initial synchronization, please check the documentation for more details!
+ server 0.us.pool.ntp.org iburst
+ server 1.us.pool.ntp.org iburst
+ server 2.us.pool.ntp.org iburst
+<!-- -->
+# Extra servers added by Kurt
+server 3.us.pool.ntp.org minpoll 12 maxpoll 17
+server 0.north-america.pool.ntp.org minpoll 12 maxpoll 17
+server 1.north-america.pool.ntp.org minpoll 12 maxpoll 17
+server 2.north-america.pool.ntp.org minpoll 12 maxpoll 17
+<!-- -->
+# Use specific NTP servers
+server wilmot.unh.edu iburst
+<!-- -->
+###########################################################
+#Section insert by NTP Time Server Monitor 3/30/2009
+<!-- -->
+enable stats
+statsdir "C:\Program Files\NTP\etc\"
+statistics loopstats
+###########################################################</pre>
+If you are considering setting up your own Stratum 1 NTP server, <a
+href="http://www.meinberg.de/english/products/lantime-m300-gps.htm">Meinberg</a>
+and <a
+href="http://www.symmetricom.com/products/ntp-servers/ntp-network-appliances/">Symmetricom</a>
+make NTP appliances - 1U rack mount systems that you just plug in the
+GPS antenna.
+-----

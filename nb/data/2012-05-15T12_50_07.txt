@@ -1,0 +1,36 @@
+TITLE: Amazon Route 53 DNS
+AUTHOR: Kurt
+DATE: 05.15.2012 12:50
+DESC: dns without bind
+-----
+BODY:
+Alex got me pointed at Amazon's Route 53 DNS.  It took me about 10
+minutes to setup an Amazon Web Services acount, activate Route 53 DNS,
+add 2 A records for schwehr.org and www.schwehr.org (why does everyone
+still assume the www???!!??), and point my registrar at the Amazon DNS
+servers.  Hopefully I'll still be happy when the first bill comes.  I
+certainly happy to have schwehr.org back up on the web.  What will
+life without explicitely running <a
+href="http://www.isc.org/software/bind">bind</a> look like?
+Certainly, the web interface was a lot simpler than working with bind
+config files.
+<pre><tt><b>dig schwehr.org</b>
+<!-- -->
+; &lt;&lt;&gt;&gt; DiG 9.7.0-P1 &lt;&lt;&gt;&gt; schwehr.org
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 25228
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+<!-- -->
+;; QUESTION SECTION:
+;schwehr.org.                   IN      A
+<!-- -->
+;; ANSWER SECTION:
+schwehr.org.            86400   IN      A       208.64.186.50
+<!-- -->
+;; Query time: 69 msec
+;; SERVER: 172.16.255.1#53(172.16.255.1)
+;; WHEN: Tue May 15 09:47:20 2012
+;; MSG SIZE  rcvd: 45
+</tt></pre>
+-----

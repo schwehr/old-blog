@@ -1,0 +1,32 @@
+TITLE: django 1.0 beta2 differences
+AUTHOR: Kurt
+DATE: 08.27.2008 13:35
+DESC: rough on a beginner
+-----
+BODY:
+<a href="http://code.djangoproject.com/wiki/BackwardsIncompatibleChanges">BackwardsIncompatibleChanges</a>
+
+There have been enough changes in Django since Practical Django
+Projects was released that it makes the book a bit challenging to use.
+For starters, the <a
+href="http://www.djangoproject.com/documentation/admin/">admin</a>
+interface has been refactored.  Gone from models.py are the
+prepopulated_from, core, edit_inline, min_num_in_admin, and
+num_extra_on_change keyword arguments.  Also, adding class Admin: pass
+does not put your class into the admin interface.  Now you have to do:
+<pre>
+class Category:
+    # ...
+from django.contrib import admin
+admin.site.register(Category)
+</pre>
+Also, the urls.py for admin has changed:
+<pre>
+from django.contrib import admin
+admin.autodiscover()
+# ...
+urlpatterns += patterns('',
+    (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    (r'^admin/(.*)', admin.site.root),
+)</pre>
+-----

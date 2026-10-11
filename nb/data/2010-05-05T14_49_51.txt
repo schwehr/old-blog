@@ -1,0 +1,78 @@
+TITLE: Handling errors in C++ and passing them back to python
+AUTHOR: Kurt
+DATE: 05.05.2010 14:49
+DESC: what is the right solution
+-----
+BODY:
+The bridge between C++ and Python really isn't very fun.  I'm trying
+to keep my structure simple.  I have never made friends with
+exceptions in C++ and now is not the time to try them.  I have an enum
+of status/error codes defined in ais.h and here is an example of what happens
+when I get a bad character in a NMEA payload.  Just the act of starting
+to write the error handling cause me to rethink how I go about it.  
+
+Let me walk through decoding a Class A position message.
+<pre><tt>PyObject <font color="#990000">*</font>
+<b><font color="#000000">ais1_2_3_to_pydict</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>nmea_payload<font color="#990000">)</font> <font color="#FF0000">{</font>
+    <b><font color="#000000">assert</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+<!-- -->
+    <font color="#008080">Ais1_2_3</font> <b><font color="#000000">msg</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>msg<font color="#990000">.</font><b><font color="#000000">had_error</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
+        <b><font color="#000000">PyErr_Format</font></b><font color="#990000">(</font>ais_py_exception<font color="#990000">,</font> <font color="#FF0000">"Ais123: %s"</font><font color="#990000">,</font> AIS_STATUS_STRINGS<font color="#990000">[</font>msg<font color="#990000">.</font><b><font color="#000000">get_error</font></b><font color="#990000">()]);</font>
+        <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+    <font color="#FF0000">}</font></tt></pre>
+I create an position object (AIS message 1, 2, or 3) by passing in the
+NMEA payload.  If in the process of building the instance the code
+detects a problem, it will set the status to be something other than
+AIS_OK and return.  I have a method "had_error()" to check for
+something being off.  If it is, I use the get_error() call to return
+the status code and use that to construct and ais.decode.error.  The
+exception type was created in the module init by <i>ais_py_exception =
+PyErr_NewException("ais.decode.error", 0, 0);</i>.  Calling PyErr_Format
+tells python that an error occured and I return a NULL pointer since the
+object is no good.  And yes, there are quite a few bad objects floating 
+around in the 300G of compressed AIS log files that I have saved.
+<pre><tt><font color="#000000">01:</font> Ais1_2_3<font color="#990000">::</font><b><font color="#000000">Ais1_2_3</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>nmea_payload<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">02:</font>     <b><font color="#000000">assert</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+<font color="#000000">03:</font> 
+<font color="#000000">04:</font>     <b><font color="#000000">init</font></b><font color="#990000">();</font>
+<font color="#000000">05:</font> 
+<font color="#000000">06:</font>     <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#000000">strlen</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">)</font> <font color="#990000">!=</font> <font color="#993399">168</font><font color="#990000">/</font><font color="#993399">6</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">07:</font>         status <font color="#990000">=</font> AIS_ERR_BAD_BIT_COUNT<font color="#990000">;</font>
+<font color="#000000">08:</font>         <b><font color="#0000FF">return</font></b><font color="#990000">;</font>
+<font color="#000000">09:</font>     <font color="#FF0000">}</font>
+<font color="#000000">10:</font> 
+<font color="#000000">11:</font>     std<font color="#990000">::</font><font color="#008080">bitset&lt;168&gt;</font> bs<font color="#990000">;</font> <i><font color="#9A1900">// 1 slot</font></i>
+<font color="#000000">12:</font>     status <font color="#990000">=</font> <b><font color="#000000">aivdm_to_bits</font></b><font color="#990000">(</font>bs<font color="#990000">,</font> nmea_payload<font color="#990000">);</font>
+<font color="#000000">13:</font>     <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#000000">had_error</font></b><font color="#990000">())</font> <b><font color="#0000FF">return</font></b><font color="#990000">;</font></tt></pre>
+In the constructor above, I call the parent class init() function and
+then start trying to pull apart the payload.  Lines 6-9 make sure that
+the string has the right number of characters (all position messages
+come back as 28 characters).  If not, it sets the error code and
+bails out of the constructor.
+<pre><tt><font color="#000000">01:</font> <b><font color="#0000FF">template</font></b><font color="#990000">&lt;</font><font color="#008080">size_t</font> T<font color="#990000">&gt;</font>
+<font color="#000000">02:</font> <font color="#008080">AIS_STATUS</font> <b><font color="#000000">aivdm_to_bits</font></b><font color="#990000">(</font>std<font color="#990000">::</font><font color="#008080">bitset&lt;T&gt;</font> <font color="#990000">&amp;</font>bits<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>nmea_payload<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">03:</font>     <b><font color="#000000">assert</font></b> <font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+<font color="#000000">04:</font>     <b><font color="#000000">assert</font></b> <font color="#990000">(</font><b><font color="#000000">strlen</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">)</font> <font color="#990000">&lt;=</font> T<font color="#990000">/</font><font color="#993399">6</font> <font color="#990000">);</font>
+<font color="#000000">05:</font>     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> char_idx<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> nmea_payload<font color="#990000">[</font>char_idx<font color="#990000">]</font> <font color="#990000">!=</font> <font color="#FF0000">'</font><font color="#CC33CC">\0</font><font color="#FF0000">'</font> <font color="#990000">&amp;&amp;</font> char_idx <font color="#990000">&lt;</font> T<font color="#990000">/</font><font color="#993399">6</font><font color="#990000">;</font> char_idx<font color="#990000">++)</font> <font color="#FF0000">{</font>
+<font color="#000000">06:</font>         <font color="#009900">int</font> c <font color="#990000">=</font> <font color="#009900">int</font><font color="#990000">(</font>nmea_payload<font color="#990000">[</font>char_idx<font color="#990000">]);</font>
+<font color="#000000">07:</font> 
+<font color="#000000">08:</font>         <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> c<font color="#990000">&lt;</font><font color="#993399">48</font> <font color="#008080">or</font> c<font color="#990000">&gt;</font><font color="#993399">119</font> <b><font color="#000000">or</font></b> <font color="#990000">(</font>c<font color="#990000">&gt;=</font><font color="#993399">88</font> <font color="#008080">and</font> c<font color="#990000">&lt;=</font><font color="#993399">95</font><font color="#990000">)</font> <font color="#990000">)</font>
+<font color="#000000">09:</font>             <b><font color="#0000FF">return</font></b> AIS_ERR_BAD_NMEA_CHR<font color="#990000">;</font>
+<font color="#000000">10:</font> 
+<font color="#000000">11:</font>         <b><font color="#0000FF">const</font></b> std<font color="#990000">::</font><font color="#008080">bitset&lt;6&gt;</font> bs_for_char <font color="#990000">=</font> nmea_ord<font color="#990000">[</font> c <font color="#990000">];</font>
+<font color="#000000">12:</font>         <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> offset<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> offset <font color="#990000">&lt;</font> <font color="#993399">6</font> <font color="#990000">;</font> offset<font color="#990000">++)</font>
+<font color="#000000">13:</font>             bits<font color="#990000">[</font>char_idx<font color="#990000">*</font><font color="#993399">6</font> <font color="#990000">+</font> offset<font color="#990000">]</font> <font color="#990000">=</font> bs_for_char<font color="#990000">[</font>offset<font color="#990000">];</font>
+<font color="#000000">14:</font>     <font color="#FF0000">}</font>
+<font color="#000000">15:</font>     <b><font color="#0000FF">return</font></b> AIS_OK<font color="#990000">;</font>
+<font color="#000000">16:</font> <font color="#FF0000">}</font></tt></pre>
+Handling the bit decoding is done outside of the class, so there is no
+<i>status</i> member to be set.  I handle the status through the
+return code rather than a non-const argument (which was my first
+strategy).  The above template handles the conversion for AIS 6 bit
+NMEA characters to a bitset.  At line 8, I check to make sure that
+each character is one of the allowed characters.  If not, I return an
+AIS status code representing the error.  There is no point to
+continuing on with the decoding when the message is known to be
+garbage.  At line 15, I know that everything decoded okay, so I return AIS_OK.
+-----

@@ -1,0 +1,49 @@
+TITLE: xml part 3 - attributes
+AUTHOR: Kurt
+DATE: 04.06.2006 11:09
+DESC: pain
+-----
+BODY:
+Brian and I got a schema to work that adds two attributes to to root
+level ais tag.  It has been a tough couple of hours trying to
+understand what is going on (which I am pretty sure I still do not
+understand this).  To start with, I have a new Makefile validation rule:
+<pre>
+<font color="8b2252"><strong>validate</strong>:</font>
+	xmllint ais.xsd
+	xmllint ais.xml
+	xmllint --schema ais.xsd ais.xml
+	xml val -e ais.xml
+	xml val -e ais.xsd
+	xml val -e --xsd ais.xsd ais.xml
+</pre>
+Then the new xml that needs to be validated includes version and date
+attributes.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ais</font> <font color="#2040a0">xmlns:xsi=</font><font color="#008000">&quot;http://www.w3.org/2000/10/XMLSchema-instance&quot;</font><font color="#2040a0">
+</font>     <font color="#2040a0">xsi:noNamespaceSchemaLocation=</font><font color="#008000">&quot;ais.xsd&quot;</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">date=</font><font color="#008000">&quot;2006-Apr-04&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ais</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Here is the xsd schema that we came up with thanks to E. Castro's book.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">'1.0'</font> <font color="#2040a0">encoding=</font><font color="#008000">'UTF-8'</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:schema</font> <font color="#2040a0">xmlns:xs=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font> <font color="#2040a0">blockDefault=</font><font color="#008000">&quot;#all&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">elementFormDefault=</font><font color="#008000">&quot;qualified&quot;</font> <font color="#2040a0">xml:lang=</font><font color="#008000">&quot;EN&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">version=</font><font color="#008000">&quot;Id: structures.xsd,v 1.2 2004/01/15 11:34:25 ht Exp &quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;ais&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:complexContent</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:extension</font> <font color="#2040a0">base=</font><font color="#008000">&quot;xs:anyType&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">ref=</font><font color="#008000">&quot;version&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">ref=</font><font color="#008000">&quot;date&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:extension</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:complexContent</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;version&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;date&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+-----

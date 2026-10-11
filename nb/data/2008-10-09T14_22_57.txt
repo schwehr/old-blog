@@ -1,0 +1,81 @@
+TITLE: The life of a zone message
+AUTHOR: Kurt
+DATE: 10.09.2008 14:22
+DESC: The whole deal documented
+-----
+BODY:
+Update: Working out in the open is sometime difficult.  The text below
+pointed out to me a bug in my code that had the occurance of whales
+always set to no whales.  The bits are correct, but this message
+should have been set to be WHALES_PRESENT.  If you look at the last 
+detect, we are still within 24 hours.  Bug fixed and committed.
+
+Here is the current process for one zone message from my point of
+view.  First, I query the server for the most recent whale status and
+get back some XML.  I parse that into a dictionary:
+<pre>{'TSS-AB02': 
+  {
+    'alert_expires': datetime.datetime(2008, 10, 10, 9, 33), 
+    'zone_id': 1, 
+    'last_detect': datetime.datetime(2008, 10, 9, 9, 33), 
+    'last_transmit': datetime.datetime(2008, 10, 9, 12, 33), 
+    'last_good_data': datetime.datetime(2008, 10, 9, 12, 33), 
+  }
+}</pre>
+From that, I generate a dictionary of condensed status.  If the buoy has
+been offline for longer than a certain time, it is just left out.
+<pre>{2: datetime.datetime(2008, 10, 9, 9, 33)}</pre>
+I then generate the binary for the DAC and FI identifying the binary
+messages.  Secondly, I create the payload for the AIS Binary Broadcast
+Message.
+<pre>1223662588
+0101101110100010,0001000000000100101001100001100100000110101111001111100100011001100110000011101000110010000000100100001011000000</pre>
+Once that is all ready, I craft the "Fetcher/Formatter" string that
+will be sent to the QueueManager.  The string specifies the bounding
+box that will be interested in the message along with several other
+parameters.
+<pre>BMS,SBNMS,43.000,-68.300,41.000,-71.300,2,1001,5,1223662588,0101101110100010,0001000000000100101001100001100100000110101111001111100100011001100110000011101000110010000000100100001011000000</pre>
+Control then switches over to the QueueManger.
+<pre>
+Received from FF: BMS,SBNMS,43.000,-68.300,41.000,-71.300,2,1001,5,1223662588,0101101110100010,0001000000000100101001100001100100000110101111001111100100011001100110000011101000110010000000100100001011000000
+Parsing received FF data and adding to message queue...
+Adding new message to queue: Message time: 1223662588, type: 1001, station id: 2 , binary data: 0001000000000100101001100001100100000110101111001111100100011001100110000011101000110010000000100100001011000000
+</pre>
+The QueueManager (QM) then waits for AisRadioInterface to connect and get
+waiting messages.  The AisRadioInterface connects every 1 minute to 
+pick up new messages.  From the QM, the transaction looks like this:
+<pre>Dequeing message: Message time: 1223662588, type: 1001, station id: 2 , binary data: 0001000000000100101001100001100100000110101111001111100100011001100110000011101000110010000000100100001011000000
+Assembled message: BMS,SBNMS,43.000,-68.300,41.000,-71.300,Fr8@1:HI1ckq6IPr&lt;P92h0,2*65
+Sending message to client: BMS,SBNMS,43.000,-68.300,41.000,-71.300,Fr8@1:HI1ckq6IPr&lt;P92h0,2*65
+</pre>
+Now, let's look at the view from the AisRadioInterface:
+<pre>Establishing connection to Queue Manager...
+Established TCP/IP connection
+Receiving data from Queue Manager:
+BMS,SBNMS,43.000,-68.300,41.000,-71.300,Fr8@1:HI1ckq6IPr&lt;P92h0,2*65
+No Data
+Finished receiving data from Queue Manager
+Closed connection to Queue Manager
+Formatting sentences for AIS Radio...
+!VTBBM,1,1,0,0,8,Fr8@1:HI1ckq6IPr&lt;P92h0,2*05
+Sending data to AIS Radio...</pre>
+I didn't write the QueueManager or AisRadioInterface, so I can't go
+into the details of how they work.  The above message decodes to:
+<pre>ZoneMsg
+  dac: 366
+  fi: 34
+  zone_id: 2
+  zone_type: 0 [Right Whales Not Observed] 
+  start_utc_day: 9
+  start_utc_hour: 9
+  start_utc_minute: 33
+  zone_duration_minutes: 1440
+  num zones: 1
+  ZoneCircular 9260m radius at (-70.56632, 42.34032)
+  ZoneCircular
+        radius:         9260m
+        longitude:      -70.566316
+        latitude:       42.34032</pre>
+
+<img title="Buoy 2 status" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/zonemsg-googleearth.png"/>
+-----

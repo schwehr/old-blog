@@ -1,0 +1,730 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: October 2012 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2012-10-31T11_30_44.txt" name=
+"e2012-10-31T11_30_44.txt"></a>
+<h2 class="date">10.31.2012 11:30</h2>
+<div class="blogbody">
+<h3 class="title">Another AIS parser - this one in Java</h3>
+<div class="item-description"><a href=
+"http://www.enavigation.org/enav2012_agenda.php">eNav 2012</a>
+<a href="http://www.ideea.com/TEXASV/program.htm">TEXAS V</a>
+(space based AIS) conferences are next week (and on opposite sides
+of the US???), so people are getting busy. I haven't been invited
+to either. And I don't typically go to conferences any more unless
+I'm invited to speak. Sorry. (well... SF Bay area conferences might
+get an exception to my personal policy). Oh, there is also the
+<a href="http://www.wildaid.org/event/2012-mpa-conference">Wild Aid
+MPA</a> conference soon. That I am going to.<br />
+<br />
+In reaching out to various places looking for sample decodes of the
+Msg 17 GNSS differential GPS/GLONASS corrections (trying to make
+libais complete), <a href=
+"http://www.linkedin.com/groups/DGPS-over-AIS-86242.S.119150709?qid=f1effc2c-6512-4433-826f-a4fd5933d9a0">
+I got pointed to a new upstart</a>.<br />
+<br />
+<a href=
+"http://dma.e-navigation.net/">http://dma.e-navigation.net/</a>,
+which links to <a href=
+"https://github.com/DaMSA/AisLib">https://github.com/DaMSA/AisLib</a>.<br />
+
+<br />
+I had not heard of AisLib before. Github shows it being about a
+year old. I would have hoped that new AIS projects would reach out
+to the older ones, but I made sure to email one of the authors to
+make sure that a link gets made, hit follow in github, and added
+AisLib to the English AIS article on Wikipedia. And I now
+understand the confusion people are having between my libais and
+emails back to me refering to AisLib.<br />
+<br />
+And in case you know of any AIS Application Specific Messages (e.g.
+Msg 6, 8, 25, or 26) that are out there in use, but not documented,
+please register them. I appreciate emails about such messages, but
+I only proposed the registry and do not run a registry. Please
+see:<br />
+<br />
+<a href=
+"http://www.iala-aism.org/iala/files/newitems3.php">IALA-AISM AIS
+Application Specific Messages:</a> "Collection of regional
+applications for AIS Application Specific Messages of regional
+applications for AIS Binary Messages.<br />
+<br />
+<a href=
+"http://www.e-navigation.nl/asm">http://www.e-navigation.nl/asm</a><br />
+
+<br />
+Remember that when creating AIS messages to:
+<ul>
+<li>Include sample AIVDM messages and the associated decodes</li>
+<li>Have your messages be 8 bit aligned</li>
+<li>Reviewed by an outsider (by writing a decoder) to make sure
+they are understandable</li>
+<li>If you change the bits of a message, use a new dac/fi pair</li>
+<li>use the minimum amount of spare</li>
+<li>keep it simple</li>
+<li>develop the message in the open and publish the spec for free
+on the internet (not behind any pay or click through nonsense)</li>
+<li>Do NOT create new dac/fi pairs for existing messages. Just
+don't. It is okay to use another country's DAC/FI pair in your
+country. Really.</li>
+</ul>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-31T11_30_44.txt">Permalink</a> 
+<!-- <br /><a href="archives/2014-01-01T09_30_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-29T14_31_40.txt" name=
+"e2012-10-29T14_31_40.txt"></a>
+<h2 class="date">10.29.2012 14:31</h2>
+<div class="blogbody">
+<h3 class="title">libais 0.11 - still more to go</h3>
+<div class="item-description">Libais 0.10 had a big binary test
+file in it. So here is libais release 0.11. Better, but not there
+yet.<br />
+<br />
+<a href=
+"http://pypi.python.org/pypi/libais/0.11">http://pypi.python.org/pypi/libais/0.11</a><br />
+
+<a href=
+"https://github.com/schwehr/libais/tags">https://github.com/schwehr/libais/tags</a>
+<ul>
+<li>Add a test directory and test of all top level msgs except 20
+in python</li>
+<li>Begin cleanup of test_libais.cpp</li>
+<li>Almost all decoders require pad bits now</li>
+<li>linted - lots of formatting changes</li>
+<li>Start implmenting Msg 17 GNSS differential corrections</li>
+<li>Convert FIX to TODO and put (schwehr) after each to assign them
+to myself.</li>
+<li>remove bool casting of bitset[offset]</li>
+<li>Implemented 8 1 26</li>
+<li>Clean up c++ logical oprators. Do not use and, or, and not</li>
+<li>Message 24 needed pad. Fixed</li>
+<li>Removed print()</li>
+<li>remove almost all cout/cerr that were not in print()</li>
+<li>Remove lots of dead code</li>
+<li>Pass pad into ais.decode in python, but handle without</li>
+</ul>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-29T14_31_40.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-31T11_30_44.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-27T19_17_55.txt" name=
+"e2012-10-27T19_17_55.txt"></a>
+<h2 class="date">10.27.2012 19:17</h2>
+<div class="blogbody">
+<h3 class="title">Book - The Ph.D. Grind</h3>
+<div class="item-description">Earlier this week, I had lunch with
+with Philip Guo, Fernando Perez, and a couple of other stellar
+hackers. I realized only later in the week that I had Philip's
+book, <a href="http://www.pgbovine.net/PhD-memoir.htm">The Ph.D.
+Grind</a> on my reading list. I decided to swap my reading
+priorities and <a href=
+"https://plus.google.com/u/0/102101513984015207006/posts/BxNheLhHChN">
+start it right then</a>. It's well written and is a quick read.
+Yeah, I didn't realize that Fernando (aka Mr. iPython) features
+prominently in the book and Philip's PhD work. I was interesting
+for me to read about a computer science PhD experience. My thesis
+was in Geology/Geophysics and the computing environment at Scripps
+is not at all like the Stanford CS department. I'm sure eveyones'
+experience Ph.D. experience is totally different (even if you had 2
+people with the same committee, there are so many factors). I often
+wonder what it would have been like if CMU had accepted me to their
+CS/Robotics program for a PhD. Instead, they hired me as visiting
+faculty to join their Mars Autonomy project for a while. I've been
+in government, academia and industry and try to share some when I
+teach. However, I'm not comfortable sharing to the level that
+Philip did even if I had 5 awesome committee members. There was way
+more time being frustrated that there was positive times. I'm glad
+I have my Ph.D. and I try to focus on the positives of the
+experience. I'm going to go decompress now from the experience of
+reading his book.<br />
+<br />
+Oh, and his work on for his thesis looks amazing! If you know me,
+you know I'm a nut about capturing the process of research with the
+goal of getting to the point of repeatable research. And I've had
+similar thoughts to what he actually implemented. I log all bash
+shell commands, but that is not really enough. So I log ipython
+commands. And way back in the day (2003?), I was paid to make the
+smallest linux distribution I could (that included mozilla and java
+and must be smaller than 256MB), so I started trapping all files
+that were opened with a linux kernel module. Now, I'm looking at
+this:<br />
+<br />
+<a href="http://www.pgbovine.net/burrito.html">Burrito: Rethinking
+the Electronic Lab Notebook</a><br />
+<br />
+From the page, I quote:
+<ul>
+<li>A versioning filesystem that automatically tracks all edits to
+all of your files and allows you to view old file versions. This
+eliminates the need to use version control systems or weird file
+naming conventions.</li>
+<li>A tracer that records the origin (provenance) of files, telling
+you which program invocations created or read from each file, and
+what their parameters were.</li>
+<li>A tracer that records your GUI interactions, such as which
+application windows you were viewing at specific times.</li>
+<li>A set of plugins that record your activities within specific
+applications, such as which MATLAB commands you were running and
+which web pages you were visiting.</li>
+<li>A real-time Activity Feed that allows you to view and take
+notes on your recent activities.</li>
+<li>An Activity Context Viewer that displays what else you were
+reading and writing when hacking on some part of your code.</li>
+<li>A Computational Context Viewer that shows how changes to your
+source code and execution parameters affected your experiment's
+output files.</li>
+<li>A Lab Notebook Generator that creates an HTML summary of your
+activities over a given time period.</li>
+</ul>
+This is a dream for an HCI (Human Computer Interaction) researcher,
+but imagine having this on your computers as you go through your
+research process!<br />
+<br />
+If only my bash logs tracked how I felt about that last command I
+ran? Please give me all wget calls that included NOAA and NGDC in
+the URL and sort by how well I liked the results.<br />
+<br />
+And then there is <a href="http://www.pgbovine.net/cde.html">CDE:
+Code, Data, Environment</a>... so how do you replicate how your
+sonar was running 2 years ago? Unless you have a full virtual
+machine of control station, it's not gonna work (well, actually,
+with the way sonar venders do nasty licensing things, this is never
+going to work even if you cloned the entire computer and software
+system). But imagine being able to go back to a particular instance
+of an experiment setup down to all the libraries that include the
+basic math routines! I'm having bad flashbacks to purchasing a
+VXWorks BSP for $20K that had atan2 implemented incorrectly.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-27T19_17_55.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-29T14_31_40.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-24T00_10_01.txt" name=
+"e2012-10-24T00_10_01.txt"></a>
+<h2 class="date">10.24.2012 00:10</h2>
+<div class="blogbody">
+<h3 class="title">Google Maps - Mapping old ships</h3>
+<div class="item-description">Check out the Google Geo Develeper
+Releations team map ships from 1850 and older!<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/ykFX_jvnWvU" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-24T00_10_01.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-27T19_17_55.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-21T02_03_54.txt" name=
+"e2012-10-21T02_03_54.txt"></a>
+<h2 class="date">10.21.2012 02:03</h2>
+<div class="blogbody">
+<h3 class="title">Software Carpentry</h3>
+<div class="item-description">Earlier this year, I talked with Greg
+Wilson of <a href="http://software-carpentry.org/">Software
+Carpentry</a>. Software Carpentry is doing some really cool work
+and my goals with research tools is very closely aligned.<br />
+<br />
+The group has out a preprint of a nice overview paper: <a href=
+"http://arxiv.org/abs/1210.0530">Best Practices for Scientific
+Computing</a> (arXiv:1210.0530). I just gave it a quick read and I
+generally agree with it (only with some smaller details do I
+differ, but that makes life more interesting). The Abstract:
+<pre>
+Scientists spend an increasing amount of time building and using
+software. However, most scientists are never taught how to do this
+efficiently. As a result, many are unaware of tools and practices that
+would allow them to write more reliable and maintainable code with
+less effort. We describe a set of best practices for scientific
+software development that have solid foundations in research and
+experience, and that improve scientists' productivity and the
+reliability of their software.
+</pre>
+They have <a href="http://software-carpentry.org/4_0/">lots of
+videos</a>, but I have not had a chance to check them out
+yet.<br />
+<br />
+Computing Skills for Scientists and Engineers... a quick
+introduction to Software Carpentry<br />
+<br />
+<iframe width="480" height="360" src=
+"http://www.youtube.com/embed/AHt3mgViyCs" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-21T02_03_54.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-24T00_10_01.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-20T15_23_56.txt" name=
+"e2012-10-20T15_23_56.txt"></a>
+<h2 class="date">10.20.2012 15:23</h2>
+<div class="blogbody">
+<h3 class="title">The cost of costs</h3>
+<div class="item-description">The <a href=
+"http://webstore.iec.ch/Webstore/webstore.nsf/Artnum_PK/47038">IEC
+just released IEC 61993-2 ed2.0</a>, but since it is 295 Swiss
+francs, I'm not going to get a copy of it. This spec is titled
+"Part 2: Class A shipborne equipment of the automatic
+identification system (AIS) - Operational and performance
+requirements, methods of test and required test results. The cost
+of the cost is that many professionals (and any generally
+interested personal) will not read and evaluate what is in here.
+How are mariners supposed to trust closed documents like this? I
+really loved when I tested a "type approved" (by the USCG) AIS
+device in 2007 and it failed item #1 in the test spec I had for it.
+These specs are so poorly done that I would definitely not trust
+what is in there.<br />
+<br />
+These kinds of documents really need to be publicly available free
+of charge if the IEC really cares about safe operations of ships.
+Depressing. I also think that the results for each device type
+should be logged and public The safety of mariners, the environment
+and ships is at stake. As a community, we need to take that more
+seriously.<br />
+<br />
+Note: I actually have 80/436/CDV in my email from 2006 when I got
+looped in to the process. More than 6 years have passed from that
+draft.<br />
+<br />
+<img width="600" height="436" title="IEC paywall" withgrayborder=
+"True" src=
+"../attachments/2012-10/iec61993-ais-costs.png" />
+<br />
+<br />
+Abstract:
+<pre>
+IEC 61993-2:2012(E) specifies the minimum operational and
+performance requirements, methods of testing and required test results
+conforming to performance standards adopted by the IMO in Resolution
+MSC.74(69), Annex 3, Shipborne Automatic Identification System. This
+standard incorporates the applicable technical characteristics of
+Class A shipborne equipment included in Recommendation ITU-R M.1371-4
+and takes into account the ITU Radio Regulations, where applicable. In
+addition, it takes account of IMO Resolution A.694(17) to which IEC
+60945 is associated. When a requirement in this standard is different
+from IEC 60945, the requirement of this standard takes
+precedence. This International Standard also specifies the minimum
+requirements both for the means to input and display data and for the
+interfaces to other equipment suitable to be used as means of input
+and display data. This second edition cancels and replaces the first
+edition, published in 2001. This edition constitutes a technical
+revision.
+</pre>
+If anyone wants to donate a pdf to me, I'd happily accept it, but I
+would rather just see these docs all freely available.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-20T15_23_56.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-21T02_03_54.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-20T09_37_01.txt" name=
+"e2012-10-20T09_37_01.txt"></a>
+<h2 class="date">10.20.2012 09:37</h2>
+<div class="blogbody">
+<h3 class="title">Don Walsh and the Trieste</h3>
+<div class="item-description">Jenifer Austin Foulkes, manager of
+Google Oceans, talks to <a href=
+"http://en.wikipedia.org/wiki/Don_Walsh">Don Walsh</a> about his
+journey in the bathysphere <a href=
+"http://en.wikipedia.org/wiki/Bathyscaphe_Trieste">Trieste</a> to
+the bottom of the Mariana Trench.<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/7H61k8-n1JI" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-20T09_37_01.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-20T15_23_56.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-19T16_43_48.txt" name=
+"e2012-10-19T16_43_48.txt"></a>
+<h2 class="date">10.19.2012 16:43</h2>
+<div class="blogbody">
+<h3 class="title">libais 0.9 release</h3>
+<div class="item-description">I just release libais version 0.9.
+That doesn't mean that the next release will be 1.0. There will
+likely be a 0.10 and 0.11. Still to come is finishing off the IMO
+Circ 289 Env. Sensor report, circ 289 adding addressed routes, Msg
+17's GNSS differential payload specification, <a href=
+"http://www.itu.int/rec/R-REC-M.823/en">ITU-R M.823</a>, does not
+require that you pay a fortune to download it. In fact, it doesn't
+cost anything. However, it is not under a free license. It doesn't
+have any sort of license on the doc. sigh.<br />
+<br />
+<a href=
+"http://pypi.python.org/pypi/libais/0.9">http://pypi.python.org/pypi/libais/0.9</a>
+<ul>
+<li>Added RIS 8_200_{10,23,24,40,55}</li>
+<li>Implmented the rest of Circ 236 BBM</li>
+<li>Implmented all Circ 289 messages except ABM route and BBM env
+sensors</li>
+<li>Implemented AIS messages 6, 9, 10, 12, 15-17, 20-22, 23, 25-27.
+Still payload work to do.</li>
+<li>Imported rolker's CMakeList.txt</li>
+</ul>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-19T16_43_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-20T09_37_01.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-19T12_19_10.txt" name=
+"e2012-10-19T12_19_10.txt"></a>
+<h2 class="date">10.19.2012 12:19</h2>
+<div class="blogbody">
+<h3 class="title">Notes from teaching over a Google Hangout
+Live</h3>
+<div class="item-description">Yesterday was lecture 2 of 2 of my
+2012 Research Tools teaching at the UNH Center for Coastal and
+Ocean Mapping. I felt like the 2nd lecture went much smoother than
+the 1st. A lot of that feeling probably comes from having the 1st
+lecture under my belt. Here are some of my thoughts a day later on
+how we did things this year. Having the YouTube/G+ Hangouts system
+automatically generate and post the video means that I spent far
+less energy on releasing the lectures than I did last year. I spent
+about 5 hours prepairing yesterday's class (but should have put in
+another couple hours on class notes and testing). Last year, I
+spent about 15 hours of prep per class and about 5-7 hours after
+each class to clean the audio and make the video.
+<ul>
+<li>Why did we end up with a couple vm instances saying they were
+already in use or missing on of the files from the zip?</li>
+<li>Two laptops on my end helped a ton. Allows me to see if text is
+legible and I can watch the class. It is key to turn off the
+built-in mic of the 2nd laptop.</li>
+<li>The fans on the macbook air are loud and annoying when doing
+video.</li>
+<li>I used apple iphone headphones. They seem to work well and I
+don't notice that I'm wearing them</li>
+<li>Would be better if I can see the students' screens. I would not
+be able to read what is on them, but just seeing the bulk color
+change as they switch apps would help</li>
+<li>Having Roxy in the room to debug student sticking points really
+is awesome!</li>
+<li>Doing things like putty with the students was hard as I don't
+have windows to copy what they do</li>
+<li>It's a bummer when I do things that only folks at CCOM can do.
+I think it is important to have them try putty and IRC, but I wish
+I could teach these in a way that was general. The classroom
+computers all have the same external IP address, which prevents
+using IRC to freenode&hellip; it thinks it is being attacked when
+all the students log in. For ssh/putty, are there still free
+services proving ssh/shell somewhere on the internet?</li>
+<li>The virtual machine part went much faster. Only installing one
+small package (ipython) was much more time effecient. Dropbox
+install was a serious time sync last year.</li>
+<li>Need to work on a better virtual machine instance.
+<ul>
+<li>Don't like that I gave out an un-updated ubuntu instance</li>
+<li>Remove open/libre office and other large non-useful packages.
+They are easy to add back in</li>
+<li>Add Google Drive (if/when it's available), DropBox, KeePassX
+and Google Earth to the instance.</li>
+<li>Puppet requirements control?</li>
+<li>How to shrink the instance to the smallest size after removing
+non-essential packages.</li>
+</ul>
+</li>
+<li>Need student feedback. What did they like. What do they
+remember?</li>
+<li>Need some excercises for the students to try. I had some, but
+not enough last year.</li>
+<li>Students whispering in the 2nd row prevented me from hearing in
+the rest of the room. The mic is great, but super sensitive</li>
+</ul>
+Here is yesterday's class. I've enabled monitization on lecture 2
+out of curiosity, but not on lecture 1. As a Google employee,
+YouTube caps what I make to a very small amount.<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/oPFzXRiuhs0?list=UUqKjRzvYd2QmW-Pa-VNCZSQ&amp;hl=en_US"
+frameborder="0" allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-19T12_19_10.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-19T16_43_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-16T12_55_25.txt" name=
+"e2012-10-16T12_55_25.txt"></a>
+<h2 class="date">10.16.2012 12:55</h2>
+<div class="blogbody">
+<h3 class="title">ResearchTools 2012 Lecture 01</h3>
+<div class="item-description">Here is the video from the first
+lecture. This was done as a broadcast Google hang out. At one
+point, I noticed that there were two other people following the
+video. This was a lot about me trying to figure out how to best
+teach over a Google Hangout.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/Classes/2012/">http://vislab-ccom.unh.edu/~schwehr/Classes/2012/</a>
+Notes are definitely a work in progress (WIP).<br />
+<br />
+<iframe width="640" height="360" src=
+"http://www.youtube.com/embed/hKe0x9XOt28" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-16T12_55_25.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-19T12_19_10.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-12T19_18_27.txt" name=
+"e2012-10-12T19_18_27.txt"></a>
+<h2 class="date">10.12.2012 19:18</h2>
+<div class="blogbody">
+<h3 class="title">AIS Area Notices in OpenCPN</h3>
+<div class="item-description">Go Roland! A while back he proposed
+the idea of adding the AIS Area Notice (Msg 8, Dac 001, FI 22) that
+I co-developed (yeah, sorry, it's painful). He proposed a patch to
+OpenCPN and it's in!<br />
+<br />
+<a href=
+"http://opencpn.org/ocpn/release3.0">http://opencpn.org/ocpn/release3.0</a><br />
+
+<br />
+Here is the <a href=
+"https://github.com/OpenCPN/OpenCPN/commit/3ec8949a158abd4a2ab7cb14467a9f187f93249b">
+patch submitted by Roland Arsenault</a>.<br />
+<br />
+<img width="427" height="471" title="AIS Area Notice in OpenCPN"
+withgrayborder="True" src=
+"../attachments/2012-10/opencpn-ais-area-notices.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-12T19_18_27.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-16T12_55_25.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-12T12_53_16.txt" name=
+"e2012-10-12T12_53_16.txt"></a>
+<h2 class="date">10.12.2012 12:53</h2>
+<div class="blogbody">
+<h3 class="title">AAG April 2013 meeting - DEM advances and
+challenges</h3>
+<div class="item-description">Saturday, Oct 13 (tomorrow): <a href=
+"http://www.meetup.com/geomeetup/events/82985792/">OSGeo California
+Chapter 2012 Annual Meeting</a> [GeoMeetup]: <a href=
+"http://lists.osgeo.org/pipermail/california/2012-October/thread.html">
+Meeting discussions</a>. Will be in San Jose, CA.<br />
+<br />
+Next week, I'm hoping to do a Google Live Hangout for my two
+lectures at the Center for Coastal and Ocean Mapping, UNH. I'll be
+at Google, Mountain View while giving these lectures.<br />
+<br />
+Thanks to Barry at NOAA NGDC Boulder, CO for this:<br />
+<br />
+April 9-13: Association of American Geographers (AAG) 2013 Annual
+Meeting in Los Angeles<br />
+<br />
+<a href=
+"http://www.aag.org/annualmeeting">http://www.aag.org/annualmeeting</a>
+<pre>
+Title: Advances and Challenges in Digital Elevation Models
+<!-- -->
+Description: Digital elevation models (DEMs) are a fundamental base
+layer for many applications, such as hydrologic and storm surge
+modeling , tsunami and sea-level rise modeling, ecosystems management
+and habitat research, coastal and marine spatial planning,
+sediment-transport analysis, and hazard mitigation and community
+preparedness. We invite papers/illustrated papers on recent advances
+in DEMs, including new techniques for building or evaluating DEMs, and
+in challenges that DEMs pose to applications that require them. How
+can DEMs be improved to support better planning or research? What are
+the limitations of DEMs in how they are used? How does DEM uncertainty
+or inaccuracy impact results derived from their use?
+<!-- -->
+Organizers: Barry W. Eakins (NOAA) and Jeffrey J. Danielson (USGS) 
+<!-- -->
+Chair:  John C. Brock (USGS) 
+<!-- -->
+Sponsorships: 
+Coastal and Marine Specialty Group 
+Geomorphology Specialty Group 
+Spatial Analysis and Modeling Specialty Group
+</pre>
+And because this is just too awesome not to share:<br />
+<br />
+<a href=
+"http://noaacoastsurvey.wordpress.com/2012/10/11/thomasjeffersonlis/">
+http://noaacoastsurvey.wordpress.com/2012/10/11/thomasjeffersonlis/</a><br />
+
+<br />
+Google Oceans / Google Earth makes a great way to present your new
+bathymetry, in case you didn't already know <img src=
+"../moods/smilies/smiley.gif" alt=":)" border=
+"0" /><br />
+<br />
+<a href=
+"http://noaacoastsurvey.files.wordpress.com/2012/10/oprb340tj12.png?w=1000&amp;h=562">
+original image</a><br />
+<br />
+<img width="600" height="338" title="NOAA TJ Bathy" withgrayborder=
+"True" src=
+"../attachments/2012-10/noaa-tj-bathy-in-google-earth-oceans.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-12T12_53_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-12T19_18_27.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-10-11T11_48_32.txt" name=
+"e2012-10-11T11_48_32.txt"></a>
+<h2 class="date">10.11.2012 11:48</h2>
+<div class="blogbody">
+<h3 class="title">org-mode and overload</h3>
+<div class="item-description">Most people who are around me work or
+school wise know that I'm an emacs/org-mode and python nut case. I
+got a nice note from Ishan, who is a graduate student at CMU with 2
+links that say I'm not alone in teaching with emacs/org-mode.<br />
+<br />
+<a href=
+"http://pascal.iiit.ac.in/~itws2">http://pascal.iiit.ac.in/~itws2</a>
+and they published a paper: <a href=
+"http://web2py.iiit.ac.in/research_centres/publications/view_publication/inproceedings/926">
+Using Org-mode and Subversion for Managing and Publishing Content
+in Computer Science courses</a>, Sankalp Khare,Ishan
+Misra,Venkatesh Choppella, T4E 2012 : IEEE International Conference
+on Technology for Education.<br />
+<br />
+Yeah, this is a reminder that I'm terrible about getting papers
+out. I think I've pretty much given up with the copyright situation
+/ costs involved. And lately I've not been blogging much. I feel
+that I should probably explain... life and work have recently done
+a good job of running over me! Monica and I got married last month,
+work at Google is insane (too many amazing projects that need
+attention right this moment), and trying to help out with
+MSL/Curiosity. Monica and I snuck off to Vieques, PR for a few
+days, but it was not nearly enough time.<br />
+<br />
+I have been making a little bit of progress on <a href=
+"https://github.com/schwehr/libais">libais</a>, but otherwise, I
+won't be able to blog much for a while. I've got a ton that I would
+like to share, but there just aren't enough hours in the day. So I
+expect my blog to be sparse from the next couple months, but do
+watch this space and I will try to be back soon. I'm am probably
+the biggest user of my blog <img src=
+"../moods/smilies/smiley.gif" alt=":)" border=
+"0" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-10.html#e2012-10-11T11_48_32.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-10-12T12_53_16.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">October 2012</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><span class="calendar">1</span></td>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar">5</span></td>
+<td align="center"><span class="calendar">6</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar">8</span></td>
+<td align="center"><span class="calendar">9</span></td>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-11T11_48_32.txt">11</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-12T19_18_27.txt">12</a></span></td>
+<td align="center"><span class="calendar">13</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-16T12_55_25.txt">16</a></span></td>
+<td align="center"><span class="calendar">17</span></td>
+<td align="center"><span class="calendar">18</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-19T16_43_48.txt">19</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-20T15_23_56.txt">20</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-21T02_03_54.txt">21</a></span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-24T00_10_01.txt">24</a></span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-27T19_17_55.txt">27</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">28</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-29T14_31_40.txt">29</a></span></td>
+<td align="center"><span class="calendar">30</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-10.html#e2012-10-31T11_30_44.txt">31</a></span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

@@ -1,0 +1,51 @@
+TITLE: bdec xml description of binary files
+AUTHOR: Kurt
+DATE: 11.30.2008 12:48
+DESC: another possibility
+-----
+BODY:
+<a href="http://www.hl.id.au/projects/bdec/">bdec</a> is a python
+project that defines a XML definition of a binary file format and
+allows programs to read the data.  If only it handled non byte aligned
+data such as AIS binary.
+
+<pre>Writing decoders for binary formats is typically tedious and error
+prone. Binary formats are usually specified in text documents that
+developers have to read if they are to create decoders, a time
+consuming, frustrating, and costly process.
+<!-- -->
+While there are high level markup languages such as ASN.1 for
+specifying formats, few specifications make use of these languages,
+and such markup languages cannot be retro-fitted to existing binary
+formats. 'bdec' is an attempt to specify arbitrary binary formats in a
+markup language, and create decoders automatically for that binary
+format given the high level specification.
+<!-- -->
+Bdec can:
+        * Allow specifications to be easily written, updated, and maintained.
+        * Decode binary files directly from the specification.
+        * Generate portable, readable, and efficient C decoders.
+        * Provide rudimentary encoding support.
+        * Run under Windows & Unix operating systems
+<!-- -->
+The bdec xml specification uses constructs loosely based on those
+found in ASN.1.</pre>
+Example description:
+<pre><tt><b><font color="#0000FF">&lt;protocol&gt;</font></b>
+   <b><font color="#0000FF">&lt;sequence</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"png"</font><b><font color="#0000FF">&gt;</font></b>
+      <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"signature"</font> <font color="#009900">length</font><font color="#990000">=</font><font color="#FF0000">"64"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"hex"</font> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"0x89504e470d0a1a0a"</font> <b><font color="#0000FF">/&gt;</font></b>
+      <b><font color="#0000FF">&lt;sequenceof</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"chunks"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;reference</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"unknown chunk"</font> <b><font color="#0000FF">/&gt;</font></b>
+      <b><font color="#0000FF">&lt;/sequenceof&gt;</font></b>
+   <b><font color="#0000FF">&lt;/sequence&gt;</font></b>
+<!-- -->
+   <b><font color="#0000FF">&lt;common&gt;</font></b>
+     <b><font color="#0000FF">&lt;sequence</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"unknown chunk"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"data length"</font> <font color="#009900">length</font><font color="#990000">=</font><font color="#FF0000">"32"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"integer"</font> <b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"type"</font> <font color="#009900">length</font><font color="#990000">=</font><font color="#FF0000">"32"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"hex"</font> <b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"data"</font> <font color="#009900">length</font><font color="#990000">=</font><font color="#FF0000">"${data length} * 8"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"hex"</font> <b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"crc"</font> <font color="#009900">length</font><font color="#990000">=</font><font color="#FF0000">"32"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"hex"</font> <b><font color="#0000FF">/&gt;</font></b>
+     <b><font color="#0000FF">&lt;/sequence&gt;</font></b>
+   <b><font color="#0000FF">&lt;/common&gt;</font></b>
+<b><font color="#0000FF">&lt;/protocol&gt;</font></b></tt></pre>
+-----

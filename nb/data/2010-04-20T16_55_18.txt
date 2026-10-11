@@ -1,0 +1,214 @@
+TITLE: Decoding AIS using C++ bitset
+AUTHOR: Kurt
+DATE: 04.20.2010 16:55
+DESC: what is the best way
+-----
+BODY:
+I have reached the point where I have to give up my pure python AIS
+library for some of the processing that I am doing.  When you have 1TB
+of AIS AIVDM NMEA to grind through python using BitVector is just not
+going to cut it.  This would be the 4th generation of AIS systems at
+CCOM.  
+
+Matt started off in ~2004 with some really fast code using a whole bunch
+of macros and bit shifts.  Great stuff, but hard to follow.  
+
+I thought about ESR's code in GPSD.  It looks fast, but I'd like to
+structure things a bit differently.  I would really like to use a bit
+representation to make adding new types as easy as possible.  And I am
+planning to make a nice C++ interface rather than just C.
+
+I have been looking at a number of C++ libraries.  The first was <a
+href="http://www.cplusplus.com/reference/stl/vector/">vector&lt;bool&gt;</a>,
+but it looks like it is not up to the task.  It is the odd child of
+vector and behaves differently than the other vector templates.
+
+Boost's <a
+href="http://www.boost.org/doc/libs/1_37_0/libs/dynamic_bitset/dynamic_bitset.html">dynamic_bitset</a>
+and <a href="http://bmagic.sourceforge.net/">BitMagic</a> look
+attractive, but both add the requirement to add a dependency that I
+don't always want to have.  Perhaps, I will come back to using one of
+these two.
+
+For now, I have settled on the C++ standard <a
+href="http://www.cplusplus.com/reference/stl/bitset/">bitset</a>.  It
+covers the basics and is pretty easy to understand.  It does have one
+major problem - you have to know ahead of time how big your bitset
+will be.  For some applications, this feature of bitset will be a show
+stopper, but for AIS, we know that messages must be &lt;= 168+4*256
+bits long when they come back over NMEA from the modem.  I can then
+make one large bitset to hold them all.
+
+My first program filters 1 sentence NMEA AIS messages based on the
+MMSI.  I use this if I have a list of ships that I am reporting on.
+Here is the code:
+<pre><tt><font color="#000000">01:</font> <b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;bitset&gt;</font>
+<font color="#000000">02:</font> 
+<font color="#000000">03:</font> <b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;fstream&gt;</font>
+<font color="#000000">04:</font> <b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;iostream&gt;</font>
+<font color="#000000">05:</font> <b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;string&gt;</font>
+<font color="#000000">06:</font> <b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sstream&gt;</font>
+<font color="#000000">07:</font> <b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;vector&gt;</font>
+<font color="#000000">08:</font> <b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;set&gt;</font>
+<font color="#000000">09:</font> 
+<font color="#000000">10:</font> <b><font color="#0000FF">using</font></b> <b><font color="#0000FF">namespace</font></b> std<font color="#990000">;</font>
+<font color="#000000">11:</font> <b><font color="#0000FF">const</font></b> <font color="#008080">size_t</font> max_bits <font color="#990000">=</font> <font color="#993399">168</font><font color="#990000">;</font>
+<font color="#000000">12:</font> 
+<font color="#000000">13:</font> <font color="#008080">vector&lt;string&gt; &amp;split(const string &amp;s, char delim, vector&lt;string&gt;</font> <font color="#990000">&amp;</font>elems<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">14:</font>     <font color="#008080">stringstream</font> <b><font color="#000000">ss</font></b><font color="#990000">(</font>s<font color="#990000">);</font>
+<font color="#000000">15:</font>     <font color="#008080">string</font> item<font color="#990000">;</font>
+<font color="#000000">16:</font>     <b><font color="#0000FF">while</font></b><font color="#990000">(</font><b><font color="#000000">getline</font></b><font color="#990000">(</font>ss<font color="#990000">,</font> item<font color="#990000">,</font> delim<font color="#990000">))</font> <font color="#FF0000">{</font>
+<font color="#000000">17:</font>         elems<font color="#990000">.</font><b><font color="#000000">push_back</font></b><font color="#990000">(</font>item<font color="#990000">);</font>
+<font color="#000000">18:</font>     <font color="#FF0000">}</font>
+<font color="#000000">19:</font>     <b><font color="#0000FF">return</font></b> elems<font color="#990000">;</font>
+<font color="#000000">20:</font> <font color="#FF0000">}</font>
+<font color="#000000">21:</font> 
+<font color="#000000">22:</font> <font color="#008080">vector&lt;string&gt;</font> <b><font color="#000000">split</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#008080">string</font> <font color="#990000">&amp;</font>s<font color="#990000">,</font> <font color="#009900">char</font> delim<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">23:</font>     <font color="#008080">vector&lt;string&gt;</font> elems<font color="#990000">;</font>
+<font color="#000000">24:</font>     <b><font color="#0000FF">return</font></b> <b><font color="#000000">split</font></b><font color="#990000">(</font>s<font color="#990000">,</font> delim<font color="#990000">,</font> elems<font color="#990000">);</font>
+<font color="#000000">25:</font> <font color="#FF0000">}</font>
+<font color="#000000">26:</font> 
+<font color="#000000">27:</font> <font color="#009900">int</font> <b><font color="#000000">decode_mmsi</font></b><font color="#990000">(</font><font color="#008080">bitset&lt;max_bits&gt;</font> <font color="#990000">&amp;</font>msg_bits<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">28:</font>     <font color="#008080">bitset&lt;30&gt;</font> bits<font color="#990000">;</font>
+<font color="#000000">29:</font>     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i <font color="#990000">&lt;</font> <font color="#993399">30</font><font color="#990000">;</font> i<font color="#990000">++)</font>
+<font color="#000000">30:</font>         bits<font color="#990000">[</font>i<font color="#990000">]</font> <font color="#990000">=</font> msg_bits<font color="#990000">[</font><font color="#993399">8</font> <font color="#990000">+</font> <font color="#993399">29</font><font color="#990000">-</font>i<font color="#990000">];</font>
+<font color="#000000">31:</font>     <b><font color="#0000FF">return</font></b> bits<font color="#990000">.</font><b><font color="#000000">to_ulong</font></b><font color="#990000">();</font>
+<font color="#000000">32:</font> <font color="#FF0000">}</font>
+<font color="#000000">33:</font> 
+<font color="#000000">34:</font> <font color="#008080">bitset&lt;6&gt;</font> nmea_ord<font color="#990000">[</font><font color="#993399">128</font><font color="#990000">];</font> <i><font color="#9A1900">// Direct lookup by the character ord number (ascii)</font></i>
+<font color="#000000">35:</font> 
+<font color="#000000">36:</font> <font color="#009900">void</font> <b><font color="#000000">build_nmea_lookup</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+<font color="#000000">37:</font>     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#009900">int</font> c<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> c <font color="#990000">&lt;</font> <font color="#993399">128</font><font color="#990000">;</font> c<font color="#990000">++)</font> <font color="#FF0000">{</font>
+<font color="#000000">38:</font>         <font color="#009900">int</font> val <font color="#990000">=</font> c <font color="#990000">-</font> <font color="#993399">48</font><font color="#990000">;</font>
+<font color="#000000">39:</font>         <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>val<font color="#990000">&gt;=</font><font color="#993399">40</font><font color="#990000">)</font> val<font color="#990000">-=</font> <font color="#993399">8</font><font color="#990000">;</font>
+<font color="#000000">40:</font>         <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>val <font color="#990000">&lt;</font> <font color="#993399">0</font><font color="#990000">)</font> <b><font color="#0000FF">continue</font></b><font color="#990000">;</font>
+<font color="#000000">41:</font>         <font color="#008080">bitset&lt;6&gt;</font> <b><font color="#000000">bits</font></b><font color="#990000">(</font>val<font color="#990000">);</font>
+<font color="#000000">42:</font>         <font color="#009900">bool</font> tmp<font color="#990000">;</font>
+<font color="#000000">43:</font>         tmp <font color="#990000">=</font> bits<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">];</font> bits<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">]</font> <font color="#990000">=</font> bits<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">];</font> bits<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">=</font> tmp<font color="#990000">;</font>
+<font color="#000000">44:</font>         tmp <font color="#990000">=</font> bits<font color="#990000">[</font><font color="#993399">4</font><font color="#990000">];</font> bits<font color="#990000">[</font><font color="#993399">4</font><font color="#990000">]</font> <font color="#990000">=</font> bits<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">];</font> bits<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]</font> <font color="#990000">=</font> tmp<font color="#990000">;</font>
+<font color="#000000">45:</font>         tmp <font color="#990000">=</font> bits<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">];</font> bits<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">]</font> <font color="#990000">=</font> bits<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">];</font> bits<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">]</font> <font color="#990000">=</font> tmp<font color="#990000">;</font>
+<font color="#000000">46:</font>         nmea_ord<font color="#990000">[</font>c<font color="#990000">]</font> <font color="#990000">=</font> bits<font color="#990000">;</font>
+<font color="#000000">47:</font>     <font color="#FF0000">}</font>
+<font color="#000000">48:</font> <font color="#FF0000">}</font>
+<font color="#000000">49:</font> 
+<font color="#000000">50:</font> <font color="#009900">void</font> <b><font color="#000000">splice_bits</font></b><font color="#990000">(</font><font color="#008080">bitset&lt;max_bits&gt; &amp;dest, bitset&lt;6&gt;</font> src<font color="#990000">,</font> <font color="#008080">size_t</font> start<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">51:</font>     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i<font color="#990000">&lt;</font><font color="#993399">6</font><font color="#990000">;</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font> dest<font color="#990000">[</font>i<font color="#990000">+</font>start<font color="#990000">]</font> <font color="#990000">=</font> src<font color="#990000">[</font>i<font color="#990000">];</font> <font color="#FF0000">}</font>
+<font color="#000000">52:</font> <font color="#FF0000">}</font>
+<font color="#000000">53:</font> 
+<font color="#000000">54:</font> <font color="#009900">void</font> <b><font color="#000000">aivdm_to_bits</font></b><font color="#990000">(</font><font color="#008080">bitset&lt;max_bits&gt;</font> <font color="#990000">&amp;</font>bits<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#008080">string</font> <font color="#990000">&amp;</font>nmea_payload<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">55:</font>     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i <font color="#990000">&lt;</font> nmea_payload<font color="#990000">.</font><b><font color="#000000">length</font></b><font color="#990000">();</font> i<font color="#990000">++)</font>
+<font color="#000000">56:</font>         <b><font color="#000000">splice_bits</font></b><font color="#990000">(</font>bits<font color="#990000">,</font> nmea_ord<font color="#990000">[</font><font color="#009900">int</font><font color="#990000">(</font>nmea_payload<font color="#990000">[</font>i<font color="#990000">])],</font> i<font color="#990000">*</font><font color="#993399">6</font><font color="#990000">);</font>
+<font color="#000000">57:</font> <font color="#FF0000">}</font>
+<font color="#000000">58:</font> 
+<font color="#000000">59:</font> <font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">(</font><font color="#008080">size_t</font> argc<font color="#990000">,</font> <font color="#009900">char</font> <font color="#990000">*</font>argv<font color="#990000">[])</font> <font color="#FF0000">{</font>
+<font color="#000000">60:</font>     <b><font color="#000000">build_nmea_lookup</font></b><font color="#990000">();</font>
+<font color="#000000">61:</font>     <font color="#008080">ifstream</font> <b><font color="#000000">infile</font></b><font color="#990000">(</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]);</font>
+<font color="#000000">62:</font>     <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font> infile<font color="#990000">.</font><b><font color="#000000">is_open</font></b><font color="#990000">()</font> <font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">63:</font>         cerr <font color="#990000">&lt;&lt;</font> <font color="#FF0000">"Unable to open file: "</font> <font color="#990000">&lt;&lt;</font> argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]</font> <font color="#990000">&lt;&lt;</font> endl<font color="#990000">;</font>
+<font color="#000000">64:</font>         <b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#000000">65:</font>     <font color="#FF0000">}</font>
+<font color="#000000">66:</font> 
+<font color="#000000">67:</font>     <font color="#008080">set&lt;int&gt;</font> mmsi_set<font color="#990000">;</font>
+<font color="#000000">68:</font>     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> i<font color="#990000">=</font><font color="#993399">2</font><font color="#990000">;</font> i <font color="#990000">&lt;</font> argc<font color="#990000">;</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font>
+<font color="#000000">69:</font>         <b><font color="#0000FF">const</font></b> <font color="#009900">int</font> mmsi <font color="#990000">=</font> <b><font color="#000000">atoi</font></b><font color="#990000">(</font>argv<font color="#990000">[</font>i<font color="#990000">]);</font>
+<font color="#000000">70:</font>         mmsi_set<font color="#990000">.</font><b><font color="#000000">insert</font></b><font color="#990000">(</font>mmsi<font color="#990000">);</font>
+<font color="#000000">71:</font>     <font color="#FF0000">}</font>
+<font color="#000000">72:</font> 
+<font color="#000000">73:</font>     <font color="#008080">bitset&lt;max_bits&gt;</font> bs<font color="#990000">;</font>
+<font color="#000000">74:</font>     <font color="#009900">int</font> i<font color="#990000">;</font>
+<font color="#000000">75:</font>     <font color="#008080">string</font> line<font color="#990000">;</font>
+<font color="#000000">76:</font>     <b><font color="#0000FF">while</font></b> <font color="#990000">(!</font>infile<font color="#990000">.</font><b><font color="#000000">eof</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
+<font color="#000000">77:</font>         i<font color="#990000">++;</font>
+<font color="#000000">78:</font>         <b><font color="#000000">getline</font></b><font color="#990000">(</font>infile<font color="#990000">,</font>line<font color="#990000">);</font>
+<font color="#000000">79:</font>         <font color="#008080">vector&lt;string&gt;</font> fields <font color="#990000">=</font> <b><font color="#000000">split</font></b><font color="#990000">(</font>line<font color="#990000">,</font><font color="#FF0000">','</font><font color="#990000">);</font>
+<font color="#000000">80:</font>         <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>fields<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">()</font> <font color="#990000">&lt;</font> <font color="#993399">7</font><font color="#990000">)</font> <b><font color="#0000FF">continue</font></b><font color="#990000">;</font>
+<font color="#000000">81:</font>         <b><font color="#000000">aivdm_to_bits</font></b><font color="#990000">(</font>bs<font color="#990000">,</font> fields<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">]);</font>
+<font color="#000000">82:</font>         <b><font color="#0000FF">const</font></b> <font color="#009900">int</font> mmsi <font color="#990000">=</font> <b><font color="#000000">decode_mmsi</font></b><font color="#990000">(</font>bs<font color="#990000">);</font>
+<font color="#000000">83:</font>         <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>mmsi_set<font color="#990000">.</font><b><font color="#000000">find</font></b><font color="#990000">(</font>mmsi<font color="#990000">)</font> <font color="#990000">==</font> mmsi_set<font color="#990000">.</font><b><font color="#000000">end</font></b><font color="#990000">())</font> <b><font color="#0000FF">continue</font></b><font color="#990000">;</font>
+<font color="#000000">84:</font>         cout <font color="#990000">&lt;&lt;</font> line <font color="#990000">&lt;&lt;</font> <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">;</font>
+<font color="#000000">85:</font>     <font color="#FF0000">}</font>
+<font color="#000000">86:</font> 
+<font color="#000000">87:</font>     <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<font color="#000000">88:</font> <font color="#FF0000">}</font></tt></pre>
+A quick walk through of the code...
+
+The first thing that I do is build a lookup table of bitset<6> blocks
+where I can convert each nmea character into 6 bits.
+<i>build_nmea_lookup</i> fills an array with the bitsets, but as you
+can see in 43-46, the sense of the bits is opposite of the way that I
+was thinking when writing this code.  A future version should remove
+the bit reordering that happens at lines 43-45 and line 30.
+
+Lines 67-71 create a set of MMSI numbers to keep.  I am trying to use
+the STL containers as much as possible.
+
+Then in lines 76-85, I loop through each line.  On line 79, I am
+splitting the NMEA on commas so that I can get the binary payload out
+of the 6th block.  After working in python, it feels is so strange
+that C++ does not come with a split.  I got my split functions from
+StackOverflow: <a
+http://stackoverflow.com/questions/236129/c-how-to-split-a-string">C++:
+How to split a string?</a> On line 81, I convert the ASCII NMEA
+payload to a bitset using aivdm_to_bits.  This really just boils down
+to copying bits from the lookup table <i>nmea_ord</i> into the bitset
+(bs).  
+
+Line 82 gets down to the real work of interpretting the bits.
+<i>decode_mmsi</i> copies the bits out of the messages <i>bs</i> and into a
+local bits working set.  Then <i>to_ulong</i> brings the data back to
+a C++ unsigned long variable.  Pretty easy!
+
+I then check to see if the mmsi is in <i>mmsi_set</i> (line 83).  The
+syntax with <i>find</i> is pretty awkward, having to check against
+<i>mmsi_set.end()</i>.
+
+I did some quick bench marking on this code.  Compiled without
+optimization, it took 15.3s on 526K lines of position messages or 34K
+lines per second.  Turning on optimization ("-O3 -funroll-loops
+-fexpensive-optimizations"), the program took 1/3 the time to complete
+the filtering.  A typical run was 5.5 seconds for 95K lines/sec.  The
+python version of the code takes 5 minutes and 12s or 1.7K lines/sec.
+C++ is faster than my python code by a factor of 57.  I really like
+Avi Kak's <a
+href="http://cobweb.ecn.purdue.edu/~kak/dist/">BitVector</a> library
+for python, but it is not very fast.  I've said it before, a
+cBitVector would be a great contribution if anyone is looking for a
+project.  The python code even got an optimization that the C++ code
+did not...  I only decode the first 7 NMEA payload characters as that
+is all I need to get to bit 38.  
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+mmsi_set <font color="#990000">=</font> <b><font
+color="#000000">set</font></b><font color="#990000">((</font><font color="#993399">205445000</font><font color="#990000">,</font>
+    <i><font color="#9A1900"># ...</font></i>
+    <font color="#993399">367381230</font><font color="#990000">))</font>
+<b><font color="#000080">import</font></b> ais
+<b><font color="#000080">import</font></b> sys
+<b><font color="#0000FF">for</font></b> line_num<font color="#990000">,</font>
+line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font><b><font color="#000000">file</font></b><font color="#990000">(</font>sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">])):</font>
+    <b><font color="#0000FF">if</font></b> line_num <font color="#990000">%</font> <font color="#993399">10000</font> <font color="#990000">==</font> <font color="#993399">0</font><font color="#990000">:</font> sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%d\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>line_num<font color="#990000">,))</font>
+    bv <font color="#990000">=</font> ais<font color="#990000">.</font>binary<font color="#990000">.</font><b><font color="#000000">ais6tobitvec</font></b><font color="#990000">(</font>line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">','</font><font color="#990000">)[</font><font color="#993399">5</font><font color="#990000">][:</font><font color="#993399">7</font><font color="#990000">])</font>
+    mmsi <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>bv<font color="#990000">[</font><font color="#993399">8</font><font color="#990000">:</font><font color="#993399">38</font><font color="#990000">])</font> 
+    <b><font color="#0000FF">if</font></b> mmsi <b><font color="#0000FF">in</font></b> mmsi_set<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> line<font color="#990000">,</font></tt></pre>
+Things to do... I haven't tried my PPC machine to see if this blows up
+with endian issues.  I also need to decode signed integers and
+embedded AIS strings.  Then I need to turn this code into a more C++
+like interface.  I'd like to have a factory setup where I drop in nmea
+sentences and get a queue of decoded messages built up.  It would be
+especially good if it could handle multi-sentence lines with multiple
+receives.  I also still need to handle NMEA 4.0 tag block sentences in
+addition to the older USCG NMEA format that I have been using all
+along.  I am also guessing that talking directly to sqlite via the C
+interface will be faster than the sqlite3 python module.  The decoding of AIS 
+can probably be sped up another 10-15% by inlining and avoiding the whole
+split and vector&lt;string&gt; business.  I can just identify the right comma
+positions and pull the characters out of the NMEA string without creating
+a new vector of strings.  But as always, first make it work correctly, then
+build a fancier and faster design.
+
+I am still going to use the python code for my research, but having a
+reasonable flexible C++ library that is 57 times faster, will be a
+great help.  I could probably even make my code faster and parallized
+it to get more out of my dual and quad core machines.
+-----

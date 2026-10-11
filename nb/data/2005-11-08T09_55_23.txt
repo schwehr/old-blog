@@ -1,0 +1,59 @@
+TITLE: oh and what does segmentation fault mean?
+AUTHOR: Kurt
+DATE: 11.08.2005 09:55
+DESC: gdb
+-----
+BODY:
+<pre>
+  oh and what does segmentation fault mean? I got the program to
+  compile and then when I tried to run it I got that error
+</pre>
+Here is a quick sample of dealing with a seg fault.  Start emacs and
+enter this BAD program as foo.C.
+<pre>
+int main() {
+  int v[3];
+  v[100000]=-1;
+  return(0);
+}
+</pre>
+Then build the program with debugging enabled (-g):
+<pre>
+M-x compile
+g++ -g foo.C -o foo
+</pre>
+Run the program
+<pre>
+M-x compile
+./foo
+#  ./foo
+#  Compilation segmentation fault at Tue Nov  8 09:57:51
+</pre>
+Whoops... something bad happened.  Start the debugger.
+<pre>
+M-x gdb
+gdb --annotate=3 foo
+</pre>
+Now use the debugger to see what is wrong.  "(gdb)" is the debugger's
+prompt.
+<pre>
+(gdb) break main
+(gdb) r   # a.k.a "run"
+Starting program: /Users/schwehr/Desktop/foo 
+Reading symbols for shared libraries . done
+#
+Breakpoint 1, main () at foo.C:3
+(gdb)</pre>
+In the foo.C buffer, you should see a red circle on the line that the
+program is at.
+<pre>
+(gdb) print v[0]
+$1 = 0  # Only in -g mode with variables be initialized to zero (I think)
+(gdb) n   # a.k.a. "next"
+#
+Program received signal EXC_BAD_ACCESS, Could not access memory.
+0x00001dec in main () at foo.C:3
+(gdb) quit
+</pre>
+That is it for the quick tutorial.
+-----

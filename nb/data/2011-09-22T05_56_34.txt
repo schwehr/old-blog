@@ -1,0 +1,35 @@
+TITLE: Capturing the screen for lecture
+AUTHOR: Kurt
+DATE: 09.22.2011 05:56
+DESC: much nicer than xwd
+-----
+BODY:
+I would like to capture the screen inside the Ubuntu Virtual Machine
+while I am teaching Research Tools.  I have Quicktime and
+<a href="http://www.shinywhitebox.com">iShowU HD</a>, but neither of
+those seems like a great solution.  In the past, I have used x windows
+dump (xwd) to save Linux X11 screens to a xwd formatted file.  I tried
+to find a nicer option - something like zScreen on windows (which is
+seriously awesome).  But I had no luck finding a good timed screen
+grab tool for Linux with the time I have, so I checked out the
+ImageMagick <a href="http://www.imagemagick.org/www/import.html">import</a>
+command.  I've never intentionally used it before.  I have run into it
+many times when forgetting to put "#!/usr/bin/env python" at the
+beginning of python scripts that then try to "import" some module.  I
+would sit there wondering why my script was taking so long only to
+notice the mouse cursor had switched to a "+".  
+
+If I give the import command a "-window root" option, it will quickly
+grab the whole screen, write the file and exit.  We shall see how this
+does during lecture today when running in the Ubuntu virtual machine.
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+<b><font color="#0000FF">while</font></b> <font color="#990000">[</font> <b><font color="#0000FF">true</font></b> <font color="#990000">]</font>
+<b><font color="#0000FF">do</font></b>
+    echo <font color="#009900">$(</font>date <font color="#990000">+%</font>H<font color="#990000">%</font>M<font color="#990000">%</font>S<font color="#990000">).</font>png 
+    <b><font color="#000080">import</font></b> -window root <font color="#009900">$(</font>date <font color="#990000">+%</font>H<font color="#990000">%</font>M<font color="#990000">%</font>S<font color="#990000">).</font>png 
+    sleep <font color="#993399">10</font>
+<b><font color="#0000FF">done</font></b>
+</tt></pre>
+
+
+-----

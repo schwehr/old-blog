@@ -1,0 +1,192 @@
+TITLE: Thoughts on GeoRSS feeds
+AUTHOR: Kurt
+DATE: 07.05.2010 13:25
+DESC: what to do?
+-----
+BODY:
+If you want to comment, please do so here: <a href="http://schwehr.blogspot.com/2010/07/more-thoughts-on-sensor-data-in-georss.html">More thoughts on sensor data in GeoRSS</a>
+
+UPDATE 2010-Jul-06: <a
+href="http://code.google.com/apis/kml/documentation/extendeddata.html">KML's
+ExtendedData</a> is basically what I was looking for with KML and <a
+href="http://sgillies.net/">Sean Gillies</a> pointed me to <a
+href="http://sgillies.net/blog/1018/geographic-odata/">his example</a>
+of Microsoft's <a href="http://www.odata.org/">Open Data Protocol
+(OData)</a>.  Sean points out that Google Maps does not understand
+OData.  GeoRSS needs to pull in something like one of these.
+
+We have started working with GeoRSS fields and my frustration with
+GeoRSS continues.  I posted back in March asking for thoughts on
+GeoRSS: <a
+href="http://schwehr.blogspot.com/2010/03/sensor-data-in-georss.html">Sensor
+data in GeoRSS?</a>.  I got some helpful thoughts from Sean Gillies,
+but have not heard from any others.
+
+Here is an example of my USCGC Healy feed of science data that is only in HTML table form within the description:
+
+<a href="http://maps.google.com/maps?q=http:%2F%2Fvislab-ccom.unh.edu%2F~schwehr%2Fhealy%2Fhealy-science-google.rss">Healy Science feed in Google Maps</a>
+
+<img title="My use of XML tables for data in RSS feeds" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/healy-rss-feed.png"/>
+
+It's got some really nice features that include:
+<ul>
+<li>Being pretty simple (when compared to SensorML and <a href="http://www.opengeospatial.org/standards/sos">SOS</a>)</li>
+<li>You can just throw a URL in Google Maps and see the data</li>
+<li>It works inside normal RSS readers (e.g. my USCGC Healy Feeds)</li>
+<li>It's a simple file that you can copy from machine to machine or email.</li>
+<li>It should be easy to parse</li>
+<li>Points and lines work great</a>
+</ul>
+The trouble comes with:
+<ul>
+<li>Validation is a pain, but appears to be getting better</li>
+<li>What should you put in the title and description?</li>
+<li>It seams you have to create separate <i>item</i> tags for points and lines for things like ships</li>
+<li>There is no standard for machine readable content other than the location</li>
+</ul>
+Here are my thoughts on the last point.  First a typical entry that has info in the title and description:
+<pre><tt><b><font color="#0000FF">&lt;item&gt;</font></b>
+  <b><font color="#0000FF">&lt;title&gt;</font></b>HOS IRON HORSE - 235072115: 0KTS @ 17 Jun 2010 16:07:10 GMT<b><font color="#0000FF">&lt;/title&gt;</font></b>
+  <b><font color="#0000FF">&lt;description&gt;</font></b>Time: 17 Jun 2010 16:07:10 GMT   Speed: 0<b><font color="#0000FF">&lt;/description&gt;</font></b>
+  <b><font color="#0000FF">&lt;pubDate&gt;</font></b>17 Jun 2010 16:07:10 GMT<b><font color="#0000FF">&lt;/pubDate&gt;</font></b>
+  <b><font color="#0000FF">&lt;georss:where&gt;</font></b>
+    <b><font color="#0000FF">&lt;gml:Point&gt;</font></b>
+      <b><font color="#0000FF">&lt;gml:pos&gt;</font></b>28.0287 -89.1005<b><font color="#0000FF">&lt;/gml:pos&gt;</font></b>
+    <b><font color="#0000FF">&lt;/gml:Point&gt;</font></b>
+  <b><font color="#0000FF">&lt;/georss:where&gt;</font></b>
+<b><font color="#0000FF">&lt;/item&gt;</font></b></tt></pre>
+This makes for easy human reading of data and works with GoogleMaps and OpenLayers.
+
+This is how the AIS feed looks in Google Maps... mostly enough to see
+what is going on.  If you know the name of a vessel, you can find it
+on the left side list of ships.  That's a great start, but it is hard
+to take that info into a database.  If the fields change at all in the
+title or description, all parsers that use that feed MUST be
+rewritten.
+
+<img title="NAIS GeoRSS feed in Google Maps" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/ais-google-maps.png"/>
+
+This buoy field shows the opposite idea of putting all the information
+into fields.  It's also missing pubDate and such, but we should focus
+on the <i>SeaSurfaceTemp</i> and <i>SampleDate</i>.  These are more
+machine readble.  The XML and an image:
+<pre><tt><b><font color="#0000FF">&lt;item&gt;</font></b>
+  <b><font color="#0000FF">&lt;title&gt;</font></b>SLDMB 43166<b><font color="#0000FF">&lt;/title&gt;</font></b>
+  <b><font color="#0000FF">&lt;description&gt;</font></b>Most recent posrep from 43166<b><font color="#0000FF">&lt;/description&gt;</font></b>
+  <b><font color="#0000FF">&lt;SeaSurfaceTemp&gt;</font></b>30C<b><font color="#0000FF">&lt;/SeaSurfaceTemp&gt;</font></b>
+  <b><font color="#0000FF">&lt;SampleDate&gt;</font></b>2010-06-25 11:00:00.0Z<b><font color="#0000FF">&lt;/SampleDate&gt;</font></b>
+  <b><font color="#0000FF">&lt;georss:where&gt;</font></b>
+    <b><font color="#0000FF">&lt;gml:Point&gt;</font></b>
+      <b><font color="#0000FF">&lt;gml:pos&gt;</font></b>27.241828, -84.663689<b><font color="#0000FF">&lt;/gml:pos&gt;</font></b>
+    <b><font color="#0000FF">&lt;/gml:Point&gt;</font></b>
+  <b><font color="#0000FF">&lt;/georss:where&gt;</font></b>
+<b><font color="#0000FF">&lt;/item&gt;</font></b></tt></pre>
+<img title="Buoys from a GeoRSS feed in Google Maps" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/buoys-google-maps.png"/>
+ 
+There are some problems in the sample above.  First, the description
+doesn't contain a human readable version.  This causes the GoogleMaps
+display to give us nothing more than the current position of this
+"buoy" (and a recent track history that comes as a separate entry).
+Ouch.  That's hard to preview.  Second, the machine readable portion
+is fine, but I can't write anything that can discover additional data
+fields if they are added.  If someone adds
+&lt;foo&gt;1234&lt;/foo&gt;, is that field a part of something else or
+is it more sensor data that I should be tracking?  A namespace for
+sensor data would help.  Then I could pick off all of the fields that
+are in the "SimpleSensorData" namespace.  But, I have to say that
+namespaces are good, but a pain.  I would prefer a <b>data</b> block,
+where everything in there is a data field.  It would also be good to
+separate units from the values.  Here is how it might look:
+<pre><tt><b><font color="#0000FF">&lt;rss</font></b> <font color="#009900">xmlns:georss</font><font color="#990000">=</font><font color="#FF0000">"http://www.georss.org/georss"</font> <font color="#009900">xmlns:gml</font><font color="#990000">=</font><font color="#FF0000">"http://www.opengis.net/gml"</font> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"2.0"</font><b><font color="#0000FF">&gt;</font></b>
+ <b><font color="#0000FF">&lt;channel&gt;</font></b>
+   <b><font color="#0000FF">&lt;title&gt;</font></b>NOAA GeoRSS Feed<b><font color="#0000FF">&lt;/title&gt;</font></b>
+   <b><font color="#0000FF">&lt;description&gt;</font></b>Vessel Tracks<b><font color="#0000FF">&lt;/description&gt;</font></b>
+<!-- -->
+   <b><font color="#0000FF">&lt;item&gt;</font></b>
+     <b><font color="#0000FF">&lt;title&gt;</font></b>HOS IRON HORSE - 235072115: 0KTS @ 17 Jun 2010 16:07:10 GMT<b><font color="#0000FF">&lt;/title&gt;</font></b>
+     <b><font color="#0000FF">&lt;description&gt;</font></b>Time: 17 Jun 2010 16:07:10 GMT   Speed: 17KTS
+<b><font color="#0000FF">&lt;a</font></b> <font color="#009900">href</font><font color="#990000">=</font><font color="#FF0000">"http://photos.marinetraffic.com/ais/shipdetails.aspx?MMSI=235072115"</font><b><font color="#0000FF">&gt;</font></b>MarineTraffic entry for 235072115<b><font color="#0000FF">&lt;/a&gt;</font></b> <i><font color="#9A1900">&lt;!-- or some other site to show vessel details --&gt;</font></i>
+     <b><font color="#0000FF">&lt;/description&gt;</font></b>
+     <b><font color="#0000FF">&lt;updated&gt;</font></b>2010-06-17T16:07:10Z<b><font color="#0000FF">&lt;/updated&gt;</font></b>
+     <b><font color="#0000FF">&lt;link</font></b> <font color="#009900">href</font><font color="#990000">=</font><font color="#FF0000">"http://gomex.erma.noaa.gov/erma.html#x=-89.1005&amp;y=28.00287&amp;z=11&amp;layers=3930+497+3392"</font><b><font color="#0000FF">/&gt;</font></b>
+     <i><font color="#9A1900">&lt;!-- Proposed new section --&gt;</font></i>
+     <b><font color="#0000FF">&lt;data&gt;</font></b>
+       <b><font color="#0000FF">&lt;mmsi&gt;</font></b>235072115<b><font color="#0000FF">&lt;/mmsi&gt;</font></b>
+       <b><font color="#0000FF">&lt;name&gt;</font></b>HOS IRON HORSE<b><font color="#0000FF">&lt;/name&gt;</font></b>
+<!-- -->
+       <i><font color="#9A1900">&lt;!-- Enermated lookup data types --&gt;</font></i>
+       <b><font color="#0000FF">&lt;type_and_cargo</font></b> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"244"</font><b><font color="#0000FF">&gt;</font></b>INVALID<b><font color="#0000FF">&lt;/type_and_cargo&gt;</font></b>
+       <b><font color="#0000FF">&lt;nav_status</font></b> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"3"</font><b><font color="#0000FF">&gt;</font></b>Restricted Maneuverability<b><font color="#0000FF">&lt;/nav_status&gt;</font></b>
+<!-- -->
+       <i><font color="#9A1900">&lt;!-- Values with units --&gt;</font></i>
+       <b><font color="#0000FF">&lt;cog</font></b> <font color="#009900">units</font><font color="#990000">=</font><font color="#FF0000">"deg true"</font><b><font color="#0000FF">&gt;</font></b>287<b><font color="#0000FF">&lt;/cog&gt;</font></b>
+       <b><font color="#0000FF">&lt;sog</font></b> <font color="#009900">units</font><font color="#990000">=</font><font color="#FF0000">"knots"</font><b><font color="#0000FF">&gt;</font></b>0<b><font color="#0000FF">&lt;/sog&gt;</font></b>
+       <i><font color="#9A1900">&lt;!-- Add more data fields here --&gt;</font></i>
+     <b><font color="#0000FF">&lt;/data&gt;</font></b>
+<!-- -->
+     <i><font color="#9A1900">&lt;!-- The meat of GeoRSS --&gt;</font></i>
+     <b><font color="#0000FF">&lt;georss:where&gt;</font></b>
+       <b><font color="#0000FF">&lt;gml:Point&gt;</font></b>
+         <b><font color="#0000FF">&lt;gml:pos&gt;</font></b>28.0287 -89.1005<b><font color="#0000FF">&lt;/gml:pos&gt;</font></b>
+       <b><font color="#0000FF">&lt;/gml:Point&gt;</font></b>
+     <b><font color="#0000FF">&lt;/georss:where&gt;</font></b>
+   <b><font color="#0000FF">&lt;/item&gt;</font></b>
+<!-- -->
+  <i><font color="#9A1900">&lt;!-- more items --&gt;</font></i>
+ <b><font color="#0000FF">&lt;/channel&gt;</font></b>
+<b><font color="#0000FF">&lt;/rss&gt;</font></b></tt></pre>
+Perhaps it would be better inside of data to have each data item have a &lt;DataItem&gt; tag and inside have a name attribute.
+<pre><tt><b><font color="#0000FF">&lt;data_value</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"sog"</font> <font color="#009900">long_name</font><font color="#990000">=</font><font color="#FF0000">"Speed Over Ground"</font> <font color="#009900">units</font><font color="#990000">=</font><font color="#FF0000">"knots"</font><b><font color="#0000FF">&gt;</font></b>12.1<b><font color="#0000FF">&lt;/data_value&gt;</font></b></tt></pre>
+Or we could just embed json within a data tag... but that would be
+mixing apples and oranges.  If we start doing json, the entire
+response should be GeoJSON.
+
+For referece, here is what one of those blue tails looks like in the GeoRSS:
+<pre><tt><b><font color="#0000FF">&lt;item&gt;</font></b>
+  <b><font color="#0000FF">&lt;title&gt;</font></b>SLDMB 43166 Track<b><font color="#0000FF">&lt;/title&gt;</font></b>
+  <b><font color="#0000FF">&lt;georss:where&gt;</font></b>
+    <b><font color="#0000FF">&lt;gml:LineString&gt;</font></b>
+      <b><font color="#0000FF">&lt;gml:posList&gt;</font></b>
+        27.241828 -84.663689
+        27.243782 -84.664666
+        27.245442 -84.66574
+        27.246978 -84.666779
+        27.248248 -84.668049
+        27.250104 -84.669318
+        27.251699 -84.670985
+        27.253158 -84.673045
+        27.254232 -84.6749
+        27.255209 -84.676561
+        27.256076 -84.678023
+      <b><font color="#0000FF">&lt;/gml:posList&gt;</font></b>
+    <b><font color="#0000FF">&lt;/gml:LineString&gt;</font></b>
+  <b><font color="#0000FF">&lt;/georss:where&gt;</font></b>
+<b><font color="#0000FF">&lt;/item&gt;</font></b></tt></pre>
+There was also an assertion that KML would be better.  However, I
+would argue against KML as a primary data transport mechanism.  KML is
+a presentation description, not a data encoding format.  It's much
+like when I ask someone for an image and they take a perfectly good
+JPG, TIF, or PNG and put it in a PowerPoint... sending me only a
+PowerPoint.  That can be useful, especially if there are annotations
+they want on a final, but I must have the original image or a lot is
+lost.
+
+Looking at the KML, you can see that we have all the same problems with data being delivered by GeoRSS.
+<pre><tt><b><font color="#0000FF">&lt;Placemark&gt;</font></b>
+  <b><font color="#0000FF">&lt;name&gt;</font></b>38681<b><font color="#0000FF">&lt;/name&gt;</font></b>
+  <b><font color="#0000FF">&lt;description&gt;</font></b>Sample Date: 2010-07-02 18:00:00.0 Lat: 30.247965 Lon: -87.690424 SST: 35.8C<b><font color="#0000FF">&lt;/description&gt;</font></b>
+  <b><font color="#0000FF">&lt;styleUrl&gt;</font></b>#msn_circle<b><font color="#0000FF">&lt;/styleUrl&gt;</font></b>
+  <b><font color="#0000FF">&lt;Point&gt;</font></b>
+    <b><font color="#0000FF">&lt;coordinates&gt;</font></b>-87.690424,30.247965,0<b><font color="#0000FF">&lt;/coordinates&gt;</font></b>
+  <b><font color="#0000FF">&lt;/Point&gt;</font></b>
+<b><font color="#0000FF">&lt;/Placemark&gt;</font></b></tt></pre>
+<img title="Data in KML" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/data-in-kml.png"/>
+
+It's too bad that in Google Earth, you can't put a GeoRSS in a Network Link.
+
+In case you are curious, wikipedia has an entry on SLDMBs: <a href="http://en.wikipedia.org/wiki/Self-Locating_Datum_Marker_Buoy">Self-Locating Datum Marker Buoy</a>
+
+Trackbacks:<br/>
+<a href="http://www.ogleearth.com/2010/07/links_for_20100_36.html">links for 2010-07-07</a> [Ogle Earth]<br/>
+<a href="http://appdomains.slashgeo.org/application_domains/10/07/09/175221.shtml">Friday Geonews: MapQuest Funding OpenStreetMap, Intergraph Acquired, More ArcGIS on iPad, and more</a> [Slashgeo]
+-----

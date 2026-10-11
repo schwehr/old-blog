@@ -1,0 +1,47 @@
+TITLE: Gridding AIS data with ship catagories (gnuplot)
+AUTHOR: Kurt
+DATE: 08.08.2007 12:51
+DESC: so close it hurts
+-----
+BODY:
+First an aside.  I happened to catch a few minutes of CNN in a coffee
+shop.  There was a guy talking about the earthquake near Jakarta.  For
+is basemap he was using Google Earth Pro with a USGS layer for the
+quake and then he had a graph of tides where he was saying something
+about Tsunamis (which I could not hear over the coffee shop noise).  
+The interesting part to me is that the graph was clearly created by
+gnuplot.  Gnuplot made CNN.  You probably don't agree, but I think
+that is pretty awesome!
+
+Now on to AIS data and gnuplot...
+
+I am not there yet on the visualization end of things, but here is a
+quick look from gnuplot.  There are three surfaces in the plot.  The
+red is the base grid showing the level of no ships present.  The cyan
+and blue are two difference categories of ships from within this list:
+<pre>
+    categories={
+       0: 'cargo_container'
+      ,1: 'fishing'
+      ,2: 'passenger'
+      ,3: 'service_research'
+      ,4: 'tanker'
+      ,5: 'tug'
+        }
+</pre>
+The command to use in the upcoming noaadata release is something like
+the following command.  Do not forget to add the region and step size
+or you will default to one of my study areas :)
+<pre>
+./ais_pg_grid2.py -d my_ais_2006 --basename='passenger' --category=2
+</pre>
+Then in gnuplot, turn on the gridding and hidden surface removal.  I set the
+grid size to be what my region happens to be.
+<pre>
+set dgrid3d 37,54
+set hidden3d
+splot 'redbaselevel-grd.dat' with l, 'sometype-cells.dat', 'another-cells.dat'
+</pre>
+The resulting image looks something like this picture.
+<img src="http://schwehr.org/blog/attachments/2007-08/ais-gridding-categories.png">
+-----

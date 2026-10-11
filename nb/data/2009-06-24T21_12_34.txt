@@ -1,0 +1,53 @@
+TITLE: geojson python __geo_interface__
+AUTHOR: Kurt
+DATE: 06.24.2009 21:12
+DESC: how to properly support json?
+-----
+BODY:
+I've been looking at JSON and GeoJSON today trying to fit it into my
+project in a way that makes sense.  I'd like to provide something that
+isn't confusing and doesn't require the user of the interface to know
+or do anything special.  How do I do this with the python 2.6 json
+(that looks a lot like simplejson)?  I tried GeoJSON and it's got
+something exactly like that:  the "Python Geo Interface".  I add
+one method to my class and it's set.  My original code:
+<pre>% <b>ipython2.6</b>
+import imo_001_22_area_notice as a
+import geojson
+pt = a.AreaNoticeCirclePt(-69, 42, radius=9260)
+geojson.dumps(pt)</pre>
+This is not happy when I run it.
+<pre>ERROR: An unexpected error occurred while tokenizing input
+The following traceback may be corrupted or invalid
+The error message is: ('EOF in multi-line statement', (9, 0))
+ValueError                                Traceback (most recent call last)
+<!-- -->
+/Users/schwehr/projects/src/ais-areanotice-py/&lt;ipython console&gt; in &lt;module&gt;()
+<!-- -->
+/sw/lib/python2.6/site-packages/geojson/codec.pyc in dumps(obj, cls, **kwargs)
+     36 
+     37 def dumps(obj, cls=GeoJSONEncoder, **kwargs):
+===&gt; 38     return simplejson.dumps(to_mapping(obj), cls=cls, **kwargs)
+     39 
+     40 
+<!-- -->
+/sw/lib/python2.6/site-packages/geojson/mapping.pyc in to_mapping(ob)
+     16         msg = "Expecting something that has %r or a mapping, got %r"
+     17         msg %= (GEO_INTERFACE_MARKER, ob)
+===&gt; 18         raise ValueError(msg)
+     19     return Mapping(candidate)
+     20 </pre>
+I just had to add the Geo Interface to my class:
+<pre>    @property
+    def __geo_interface__(self):
+        return {'area_shape':0, 
+                'type':'Point', 'coordinates': (self.lon, self.lat), 
+                'radius':self.radius, 'scale_factor':self.scale_factor}</pre>
+Now with it working:
+<pre>Out[50]: '{"scale_factor": 10, "type": "Point", "radius": 9260, "coordinates": [-69, 42], "area_shape": 0}'</pre>
+Now how can I do that something like that with Python 2.6's json module?
+
+<b>Trackback:</b> Thanks to Sean for answering in his blog!  <a
+href="http://sgillies.net/blog/911/geo-interface-and-python-2-6">Geo
+interface and Python 2.6</a>
+-----

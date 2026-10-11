@@ -1,0 +1,71 @@
+TITLE: PostGIS first try
+AUTHOR: Kurt
+DATE: 02.12.2007 12:22
+DESC: getting there
+-----
+BODY:
+Here are some quick notes on a first try at using postgis.  This is
+with postgres82 installed from fink on mac osx.  This ignores all
+database security and good design practices.  This is how to get
+a database up as fast as possible.  Make sure your firewall is on.
+<pre>
+sudo pgsql.sh start
+sudo -u postgres createdb kurttest
+sudo -u postgres /sw/bin/psql-8.2 -f /sw/share/doc/postgis82/lwpostgis.sql -d kurttest
+sudo -u postgres createuser -U postgres -W schwehr -P
+./ais_msg_1.py --sql-create
+</pre>
+The create returns this long string, so let us use that to create a
+table and add a point geometry type. Connect to the database and get 
+crackin.
+<pre>
+pgsql kurttest
+kurttest=# CREATE TABLE position ( MessageID INTEGER, RepeatIndicator 
+  INTEGER, UserID INTEGER, NavigationStatus INTEGER, ROT INTEGER, 
+  SOG DECIMAL(4,1), PositionAccuracy INTEGER, 
+  Position_longitude DECIMAL(8,5), Position_latitude DECIMAL(8,5), 
+  COG DECIMAL(4,1), TrueHeading INTEGER, TimeStamp INTEGER, 
+  RegionalReserved INTEGER, Spare INTEGER, RAIM BOOL, syncstate INTEGER, 
+  slottimeout INTEGER, slotoffset INTEGER, 
+  cg_r VARCHAR(15), cg_timestamp INTEGER ); 
+</pre>
+Now we need to add a Point Geometry field in the test table.  
+<pre>
+kurttest=# SELECT AddGeometryColumn('position','position',-1,'POINT',2);
+</pre>
+Here is a sample message to try.
+<pre>
+./ais_msg_1.py -t nmea -T sql -d '!AIVDM,1,1,,B,15N0wr0P1<Icu3lAD>KC@OvT00Su,0*0F16,r993669943,1171299619'
+</pre>
+sqlite did not understand false, so convert the RAIM field's 0 into False.  Insert this into the table.
+<pre>
+kurttest=# INSERT INTO position (slottimeout,RegionalReserved,
+	   NavigationStatus,COG,SOG,slotoffset,Position_longitude,
+	   RepeatIndicator,UserID,RAIM,syncstate,TimeStamp,Spare,
+	   PositionAccuracy,MessageID,TrueHeading,ROT,Position_latitude) 
+	   VALUES (
+	   0,0,0,83.3,7.6,2301,-88.2651833333,0,367017960,False,
+	   0,18,0,0,1,511,-128,30.2619416667);
+</pre>
+But we would also like to try out the position geometry:
+<pre>
+kurttest=# INSERT INTO position (slottimeout,RegionalReserved,
+	   NavigationStatus,COG,SOG,slotoffset,Position_longitude,
+	   RepeatIndicator,UserID,RAIM,syncstate,TimeStamp,Spare,
+	   PositionAccuracy,MessageID,TrueHeading,ROT,Position_latitude) 
+	   VALUES (
+	   0,0,0,83.3,7.6,2301,-88.2651833333,0,367017960,False,
+	   0,18,0,0,1,511,-128,30.2619416667
+	   ,<b>GeomFromText('POINT(-88.2651833333 30.2619416667)')</b>);
+</pre>
+Now take a look at this little table:
+<pre>
+kurttest=# SELECT UserID,AsText(position) FROM position;
+  userid   |               astext                
+===========+=====================================
+ 367017960 | 
+ 367017960 | POINT(-88.2651833333 30.2619416667)
+(2 rows)
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-02/pgadmin-position.png">
+-----

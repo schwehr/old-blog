@@ -1,0 +1,107 @@
+TITLE: Hysteresis plots - Day and Tauxe
+AUTHOR: Kurt
+DATE: 10.19.2005 14:04
+DESC: making AGFM data plots
+-----
+BODY:
+(This is my 2nd try at this since the first draft went up in smoke :( )
+
+I wanted to create the Day Plot and Lisa's squareness plot for some of
+my hysteresis data (from the AGFM).  I reverted back to gnuplot for these.
+From a previous post, I have created a small text file that has the
+hysteresis parameters generated with hystcrunch in Lisa's pmag-1.9.
+flattened.hyst.dat: 
+<pre>
+# flattened.hyst.dat from --dist-percent=0.2 
+# filename                 sid       s        Ms        Mr*Ms   Bc     Bcr Bcrn*1e-3
+bp04-1gw-s2-026.raw.flat         -.602E-37 0.599E-07 0.130E-07 0.014 0.039 0.107
+bp04-1gw-s2-032.raw.flat         -.602E-37 0.106E-06 0.217E-07 0.013 0.038 0.109
+bp04-1gw-s2-053.raw.flat         -.602E-37 0.225E-07 0.314E-08 0.007 0.035 0.106
+...
+</pre>
+I am trying to match Figure 13 in Tauxe et al. 2002 on micromagnetic
+modeling.  Here is a bit of my Makefile turned into a shell script...
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+<font color="#FF8800"># Columns in flattened.hyst.dat for awk</font>
+<font color="#FF8800"># Ms  = 3</font>
+<font color="#FF8800"># Mr  = 4</font>
+<font color="#FF8800"># Bc  = 5</font>
+<font color="#FF8800"># Bcr = 6</font>
+<font color="#FF8800">#
+# dayplot:</font>
+egrep 'bp04-1gw' flattened.hyst.dat &gt; hyst-1gw.dat
+echo '# Bcr/Br  Mr/Ms (aka squareness)' &gt; hyst-1gw-day.dat
+awk '{print $<font color="#2040a0">$6</font>/$<font color="#2040a0">$5</font>,$<font color="#2040a0">$4</font>/$<font color="#2040a0">$3</font>}' hyst-1gw.dat &gt;&gt; hyst-1gw-day.dat
+./dayplot.gp
+<font color="#FF8800">#</font>
+<font color="#FF8800">#square-coerce:</font>
+egrep 'bp04-1gw' flattened.hyst.dat &gt; hyst-1gw.dat
+echo '# Bc(mT)  Mr/Ms (aka squareness)' &gt; hyst-1gw-squarec.dat
+awk '{print $<font color="#2040a0">$5</font>*1000.,$<font color="#2040a0">$4</font>/$<font color="#2040a0">$3</font>}' hyst-1gw.dat &gt;&gt; hyst-1gw-squarec.dat
+./squarec.gp
+</pre>
+A little awk to make Bcr/Br versus Mr/Ms for the Day plot.  Then the
+1000 multiplier in the second awk makes Bc be in mT.
+I then have two gnuplot files to make the plots.  Here is the
+dayplot.gp:
+<pre>
+#!/usr/bin/env gnuplot
+set xlabel 'Bcr/Bc'
+set ylabel 'Squareness (Mr/Ms)'
+set xrange [0:9.5]
+set yrange [0.0:0.7]
+set label 1 'SD' at 1,.55
+set label 2 'PSD' at 2,0.4
+set label 3 'MD' at 6,.05
+
+set terminal pdf
+set output 'bpsio2004-dayplot.pdf'
+plot 'hyst-1gw-day.dat','hyst-2gw-day.dat','hyst-4gw-day.dat', \
+  0.5, 0.15, 'day.l1' with l, 'day.l2' with l
+</pre>
+It first sets the axis labels and the range of the plot.  The <em>set
+label</em> puts three text labels into the plot.  The coordinates are
+the same as the data.  I don't know how to draw vertical lines with
+gnuplot, so I do it with the end points in file like day.l1:
+<pre>
+1.5 0 
+1.5 0.7
+</pre>
+Then for squarec.gp:
+<pre>
+#!/usr/bin/env gnuplot
+set xlabel 'Bc (mT)'
+set ylabel 'Squareness (Mr/Ms)'
+set xrange [0:110]
+set yrange [0.0:1.0]
+set label 30 'MD' at 1,.02
+set label 40 'MD+stress' at 40,.25
+set label 50 'USD/SP' at 32,.35
+set label 60 'vortex' at 6,.2
+set label 70 'CSD' at 5,.8 # Cubic
+set label 80 'flower' at 5,.70
+set label 81 'flower' at 21,.4
+set label 90 'complicated shapes' at 45,.65
+set label 100 'uniform' at 56,.52
+#
+set terminal gif
+set output 'bpsio2004-squarecplot.gif'
+plot 'hyst-1gw-squarec.dat','hyst-2gw-squarec.dat','hyst-4gw-squarec.dat',\
+  'tauxe2002-fig13.dat' with l
+#
+set terminal pdf
+set output 'bpsio2004-squarecplot.pdf'
+replot
+</pre>
+The same basic idea, but there is a trick: tauxe2002-fig13.dat.  This
+file contains a series of lines separated by a blank like that were
+digitized from Lis'a paper.  I converted the pdf to a png and then
+used g3data (much like the old DataThief) to grab the lines.
+
+<img src="http://schwehr.org/blog/attachments/2005-10/agfm-squareness-v01-small.png">
+
+Looks like I made it without any accidents.  I hope that made some
+sense.  matplotlib seems to be much more powerful than gnuplot, but I
+know gnuplot really well and am still struggling with matplotlib.
+-----

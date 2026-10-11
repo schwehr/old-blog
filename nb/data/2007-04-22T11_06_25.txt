@@ -1,0 +1,25 @@
+TITLE: gnuplot index
+AUTHOR: Kurt
+DATE: 04.22.2007 11:06
+DESC: two blank lines
+-----
+BODY:
+gnuplot has an index function that lets you plot a subsection of data
+in a file.  Yesterday, I tried to get that to work and did not
+understand why.  Turns out that two blank lines between each section
+are required.
+<pre>
+cat &lt;&lt; EOF &gt; foo.dat
+1 3
+2 1
+3 2.5
+
+
+9 4
+10 -1
+11 6
+EOF
+gnuplot
+plot 'foo.dat' index 0 with l
+</pre>
+-----

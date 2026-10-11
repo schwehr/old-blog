@@ -1,0 +1,50 @@
+TITLE: AGFM gets database support
+AUTHOR: Kurt
+DATE: 10.12.2005 17:09
+DESC: now I gotta figure the data
+-----
+BODY:
+I just added a little database support to the SIO AGFM system.  I am
+sure this will NOT work for other models as I have never seen their
+dataformats.  No clue what a lot of the fields are, but I have
+integrated calling hystcrunch to get Mr and Ms.
+
+How does this relate to the <font color="red">GRAND UNIFIED PMAG
+DATABASE</font>?  Ummm... not at all.  Sorry.  B.T.W.  that would be
+MacIG.  But the python code that I am putting in sqlhelp.py is
+reasonable helpful, hence the help name :)
+
+A real quick demo and then some code.
+<pre>
+  agfm.py f.raw --sql-create
+. agfm.py f.raw --sql-insert
+</pre>
+Then I paste the results of those two calls into an sqlite session.
+<pre>
+  rm -f foo.db 
+  sqlite foo.db
+
+SQLite version 2.8.5
+
+sqlite> CREATE TABLE hyst ( key INTEGER PRIMARY KEY, filename VARCHAR(255), \
+  instrument VARCHAR(50), comment VARHCHAR(80), date VARCHAR(100), 
+  s  REAL, Ms REAL, Mr REAL, Bc REAL, Bcr REAL, Bcrn REAL, \
+  sid VARCHAR(30) );
+
+sqlite> INSERT INTO hyst (comment,Bc,Mr,filename,instrument,s,Ms,sid,\
+  date,Bcrn,Bcr) VALUES ("bp04-4gw-s1-063",0.003,6.95e-09,"f.raw",\
+  "Model 2900 ASCII Data File",-2.0,2.7e-07," ","10/11/2005  11:02",\
+  0.109,0.033);
+</pre>
+Bam!  There is the beginnings of a database.  Errr... it will need
+some joins and such to get sample location and depth in core, but
+that is the basic idea. 
+
+I really like the idea of having classes that have the ability to emit
+SQL INSERT statements.  Maybe there is a better way to do this.  I
+should look at the marshal and pickle modules, but I won't.  Not
+enough time.
+
+And I am skipping any code.  You will have to grab agfm.py from
+somewhere.  Well, it's nowhere right now!
+-----

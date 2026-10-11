@@ -1,0 +1,42 @@
+TITLE: hello world in C# with mono on a mac
+AUTHOR: Kurt
+DATE: 12.01.2007 18:17
+DESC: the current state of what I know about C# and Mono
+-----
+BODY:
+Here is a quick C# hello world that I did.  First I need to get mono
+(the cross platform .Net equivalent).
+<pre>
+fink install mono
+</pre>
+Now write out a hello world source file:
+<pre>
+cat &lt;&lt; EOF > hello.cs
+using System;
+namespace Kurt.Mono.Examples
+{
+   public class HelloWorld
+   {
+      public static void Main(string[] args)
+      {
+         Console.WriteLine("Hello World");
+      }
+   } 
+}
+</pre>
+Now compile it and see what we got.
+<pre>
+% mcs hello.cs 
+% ls -l hello*  
+-rw-r--r--   1 schwehr  schwehr   189 Dec  1 18:16 hello.cs
+-rwxr-xr-x   1 schwehr  schwehr  3072 Dec  1 18:16 hello.exe
+% file hello.exe
+hello.exe: MS Windows PE 32-bit Intel 80386 console executable
+</pre>
+Now run it.
+<pre>
+% mono hello.exe 
+Hello World
+</pre>
+More is available here... <a href="http://www.codeproject.com/cpnet/introtomono1.asp">Introduction to Mono - Your first Mono app</a> [codeproject.com]
+-----

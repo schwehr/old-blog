@@ -1,0 +1,30 @@
+TITLE: gdal to google earth for bags
+AUTHOR: Kurt
+DATE: 12.07.2009 12:58
+DESC: now I need to put it all together
+-----
+BODY:
+I've got the whole process down now for going from a BAG to Google
+Earth.  I am now using GDAL, ImageMagick, and libgeotiff.  In past
+blog posts, I had created three base GeoTiffs (data, hillshade and
+colored) and a blend file from ImageMagick.  The blend file lost its
+georeferencing.  I tried to use the -g option of geotifcp, but kept
+getting "Failure in GTIFImport" errors.  Turns out to work if I use an
+ESRI World file.  One warning: the resulting geotif will not know what
+spatial reference system (srs) that it is in.  
+
+Step zero was to fix libgeotiff in fink.  The version in fink (1.2.5) does something wrong in setting up the programs and they will not run.  I have packaged 1.3.0b1, which mostly seems to work for me. <a href="http://vislab-ccom.unh.edu/~schwehr/software/fink/libgeotiff.info">libgeotiff.info</a>
+
+<b>Update 2009-Dec-09:</b> Baba fixed libgeotiff so that it is working again in fink.
+
+First create the world file:
+<pre><b>listgeo -tfw H11657_1of5_1m_Final_Depth.tif</b></pre>
+Now create the nice product that we will want to tile in google earth:
+<pre><b>geotifcp -e H11657_1of5_1m_Final_Depth.tfw H11657-1of5-blend.tif H11657-1of5.tif</b></pre>
+Now tile the results and make a KML for Google Earth:
+<pre><b>gdal2tiles.py26 -k H11657-1of5.tif -s EPSG:4326</b>
+<b>open H11657-1of5/doc.kml</b></pre>
+<a href="http://schwehr.org/blog/attachments/2009-12/H11657_1of5_1m_Final-tiled.kmz">H11657_1of5_1m_Final-tiled.kmz</a>
+
+<img title="Viewing the tiled results" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/googleearth-from-gdal2tile.png"/>
+-----

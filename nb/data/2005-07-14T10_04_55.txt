@@ -1,0 +1,28 @@
+TITLE: Mapping in fledermaus
+AUTHOR: Kurt
+DATE: 07.14.2005 10:04
+DESC: fledermaus to gnuplot in just a couple minutes!
+-----
+BODY:
+Basic mapping in Fledermaus off of topography is just about as easy as
+it was in Viz 1.0 for MPL.  Still missing are ways to mess with each
+waypoint on a polyline.
+
+I loaded in terrain C from the Santa Barbara CD and zoomed over to the
+western slide.  Then I did Data-&gt;Add 3D Line.  Then I selected the
+Polygon Select (P) function.  Use the left mouse button to click
+around the outside edge of a unit.  Double click on the last point to
+close the polygon.  In the Internal 3D lines object, click the Add
+Polygon Selection.  Now to get it to an ascii xyz file, click Export
+XYZ.  That is it!
+
+I saved two files:
+<a href="http://schwehr.org/blog/attachments/2005-07/westernslide-excavated.xyz">westernslide-excavated.xyz</a>
+<a href="http://schwehr.org/blog/attachments/2005-07/westernslide-toe.xyz">westernslide-toe.xyz</a>
+To plot these up, just use the 3D plotting feature of gnuplot:
+<pre>
+  splot 'westernslide-excavated.xyz' with l, 'westernslide-toe.xyz' with l
+</pre>
+This is what you will see!!!<br>
+<img src="http://schwehr.org/blog/attachments/2005-07/westernslide.gif">
+-----

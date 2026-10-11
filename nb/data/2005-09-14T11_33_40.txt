@@ -1,0 +1,24 @@
+TITLE: working su seismic image
+AUTHOR: Kurt
+DATE: 09.14.2005 11:33
+DESC: all is well
+-----
+BODY:
+The problem with yesterday's image was that I was trying to look at
+too much of the seismic line at one.  Resolution issues!  When I
+replotted with this command, I get results that are better.  However I
+am seeing offsets that should have been fixed by the nodelay business.
+<pre>
+  supsimage verbose=1 d1=.000125 wbox=18 &lt line-4000-7000.nodelay.su  &gt; ps
+  gv ps
+</pre>
+Then I selected a magnification of 10x and did Shft-Apple-4 to make a
+screen shot.<br>
+<img src="http://schwehr.org/blog/attachments/2005-09/line43-su.png">
+
+<b>UPDATE</b>:  Duh.  The delay offset problem was my fault.  I had a symbolic link to the wrong file!
+<pre>
+lrwxr-xr-x    1 schwehr  staff          23 Sep 14 11:19 line.su -> line43.ch1.4000-7000.su
+</pre>
+I don't see the required nodelay in that filename!
+-----

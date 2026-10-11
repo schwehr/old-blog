@@ -1,0 +1,48 @@
+TITLE: LaTeX Beamer - slide shows without requiring a GUI
+AUTHOR: Kurt
+DATE: 02.19.2012 22:10
+DESC: universal constant
+-----
+BODY:
+I know, I know.  I work for Google and I should be making "decks" in
+Google Docs with the Presentation tool.  I've been doing that, but
+life would not be complete if I never tried making a LaTeX beamer
+presentation.  Beamer, LaTeX, org and related are for those people who truly value the concept of
+creating content without worrying about the form.  Content over form
+for sure.   Sometimes the planets align (or I just had enough red wine) to step
+from the known to the undefined of the new.  That, plus a blip in my RSS feeds, <a href="http://emacsworld.blogspot.com/2012/02/using-beamer-animations-to-simulate.html?">Using Beamer Animations to simulate Terminal Input and Output</a>So, I've finally taken the step.
+I was really impressed with Dan Pineo's thesis presentations done with Beamer
+while he was doing his PhD.  Now I need to take the plung and get emacspeak 
+sending org to my Google docs account.
+
+I used <a
+href="http://www.math.umbc.edu/~rouben/beamer/quickstart-Z-H-3.html#node_sec_3"</a>A
+Beamer Quickstart</a> by Rouben Rostamian.  Latex is not my favorite
+markup as I definitely prefer org-mode, but I feel more complete now.
+<pre><tt><i><font color="#9A1900">% -*- compile-command: "pdflatex helloworld-beamer.tex &amp;&amp; open helloworld-beamer.pdf" -*-</font></i>
+<!-- -->
+<b><font color="#0000FF">\documentclass</font></b><font color="#009900">{beamer}</font>
+<b><font color="#0000FF">\usetheme</font></b><font color="#009900">{default}</font>
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{document}</font>
+<!-- -->
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{frame}{A universal law}</font>
+<!-- -->
+Hello world!
+<!-- -->
+<b><font color="#0000FF">\end</font></b><font color="#009900">{frame}</font>
+<b><font color="#0000FF">\end</font></b><font color="#009900">{document}</font></tt></pre>
+Hello world is the universal constant.  Put the above into a file called helloworld-beamer.tex in emacs and use M-x compile (if you are on a Mac), so view the results.  On linux, change open to xdg-open.
+
+<img width="600" height="513" title="Beamer Hello Worl" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-02/latex-beamer-helloworld.png"/>
+
+And yes, you can do beamer right from org mode.  Just ask it to!
+<pre>#+LaTeX_CLASS: beamer
+<!-- -->
+* A universal constant
+<!-- -->
+-Hello world</pre>
+Then just do <b>C-c C-e d</b> and you'll be looking at a PDF of your
+presentation.  I expected there to be an export to beamer under the
+latex options, but alas, I was surprised to see that you have to 
+set beamer as an option.
+-----

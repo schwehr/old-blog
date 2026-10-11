@@ -1,0 +1,44 @@
+TITLE: Waterbottom overlay for Illustrator
+AUTHOR: Kurt
+DATE: 10.05.2005 18:14
+DESC: scale figure
+-----
+BODY:
+I am redoing my Huntec figure so I need a new overlay of the water
+bottom.  I have a sonarweb figure of line43, but it does not have
+FieldRecNo values on it nor TWTT (two-way travel time).  I make a pdf
+overlay with segywaterbottom and gnuplot.  I strecht the water bottom
+to fit over the figure and presto!  I have horizontal and vertical
+scales.  Here is how.
+<pre>
+segywaterbottom.py -t 27000 --time -n  --file=line43.sgy   -k FieldRecNo
+grep -vi none wbt.dat &gt; wbt2.dat
+</pre>
+<pre>
+Now I have an ascii table that looks something like this:
+head wbt2.dat 
+# FILE: line43.sgy
+# traceNumber FieldRecNo time(s) 
+
+1 1 0.738125
+3 2 0.736375
+4 2 0.812625
+5 3 0.737875
+7 4 0.737375
+9 5 0.737125
+11 6 0.7375
+</pre>
+Now for a little gnuplot and I will have the overlay.
+<pre>
+gnuplot
+
+gnuplot&gt; set xrange [1000:8000]
+gnuplot&gt; replot
+gnuplot&gt; set yrange [.8:.5] 
+gnuplot&gt; set terminal pdf
+gnuplot&gt; set output 'line43-wbt-pts-1000-8000.pdf'
+gnuplot&gt; plot 'wbt2.dat' using 2:3 with p
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-10/line43-wbt-pts.gif">
+Presto change-o!
+-----

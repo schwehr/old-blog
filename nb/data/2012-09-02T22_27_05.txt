@@ -1,0 +1,25 @@
+TITLE: Large scale code changes
+AUTHOR: Kurt
+DATE: 09.02.2012 22:27
+DESC: perl one liner
+-----
+BODY:
+I really wanted a global regular expression query replace command in
+emacs, but barring that being obvious (yeah, I'm still not up to much
+in elisp), I came up with this in perl.  I want to get rid of all
+fprintf command that have only rcs_id as their argument from
+mb-system.  If a function is fprintf(stderr,"%s
+%s\n",rcs_id,something_else), then it should stay and I need to deal
+with it differently.
+<pre>perl -ni.bak -e'print unless m!.*fprintf\(.*,\".*\",rcs_id\)\;!' mbtime.c</pre>
+Looking at the diff, it did exactly what I want withou a lot of typing (I have 2 thousand of these to do).
+<pre>diff mbtime.c mbtime.c.bak 
+119a120
+&gt; 		fprintf(stderr,"dbg2  Version %s\n",rcs_id);</pre>
+If you want to see how it did:
+<pre><b>(for file in */*.bak; do echo ${file%%.bak} diff ${file%%.bak} $file; done) | less
+(for file in */*.bak; do diff ${file%%.bak} $file; done) | grep fprintf  | wc -l</b>
+1780</pre>
+At work, someone broke out some very impressive awk fu last week.  Wow.
+Crazy powerful, but weird (to me).
+-----

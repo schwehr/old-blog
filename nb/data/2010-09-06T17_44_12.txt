@@ -1,0 +1,106 @@
+TITLE: Switching from svn to git - Part 2
+AUTHOR: Kurt
+DATE: 09.06.2010 17:44
+DESC: migration
+-----
+BODY:
+When reading this, please realize that I'm a beginner at git and might
+not be following best practices.
+
+Here is a bit of what I am going through to get my source code more
+out there in the world.  I've missed a number of collaboration
+opportunities because my code was squirreled away in CCOM
+repositories.  If this code is not mixing it up in the community, I am
+failing at my job.  I thought about using Google to host my project,
+but was surprised to see that they "only" offer <a
+href="http://subversion.apache.org/">Subversion (svn)</a> and <a
+href="http://mercurial.selenic.com/">Mercurial (HG)</a> (Google's <a
+href="http://code.google.com/p/support/wiki/ChoosingAVersionControlSystem">Choosing
+A Version Control System</a>).  It is pretty wild that Google will
+give you 2GB of project hosting space.  I'm following a mixture of
+instructions from <a
+href="http://www.weask.us/entry/migrate-svn-history-git-repository">How
+to migrate SVN with history to a new Git repository?</a>, <a
+href="http://progit.org/book/">Pro Git</a> and the GitHub directions
+that appear when you create a new repo (aka repository).
+
+First, I have to setup my mac for git.  If you are not using a mac, you
+will need to install git some other way.
+<pre><b>fink install git git-svn git-mode</b> # git-mode is for emacs
+<b>git config --global user.name "Kurt Schwehr"
+git config --global user.email schwehr gmail.com</b> # Except there is an @ there when I typed it
+<b>git config --global core.editor emacs
+git config --global merge.tool opendiff</b> # opendiff is a mac specific graphical tool
+<b>git config --global core.excludesfile ~/.gitignore</b>
+<b>git config --list</b> # Check the settings</pre>
+Now I need to pull my old code from the svn repository.  Hopefully I'm doing this right.
+The old repository is locked down so that it is only accessible by people with a CCOM
+account.  Not good.  Even if I made this part of the tree public, it wouldn't be possible
+to manage code submissions from others.
+<pre><b>git svn clone https://cowfish.unh.edu/projects/schwehr -T trunk/src/libais libais</b>
+Initialized empty Git repository in /Users/schwehr/Desktop/foo/libais/.git/
+W: Ignoring error from SVN, path probably does not exist: (175002): RA layer request failed: REPORT of '/projects/schwehr/!svn/bc/100': Could not read chunk size: Secure connection truncated (https://cowfish.unh.edu)
+W: Do not be alarmed at the above message git-svn is just searching aggressively for old history.
+This may take a while on large repositories
+Checked through r2000   <i># This took a while across the network to go through 12K changes</i>
+Checked Ahrough ais_pos.cpp
+r13581 = 61caae999122714e5ac2af4e60b0c798e2e51b08 (refs/remotes/trunk)
+	A	ais.h
+	A	ais123.cpp
+	D	ais_pos.cpp
+W: -empty_dir: trunk/src/libais/ais_pos.cpp
+r13600 = 9ca2bccd11b9fcbb0ae978efc49dfe2ad0df52cd (refs/remotes/trunk)
+	M	ais.h
+	A	ais4_11.cpp
+...
+r14083 = c2c949807f3c6dcad9a235c81e67e6629a287a54 (refs/remotes/trunk)
+	M	ais15.cpp
+r14085 = 089da02b8d742ca472baa5eabebd19d06a259cf0 (refs/remotes/trunk)
+Checked out HEAD:
+  https://cowfish.unh.edu/projects/schwehr/trunk/src/libais r14085
+</pre>
+Before going to the next step, I should make sure that everything will be alright.
+<pre>
+<b>cd libais</b>
+<b>gitk</b> # Run the GUI built into git (see the screen shot)
+<b>git remote -v</b>
+origin	git@github.com:schwehr/libais.git (fetch)
+origin	git@github.com:schwehr/libais.git (push)
+<b>git status</b>
+# On branch master
+nothing to commit (working directory clean)
+<b>git log | head</b>
+commit 089da02b8d742ca472baa5eabebd19d06a259cf0
+Author: schwehr <schwehr@a19cddd1-5311-0410-bb07-9ca93daf0f0b>
+Date:   Wed Jul 7 22:53:29 2010 +0000
+<!-- -->
+    compiles but does not work
+<!-- -->    
+    git-svn-id: https://cowfish.unh.edu/projects/schwehr/trunk/src/libais@14085 a19cddd1-5311-0410-bb07-9ca93daf0f0b
+<!-- -->
+commit c2c949807f3c6dcad9a235c81e67e6629a287a54
+Author: schwehr <schwehr@a19cddd1-5311-0410-bb07-9ca93daf0f0b></pre>
+Here is what gitk looks like on the mac:
+
+<img title="libais from svn in gitk" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/libais-gitk.png"/>
+
+Add one of my ssh public keys to git hub's account page <a
+href="https://github.com/account#keys">https://github.com/account#keys</a>
+by pasting in the text from ~/.ssh/id_dsa.pub assuming you've already
+made a passwordless ssh key using the ssh-keygen command.
+Now I am ready to push the code to github.
+<pre><b>git remote add origin git@github.com:schwehr/libais.git
+git push origin master</b>
+The authenticity of host 'github.com (207.97.227.239)' can't be established.
+RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'github.com,207.97.227.239' (RSA) to the list of known hosts.
+Counting objects: 340, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (331/331), done.
+Writing objects: 100% (340/340), 135.41 KiB, done.
+Total 340 (delta 241), reused 0 (delta 0)
+To git@github.com:schwehr/libais.git
+ * [new branch]      master -> master</pre>
+View the results: <a href="http://github.com/schwehr/libais">http://github.com/schwehr/libais</a>
+-----

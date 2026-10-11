@@ -1,0 +1,61 @@
+TITLE: matplotlib
+AUTHOR: Kurt
+DATE: 10.08.2005 23:45
+DESC: trouble with fonts?
+-----
+BODY:
+I thought maybe it was a font problem, but that just changes the gv
+error message.
+<pre>
+Error: /invalidfont in -dict-
+Operand stack:
+   LucidaGrande   --dict:11/14(L)--   Font   LucidaGrande   --dict:11/14(L)--   LucidaGrande
+rep -i lucida ams-tau123-core1.ps 
+%%BeginFont: LucidaGrande
+/FontName /LucidaGrande def
+/FamilyName (Lucida Grande) def
+/FullName (Lucida Grande) def
+/LucidaGrande findfont
+/LucidaGrande findfont
+</pre>
+So, I tried a different font...
+<pre>
+        pylab.title('Tau{1,2,3}', fontname='Times Roman')
+        pylab.yticks(fontname='Times Roman')
+        pylab.xticks(fontname='Times Roman')
+</pre>
+Which changes the error to be this:
+<pre>
+%interp_exit   .runexec2   --nostringval--   --nostringval--
+   --nostringval--   2   %stopped_push   --nostringval--
+   --nostringval--   --nostringval--   false   1   %stopped_push   1
+   3   %oparray_pop   1   3   %oparray_pop   1   3   %oparray_pop   1
+   3   %oparray_pop   .runexec2   --nostringval--   --nostringval--
+   --nostringval--   2   %stopped_push   --nostringval--   2   4
+   %oparray_pop   3   4   %oparray_pop   --nostringval--
+   --nostringval--   --nostringval--   7   5   %oparray_pop
+   --nostringval--   7   5   %oparray_pop 
+Dictionary stack:
+   --dict:1121/1686(ro)(G)--   --dict:0/20(G)--   --dict:71/200(L)--   --dict:6/7(L)--   --dict:17/17(ro)(G)--
+Current allocation mode is local
+Last OS error: 2
+AFPL Ghostscript 8.51: Unrecoverable error, exit code 1
+</pre>
+What a lovely error message.  What in the world does that mean?
+
+If I can't figure this out quickly tomorrow, it is goodbye to
+matplotlib.  I really need to have pdf or at least ps output so that I
+can work with my figures in Illustrator.
+
+I tried playing with <a href="http://matplotlib.sourceforge.net/matplotlib.afm.html">AFM</a> thinking that would be the solution, but I
+don't know what I am doing with that.
+<pre>
+  from matplotlib.afm import AFM
+  fh = file ('/sw/share/fonts/afms/adobe/ptmr8a.afm')
+  afm = AFM(fh)
+  afm.get_fullname()
+
+Out[12]: 'Times Roman'
+</pre>
+Now what?
+-----

@@ -1,0 +1,24 @@
+TITLE: django database integrity
+AUTHOR: Kurt
+DATE: 03.27.2009 06:28
+DESC: scary?
+-----
+BODY:
+In <a href="http://www.pointy-stick.com/blog/2009/03/26/django-tip-controlling-admin-or-other-access/">Django Tip: Controlling Admin (Or Other) Access</a> [Malcolm Tredinnick], he says this:
+<pre><b>A Warning About Database Changes</b>
+<!-- -->
+If you're making any database changes, particularly using
+django-admin.py, make sure to make them using the settings file that
+includes all of your applications. The reason for this is that Django
+sanitises the Content Type data when it loads any new tables, removing
+entries that don't belong to applications it knows about. So if
+changes were made to the content types using a settings file that
+didn't contain the admin application in the INSTALLED_APPS list, the
+admin's content type table entry would be removed. This wouldn't be a
+good idea.</pre>
+This doesn't sound good.  Does it imply that I had better have models
+for all tables in my database?  I often use django admin to look at
+part of a database.  I haven't tried modifying a database that has
+add additional tables that django is not aware of, but I had better
+watch out (unless I'm not understanding what he means).
+-----

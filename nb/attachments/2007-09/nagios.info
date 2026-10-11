@@ -1,0 +1,135 @@
+Package: nagios
+Version: 3.0b3
+Revision: 1
+Description: Service and network monitoring
+License: GPL
+Homepage: http://www.nagios.org
+Maintainer: Kurt Schwehr <goatbar@users.sourceforge.net>
+Source: mirror:sourceforge:%n/%n-%v.tar.gz
+Source-MD5: 09138d953bfd0b177df51d908a4131bb
+
+BuildDepends: gd2
+Depends: gd2-shlibs, apache2, daemonic
+
+DescDetail: <<
+Formerly known as "netsaint"
+
+Nagios is a host and service monitor designed to inform you of network
+problems before your clients, end-users or managers do. It has been
+designed to run under the Linux operating system, but works fine under
+most *NIX variants as well. The monitoring daemon runs intermittent
+checks on hosts and services you specify using external "plugins"
+which return status information to Nagios. When problems are
+encountered, the daemon can send notifications out to administrative
+contacts in a variety of different ways (email, instant message, SMS,
+etc.). Current status information, historical logs, and reports can
+all be accessed via a web browser.
+
+Features
+
+    * Monitoring of network services (SMTP, POP3, HTTP, NNTP, PING, etc.)
+    * Monitoring of host resources (processor load, disk and memory
+      usage, running processes, log files, etc.)
+    * Monitoring of environmental factors such as temperature
+    * Simple plugin design that allows users to easily develop their
+      own host and service checks
+    * Ability to define network host hierarchy, allowing detection of
+      and distinction between hosts that are down and those that are
+      unreachable
+    * Contact notifications when service or host problems occur and
+      get resolved (via email, pager, or other user-defined method)
+    * Optional escalation of host and service notifications to
+      different contact groups
+    * Ability to define event handlers to be run during service or
+      host events for proactive problem resolution
+    * Support for implementing redundant and distributed monitoring servers
+    * External command interface that allows on-the-fly modifications
+      to be made to the monitoring and notification behavior through
+      the use of event handlers, the web interface, and third-party
+      applications
+    * Retention of host and service status across program restarts
+    * Scheduled downtime for suppressing host and service
+      notifications during periods of planned outages
+    * Ability to acknowledge problems via the web interface
+    * Web interface for viewing current network status, notification
+      and problem history, log file, etc.
+    * Simple authorization scheme that allows you restrict what users
+      can see and do from the web interface
+<<
+
+DocFiles: Changelog INSTALLING LEGAL LICENSE README THANKS UPGRADING
+
+ConfigureParams: <<
+  --mandir=%i/share/man \
+  --with-gd-inc=%p/include \
+  --with-gd-lib=%p/lib \
+  --sysconfdir=%p/etc/%n \
+  --datadir=%p/share/%n \
+  --sbindir=%p/lib/cgi-bin \
+  --with-httpd-conf=%p/etc/apache2/conf.d
+<<
+
+CompileScript: <<
+  ./configure %c
+  nagpaths="prefix=%p LOGDIR=%p/var/log/%n CGIDIR=%p/lib/cgi-bin"
+  make nagios $nagpaths
+  make cgis $nagpaths
+  make contrib $nagpaths
+  make modules $nagpaths
+  ls -l
+<<
+
+InstallScript: <<
+  #!/bin/bash -ev
+  nagpaths="prefix=%i LOGDIR=%i/var/log/%n CFGDIR=%i/etc/%n CGIDIR=%i/lib/cgi-bin"
+  make install $nagpaths
+  make install-config $nagpaths
+  # Do not do make install-init - Fink uses Daemonic
+
+  # update daemonic init script if necessary
+  daemonic install %N
+
+<<
+
+ConfFiles: <<
+  %p/etc/nagios/cgi.cfg
+  %p/etc/nagios/nagios.cfg
+  %p/etc/nagios/objects
+  %p/etc/nagios/objects/commands.cfg
+  %p/etc/nagios/objects/contacts.cfg
+  %p/etc/nagios/objects/localhost.cfg
+  %p/etc/nagios/objects/printer.cfg
+  %p/etc/nagios/objects/switch.cfg
+  %p/etc/nagios/objects/templates.cfg
+  %p/etc/nagios/objects/timeperiods.cfg
+  %p/etc/nagios/objects/windows.cfg
+  %p/etc/nagios/resource.cfg
+<<
+
+PreRmScript: <<
+  # clean up
+  if [ $1 != "upgrade" ]; then
+        daemonic remove %N
+  fi
+<<
+
+DaemonicFile: <<
+        <service>
+        <description>Nagios service and network monitoring daemon</description>
+        <message> Nagios service and network monitoring</message>
+        
+        <daemon name="%N">
+                <executable background="no">%p/bin/%n</executable>
+                <parameters>start</parameters>
+        </daemon>
+        
+        </service>
+<<
+
+DescUsage: <<
+To configure nagios to start on boot:
+'sudo daemonic enable %N' to create a StartupItem for it.
+
+To start nagios manually:
+'sudo %p/bin/%n -v %p/etc/%n/%n.cfg'
+<<

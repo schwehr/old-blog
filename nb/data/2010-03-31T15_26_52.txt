@@ -1,0 +1,230 @@
+TITLE: Debugging AIS AtoNs
+AUTHOR: Kurt
+DATE: 03.31.2010 15:26
+DESC: Ohmex and L3
+-----
+BODY:
+This week, Ted Reed from Ohmex paid a visit to CCOM.  We spent some
+time trying to debug why we could not receive messages from an <a href="http://www.ohmex.com/tidemet.htm">Ohmex
+TideMet AIS AtoN station</a> on our test bench.  We tried a lot of
+combinations and without proper RF test gear (which we do not own), it
+is hard to know what is going on.  The LED on the TideMet said it was 
+transmitting, but we did not receive anything.  After exploring all
+the options we could think of, we tore down the test setup and moved
+it to our highbay.  Right off it worked.  We figured out after some
+more testing that we had two fatal problems on our test bench.  First,
+the power supply we were using said that it could handle the TideMet,
+but it definitely can not handle the brief peak loads.  We switched to
+a battery pack and a different (more robust) power supply and it
+worked like a champ.  The 2nd problem was the roof of our building.
+GPS reception from the roof is great, but the building construction
+almost totally blocks any signals from getting down to the test area
+and we may also have a lot of noise in the test area.  To compound all
+of this, the AIS ATON specifications makes it a challenge to work with
+type approved devices.  There are a lot of restrictions placed on how
+the units work that make debugging difficult.  
+
+Here is our test setup.  I had my Mac with an SR162g (a very wimpy AIS
+receiver), goSerial, and my python based serial logging and AIS
+decoding software.  Ted had the Ohmex monitoring and display software
+on his laptop with a very cool <a
+href="http://www.ohmex.com/aism8.htm">USB powered Ohmex AIS
+receiver</a>.  Next to the laptops are a L3 stock AIS AtoN and a
+Ohmex TideMet.
+
+<img title="Hi-bay test setup for AIS AtoNs" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-03/aton-debugging.jpg"/>
+
+For those who don't have one, here is what the L3 board configuration
+looks like (on port P2), when you press "<b>c</b>":
+
+<pre>L3 AT91 AtoN Project, [Rev 1.15J of 21-Aug-08]
+*** System Time: 000:01:03.128 ***
+<!-- -->
+*** System Configuration Menu ***
+<!-- -->
+   1. Show Current Configuration Info
+   2. Set Unit MMSI
+   3. Set Configured Lat and Lon
+   4. Show Current Transmit Schedule
+   5. Create New Transmit Schedule
+   6. Set Attributes for Scheduled Binary Msg Types
+   7. Set System Startup Time (following Standby)
+   8. Enable or Disable 62320-2 FDIS Mode
+   9. Enable or Disable Standby Operation
+   a. Enable or Disable Acquisition Subsystem Control
+   b. Enable or Disable SART Relay Feature
+   c. Set SART Relay Mode Parameters
+   d. Enable or Disable DGNSS Serial Input
+   e. Enable or Disable Message 17 Transmit
+   f. Enable or Disable Off Position Algorithm
+   g. Set Tx Test Mode Parameters</pre>
+And here is what the unit looks like in the test configuration using
+my test MMSI.
+<pre>Software [Rev 1.15J of 21-Aug-08]
+*** AtoN Configuration is [L3 Communications Type 3]
+*** Serial Number is [000xxxxxx]
+*** MMSI [338040883], Base Station MMSI [0]
+*** AtoN Name is [UNH_OHMEX]
+*** Configured Lat/Lon [43 8.1320 N, 70 56.3690 W]
+*** Base Startup Time is [10] Secs
+*** Receiver Operation is [Enabled]
+*** RATDMA Support is [Enabled]
+*** Standby Operation is [Disabled]
+*** Acquisition Subsystem Ctl is [Enabled]
+*** SART Relay Feature is [Disabled]
+*** DGNSS Input is [Disabled]
+*** Message 17 Transmit is [Disabled]
+*** IEC 62320-2 Sentence Mode is [FDIS]
+*** Off Position Algorithm is [Disabled]
+*** Flash/SDRAM CheckSums [7928, 7928]
+*** Code/Data Size [238149, 0x0003A245] Bytes
+</pre>
+As the unit boots up, I get this stream of NMEA:
+<pre>!ANVDO,1,1,,X,E52HH&lt;h:W4?WT6Rd00000000000=M`Oe&lt;Ema@00000bP20,4*72
+!ANVDO,1,1,,X,E52HH&lt;h:W4?WT6Rd00000000000MM`Og&lt;Em`800000g020,4*1C
+!ANVDM,1,1,,B,39NS7FE001rsr8hHbdnadIdP0000,0*4B
+...
+!ANVDO,1,1,,Y,E52HH&lt;h:W4?WT6Rd00000000000MM`Os&lt;EmVP00000TP20,4*04
+!ANVDO,1,1,,A,E52HH&lt;h:W4?WT6Rd00000000000MM`On&lt;EmVh00000uP20,4*18</pre>
+The first messages with ',<b>X</b>,' say that the device is booting
+up.  There is an AIS position message in there (',B<b>,3</b>').
+Then, once the unit is up with a good GPS fix, it starts putting out
+',<b>Y</b>,' messages.  When it transmits, it replaces the Y with an A
+or B to denote which channel it just transmitted on.  Here is one of
+the messages that I received being decoded by my noaadata package:
+<pre>ais_msg_21.py -d '!AIVDM,1,1,,A,E52HH&lt;h:W4?WT6Rd00000000000MM`OJ&lt;Emc@00000uP20,4*24,1269951900.77'
+<!-- -->
+AidsToNavReport:
+        MessageID:           21
+        RepeatIndicator:     0
+        UserID:              338040883
+        type:                0
+        name:                UNH-OHMEX
+        PositionAccuracy:    1
+        longitude:           -70.93937
+        latitude:            43.1357233
+        dim:                 0
+        FixType:             1
+        timestamp:           59
+        OffPosition:         False
+        RegionalApp:         0
+        RAIM:                True
+        virtual_aton_flag:   False
+        assigned_mode_flag:  False
+        spare:               0
+        extended_name:       </pre>
+Or in a HTML table view with LUT values:
+
+<table border="1">
+<tr bgcolor="orange">
+<th align="left">Field Name</th>
+<th align="left">Type</th>
+<th align="left">Value</th>
+<th align="left">Value in Lookup Table</th>
+<th align="left">Units</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>uint</td>
+	<td>21</td>
+	<td>21</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>uint</td>
+	<td>0</td>
+<td>default</td></tr>
+<tr>
+<td>UserID</td>
+<td>uint</td>
+	<td>338040883</td>
+	<td>338040883</td>
+</tr>
+<tr>
+<td>type</td>
+<td>uint</td>
+	<td>0</td>
+<td>Default, Type of A to N not specified</td></tr>
+<tr>
+<td>name</td>
+<td>aisstr6</td>
+	<td>UNH-OHMEX@@@@@@@@@@@</td>
+	<td>UNH-OHMEX</td>
+</tr>
+<tr>
+<td>PositionAccuracy</td>
+<td>uint</td>
+	<td>1</td>
+<td>high (less than 10 m)</td></tr>
+<tr>
+<td>longitude</td>
+<td>decimal</td>
+	<td>-70.93937</td>
+	<td>-70.93937</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>decimal</td>
+	<td>43.135723333</td>
+	<td>43.135723333</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td>dim</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+<tr>
+<td>FixType</td>
+<td>uint</td>
+	<td>1</td>
+<td>GPS</td></tr>
+<tr>
+<td>timestamp</td>
+<td>uint</td>
+	<td>59</td>
+<td><i>Missing LUT entry</i></td></tr>
+<tr>
+<td>OffPosition</td>
+<td>bool</td>
+	<td>False</td>
+<td>On position</td></tr>
+<tr>
+<td>RegionalApp</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+<tr>
+<td>RAIM</td>
+<td>bool</td>
+	<td>True</td>
+<td>in use</td></tr>
+<tr>
+<td>virtual_aton_flag</td>
+<td>bool</td>
+	<td>False</td>
+<td>Unit physically exists</td></tr>
+<tr>
+<td>assigned_mode_flag</td>
+<td>bool</td>
+	<td>False</td>
+<td>autonomous and continuous mode</td></tr>
+<tr>
+<td>spare</td>
+<td>uint</td>
+	<td>0</td>
+	<td>0</td>
+</tr>
+</table>
+
+Watch out when writing decoders for Msg 21, as the message might
+contain a "Name of Aid-to-Navigation Extension" of up to 14 characters
+at the end.  The L3 and Ohmex units do not use this extension, but
+GPSD's test dataset has a message that comes with an extension.  Also,
+ITU 1371 <b>Rev 3</b> changed the 3 spare bits in revision 1 to be two
+flags (virtual aton and assigned mode) and 1 spare.
+-----

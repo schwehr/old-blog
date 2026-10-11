@@ -1,0 +1,37 @@
+TITLE: Windows and grouchy com ports
+AUTHOR: Kurt
+DATE: 05.27.2009 17:57
+DESC: wtf
+-----
+BODY:
+We have a windows machine that is controlling a device via the serial
+port.  On boot, the computer did not want to talk to the serial port.
+I couldn't figure out how to list what is owning the serial port
+(which is pretty easy on Linux...).  Les and Will showed me what
+turned out to be the solution to getting the serial port back.  But, I
+still don't know what the caused problem.  Solution: Disable the com
+port.  Wait 5 minutes for whatever it was give up and die.  Enable the
+com port.
+
+First I kill the app that wasn't working and fired up Hyperterm.
+
+<img title="Hyperterm - no luck" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/windows-xp-com1-unavailable.png"/>
+
+Disable the port and let it sit...
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/windows-xp-disable-com1.png"/>
+
+Enable the port...
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/windows-xp-enable-com1.png"/>
+
+And now everything works as expected.  Looking at the task manager,
+there was no change in processes.
+
+Update 2009-July-08: Thanks to Hector M. for pointing out the solution:
+<pre>[T]he problem with the grouchy Windows PC serial port is due to
+Windows scanning the serial ports on the PC on startup for serial mice
+- notice the alarmed serial mouse present in your screenshot. There is
+a Microsoft utility ComDisable (<a href="http://support.microsoft.com/kb/819036">http://support.microsoft.com/kb/819036</a>) 
+which can be used to disable the scan on startup for selected ports. </pre>
+-----

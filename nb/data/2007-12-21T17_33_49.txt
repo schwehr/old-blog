@@ -1,0 +1,28 @@
+TITLE: pygooglechart info file for fink
+AUTHOR: Kurt
+DATE: 12.21.2007 17:33
+DESC: quick start
+-----
+BODY:
+I haven't done anything more than the example graph at this point, but
+it works for me.
+<pre>
+% fink install wget imagemagick
+% wget http://vislab-ccom.unh.edu/~schwehr/software/fink/pygooglechart-py.info
+% fink install pygooglechart-py25
+% ipython
+from pygooglechart import SimpleLineChart, Axis
+chart = SimpleLineChart(200, 125)
+data = [ 1, 5, 30, 10, 25 ]
+chart.add_data(data)
+chart.set_axis_range(Axis.LEFT, 0, 10)
+chart.download('hello.png')
+print chart.get_url()
+quit()
+% display hello.png
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-12/hello.png"/>
+
+The graphs look nice and clean.  Not overly fleximble, but definitely nice.
+Too bad you can't ask for an svg or pdf instead of just png. 
+-----

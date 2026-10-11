@@ -1,0 +1,57 @@
+TITLE: transporting AIS messages over the internet
+AUTHOR: Kurt
+DATE: 03.31.2009 15:29
+DESC: how?
+-----
+BODY:
+Back in January, I talked about <a
+href="http://schwehr.org/blog/archives/2009-01.html#e2009-01-04T17_48_16.txt">AIS
+Encoding with JSON</a> and <a
+href="http://schwehr.org/blog/archives/2009-01.html#e2009-01-12T18_47_02.txt">AIS
+Binary Message queuing format</a> for the USCG Fetcher-Formatter.
+Here is a supper simple format for AIS messages that is more like the
+JSON format that is a lot simpler than the Maritime Domain Awareness
+(MDA) Data Sharing Community of Interest (DS COI) by Tollefson et al.:
+<a href="www.uscg.mil/hq/cg9/NAIS/RFP/SectionJ/MDA-COI-vocab.pdf">Data
+Management Working Group Spiral 2 Vocabulary Handbook Version 2.0.2
+Final Release 15 November 2007</a> [PDF]
+
+Being that this is XML, you can drop in other things with easy.  For
+example, you could include the binary 011011 representation, AIS
+channel (A or B), a BBM or ABM command to transmit the message, the
+VDM message, any of the other information that was in the
+Fetcher-Formatter queuing metadata (bounding box, priority), or what
+ever else you need.
+<pre><tt><b><font color="#0000FF">&lt;aismsg</font></b> <font color="#009900">msgnum</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="#009900">timestampt</font><font color="#990000">=</font><font color="#FF0000">"1238525354.12"</font><b><font color="#0000FF">&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"MessageId"</font><b><font color="#0000FF">&gt;</font></b>1<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"RepeatIndicator"</font><b><font color="#0000FF">&gt;</font></b>1<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"NavigationStatus"</font><b><font color="#0000FF">&gt;</font></b>6<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <i><font color="#9A1900">&lt;!--  and so forth... --&gt;</font></i>
+<b><font color="#0000FF">&lt;/aismsg&gt;</font></b>
+<!-- -->
+<i><font color="#9A1900">&lt;!-- and --&gt;</font></i>
+<!-- -->
+<b><font color="#0000FF">&lt;aismsg</font></b> <font color="#009900">msgnum</font><font color="#990000">=</font><font color="#FF0000">"8"</font> <font color="#009900">timestampt</font><font color="#990000">=</font><font color="#FF0000">"1238525354.12"</font><b><font color="#0000FF">&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"MessageId"</font><b><font color="#0000FF">&gt;</font></b>8<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"RepeatIndicator"</font><b><font color="#0000FF">&gt;</font></b>1<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"UserID"</font><b><font color="#0000FF">&gt;&lt;/field&gt;</font></b> <i><font color="#9A1900">&lt;!-- MMSI - use the same name as in Pos 1-3 messages --&gt;</font></i>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"Spare"</font><b><font color="#0000FF">&gt;</font></b>0<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"Notice Description"</font> <font color="#009900">alt</font><font color="#990000">=</font><font color="#FF0000">"Restricted Area: Entry prohibited"</font><b><font color="#0000FF">&gt;</font></b>35<b><font color="#0000FF">&lt;/field&gt;</font></b> <i><font color="#9A1900">&lt;!-- alt attribute modeled off of HTML --&gt;</font></i>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"start_day"</font><b><font color="#0000FF">&gt;</font></b>12<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"start_hour"</font><b><font color="#0000FF">&gt;</font></b>16<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"start_min"</font><b><font color="#0000FF">&gt;</font></b>0<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"duration"</font><b><font color="#0000FF">&gt;</font></b>4000<b><font color="#0000FF">&lt;/field&gt;</font></b> <i><font color="#9A1900">&lt;!-- optional units attribute? --&gt;</font></i>
+  <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"message_identifier"</font><b><font color="#0000FF">&gt;</font></b>643<b><font color="#0000FF">&lt;/field&gt;</font></b>
+<!-- -->
+  <i><font color="#9A1900">&lt;!-- start of first sub area ... do you include grouping tags? --&gt;</font></i>
+  <b><font color="#0000FF">&lt;group</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"circle"</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"area_shape"</font> <font color="#009900">alt</font><font color="#990000">=</font><font color="#FF0000">"circle"</font><b><font color="#0000FF">&gt;</font></b>0<b><font color="#0000FF">&lt;/field&gt;</font></b>
+    <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"scale_factor"</font><b><font color="#0000FF">&gt;</font></b>.5<b><font color="#0000FF">&lt;/field&gt;</font></b>
+    <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"lontitude"</font><b><font color="#0000FF">&gt;</font></b>-50.21234<b><font color="#0000FF">&lt;/field&gt;</font></b>
+    <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"latitude"</font><b><font color="#0000FF">&gt;</font></b>10.3457<b><font color="#0000FF">&lt;/field&gt;</font></b>
+    <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"radius"</font><b><font color="#0000FF">&gt;</font></b>143<b><font color="#0000FF">&lt;/field&gt;</font></b> <i><font color="#9A1900">&lt;!-- Is this the scaled for the VDL or the actual number for display? --&gt;</font></i>
+    <b><font color="#0000FF">&lt;field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"spare"</font><b><font color="#0000FF">&gt;</font></b>0<b><font color="#0000FF">&lt;/field&gt;</font></b>
+  <b><font color="#0000FF">&lt;/group&gt;</font></b>
+  <i><font color="#9A1900">&lt;!--  and so forth... --&gt;</font></i>
+<b><font color="#0000FF">&lt;/aismsg&gt;</font></b></tt></pre>
+-----

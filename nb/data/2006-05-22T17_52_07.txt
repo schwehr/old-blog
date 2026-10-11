@@ -1,0 +1,56 @@
+TITLE: beginning graphviz
+AUTHOR: Kurt
+DATE: 05.22.2006 17:52
+DESC: so easy
+-----
+BODY:
+I have never directly used graphviz before today.  Yes, I run it all
+the time as a side effect of using doxygen, but that is not the same
+as creating my own graphs as dot files.  Well, now I have and damn is
+it <b>easy</b>!  The only thing to know is that the fink version for
+graphviz does not seem to be able to handle png images.  
+<pre>
+   Error: Could not find/open font : Times-Roman
+</pre>
+I emailed the maintainer, but it does work with ps output.  Here is my
+first example.  I made a text file of a tree from within a GeoZui
+subtest:
+<pre>
+TREE: I_am_root
+        I_am_root -&gt; c0; // 0
+        I_am_root -&gt; c1; // 1
+                c1 -&gt; cc0; // 0
+                c1 -&gt; cc1; // 1
+        I_am_root -&gt; c2; // 2
+        I_am_root -&gt; c3; // 3
+        I_am_root -&gt; c4; // 4
+                c4 -&gt; cd0; // 0
+                c4 -&gt; cd1; // 1
+                c4 -&gt; cd2; // 2
+</pre>
+That works, but really is not that much fun.  More fun is to use
+graphviz...
+<pre>
+digraph foo {
+        I_am_root -> c0; // 0
+        I_am_root -> c1; // 1
+        c1 -> cc0; // 0
+        c1 -> cc1; // 1
+        I_am_root -> c2; // 2
+        I_am_root -> c3; // 3
+        I_am_root -> c4; // 4
+        c4 -> cd0; // 0
+        c4 -> cd1; // 1
+        c4 -> cd2; // 2
+} // digraph foo
+</pre>
+To view the graph either use the Mac GraphViz (which is pretty nice)
+or do this:
+<pre>
+  dot -Tps -o foo.ps foo.dot
+  gv foo.ps
+</pre>
+And I ended up with a graph that looks like this:
+
+<img src="http://schwehr.org/blog/attachments/2006-05/graphviz-foo.png">
+-----

@@ -1,0 +1,61 @@
+TITLE: pylint validation of source code
+AUTHOR: Kurt
+DATE: 02.04.2008 09:15
+DESC: should I comply?
+-----
+BODY:
+I just tried the latest version of pylint on my serial logger code.  Ouch!
+I am not very close to the python coding style guide.  It does not like 
+how I redefine the doc string, but that is important for good quality 
+epydoc output.
+<pre>
+pylint serial_logger.py  --max-line-<font color="#2040a0">length</font>=200
+No config file found, using default configuration
+************* Module serial_logger
+C:  1: Missing docstring
+W:  1: Redefining built-in '__doc__'
+C: 34:createDaemon: Invalid name <font color="#008000">&quot;createDaemon&quot;</font> (should match [a-z_][a-z0-9_]{2,30}$)
+C: 39:createDaemon: Invalid name <font color="#008000">&quot;e&quot;</font> (should match [a-z_][a-z0-9_]{2,30}$)
+C: 48:createDaemon: Invalid name <font color="#008000">&quot;e&quot;</font> (should match [a-z_][a-z0-9_]{2,30}$)
+W: 52:createDaemon: Access to a protected member _exit of a client class
+W: 55:createDaemon: Access to a protected member _exit of a client class
+C: 64:createDaemon: Invalid name <font color="#008000">&quot;fd&quot;</font> (should match [a-z_][a-z0-9_]{2,30}$)
+W: 67:createDaemon: Except doesn't do anything
+C: 78:dateStr: Invalid name <font color="#008000">&quot;dateStr&quot;</font> (should match [a-z_][a-z0-9_]{2,30}$)
+C: 84:dateStr: Operator not preceded by a space
+    <font color="#2040a0">t</font>=time.gmtime()
+     ^
+C: 84:dateStr: Invalid name <font color="#008000">&quot;t&quot;</font> (should match [a-z_][a-z0-9_]{2,30}$)
+C: 85:dateStr: Operator not preceded by a space
+    <font color="#2040a0">d</font>='%04d-%02d-%02d' % t[:3]
+     ^
+C: 85:dateStr: Invalid name <font color="#008000">&quot;d&quot;</font> (should match [a-z_][a-z0-9_]{2,30}$)
+W: 89:start: Redefining name 'options' from outer scope (line 217)
+C: 95:start: Comma not followed by a space
+    ser = serial.Serial(options.port,options.baud,<font color="#2040a0">timeout</font>=options.timeout)
+</pre>
+And the summary of messages by catagory.
+<pre>
++===========+=======+
+|type       |number |
++===========+=======+
+|convention |49     |
++===========+=======+
+|refactor   |2      |
++===========+=======+
+|warning    |5      |
++===========+=======+
+|error      |0      |
++===========+=======+
+</pre>
+Pylint gave me my initial evalation:
+<pre>
+Your code has been rated at 0.17/10
+</pre>
+Ouch!  After a bit of tweaking to my code, pylint tells me this...
+<pre>
+Your code has been rated at 8.39/10 (previous run: 8.05/10)
+</pre>
+I don't think my code could be any better at this point, so I am
+not going to try for a 10/10.
+-----

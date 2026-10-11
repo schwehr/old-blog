@@ -1,0 +1,36 @@
+TITLE: libais 0.5 - good enough for first production use
+AUTHOR: Kurt
+DATE: 05.25.2010 14:44
+DESC: better, but not great
+-----
+BODY:
+This code is good enough that it is being used in an operational
+environment.  It's handling 60KB/sec with more than 8000 vessels.  It
+is by no means perfect.  Suggestions and comments are more than
+welcome.  I would like to do more with class inheritance, for example
+decoding the message type, MMSI, and repeat indicator that is all
+messages, but the C++ BitSet class prevents that.  If only the dynamic
+bitset type would migrate from Boost to the C++ standard library.
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/libais/downloads/libais-0.5.tar.bz2">libais-0.5.tar.bz2</a> (still only 31K)
+<ul>
+    <li>docs: Include ESR's AIVDM.txt with permission</li>
+    <li>docs: MID / DAC / MMSI prefixes now listed in mid.csv</li>
+    <li>docs: dac/fi list</li>
+    <li>docs: More notes for message designers</li>
+    <li>Added msg 8 - 1:11 - IMO Met/Hydro</li>
+    <li>Added AIS msg 9 - SAR Position</li>
+    <li>nais2py.py: Added try except wrapper on ProcessingThread.  Also
+  try to track one off error found on call with timestamp converting
+  to float</li>
+    <li>send_data.py: new file for testing</li>
+    <li>nais2py.py: LineQueue now has a custom drop handler for too many lines waiting.
+    Could be better.  </li>
+    <li>nais2py.py: Added threaded network interface.
+    Seeing the network side overwhelm the processing thread</li>
+    <li>nais2py.py: Added response_class handling to VesselNames.  Can be preloaded.
+    Allows periodic name dump</li>
+    <li>nais2py.py: Added ENABLE_DB flag to try runs without database execute commands.
+    Faster debugging</li>
+ </ul>
+-----

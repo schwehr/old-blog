@@ -1,0 +1,32 @@
+TITLE: gdalwarp
+AUTHOR: Kurt
+DATE: 02.01.2008 11:44
+DESC: backscatter
+-----
+BODY:
+Thanks to help from Rob, I was able to take a backscatter file from
+Luciano and convert from UTM to Geographic.  I ran it through two
+paths: ImageView in IVS Fledermaus and gdal.  I had trouble with getting
+the image transparent and exporting to KML from ImageView gave me a tif
+inside the kmz that would not display in GoogleEarth.  I converted the tif
+to a transparent png after unzipping the kmz.  Then I had the image below.
+Rob set me straight on using gdalwarp.  The associated tfw with the original
+geotif did not tell gdal the source projection...
+<pre>
+0.25000
+0
+0
+-0.25000
+360246.83000
+4771048.51000
+</pre>
+Looking in epsg, you can see the NH coast area is in this UTM project:
+<pre>
+# WGS 84 / UTM zone 19N
+&lt;32619&gt; +proj=utm +zone=19 +ellps=WGS84 +datum=WGS84 +units=m +no_defs  &lt;&gt;
+</pre>
+<pre>
+gdalwarp -s_srs EPSG:32619 -t_srs EPSG:4326 backscatter-utmz19.tif backscatter-4326.tif
+</pre>
+<img src="http://schwehr.org/blog/attachments/2008-02/backscatter-newcastle.png"/>
+-----

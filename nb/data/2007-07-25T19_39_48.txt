@@ -1,0 +1,75 @@
+TITLE: A helping hand for AIS decoding
+AUTHOR: Kurt
+DATE: 07.25.2007 19:39
+DESC: the joy of bit slicing
+-----
+BODY:
+I had a request for help in understanding the decoding of AIS packets
+by a software developer.  Here is what I wrote up on the process.  He
+wanted an example for the MMSI/UserID field.
+
+First take a look at the whole decode from my noaadata package:
+<pre>
+cd ~/projects/src/noaadata/ais
+./ais_msg_1.py -d '!AIVDM,1,1,,A,15`&gt;DT00002BckegQW1P02in00Rg,0*41'
+position:
+        MessageID:          1
+        RepeatIndicator:    0
+        UserID:             377722000
+        NavigationStatus:   0
+        ROT:                0
+        SOG:                0
+        PositionAccuracy:   0
+        longitude:          32.04371666666666666666666667
+        latitude:           -28.79188333333333333333333333
+        COG:                0
+        TrueHeading:        88
+        TimeStamp:          59
+        RegionalReserved:   0
+        Spare:              0
+        RAIM:               False
+</pre>
+Here is the binary that I get...
+<pre>
+ipython
+In [1]: import binary
+In [2]: binary.ais6tobitvec('15`&gt;DT00002BckegQW1P02in00Rg')
+Out[2]: &lt;BitVector.BitVector object at 0x129ff10&gt;
+In [3]: print binary.ais6tobitvec('15`&gt;DT00002BckegQW1P02in00Rg')
+00000100010110100000111001010010010000000000000000000000000000001001
+00101010111100111011011011111000011001110000011000000000000000101100
+01110110000000000000100010101111
+</pre>
+By hand, here is how the characters work for me:
+<pre>
+000001 000101 101000 001110 010100 1001000 000000 000000 000000 000000
+1      5      `      &      &gt;   D       T      0      0      0
+====== ==**** ****** ****** ****** ******* *===== ====== ====== ======
+012345 678901 234567 890123 456789 0123456 789012 345678 901234 567890
+0          1           2           3          4           5          6
+         0101 101000 001110 010100 1001000 0  
+</pre>
+The above shows first the bits broken up by the groups of 6 that make
+up the characters.  Then the 2nd line show the character that
+represents those bits in the NMEA string.  Then I use '-' and '*' to
+show the location of the MMSI bits with the position numbers below.
+Finally I show the bits that are pulled out for the MMSI/UserID.
+
+My python decoding of the bits for UserID (aka MMSI) in ais_msg_1.py:
+<pre>
+def decodeUserID(bv, validate=False):
+        return int(bv[8:38])
+<pre>
+So now, pull out the bits for the UserID:
+In [5]: bv = binary.ais6tobitvec('15`&gt;DT00002BckegQW1P02in00Rg')
+In [6]: print bv[8:38]
+010110100000111001010010010000
+</pre>
+Now convert that binary to the ship MMSI/UserID:
+<pre>
+In [7]: print int(bv[8:38])
+377722000
+</pre>
+Hope that helps.  Now if I can figure out why postgres82 currently
+does not like me.
+-----

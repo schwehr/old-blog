@@ -1,0 +1,62 @@
+TITLE: NSFastEnumeration - finally correct?
+AUTHOR: Kurt
+DATE: 08.12.2010 11:54
+DESC: whew!
+-----
+BODY:
+I think I finally have a reasonably functional example of
+NSFastEnumeration.  Thanks to <a href="http://stackoverflow.com/users/6443/ahruman">Ahruman</a> for help on my 1st Stack Overflow post:
+<a href="http://stackoverflow.com/questions/3468349/proper-construction-of-nsfastenumeration-class">Proper construction of NSFastEnumeration class</a>
+
+The code is long, so you will have to download it see how I finally
+got it working.
+
+<a href="http://schwehr.org/blog/attachments/2010-08/using-NSFastEnumeration.m">using-NSFastEnumeration.m</a>
+<pre><b>gcc -ObjC -framework Foundation using-NSFastEnumeration.m -o using-NSFastEnumeration
+./using-NSFastEnumeration</b>
+2010-08-12 11:52:21.674 using-NSFastEnumeration[93784:903] In countByEnumeratingWithState: stackbuf: 0x7fff5fbfdf90, count: 16
+2010-08-12 11:52:21.676 using-NSFastEnumeration[93784:903] 	 state struct: state=0 0x0 0x0
+2010-08-12 11:52:21.676 using-NSFastEnumeration[93784:903] First time through the loop
+2010-08-12 11:52:21.676 using-NSFastEnumeration[93784:903] mutationsPtr incoming: 0x0 outgoing: 0x10010d470
+2010-08-12 11:52:21.677 using-NSFastEnumeration[93784:903] Creating datagram of type 73 state: 0 count 0
+2010-08-12 11:52:21.677 using-NSFastEnumeration[93784:903] Creating datagram of type 67 state: 1 count 1
+2010-08-12 11:52:21.677 using-NSFastEnumeration[93784:903] Building clock object
+2010-08-12 11:52:21.677 using-NSFastEnumeration[93784:903] Creating datagram of type 68 state: 2 count 2
+2010-08-12 11:52:21.678 using-NSFastEnumeration[93784:903] Building depth object
+2010-08-12 11:52:21.678 using-NSFastEnumeration[93784:903] Creating datagram of type 67 state: 3 count 3
+2010-08-12 11:52:21.678 using-NSFastEnumeration[93784:903] Building clock object
+2010-08-12 11:52:21.678 using-NSFastEnumeration[93784:903] Creating datagram of type 68 state: 4 count 4
+2010-08-12 11:52:21.678 using-NSFastEnumeration[93784:903] Building depth object
+2010-08-12 11:52:21.679 using-NSFastEnumeration[93784:903] Creating datagram of type 67 state: 5 count 5
+2010-08-12 11:52:21.679 using-NSFastEnumeration[93784:903] Building clock object
+2010-08-12 11:52:21.679 using-NSFastEnumeration[93784:903] Creating datagram of type 105 state: 6 count 6
+2010-08-12 11:52:21.679 using-NSFastEnumeration[93784:903] countByEnumeratingWithState read 7 datagrams.  state->state: 7
+2010-08-12 11:52:21.680 using-NSFastEnumeration[93784:903] About to read datagram in for
+2010-08-12 11:52:21.680 using-NSFastEnumeration[93784:903]   Datagram type: 73  description: Datagram: dgId: 73
+2010-08-12 11:52:21.680 using-NSFastEnumeration[93784:903] About to read datagram in for
+2010-08-12 11:52:21.680 using-NSFastEnumeration[93784:903]   Datagram type: 67  description: I am a clock
+2010-08-12 11:52:21.681 using-NSFastEnumeration[93784:903] About to read datagram in for
+2010-08-12 11:52:21.681 using-NSFastEnumeration[93784:903]   Datagram type: 68  description: I am a depth datagram
+2010-08-12 11:52:21.681 using-NSFastEnumeration[93784:903] About to read datagram in for
+2010-08-12 11:52:21.681 using-NSFastEnumeration[93784:903]   Datagram type: 67  description: I am a clock
+2010-08-12 11:52:21.681 using-NSFastEnumeration[93784:903] About to read datagram in for
+2010-08-12 11:52:21.682 using-NSFastEnumeration[93784:903]   Datagram type: 68  description: I am a depth datagram
+2010-08-12 11:52:21.682 using-NSFastEnumeration[93784:903] About to read datagram in for
+2010-08-12 11:52:21.682 using-NSFastEnumeration[93784:903]   Datagram type: 67  description: I am a clock
+2010-08-12 11:52:21.682 using-NSFastEnumeration[93784:903] About to read datagram in for
+2010-08-12 11:52:21.683 using-NSFastEnumeration[93784:903]   Datagram type: 105  description: Datagram: dgId: 105
+2010-08-12 11:52:21.683 using-NSFastEnumeration[93784:903] In countByEnumeratingWithState: stackbuf: 0x7fff5fbfdf90, count: 16
+2010-08-12 11:52:21.683 using-NSFastEnumeration[93784:903] 	 state struct: state=7 0x7fff5fbfdf90 0x10010d470
+2010-08-12 11:52:21.683 using-NSFastEnumeration[93784:903] mutationsPtr incoming: 0x10010d470 outgoing: 0x10010d470
+2010-08-12 11:52:21.684 using-NSFastEnumeration[93784:903] countByEnumeratingWithState read 0 datagrams.  state->state: 7
+2010-08-12 11:52:21.684 using-NSFastEnumeration[93784:903] No objects found.  We are done.  Put any cleanup code here
+2010-08-12 11:52:21.684 using-NSFastEnumeration[93784:903] about to drain pool
+2010-08-12 11:52:21.684 using-NSFastEnumeration[93784:903] dealloc datagram: 105
+2010-08-12 11:52:21.684 using-NSFastEnumeration[93784:903] dealloc datagram: 67
+2010-08-12 11:52:21.685 using-NSFastEnumeration[93784:903] dealloc datagram: 68
+2010-08-12 11:52:21.685 using-NSFastEnumeration[93784:903] dealloc datagram: 67
+2010-08-12 11:52:21.685 using-NSFastEnumeration[93784:903] dealloc datagram: 68
+2010-08-12 11:52:21.685 using-NSFastEnumeration[93784:903] dealloc datagram: 67
+2010-08-12 11:52:21.686 using-NSFastEnumeration[93784:903] dealloc datagram: 73
+2010-08-12 11:52:21.686 using-NSFastEnumeration[93784:903] pool drained.  ready for winter</pre>
+-----

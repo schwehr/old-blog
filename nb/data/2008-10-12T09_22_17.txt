@@ -1,0 +1,56 @@
+TITLE: mp for checking metadata
+AUTHOR: Kurt
+DATE: 10.12.2008 09:22
+DESC: working towards valid metadata
+-----
+BODY:
+It looks like we might be a fair ways away from having valid FDGC
+metadata.  I don't know enough about the specification to know what is
+valid and what is not, so I went looking for software that might
+validate what we have.  I found <a
+href="http://geology.usgs.gov/tools/metadata/tools/doc/mp.html">mp</a>
+from the USGS.  I did a quick by hand build of the code and threw a
+sample metadata file for a line of multibeam data at it:
+<pre>% <b>mp 0479_20080620_175447_RVCS.all.metadata -e 0479_20080620_175447_RVCS.all.metadata.errors -h 0479_20080620_175447_RVCS.all.metadata.html</b></pre>
+The -e has it write the errors to a file and the -h writes out a HTML file
+for the web.  Take a look at the HTML:
+
+<a href="http://schwehr.org/blog/attachments/2008-10/0479_20080620_175447_RVCS.all.metadata.html">0479_20080620_175447_RVCS.all.metadata.html</a>
+
+That looks pretty good.  But then looking at the error list, we have
+work ahead of us to figure out how to produce proper metadata.
+<pre>mp 2.9.8 - Peter N. Schweitzer (U.S. Geological Survey)
+Info: input file = 0479_20080620_175447_RVCS.all.metadata
+Info: process date = 20081012
+Info: process time = 09:03:43
+Warning (line 2): Extraneous text following element Identification_Information ignored.  Check indentation of line 3.
+Warning (line 108): Extraneous text following element Contact_Organization ignored.  Check indentation of line 109.
+Warning (line 111): Extraneous text following element Contact_Address ignored.  Check indentation of line 112.
+Error (line 8): Description is not permitted in Metadata
+Error (line 12): Time_Period_of_Content is not permitted in Metadata
+Error (line 19): Status is not permitted in Metadata
+Error (line 21): Spatial_Domain is not permitted in Metadata
+Error (line 28): Keywords is not permitted in Metadata
+Error (line 36): Access_Constraints is not permitted in Metadata
+Error (line 37): Use_Constraints is not permitted in Metadata
+Error (line 38): Point_of_Contact is not permitted in Metadata
+Error (line 55): Security_Information is not permitted in Metadata
+Error (line 2): Description is required in Identification_Information
+Error (line 2): Time_Period_of_Content is required in Identification_Information
+Error (line 2): Status is required in Identification_Information
+Error (line 2): Spatial_Domain is required in Identification_Information
+Error (line 2): Keywords is required in Identification_Information
+Error (line 2): Access_Constraints is required in Identification_Information
+Error (line 2): Use_Constraints is required in Identification_Information
+Error (line 12): Currentness_Reference is required in Time_Period_of_Content
+Error (line 16): improper value for Beginning_Time
+Error (line 18): improper value for Ending_Time
+Error (line 19): Maintenance_and_Update_Frequency is required in Status
+Error (line 20): improper value for Progress
+Error (line 23): no element recognized in "Start_of_line_Latitude: 44.394985"; text is not permitted in Bounding_Coordinates
+...
+72 errors: 6 unrecognized, 26 misplaced, 33 missing, 1 empty, 6 bad_value</pre>
+The code comes with xtme for creating metadata files, which will hopefully make understanding this output a lot easier.
+
+<img title="metadata editor xtme from the USGS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/mp-xtme.png"/>
+-----

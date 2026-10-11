@@ -1,0 +1,31 @@
+TITLE: Coping with Mail.app botching base64 mime encoding
+AUTHOR: Kurt
+DATE: 07.14.2005 12:00
+DESC: works well
+-----
+BODY:
+I got an email today that Mail.app refused to decode into the pdf that was the email:
+<pre>
+--Apple-Mail-6--850890775
+Content-Transfer-Encoding: base64
+Content-Type: application/pdf;
+	x-unix-mode=0444;
+	name="some.pdf"
+Content-Disposition: inline;
+	filename=some.pdf
+
+JVBERi0xLjMNJeLjz9MNCjEzNCAwIG9iag08PCANL0xpbmVhcml6ZWQgMSANL08gMTM5IA0vSCBb
+IDI1MTIgOTA4IF0gDS9MIDM2NDk4MyANL0UgNjQxODAgDS9OIDggDS9UIDM2MjE4NCANPj4gDWVu
+ZG9iag0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+...
+</pre>
+I found the base64 program in fink.  Worked like a charm.  Copy all of
+the test in the base64 block.  Here that was from JVBER down to the
+next blank line.  Then run base64 on this file:
+<pre>
+  base64 -d some.pdf.mime  > some.pdf
+  file some.pdf
+  open some.pdf
+</pre>
+That's it!
+-----

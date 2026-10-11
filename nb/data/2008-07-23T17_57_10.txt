@@ -1,0 +1,76 @@
+TITLE: SQLITE tutorial
+AUTHOR: Kurt
+DATE: 07.23.2008 17:57
+DESC: for Gwennie
+-----
+BODY:
+I told Gwennie that I would give her a quick SQL tutorial.  She is
+another mac user (there were many at the Phoenix Sience Operations
+Center... probably over 100 Macs at the SOC).  So here it is and this
+assumes you are running on a Mac and are comfortable on the command
+line.
+
+See also: <a href="http://www.sqlite.org/sqlite.html">http://www.sqlite.org/sqlite.html</a> for a quick tutorial
+
+First, the Mac comes with <a
+href="http://www.sqlite.org/">Sqlite3</a>.  You can use either the Mac
+one or the one from fink.  They are pretty much equivalent.
+<pre>
+% <b>type -a sqlite3</b>
+sqlite3 is /sw/bin/sqlite3
+sqlite3 is /usr/bin/sqlite3
+</pre>
+Sqlite is a great database program to use when learning SQL.  There is
+no database server to setup.  It uses a file for the database and if
+you don't like what you did, just delete the file.  Note, that sqlite2
+and older use an ASCII database format and are really slow (and have
+very large db files).  Let's get started!
+<pre>
+% sqlite3 demo.db3
+sqlite&gt; <b>SELECT 1+1;</b>
+2
+sqlite&gt; <b>.quit</b>
+</pre> 
+Not so exciting, but it is a start.  You have to specify a file to use
+as the database, but if unless you do something to the database, it
+won't create the file.  <b>SELECT</b> is the basic lookup command.
+You can do basic math with it.  You can also get the current time.
+<pre>
+sqlite&gt; <b>SELECT CURRENT_TIMESTAMP;</b>
+2008-07-23 22:33:56
+</pre>
+Some quick SQL convention notes.  SQL reserved words are typically
+done in all caps and comments start with '<b>--</b>'.  SQL statements
+end with a '<b>;</b>'.
+
+Now we need to make some tables so we can do something a bit more
+interesting.  This makes a 3 column table.  The .schema command lists
+the tables in the database.
+<pre>
+sqlite&gt; <b>CREATE TABLE somedata (aNumber INT, aFloat REAL, aString VARCHAR(30));</b>
+sqlite&gt <b>.schema</b>
+CREATE TABLE somedata (aNumber INT, aFloat REAL, aString VARCHAR(30));
+</pre>
+Now put some data into the table:
+<pre>
+sqlite&gt; INSERT INTO somedata values (1, 1.001, "a first string");
+sqlite&gt; INSERT INTO somedata values (6, 42.000001, "another string");
+sqlite&gt; SELECT * FROM somedata;
+1|1.001|a first string
+6|42.000001|another string
+</pre>
+If you want to write out a csv file that you can import into Excel
+or some other database, try something like this:
+<pre>
+sqlite&gt; .separator ", "
+sqlite&gt; .output foo.csv
+sqlite&gt; SELECT aFloat, aString FROM somedata;
+sqlite&gt; .quit
+% <b>cat foo.csv</b>
+1.001, a first string
+42.000001, another string
+% <b>open .output foo.csv</b>
+</pre>
+The next thing to look at is <b>WHERE</b> to limit searches to a
+subset of the data.
+-----

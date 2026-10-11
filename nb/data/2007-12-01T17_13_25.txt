@@ -1,0 +1,65 @@
+TITLE: quick ships per day calculations from SQL
+AUTHOR: Kurt
+DATE: 12.01.2007 17:13
+DESC: timedelta good
+-----
+BODY:
+I think I finally have a basic program to calculate vessels per day
+using python and SQL that runs fast and is not too complicated.  This
+one can summarize the vessels per day for one year with 4.5M records
+in about 3-4 seconds.  Here is an example of the test SQL code for one
+day:
+<pre>
+SELECT distinct(userid) \
+FROM position \
+WHERE cg_timestamp BETWEEN \
+    DATE('2006-01-02') and DATE('2006-01-03');
+
+  userid
+===========
+ 303388000
+ 316012950
+ 366897920
+ 367075760
+ 477930000
+</pre>
+This is equivalent to the less friendly query I had the other day:
+<pre>
+SELECT distinct(userid) \
+FROM position \
+WHERE cg_timestamp >= '2006-01-02 00:00:00' 
+  AND cg_timestamp <= '2006-01-03 00:00:01';
+
+  userid   
+===========
+ 303388000
+ 316012950
+ 366897920
+ 367075760
+ 477930000
+</pre>
+And here is the core part of the resulting python using psycopg2.  The trick
+is to use timedelta to jump one day at a time through the days of the year.
+<pre>
+    # make postgres db connection and get a cursor called "cu"
+    import datetime
+    dt = datetime.datetime(2006,1,1)
+    dtend = datetime.datetime(2007,1,1)
+    doy = 1 # day of the year
+    oneDay = datetime.timedelta(1)
+    while dt &lt; dtend:
+        dateStr1 = ('%d-%02d-%02d' % (dt.year, dt.month, dt.day))
+        dtnext = dt + oneDay
+        dateStr2 = ('%d-%02d-%02d' % (dtnext.year, dtnext.month, dtnext.day))
+        q = "SELECT count(distinct(userid)) FROM position"\
+            " WHERE cg_timestamp &gt;= '"+dateStr1+"' AND cg_timestamp &lt;= '"+dateStr2+"';"
+        cu.execute(q)
+        numVessels = cu.fetchone()[0]
+        print doy, numVessels, dateStr1
+        dt = dtnext
+        doy += 1
+</pre>
+This will become part of noaadata as ais_pg_dailvessels.py.  I will hopefully
+let the default range over all of the database, but allow the user to constrain
+either the end date and/or the beginning date.
+-----

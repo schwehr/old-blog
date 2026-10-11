@@ -1,0 +1,32 @@
+TITLE: Using python to read /dev/random
+AUTHOR: Kurt
+DATE: 10.29.2005 14:54
+DESC: struct module
+-----
+BODY:
+I was thinking about using the python random class to make some simple
+figures that need random particles dispersed in a uniform manner.
+Since random needs a seed, I figured a good way to give it one is to
+use /dev/random.  It is easy to use the python struct class to turn
+the random data that /dev/random generates into values of a certain
+type.  Here the 'i' tells struct that the random data is a 4 byte
+integer.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<strong>import</strong> <font color="#2040a0">struct</font>
+<strong>class</strong> <font color="#2040a0">DevRandom</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;http://www.python.org/doc/current/lib/module-struct.html&quot;</font><font color="#008000">&quot;&quot;</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">devrand</font> <font color="4444FF">=</font> <font color="#2040a0">open</font> <font color="4444FF">(</font><font color="#008000">'/dev/random'</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>
+        <strong>return</strong>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> getInt4</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">string</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">devrand</font>.<font color="#2040a0">read</font><font color="4444FF">(</font><font color="#FF0000">4</font><font color="4444FF">)</font>
+        <font color="#2040a0">intval</font> <font color="4444FF">=</font> <font color="#2040a0">struct</font>.<font color="#2040a0">unpack</font><font color="4444FF">(</font><font color="#008000">'i'</font>,<font color="#2040a0">string</font><font color="4444FF">)</font>
+        <strong>return</strong> <font color="#2040a0">intval</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+
+<font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#2040a0">DevRandom</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">100000</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">r</font>.<font color="#2040a0">getInt4</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+-----

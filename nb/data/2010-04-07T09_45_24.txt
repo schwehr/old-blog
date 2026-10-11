@@ -1,0 +1,46 @@
+TITLE: Creating debs for ubuntu
+AUTHOR: Kurt
+DATE: 04.07.2010 09:45
+DESC: deb packaging
+-----
+BODY:
+I just created a debian package (.deb) of ntplib for one of my Ubuntu
+boxes.  I still do not feel like I understand the process, but it
+worked!  I started with <a
+href="http://ghantoos.org/2008/10/19/creating-a-deb-package-from-a-python-setuppy/">Creating
+a .deb package from a python setup.py</a>.  I skipped the signing part
+of the process.  I thought it had all failed yesterday, but then I
+found a deb sitting there one directory up today.  Wahoo!
+<pre><b>sudo dpkg -i python-ntplib_0.1.9_all.deb</b>
+<b>dpkg -L python-ntplib</b>
+/.
+/usr
+/usr/share
+/usr/share/python-support
+/usr/share/python-support/python-ntplib
+/usr/share/python-support/python-ntplib/ntplib-0.1.9.egg-info
+/usr/share/python-support/python-ntplib/.version
+/usr/share/python-support/python-ntplib/ntplib.py
+/usr/share/doc
+/usr/share/doc/python-ntplib
+/usr/share/doc/python-ntplib/changelog.gz
+/usr/share/doc/python-ntplib/README
+/usr/share/doc/python-ntplib/copyright
+<b>python</b>
+Python 2.6.2 (release26-maint, Apr 19 2009, 01:56:41) 
+[GCC 4.3.3] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; <b>import ntplib</b></pre>
+It didn't create the pyc on install, but it works!  There needs to be
+a postinst script, but that is another day.
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/ubuntu/9.04/python-ntplib_0.1.9_all.deb">http://vislab-ccom.unh.edu/~schwehr/software/ubuntu/9.04/python-ntplib_0.1.9_all.deb</a>
+
+Another route would have been to try: <a href="http://pypi.python.org/pypi/stdeb">stdeb</a>:
+<pre>stdeb produces Debian source packages from Python packages via a new
+distutils command, sdist_dsc. Automatic defaults are provided for the
+Debian package, but many aspects of the resulting package can be
+customized (see the customizing section, below). An additional
+command, bdist_deb, creates a Debian binary package, a .deb file.</pre>
+
+-----

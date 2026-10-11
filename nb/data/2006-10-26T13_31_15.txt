@@ -1,0 +1,31 @@
+TITLE: AIS BSVDM
+AUTHOR: Kurt
+DATE: 10.26.2006 13:31
+DESC: what are these things?
+-----
+BODY:
+I was just going back through a recent days worth of logged AIS data
+and noticed that I am getting way more complaints from my python code.
+Looking at the NMEA I was surprised to see BSVDM NMEA messages.  I am
+accustomed to seeing AIVDM messages broadcast from remote vessels.
+Googling BSVDM only got one hit which is the AIS basestation
+specification.
+<pre><a href="http://www.navcenter.org/marcomms/IEC/80_427e_CDV.pdf">80_427e_CDV</a>[pdf]</pre>
+Skimming through that document, there are messages that start with
+!BS, but I didn't find a description.  Perhaps this means "Base
+Station," but it could also stand for "Bit Scrambled."  I haven't
+tried to decode these since my code rejects anything that is not AIVDM
+or AIVDO.  Here is an example just for reference.
+<pre>
+!BSVDM,1,1,,A,152w@t5P00JSDt6E7qv@0?wF0<0f,0*61,r003669717,1161821504
+!BSVDM,1,1,,A,15N7`G0P00JRURdE7oVevgwH08JH,0*74,r003669717,1161821504
+!BSVDM,1,1,,A,15N4He0P06JRT<TE:;v22?wH08Jt,0*2A,r003669717,1161821505
+!BSVDM,1,1,,B,15N5p@0P00JRh:HE3`jI9?wL240d,0*4B,r003669717,1161821505
+!BSVDM,2,1,7,A,53bNQv02<LuU0P46221A84m0E:22222222222216:0D::6b<0>PC0PCVH888,0*51,r003669717,1161821506
+!BSVDM,2,2,7,A,88888888880,2*3A,r003669717,1161821506
+!BSVDM,1,1,,A,15N8JePP00JR`t0E6501sOwP0D0f,0*20,r003669717,1161821507
+!BSVDM,1,1,,A,15N1NJPP1=JSBH`E<cBWNwwP08LT,0*3E,r003669717,1161821508
+</pre>
+Something to look into if I get some more time.  And I really should
+read the whole base station specification.
+-----

@@ -1,0 +1,38 @@
+TITLE: SPAWAR - AUV competition
+AUTHOR: Kurt
+DATE: 08.08.2003 12:00
+DESC: Old blog
+-----
+BODY:
+<a href="http://www.auvsi.org/competitions/water.cfm">AUV
+Competition</a>
+
+Spent yesterday with Sib at the 2003 AUV competition up a the SPAWAR
+pool.  It was definitely a blast.  I wish I had something like that
+available to me when I was an undergrad.  I saw some really
+interesting designs there.  I especially thought that the little PIC
+controlled bomblet was a clever design even if it turns out not to
+work.  It was interesting that MIT used a frame as there overall
+construction unit.
+
+I even got to help out a bit by trying to remember how to write Linux
+timing code to trigger off the 3 sonar pingers that are located at
+each of the 3 targets.  Thanks to Alex and Dan for suggestions.  Does
+anyone have some good (and simple) code to to IRQ based TTL edge
+detection on a parallel port?  I tried parapin, but it hasn't been
+updated in three years, won't compile with current kernels, and it
+isn't clear how it does IRQ handling...  I only found 2 lines that
+even have anything with IRQ in them.  Where is it setting the callback
+function?  Dan suggested Comedi, which looks powerful, but a little
+too much to whip up in a hour or two.
+
+A note about timers!  When using setitimer, remember that you can not
+use usleep at the same time.  It uses the same timer.  We also had
+some issues with the short time that we wanted to trigger the TTL
+pulse to the sonars.  We wanted it short (like 5-10 ms), but with a
+standard redhat 9 with 2.4.20, we got about 25-26 ms as the minimum
+sleep time.  Guess me needed the RML realtime patches to make it work.
+Sib instead used a look with sin cos in it to do a better delay.  It
+now works great but it is now machine dependent with timing.  outb is
+so unbelievably easy to use!
+-----

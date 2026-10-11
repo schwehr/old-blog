@@ -1,0 +1,64 @@
+TITLE: Fun with SQL - AIS ship reports
+AUTHOR: Kurt
+DATE: 06.18.2007 14:34
+DESC: slicker-n-snot
+-----
+BODY:
+This is something I have wanted to get done for quite a few months.
+This code builds a table with ship sizes and the cargo while trying to
+do as much as possible in SQL.  A fair bit of prep work 
+<pre>
+#!/usr/bin/env bash
+for file in 2007-??.5.db3; do
+    sqlite3 $file &quot;DROP TABLE shipandcargoLUT;&quot;
+    ../build_sqlite_shipandcargo.py $file
+    out=${file%%db3}csv
+    echo $out
+    echo &quot;See http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/ais_msg_5.html&quot; &gt; $out
+    echo &quot;MMSI is the same as UserID&quot; &gt;&gt; $out
+    echo &quot;MMSI,IMOnumber,callsign,name,shipandcargo,length,width,dimA,dimB,dimC,dimD,ship,cargo_maybe&quot; &gt;&gt; $out
+    sqlite3 $file 'SELECT found.UserID,IMOnumber,callsign,name,shipdata.shipandcargo,\
+                   dimA+dimB,dimC+dimD,dimA,dimB,dimC,dimD,shipandcargoLUT.text \
+                   FROM shipdata,found,shipandcargoLUT \
+                   WHERE shipdata.UserID=found.UserID AND shipdata.shipandcargo=shipandcargoLUT.shipandcargo'\
+                   | tr '|' ',' | tr '@' ' ' | sort -un &gt;&gt; $out
+done
+</pre>
+Here is the build_sqlite_shipandcargo.py that does a quick lookuptable (LUT) build.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>, <font color="#2040a0">os</font>
+<strong>from</strong> <font color="#2040a0">lxml</font> <strong>import</strong> <font color="#2040a0">etree</font> 
+<strong>import</strong> <font color="#2040a0">pysqlite2</font>.<font color="#2040a0">dbapi2</font> <font color="#2040a0">as</font> <font color="#2040a0">sqlite</font>
+<strong>import</strong> <font color="#2040a0">pysqlite2</font>.<font color="#2040a0">dbapi2</font>
+<font color="#444444">#</font>
+<font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">'CREATE TABLE shipandcargoLUT ( shipandcargo INTEGER, text VARCHAR(100) );'</font><font color="4444FF">)</font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">aisMsgsET</font> <font color="4444FF">=</font> <font color="#2040a0">etree</font>.<font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#008000">'/Users/schwehr/projects/src/noaadata/ais/ais_msg_5.xml'</font><font color="4444FF">)</font>.<font color="#2040a0">getroot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">results</font> <font color="4444FF">=</font> <font color="#2040a0">aisMsgsET</font>.<font color="#2040a0">xpath</font><font color="4444FF">(</font><font color="#008000">'*/field[@name=&quot;shipandcargo&quot;]/lookuptable/entry'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#008000">'INSERT INTO shipandcargoLUT (shipandcargo,text) VALUES (0,&quot;unknown,unknown&quot;);'</font><font color="4444FF">)</font>
+<strong>for</strong> <font color="#2040a0">val</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#FF0000">11</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">insStr</font><font color="4444FF">=</font><font color="#008000">'INSERT INTO shipandcargoLUT (shipandcargo,text) VALUES ('</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">val</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">',&quot;'</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">val</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">',unknown/invalid&quot;);'</font>
+    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font> <font color="4444FF">(</font><font color="#2040a0">insStr</font><font color="4444FF">)</font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>for</strong> <font color="#2040a0">val</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">10</font>,<font color="#FF0000">20</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">insStr</font><font color="4444FF">=</font><font color="#008000">'INSERT INTO shipandcargoLUT (shipandcargo,text) VALUES ('</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">val</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">',&quot;reserved,reserved&quot;);'</font>
+    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font> <font color="4444FF">(</font><font color="#2040a0">insStr</font><font color="4444FF">)</font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>for</strong> <font color="#2040a0">entry</font> <strong>in</strong> <font color="#2040a0">results</font><font color="4444FF">:</font>
+    <font color="#2040a0">key</font><font color="4444FF">=</font><font color="#2040a0">entry</font>.<font color="#2040a0">attrib</font><font color="4444FF">[</font><font color="#008000">'key'</font><font color="4444FF">]</font>
+    <font color="#2040a0">text</font><font color="4444FF">=</font><font color="#2040a0">entry</font>.<font color="#2040a0">text</font>
+    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font> <font color="4444FF">(</font><font color="#008000">'INSERT INTO shipandcargoLUT (shipandcargo,text) VALUES ('</font><font color="4444FF">+</font><font color="#2040a0">key</font><font color="4444FF">+</font><font color="#008000">',&quot;'</font><font color="4444FF">+</font><font color="#2040a0">text</font><font color="4444FF">+</font><font color="#008000">'&quot;);'</font><font color="4444FF">)</font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+The resulting CSV file looks like this in Excel.
+
+<img src="http://schwehr.org/blog/attachments/2007-06/ais_shipcatalog.png">
+-----

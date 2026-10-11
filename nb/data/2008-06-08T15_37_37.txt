@@ -1,0 +1,116 @@
+TITLE: printing EBCDIC SEGY seismic data headers
+AUTHOR: Kurt
+DATE: 06.08.2008 15:37
+DESC: how to survive data processing
+-----
+BODY:
+<b>Update:</b> Jenna Hill suggested a simpler command.
+<pre>dd if=file.sgy conv=ascii ibs=3200 count=1</pre>
+I didn't realize that dd knows how to convert from EBCDIC to ASCII:
+<pre>conv=value[,value ...]
+  ascii
+                       The same as the unblock value except that characters
+                       are translated from EBCDIC to ASCII before the records
+                       are converted.  (These values imply unblock if the op-
+                       erand cbs is also specified.)</pre>
+Here is a bit of code that will print out the first 3200 character
+text header of a seismic SEGY data file.  It will notice if the text
+is EBCDIC and convert it to ascii or you can force it to convert.  You
+can also ask it to split at 80 character line boundaries for well
+formed text headers.  Here is an example with a header that seems to
+be missing some things.
+<pre>
+% <b>./short.py --split-80 0001_2004_026_LF.sgy</b>
+C 1 CLIENT                        COMPANY                       CREW NO         
+C 2 LINE            AREA                        MAP ID                          
+C 3 REEL NO           DAY-START OF REEL     YEAR      OBSERVER                  
+C 4 INSTRUMENT: MFG KEL        MODEL 320B/R     SERIAL NO K99403                
+C 5 DATA TRACES/RECORD        AUXILIARY TRACES/RECORD         CDP FOLD          
+C 6 SAMPLE INTERVAL         SAMPLES/TRACE       BITS/IN      BYTES/SAMPLE       
+C 7 RECORDING FORMAT        FORMAT THIS REEL        MEASUREMENT SYSTEM          
+C 8 SAMPLE CODE: FLOATING PT     FIXED PT X   FIXED PT-GAIN     CORRELATED      
+C 9 GAIN  TYPE: FIXED     BINARY     FLOATING POINT     OTHER                   
+C10 FILTERS: ALIAS     HZ  NOTCH     HZ  BAND     -     HZ  SLOPE    -    DB/OCT
+C11 SOURCE: TYPE            NUMBER/POINT        POINT INTERVAL                  
+C12     PATTERN:                           LENGTH        WIDTH                  
+C13 SWEEP: START     HZ  END.    HZ  LENGTH      MS  CHANNEL NO     TYPE        
+C14 TAPER: START LENGTH       MS  END LENGTH       MS  TYPE                     
+C15 SPREAD: OFFSET        MAX DISTANCE        GROUP INTERVAL                    
+C16 GEOPHONES: PER GROUP     SPACING     FREQUENCY     MFG          MODEL       
+C17     PATTERN:                           LENGTH        WIDTH                  
+C18 TRACES SORTED BY: RECORD     CDP     OTHER                                  
+C19 AMPLITUDE RECOVERY: NONE      SPHERICAL DIV       AGC    OTHER              
+C20 MAP PROJECTION                      ZONE ID       COORDINATE UNITS          
+C21 PROCESSING:                                                                 
+C22 PROCESSING:                                                                 
+C23                                                                             
+<i>...</i>
+C39                                                                             
+C40 END EBCDIC               
+</pre>
+I should have used the python cp037.py for EBCDIC that comes with python, but here is 
+the code:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#2040a0">__author__</font> <font color="4444FF">=</font>  <font color="#008000">&quot;Don Perterson did the a2e and e2a functions.  Kurt Schwehr did the UI&quot;</font>
+<font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+Description: ASCII &lt;=&gt; EBCDIC conversion functions. The arrays were
+taken from the Snippets collection.
+&quot;</font><font color="#008000">&quot;&quot;</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<font color="#2040a0">e2aG</font> <font color="4444FF">=</font> <font color="4444FF">[</font>
+      <font color="#FF0000">0</font>,  <font color="#FF0000">1</font>,  <font color="#FF0000">2</font>,  <font color="#FF0000">3</font>,<font color="#FF0000">156</font>,  <font color="#FF0000">9</font>,<font color="#FF0000">134</font>,<font color="#FF0000">127</font>,<font color="#FF0000">151</font>,<font color="#FF0000">141</font>,<font color="#FF0000">142</font>, <font color="#FF0000">11</font>, <font color="#FF0000">12</font>, <font color="#FF0000">13</font>, <font color="#FF0000">14</font>, <font color="#FF0000">15</font>,
+     <font color="#FF0000">16</font>, <font color="#FF0000">17</font>, <font color="#FF0000">18</font>, <font color="#FF0000">19</font>,<font color="#FF0000">157</font>,<font color="#FF0000">133</font>,  <font color="#FF0000">8</font>,<font color="#FF0000">135</font>, <font color="#FF0000">24</font>, <font color="#FF0000">25</font>,<font color="#FF0000">146</font>,<font color="#FF0000">143</font>, <font color="#FF0000">28</font>, <font color="#FF0000">29</font>, <font color="#FF0000">30</font>, <font color="#FF0000">31</font>,
+    <font color="#FF0000">128</font>,<font color="#FF0000">129</font>,<font color="#FF0000">130</font>,<font color="#FF0000">131</font>,<font color="#FF0000">132</font>, <font color="#FF0000">10</font>, <font color="#FF0000">23</font>, <font color="#FF0000">27</font>,<font color="#FF0000">136</font>,<font color="#FF0000">137</font>,<font color="#FF0000">138</font>,<font color="#FF0000">139</font>,<font color="#FF0000">140</font>,  <font color="#FF0000">5</font>,  <font color="#FF0000">6</font>,  <font color="#FF0000">7</font>,
+    <font color="#FF0000">144</font>,<font color="#FF0000">145</font>, <font color="#FF0000">22</font>,<font color="#FF0000">147</font>,<font color="#FF0000">148</font>,<font color="#FF0000">149</font>,<font color="#FF0000">150</font>,  <font color="#FF0000">4</font>,<font color="#FF0000">152</font>,<font color="#FF0000">153</font>,<font color="#FF0000">154</font>,<font color="#FF0000">155</font>, <font color="#FF0000">20</font>, <font color="#FF0000">21</font>,<font color="#FF0000">158</font>, <font color="#FF0000">26</font>,
+     <font color="#FF0000">32</font>,<font color="#FF0000">160</font>,<font color="#FF0000">161</font>,<font color="#FF0000">162</font>,<font color="#FF0000">163</font>,<font color="#FF0000">164</font>,<font color="#FF0000">165</font>,<font color="#FF0000">166</font>,<font color="#FF0000">167</font>,<font color="#FF0000">168</font>, <font color="#FF0000">91</font>, <font color="#FF0000">46</font>, <font color="#FF0000">60</font>, <font color="#FF0000">40</font>, <font color="#FF0000">43</font>, <font color="#FF0000">33</font>,
+     <font color="#FF0000">38</font>,<font color="#FF0000">169</font>,<font color="#FF0000">170</font>,<font color="#FF0000">171</font>,<font color="#FF0000">172</font>,<font color="#FF0000">173</font>,<font color="#FF0000">174</font>,<font color="#FF0000">175</font>,<font color="#FF0000">176</font>,<font color="#FF0000">177</font>, <font color="#FF0000">93</font>, <font color="#FF0000">36</font>, <font color="#FF0000">42</font>, <font color="#FF0000">41</font>, <font color="#FF0000">59</font>, <font color="#FF0000">94</font>,
+     <font color="#FF0000">45</font>, <font color="#FF0000">47</font>,<font color="#FF0000">178</font>,<font color="#FF0000">179</font>,<font color="#FF0000">180</font>,<font color="#FF0000">181</font>,<font color="#FF0000">182</font>,<font color="#FF0000">183</font>,<font color="#FF0000">184</font>,<font color="#FF0000">185</font>,<font color="#FF0000">124</font>, <font color="#FF0000">44</font>, <font color="#FF0000">37</font>, <font color="#FF0000">95</font>, <font color="#FF0000">62</font>, <font color="#FF0000">63</font>,
+    <font color="#FF0000">186</font>,<font color="#FF0000">187</font>,<font color="#FF0000">188</font>,<font color="#FF0000">189</font>,<font color="#FF0000">190</font>,<font color="#FF0000">191</font>,<font color="#FF0000">192</font>,<font color="#FF0000">193</font>,<font color="#FF0000">194</font>, <font color="#FF0000">96</font>, <font color="#FF0000">58</font>, <font color="#FF0000">35</font>, <font color="#FF0000">64</font>, <font color="#FF0000">39</font>, <font color="#FF0000">61</font>, <font color="#FF0000">34</font>,
+    <font color="#FF0000">195</font>, <font color="#FF0000">97</font>, <font color="#FF0000">98</font>, <font color="#FF0000">99</font>,<font color="#FF0000">100</font>,<font color="#FF0000">101</font>,<font color="#FF0000">102</font>,<font color="#FF0000">103</font>,<font color="#FF0000">104</font>,<font color="#FF0000">105</font>,<font color="#FF0000">196</font>,<font color="#FF0000">197</font>,<font color="#FF0000">198</font>,<font color="#FF0000">199</font>,<font color="#FF0000">200</font>,<font color="#FF0000">201</font>,
+    <font color="#FF0000">202</font>,<font color="#FF0000">106</font>,<font color="#FF0000">107</font>,<font color="#FF0000">108</font>,<font color="#FF0000">109</font>,<font color="#FF0000">110</font>,<font color="#FF0000">111</font>,<font color="#FF0000">112</font>,<font color="#FF0000">113</font>,<font color="#FF0000">114</font>,<font color="#FF0000">203</font>,<font color="#FF0000">204</font>,<font color="#FF0000">205</font>,<font color="#FF0000">206</font>,<font color="#FF0000">207</font>,<font color="#FF0000">208</font>,
+    <font color="#FF0000">209</font>,<font color="#FF0000">126</font>,<font color="#FF0000">115</font>,<font color="#FF0000">116</font>,<font color="#FF0000">117</font>,<font color="#FF0000">118</font>,<font color="#FF0000">119</font>,<font color="#FF0000">120</font>,<font color="#FF0000">121</font>,<font color="#FF0000">122</font>,<font color="#FF0000">210</font>,<font color="#FF0000">211</font>,<font color="#FF0000">212</font>,<font color="#FF0000">213</font>,<font color="#FF0000">214</font>,<font color="#FF0000">215</font>,
+    <font color="#FF0000">216</font>,<font color="#FF0000">217</font>,<font color="#FF0000">218</font>,<font color="#FF0000">219</font>,<font color="#FF0000">220</font>,<font color="#FF0000">221</font>,<font color="#FF0000">222</font>,<font color="#FF0000">223</font>,<font color="#FF0000">224</font>,<font color="#FF0000">225</font>,<font color="#FF0000">226</font>,<font color="#FF0000">227</font>,<font color="#FF0000">228</font>,<font color="#FF0000">229</font>,<font color="#FF0000">230</font>,<font color="#FF0000">231</font>,
+    <font color="#FF0000">123</font>, <font color="#FF0000">65</font>, <font color="#FF0000">66</font>, <font color="#FF0000">67</font>, <font color="#FF0000">68</font>, <font color="#FF0000">69</font>, <font color="#FF0000">70</font>, <font color="#FF0000">71</font>, <font color="#FF0000">72</font>, <font color="#FF0000">73</font>,<font color="#FF0000">232</font>,<font color="#FF0000">233</font>,<font color="#FF0000">234</font>,<font color="#FF0000">235</font>,<font color="#FF0000">236</font>,<font color="#FF0000">237</font>,
+    <font color="#FF0000">125</font>, <font color="#FF0000">74</font>, <font color="#FF0000">75</font>, <font color="#FF0000">76</font>, <font color="#FF0000">77</font>, <font color="#FF0000">78</font>, <font color="#FF0000">79</font>, <font color="#FF0000">80</font>, <font color="#FF0000">81</font>, <font color="#FF0000">82</font>,<font color="#FF0000">238</font>,<font color="#FF0000">239</font>,<font color="#FF0000">240</font>,<font color="#FF0000">241</font>,<font color="#FF0000">242</font>,<font color="#FF0000">243</font>,
+     <font color="#FF0000">92</font>,<font color="#FF0000">159</font>, <font color="#FF0000">83</font>, <font color="#FF0000">84</font>, <font color="#FF0000">85</font>, <font color="#FF0000">86</font>, <font color="#FF0000">87</font>, <font color="#FF0000">88</font>, <font color="#FF0000">89</font>, <font color="#FF0000">90</font>,<font color="#FF0000">244</font>,<font color="#FF0000">245</font>,<font color="#FF0000">246</font>,<font color="#FF0000">247</font>,<font color="#FF0000">248</font>,<font color="#FF0000">249</font>,
+     <font color="#FF0000">48</font>, <font color="#FF0000">49</font>, <font color="#FF0000">50</font>, <font color="#FF0000">51</font>, <font color="#FF0000">52</font>, <font color="#FF0000">53</font>, <font color="#FF0000">54</font>, <font color="#FF0000">55</font>, <font color="#FF0000">56</font>, <font color="#FF0000">57</font>,<font color="#FF0000">250</font>,<font color="#FF0000">251</font>,<font color="#FF0000">252</font>,<font color="#FF0000">253</font>,<font color="#FF0000">254</font>,<font color="#FF0000">255</font>
+<font color="4444FF">]</font>
+<font color="#444444">#</font>
+<font color="#2040a0">def</font> <font color="#2040a0">EbcdicToAscii</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">)</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#008000">&quot;&quot;</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <strong>raise</strong> <font color="#008000">&quot;Bad data&quot;</font>, <font color="#008000">&quot;Expected a string argument&quot;</font>
+    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">)</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">:</font>  <strong>return</strong> <font color="#2040a0">str</font>
+    <font color="#2040a0">newstr</font> <font color="4444FF">=</font> <font color="#008000">&quot;&quot;</font>
+    <strong>for</strong> <font color="#2040a0">ix</font> <strong>in</strong> <font color="#2040a0">xrange</font><font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">newstr</font> <font color="4444FF">=</font> <font color="#2040a0">newstr</font> <font color="4444FF">+</font> <font color="#2040a0">chr</font><font color="4444FF">(</font><font color="#2040a0">e2aG</font><font color="4444FF">[</font><font color="#2040a0">ord</font><font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">[</font><font color="#2040a0">ix</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">]</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">newstr</font>
+<font color="#444444"># This could be made faster</font>
+<font color="#2040a0">def</font> <font color="#2040a0">printSplit80</font><font color="4444FF">(</font><font color="#2040a0">s</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">s</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <strong>if</strong> <font color="#2040a0">i</font><font color="4444FF">%</font><font color="#FF0000">80</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font> <strong>and</strong> <font color="#2040a0">i</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">:</font>
+            <font color="#2040a0">sys</font>.<font color="#2040a0">stdout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">'\n'</font><font color="4444FF">+</font><font color="#2040a0">s</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">)</font>
+        <strong>else</strong><font color="4444FF">:</font> 
+            <font color="#2040a0">sys</font>.<font color="#2040a0">stdout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">s</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>from</strong> <font color="#2040a0">optparse</font> <strong>import</strong> <font color="#2040a0">OptionParser</font>
+    <font color="#2040a0">parser</font> <font color="4444FF">=</font> <font color="#2040a0">OptionParser</font><font color="4444FF">(</font><font color="#2040a0">usage</font><font color="4444FF">=</font><font color="#008000">&quot;%prog [options] files&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'--force-ebcdic'</font>, <font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'ebcdic'</font>, <font color="#2040a0">default</font><font color="4444FF">=</font><font color="#2040a0">False</font>
+                      , <font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">'store_true'</font>
+                      , <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Force treating the input files as EBCDIC'</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'--split-80'</font>, <font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'split80'</font>, <font color="#2040a0">default</font><font color="4444FF">=</font><font color="#2040a0">False</font>
+                      , <font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">'store_true'</font>
+                      , <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Split at 80 character boundaries for well formed header'</font><font color="4444FF">)</font>
+    <font color="4444FF">(</font><font color="#2040a0">options</font>, <font color="#2040a0">args</font><font color="4444FF">)</font> <font color="4444FF">=</font> <font color="#2040a0">parser</font>.<font color="#2040a0">parse_args</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#444444">#</font>
+    <strong>for</strong> <font color="#2040a0">filename</font> <strong>in</strong> <font color="#2040a0">args</font><font color="4444FF">:</font>
+        <font color="#2040a0">f</font> <font color="4444FF">=</font> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>
+        <font color="#2040a0">headerStr</font> <font color="4444FF">=</font> <font color="#2040a0">f</font>.<font color="#2040a0">read</font><font color="4444FF">(</font><font color="#FF0000">3200</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">options</font>.<font color="#2040a0">ebcdic</font> <strong>or</strong> <strong>not</strong> <font color="#2040a0">headerStr</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">isalnum</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">headerStr</font> <font color="4444FF">=</font> <font color="#2040a0">EbcdicToAscii</font><font color="4444FF">(</font><font color="#2040a0">headerStr</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">options</font>.<font color="#2040a0">split80</font><font color="4444FF">:</font>
+            <font color="#2040a0">printSplit80</font><font color="4444FF">(</font><font color="#2040a0">headerStr</font><font color="4444FF">)</font>
+        <strong>else</strong><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#2040a0">headerStr</font></pre>
+-----

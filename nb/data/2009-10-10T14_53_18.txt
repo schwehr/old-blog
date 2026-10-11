@@ -1,0 +1,57 @@
+TITLE: Objective-C kickstart
+AUTHOR: Kurt
+DATE: 10.10.2009 14:53
+DESC: my way
+-----
+BODY:
+I always like to have simple examples and a Makefile to get things
+going.  Until I'm familiar with what is going on behind the scenes, I
+am uncomfortable with IDE's that hide all the details.  I started
+reading the O'Reilly <a href="http://oreilly.com/catalog/9780596523190">iPhone SDK book</a>, and wanted to try out the
+examples in Chapter 1, the ObjC kick start.  Didn't turn out like the
+book implies.  Here is my take on <a href="http://www.zdziarski.com/">Zdziarski's</a> Fraction program.  This
+compiles for me on Mac OSX 10.5 with GCC 4.0.1: frac.m
+<pre><tt><b><font color="#000080">#import</font></b> <font color="#990000">&lt;</font>Foundation<font color="#990000">/</font>NSObject<font color="#990000">.</font>h<font color="#990000">&gt;</font>
+<b><font color="#000080">#import</font></b> <font color="#990000">&lt;</font>stdio<font color="#990000">.</font>h<font color="#990000">&gt;</font>
+<!-- -->
+@<font color="#008080">interface</font> Fraction<font color="#990000">:</font> NSObject <font color="#FF0000">{</font>
+    <font color="#009900">int</font> numerator<font color="#990000">;</font>
+    <font color="#009900">int</font> denominator<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> print<font color="#990000">;</font>
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> setNumerator<font color="#990000">:</font> <font color="#990000">(</font><font color="#009900">int</font><font color="#990000">)</font> n<font color="#990000">;</font>
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> setDenominator<font color="#990000">:</font> <font color="#990000">(</font><font color="#009900">int</font><font color="#990000">)</font> d<font color="#990000">;</font>
+<font color="#990000">-(</font><font color="#009900">int</font><font color="#990000">)</font> numerator<font color="#990000">;</font>
+<font color="#990000">-(</font><font color="#009900">int</font><font color="#990000">)</font> denominator<font color="#990000">;</font>
+@end
+<!-- -->
+@implementation Fraction
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> print <font color="#FF0000">{</font> <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%i/%i"</font><font color="#990000">,</font>  numerator<font color="#990000">,</font> denominator<font color="#990000">);</font> <font color="#FF0000">}</font>
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> setNumerator<font color="#990000">:</font> <font color="#990000">(</font><font color="#009900">int</font><font color="#990000">)</font> n <font color="#FF0000">{</font> numerator <font color="#990000">=</font> n<font color="#990000">;</font> <font color="#FF0000">}</font>
+<font color="#990000">-(</font><font color="#009900">void</font><font color="#990000">)</font> setDenominator<font color="#990000">:</font> <font color="#990000">(</font><font color="#009900">int</font><font color="#990000">)</font> d <font color="#FF0000">{</font> denominator <font color="#990000">=</font> d<font color="#990000">;</font> <font color="#FF0000">}</font>
+<font color="#990000">-(</font><font color="#009900">int</font><font color="#990000">)</font> denominator <font color="#FF0000">{</font> <b><font color="#0000FF">return</font></b> denominator<font color="#990000">;</font> <font color="#FF0000">}</font>
+<font color="#990000">-(</font><font color="#009900">int</font><font color="#990000">)</font> numerator <font color="#FF0000">{</font> <b><font color="#0000FF">return</font></b> numerator<font color="#990000">;</font> <font color="#FF0000">}</font>
+@end
+<!-- -->
+<font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">(</font><font color="#009900">int</font> argc<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>argv<font color="#990000">[])</font> <font color="#FF0000">{</font>
+    <font color="#008080">Fraction</font> <font color="#990000">*</font>frac <font color="#990000">=</font> <font color="#990000">[[</font><font color="#008080">Fraction</font> alloc<font color="#990000">]</font> init<font color="#990000">];</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> setNumerator<font color="#990000">:</font> <font color="#993399">1</font><font color="#990000">];</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> setDenominator<font color="#990000">:</font> <font color="#993399">3</font><font color="#990000">];</font>
+    <b><font color="#000000">printf</font></b><font color="#990000">(</font> <font color="#FF0000">"The fraction is: "</font><font color="#990000">);</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> print<font color="#990000">];</font>
+    <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+    <font color="#990000">[</font><font color="#008080">frac</font> release<font color="#990000">];</font>
+    <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<font color="#FF0000">}</font></tt></pre>
+To build the code, we need the Foundation framwork for the NSObject type.  
+Because the example is so simple, we don't need a makefile.  Make will notice
+the .m ObjC file (no, this is not MatLab) and will realize that it can
+use it to build the "frac" program.
+<pre><b>make LDFLAGS='-framework Foundation' frac</b></pre>
+I then tried to use the Properties feature to simplify the above code, but
+I kept getting errors trying to do @property(copy) on an int.  I could easily
+be wrong, but I believe that properties do not work on simple C types.  I
+tried a property on a NSString and it compiled fine.
+
+For more on properties in ObjC, see: <a href="http://macdevelopertips.com/objective-c/objective-c-properties-setters-and-dot-syntax.html">Objective-C: Properties, Setters and Dot Syntax</a>
+-----

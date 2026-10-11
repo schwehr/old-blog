@@ -1,0 +1,44 @@
+TITLE: Mac image capture
+AUTHOR: Kurt
+DATE: 06.24.2008 22:28
+DESC: high on possibilities
+-----
+BODY:
+There are a number of image grabbers for the isight (built in or
+external) out there for the Mac.  It seems very strange that Apple
+doesn't provide a simple command line image grabber.  DarwinPorts has
+a <a href="http://isightcapture.darwinports.com/">package</a> of <a
+href="http://www.intergalactic.de/pages/iSight.html">iSightCapture</a>,
+but that comes from the dmg.  Today, I found <a
+href="http://www.linuxmachine.net/2007/07/command-line-isight-capture/">isightGrab</a>
+that provides the source code, but is a little weird in the licensing.
+It says in parts that it is the same as telekinesis, so that would be
+the Apache License 2.0.  If that is true, that I am just about good to
+go to package it for fink as is, but I am not happy with the current
+interface.  For now, here is how to get and build the program: 
+<pre>
+svn co http://telekinesis.googlecode.com/svn/external/isightGrab
+cd isightGrab
+echo << EOF > Makefile
+LDFLAGS := -framework Cocoa -framework QuickTime
+SRCS:=${wildcard *.m}
+OBJS:=${SRCS:.m=.o}
+isightGrab:  ${OBJS}
+EOF
+make
+./isightGrab > foo.jpg
+</pre>
+But the code is setup as a CGI, so it returns MIME type info that I 
+ripped out with emacs.  This really needs two things.  The first
+is a command line interface (say using gengetopt or something similar).
+The second is a clean python binding that returns a useful object type.
+Those two things would really help out a number of projects.
+
+The license info:
+<pre>
+// brian whitman brian.whitman@variogr.am 
+// uses Tim Omernick's CocoaSequenceGrabber which appears to have no license
+// license granted to whatever telekinesis uses
+</pre>
+<a href="http://www.skyfell.org/cocoasequencegrabber.html">CocoaSequenceGrabber</a>
+-----

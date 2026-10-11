@@ -1,0 +1,68 @@
+TITLE: Tweaked pmag Makefiles
+AUTHOR: Kurt
+DATE: 09.09.2005 19:53
+DESC: should be lots easier to work with
+-----
+BODY:
+I just saw that Lisa released pmag-1.9 last month.  I gave her some
+make files for it,, but they had some room for improvement.  I took an
+hour today to merge in some ideas from other Makefile ideas that I
+came up with in due to segy-py developement.  src/Makefile is much
+simpler than before.  I had lots of unnecessary rules in the old
+version.
+
+<a
+href="http://schwehr.org/software/pmag-1.9-kurt-makes.tar.bz2">pmag-1.9-kurt-makes.tar.bz2</a> [357K]
+<pre>
+The best parts are probably
+
+* Edit VERSION to update to a new version (e.g. 1.9.1 or 1.10 or
+  2.0... whatever your pref) 
+
+* the top make files tries to help
+
+    cd src
+    make
+    # It tells you all the options... hopefully the discriptions are
+    # not too cryptic :) 
+
+* Build with compiler optimizations so things go as fast as possible
+
+     make clean; make all-opt
+
+* Make a tar of the binaries for a platform... e.g. this will make
+  pmag-1.9-tiger.tar.bz2 
+
+    make bdist PLATFORM=tiger
+
+* Make a release for fink... this removes all binaries, .o files, and
+  fort.xx files and builds a tar.bz2 
+
+   make pmag.info
+   scp pmag-1.9.tar.bz2 sorcerer:/Library/WebServer/Documents/software/
+   # then email me pmag.info
+</pre>
+Now, when you cd in src and type make, you will see this (BTW, GNU
+make only!!!)
+<pre>
+make
+
+      Welcome to pmag 1.9
+            by Lisa Tauxe
+
+Options:
+
+ make all         build everything
+ make all-opt     build everything for SPEED
+ make install     build everything and put in ../bin
+
+ make clean       remove all build files
+ make clean-dist  cleanup in prep for a dist
+ make real-clean  nuke the dist tars and do clean/clean-dist
+
+ make sdist       create a SOURCE only distribution
+ make bdist       create a BINARY only distribution
+
+ make pmag.info   create a fink info package and tar for Mac OSX
+</pre>
+-----

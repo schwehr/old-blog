@@ -1,0 +1,248 @@
+TITLE: segy-py setup.py and distutils
+AUTHOR: Kurt
+DATE: 05.31.2005 15:48
+DESC: segy config files and more
+-----
+BODY:
+I am now in the Chicago O'Hare airport.  I actually found an electrical
+outlet next to a seat.  What a rare thing in this airport.  I usually
+end up sitting on the floor, often under a drinking fountain or pay
+phone.
+
+I have been working on packaging up segy-py a bit better while on the
+plane, but first want to write a bit about some thoughts on python
+segy driver files.  I keep discovering little design problems that
+show off the power of python.  I realized one today.  I was thinking
+about how I have to create a large python file full of dictionaries
+for each flavor of segy.  If this were C/C++ this would definitely be
+the case or I could write a whole bunch of wrapper functions to go
+into other definitions for functionality.  In python, it turns out
+that it should be really easy to pull parts of functionality from
+different config files.  The example that I was thinking of was with a
+segy flavor that is almost segy rev1.
+
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<strong>import</strong> <font color="#2040a0">segy_rev1</font>
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+
+<strong>from</strong> <font color="#2040a0">segy_rev1</font> <strong>import</strong> <font color="#2040a0">textFileHeaderEntries</font>
+
+<strong>print</strong> <font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#FF0000">3</font>,<font color="#FF0000">5</font><font color="4444FF">]</font>
+<strong>print</strong> <font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+</pre>
+Running this as './segy_tweak.py' gives results like this:
+<pre>
+  [2, 5]
+  [2, 5]
+  [3, 5]
+  [3, 5]
+</pre>
+This show that there is one problem or drawback to this approach.  The
+original module data is altered.  If you had two different segy files
+open with different drivers for each, they could step on each other,
+right?  I did a quick check and this is a global problem (or feature
+if it helps you for other code).  So a better way to solve this
+trickiness is to do a deep copy of the data.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<strong>import</strong> <font color="#2040a0">segy_rev1</font>
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+
+<strong>import</strong> <font color="#2040a0">copy</font>
+<font color="#2040a0">textFileHeaderEntries</font> <font color="4444FF">=</font> <font color="#2040a0">copy</font>.<font color="#2040a0">deepcopy</font><font color="4444FF">(</font><font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">)</font>
+
+<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#FF0000">3</font>,<font color="#FF0000">5</font><font color="4444FF">]</font>
+<strong>print</strong> <font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+
+<strong>print</strong> <font color="#2040a0">segy_rev1</font>.<font color="#2040a0">textFileHeaderEntries</font><font color="4444FF">[</font><font color="#008000">'LINE'</font><font color="4444FF">]</font>
+</pre>
+Which shows that the deep copy does what we want in this case:
+<pre>
+  ./segy_tweaked3.py 
+  [2, 5]
+  [3, 5]
+  [2, 5]  &lt;-- The original value is not changed.  Perfect!
+</pre>
+
+<b>PACKAGING</b>
+
+In order for people to be able to use my segy-py package, it needs to
+work as a solid python package.  As such, I have been trying to use
+the standard distutils.  This started off pretty quickly, but then I
+ran into a few things that I figured out by looking at other
+packages.  The first one is that I hate having to list out every
+source file.  There ways to do this with GNU Make, but it is
+complicated for a beginner.  With python it turns out to be simple,
+but I am not sure the difference between the two.  I started out with
+something like this inside of the setup call in setup.py:
+<pre>
+        py_modules = ['segy','ebcdic','segy_sql','ibm'],
+</pre>
+There I have listed out each python file that I want to end up in the
+distributed tarball.  But what I really want is every python file
+included.  I found an example that does this:
+<pre>
+        packages=['']
+</pre>
+So what really is the difference between a module and a package?  I
+bet I will discover that when I get around to trying to install the
+stuff with setup.py.
+
+The next question is should I be putting my pure python sources under
+a subdirectory or can I leave them all in the top level right now?
+Will everything at the top level cause install problems?   Looking in
+the fink directory <em>/sw/lib/python2.4/site-packages</em> I see a
+mess.  There are directories, python files, .so compiled shared
+libraries, pth files (what are these?), and other junk.  I will have
+to get back to this one later.
+
+Then on to a Makefile.  I almost always end up with a Makefile for
+everything I do.  People who work on projects with me know that I love
+simple GNU makefiles and bash scripts.  Bash is falling quickly by the
+wayside with python, but I have a makefile for this project.  Take a
+quick look at part of my makefile:
+<pre>
+<font color="2040a0">PYTHON_FILES:=</font><font color="2040a0">${wildcard *.py}</font>
+<font color="2040a0">PYTHON_MODS:=</font><font color="2040a0">${PYTHON_FILES:.py=}</font>
+<font color="2040a0">PYTHON_MOD_DOCS:=</font><font color="2040a0">${PYTHON_FILES:.py=.html}</font>
+<font color="8b2252">
+<strong>docs</strong>:</font> 
+	@echo &quot;<font color="2040a0">${PYTHON_MODS}</font>&quot;
+	pydoc -w <font color="2040a0">${PYTHON_MODS}</font>
+	code2html Makefile &gt; Makefile-segy-py.html
+<font color="8b2252">
+<strong>BASE_URL</strong>:</font>=http://schwehr.org/software/segy-py
+<font color="2040a0">BASE_SCP:=</font>schwehr.org:www/software/segy-py
+<font color="8b2252"><strong>docs-install</strong>:</font> docs
+	scp <font color="2040a0">${PYTHON_MOD_DOCS}</font>  Makefile-segy-py.html <font color="2040a0">${BASE_SCP}</font>/docs
+	open <font color="2040a0">${BASE_URL}</font>/docs
+<font color="8b2252">
+<strong>help</strong>:</font>
+	open <font color="2040a0">${BASE_URL}</font>/docs
+<font color="8b2252">
+<strong>check</strong>:</font> test
+	pychecker *.py
+	grep -n FIX *.py
+<font color="8b2252">
+<strong>test</strong>:</font>
+	./segy.py -v
+<font color="8b2252">
+<strong>clean</strong>:</font>
+	rm -f *.pyc *.html *~
+
+<font color="#444444"># dist is build by &quot;python setup.py sdist&quot;</font>
+<font color="#444444"># and MANIFEST gets built in the process based on MANIFEST.in</font>
+<font color="8b2252"><strong>dist-clean</strong>:</font> clean
+	rm -rf dist *.db
+	rm -rf MANIFEST
+
+<font color="#444444"># python packaging</font>
+<font color="8b2252"><strong>sdist</strong>:</font> dist-clean
+	./setup.py sdist --formats=bztar
+<font color="8b2252">
+<strong>sdist-install</strong>:</font> sdist
+	scp dist/* <font color="2040a0">${BASE_SCP}</font>/
+</pre>
+It really does not do very much, but it helps me remember common
+tasks.  For example, testing the code and uploading the web
+documentation to my server becomes as easy as this:
+<pre>
+  make check && make test && make docs-install
+</pre>
+Well, that does not work right now as I often have tests that fail,
+but you get the idea.
+
+Why am I bringing up make other than the fact that I think make is
+cool?  Well, the default setup.py file I had does not put the Makefile
+in the tarball.  Doh! :(  Some projects put these kinds of things in
+"data_files=", but these are NOT datafiles.  Turns out that this is
+what MANIFEST.in is for.  There I can list files that I want to end up
+in the tar ball.  I ultimately would like them to get installed in the
+fink doc dir (e.g. /sw/share/doc/segy-py) without explicitly mentioning them
+in the info file, but that is another day.  Here is the MANIFEST.in
+that I created:
+<pre>
+  # Files to also put in the distribution (sdist or bdist)
+
+  # Active files
+  include Makefile
+
+  # Documentation files
+  include COPYRIGHT ChangeLog README TODO
+</pre>
+Then I did a make sdist (which is just ./setup.py sdist
+  --formats=bztar) and I now have a MANIFEST that shows:
+<pre>
+  COPYRIGHT
+  ChangeLog
+  Makefile
+  README
+  TODO
+  ebcdic.py
+  ibm.py
+  segy.py
+  segy_rev1.py
+  segy_sql.py
+  setup.py
+</pre>
+And looking at the tar that is produced, everything looks great:
+<pre>
+  tar tfj dist/segy-py-0.3.tar.bz2 
+
+  segy-py-0.3/
+  segy-py-0.3/ChangeLog
+  segy-py-0.3/COPYRIGHT
+  segy-py-0.3/ebcdic.py
+  segy-py-0.3/ibm.py
+  segy-py-0.3/Makefile
+  segy-py-0.3/PKG-INFO
+  segy-py-0.3/README
+  segy-py-0.3/segy.py
+  segy-py-0.3/segy_rev1.py
+  segy-py-0.3/segy_sql.py
+  segy-py-0.3/setup.py
+  segy-py-0.3/TODO
+</pre>
+Hopefully that will help others get an even quicker jump start on
+setup.py files than I got (and I started just a day or two ago).
+
+Now what exactly is __init__.py supposed to do?  None of them seem to
+really have any info in them.  I do not yet see a purpose.
+
+<b>DB WORK BEGINNING...</b>
+
+It is now time to start working on the database side of the house.  I
+want these drivers to be able to create and/or flush out an sql
+database.  I would prefer the design to be generic enough that it will
+work with any database that I may want to interface with ( for
+example: sqlite, mysql, postgres, oracle, and so on).  I am thinking
+that the simplest way (but not the best for absolute performance) is
+to have the drivers be able to return SQL strings.  So for a trace, I
+can first get a CREATE TABLE string.  Then I can ask for an INSERT
+INTO string.  Then from outside the driver I can work with the
+database how I see fit.
+
+The other key idea I have is to either take a list of field that will
+be used or dynamically generate a string that inspects the dictionary
+in the driver to see what table fields should be called.  The later
+may cause serious trouble when trying to build a large database of
+SEGY info between instruments.
+
+Soon I will be running into another problem.  The contractor SEGY from
+the 70's that is available on the USGS walrus database does not have
+navigation in the SEGY.  That comes as a separate file.  Somehow, I
+will have to shoehorn that into the driver for that older SEGY Rev 0
+data.  Joy.  Right now, I have a parser called sins_nav_data.py that
+handles the navigation data.  What does SINS stand for?
+
+That is enough writing for now.  If you made it this far into what I
+wrote, I am impressed.  Time to get back to coding this up.
+When I am back in San Diego, I will have to transition from these
+couple days of coding back to writing up the data for my thesis.
+-----

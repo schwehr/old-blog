@@ -1,0 +1,175 @@
+TITLE: puppet hello world
+AUTHOR: Kurt
+DATE: 06.02.2012 11:10
+DESC: learning by doing
+-----
+BODY:
+I'm getting tired trying to maintain too many machines across the
+globe.  I'd like to have a way to make sure that virtual and
+non-virtual machines meet the requirements for what I'm going to
+do with them.  
+
+There are a number of use cases that I have in my mind:
+
+This first is with my remake of my research tools Ubuntu 11.04 VMWare 
+Fusion 3 vm that I used with the 2011 Research Tools course.  While it
+did work okay for the class.  It was hard to be sure that each
+students instance was the same as mine.  I couldn't push changes to
+the students.  They had to run 'sudo apt-get some-package' to install 
+software that we needed, which is great for learning, but hard to keep
+momentum.   If they had been able to use hg, git or
+svn to pull and updated puppet config and ask puppet to do the
+updating, I think it would have gone a lot faster.
+
+My next use case is for my own use of many machines.  My computing
+life spans 10's of mac and linux machines that I directly log into and
+many more that I count on.  If I could make some basic modules of
+things, then I could say... "give me my programming environment"
+(e.g. emacs, yasnippets, python, and my favorite python modules).
+Or "this machine is a data logger" (seriously coders... I don't know
+the answer for this one.  Tell me what this is).  Or "I need to do GIS
+data processing" (give me qgis, gdal, shapely, pyproj).  You get the
+idea.
+
+Then there is the collaboration aspect.  When a buddy needs to work
+with me, I can say "grab this puppet config" and it will get you
+there.  Every system has it's own way to get going... e.g. yum/rpm vrs
+apt/deb vrs fink/deb vrs macports/? vrs homebrew/just don't look.  And
+we have ruby gems, php pear, python distribute/pip/pypi/virtualenv, perl cpan,
+emacs 24+?, etc.
+
+So, how to get myself started?  I bought a book.  It wasn't very
+good.  Instead, I'm trying to do some simple hello world type stuff
+and bootstrap myself by doing.
+
+First, I'm going to assume that you have puppet installed somehow (I'm
+not worrying about the puppet master today).  I leave this to the
+reader to pick their way.  On ubuntu "apt-get install puppet".
+
+Make sure puppet is installed:
+<pre><b>puppet --version</b>
+2.7.12
+<b>facter --puppet | egrep 'architecture|os_version|operatingsystem'</b>
+architecture =&gt; x86_64
+operatingsystem =&gt; Darwin
+operatingsystemrelease =&gt; 11.4.0
+sp_os_version =&gt; Mac OS X 10.7.4 (11E53)
+<b>puppet help</b>
+...</pre>
+Now that I know that puppet at least runs, time to write a hello
+world.  I'm using emacs and telling it to treat the code as if it is
+ruby.  Older versions were okay without the apply in the shebang line
+(#!).
+<pre><i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+<!-- -->
+notice<font color="#990000">(</font><font color="#FF0000">"hello world!"</font><font color="#990000">)</font></pre>
+Now run it:
+<pre># apply runs a .pp file
+<b>puppet apply helloworld.pp</b>
+notice: Scope(Class[main]): hello world!
+notice: Finished catalog run in 0.03 seconds
+<!-- -->
+<b>chmod +x helloworld.pp
+./helloworld.pp</b>
+notice: Scope(Class[main]): hello world!
+notice: Finished catalog run in 0.02 seconds</pre>
+Yup, we can do hello world.
+
+Can we do the equivalent of "touch" a file... this will create an
+empty file.
+<pre><i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+<!-- -->
+file <font color="#FF0000">{</font> <font color="#FF0000">"a file"</font><font color="#990000">:</font>
+    path <font color="#990000">=&gt;</font> <font color="#FF0000">"/tmp/aliastest"</font><font color="#990000">,</font>
+    <b><font color="#0000FF">ensure</font></b> <font color="#990000">=&gt;</font> file
+<font color="#FF0000">}</font></pre>
+<pre><b>ls -l /tmp/aliastest</b>
+ls: /tmp/aliastest: No such file or directory
+<!-- -->
+<b>./file.pp</b>
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: /Stage[main]//File[a file]/ensure: created
+notice: Finished catalog run in 0.02 seconds
+<!-- -->
+<b>ls -l /tmp/aliastest</b>
+-rw-r--r--  1 schwehr  wheel  0 Jun  2 17:59 /tmp/aliastest
+./file.pp 
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: Finished catalog run in 0.02 seconds
+<!-- -->
+<b>ls -l /tmp/aliastest</b>
+-rw-r--r--  1 schwehr  wheel  0 Jun  2 17:59 /tmp/aliastest</pre>
+So that worked for creating a zero length file the first time and 
+if the file already exists, it does not mess with an existing file.
+
+The next thing to try to do is put content into a file.  We here add
+a mode to control the file permission bits and a content entry that
+will be exactly what is in the file.
+<pre><i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+<!-- -->
+file <font color="#FF0000">{</font> <font color="#FF0000">'helloworld.txt'</font><font color="#990000">:</font>
+  path <font color="#990000">=&gt;</font> <font color="#FF0000">'/tmp/helloworld.txt'</font><font color="#990000">,</font>
+  mode <font color="#990000">=&gt;</font> <font color="#993399">644</font><font color="#990000">,</font>
+  content <font color="#990000">=&gt;</font> 'Hello world to a file<font color="#990000">.</font>
+'<font color="#990000">,</font>
+<font color="#FF0000">}</font></pre>
+Run it:
+<pre><b>chmod +x helloworld-file.pp
+./helloworld-file.pp</b>
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: /Stage[main]//File[helloworld.txt]/ensure: defined content as '{md5}bb341d5ec467509b253683246617c8b3'
+notice: Finished catalog run in 0.03 seconds
+<!-- -->
+<b>ls -l /tmp/helloworld.txt</b>
+-rw-r--r--  1 schwehr  wheel  23 Jun  2 18:13 /tmp/helloworld.txt
+<!-- -->
+cat /tmp/helloworld.txt 
+Hello world to a file.</pre>
+Slow and steady wins the race, right?  This is a long ways from giving
+us super powers over our systems.
+
+What if we want to have the content change depending on system
+variables like the hostname?  We can use the puppet templating system
+to fill in variables.  Let's create a file with some variable filled
+in.  Here is the "mytemplate.erb" file that I have in the same
+directory:
+<pre>os: <%= operatingsystem %></pre>
+Now we need to create a puppet script that will use that template:
+<pre><i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+file <font color="#FF0000">{</font> <font color="#FF0000">'helloworld-template.txt'</font><font color="#990000">:</font>
+  path <font color="#990000">=&gt;</font> <font color="#FF0000">'/tmp/helloworld-template.txt'</font><font color="#990000">,</font>
+  mode <font color="#990000">=&gt;</font> <font color="#993399">644</font><font color="#990000">,</font>
+  content <font color="#990000">=&gt;</font> template<font color="#990000">(</font><font color="#FF0000">"mytemplate.erb"</font><font color="#990000">),</font>
+<font color="#FF0000">}</font></pre>
+Try it:
+<pre><b>chmod +x helloworld-template.pp 
+./helloworld-template.pp a</b>
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+Could not find template 'mytemplate.erb' at /Users/schwehr/Desktop/puppet/helloworld-template.pp:6 on node schwehr-macbookair.local</pre>
+Rats!  puppet is looking somewhere else.  It took me a while to find
+out how to have puppet look in the current directory for the template:
+<pre><b>puppet apply --templatedir=`pwd` helloworld-template.pp</b>
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: /Stage[main]//File[helloworld-template.txt]/ensure: defined content as '{md5}2d97ba272f96c4d53d505981330e3338'
+notice: Finished catalog run in 0.03 seconds
+<b>cat /tmp/helloworld-template.txt</b>
+os: Darwin</pre>
+So there we have my not overly useful introduction to playing with puppet.
+-----

@@ -1,0 +1,47 @@
+TITLE: fonts with pil
+AUTHOR: Kurt
+DATE: 03.04.2005 09:40
+DESC: truetype no work
+-----
+BODY:
+The Python Imaging Library (pil) seems to be lacking in documenation
+on how to load fonts in.  I just want a big bold font to lay on png's
+that are going into a poster via PDFlib lite.  The first thing I ran
+into on google groups was a suggestion to load a truetype font.  So I
+made a quick test program and kaboom!
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444"># ls /Library/Fonts/[a-zA-Z]*.ttf</font>
+
+<strong>import</strong> <font color="#2040a0">Image</font>, <font color="#2040a0">ImageDraw</font>, <font color="#2040a0">ImageFont</font>
+<font color="#2040a0">im</font> <font color="4444FF">=</font> <font color="#2040a0">Image</font>.<font color="#2040a0">new</font><font color="4444FF">(</font><font color="#008000">&quot;RGB&quot;</font>,<font color="4444FF">(</font><font color="#FF0000">400</font>,<font color="#FF0000">400</font><font color="4444FF">)</font>,<font color="#008000">&quot;white&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">draw</font> <font color="4444FF">=</font> <font color="#2040a0">ImageDraw</font>.<font color="#2040a0">Draw</font><font color="4444FF">(</font><font color="#2040a0">im</font><font color="4444FF">)</font>
+
+<font color="#2040a0">font</font> <font color="4444FF">=</font> <font color="#2040a0">ImageFont</font>.<font color="#2040a0">truetype</font><font color="4444FF">(</font><font color="#008000">&quot;Raanana&quot;</font>,<font color="#FF0000">30</font><font color="4444FF">)</font>
+<font color="#2040a0">draw</font>.<font color="#2040a0">text</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#FF0000">10</font>,<font color="#FF0000">100</font><font color="4444FF">)</font>,<font color="#008000">&quot;hello&quot;</font>, <font color="#2040a0">font</font><font color="4444FF">=</font><font color="#2040a0">font</font>, <font color="#2040a0">fill</font><font color="4444FF">=</font><font color="#008000">&quot;red&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">im</font>.<font color="#2040a0">show</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+It looks like the fink pil does not build the module _imagingft:
+<pre>
+File "./fonttest.py", line 9, in ?
+    font = ImageFont.truetype("Raanana",30)
+  File "/sw/lib/python2.4/site-packages/PIL/ImageFont.py", 
+    line 189, in truetype
+    return FreeTypeFont(filename, size, index)
+  File "/sw/lib/python2.4/site-packages/PIL/ImageFont.py", 
+    line 116, in __init__
+    import _imagingft
+ImportError: No module named _imagingft
+</pre>
+Doh!  I'm hoping Jeff W. will have a quick fix up his sleeve.
+
+Just noticed pygsl-py24 in fink... sweet!  A wrapper for the GNU
+Scientific Library.
+
+Some day I need to pull out the old jaz disks for Haughton and
+Yellowstone and try to recover all that great data with something like
+this:
+<pre>
+    dd bs=512 if=/dev/rXX# of=/some_dir/foo.dmg conv=noerror,sync
+</pre>
+-----

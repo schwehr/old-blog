@@ -1,0 +1,35 @@
+TITLE: python and configure like status reports
+AUTHOR: Kurt
+DATE: 08.18.2009 13:05
+DESC: more tricks
+-----
+BODY:
+With python 2.5 came conditionals (<a
+href="http://docs.python.org/whatsnew/2.5.html#pep-308">PEP 308</a>.  In
+C, conditionals look like:
+<pre>char *results = (retval ? "true string" : "false string");</pre>
+In python, the syntax is a bit different, but is easier to read if you
+are not used to it.  Conditionals make it easy to do GNU autoconf configure
+like reporting of tests (or unittest with verbose mode in python).
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> sys
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">good</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">return</font></b> True
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">bad</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">return</font></b> False
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#990000">&gt;&gt;</font> sys<font color="#990000">.</font>stderr<font color="#990000">,</font> <font color="#FF0000">'trying good...\t'</font><font color="#990000">,</font>
+r <font color="#990000">=</font> <b><font color="#000000">good</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> <font color="#990000">&gt;&gt;</font> sys<font color="#990000">.</font>stderr<font color="#990000">,</font> <font color="#FF0000">'ok'</font> <b><font color="#0000FF">if</font></b> r <b><font color="#0000FF">else</font></b> <font color="#FF0000">'FAILED'</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#990000">&gt;&gt;</font> sys<font color="#990000">.</font>stderr<font color="#990000">,</font> <font color="#FF0000">'trying bad...\t'</font><font color="#990000">,</font>
+r <font color="#990000">=</font> <b><font color="#000000">bad</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> <font color="#990000">&gt;&gt;</font> sys<font color="#990000">.</font>stderr<font color="#990000">,</font> <font color="#FF0000">'ok'</font> <b><font color="#0000FF">if</font></b> r <b><font color="#0000FF">else</font></b> <font color="#FF0000">'FAILED'</font></tt></pre>
+Running the above script looks like this:
+<pre>% <b>results.py</b>
+trying good...  ok
+trying bad...   FAILED</pre>
+-----

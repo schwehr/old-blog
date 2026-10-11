@@ -1,0 +1,2841 @@
+<div class="item">
+<a id="e2006-04-30T21_39_53.txt" name="e2006-04-30T21_39_53.txt"></a>
+<h2 class="date">04.30.2006 21:39</h2>
+<div class="blogbody">
+<h3 class="title">doctest chaining and python module template</h3>
+<div class="item-description">
+I just realized (am I am sure this is documented) that within a doc
+string, that doctest chain beyond just the current group.  I thought
+before (which was not correct) that everything was reset after the
+first result.  This makes my life easier for setting up more
+complicated examples.  I was worried that I would have to keep
+generating longer and longer blocks.  For example, these work:
+<pre>
+    '''
+    Some silly math
+    >>> a = 1
+    >>> print a
+    1
+    >>> print a+1
+    2
+<br /><br />
+    And...
+<br /><br />
+    >>> print a+2
+    3
+    '''
+</pre>
+Here is my current template file for a module.  Note that this is a
+work in progress!  Being that these are just templates and they need
+to be improved, I give permission for folks to use these how ever they
+see fit.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#2040a0">__version__</font> <font color="4444FF">=</font> <font color="#008000">'$Revision: 2054 $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">__date__</font> <font color="4444FF">=</font> <font color="#008000">'$Date: 2006-04-27 23:32:12 -0400 (Thu, 27 Apr 2006) $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">__author__</font> <font color="4444FF">=</font> <font color="#008000">'Kurt Schwehr'</font>
+<br /><br />
+<font color="#2040a0">__doc__</font><font color="4444FF">=</font><font color="#008000">''</font><font color="#008000">'
+Describe the module here.
+<br /><br />
+Example file to start with.  Make sure to do these::
+<br /><br />
+  chmod +x mynewfile.py
+  svn add mynewfile.py
+  svn propedit svn:keywords mynewfile.py
+     Revision
+     Date
+  svn commit mynewfile.py
+<br /><br />
+A doctest looks like this
+<br /><br />
+  &gt;&gt;&gt; print 2
+  2
+<br /><br />
+@see: Where else to look
+<br /><br />
+@author: '</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">__author__</font><font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'
+@version: '</font><font color="#008000">''</font> <font color="4444FF">+</font> <font color="#2040a0">__version__</font> <font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'
+@copyright: 2006
+<br /><br />
+@var __date__: Date of last svn commit
+<br /><br />
+@bug: Write this module
+@todo: Design this module
+@todo: Write doctests
+@todo: Write a corresponding unittest file in the test directory
+<br /><br />
+@undocumented: __version__ __author__ __doc__ myparser
+'</font><font color="#008000">''</font>
+<br /><br />
+<font color="#444444"># python standard libraries</font>
+<strong>import</strong> <font color="#2040a0">sys</font>, <font color="#2040a0">os</font>
+<br /><br />
+<font color="#444444"># External modules</font>
+<br /><br />
+<font color="#444444"># Local modules</font>
+<strong>import</strong> <font color="#2040a0">verbosity</font>
+<strong>from</strong> <font color="#2040a0">verbosity</font> <strong>import</strong> <font color="#2040a0">BOMBASTIC</font>,<font color="#2040a0">VERBOSE</font>,<font color="#2040a0">TRACE</font>,<font color="#2040a0">TERSE</font>,<font color="#2040a0">ALWAYS</font>
+<br /><br />
+<font color="#444444">######################################################################</font>
+<br /><br />
+<font color="#444444"># FIX: write the module here</font>
+<br /><br />
+<strong>class</strong> <font color="#2040a0">MyClass</font>
+    <font color="#008000">''</font><font color="#008000">'
+    FIX: describe the class here
+<br /><br />
+    @todo: design MyClass
+    @todo: code MyClass
+    '</font><font color="#008000">''</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,myparam)</font>:
+</strong>	<font color="#008000">''</font><font color="#008000">'Create a MyModule object
+	@param myparam: some arg
+	@type myparam: bool
+	'</font><font color="#008000">''</font>
+	<strong>assert</strong> <font color="#2040a0">False</font> <font color="#444444"># FIX: implement this</font>
+<br /><br />
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> getSomething</font><font color="2040a0">(self,somearg)</font>:
+</strong>	<font color="#008000">''</font><font color="#008000">'
+	Fetch some value based on somearg
+	@return: a something based on somearg
+	@rtype: int
+	'</font><font color="#008000">''</font>
+	<strong>assert</strong> <font color="#2040a0">False</font> <font color="#444444"># FIX: implement this</font>
+<br /><br />
+<br /><br />
+<font color="#444444">######################################################################</font>
+<br /><br />
+<strong>if</strong> <font color="#2040a0">__name__</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>from</strong> <font color="#2040a0">optparse</font> <strong>import</strong> <font color="#2040a0">OptionParser</font>
+    <font color="#2040a0">myparser</font> <font color="4444FF">=</font> <font color="#2040a0">OptionParser</font><font color="4444FF">(</font><font color="#2040a0">usage</font><font color="4444FF">=</font><font color="#008000">&quot;%prog [options]&quot;</font>,
+			    <font color="#2040a0">version</font><font color="4444FF">=</font><font color="#008000">&quot;%prog &quot;</font><font color="4444FF">+</font><font color="#2040a0">__version__</font><font color="4444FF">)</font>
+    <font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'--test'</font>,<font color="#008000">'--doc-test'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'doctest'</font>,
+<br /><br />
+			<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#2040a0">False</font>,<font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">'store_true'</font>,
+                        <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'run the documentation tests'</font><font color="4444FF">)</font>
+    <font color="#2040a0">verbosity</font>.<font color="#2040a0">addVerbosityOptions</font><font color="4444FF">(</font><font color="#2040a0">myparser</font><font color="4444FF">)</font>
+    <font color="4444FF">(</font><font color="#2040a0">options</font>,<font color="#2040a0">args</font><font color="4444FF">)</font> <font color="4444FF">=</font> <font color="#2040a0">myparser</font>.<font color="#2040a0">parse_args</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">options</font>.<font color="#2040a0">doctest</font><font color="4444FF">:</font>
+	<strong>import</strong> <font color="#2040a0">os</font><font color="4444FF">;</font> <strong>print</strong> <font color="#2040a0">os</font>.<font color="#2040a0">path</font>.<font color="#2040a0">basename</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font>, <font color="#008000">'doctests ...'</font>,
+	<font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">=</font> <font color="4444FF">[</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">]</font>
+	<strong>if</strong> <font color="#2040a0">options</font>.<font color="#2040a0">verbosity</font><font color="4444FF">&gt;</font><font color="4444FF">=</font><font color="#2040a0">VERBOSE</font><font color="4444FF">:</font> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#008000">'-v'</font><font color="4444FF">)</font>
+	<strong>import</strong> <font color="#2040a0">doctest</font>
+	<font color="#2040a0">numfail</font>,<font color="#2040a0">numtests</font><font color="4444FF">=</font><font color="#2040a0">doctest</font>.<font color="#2040a0">testmod</font><font color="4444FF">(</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">numfail</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">'ok'</font>
+	<strong>else</strong><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">'FAILED'</font>
+</pre>
+And verbosity looks something like this:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<br /><br />
+<font color="#2040a0">__version__</font> <font color="4444FF">=</font> <font color="#008000">'$Revision: 2054 $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="#444444"># See man ident</font>
+<font color="#2040a0">__date__</font> <font color="4444FF">=</font> <font color="#008000">'$Date: 2006-04-27 23:32:12 -0400 (Thu, 27 Apr 2006) $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">__author__</font> <font color="4444FF">=</font> <font color="#008000">'Kurt Schwehr'</font>
+<font color="#2040a0">__doc__</font><font color="4444FF">=</font><font color="#008000">''</font><font color="#008000">'
+@author: '</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">__author__</font><font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'
+@version: '</font><font color="#008000">''</font> <font color="4444FF">+</font> <font color="#2040a0">__version__</font> <font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'
+@copyright: Copyright (C) 2005  Kurt Schwehr
+@var __date__: Date of last svn commit
+@undocumented: __version__ __author__ __doc__ myparser
+<br /><br />
+@todo: make a print function that knows about verbosity
+'</font><font color="#008000">''</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<br /><br />
+<font color="#2040a0">BOMBASTIC</font><font color="4444FF">=</font> <font color="#FF0000">4</font>
+<font color="#2040a0">VERBOSE</font>  <font color="4444FF">=</font> <font color="#FF0000">3</font>
+<font color="#2040a0">TRACE</font>    <font color="4444FF">=</font> <font color="#FF0000">2</font>
+<font color="#2040a0">TERSE</font>    <font color="4444FF">=</font> <font color="#FF0000">1</font>
+<font color="#2040a0">ALWAYS</font>   <font color="4444FF">=</font> <font color="#FF0000">0</font>
+<font color="#2040a0">NEVER</font>    <font color="4444FF">=</font> <font color="#FF0000">0</font> <font color="#444444"># Confusing, eh?</font>
+<font color="#444444"># Pass in 0 for NEVER from the user side</font>
+<br /><br />
+<font color="#444444"># </font>
+<font color="#2040a0">def</font> <font color="#2040a0">addVerbosityOptions</font><font color="4444FF">(</font><font color="#2040a0">parser</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    Added the verbosity options to a parser
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-v'</font>,<font color="#008000">'--verbose'</font>,<font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">&quot;count&quot;</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'verbosity'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#FF0000">0</font>,
+                        <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'how much information to give.  Specify multiple times to increase verbosity'</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'--verbosity'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'verbosity'</font>,<font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'int'</font>,
+                        <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Specify verbosity.  Should be in the range of '</font>
+                        <font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">ALWAYS</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'...'</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">BOMBASTIC</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">' (None...Bombastic)'</font><font color="4444FF">)</font>
+    <font color="#2040a0">parser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'--noisy'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'verbosity'</font>, <font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">'store_const'</font>, <font color="#2040a0">const</font><font color="4444FF">=</font><font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">BOMBASTIC</font>,
+                        <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'Go for the max verbosity ['</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">BOMBASTIC</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">']'</font><font color="4444FF">)</font>
+<br /><br />
+<font color="#444444"># FIX: what to do for a main?  Perhaps run a test?</font>
+<br /><br />
+<font color="#444444">######################################################################</font>
+<br /><br />
+<strong>if</strong> <font color="#2040a0">__name__</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>from</strong> <font color="#2040a0">optparse</font> <strong>import</strong> <font color="#2040a0">OptionParser</font>
+    <font color="#2040a0">myparser</font> <font color="4444FF">=</font> <font color="#2040a0">OptionParser</font><font color="4444FF">(</font><font color="#2040a0">usage</font><font color="4444FF">=</font><font color="#008000">&quot;%prog [options]&quot;</font>,
+			    <font color="#2040a0">version</font><font color="4444FF">=</font><font color="#008000">&quot;%prog &quot;</font><font color="4444FF">+</font><font color="#2040a0">__version__</font><font color="4444FF">)</font>
+    <font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'--test'</font>,<font color="#008000">'--doc-test'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'doctest'</font>,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#2040a0">False</font>,<font color="#2040a0">action</font><font color="4444FF">=</font><font color="#008000">'store_true'</font>,
+                        <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'run the documentation tests'</font><font color="4444FF">)</font>
+    <font color="#2040a0">addVerbosityOptions</font><font color="4444FF">(</font><font color="#2040a0">myparser</font><font color="4444FF">)</font>
+    <font color="4444FF">(</font><font color="#2040a0">options</font>,<font color="#2040a0">args</font><font color="4444FF">)</font> <font color="4444FF">=</font> <font color="#2040a0">myparser</font>.<font color="#2040a0">parse_args</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">options</font>.<font color="#2040a0">doctest</font><font color="4444FF">:</font>
+	<strong>import</strong> <font color="#2040a0">os</font><font color="4444FF">;</font> <strong>print</strong> <font color="#2040a0">os</font>.<font color="#2040a0">path</font>.<font color="#2040a0">basename</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font>,<font color="#008000">'doctests ...'</font>,
+	<font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">=</font> <font color="4444FF">[</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">]</font>
+	<strong>if</strong> <font color="#2040a0">options</font>.<font color="#2040a0">verbosity</font><font color="4444FF">&gt;</font><font color="4444FF">=</font><font color="#2040a0">VERBOSE</font><font color="4444FF">:</font> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#008000">'-v'</font><font color="4444FF">)</font>
+	<strong>import</strong> <font color="#2040a0">doctest</font>
+	<font color="#2040a0">numfail</font>,<font color="#2040a0">numtests</font><font color="4444FF">=</font><font color="#2040a0">doctest</font>.<font color="#2040a0">testmod</font><font color="4444FF">(</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">numfail</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">'ok'</font>
+	<strong>else</strong><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">'FAILED'</font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-30T21_39_53.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-05-01T06_14_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-30T21_09_05.txt" name="e2006-04-30T21_09_05.txt"></a>
+<h2 class="date">04.30.2006 21:09</h2>
+<div class="blogbody">
+<h3 class="title">Analogy for ship navigation</h3>
+<div class="item-description">
+When driving a ship, it is important to keep your eyes out the window.
+This is just like what is happening with drivers using the in-car GPS
+systems.  If you don't look at what is coming up, you may really
+regret it.
+<br /><br />
+<a href="http://www.engadget.com/2006/04/20/uk-drivers-trust-gps-more-than-their-own-eyes/">UK drivers trust GPS more than their own eyes</a> [engadget]
+<br /><br />
+This is about the 5th time I have seen this story this week, but I had
+to bring up the relation to the Chart-Of-The-Future.  Driving only by
+instruments is sometimes forced on a pilot, but never recommended.
+<pre>
+  We've heard reports before about the dangers of driving while under
+  the influence of GPS, but it looks like drivers in the UK have taken
+  trust of their navigation units to the extreme. Twice in the space
+  of the last two weeks, we've seen reports of British drivers taking
+  serious risks because they trust the info displayed on the small
+  screen more than what they see through their windshield. In the most
+  recent case, drivers passing through the village of Luckington have
+  found themselves landing in the River Avon, by following a
+  GPS-recommended route that pointed to a bridge that has been closed
+  for a week.
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-30T21_09_05.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-30T21_39_53.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-30T06_12_47.txt" name="e2006-04-30T06_12_47.txt"></a>
+<h2 class="date">04.30.2006 06:12</h2>
+<div class="blogbody">
+<h3 class="title">geocoder.us</h3>
+<div class="item-description">
+<a href="http://geocoder.us/">http://geocoder.us/</a>
+<br /><br />
+If you live in Canada, you can use <a
+href="http://geocoder.ca">http://geocoder.ca</a> to get the exact
+longitude and latitude of your position.
+<br /><br />
+If you live in Europe, you can use <a
+href="http://www.maporama.com">http://www.maporama.com</a> to get the
+exact longitude and latitude of your position.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-30T06_12_47.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-30T21_09_05.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-29T14_20_43.txt" name="e2006-04-29T14_20_43.txt"></a>
+<h2 class="date">04.29.2006 14:20</h2>
+<div class="blogbody">
+<h3 class="title">build your own web server with python</h3>
+<div class="item-description">
+I want to add a webserver to one of my programs so that I can allow
+people to view a web page that presents the latest statistics
+collected by the logger.  This way, I can connect to a remote data
+logger and see how it has been doing.  This is about the simplest web
+server that can be done, but all it does is let someone walk the files
+in the tree below to working directory of the server program.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">BaseHTTPServer</font>, <font color="#2040a0">SimpleHTTPServer</font>
+<font color="#2040a0">server</font> <font color="4444FF">=</font> <font color="#2040a0">BaseHTTPServer</font>.<font color="#2040a0">HTTPServer</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#008000">''</font>,<font color="#FF0000">8080</font><font color="4444FF">)</font>,<font color="#2040a0">SimpleHTTPServer</font>.<font color="#2040a0">SimpleHTTPRequestHandler</font><font color="4444FF">)</font>
+<font color="#2040a0">server</font>.<font color="#2040a0">serve_forever</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+If I then do an "open http://localhost:8080/" here is what I see...
+<pre>
+<h2>Directory listing for /</h2>
+<hr>
+<ul>
+  <li><a href="1.py">1.py</a>
+  <li><a href="2.py">2.py</a>
+  <li><a href="2.pyc">2.pyc</a>
+  <li><a href="3.py">3.py</a>
+  <li><a href="3.pyc">3.pyc</a>
+  <li><a href="BaseHTTPServer">BaseHTTPServer</a>
+  <li><a href="http.py">http.py</a>
+</ul>
+<hr>
+</pre>
+That is fine, but does not let me generate my own web pages.  I want
+to present the status for what is happening within a small program.  I
+got this idea from what Roland is doing with GeoZui4D.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">BaseHTTPServer</font>
+<font color="#444444">#</font>
+<strong>class</strong> <font color="#2040a0">httpHandler</font><font color="4444FF">(</font><font color="#2040a0">BaseHTTPServer</font>.<font color="#2040a0">BaseHTTPRequestHandler</font><font color="4444FF">)</font><font color="4444FF">:</font>	
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> do_GET</font><font color="2040a0">(self)</font>:
+</strong>	<font color="#2040a0">msg</font> <font color="4444FF">=</font> <font color="#008000">'hello'</font>
+	<font color="#2040a0">self</font>.<font color="#2040a0">send_response</font><font color="4444FF">(</font><font color="#FF0000">200</font><font color="4444FF">)</font>
+	<font color="#2040a0">self</font>.<font color="#2040a0">send_header</font><font color="4444FF">(</font><font color="#008000">&quot;Content-type&quot;</font>, <font color="#008000">&quot;text/html&quot;</font><font color="4444FF">)</font>
+	<font color="#2040a0">self</font>.<font color="#2040a0">send_header</font><font color="4444FF">(</font><font color="#008000">&quot;Content-Length&quot;</font>,<font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">msg</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<font color="#2040a0">self</font>.<font color="#2040a0">end_headers</font><font color="4444FF">(</font><font color="4444FF">)</font>
+	<font color="#2040a0">self</font>.<font color="#2040a0">wfile</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">msg</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>if</strong> <font color="#2040a0">__name__</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <font color="#2040a0">server</font> <font color="4444FF">=</font> <font color="#2040a0">BaseHTTPServer</font>.<font color="#2040a0">HTTPServer</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#008000">''</font>,<font color="#FF0000">8080</font><font color="4444FF">)</font>,<font color="#2040a0">httpHandler</font><font color="4444FF">)</font>
+    <font color="#2040a0">server</font>.<font color="#2040a0">serve_forever</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Now all I need to do is dip into the application's data structures to
+see what is going on.  Time for me to try out a multithreaded python
+application next.  Will python threads utilize multiple CPUs?  That
+would be really nice.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-29T14_20_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-30T06_12_47.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-29T13_11_57.txt" name="e2006-04-29T13_11_57.txt"></a>
+<h2 class="date">04.29.2006 13:11</h2>
+<div class="blogbody">
+<h3 class="title">Portsmouth port security</h3>
+<div class="item-description">
+<a href="http://www.seacoastonline.com/news/04292006/news/100230.htm">Port director praises new rules</a> [sea coast online]
+<pre>
+PORTSMOUTH - Director of Ports and Harbors Geno Marconi said the port
+of New Hampshire is safe.
+<br /><br />
+The Bush Administration's new regulations that require background
+checks for all port workers to uncover links to terrorism and verify
+all workers are legal U.S. residents will only help to make it safer,
+Marconi said Friday.
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-29T13_11_57.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-29T14_20_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-29T08_02_18.txt" name="e2006-04-29T08_02_18.txt"></a>
+<h2 class="date">04.29.2006 08:02</h2>
+<div class="blogbody">
+<h3 class="title">Oracle spatial</h3>
+<div class="item-description">
+<a href="http://www.allpointsblog.com/archives/1389-At-the-Oracle-Spatial-SIG-New-Oracle-Spatial-Features-Coming.html">At the Oracle Spatial SIG - New Oracle Spatial Features Coming</a> [allpointsblog.com]
+<br /><br />
+<a href="http://www.oracle.com/technology/products/spatial/index.html">Oracle Spatial</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-29T08_02_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-29T13_11_57.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-29T07_52_46.txt" name="e2006-04-29T07_52_46.txt"></a>
+<h2 class="date">04.29.2006 07:52</h2>
+<div class="blogbody">
+<h3 class="title">GeoZui4D XPath example</h3>
+<div class="item-description">
+I am sold on the power of XPath for dealing with XML data.  XPath
+makes it much more manageable to cope with complex data structures in
+ML files.  The ease of searching with XPath is impressive.  Here is
+my first real example of trying to do something useful with XPath.
+First, here is an example from GeoZui4D.  This is an example of a gzx
+file that contains the location of two ships at a couple time stamps.
+Actually, I chopped up an example file with one ship to make a more
+interesting example.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;ISO-8859-1&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">GZ</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Object</font> <font color="#2040a0">type=</font><font color="#008000">&quot;Boat&quot;</font> <font color="#2040a0">label=</font><font color="#008000">&quot;boat1&quot;</font> <font color="#2040a0">path=</font><font color="#008000">&quot;on&quot;</font> <font color="#2040a0">bow_size=</font><font color="#008000">&quot;1.0 15.0 10.0&quot;</font> <font color="#2040a0">
+	</font>  <font color="#2040a0">hull_size=</font><font color="#008000">&quot;13.7 35.0 13.0&quot;</font> <font color="#2040a0">bridge_nudge=</font><font color="#008000">&quot;18.0&quot;</font><font color="#2040a0">
+</font>          <font color="#2040a0">stern_size=</font><font color="#008000">&quot;12.0 15.0 11.0&quot;</font> <font color="#2040a0">bridge_size=</font><font color="#008000">&quot;13.0 14.0 18.0&quot;</font><font color="#2040a0">
+</font>          <font color="#2040a0">local_origin=</font><font color="#008000">&quot;468275.0 4595425.6 0.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Position</font> <font color="#2040a0">position=</font><font color="#008000">&quot;468082.0 4595833.5 0.0&quot;</font> <font color="#2040a0">time=</font><font color="#008000">&quot;1089386678.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Position</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Position</font> <font color="#2040a0">position=</font><font color="#008000">&quot;468069.5 4596129.7 0.0&quot;</font> <font color="#2040a0">time=</font><font color="#008000">&quot;1089386836.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Position</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Position</font> <font color="#2040a0">position=</font><font color="#008000">&quot;467903.1 4596241.4 0.0&quot;</font> <font color="#2040a0">time=</font><font color="#008000">&quot;1089386941.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Position</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Object</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Object</font> <font color="#2040a0">type=</font><font color="#008000">&quot;Boat&quot;</font> <font color="#2040a0">label=</font><font color="#008000">&quot;ship2&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Position</font> <font color="#2040a0">position=</font><font color="#008000">&quot;466388.8 4599560.5 0.0&quot;</font> <font color="#2040a0">time=</font><font color="#008000">&quot;1089394391.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Position</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Position</font> <font color="#2040a0">position=</font><font color="#008000">&quot;466402.3 4599486.4 0.0&quot;</font> <font color="#2040a0">time=</font><font color="#008000">&quot;1089394516.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Position</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Object</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/GZ</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Now, what if I want to get either the first or last value for a
+particular vessel?  Here is all I have to do:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>
+<font color="#444444">#</font>
+<font color="#2040a0">boats</font> <font color="4444FF">=</font> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>.<font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#008000">'example.xml'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">lastpos1</font><font color="4444FF">=</font><font color="#2040a0">boats</font>.<font color="#2040a0">xpath</font><font color="4444FF">(</font><font color="#008000">'//GZ/Object[@label=&quot;boat1&quot;]/Position[last()]'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">lastpos1</font><font color="4444FF">)</font>, <font color="#2040a0">lastpos1</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">attrib</font>
+<font color="#444444">#</font>
+<font color="#2040a0">firstpos2</font><font color="4444FF">=</font><font color="#2040a0">boats</font>.<font color="#2040a0">xpath</font><font color="4444FF">(</font><font color="#008000">'//GZ/Object[@label=&quot;ship2&quot;]/Position[1]'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">firstpos2</font><font color="4444FF">)</font>,<font color="#2040a0">firstpos2</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">attrib</font>
+</pre>
+Running the above program returns this:
+<pre>
+  1 {'position': '467903.1 4596241.4 0.0', 'time': '1089386941.0'}
+  1 {'position': '466388.8 4599560.5 0.0', 'time': '1089394391.0'}
+</pre>
+Where did I learn how to do this?  <a
+href="http://www.zvon.org/xxl/XPathTutorial/General/examples.html">http://www.zvon.org/xxl/XPathTutorial/General/examples.html</a>
+- check out example 5.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-29T07_52_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-29T08_02_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-29T06_34_02.txt" name="e2006-04-29T06_34_02.txt"></a>
+<h2 class="date">04.29.2006 06:34</h2>
+<div class="blogbody">
+<h3 class="title">Small Linux systems</h3>
+<div class="item-description">
+<a href="http://www.linuxdevices.com/news/NS6270733703.html">World's smallest networked Linux computer?</a> [linuxdevices.com]... 
+<pre>
+  Intec Automation is shipping a tiny ColdFire-powered CPU module
+  claimed to be the smallest Linux SBC (single-board computer) with
+  Internet connectivity, a reasonable amount of memory, and "massive
+  control functionality." The WildFireMod measures 1.9 x 1.7 inches
+  (49 x 44mm), and targets data acquisition systems, communications,
+  electric and internal combustion motor controllers, robotics,
+  automotive, avionics, and industrial control.
+  ...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-29T06_34_02.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-29T07_52_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-29T06_30_38.txt" name="e2006-04-29T06_30_38.txt"></a>
+<h2 class="date">04.29.2006 06:30</h2>
+<div class="blogbody">
+<h3 class="title">OpenVPN</h3>
+<div class="item-description">
+<a href="http://openvpn.net/">http://openvpn.net/</a> loots like it
+might be an interesting solution to the UNH world of VPN trouble.  At
+UNH, Windows VPN clients are free, but I have to pay for a Mac Client
+and I haven't even looked to see what they say about Linux.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-29T06_30_38.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-29T06_34_02.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-29T06_19_36.txt" name="e2006-04-29T06_19_36.txt"></a>
+<h2 class="date">04.29.2006 06:19</h2>
+<div class="blogbody">
+<h3 class="title">NASA World Wind database discussion</h3>
+<div class="item-description">
+Not as much discussion as i had hoped, but it is a quick read...
+<br /><br />
+<a href="http://radar.oreilly.com/archives/2006/04/database_war_stories_4_nasa_wo.html">http://radar.oreilly.com/archives/2006/04/database_war_stories_4_nasa_wo.html</a> - Database War Stories #4: NASA World Wind
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-29T06_19_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-29T06_30_38.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-28T07_51_56.txt" name="e2006-04-28T07_51_56.txt"></a>
+<h2 class="date">04.28.2006 07:51</h2>
+<div class="blogbody">
+<h3 class="title">lxml and xpath</h3>
+<div class="item-description">
+I spent about 2 hours yesterday at NOAA talking to Jack who is one of
+the pydro developers.  Pydro is a very large python application that
+does all sorts of neat things with python.  He overloaded my brain
+with all kinds of ideas, but an easiest one for me to use is XPath.
+<br /><br />
+He codes under the Microsoft DOM, so I can't use that.  I found out
+this morning that elementtree only implements a small subset of XPath.
+That is when I discovered lxml.  lxml wraps libxml2 with an
+ElementTree interface, but then extends that to provide more
+capabilities.  First, I created a <a
+href="http://schwehr.org/blog/attachments/2006/lxml-py.info">lxml-py.info</a>
+<br /><br />
+Now for an example.  This first example shows how to load in an xml
+string via the string interface.  This makes is easy to embed the xml
+document inside of a python file.  I should really do this for the
+current application that I am working on so that I don't have to keep
+shoving around the path to the core xml specification file.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">StringIO</font> <strong>import</strong> <font color="#2040a0">StringIO</font>
+<strong>import</strong> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>
+<font color="#2040a0">f</font><font color="4444FF">=</font><font color="#2040a0">StringIO</font><font color="4444FF">(</font><font color="#008000">'&lt;foo&gt;&lt;bar&gt;some text&lt;/bar&gt;&lt;/foo&gt;'</font><font color="4444FF">)</font>
+<font color="#2040a0">doc</font> <font color="4444FF">=</font> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>.<font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#2040a0">f</font><font color="4444FF">)</font>
+<font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#2040a0">doc</font>.<font color="#2040a0">xpath</font><font color="4444FF">(</font><font color="#008000">'/foo/bar'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'length of result should be 1: '</font>,<font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">r</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">r</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">tag</font>
+<strong>print</strong> <font color="#2040a0">r</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">text</font>
+</pre>
+Here is what the code prints when run:
+<pre>
+length of result should be 1:  1
+bar
+some text
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-28T07_51_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-29T06_19_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-28T07_03_37.txt" name="e2006-04-28T07_03_37.txt"></a>
+<h2 class="date">04.28.2006 07:03</h2>
+<div class="blogbody">
+<h3 class="title">mullesight still not happening</h3>
+<div class="item-description">
+Mullesight is still not working for me.  I tried this with no
+possitive results...  First I did an hfstar of
+/Applications/MulleSight-1.0.9 and untared it on the machine with the
+iSight (running 10.4.6).  Then I grabbed grabframes-0.2.bash from <a
+href="http://schwehr.org/software/scripts/">http://schwehr.org/software/scripts/</a>.
+After a chmod +x graframes-0.2.bash, I ran the script, but got this
+error:
+<pre>
+/Applications/MulleSight-1.0.9/MulleSightAsWebcam.applescript:811:845: 
+    execution error: No user interaction allowed. (-1713)
+</pre>
+Bummer.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-28T07_03_37.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-28T07_51_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-28T06_07_07.txt" name="e2006-04-28T06_07_07.txt"></a>
+<h2 class="date">04.28.2006 06:07</h2>
+<div class="blogbody">
+<h3 class="title">Working with Apple's NetInfo</h3>
+<div class="item-description">
+<a href="http://www.oreillynet.com/mac/blog/2006/04/deleting_mac_os_x_users_remote.html?CMP=OTC-13IV03560550&ATT=Deleting+Mac+OS+X+users+remotely+with+dscl">http://www.oreillynet.com/mac/blog/2006/04/deleting_mac_os_x_users_remote.html</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-28T06_07_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-28T07_03_37.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-28T05_38_00.txt" name="e2006-04-28T05_38_00.txt"></a>
+<h2 class="date">04.28.2006 05:38</h2>
+<div class="blogbody">
+<h3 class="title">Google sketchup</h3>
+<div class="item-description">
+Or was that ketchup?
+<br /><br />
+<a href="http://sketchup.google.com/download.html">http://sketchup.google.com/download.html</a>:
+<pre>
+Download Google SketchUp (free)
+Windows: Version # 5.0.245
+Macintosh: <font color="red">Coming Soon</font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-28T05_38_00.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-28T06_07_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-26T17_30_56.txt" name="e2006-04-26T17_30_56.txt"></a>
+<h2 class="date">04.26.2006 17:30</h2>
+<div class="blogbody">
+<h3 class="title">Mullesight web cam</h3>
+<div class="item-description">
+I am trying to get a web camera going with my old Mullesight time
+lapse frame grabs but for some reason it is not grabbing frames with
+Mullesight 1.0.10 and Mac OSX 10.4.6.  Not sure what is wrong <img src="http://schwehr.org/blog/moods/smilies/sad.gif" alt=":(" border="0" 
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-26T17_30_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-28T05_38_00.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-24T23_14_19.txt" name="e2006-04-24T23_14_19.txt"></a>
+<h2 class="date">04.24.2006 23:14</h2>
+<div class="blogbody">
+<h3 class="title">small ais transmitter</h3>
+<div class="item-description">
+Here is a little unit for Class B AIS (?is that right?) that does
+limited transmission: <a
+href="http://maritec.co.za/index.php?pr=APIRB">http://maritec.co.za/index.php?pr=APIRB</a>
+<pre>
+APIRB is a low cost AIS transmit only device, designed to operate in
+conformance with ITU-R M.1371-1. 
+...
+	
+APIRB allows vessels not required to fit Class A in terms of SOLAS
+regulation, to fit an AIS device that meets ISPS code and Marine
+Domain Awareness (MDA) requirements, where applicable.  It is also a
+solution for Search and Rescue craft that only need to transmit their
+own identification and position. 
+<br /><br />
+APIRB supports AIS VDL messages 18, 24A and 24B
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-24T23_14_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-26T17_30_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-24T08_07_33.txt" name="e2006-04-24T08_07_33.txt"></a>
+<h2 class="date">04.24.2006 08:07</h2>
+<div class="blogbody">
+<h3 class="title">ElementTree colorizer</h3>
+<div class="item-description">
+I need to look at <a
+href="http://effbot.python-hosting.com/browser/stuff/sandbox/pythondoc/">http://effbot.python-hosting.com/browser/stuff/sandbox/pythondoc/</a>
+which is a python source colorizer and something for elementtrees.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-24T08_07_33.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-24T23_14_19.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-23T17_12_58.txt" name="e2006-04-23T17_12_58.txt"></a>
+<h2 class="date">04.23.2006 17:12</h2>
+<div class="blogbody">
+<h3 class="title">Agile Manifesto</h3>
+<div class="item-description">
+Brian L. saw a copy of <a
+href="http://www.amazon.com/gp/product/1590594649/">Agile developement
+using the ICONIX process</a> that I got from ESRI and asked me
+if I had read the <a href="http://agilemanifesto.org/">Agile
+Manifesto</a>.  Not sure why I should want to sign it, but the
+principles do sound appealing.
+<br /><br />
+I took two classes in 1997 from UCSC extension that were aimed at
+getting us to use UML.  I'm still trying to half pay attention to UML,
+but I am not that into it.  Just too many tools to learn...
+<ul>
+<li>Trac - I am getting pretty good at being a track user and I am better now with the wiki concept (I know, it's not that hard).  Trac ROCKS!</li>
+<li>Eclipse and the Eclipse Python plugin.  Eclipse is huge.</li>
+<li><a href="http://argouml.tigris.org/">ArgoUML</a> looks interesting, especially if PyReverse generates the UML for me.</li>
+<li>and a million other little items!</li>
+</ul>
+I also started playing with QGIS today to look at some DEM's.  It was
+pretty easy to get USGS 7.5 minute dems up and viewed.  Thanks to Roi
+for getting me to finally try it.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-23T17_12_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-24T08_07_33.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-23T14_48_19.txt" name="e2006-04-23T14_48_19.txt"></a>
+<h2 class="date">04.23.2006 14:48</h2>
+<div class="blogbody">
+<h3 class="title">Annoying GIS data delivery systems</h3>
+<div class="item-description">
+<br /><br />
+I am hitting the same frustration that I have been going through since
+about 1997.  Why do people wrap data in silly web interfaces such that
+it is impossible to easily specify what data you have fetched and
+track it through a project?  Today I am playing with local GIS data.
+First problem is that it is not that easy to find data sources.  The
+city of <a
+href="http://www.ci.dover.nh.us/planning/GIS/gis.htm">Dover's web
+site</a> says that they will take orders for maps.  Great.  Like they
+are going to give me gmt grids and Fledermaus scene files... I don't
+think so.  I did find the <a
+href="http://www.granit.sr.unh.edu/cgi-bin/load_file?PATH=/data/datacat/index.html">GRANIT</a>
+system at unh.  I found a first dem to pull down, but what it does is
+not that fun.  I get to download a GRANIT.zip for each item that I
+fetch.  When I unzip that file, it unpacks to this:
+<pre>
+-rwxrwxr-x    1044839 Jun 19  2000 dem169.dem
+-rwxrwxr-x      36523 Mar  6 13:21 dem169.html
+</pre>
+Those filenames are helpful (like I know what 169 is!), but what I
+prefer is to be able to pull these files with a sane URL so that I can
+pass along my notes in a useful form to others.  I think along the
+lines of something like this:
+<pre>
+#!/bin/bash
+echo "Fetch all raw data need for project X - ship tracking"
+echo "Region includes Portsmouth, Newington, Dover, Durham, Kittery, "
+echo "New Castle, and Rye areas"
+echo
+echo "DEM's"
+wget http://mygisdatasite.org/nh/portsmouth.dem
+wget http://mygisdatasite.org/nh/newington.dem
+wget http://mygisdatasite.org/nh/dover.dem
+wget http://mygisdatasite.org/nh/durham.dem
+wget http://mygisdatasite.org/nh/kittery.dem
+<br /><br />
+echo
+echo "Fetching completed Fledermaus scene file."
+echo "View with iview3d"
+wget http://mygisdatasite.org/nh/nh-ship-tracking.scene
+</pre>
+Bam!  Someone could start following through how I assembled my data
+and get there much faster than my first time through.  End of rant
+about data availability before I get carried away.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-23T14_48_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-23T17_12_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-23T07_30_35.txt" name="e2006-04-23T07_30_35.txt"></a>
+<h2 class="date">04.23.2006 07:30</h2>
+<div class="blogbody">
+<h3 class="title">Debugging python programs in emacs</h3>
+<div class="item-description">
+I was having trouble figuring out how to get M-x pdb to start the
+debugger.  I found a way around it.  Add this to where you would like
+to start debugging:
+<pre>
+	import pdb
+	pdb.set_trace()
+</pre>
+Then start pdb in emacs like this.  First do M-x pdb.  When it says:
+<pre>
+Run pdb (like this): pdb
+</pre>
+Replace pdb with your program.
+<pre>
+Run pdb (like this): ./myprogram.py --foo -bar
+</pre>
+It will then drop into the pdb debugger when you get to the set_trace
+call and act like pdb, but emacs will follow along in the other view
+so you do not have to type list all the time.
+<br /><br />
+The big drawback of this is that you must restart the debugger each
+time and this will loose any debugger state that you want to keep
+between runs (like break points).
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-23T07_30_35.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-23T14_48_19.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-21T08_22_33.txt" name="e2006-04-21T08_22_33.txt"></a>
+<h2 class="date">04.21.2006 08:22</h2>
+<div class="blogbody">
+<h3 class="title">major speedups</h3>
+<div class="item-description">
+I have been working on optimizing my code.  Profiling showed that I
+was calling the BitVector _getbit and _setbit calls a million times
+each to handle just a 300 line log file.  That was just way too much.
+Here are my initial speed tests:
+<pre>
+G4 1.5GHz laptop:
+0300       11.10 real        10.18 user         0.28 sys
+5000      137.85 real       131.15 user         0.97 sys
+<br /><br />
+4xG5 2.5 GHz:
+0300        7.41 real         7.18 user         0.22 sys
+5000       92.57 real        92.09 user         0.28 sys
+</pre>
+After optimization, here are the new numbers:
+<pre>
+G4 1.5GHz laptop:
+0300       2.39 real         1.93 user         0.27 sys
+5000      20.41 real        17.77 user         0.51 sys
+<br /><br />
+4xG5 2.5 GHz
+0300       1.50 real         1.23 user         0.22 sys
+5000      11.66 real        11.37 user         0.25 sys
+<br /><br />
+With the profiler showing:
+81K _setbit calls
+77k _getbit calls
+</pre>
+How did I get such a large speedup?  For starters, my initial coding
+was done to be as clear as possible.  I picked simple looking code
+over speed.  Only once I knew the whole system was behaving correctly,
+then I started optimizing.  That isn't to say that I was ignore speed.
+I tried to design such that it would be easy to come back for an
+optimization pass.
+<br /><br />
+Then I used the profiler to identify the trouble spots.  These mostly
+turned out to be abuses of calling the BitVector class too often and
+in very bad ways.  I started with lazy evaluation at my top level
+class.  This let me discard uninteresting messages by only decoding
+the first 6 bits.  Then I did my translations to bitvectors with a
+lookup table so that I have 64 BitVectors ready to go.  Finally, I
+changed the assembly of the large converted bitvector from a "bv +=
+partialBV" loop to preallocating one large BitVector and just
+assigning in the partialBV in to the right place one bit at a time.
+<br /><br />
+There is still more optimization possible down at level of my handler
+that pulls apart the bits to create the usable message, but I think
+the gains will be much smaller.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-21T08_22_33.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-23T07_30_35.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-19T08_57_12.txt" name="e2006-04-19T08_57_12.txt"></a>
+<h2 class="date">04.19.2006 08:57</h2>
+<div class="blogbody">
+<h3 class="title">python hotshot</h3>
+<div class="item-description">
+I gave hotshot a try...
+<pre>
+In [1]: import hotshot, hotshot.stats, test.pystone
+In [3]: stats = hotshot.stats.load("ais-log2gzx.profile")
+In [4]: stats.strip_dirs()
+In [5]: stats.sort_stats('time','calls')
+In [6]: stats.print_stats(20)
+         330324 function calls (330249 primitive calls) in 2.546 CPU seconds
+<br /><br />
+   Ordered by: internal time, call count
+   List reduced from 190 to 20 due to restriction <20>
+<br /><br />
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   132849    1.111    0.000    1.111    0.000 BitVector.py:641(_getbit)
+   137087    0.506    0.000    0.506    0.000 BitVector.py:626(_setbit)
+     2607    0.368    0.000    1.481    0.001 BitVector.py:702(__add__)
+     5576    0.230    0.000    0.755    0.000 BitVector.py:541(__init__)
+       87    0.022    0.000    0.029    0.000 decimal.py:1143(_divide)
+     8992    0.020    0.000    0.020    0.000 BitVector.py:599(lambda)
+       22    0.019    0.001    0.830    0.038 msg.py:177(getFields)
+       46    0.017    0.000    1.594    0.035 binary.py:191(ais6tobitvec)
+      599    0.015    0.000    0.022    0.000 ElementTree.py:1072(start)
+    10069    0.015    0.000    0.015    0.000 ElementTree.py:220(__getitem__)
+      420    0.014    0.000    0.027    0.000 BitVector.py:829(intValue)
+     1124    0.013    0.000    0.116    0.000 binary.py:19(setBitVectorSize)
+      474    0.013    0.000    0.670    0.001 BitVector.py:906(__getslice__)
+      991    0.012    0.000    0.012    0.000 msg.py:83(getType)
+        2    0.011    0.005    0.067    0.034 ElementTree.py:1241(feed)
+      495    0.010    0.000    0.017    0.000 msg.py:85(getScale)
+      466    0.009    0.000    0.013    0.000 msg.py:118(isCase)
+        1    0.009    0.009    0.017    0.017 ElementTree.py:1110(__init__)
+      423    0.009    0.000    0.012    0.000 msg.py:102(getDecode)
+      445    0.009    0.000    0.012    0.000 msg.py:107(getUnavailableRaw)
+</pre>
+<br /><br />
+Looks like most of my time is spent in the BitVector _getbit and
+_setbit calls.  Now I need to reduce the number of those calls.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-19T08_57_12.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-21T08_22_33.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-19T07_53_06.txt" name="e2006-04-19T07_53_06.txt"></a>
+<h2 class="date">04.19.2006 07:53</h2>
+<div class="blogbody">
+<h3 class="title">Python speed</h3>
+<div class="item-description">
+<a
+href="http://wiki.python.org/moin/PythonSpeed/PerformanceTips">http://wiki.python.org/moin/PythonSpeed/PerformanceTips</a>
+looks like a good place to start for speeding up my python code.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-19T07_53_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-19T08_57_12.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-19T06_55_41.txt" name="e2006-04-19T06_55_41.txt"></a>
+<h2 class="date">04.19.2006 06:55</h2>
+<div class="blogbody">
+<h3 class="title">Python performance testing</h3>
+<div class="item-description">
+Now comes the time when I need to start understand who costs what in
+python.  My log file parse runs <b>very</b> slow.  In working up this
+program, I was aiming to get the API and behavior correct
+all-the-while knowing that I was coding this the "slow" way.  I have a
+good sense of costs in the C/C++/Fortran worlds, but not yet in
+Python.  This is my chance to get to know it better.  I have a lot of
+searches through an element tree in this code that could be turned
+into much faster array or hash lookups.  array lookup tables would
+take a lot of the code from O(n) to O(1) and that O(1) would be with a
+very small constant.  To kick off the games, here is a graph of log
+files with increasing number of log entries.
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-04/speed-initial.gif">
+<br /><br />
+There are some interesting features to note.  First, here is the
+results from time for the 5000 line log file:
+<pre>
+1xG4 1.5GHz 137.85 real       131.15 user         0.97 sys
+4xG5 2.5GHz  92.57 real        92.09 user         0.28 sys
+</pre>
+<br /><br />
+Note that I am NOT doing any parallel processing in this python
+script.  I would expect that the 4xG5 would be at least 2 times faster
+than the G4 laptop.  The laptop has a slower memory bus which should
+really cause problems.  Not seeing such slowdown implies that most of
+this python program is staying in cache on the CPU.  This is not too
+surprising since all of the data structures are pretty small.  Looking
+at the time spent on system calls, it is plain to see that the 4xG5
+machine is generally much faster than the G4 almost by a factor of 4
+when dealing with OS level calls.  Another thing to note with these
+tests is that there is hardly any effort spent on disk IO.  The largest
+log file is 211KB.
+<br /><br />
+Finally, it is interesting no note that there is a knee in the graph
+at around 500 lines.  I believe that this comes from the number of
+time stamps in the log file.  Time stamps should take much less effort
+to process.
+<pre>Log 
+File               Percent
+Length  NumStamps  Time Stamps
+0001      0          0
+0002      1          0.5
+0003      1          0.333
+0004      2          0.5
+0005      2          0.4
+0010      5          0.5
+0020     10          0.5
+0030     15          0.5
+0040     20          0.5
+0050     25          0.5
+0100     50          0.5
+0200    100          0.5
+0300    150          0.5
+0400    200          0.5
+0500    250          0.5    Change in slope
+1000    596          0.596  starts here
+2000   1300          0.65
+3000   1960          0.653
+4000   2491          0.623
+5000   2991          0.598<pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-19T06_55_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-19T07_53_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-18T05_28_47.txt" name="e2006-04-18T05_28_47.txt"></a>
+<h2 class="date">04.18.2006 05:28</h2>
+<div class="blogbody">
+<h3 class="title">New UNH coastal lab</h3>
+<div class="item-description">
+<a href="">Groups monitor UNH plan for Odiorne lab</a>
+<pre>
+...
+Paul Chamberlin, the university interim assistant vice president for
+facilities, said the lab was originally going to be built near the
+New Castle Coast Guard Station, but neighboring historic structures
+prohibited it.
+<br /><br />
+"There were also some issues raised by New Castle," namely the size of
+the structure and increased traffic the lab would’ve brought,
+Chamberlin said. "A few folks were very vocal with their concerns."
+</pre>
+Now I am confused, since several of us have been counting on that lab
+going in New Castle.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-18T05_28_47.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-19T06_55_41.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-17T18_51_40.txt" name="e2006-04-17T18_51_40.txt"></a>
+<h2 class="date">04.17.2006 18:51</h2>
+<div class="blogbody">
+<h3 class="title">epydoc - new version</h3>
+<div class="item-description">
+<a href=http://epydoc.sourceforge.net/">epydoc 3.0alpha2</a> is out.
+It looks like Ed fixed up the couple bugs that I ran into.  I checked
+it into fink (and I fixed the source location typo... sorry about
+that).
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-17T18_51_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-18T05_28_47.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-16T11_15_04.txt" name="e2006-04-16T11_15_04.txt"></a>
+<h2 class="date">04.16.2006 11:15</h2>
+<div class="blogbody">
+<h3 class="title">Calendar Server?</h3>
+<div class="item-description">
+<a
+href="http://mirror.open-xchange.org/ox/EN/community/screenshots.htm">OpenExchange</a>
+may be that calendar system that I have been wanted.  Or maybe not.
+Now, can it integrate with trac?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-16T11_15_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-17T18_51_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-16T08_38_42.txt" name="e2006-04-16T08_38_42.txt"></a>
+<h2 class="date">04.16.2006 08:38</h2>
+<div class="blogbody">
+<h3 class="title">Porting to 64 bit machines</h3>
+<div class="item-description">
+The first time I used a 64-bit machine was back in the early 90's, but
+we as a community are still trying to get there.  I hardly used the 64
+bit libraries of the SGI, but now with 8 GB of RAM on one of my
+machines and problems that really need that RAM, I need to get back
+into the 64-bit game.
+<br /><br />
+<a
+href="http://www-128.ibm.com/developerworks/linux/library/l-port64.html">Porting
+Linux applications to 64-bit systems</a> [IBM DeveloperWorks]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-16T08_38_42.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-16T11_15_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-15T08_24_26.txt" name="e2006-04-15T08_24_26.txt"></a>
+<h2 class="date">04.15.2006 08:24</h2>
+<div class="blogbody">
+<h3 class="title">lxml</h3>
+<div class="item-description">
+<a href="http://codespeak.net/lxml/">lxml</a> looks like an
+interesting python interface to XML.  Of special interest is support
+of XML Schemas and Relax NG.  It is a superset of ElementTree which
+means that I should be able to switch to it without much hassle.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-15T08_24_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-16T08_38_42.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-13T11_23_30.txt" name="e2006-04-13T11_23_30.txt"></a>
+<h2 class="date">04.13.2006 11:23</h2>
+<div class="blogbody">
+<h3 class="title">Nationwide Automatic Identification System (NAIS)</h3>
+<div class="item-description">
+Check out this Coast Guard website on the <a
+href="http://www.uscg.mil/HQ/G-A/AIS/">National Automatic
+Identification System</a> (NAIS).  Not much information yet and they have
+some bugs with their JavaScript menus.  Hopefully, they will be adding
+more info soon.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-13T11_23_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-15T08_24_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-13T09_41_28.txt" name="e2006-04-13T09_41_28.txt"></a>
+<h2 class="date">04.13.2006 09:41</h2>
+<div class="blogbody">
+<h3 class="title">MapGuide</h3>
+<div class="item-description">
+<a href="https://mapguide.osgeo.org/">MapGuide</a> looks pretty
+interesting and is available under the LGPL license.
+<pre>
+MapGuide Open Source is a web-based platform that enables users to
+quickly develop and deploy web mapping applications and geospatial web
+services.
+<br /><br />
+MapGuide features an interactive viewer that includes support for
+feature selection, property inspection, map tips, and operations such
+as buffer, select within, and measure. MapGuide includes an XML
+database for storing and managing content, and supports most popular
+geospatial file formats, databases, and standards. The MapGuide
+platform can be deployed on Linux or Microsoft Windows, supports
+Apache and IIS web servers, and offers extensive PHP, .NET, Java, and
+JavaScript APIs for application development.
+<br /><br />
+MapGuide Open Source is free, open source software licensed under the
+LGPL.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-13T09_41_28.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-13T11_23_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-13T09_35_20.txt" name="e2006-04-13T09_35_20.txt"></a>
+<h2 class="date">04.13.2006 09:35</h2>
+<div class="blogbody">
+<h3 class="title">global view of ship locations</h3>
+<div class="item-description">
+Here is another project that I need to tap into...
+<br /><br />
+From <a href="http://ccablog.blogspot.com/2006/04/mapping-ship-locations.html">Mapping Ship Locations</a>
+<br /><br />
+<a href="http://www.sailwx.info/shiptrack/shiplocations.phtml">sailwx.info</a> which uses NOAA's VOS: <a href="http://vos.noaa.gov/vos_scheme.shtml">WMO Voluntary Observing Ships</a>
+<br /><br />
+Now I need a python interface to this data!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-13T09_35_20.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-13T09_41_28.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-13T08_15_59.txt" name="e2006-04-13T08_15_59.txt"></a>
+<h2 class="date">04.13.2006 08:15</h2>
+<div class="blogbody">
+<h3 class="title">type coercion in python</h3>
+<div class="item-description">
+Today's python problem is comparing values pulled out of XML fields.
+I pull out a field and run a translator on it which gives me a float,
+Decimal, integer, or string.  Then I pull from another location a
+value that I want to compare to the translated value.  The trouble is
+that this second value is always encoded in a string.  I want to do
+the comparison with a minimum of hassle, so I want to coerce the
+second value to the type of the first.  Confused yet?  Here is the
+python code that states the problem and shows the solution.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">#</font>
+<font color="#2040a0">a</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">b</font><font color="4444FF">=</font><font color="#008000">'1'</font>
+<font color="#444444">#</font>
+<strong>assert</strong> <font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">b</font><font color="4444FF">)</font>
+<strong>assert</strong> <font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">=</font><font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">b</font><font color="4444FF">)</font> <font color="4444FF">)</font>
+<strong>assert</strong> <font color="4444FF">(</font> <font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">b</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">b</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">b</font><font color="4444FF">)</font>, <font color="#2040a0">type</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">b</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">b</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">)</font>, <font color="#2040a0">type</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">b</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">a</font><font color="4444FF">)</font><font color="4444FF">)</font>
+</pre>
+When running this code, here is what I get:
+<pre>
+./t.py
+1 &lt;type 'int'&gt;
+1 &lt;type 'str'&gt;
+</pre>
+Now that I see the solution to this problem, I don't know why it took
+me so long to figure it out.  Perhaps because I have been a c
+programmer for almost 20 years.  Being able to do this kind of thing
+makes like so much easier in python.  I am sure I could do something
+clever in C or C++, but it would be so much more work.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-13T08_15_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-13T09_35_20.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-12T18_16_50.txt" name="e2006-04-12T18_16_50.txt"></a>
+<h2 class="date">04.12.2006 18:16</h2>
+<div class="blogbody">
+<h3 class="title">Suns XML modeling tools</h3>
+<div class="item-description">
+<a href="http://www.regdeveloper.co.uk/2006/04/12/sun_uml_eclipse/">Sun opens modeling tools</a>
+<pre>
+Tools for UML, XML and service orchestrated architectures (SOAs) will
+become the latest features in Sun Microsystems Java Studio Enterprise
+suite to be open sourced.
+...
+</pre>
+What exactly this is, I am not sure.  The whole Java world seems a bit
+strange to me and I am not totally sure how to get and install install
+Java tools.   Time to look at Eclipse again.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-12T18_16_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-13T08_15_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-12T07_54_25.txt" name="e2006-04-12T07_54_25.txt"></a>
+<h2 class="date">04.12.2006 07:54</h2>
+<div class="blogbody">
+<h3 class="title">pysqlite2-py24 in fink</h3>
+<div class="item-description">
+I have stopped putting python 2.3 in my python based packages.  I
+figure less clutter for fink and few maintence issues.  The one
+drawback is that Mac OSX still has python 2.3 and no python 2.4.
+(Grr)
+<br /><br />
+The announcement for this morning is that pysqlite2-py24 is now in
+fink 10.4-transitional/unstable.  Trac users be warned.  If you
+install this and your database is in sqlite2 format with pysqlite,
+when you restart trac it will bomb out.  Here is how to upgrade your
+database:
+<pre>
+  $ mv trac.db trac2.db
+  $ sqlite trac2.db .dump | sqlite3 trac.db
+</pre>
+Which comes from <a href="http://projects.edgewall.com/trac/wiki/PySqlite">http://projects.edgewall.com/trac/wiki/PySqlite</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-12T07_54_25.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-12T18_16_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-11T22_02_45.txt" name="e2006-04-11T22_02_45.txt"></a>
+<h2 class="date">04.11.2006 22:02</h2>
+<div class="blogbody">
+<h3 class="title">MMI - Marine Metadata Interoperability</h3>
+<div class="item-description">
+<a href="http://marinemetadata.org/">http://marinemetadata.org/</a> -
+Looks interesting, but I have not dug into it yet.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-11T22_02_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-12T07_54_25.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-11T21_53_56.txt" name="e2006-04-11T21_53_56.txt"></a>
+<h2 class="date">04.11.2006 21:53</h2>
+<div class="blogbody">
+<h3 class="title">SensorML</h3>
+<div class="item-description">
+Draft spec that Myche pointed me to:
+<br /><br />
+<a href="http://www.opengeospatial.org/specs/?page=requests&request=rfpc31">http://www.opengeospatial.org/specs/?page=requests&request=rfpc31</a>
+<br /><br />
+OGC Request 31: OpenGIS Sensor Model Language (SensorML): Request for Public Comments
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-11T21_53_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-11T22_02_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-11T18_59_54.txt" name="e2006-04-11T18_59_54.txt"></a>
+<h2 class="date">04.11.2006 18:59</h2>
+<div class="blogbody">
+<h3 class="title">Little OpenInventor Visualization</h3>
+<div class="item-description">
+Here is a quick and dirty OpenInventor file to view a sequence of
+images.  Dirty is the key word.  Everything is hard coded.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>print</strong> <font color="#008000">&quot;#Inventor V2.0 ascii&quot;</font>
+<strong>import</strong> <font color="#2040a0">glob</font>
+<font color="#2040a0">files</font> <font color="4444FF">=</font> <font color="#2040a0">glob</font>.<font color="#2040a0">glob</font><font color="4444FF">(</font><font color="#008000">'*.png'</font><font color="4444FF">)</font>
+<font color="#2040a0">offset</font> <font color="4444FF">=</font> <font color="4444FF">-</font><font color="#FF0000">500</font>
+<strong>for</strong> <font color="#2040a0">file</font> <strong>in</strong> <font color="#2040a0">files</font><font color="4444FF">:</font>
+    <font color="#2040a0">offset</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">100</font>
+    <strong>print</strong> <font color="#008000">''</font><font color="#008000">'Separator {'</font><font color="#008000">''</font>
+    <strong>if</strong> <font color="#2040a0">abs</font><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">50</font><font color="4444FF">:</font>
+	<strong>print</strong> <font color="#008000">''</font><font color="#008000">'	Material {transparency 0.8}'</font><font color="#008000">''</font>
+    <strong>print</strong> <font color="#008000">''</font><font color="#008000">'
+        Translation {translation 0 '</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">' 0 }
+	Coordinate3 { point [ 0. 0. 0.0, 340 0.0 0.0,
+		  0. 0. -200, 340 0.0 -200 ] }
+	BaseColor { rgb [ 0.5 0.5 0.5 ] }
+	Texture2 { filename &quot;'</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">file</font><font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'&quot; model DECAL }
+	TextureCoordinate2 { point [
+		0.0 1.0,
+		1.0 1.0,
+		0.0 0.0,
+		1.0 0.0,
+	] }
+	IndexedFaceSet { coordIndex [ 0, 1, 2, -1,
+				      1, 3, 2, -1 ]}
+	IndexedLineSet { coordIndex [ 0, 1, 3, 2, 0 ] }
+}'</font><font color="#008000">''</font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-11T18_59_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-11T21_53_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-11T17_17_52.txt" name="e2006-04-11T17_17_52.txt"></a>
+<h2 class="date">04.11.2006 17:17</h2>
+<div class="blogbody">
+<h3 class="title">USB gadgets</h3>
+<div class="item-description">
+Just saw a little <a href="http://www.phidgets.com/">phidgets.com</a>
+USB board.  Turns out the support Mac OSX and Linux.  Like I need
+more projects, but looks cool and reasonably cheap.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-11T17_17_52.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-11T18_59_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-11T13_45_36.txt" name="e2006-04-11T13_45_36.txt"></a>
+<h2 class="date">04.11.2006 13:45</h2>
+<div class="blogbody">
+<h3 class="title">python eval</h3>
+<div class="item-description">
+Python's eval function is pretty handy...
+<pre>
+from math import *
+value = 50
+eval ('4.733*sqrt(value)')
+<br /><br />
+33.467363953559293
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-11T13_45_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-11T17_17_52.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-11T09_31_18.txt" name="e2006-04-11T09_31_18.txt"></a>
+<h2 class="date">04.11.2006 09:31</h2>
+<div class="blogbody">
+<h3 class="title">Virtual Globes Science Conference</h3>
+<div class="item-description">
+Too many interesting things, not enough time.
+<pre>
+Conference Announcement
+Virtual Globes Scientific Users
+10-12 July 2006
+Boulder, Colorado
+<br /><br />
+Registration Deadline: Friday, 9 June 2006
+<br /><br />
+Further details on the conference, registration, and venue are available at:
+http://www.earthslot.org/vgconference/registration.php
+<hr>
+The first annual Virtual Globes Scientific Users conference will be held
+10-12 July 2006 in Boulder, Colorado. The intended goal of this
+conference is to assess the state-of-the-art in the use of online
+Virtual Globes (VGs) in support of earth sciences.
+<br /><br />
+Earth sciences here should be interpreted broadly as including any
+aspect of the earth system, whether the focus is on land, oceans, or
+atmosphere or on physical, chemical, or biological processes. Virtual
+Globes in this context include any online tool which allows the user
+free-access to see a spinning globe at space level and interactively fly
+down to surface level with 3D perspective (such tools currently include
+Google Earth, World Wind, EarthSLOT, GeoFusion, and others). VGs are
+quickly becoming the new paradigm in earth science, earth science
+education and outreach, earth science logistics, and earth science data
+access.
+<br /><br />
+This conference will address questions such as:
+- How are these tools currently being used in earth sciences?
+- How do they work?
+- How have they changed earth sciences?
+- What needs of earth sciences are currently not being met by the
+existing tools?
+- What should we expect for the future and what role should we play in
+it?
+<br /><br />
+Organizers are interested in not just seeing final products, but also
+the tips, tricks, and traps that go into building such applications, as
+well as higher-level perspectives on how these tools may shape the
+future. As such, they hope to bring together earth scientists,
+educators, and related individuals who are currently using or planning
+to use VGs to support their work, with the intent of facilitating the
+formation of a community that can serve as a nucleus for support,
+discussion, promotion, and enhancement of use of VGs in the earth
+sciences. Part of this community-building effort will be a compilation
+of applications, websites, tutorials, etc., that can serve as a resource
+for future developments or earth-science events, such as the upcoming
+International Polar Year.
+<br /><br />
+The conference will consist of 15-minute presentations, an interactive
+poster/laptop session, and several invited plenary talks. The
+presentations can cover any aspects of how VGs are being used to support
+earth scientists, educators, logisticians, data archivists, program
+managers, or the public. Internet will be available for presentations.
+Those presenting in the interactive session can either hang posters or
+use their wireless-enabled laptops. Several invited talks by VG software
+developers are also planned.
+<br /><br />
+Space is limited, so registration is required, even for those not
+presenting. The registration deadline is Friday, 9 June 2006. Attendees
+are responsible for their own travel, lodging, and meal expenses.
+<br /><br />
+Further details on the conference, registration, and venue are available at:
+<a href="http://www.earthslot.org/vgconference/registration.php">http://www.earthslot.org/vgconference/registration.php</a>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-11T09_31_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-11T13_45_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-11T09_16_43.txt" name="e2006-04-11T09_16_43.txt"></a>
+<h2 class="date">04.11.2006 09:16</h2>
+<div class="blogbody">
+<h3 class="title">wxOptParse</h3>
+<div class="item-description">
+I just did a first pass at packaging wxOptParse.  I have GLib poll
+issues, but otherwise it seems to work.
+<pre>
+GLib-WARNING **: poll(2) failed due to: Invalid argument.
+</pre>
+<a href="http://schwehr.org/software/fink/wxoptparse-py.info">http://schwehr.org/software/fink/wxoptparse-py.info</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-11T09_16_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-11T09_31_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-10T19_52_36.txt" name="e2006-04-10T19_52_36.txt"></a>
+<h2 class="date">04.10.2006 19:52</h2>
+<div class="blogbody">
+<h3 class="title">quickstart trac</h3>
+<div class="item-description">
+I am working on what happens with trac when the pysqlite2 db driver is
+added after initial startup.  Here is my setup on Mac OSX 10.4.x:
+<pre>
+cd ~/Desktop
+mkdir trac
+cd trac
+mkdir svnroot
+cd svnroot
+svnadmin create `pwd`
+cd ..
+trac-admin ${HOME}/Desktop/trac/tracfoo initenv
+  Defaults for all except:
+  Path to repository &gt; YOURHOMEDIR/Desktop/trac/svnroot
+tracd --port 8000 /Users/schwehr/Desktop/trac/tracfoo
+open http://localhost:8000/tracfoo
+</pre>
+Now to install the pysqlite driver:
+<pre>
+fink install pysqlite2-py24
+  
+tracd --port 8000 /Users/schwehr/Desktop/trac/tracfoo &
+<br /><br />
+open http://localhost:8000/tracfoo
+<br /><br />
+Available Projects
+    * tracfoo: Error
+      (file is encrypted or is not a database) 
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-10T19_52_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-11T09_16_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-10T15_59_45.txt" name="e2006-04-10T15_59_45.txt"></a>
+<h2 class="date">04.10.2006 15:59</h2>
+<div class="blogbody">
+<h3 class="title">DOD meta data clearing house</h3>
+<div class="item-description">
+<a href="http://metadata.dod.mil/">http://metadata.dod.mil/</a>
+<br /><br />
+<pre>
+Welcome to the DoD Metadata Registry and Clearinghouse!
+<br /><br />
+The DoD Metadata Registry and Clearinghouse provides software
+developers access to data technologies to support DoD mission
+applications. Through the Metadata Registry and Clearinghouse,
+software developers can access registered XML data and metadata
+components, COE database segments, and reference data tables and
+related metadata information such as country codes and U.S. state
+codes. These data technologies increase the DoD's core capabilities by
+integrating common data, packaging database servers, implementing
+transformation media and using Enterprise data services built from
+"plug-and-play" components and data access components.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-10T15_59_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-10T19_52_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-10T14_13_55.txt" name="e2006-04-10T14_13_55.txt"></a>
+<h2 class="date">04.10.2006 14:13</h2>
+<div class="blogbody">
+<h3 class="title">New Methods Being Used to Support AIS Data Sharing</h3>
+<div class="item-description">
+<pre>
+New Methods Being Used to Support AIS Data Sharing
+<br /><br />
+In an effort to better share information amongst organizations that
+produce or consume data to enable maritime domain awareness (MDA), RDC
+is supporting the development of the MDA Data Sharing Community of
+Interest (DS COI).  Immediate efforts are focused on the development
+of a common data vocabulary and a pilot project for AIS information.
+The goal of the pilot project is to access AIS information from more
+than one producer and make that information available to more than one
+data consumer.  The pilot team, led by Navy SPAWAR PEO-C4I and Space
+ISR (PMW-180), intends to use the net-centric infrastructure developed
+by the DOD Defense Information Systems Agency to connect Navy (SPAWAR)
+and RDC AIS information and make it available in XML format.  Data
+consumer applications with access rights could then discover and
+connect to the data producers enabling this new approach to share
+information across DOD and DHS.
+<br /><br />
+Project:        Automatic Identification System Research and Development (2410.5)
+<br /><br />
+RDC POC:        Mr. Jay Spalding
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-10T14_13_55.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-10T15_59_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-10T07_52_54.txt" name="e2006-04-10T07_52_54.txt"></a>
+<h2 class="date">04.10.2006 07:52</h2>
+<div class="blogbody">
+<h3 class="title">svn keyword properties</h3>
+<div class="item-description">
+In order to use keywork substitution in svn like what is available by
+default in CVS (which is not a good thing to have automatically turned
+on), you need to use a svn command like this:
+<pre>
+  svn propset svn:keywords "Revision Date" myfile.py
+  svn commit -m "added keywords" myfile.py
+</pre>
+Which ended up doing something like this:
+<pre>
+  __version__ = '$Revision: 347 $'.split()[1]
+  __date__ = '$Date: 2006-03-31 10:00:27 -0500 (Fri, 31 Mar 2006) $'.split()[1]
+  __author__ = 'Kurt Schwehr'
+</pre>
+Too bad epydoc currently does not understand that I want my __version__
+to be just 347.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-10T07_52_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-10T14_13_55.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-10T06_36_27.txt" name="e2006-04-10T06_36_27.txt"></a>
+<h2 class="date">04.10.2006 06:36</h2>
+<div class="blogbody">
+<h3 class="title">relax ng</h3>
+<div class="item-description">
+I have yet to see a good discussion as to which Schema language is the
+best.  I wrote my first (and only so far) schema in XML Schema.  The
+RELAX NG ("relaxing") home page is <a
+href="http://relaxng.org/">http://relaxng.org/</a>
+<br /><br />
+The list of software tools on that site is intriguing.  Sun has <a
+href="http://www.sun.com/software/xml/developers/relaxngconverter/">relaxngconverter</a>
+to convert from other schema languages to RELAX NG.  libxml2 is
+supposed to know about Relax NG and there is the <a
+href="http://www.thaiopensource.com/relaxng/jing.html">Jing</a>
+validator.  Finally, <a
+href="http://www.xmloperator.net/i2s/">isntancetoschema</a> (i2s)
+makes Relax NG schemas from XML documents.  That would have been great
+for my first project!  Is there something like that for XML Schema?
+<br /><br />
+And finally, the main reason I should pay attention to Relax NG is
+that there is a schema for XML Schema... <a
+href="http://www.jenitennison.com/schema/xmlschema.rng">xmlsschema.rng</a>
+<br /><br />
+Now how do I use libxml2 to validate my schema with a schema?  Ah,
+finally found <a
+href="http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#normative-schemaSchema">http://www.w3.org/TR/2001/REC-xmlschema-1-20010502/#normative-schemaSchema</a>
+which is the schema for XML schemas.  Doh!  Where exactly is
+datatypes.xsd that is required for the normative schema?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-10T06_36_27.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-10T07_52_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-10T06_23_40.txt" name="e2006-04-10T06_23_40.txt"></a>
+<h2 class="date">04.10.2006 06:23</h2>
+<div class="blogbody">
+<h3 class="title">xml schema faq</h3>
+<div class="item-description">
+<a href="http://www.schemavalid.com/faq/xml-schema.html">http://www.schemavalid.com/faq/xml-schema.html</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-10T06_23_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-10T06_36_27.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-10T06_18_43.txt" name="e2006-04-10T06_18_43.txt"></a>
+<h2 class="date">04.10.2006 06:18</h2>
+<div class="blogbody">
+<h3 class="title">including xml within xml</h3>
+<div class="item-description">
+Val showed me how to do this last week, but I stumbled across a good
+web page description of including one xml file in another.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!DOCTYPE</font> <font color="#2040a0">novel</font> <font color="#2040a0">SYSTEM</font> <font color="#008000">&quot;/dtd/novel.dtd&quot;</font> <font color="#2040a0">[
+&lt;!ENTITY</font> <font color="#2040a0">chap1</font> <font color="#2040a0">SYSTEM</font> <font color="#008000">&quot;mydocs/chapter1.xml&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!ENTITY</font> <font color="#2040a0">chap2</font> <font color="#2040a0">SYSTEM</font> <font color="#008000">&quot;mydocs/chapter2.xml&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!ENTITY</font> <font color="#2040a0">chap3</font> <font color="#2040a0">SYSTEM</font> <font color="#008000">&quot;mydocs/chapter3.xml&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!ENTITY</font> <font color="#2040a0">chap4</font> <font color="#2040a0">SYSTEM</font> <font color="#008000">&quot;mydocs/chapter4.xml&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!ENTITY</font> <font color="#2040a0">chap5</font> <font color="#2040a0">SYSTEM</font> <font color="#008000">&quot;mydocs/chapter5.xml&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+]&gt;
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">novel</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">header</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    ...blah blah...
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/header</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="ff0000">&amp;chap1;</font> 
+<font color="ff0000">&amp;chap2;</font> 
+<font color="ff0000">&amp;chap3;</font> 
+<font color="ff0000">&amp;chap4;</font> 
+<font color="ff0000">&amp;chap5;</font> 
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/novel</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+from <a href="http://xml.silmaril.ie/authors/includes/">http://xml.silmaril.ie/authors/includes/</a>.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-10T06_18_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-10T06_23_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-09T08_12_43.txt" name="e2006-04-09T08_12_43.txt"></a>
+<h2 class="date">04.09.2006 08:12</h2>
+<div class="blogbody">
+<h3 class="title">simple enum</h3>
+<div class="item-description">
+I am not sure this is exactly how it should be done, but here is a
+pretty stripped down example of xml enums.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:schema</font> <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;SONG&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;songType&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<br /><br />
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:simpleType</font> <font color="#2040a0">name=</font><font color="#008000">&quot;oligopolyMember&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:restriction</font> <font color="#2040a0">base=</font><font color="#008000">&quot;xsd:string&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:enumeration</font> <font color="#2040a0">value=</font><font color="#008000">&quot;Capitol Records, Inc.&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:enumeration</font> <font color="#2040a0">value=</font><font color="#008000">&quot;BMG Music&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:restriction</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:simpleType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font> 
+ 
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font> <font color="#2040a0">name=</font><font color="#008000">&quot;songType&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;PUBLISHER&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;oligopolyMember&quot;</font> <font color="#2040a0">
+</font>        <font color="#2040a0">minOccurs=</font><font color="#008000">&quot;0&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+ 
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+With the above xsd schema file, this validates:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">SONG</font> <font color="#2040a0">xmlns:xsi=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>BMG Music<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/SONG</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+and this fails to validate...
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">SONG</font> <font color="#2040a0">xmlns:xsi=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>foo<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/SONG</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+like so:
+<pre>
+xmllint --schema enum.xsd enum.xml
+<br /><br />
+enum.xml:3: element PUBLISHER: Schemas validity error : 
+    Element 'PUBLISHER': [facet 'enumeration'] 
+       The value 'foo' is not an element of the set 
+         {'Capitol Records, Inc.', 'BMG Music'}.
+enum.xml:3: element PUBLISHER: Schemas validity error : 
+    Element 'PUBLISHER': 'foo' is not a valid value of the atomic type 
+       'oligopolyMember'.
+enum.xml fails to validate
+</pre>
+I started with an example from this web page, but it was too complicated, so I stripped it down... <a href="http://www.cafeconleche.org/slides/xmlonelondon2001/schemas/38.html">http://www.cafeconleche.org/slides/xmlonelondon2001/schemas/38.html</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-09T08_12_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-10T06_18_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-09T06_29_26.txt" name="e2006-04-09T06_29_26.txt"></a>
+<h2 class="date">04.09.2006 06:29</h2>
+<div class="blogbody">
+<h3 class="title">SIO on the Apple web page</h3>
+<div class="item-description">
+There is a nice article on the Apple Science web site about SIO.  It
+includes pictures of Atul Nayak, Debi Kilb, Graham Kent, and John
+Orcutt.  It also looks like Bridget Smith's thesis work in the first
+image.
+<br /><br />
+<a href="http://www.apple.com/science/profiles/sio/">Scripps Institution of Oceanography - Seeing the Big Picture</a> [apple.com]
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-04/sio-apple.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-09T06_29_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-09T08_12_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-08T21_32_06.txt" name="e2006-04-08T21_32_06.txt"></a>
+<h2 class="date">04.08.2006 21:32</h2>
+<div class="blogbody">
+<h3 class="title">Subscribing to news groups</h3>
+<div class="item-description">
+I haven't "subscribed" to a news group for the first time in about 10
+years.  At Stanford, I subscribed to the ir news group that mirrored and bridged
+the Sweet Hall question/answer email.  I learned a lot of my unix
+skills there.  Now with google groups, there is a little XML button at
+the bottom of the page for each group.  I subscribed to
+comp.lang.python and comp.lang.xml.  How long until I get overloaded
+and start nuking feeds?  Probably not long.
+<br /><br />
+Flash backs to the days of when 36.x.x.x was all Stanford, afs rocked,
+and the "cool kids" hung out in the secret SGI workstation rooms.
+Nothing like an all nighter in the basement of the CS building.  And
+no, I don't mean the Gates building.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-08T21_32_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-09T06_29_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-08T07_09_06.txt" name="e2006-04-08T07_09_06.txt"></a>
+<h2 class="date">04.08.2006 07:09</h2>
+<div class="blogbody">
+<h3 class="title">National Geologic Map Database</h3>
+<div class="item-description">
+I was all excited to find this web page: <a
+href="http://ngmdb.usgs.gov/ImageLibrary/index_html">NGMDB</a> - the
+national geologic map database.  Then I discoved that there are no
+maps in the area that I live and work.  The overall US coverage is
+very weak and it is sad to say that my GIS work will never make it in
+there.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-08T07_09_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-08T21_32_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-07T09_53_42.txt" name="e2006-04-07T09_53_42.txt"></a>
+<h2 class="date">04.07.2006 09:53</h2>
+<div class="blogbody">
+<h3 class="title">VoidSpace python coding style</h3>
+<div class="item-description">
+I don't totally agree with all of his guidelines, but VoidSpace has his: <a href="http://www.voidspace.org.uk/python/weblog/arch_d7_2006_04_01.shtml#e296">style guide</a>
+<br /><br />
+Also, 
+<a href="http://jaynes.colorado.edu/PythonIdioms.html">PythonIdioms</a> has things like:
+<pre>
+<b>Wrong:</b>
+for s in strings: result += s
+<b>Right:</b>
+result = ''.join(strings)
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-07T09_53_42.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-08T07_09_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-07T09_39_34.txt" name="e2006-04-07T09_39_34.txt"></a>
+<h2 class="date">04.07.2006 09:39</h2>
+<div class="blogbody">
+<h3 class="title">SnowFlake GML viewer</h3>
+<div class="item-description">
+SnowFlake has a free (?) <a
+href="http://www.snowflakesoftware.co.uk/products/gmlviewer/index.htm">GMLViewer</a>
+that includes Mac, Linux, and MS Windows support.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-07T09_39_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-07T09_53_42.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-07T08_13_17.txt" name="e2006-04-07T08_13_17.txt"></a>
+<h2 class="date">04.07.2006 08:13</h2>
+<div class="blogbody">
+<h3 class="title">using name rather than ref</h3>
+<div class="item-description">
+Now that I have a base that I know works, it is much easier to try
+things out.  The first thing to try is to switch from ref attributes
+that require a reference definition in the document to named ones.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">'1.0'</font> <font color="#2040a0">encoding=</font><font color="#008000">'UTF-8'</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:schema</font> <font color="#2040a0">xmlns:xs=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font> <font color="#2040a0">blockDefault=</font><font color="#008000">&quot;#all&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">elementFormDefault=</font><font color="#008000">&quot;qualified&quot;</font> <font color="#2040a0">xml:lang=</font><font color="#008000">&quot;EN&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">version=</font><font color="#008000">&quot;Id: structures.xsd,v 1.2 2004/01/15 11:34:25 ht Exp &quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;ais&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:complexContent</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:extension</font> <font color="#2040a0">base=</font><font color="#008000">&quot;xs:anyType&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;version&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;date&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:extension</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:complexContent</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Where I removed these from the previous version:
+<pre>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">ref=</font><font color="#008000">&quot;version&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">ref=</font><font color="#008000">&quot;date&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;version&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;date&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-07T08_13_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-07T09_39_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-07T07_55_08.txt" name="e2006-04-07T07_55_08.txt"></a>
+<h2 class="date">04.07.2006 07:55</h2>
+<div class="blogbody">
+<h3 class="title">xml documentation</h3>
+<div class="item-description">
+<a href="http://www.xml.com">xml.com</a> seems like a good place to
+start reading in addition to the O'Rielly Learning XML book, the
+Visual Quickstart XML book is a good companion (for me so far).
+However, the Visual Quickstart is definitely not a stand-alone book
+for the beginner.  I need complete examples.  Is there a tutorial out
+there that talks about learning, building, and validating DTDs and
+Schemas all at the same time?
+<br /><br />
+<a href="http://www.oreilly.com/pub/topic/xml">http://www.oreilly.com/pub/topic/xml</a>
+<br /><br />
+For the Mac, <a href="http://www.oxygenxml.com/">OxygenXML</a> looks
+pretty good. 
+<br /><br />
+I tried <a href="http://xmlnanny.com/">xmlNanny</a>, but
+got tons of errors that I did not understand.  Not much info in that
+tool.  Maybe it is good for web pages?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-07T07_55_08.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-07T08_13_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-07T07_11_58.txt" name="e2006-04-07T07_11_58.txt"></a>
+<h2 class="date">04.07.2006 07:11</h2>
+<div class="blogbody">
+<h3 class="title">xsv works</h3>
+<div class="item-description">
+I just got the xsv command line program properly built and it now
+"works for me."  You will need ltxml.info, pyltxml-py.info, and
+xsv-py.info from <a
+href="http://schwehr.org/software/fink">http://schwehr.org/software/fink</a>
+<pre>
+  fink install ltxml pyltxml-py24 xsv-py24
+  wget http://www.xml.com/2000/11/29/schemas/library1.xsd
+  xsv library1.xsd
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-07T07_11_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-07T07_55_08.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-06T15_04_03.txt" name="e2006-04-06T15_04_03.txt"></a>
+<h2 class="date">04.06.2006 15:04</h2>
+<div class="blogbody">
+<h3 class="title">ajax library</h3>
+<div class="item-description">
+I was told today that the best/most popular AJAX javascript library is
+<a href="http://prototype.conio.net/">prototype</a> but there are also
+libraries named RICO, DWR, JSON, and AFLAX.  I really don't know
+anything about writing AJAX type web applications at this point.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-06T15_04_03.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-07T07_11_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-06T15_00_26.txt" name="e2006-04-06T15_00_26.txt"></a>
+<h2 class="date">04.06.2006 15:00</h2>
+<div class="blogbody">
+<h3 class="title">ltxml and xsv</h3>
+<div class="item-description">
+I just created fink packages for ltxml and xsv-py since there was talk
+about xsv being a good tool for xsd schema validation.  These are
+pretty rough.
+<ul>
+<li><a href="http://schwehr.org/software/fink/xsv-py.info">http://schwehr.org/software/fink/xsv-py.info</a></li>
+<li><a href="http://schwehr.org/software/fink/ltxml.info">http://schwehr.org/software/fink/ltxml.info</a></li>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-06T15_00_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-06T15_04_03.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-06T14_49_03.txt" name="e2006-04-06T14_49_03.txt"></a>
+<h2 class="date">04.06.2006 14:49</h2>
+<div class="blogbody">
+<h3 class="title">ESRI arcwebservices</h3>
+<div class="item-description">
+Went to a talk today by a guy from ESRI.  <a href="http://www2.arcwebservices.com/explorer/index.jsp">http://www2.arcwebservices.com/explorer/index.jsp</a>
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-04/arcwebserv.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-06T14_49_03.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-06T15_00_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-06T11_09_22.txt" name="e2006-04-06T11_09_22.txt"></a>
+<h2 class="date">04.06.2006 11:09</h2>
+<div class="blogbody">
+<h3 class="title">xml part 3 - attributes</h3>
+<div class="item-description">
+Brian and I got a schema to work that adds two attributes to to root
+level ais tag.  It has been a tough couple of hours trying to
+understand what is going on (which I am pretty sure I still do not
+understand this).  To start with, I have a new Makefile validation rule:
+<pre>
+<font color="8b2252"><strong>validate</strong>:</font>
+	xmllint ais.xsd
+	xmllint ais.xml
+	xmllint --schema ais.xsd ais.xml
+	xml val -e ais.xml
+	xml val -e ais.xsd
+	xml val -e --xsd ais.xsd ais.xml
+</pre>
+Then the new xml that needs to be validated includes version and date
+attributes.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ais</font> <font color="#2040a0">xmlns:xsi=</font><font color="#008000">&quot;http://www.w3.org/2000/10/XMLSchema-instance&quot;</font><font color="#2040a0">
+</font>     <font color="#2040a0">xsi:noNamespaceSchemaLocation=</font><font color="#008000">&quot;ais.xsd&quot;</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">date=</font><font color="#008000">&quot;2006-Apr-04&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<br /><br />
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ais</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Here is the xsd schema that we came up with thanks to E. Castro's book.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">'1.0'</font> <font color="#2040a0">encoding=</font><font color="#008000">'UTF-8'</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:schema</font> <font color="#2040a0">xmlns:xs=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font> <font color="#2040a0">blockDefault=</font><font color="#008000">&quot;#all&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">elementFormDefault=</font><font color="#008000">&quot;qualified&quot;</font> <font color="#2040a0">xml:lang=</font><font color="#008000">&quot;EN&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">version=</font><font color="#008000">&quot;Id: structures.xsd,v 1.2 2004/01/15 11:34:25 ht Exp &quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;ais&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:complexContent</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:extension</font> <font color="#2040a0">base=</font><font color="#008000">&quot;xs:anyType&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">ref=</font><font color="#008000">&quot;version&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">ref=</font><font color="#008000">&quot;date&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:extension</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:complexContent</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;version&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;date&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xs:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-06T11_09_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-06T14_49_03.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-06T11_07_09.txt" name="e2006-04-06T11_07_09.txt"></a>
+<h2 class="date">04.06.2006 11:07</h2>
+<div class="blogbody">
+<h3 class="title">Seacoast to get new aerial photos</h3>
+<div class="item-description">
+<a href="http://www.seacoastonline.com/news/04062006/news/96264.htm">Seacoast towns to update aerial photos</a> [Sea Coast Online]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-06T11_07_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-06T11_09_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-06T10_25_00.txt" name="e2006-04-06T10_25_00.txt"></a>
+<h2 class="date">04.06.2006 10:25</h2>
+<div class="blogbody">
+<h3 class="title">xml try number 2</h3>
+<div class="item-description">
+<br /><br />
+ais.xsd
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">'1.0'</font> <font color="#2040a0">encoding=</font><font color="#008000">'UTF-8'</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:schema</font> <font color="#2040a0">xmlns:xs=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font> <font color="#2040a0">blockDefault=</font><font color="#008000">&quot;#all&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">elementFormDefault=</font><font color="#008000">&quot;qualified&quot;</font> <font color="#2040a0">xml:lang=</font><font color="#008000">&quot;EN&quot;</font><font color="#2040a0">
+</font>           <font color="#2040a0">version=</font><font color="#008000">&quot;Id: structures.xsd,v 1.2 2004/01/15 11:34:25 ht Exp &quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xs:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;ais&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xs:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+ais.xml
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ais</font> <font color="#2040a0">xmlns:xsi=</font><font color="#008000">&quot;http://www.w3.org/2000/10/XMLSchema-instance&quot;</font><font color="#2040a0">
+</font>   <font color="#2040a0">xsi:noNamespaceSchemaLocation=</font><font color="#008000">&quot;ais.xsd&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ais</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+seems to validate okay with these two commands:
+<pre>
+xmllint --schema ais.xsd ais.xml
+xml val -e --xsd ais.xsd ais.xml
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-06T10_25_00.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-06T11_07_09.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-05T15_16_45.txt" name="e2006-04-05T15_16_45.txt"></a>
+<h2 class="date">04.05.2006 15:16</h2>
+<div class="blogbody">
+<h3 class="title">GML - Geography Markup Language</h3>
+<div class="item-description">
+I just grabbed the GML zip with schemas and a <b>600+</b> page pdf
+describing the language from <a
+href="http://opengis.net/gml/">http://opengis.net/gml/</a>.  That is a
+monster.  But it has quite a few xsd files that should hopefully make
+things easier to understand.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-05T15_16_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-06T10_25_00.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-05T14_08_58.txt" name="e2006-04-05T14_08_58.txt"></a>
+<h2 class="date">04.05.2006 14:08</h2>
+<div class="blogbody">
+<h3 class="title">simplest xsd schema example</h3>
+<div class="item-description">
+In my quest to get this stuff figured out, here is the simplest
+example that I can come up with that validates.  First the GNU Makefile:
+<pre>
+<font color="8b2252"><strong>validate</strong>:</font>
+	xmllint ais.xsd
+	xmllint ais.xml
+	xml val -e --xsd ais.xsd ais.xml
+<font color="8b2252">
+<strong>html</strong>:</font>
+	code2html -l html ais.xsd &gt; ais.xsd.html
+	code2html -l html ais.xml &gt; ais.xml.html
+	code2html Makefile &gt; Makefile.html
+<font color="8b2252">
+<strong>clean</strong>:</font>
+	rm *.html
+</pre>
+I like the idea of validating with multiple tools.  The more checks
+the better and if there is an error, one program may have a more
+comprehensible error message.  Now the xsd schema.  This is not much.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:schema</font> <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;ais&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Finally, the xml document:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ais</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ais</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-05T14_08_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-05T15_16_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-05T13_39_19.txt" name="e2006-04-05T13_39_19.txt"></a>
+<h2 class="date">04.05.2006 13:39</h2>
+<div class="blogbody">
+<h3 class="title">xml acryonym soup</h3>
+<div class="item-description">
+<br /><br />
+I feel like I am lost in NASA documentation where I need a lookup
+table of acronyms to understand what I am reading about.  What am I
+trying to do?  I just want to create an xml schema that can validate a
+new xml fomatted config file that I am working on.  How hard can that
+be?  Well, I got lost for a couple hours.  Then I found <a
+href="http://xmlstar.sourceforge.net/doc/xmlstarlet.txt">xmlstartlet.txt</a>.
+What is so good about it?  Just the existance of test cases that work
+from the command line...  and it provides the input files.
+<pre>
+   xml val -s xsd/table.xsd xml/table.xml
+</pre>
+I was trying to write a schema and all xmllint would tell me is that
+it thought my file was not a schema.  Thanks.
+<br /><br />
+For your viewing pleasure, here is the table example xsd (the schema
+to validate against) and a sample document.  table.xsd:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:schema</font> <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;xml&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;table&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;rec&quot;</font> <font color="#2040a0">maxOccurs=</font><font color="#008000">&quot;unbounded&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;numField&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xsd:int&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;stringField&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xsd:string&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:attribute</font> <font color="#2040a0">name=</font><font color="#008000">&quot;id&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;xsd:NMTOKEN&quot;</font> <font color="#2040a0">use=</font><font color="#008000">&quot;required&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+and table.xml
+<pre>
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xml</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">table</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">rec</font> <font color="#2040a0">id=</font><font color="#008000">&quot;1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>123<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>String Value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/rec</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">rec</font> <font color="#2040a0">id=</font><font color="#008000">&quot;2&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>346<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Text Value<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/rec</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">rec</font> <font color="#2040a0">id=</font><font color="#008000">&quot;3&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>-23<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/numField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>stringValue<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/stringField</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/rec</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/table</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xml</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Maybe now I can make some progress!
+<br /><br />
+xmlstarlet looks like it does quite a bit of jobs with xml.  I have a
+feeling that I will be using it a fair bit in the near future.  Maybe
+I can make a few schemas for geozui if they do not already exist.
+<br /><br />
+<a href="http://freshmeat.net/projects/xsddoc/">xsddoc</a> might also
+be handy, but being that it is in java, I need to hold off a bit
+before packaging it.  The output is nice.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-05T13_39_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-05T14_08_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-04T19_56_50.txt" name="e2006-04-04T19_56_50.txt"></a>
+<h2 class="date">04.04.2006 19:56</h2>
+<div class="blogbody">
+<h3 class="title">Open Source security strategy</h3>
+<div class="item-description">
+<a href="http://www.osnews.com/story.php?news_id=14227">  Open Source Security Testing Methodology Manual</a> [osnew]
+<pre>
+  ISECOM is an open, collaborative, security research community
+  established in January 2001. Recently, Pete Herzog, founder of
+  ISECOM and creator of the OSSTMM, talked about the upcoming revision
+  3.0 of the Open Source Security Testing Methodology Manual. He
+  discusses why we need a testing methodology, why use open source,
+  the value of certifications, and plans for a new vulnerability
+  scanner developed with a different approach than Nessus.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-04T19_56_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-05T13_39_19.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-04T14_47_59.txt" name="e2006-04-04T14_47_59.txt"></a>
+<h2 class="date">04.04.2006 14:47</h2>
+<div class="blogbody">
+<h3 class="title">10.4.6</h3>
+<div class="item-description">
+Just a warning: The reboot process for the 10.4.6 upgrade reboots
+twice.  And it overall process took about 7-8 minutes on my laptop.
+<pre>
+uname -a
+Darwin my-computer 8.6.0 Darwin Kernel Version 8.6.0: 
+  Tue Mar  7 16:58:48 PST 2006; 
+  root:xnu-792.6.70.obj~1/RELEASE_PPC Power Macintosh powerpc
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-04T14_47_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-04T19_56_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-04T09_28_55.txt" name="e2006-04-04T09_28_55.txt"></a>
+<h2 class="date">04.04.2006 09:28</h2>
+<div class="blogbody">
+<h3 class="title">elementtry 1st program</h3>
+<div class="item-description">
+The first thing to try in elementtree is to view the structure of an
+xml file.  Yes, this is easier done with a graphical tool, but this
+illustrates how to use elementtree.  First the code.  This is a simple
+recursive decent of the children.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>from</strong> <font color="#2040a0">elementtree</font>.<font color="#2040a0">ElementTree</font> <strong>import</strong> <font color="#2040a0">parse</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">printEleTree</font><font color="4444FF">(</font><font color="#2040a0">ele</font>,<font color="#2040a0">indent</font><font color="4444FF">=</font><font color="#008000">'  '</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">ele</font><font color="4444FF">:</font> <strong>return</strong> <font color="#FF0000">0</font>
+    <font color="#2040a0">c</font> <font color="4444FF">=</font> <font color="#2040a0">ele</font>.<font color="#2040a0">getchildren</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">child</font> <strong>in</strong> <font color="#2040a0">c</font><font color="4444FF">:</font>
+	<font color="#2040a0">count</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+	<strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font>
+	<font color="#2040a0">num</font> <font color="4444FF">=</font> <font color="#2040a0">printEleTree</font><font color="4444FF">(</font><font color="#2040a0">child</font>,<font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'  '</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">num</font> <font color="4444FF">&gt;</font> <font color="#FF0000">0</font><font color="4444FF">:</font>
+	    <strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'end '</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font><font color="4444FF">+</font><font color="#008000">' numchildren = '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">num</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">count</font>
+<br /><br />
+<font color="#2040a0">filename</font><font color="4444FF">=</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">tree</font> <font color="4444FF">=</font> <font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>
+<font color="#2040a0">root</font><font color="4444FF">=</font><font color="#2040a0">tree</font>.<font color="#2040a0">getroot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">root</font>.<font color="#2040a0">tag</font>
+<font color="#2040a0">num</font> <font color="4444FF">=</font> <font color="#2040a0">printEleTree</font><font color="4444FF">(</font><font color="#2040a0">root</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'end'</font><font color="4444FF">+</font><font color="#2040a0">root</font>.<font color="#2040a0">tag</font><font color="4444FF">+</font><font color="#008000">' numchildren = '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">num</font><font color="4444FF">)</font>
+</pre>
+Now for something to parse:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;ISO8859-1&quot;</font> <font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">to</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Tove<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/to</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">from</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Jani<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/from</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">heading</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Reminder<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/heading</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Don't forget me this weekend!<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Running the above code on the note.xml file looks like this:
+<pre>
+./printxml.py note.xml 
+note
+  to
+  from
+  heading
+  body
+endnote numchildren = 4
+</pre>
+How about some (slightly) more complicated xml...
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;ISO8859-1&quot;</font> <font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">breakfast-menu</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Belgian Waffles<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>$5.95<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>two of our famous Belgian Waffles with plenty of real maple syrup<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>650<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Strawberry Belgian Waffles<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>$7.95<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>light Belgian waffles covered with strawberrys and whipped cream<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>900<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/breakfast-menu</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Which looks like this:
+<pre>
+./printxml.py simple.xml 
+breakfast-menu
+  food
+    name
+    price
+    description
+    calories
+  end food numchildren = 4
+  food
+    name
+    price
+    description
+    calories
+  end food numchildren = 4
+endbreakfast-menu numchildren = 2
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-04T09_28_55.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-04T14_47_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-04T07_00_17.txt" name="e2006-04-04T07_00_17.txt"></a>
+<h2 class="date">04.04.2006 07:00</h2>
+<div class="blogbody">
+<h3 class="title">xml convert</h3>
+<div class="item-description">
+Up until yesterday, I was pretty much set in my ways of disliking xml.
+I've tried using xml in the past and I have seen some projects that
+have a variety of xml issues.  So why would I intentionally use xml?
+<br /><br />
+Yesterday was that tipping point for me.  I am now addicted to XML.
+Not for everything, but for a project I am working now, the core will
+switch from python code (with a lot of dictionaries) to xml.  Why did
+I switch?  There was a culmination of a range of factors that have
+building over time.  The first is that Roland and Matt built the
+geozui formats on xml.  I have been working with those formats and
+watching Roland write xml handlers.  Then I was talking with Capt Ben
+and Brian L. about how to layout a project.  Brian offered a range of
+suggestions on how to refactor my initial prototype.  Both Ben and
+Brian asked a lot of questions that mirrored my feeling about my draft
+API.  It was pretty confusing.  It works and is more straight forward
+that the generation before mostly because things like python make life
+easier than C/C++.  Then Brian said, "Why aren't you doing this in
+ML?"  He sketched a couple tags on the white board.  Now being in a
+place with a bunch of developers who use xml, I saw how this would
+make my design so much simpler:
+<ul>
+<li>Parsers can easily be written in any language that supports xml.
+<li>Non programmers have a chance of updating the xml document that
+specifies the formats.
+<li>It is possible to generate nice documentation of the formats
+directly from the xml document.  The original spec is not very machine
+readable.
+<li>Python has pyxml and elementtree which both handle reading and
+writing xml files.  Elementtree is supposed to become part of the
+Python Standard Library.  And Elementtree is not to bad to learn.
+<li>Other people using the same technology in the local neighborhood makes using that tech much easier.
+</ul>
+That's about it... xml - "good"; non-machine readable specifications - "bad"
+<br /><br />
+WX: very rainy
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-04T07_00_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-04T09_28_55.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-04T06_02_37.txt" name="e2006-04-04T06_02_37.txt"></a>
+<h2 class="date">04.04.2006 06:02</h2>
+<div class="blogbody">
+<h3 class="title">OSX Repair Permissions</h3>
+<div class="item-description">
+Just yesterday, I got the latest UNH computing group news letter.  In
+that letter they said that it is critical to run Repair Permissions
+BEFORE and AFTER any update to a Mac.  So I have found a "them" from
+this article...
+<a href="http://daringfireball.net/2006/04/repair_permissions">Daring
+Fireball - Repair Permissions</a>
+<pre>
+  We are told to repair permissions before and after each update by
+  whom? Certainly not by Apple. Perhaps Cruse means "them", the same
+  "them" who, in the classic Mac OS era, recommended zapping your PRAM
+  every time you need to reboot your Mac after the system was wedged
+  by a crashed app.
+</pre>
+For the record, since my very first Mac in 2001, I have never once run
+repair permissions.  fsck: yes.  repair permissions: no.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-04T06_02_37.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-04T07_00_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-03T12_23_40.txt" name="e2006-04-03T12_23_40.txt"></a>
+<h2 class="date">04.03.2006 12:23</h2>
+<div class="blogbody">
+<h3 class="title">kiko calendar</h3>
+<div class="item-description">
+From Brian L... <A href="http://kiko.com/">http://kiko.com/</a> calendar.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-03T12_23_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-04T06_02_37.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-03T07_30_17.txt" name="e2006-04-03T07_30_17.txt"></a>
+<h2 class="date">04.03.2006 07:30</h2>
+<div class="blogbody">
+<h3 class="title">sf.net cvs still down</h3>
+<div class="item-description">
+Doh!  The sourceforge.net cvs server is still down after trouble on March 30th.
+<pre>
+  (2006-03-31 07:00:01 - Project CVS Service ) On 2006-03-30 the
+  developer CVS server had a hardware issue that required us to take
+  the service offline. We are actively working on this problem and
+  hope to have it back up soon. There is not a current estimate for
+  the duration of this outage, but when we get one, it will be posted
+  on the site status page (this page). We currently expect this outage
+  to last 48 hours, at minimum.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-03T07_30_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-03T12_23_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-02T12_01_08.txt" name="e2006-04-02T12_01_08.txt"></a>
+<h2 class="date">04.02.2006 12:01</h2>
+<div class="blogbody">
+<h3 class="title">decoding a ship name</h3>
+<div class="item-description">
+I took two messages and combined them into one long one like this:
+<pre>
+!AIVDM,2,1,1,A,58Lh=j02;?TTQ&lt;=@000&lt;P4hu@Pu8r0p58DD00016A0L7D50m0Hl3lU4k,0*3B
+!AIVDM,2,2,1,A,@00000000000000,2*55'
+</pre>
+Becomes:
+<pre>
+!AIVDM,1,1,,A,58Lh=j02;?TTQ&lt;=@000&lt;P4hu@Pu8r0p58DD00016A0L7D50m0Hl3lU4k@00000000000000,0*49
+</pre>
+Then I converted this NMEA string from the message 5 format and found that the strings contain:
+<pre>
+HSCT
+CHALOTHORN NAREE
+4C4%D3P
+</pre>
+When I look at the stern of the ship, I can see that the name is
+correct!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-02T12_01_08.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-03T07_30_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-02T09_27_04.txt" name="e2006-04-02T09_27_04.txt"></a>
+<h2 class="date">04.02.2006 09:27</h2>
+<div class="blogbody">
+<h3 class="title">the answer to life</h3>
+<div class="item-description">
+On this windy day...
+<br /><br />
+<a href="http://www.google.com/search?q=the+answer+to+life%2C+the+universe+and+everything">The answer to life, the universe, and everything</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-02T09_27_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-02T12_01_08.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-02T09_23_43.txt" name="e2006-04-02T09_23_43.txt"></a>
+<h2 class="date">04.02.2006 09:23</h2>
+<div class="blogbody">
+<h3 class="title">Schooltool's calendar</h3>
+<div class="item-description">
+In the quest for calendaring...  saw someone talking about this on #python
+<br /><br />
+<a
+href="http://www.schooltool.org/products/schooltool-calendar">http://www.schooltool.org/products/schooltool-calendar</a>.
+Of course if this doesn't integrate with our authentication system,
+then it isn't much use.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-02T09_23_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-02T09_27_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-02T08_27_39.txt" name="e2006-04-02T08_27_39.txt"></a>
+<h2 class="date">04.02.2006 08:27</h2>
+<div class="blogbody">
+<h3 class="title">epydoc 3.0a bug</h3>
+<div class="item-description">
+Just ran into what I consider a bug in epydoc.  In my scripts
+subdirectory for my current project, I have foo-job1, foo-job2,
+foo-bar which are all python programs that provide a command line
+interface (CLI) to this package.  When I try to run epydoc on foo-bar,
+it completely fails, I also get a foo-bar<b>c</b> file from the
+compilation.  I tried making a link to foo-bar.py, but that also
+fails.  What I have to do for epydoc (and i think this is more a
+python general issue) is to make a link from foo-bar to foo_bar.py,
+but then all the documentation is pretty confused.
+<br /><br />
+Maybe the solution is for epydoc to rename to file on the file,
+generate the documentation, and then translate everything inside the
+docs to match the original?
+<br /><br />
+My other major interest with epydoc (and I think I am going to have to
+start hacking epydoc) is to generate html listings of the source with
+all the documentation stripped out.  With all the documentation
+embedded in the code, it can get hard to follow.  If I can have two
+browser windows open at the same time while editing the code, I would
+then be able to see just the clean html documentation and a clean and
+<b>compact</b> bit of code.  Some of my python files are 3/4
+documentation.
+<br /><br />
+I posted a documentation question on comp.lang.python, but only got
+one email saying to look at numarray for an example.  The nntp
+(remember that?  not ntp) thread via google groups: <a
+href="http://groups.google.com/group/comp.lang.python/browse_thread/thread/98c04d2492264dc6/">packaging
+question - documentation</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-02T08_27_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-02T09_23_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-04-01T17_12_36.txt" name="e2006-04-01T17_12_36.txt"></a>
+<h2 class="date">04.01.2006 17:12</h2>
+<div class="blogbody">
+<h3 class="title">Realtime weather data</h3>
+<div class="item-description">
+<a href="http://airmap.unh.edu/data/aq.html">http://airmap.unh.edu/data/aq.html</a>
+<br /><br />
+There is a station down at Pierce Island which has this URL on the side <a href="http://www.des.state.nh.us/">http://www.des.state.nh.us/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-04.html#e2006-04-01T17_12_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-02T08_27_39.html#comments">Comments</a> -->
+</div>
+</div>

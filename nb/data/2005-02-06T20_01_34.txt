@@ -1,0 +1,72 @@
+TITLE: Fink shlib policy change
+AUTHOR: Kurt
+DATE: 02.06.2005 20:01
+DESC: Look out below
+-----
+BODY:
+Uh oh.  I have some shared lib packages.
+
+From - TheSin 
+Subject - Proposed Policy Change for all Maintainers 
+IMPORTANT
+
+With the upcoming shlibs change, the packaging engine needs to be 
+changed a little and this will break many packages.
+
+first let me explain the shlibs change.  Basically fink will beable to 
+automatically insert all share library deps to the Depends line by 
+using Depends: {SHLIB_DEPS}, curl | curl-ssl.  This is an example and I 
+added curl | curl-ssl to show that we will still need to add runtime 
+depends by hand, but now dylib pkgs.
+
+Now currently fink treats Depends and builddepends in the pretty much 
+the same manor.  In the new layout Depends will be Install/Run tim 
+depends, so not needed to build a package.  And since in the new policy 
+all -dev pkgs will be required to depend on there own -shlibs, we can 
+rest assured that the -shlibs will be present at build time so no need 
+to list them in the BuildDepends, except if a -dev isn't currently 
+following that policy.  But there are only a few that aren't at this 
+point so that won't be a big change.
+
+Anyhow, any maintainer wishing to help us out and help speed this new 
+great tool up for us, please follow this next set of instructions to 
+fix your pkgs:
+
+all pkgs such be able fink build foo with out the depends line so 
+comment it out and add what is needed to builddep line. This is to test 
+build only, so use fink build to test this and not install.  Also 
+please don't commit it like this.  Again this is only to test that the 
+pkg will build sans the Depends line.  Install and Run time deps are 
+still required at this point and that includes the -shlibs pkgs so 
+don't start removing those yet.
+
+Also we NEED and I can't stress this enough, need proper shlibs fields. 
+  This will are receive a little more documentation I hope and much 
+more 
+clarification in the policy and packaging section of our website.
+
+The format is as such
+
+Shlibs: &lt;&lt;
+%p/lib/libfoo.5.dylib 4.0.0 %n (&gt;= 4.0-1)
+&lt;&lt;
+
+1) installed lib name of the major versioned lib, that means the actual 
+dylib not the one of the symlinks
+2) the compat version of the lib, you can get this by running otool -L 
+on 1)
+3) the lowest version of the pkg that has this lib, should almost 
+always be %n and a -1 revision of when the compat version of this lib 
+first made it into a fink pkg, This value shouldn't change until the 
+next time the compat version on that lib changes.
+
+Also contrary to some pkgs and what we may have stated before please do 
+NOT use
+foo-shlibs (&gt;= 1.0-1) | foo-ssl-shlibs (&gt;= 1.0-1).  We may allow it for 
+x11 and nox variants but for now please only one pkgname and version.
+
+The more Maintainers do the faster we won't need to worry about Depends 
+anymore :D
+
+http://southofheaven.org
+-----

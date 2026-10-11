@@ -1,0 +1,77 @@
+TITLE: Parsing GGA strings inside a em3002 multibeam file
+AUTHOR: Kurt
+DATE: 08.08.2010 11:21
+DESC: scanf is not so much fun
+-----
+BODY:
+In the multibeam nuts and bolts class, we are parsing an em3002 data file.
+Mostly it's parsing binary data in the same byte order, so it's not too hard.
+There are some text strings embedded in one of the packets.  Here is the
+command line that I used to pull the strings:
+<pre><b>strings 0018_20050728_153458_Heron.all | egrep '.{20,}' |  sort -u</b>
+LGPGGA,153459.00,4647.01167,N,07113.70578,W,2,7,1.8,3.26,M,-28.23,M,8,0108*55
+LGPGGA,153500.00,4647.01020,N,07113.70768,W,2,7,1.8,3.25,M,-28.23,M,9,0108*5B
+LGPGGA,153501.00,4647.00881,N,07113.70957,W,2,7,1.8,3.23,M,-28.23,M,8,0108*5D
+[snip]
+WLZ=-0.75,SMH=265,S1X=0.00,S1Y=0.00,S1Z=0.00,S1H=0.00,S1P=0.00,S1R=0.00,GO1=0.00,S2X=0.00,S2Y=0.00,S2Z=0.00,S2H=0.00,S2P=0.00,S2R=0.00,GO2=0.00,TSV=2.0.8 050304,RSV=,BSV=1.2.7 040830,PSV=1.7.1 050510,DSX=0.00,DSY=0.00,DSZ=0.00,DSD=0,DSO=0.000000,DSF=1.000000,DSH=NI,P1M=0,P1T=0,P1X=0.00,P1Y=0.00,P1Z=0.00,P1D=0.000,P1G=WGS84,P2M=0,P2T=0,P2X=0.00,P2Y=0.00,P2Z=0.00,P2D=0.000,P3M=0,P3T=0,P3X=0.00,P3Y=0.00,P3Z=0.00,P3D=0.000,MSX=0.00,MSY=0.00,MSZ=0.00,MRP=RP,MSD=0,MSR=0.00,MSP=0.00,MSG=0.00,NSX=0.00,NSY=0.00,NSZ=0.00,NRP=RP,NSD=0,NSR=0.00,NSP=0.00,NSG=0.00,MAS=1.000,GCG=0.00,APS=0,AHS=2,ARO=2,AHE=2,DDS= 3.17 2004/06/11,
+W</pre>
+That's a pretty confusing looking command, so let me break it down for
+you.  You can check the GNU grep command's <a
+href="http://www.gnu.org/software/grep/manual/grep.html#Regular-Expressions">Regular-Expressions</a>
+section to follow along.  First, I use strings to pull all the ASCII
+printable characters.  A lot of these strings are just unlucky chunks
+of binary data that happen to map to ASCII characters.  To clean that
+up, I use grep to find all strings that are 20 characters or longer.  I
+use the extended grep (egrep) to get the full power of regular expressions.
+Normal grep is faster than egrep, but is less flexible.
+The "." matches any character.  Then the "{<i>n</i>,}" matches
+<i>n</i> or more of the preceeding match.  Then I pass the resulting
+strings to sort -u to give me a sorted unique list of strings.  
+
+One of the fun parts of unix command lines is that there are often
+many ways to accomplish the same thing.  It took me a couple of tries to 
+decide on what I wanted to use for the grep string.  Once I realized that
+all I want is to get any string longer than 20 characters, I knew that I
+can accomplish the same thing with a much simpler strings command:
+<pre><b>strings -n 20 0034_20100604_005123_Healy.all | head</b>
+WLZ=0.53,SMH=106,S1X=-18.40,S1Y=-1.91,S1Z=8.92,S1H=0.00,S1P=-0.02,S1R=-0.01,S1S=1,S2X=-7.66,S2Y=0.00,S2Z=9.02,S2H=0.02,S2P=-0.14,S2R=0.02,S2S=2,GO1=0.00,TSV=1.1.1 080617,RSV=1.1.1 080425,BSV=2.2.3 090702,PSV=1.1.9 100410,DSV=3.1.1 060110,DDS=3.4.9 070328,P1M=1,P1T=1,P1Q=1,P1X=0.00,P1Y=0.00,P1Z=0.00,P1D=0.000,P1G=WGS84,P2M=0,P2T=0,P2Q=1,P2X=0.00,P2Y=0.00,P2Z=0.00,P2D=0.000,P2G=WGS84,P3M=0,P3T=0,P3Q=1,P3X=0.00,P3Y=0.00,P3Z=0.00,P3D=0.000,P3G=WGS84,P3S=1,MSX=0.00,MSY=0.00,MSZ=0.00,MRP=RP,MSD=0,MSR=-0.15,MSP=0.15,MSG=0.00,NSX=0.00,NSY=0.00,NSZ=0.00,NRP=RP,NSD=0,NSR=0.00,NSP=0.00,NSG=0.00,MAS=1.000,GCG=0.00,APS=0,AHS=2,ARO=2,AHE=2,CLS=1,CLO=0,VSN=1,VSE=2,VSI=192.168.10.54,VSM=255.255.255.0,VSU=5602,SID=HLY10TC_survey1_2010-06-03,
+GINGGA,005124.508,2615.32662,N,15924.40376,W,2,07,1.0,3.83,M,,,2,0260*07
+GINGGA,005125.508,2615.32959,N,15924.40381,W,2,07,1.0,3.77,M,,,3,0260*03</pre>
+Grep will let you do more, but simpler is better, no?
+
+Now to parse some of that data.  The default way to start parsing with
+C is to use scanf.  This tool is old and crusty, but it works.  Here
+is a quick C++ file called text-scan.cpp that demonstrates scanf.
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;cstdio&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;iostream&gt;</font>
+<b><font color="#0000FF">using</font></b> <b><font color="#0000FF">namespace</font></b> std<font color="#990000">;</font>
+<!-- -->
+<font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+    <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>s <font color="#990000">=</font> <font color="#FF0000">"LGPGGA,153459.00,4647.01167,N,07113.70578,W,2,7,1.8,3.26,M,-28.23,M,8,0108*55"</font><font color="#990000">;</font>
+<!-- -->
+    <font color="#009900">float</font> date<font color="#990000">,</font> lat<font color="#990000">,</font> lon<font color="#990000">;</font>
+    <font color="#009900">char</font> lat_hem<font color="#990000">;</font>
+    <font color="#009900">int</font> r <font color="#990000">=</font> <b><font color="#000000">sscanf</font></b><font color="#990000">(</font>s<font color="#990000">,</font> <font color="#FF0000">"LGPGGA,%f,%f,%c"</font><font color="#990000">,</font> <font color="#990000">&amp;</font>date<font color="#990000">,</font> <font color="#990000">&amp;</font>lat<font color="#990000">,</font> <font color="#990000">&amp;</font>lat_hem<font color="#990000">);</font>
+    cout <font color="#990000">&lt;&lt;</font> r <font color="#990000">&lt;&lt;</font> <font color="#FF0000">" (should be 3): "</font> <font color="#990000">&lt;&lt;</font> date <font color="#990000">&lt;&lt;</font> <font color="#FF0000">" "</font> <font color="#990000">&lt;&lt;</font> lat <font color="#990000">&lt;&lt;</font> <font color="#FF0000">" "</font> <font color="#990000">&lt;&lt;</font> lat_hem <font color="#990000">&lt;&lt;</font> endl<font color="#990000">;</font>
+<!-- -->
+    <i><font color="#9A1900">// Try to read a float where the "N" is.</font></i>
+    cout <font color="#990000">&lt;&lt;</font> <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">Incomplete parse example:"</font> <font color="#990000">&lt;&lt;</font> endl<font color="#990000">;</font>
+    r <font color="#990000">=</font> <b><font color="#000000">sscanf</font></b><font color="#990000">(</font>s<font color="#990000">,</font> <font color="#FF0000">"LGPGGA,%f,%f,%f"</font><font color="#990000">,</font> <font color="#990000">&amp;</font>date<font color="#990000">,</font> <font color="#990000">&amp;</font>lat<font color="#990000">,</font> <font color="#990000">&amp;</font>lon<font color="#990000">);</font>
+    cout <font color="#990000">&lt;&lt;</font> r <font color="#990000">&lt;&lt;</font> <font color="#FF0000">" (should be 2 out of 3): "</font> <font color="#990000">&lt;&lt;</font> date <font color="#990000">&lt;&lt;</font> <font color="#FF0000">" "</font> <font color="#990000">&lt;&lt;</font> lat <font color="#990000">&lt;&lt;</font> <font color="#FF0000">" "</font> <font color="#990000">&lt;&lt;</font> lon <font color="#990000">&lt;&lt;</font> endl<font color="#990000">;;</font>
+<!-- -->
+    <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<font color="#FF0000">}</font></tt></pre>
+Running the above program demostrates both a successful parse and then
+a parse that misses one of the arguments by trying to read a float
+when there is only an character ("N").  Scanf (actually string scanf,
+sscanf) returns the number of items that it successfully parsed.
+<pre><b>g++ -Wall -o text-scan text-scan.cpp -g && ./text-scan</b>
+3 (should be 3): 153459 4647.01 N
+<!-- -->
+Incomplete parse example:
+2 (should be 2 out of 3): 153459 4647.01 0</pre>
+Obviously, this is not a proper parser for <a href="http://gpsd.berlios.de/NMEA.txt">GGA and other NMEA strings</a>, but it should
+give you an idea about how you might write the full parser.
+
+Better yet, you should use regular expressions to parse text data like this.  e.g. <a href="http://www.gnu.org/s/libc/manual/html_node/Regular-Expressions.html">The GNU C library: 10.3 Regular Expression Matching</a>
+-----

@@ -1,0 +1,33 @@
+TITLE: modwsgi for apache2 in fink
+AUTHOR: Kurt
+DATE: 01.12.2009 07:53
+DESC: it works!
+-----
+BODY:
+<a href="http://www.python.org/dev/peps/pep-0333/">WSGI</a> is the Python Web Server Gateway Interface.
+
+I just added modwsgi to fink for Mac OSX 10.5.  Here is a quick
+tutorial that shows it working adapted from <a
+href="http://www.rkblog.rk.edu.pl/w/p/mod_wsgi/">rkblog mod_wsgi</a>.
+
+First, enable mod-wsgi for apache2:
+<pre>% <b>fink selfupdate</b>
+% <b>fink install libapache2-mod-wsgi-py26</b>
+% <b>sudo a2enmod wsgi2.6</b>
+% <b>sudo apache2ctl restart</b></pre>
+Now we can create the test app:
+<pre>% <b>mkdir ~/Sites/test-wsgi && cd ~/Sites/test-wsgi</b>
+% <b>echo "AddHandler wsgi-script .wsgi" &gt; .htaccess</b></pre>
+Now create test.wsgi
+<pre><tt><b><font color="#0000FF">def</font></b> <b><font color="#000000">application</font></b><font color="#990000">(</font>environ<font color="#990000">,</font> start_response<font color="#990000">):</font>
+    status <font color="#990000">=</font> <font color="#FF0000">'200 OK'</font> 
+    output <font color="#990000">=</font> <font color="#FF0000">'Hello World from a WSGI app!'</font>
+<!-- -->
+    response_headers <font color="#990000">=</font> <font color="#990000">[(</font><font color="#FF0000">'Content-type'</font><font color="#990000">,</font> <font color="#FF0000">'text/plain'</font><font color="#990000">),</font>
+                        <font color="#990000">(</font><font color="#FF0000">'Content-Length'</font><font color="#990000">,</font> <b><font color="#000000">str</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>output<font color="#990000">)))]</font>
+    <b><font color="#000000">start_response</font></b><font color="#990000">(</font>status<font color="#990000">,</font> response_headers<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">return</font></b> <font color="#990000">[</font>output<font color="#990000">]</font></tt></pre>
+Now try the test:
+<pre>% <b>open http://localhost/~$USER/test-wsgi/test.wsgi</b></pre>
+-----

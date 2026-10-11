@@ -1,0 +1,58 @@
+TITLE: emacs regular expressions (regex)
+AUTHOR: Kurt
+DATE: 10.16.2011 10:51
+DESC: better?
+-----
+BODY:
+I keep trying to learn emacs lisp and better my emacs skills.  As
+a part of that I realize that I really should shart trying to use
+regular expressions (regex).  I use them in python all the time and
+with the named matches getting returned as a dictionary, import re
+with kodos just rocks.  In emacs, I'm just not getting it quite a easily.
+
+First, I found a suggestion to switch to the "string" syntax and use
+re-builder.
+<pre>(require 're-builder)
+(setq reb-re-syntax 'string)</pre>
+Okay, can I write a NMEA GGA parser?
+
+<img width="600" height="324" title="RE Builder parsing a NMEA GGA" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-10/emacs-re-builder-nmea-gga.png"/>
+
+We'll there are lot more "\" characters than I would like and
+[[:digit:]] sucks compaired to just saying [0-9], but it works.  And
+the highlighting is nice.  Here is my emacs lisp string style regex:
+<pre>"\$\([A-Z]\{2\}\)\(GGA\),\([[:digit:]]\{6\}\),\([0-9]+.[0-9]+\),\([NS]\),\([0-9]+.[0-9]+\),\([EW]\),\([0-9]+\)?,\([0-9]+\)?,\([0-9]+.[0-9]+\)?,\([0-9]+.[0-9]+\)?,M,\([0-9]+.[0-9]+\)?,M?,\([0-9]*\),\([0-9]*\)\*\([0-9A-F]\{2\}\)"</pre>
+Got that?  For comparison, here is what I had with python:
+<pre>[$](?P&lt;talker&gt;[A-Z][A-Z])(?P&lt;sentence&gt;GGA),
+(?P&lt;time_utc&gt;(?P&lt;hour&gt;\d\d)(?P&lt;minute&gt;\d\d)(?P&lt;second&gt;\d\d\.\d*))?,
+(?P&lt;lat&gt;(?P&lt;lat_deg&gt;\d\d)(?P&lt;lat_min&gt;\d\d\.\d*))?,
+(?P&lt;lat_hemi&gt;[NS])?,
+(?P&lt;lon&gt;(?P&lt;lon_deg&gt;\d{3})(?P&lt;lon_min&gt;\d\d\.\d*))?,
+(?P&lt;lon_hemi&gt;[EW])?,
+(?P&lt;gps_quality&gt;\d+)?,
+(?P&lt;satellites&gt;\d+)?,
+(?P&lt;hdop&gt;\d+\.\d+)?,
+(?P&lt;antenna_height&gt;[+-]?\d+\.\d+)?,
+(?P&lt;antenna_height_units&gt;M)?,
+(?P&lt;geoidal_height&gt;[+-]?\d+\.\d+)?,
+(?P&lt;geoidal_height_units&gt;M)?,
+(?P&lt;differential_ref_station&gt;[A-Z0-9.]*),
+(?P&lt;differential_age_sec&gt;\d+)?
+\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])</pre>
+I think the python is a wee bit easier to comprehend and use.
+Although, looking at my very expensive NMEA 4.0 documentation (yes, I
+bought the darn thing), it looks like I have the age and teh ref
+station backwards and the ref station should only be 0000-1023.  Using
+the emacs version, I have to count the match numbers.  Yuck.
+
+I'm not quite sure how to write a GGA regex in rx.  With a little playing with M-x eval-print-last-sexp
+<pre>(require 'rx) ; C-x C-e to load rx
+(rx (one-or-more digit) )
+"[[:digit:]]+"
+<!-- -->
+(rx (and "GGA" ","  (one-or-more digit)))
+"GGA,[[:digit:]]+"</pre>
+Yeah, I don't yet get how to effectively use regular expressions in emacs.
+I can't quite wrap my head around how to now write a function that would
+whip through a region and pull out the GPS x,y coords.
+-----

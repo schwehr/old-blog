@@ -1,0 +1,91 @@
+TITLE: elementtry 1st program
+AUTHOR: Kurt
+DATE: 04.04.2006 09:28
+DESC: parse a note
+-----
+BODY:
+The first thing to try in elementtree is to view the structure of an
+xml file.  Yes, this is easier done with a graphical tool, but this
+illustrates how to use elementtree.  First the code.  This is a simple
+recursive decent of the children.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>from</strong> <font color="#2040a0">elementtree</font>.<font color="#2040a0">ElementTree</font> <strong>import</strong> <font color="#2040a0">parse</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">printEleTree</font><font color="4444FF">(</font><font color="#2040a0">ele</font>,<font color="#2040a0">indent</font><font color="4444FF">=</font><font color="#008000">'  '</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">ele</font><font color="4444FF">:</font> <strong>return</strong> <font color="#FF0000">0</font>
+    <font color="#2040a0">c</font> <font color="4444FF">=</font> <font color="#2040a0">ele</font>.<font color="#2040a0">getchildren</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">child</font> <strong>in</strong> <font color="#2040a0">c</font><font color="4444FF">:</font>
+	<font color="#2040a0">count</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+	<strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font>
+	<font color="#2040a0">num</font> <font color="4444FF">=</font> <font color="#2040a0">printEleTree</font><font color="4444FF">(</font><font color="#2040a0">child</font>,<font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'  '</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">num</font> <font color="4444FF">&gt;</font> <font color="#FF0000">0</font><font color="4444FF">:</font>
+	    <strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'end '</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font><font color="4444FF">+</font><font color="#008000">' numchildren = '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">num</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">count</font>
+
+<font color="#2040a0">filename</font><font color="4444FF">=</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">tree</font> <font color="4444FF">=</font> <font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#2040a0">filename</font><font color="4444FF">)</font>
+<font color="#2040a0">root</font><font color="4444FF">=</font><font color="#2040a0">tree</font>.<font color="#2040a0">getroot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">root</font>.<font color="#2040a0">tag</font>
+<font color="#2040a0">num</font> <font color="4444FF">=</font> <font color="#2040a0">printEleTree</font><font color="4444FF">(</font><font color="#2040a0">root</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'end'</font><font color="4444FF">+</font><font color="#2040a0">root</font>.<font color="#2040a0">tag</font><font color="4444FF">+</font><font color="#008000">' numchildren = '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">num</font><font color="4444FF">)</font>
+</pre>
+Now for something to parse:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;ISO8859-1&quot;</font> <font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">to</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Tove<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/to</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">from</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Jani<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/from</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">heading</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Reminder<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/heading</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Don't forget me this weekend!<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/note</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Running the above code on the note.xml file looks like this:
+<pre>
+./printxml.py note.xml 
+note
+  to
+  from
+  heading
+  body
+endnote numchildren = 4
+</pre>
+How about some (slightly) more complicated xml...
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;ISO8859-1&quot;</font> <font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">breakfast-menu</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Belgian Waffles<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>$5.95<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>two of our famous Belgian Waffles with plenty of real maple syrup<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>650<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Strawberry Belgian Waffles<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/name</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>$7.95<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/price</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>light Belgian waffles covered with strawberrys and whipped cream<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/description</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>900<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/calories</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/food</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/breakfast-menu</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Which looks like this:
+<pre>
+./printxml.py simple.xml 
+breakfast-menu
+  food
+    name
+    price
+    description
+    calories
+  end food numchildren = 4
+  food
+    name
+    price
+    description
+    calories
+  end food numchildren = 4
+endbreakfast-menu numchildren = 2
+</pre>
+-----

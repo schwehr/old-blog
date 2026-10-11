@@ -1,0 +1,30 @@
+TITLE: fink and javascript - openlayers test case
+AUTHOR: Kurt
+DATE: 01.13.2009 09:13
+DESC: better?
+-----
+BODY:
+In an effort to kickstart fink packaging of JavaScript APIs, I
+packaged OpenLayers last year.  I stuck an openlayers package in
+/sw/share/openlayers.  I realize that layout is not going to scale
+well or be obvious to those wanting to use/find APIs.  Following the
+models of python and ruby in fink, I changed openlayers to live in
+/sw/lib/javascript.  I renamed the package to openlayers-js and I've
+just released an updated package with version 2.7.  I moved the
+<i>tools</i> and <i>art</i> directories into share/doc/openlayers-js/
+and removed the openlayers <i>lib</i> directory completely.  This
+package only provides the single file version of OpenLayers.
+<pre>% <b>fink install openlayers-js</b>
+% <b>ls -l /sw/lib/javascript/</b>
+ls -l /sw/lib/javascript/openlayers/
+total 560
+-rw-r--r--  1 root admin 572604 Oct 27 13:04 OpenLayers.js
+drwxr-xr-x 25 root admin    850 Jan 13 09:03 img
+drwxr-xr-x  3 root admin    102 Jan 13 08:57 theme</pre>
+I'll likely be adding another JavaScript API today for some Django work.
+
+Please let me know if you use this successfully or if it causes trouble.
+
+It is interesting to look through the automated fink build errors: 
+<a href="http://fink.sodan.ecc.u-tokyo.ac.jp/build-10.4-powerpc/">http://fink.sodan.ecc.u-tokyo.ac.jp/build-10.4-powerpc/</a>
+-----

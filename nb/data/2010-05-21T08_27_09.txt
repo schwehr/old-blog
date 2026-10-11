@@ -1,0 +1,41 @@
+TITLE: Python decorators
+AUTHOR: Kurt
+DATE: 05.21.2010 08:27
+DESC: catch exceptions
+-----
+BODY:
+I still don't feel like I have a handle on <a
+href="http://www.artima.com/weblogs/viewpost.jsp?thread=240808">python
+decorators</a>.  The seem pretty interesting, but I have no sense of
+when and how in my code to use them.  Here is an interesting example
+that actually seems to make sense to me: <a
+href="http://djangosnippets.org/snippets/2029/">Capture Stack Trace
+Decorator</a>.  I've wrapped it in an example program that works with
+both python 2.6 and 3.x (hence the from __future__ ... yeah time
+travel).  If you call this function and it barfs, your program keeps
+running and leaves you a stack trace.  Sometimes, you just can't
+afford to have a program fail.  It's time to log the error and keep
+moving forward.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> __future__ <b><font color="#000080">import</font></b> print_function
+<!-- -->
+<b><font color="#000080">import</font></b> traceback
+<b><font color="#000080">import</font></b> sys
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">catch</font></b><font color="#990000">(</font>func<font color="#990000">):</font>
+<i><font color="#9A1900">    'Catches any exception and prints a stack trace.'</font></i>
+    <b><font color="#0000FF">def</font></b> <b><font color="#000000">wrapper</font></b><font color="#990000">(*</font>args<font color="#990000">,**</font>kwargs<font color="#990000">):</font>
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">return</font></b> <b><font color="#000000">func</font></b><font color="#990000">(*</font>args<font color="#990000">,**</font>kwargs<font color="#990000">)</font>
+        <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'Caught exception'</font><font color="#990000">)</font>
+            traceback<font color="#990000">.</font><b><font color="#000000">print_exc</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">return</font></b> wrapper
+<!-- -->
+@catch
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">face_palm</font></b><font color="#990000">():</font>
+    <b><font color="#000000">int</font></b><font color="#990000">(</font><font color="#FF0000">"a"</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#000000">face_palm</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'still running'</font><font color="#990000">)</font></tt></pre>
+-----

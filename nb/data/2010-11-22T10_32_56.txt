@@ -1,0 +1,108 @@
+TITLE: org-babel
+AUTHOR: Kurt
+DATE: 11.22.2010 10:32
+DESC: getting started
+-----
+BODY:
+Since starting to work on my PhD, I have strived to make my work be
+reproducable.  I wanted to be able to start from my raw data and
+writing and with one command (e.g. "make") do all the processing,
+build the figures, and produce the journal ready paper.  I was
+definitely not even close to this goal.  I used Fledermaus, Photoshop
+and Illustrator to modify or produce some of my figures.  Using Latex
+got me closer to this goal.  I was able to at least keep my figures
+separate from the writing (which I'm not sure is really even possible
+with MS Word) and have all sorts of scripts do the work.  Unfortunely,
+after 4 and a half years from finishing my PhD, it would take me some
+serious work to get things to work from beginning to end.  That means
+my research is that much less valuable - my data is not in the MAGIC
+paleomag database and should someone ask, I don't have the time to get 
+things back in shape.
+
+It turns out that there are a lot of other people with this same goal.
+There are two camps that I've found.  First is <a
+href="http://en.wikipedia.org/wiki/Literate_programming">Literate
+Programming</a> started by Knuth.  While, I have met him, sat through
+one of his talks at Stanford ("Knuth's current favorite emacs tricks";
+which really was 5-6 of us sitting around with him for an hour), and
+had a copy of it literate programming book, I never got what he was
+getting at until last week (15 years later).  I got turned around by
+his discussions of Weave, Tangle, and CWEB.
+
+The second was the <a
+href="http://en.wikipedia.org/wiki/Reproducibility#Reproducible_research">Reproducible
+Research</a> movement that wikipedia says was started by <a
+href="http://sepwww.stanford.edu/data/media/public/sep/jon/">Jon
+Claerbout</a>, a geophysics professor at Stanford.  How did a I miss
+out of this while I was there?  He has a short essay: <a
+href="http://sepwww.stanford.edu/data/media/public/sep//jon/reproducible.html">Reproducible
+Computational Research: A history of hurdles, mostly overcome</a>.  Wow, I really missed out looking at his <a href="http://sepwww.stanford.edu/data/media/public/sep//prof/index.html">books</a>, e.g. <a href="http://sepwww.stanford.edu/data/media/public/sep//prof/bei/toc_html/">Basic Earth Imaging (BEI)</a>
+There is now <a
+href="http://www.reproducibleresearch.net">ReproducibleResearch.net</a>.
+
+I was trying to read more about the emacs <a
+href="http://orgmode.org/worg/org-contrib/babel/">org-babel</a>, which
+is a way to write text in <a href="http://orgmode.org/">org-mode</a>
+and have the code snippets actually run and work with you to produce
+the document.  I'm not sure this would work out to produce a journal
+paper directly, but it would be pretty close.  It can document all of
+your thinking and small code bits together in one place.  This stuff
+is not easy, but if you learn it, I'm sure it will be with you for the
+next 20+ years, just like emacs has been with me for the last 20 years.
+
+I've had a bit of trouble getting babel to work.  The error messages
+are not very informative, but here is where I am at so far.  The first
+trick is that org-mode that comes with emacs 23.1 or Aquamacs circa
+2010 is just too old to have everything you would want.  I had to
+ditch org-mode 6.3.
+<pre><b>cd
+wget http://orgmode.org/org-7.3.tar.gz
+tar xf org-7.3.tar.gz
+cd org-7.3
+make</b> # Convert the emacs lisp to elc byte code</pre>
+Then I had to change my .emacs file to add these lines:
+<pre>(setq load-path (cons "~/org-7.3/lisp" load-path))
+(require 'org-install)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)
+   (sh . true)
+   (python . true)
+   (ruby . true)
+   (ditaa . true)
+   ))</pre>
+It seems strange to have to specify languages.  Shouldn't most languages
+be turned on by default?
+Then I started up emacs23 from fink under X11.  Things then worked.  I
+can press C-c C-c in each of the src blocks and I get the code to run.
+It does ask you if you want to run the code.  This could be the worst
+of the worst code injection issues if you were not paying attention.
+But unlike Work macros, this stuff is right in front of you out in the open.
+Ruby is the primary example on the web, but apparently requires extra emacs
+modules be installed (e.g. inf-ruby) that I don't have.  I don't use ruby.
+It seems like emacs-lisp and sh should have been the two primary introduction 
+cases.
+
+<img title="org-babel in Emacs23 X11 Mac" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-11/org-babel.png"/>
+
+The I tried <b>C-c C-e b</b> to open an HTML version in my default web browser (which is Firefox).  It asks every time if it can run the ditaa graph section, but never exports the results from the other languages.  I don't understand why the results from the other languages do not get included.
+
+<img title="org-babel output in Firefox" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-11/org-babel-html.png"/>
+
+This is definitely a start but is not enough for me to use it for my
+class tomorrow that I'm trying to write, which will be in python and
+needs to have the results available.  However, the potential for using
+this while working through my research is HUGE.  Finally, I understand what
+Knuth was talking about with Literate Programming.  It's great when you 
+can stick with the language at hand and ignore CWEB.
+
+<b>Update 2010-11-23:</b> Trey Smith suggested the idea of using
+python doctest if you are just using python.  While this is definitely
+not as flexible as org-babel, there are a lot of cases where having a
+doctest only file would make for a really great final document.  It
+doesn't execute the same way as babel, but it does check itself for
+consistency.  I've seen python projects with large doctest files used
+for testing and they are usually very easy to follow and definitely 
+helpful to people learning those packages.  A clever way to reuse an
+existing technology.
+-----

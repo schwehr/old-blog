@@ -1,0 +1,68 @@
+TITLE: RSS for data transfers
+AUTHOR: Kurt
+DATE: 09.30.2011 07:35
+DESC: sigh
+-----
+BODY:
+Webb Pinner has a neat article: <a href="http://www.oceandatarat.org/?p=392">Using RSS to Monitor Data
+Transfers</a> [oceandatarat.org]  It's fun to see him rocking bash
+shell scripting for the NOAA ship Okeanos Explorer.
+
+<a href="http://www.oceandatarat.org/tools/Rsynclog2RSS/ODR_RsyncLog2RSS.sh">ODR_RsyncLog2RSS.sh</a>
+
+Thanks to <a href="http://udcshel.blogspot.com/2011/09/using-rss-to-monitor-data-transfers.html">Art for pointing</a> me to this blog post.  I've been long
+talking to people that we need services that people can subscribe to
+for notices that data has landed somewhere in a system.  e.g. a small
+report that there is new multibeam file collected on the ship.  We can
+then pre-allocated processing and storage requirements.  That should
+then be followed up with a notice that the data has landed at the
+national archives along with the URL and checksums for that data.  I
+can then ingest that data into our systems.  RSS is one possible such
+delivery mechanism, but can't exist on it's own.  Really, we need
+GeoRSS, message passing systems such as XMPP/Jabber, IRC bot, AMQP,
+DDS, java message bus "thingies" etc., and multiple ways to get the
+data that include http and more importantly peer-to-peer bittorrent
+delivery.  Imagine a global system of established bittorrent data
+providers for science data that have a couple copies per continent.  A
+research ship could torrent export the multibeam data when it hit the
+internet anywhere in the world and it would gradually make its way to
+world.  Having all of NOAA's multibeam at your site really isn't much
+of an IT feat these days.  A small server can easily have 30+ TB of
+USB drive storage for very little investment.  And with this system, a
+drive failure isn't a bit deal as the site can just re-torrent the
+data with confidence as long as we know that there is a rigorous
+master archive.
+
+Imagine a research ship pulling in to Alaska.... say the USCGC Healy,
+which just pulled into Dutch Harbor.  A local torrent node would
+likely pull most of the multibeam raw data in a day or two via the
+islands local network.  While the research team is flying back to
+their institutions with their own copy of the data, it's already
+trickling over the backbones and sat links to all the nodes and the
+national archive.  When the researchers make it to their home
+institution with higher speed networking, they locally torrent the
+data to their torrent node and that will sync anything not already
+archived by the system over the slow links from AK.
+
+If you can watch the whole process as an end user, you get data at the
+earliest possible time (it could even come over the ship VSAT if there
+was excess bandwidth).  And you can watch the progress with little
+effort.
+
+The fact that we are still primarily using disk drives in this country
+to transfer data under a TB seems ridiculous.  He have some seriously
+fat pipes available for government and research.  In fact, I've gotten
+in trouble for not using some of our backup pipes, so I've written
+cron jobs to sit around all night sending random 1-2GB chunks of data
+back and forth over the backbones to make the bean counters happy.
+And they have no idea what I'm sending over an encrypted scp copy.
+Nothing like quiet fiber to push bucket loads of data around the
+country.
+
+Will the <a href="http://www.rvdata.us/">Rollingdeck to Repository
+(r2r)</a> achieve this vision?  I will have a lot to talk to people
+about at AGU this year.
+
+I have a feeling that managers are never going to buy into bittorrent,
+but this is what bittorrent was made for!
+-----

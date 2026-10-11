@@ -1,0 +1,50 @@
+TITLE: Mac - Hiding the dock and menu bar
+AUTHOR: Kurt
+DATE: 07.21.2008 17:44
+DESC: nice if it works
+-----
+BODY:
+From Jake and Kenny: <a href="http://www.macworld.com/article/55321/2007/02/hidemenubar.html">How to hide the menu bar and Dock</a> on a Mac. [macworld]
+<pre>
+Have you ever wanted the ability to hide the Dock and/or the menu bar
+on an application-by-application basis? That is, when you launch
+iPhoto, the Dock is hidden, when you launch Google Earth both the Dock
+and the menu bar are hidden? This can be useful when working on a
+smaller screen with a program that requires most of the screen for its
+visuals, or if you just find the Dock and menu bar are cluttering your
+view of things.
+.
+While there are a number of third-party programs out that purport to
+do just this- ASM and MenuShade come to mind - it's actually quite easy
+to do yourself. It just takes a couple of simple edits in one file
+within the given application.
+...
+</pre>
+I made a copy of the Stickies application on my desktop.
+<pre>
+  % <b>cd ~/Desktop/StickiesCopy.app/Contents</b>
+  % <b>emacs -nw  Info.plist</b>
+</pre>
+Then add the lines that say 'HERE:'...
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;UTF-8&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!DOCTYPE</font> <font color="#2040a0">plist</font> <font color="#2040a0">PUBLIC</font> <font color="#008000">&quot;-//Apple//DTD PLIST 1.0//EN&quot;</font> <font color="#008000">&quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">plist</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">dict</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<!-- HERE: -->  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">key</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>LSUIPresentationMode<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/key</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<!-- HERE: -->  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">integer</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>4<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/integer</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">key</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>CFBundleDevelopmentRegion<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/key</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">string</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>English<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/string</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+	<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">key</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>CFBundleDocumentTypes<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/key</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  ...
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/dict</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/plist</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+And the options for that variable:
+<ul>
+<li>LSUIPresentationMode 1 - Hides Dock. Dock will appear if mouse moved to where it is located.</li>
+<li>LSUIPresentationMode 2 - Removes Dock.</li>
+<li>LSUIPresentationMode 3 - Removes Menu Bar and Dock.</li>
+<li>LSUIPresentationMode 4 - Hides Menu Bar and Dock. Menu Bar or Dock will appear if mouse moved to where Menu Bar or Dock is located.</li>
+</ul>
+-----

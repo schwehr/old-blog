@@ -1,0 +1,89 @@
+TITLE: sioseis script
+AUTHOR: Kurt
+DATE: 03.30.2006 12:56
+DESC: wbt from fledermaus
+-----
+BODY:
+Here is a little sioseis script from Becca.  This does not work for
+all datasets.  For example, my Humboldt Slide dataset was not
+correctable in this way.
+
+First her intro:
+<pre>
+I have got the heave correction to work for wire in-out issues where
+you can't see the multiple! I took the depth profile from fledermaus
+and converted it to twtt and used it as a picked water bottom. To do
+this I imported the xy data points that I used to make the vertical
+curtain and draped them on the seafloor, made a note of the depth of
+each one and then converted that depth into twt (using 1500 m/s), Then
+I made a file with the shot number and the fleder seafloor depth and
+used that in the script below. It only works if there is not
+significent layback.
+
+-Becca
+</pre>
+And the script:
+<pre>
+pre>
+<font color="0000ff"><strong>#!/usr/bin/env bash</strong></font>
+
+<font color="#444444"># for shifting when you've picked the multiple/know the seafloor depth or time
+</font>
+declare -r <font color="#2040a0">FNO</font>=<font color="#008000">&quot;94000&quot;</font>
+declare -r <font color="#2040a0">LNO</font>=<font color="#008000">&quot;111047&quot;</font>
+declare -r <font color="#2040a0">BASENAME</font>=ice2003_B7
+
+sioseis &lt;&lt; eof
+procs diskin header mix wbt wbt2 header2 prout shift diskoa end
+
+diskin
+   set 0 .5
+   ipath <font color="#2040a0">$BASENAME</font>.sgy end
+end
+
+header
+    fno <font color="#2040a0">$FNO</font> lnO <font color="#2040a0">$LNO</font> ftr 1 ltr 99 l6 = l3 end
+end
+
+mix
+    type 4  lhdr 59 weight
+    1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 end
+end
+
+wbt
+! shot-time pairs for fleder picked seafloor gets asigned to r50
+`cat B7.sf`
+end
+
+wbt2
+! pick the water bottom from the original data, using the method that works best beneath
+   index 60   ! put this pick in real word 60
+
+!   peak pos sepp .07 .09 track .01 lprint 2 end
+!   thres .1e-08 track .005 end
+!   peak pos sepp 0.01 0.25 track 0.005 lprint 2 end
+    solrat 6 ses 0.0010 0.0020 sel 0.1 0.25 lprint 2 end
+!   solrat 4 ses .001 .005 sel .2 .3 lprint 2 end
+end
+
+header2
+   fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftr 1 ltr 99
+      ! substitute the picked water column depth for the theoretical
+   r59 = r50 - r60 end
+end
+prout
+   indices r50 r59 r60
+   fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> noinc 100 end
+end
+shift
+  indices r59 end
+end
+diskoa
+   ofmt 1 opath <font color="#2040a0">$BASENAME</font>-flt.sgy end
+end
+end
+eof
+</pre>
+-----

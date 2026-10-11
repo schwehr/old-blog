@@ -1,0 +1,49 @@
+TITLE: My first sioseis plot
+AUTHOR: Kurt
+DATE: 09.21.2005 12:44
+DESC: not good, but getting going
+-----
+BODY:
+I finally gave plotting in sioseis a try. Pltsegy has been really
+great for the xstar chirp data, but I have not figured out the deal
+for the Huntec channel 1 data.  This plot is not pretty, but it is the
+first one that actually looks somewhat like the data.  I can see the
+wbt.  There are no gains applied.
+
+<img src="http://schwehr.org/blog/attachments/2005-09/sioseis-1st.png">
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+<font color="#FF8800"># First attempt to use sioseis for plotting the huntec data.</font>
+sioseis=/Users/schwehr/x/src/sioseis/sioseis.Darwin
+INFILE=line43-ch1-5575-6175.sgy
+<font color="#FF8800"># stime  - time offset from shot to start plotting
+# nsecs  - number of seconds of data to plot
+# vscale - vertical scale in inches per sec
+# trpin  - traces per inch on the horizontal
+# wiggle - with 0 the it plots too much!
+# opath  - where to write the file on disk</font>
+$sioseis &lt;&lt;EOF
+procs diskin prout plot end
+diskin
+  ipath <font color="#2040a0">$INFILE</font> end
+end
+!
+plot
+  stime .6
+  nsecs .1
+  vscale 40
+  trpin 100
+  wiggle 0
+  opath foo.sio end
+end
+!
+end
+EOF
+sio2sun foo.sio foo.sun
+convert -rotate 90 foo.sun foo.png
+xv foo.png
+</pre>
+Without the <em>wiggle 0</em> the graph looks even worse.
+
+<b>Update:</b>  Adding def .1 and clip .1 made a big improvement over this picture!
+-----

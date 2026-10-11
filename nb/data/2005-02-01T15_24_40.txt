@@ -1,0 +1,44 @@
+TITLE: gnuplot tutorial
+AUTHOR: Kurt
+DATE: 02.01.2005 15:24
+DESC: Simple gnuplot starter
+-----
+BODY:
+gnuplot in a box...  open a terminal, shell, xterm, or something and
+start typing:
+<pre>
+cat &lt;&lt; EOF &gt; 1.dat
+   # depth value table for core 1
+   1 2 
+   2 2.2
+   3 3.3
+   4 1.4
+EOF
+
+
+cat &lt;&lt; EOF &gt; 2.dat
+   # depth value table for core 3
+   1 2.9 
+   2 2.1
+   3 1.3
+   4 2.4
+EOF
+
+gnuplot
+plot '1.dat' with linespoints, '2.dat' with lines title 'core 2'
+quit
+
+cat &lt;&lt;EOF &gt; sample.gp
+  set terminal pdf
+  set output "sample.pdf"
+  set title "This is a test"
+  set xrange [1:4]
+  set xlabel "depth"
+  set ylabel "some value"
+  plot cos(4*x)+2, '1.dat' with linespoints, '2.dat' with lines
+EOF
+
+gnuplot sample.gp
+open sample.pdf
+</pre>
+-----

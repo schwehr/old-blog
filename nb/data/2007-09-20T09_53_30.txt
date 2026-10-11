@@ -1,0 +1,45 @@
+TITLE: magicdate-py in fink
+AUTHOR: Kurt
+DATE: 09.20.2007 09:53
+DESC: and noaadata-py
+-----
+BODY:
+After using <a
+href="http://cheeseshop.python.org/pypi/magicdate">magicdate</a> for
+just a few minutes, I like it!  I decided to add it to fink.  For
+people handling time series data, this makes life much better.
+<pre>
+&gt;&gt;&gt; from optparse import OptionParser
+&gt;&gt;&gt; import magicdate
+&gt;&gt;&gt; parser = OptionParser(option_class=magicdate.MagicDateOption)
+&gt;&gt;&gt; parser.add_option('-s', '--start', dest='start', type='magicdate', default=None)
+&gt;&gt;&gt; parser.add_option('-e', '--end', dest='end', type='magicdate', default='today')
+</pre>
+I'm trying to create a "kml_countdown_placemark.py" program.  I need
+to be able to specify when it starts, so magicdate is the clear
+choice.
+
+<pre>
+...
+if __name__ == '__main__':
+    from optparse import OptionParser
+    import magicdate
+    
+    parser = OptionParser(usage="%prog [options] [file1] [file2] ...",
+                          version="%prog "+__version__
+			  +' ('+__date__
+			  +')',option_class=magicdate.MagicDateOption)
+    parser.add_option('--start-time',dest='start',type='magicdate',default=None,help='magicdate')
+    parser.add_option('--time-offset',dest='timeOffset',default=0
+                      , type='int'
+                      ,help=' Move date to a time within a day [default: %default m ]')
+    #   More options here
+    (options,args) = parser.parse_args()
+
+    import datetime
+    start =  datetime.datetime(options.start.year,options.start.month,options.start.day)+datetime.timedelta(seconds=60*options.timeOffset)
+
+    # Lots of code follows
+</pre>
+Look for it in the next noaadata-py release.
+-----

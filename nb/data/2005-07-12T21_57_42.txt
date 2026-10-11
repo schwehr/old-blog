@@ -1,0 +1,46 @@
+TITLE: CMU Sandstorm goes 200 Miles
+AUTHOR: Kurt
+DATE: 07.12.2005 21:57
+DESC: gmail tips, ssh tunnels
+-----
+BODY:
+So it was on a track.  It is still a great feat!
+
+<a
+href="http://www.cmu.edu/cmnews/extra/050712_sandstorm.html">Carnegie
+Mellon's Sandstorm Robot Makes Unprecedented 200-Mile Autonomous
+Run</a>
+
+<a href="http://g04.com/misc/GmailTipsComplete.html">42 gmail tips</a>
+
+<a
+href="http://techrepublic.com.com/5100-10879-5779944.html?tag=nl.e011">Setting
+up a reverse SSH tunnel</a> by Vincent Danen. [techrepublic.com]
+<pre>
+  ...
+  This is useful if you have a service on the remote end that you want
+  to have connected to something on the local machine, but you don't
+  wish to open up your firewall or have SSH private keys stored on the
+  remote machine. By using a reverse tunnel, you maintain all of the
+  control on the local machine. An example usage for this would be for
+  logging messages; by setting up a reverse SSH tunnel, you can have a
+  logger on the remote system send logs to the local system (i.e.,
+  syslog-ng). 
+
+  To set up the reverse tunnel, use:
+
+  <code>
+  $ ssh -nNT -R 1100:local.mydomain.com:1100 remote.mydomain.com
+  </code>
+  What this does is initiate a connection to remote.mydomain.com and
+  forwards TCP port 1100 on remote.mydomain.com to TCP port 1100 on
+  local.mydomain.com. The "-n" option tells ssh to associate standard
+  input with /dev/null, "-N" tells ssh to just set up the tunnel and
+  not to prepare a command stream, and "-T" tells ssh not to allocate
+  a pseudo-tty on the remote system. These options are useful because
+  all that is desired is the tunnel and no actual commands will be
+  sent through the tunnel, unlike a normal SSH login session. The "-R"
+  option tells ssh to set up the tunnel as a reverse tunnel 
+  ...
+</pre>
+-----

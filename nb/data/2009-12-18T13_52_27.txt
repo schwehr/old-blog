@@ -1,0 +1,141 @@
+TITLE: first steps in giving MB-System an autoconf build system
+AUTHOR: Kurt
+DATE: 12.18.2009 13:52
+DESC: a very small step forward
+-----
+BODY:
+Dale and I (with lots of help from #fink IRC) are working on autoconf
+for MB-System.  We are starting with just the mbio subdirectory to see
+if we can build libmbio.a.  I started out with this little autogen.sh
+script:
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+rm -rf aclocal<font color="#990000">.</font>m4 autom4te<font color="#990000">.</font>cache configure
+<b><font color="#0000FF">set</font></b> -x <i><font color="#9A1900"># Turn on Debugging</font></i>
+<!-- -->
+aclocal
+autoconf
+automake --add-missing</tt></pre>
+I was quickly told that I don't need that and that I can just do:
+<pre>autoreconf -fvi</pre>
+Then I went to the mbio subdirectory and ran
+<pre>autoscan</pre>
+This generates a basic template to start working with:
+<pre><tt><i><font color="#9A1900">#                                               -*- Autoconf -*-</font></i>
+<i><font color="#9A1900"># Process this file with autoconf to produce a configure script.</font></i>
+<!-- -->
+AC_PREREQ([2.63])
+AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_CONFIG_SRCDIR([mb_absorption.c])
+AC_CONFIG_HEADERS([config.h])
+<!-- -->
+<i><font color="#9A1900"># Checks for programs.</font></i>
+AC_PROG_CC
+<!-- -->
+<i><font color="#9A1900"># Checks for libraries.</font></i>
+<!-- -->
+<i><font color="#9A1900"># Checks for header files.</font></i>
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
+<!-- -->
+<i><font color="#9A1900"># Checks for typedefs, structures, and compiler characteristics.</font></i>
+AC_TYPE_SIZE_T
+AC_HEADER_STDBOOL
+<!-- -->
+<i><font color="#9A1900"># Checks for library functions.</font></i>
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([floor getcwd gethostname memmove memset pow rint sqrt strchr strrchr strstr strtol])
+<!-- -->
+AC_OUTPUT</tt></pre>
+Copy that file to configure.ac (configure.in is a less prefered name,
+but will work too).  With the help of fangism and pogma, we made these changes:
+<ul>
+<li>Edit AC_INIT to have the name of the package, version number, and an email address</li>
+<li>Comment out the AC_CONFIG_SRCDIR... don't know what that line does</li>
+<li>Add AM_INIT_AUTOMAKE([foreign]) to tell it to build a makefile</li>
+<li>Same boes for the AC_CONFIG_FILES([Makefile])</li>
+<li>I was trying to build a library, and it needs to know about RANLIB, so tell it to go look for ranlib</li>
+<li>AC_PROB_LIBTOOL is old.  Use LT_INIT to tell it to use libtool so we can build libraries</li>
+<li>Turn off the MALLOC lines as those are not helpful.  We don't care what malloc(0) does</li>
+</ul>
+The final result:
+<pre><tt><i><font color="#9A1900">#                                               -*- Autoconf -*-</font></i>
+<i><font color="#9A1900"># Process this file with autoconf to produce a configure script.</font></i>
+<!-- -->
+AC_PREREQ([2.63])
+AC_INIT([mbio], [5.1.3], [dave@mbari.org])
+AC_CONFIG_HEADERS([config.h])
+<!-- -->
+<i><font color="#9A1900">#AM_INIT_AUTOMAKE</font></i>
+AM_INIT_AUTOMAKE([foreign])
+AC_CONFIG_FILES([Makefile])
+AC_PROG_RANLIB
+<!-- -->
+<i><font color="#9A1900"># Checks for programs.</font></i>
+AC_PROG_CC
+<!-- -->
+<i><font color="#9A1900"># Checks for libraries.</font></i>
+<b><font color="#0000FF">dnl</font></b><i><font color="#9A1900"> libtool setup</font></i>
+LT_INIT
+<!-- -->
+<i><font color="#9A1900"># Checks for header files.</font></i>
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
+<!-- -->
+<i><font color="#9A1900"># Checks for typedefs, structures, and compiler characteristics.</font></i>
+AC_TYPE_SIZE_T
+AC_HEADER_STDBOOL
+<!-- -->
+<i><font color="#9A1900"># Checks for library functions.</font></i>
+AC_CHECK_FUNCS([floor getcwd gethostname memmove memset pow rint sqrt strchr strrchr strstr strtol])
+<!-- -->
+AC_OUTPUT</tt></pre>
+
+<img title="Changes from autoscan" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/autoscan-diff.png"/>
+
+Now we need a Makefile.am to build our makefile:
+<pre><tt><font color="#009900">lib_LIBRARIES =</font> libmbio.a 
+<font color="#009900">libmbio_a_SOURCES =</font> <font color="#990000">*</font>.c</tt></pre>
+This tells it that we want to build libmbio.a, a static library (not a shared lib) and that all the C source files in this directory go into the shared library.
+
+Now we have all the pieces, so let build the world...
+<pre><b>autoreconf -fvi</b>
+<b>./configure --prefix=/tmp/foo</b>
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... ./install-sh -c -d
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for ranlib... ranlib
+checking for gcc... gcc
+checking for C compiler default output file name... a.out
+...
+checking for strtol... yes
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing depfiles commands
+<b>make</b>
+make  all-am
+gcc -DHAVE_CONFIG_H -I.     -g -O2 -MT *.o -MD -MP -MF .deps/*.Tpo -c -o *.o mb_absorption.c
+mb_absorption.c:107:37: error: ../../include/mb_status.h: No such file or directory
+mb_absorption.c:108:37: error: ../../include/mb_define.h: No such file or directory
+mb_absorption.c: In function 'mb_absorption':
+mb_absorption.c:117: error: 'MB_SUCCESS' undeclared (first use in this function)
+mb_absorption.c:117: error: (Each undeclared identifier is reported only once
+mb_absorption.c:117: error: for each function it appears in.)
+mb_absorption.c:180: error: 'MB_ERROR_NO_ERROR' undeclared (first use in this function)
+make[1]: *** [*.o] Error 1
+make: *** [all] Error 2</pre>
+David Fang has some good notes on autoconf: <a href="http://csl.cornell.edu/~fang/opensource.html">Open Source Projects and Programs</a>.  Especially: <a href="http://csl.cornell.edu/~fang/sw/hello-autotools-0.1.tar.bz2">hello-autotools-0.1.tar.bz2</a> and <a href="http://sourceware.org/autobook/">AutoBook/Goat Book</a>
+
+The above was using these versions of the tools:
+<pre><b>fink list -i automake autoconf libtool | egrep -v 'shlib|automaken'</b>
+ i      autoconf        1:2.63-3        System for generating configure scripts
+ i      automake1.11    1.11.1-1        GNU Standards-compliant Makefile generator
+ i      libtool14       1.5.26-3        Shared library build helper, v1.5</pre>
+
+For future work, we will have to go back into the code and change the
+architecture detecting flags into autoconf feature detecting flags.
+
+Trackback: Dale wrote <a href="http://new.ilab.ldeo.columbia.edu/node/42">"autoconfsicating" MB-System</a> [LDEO Instrument Laboratory]
+-----

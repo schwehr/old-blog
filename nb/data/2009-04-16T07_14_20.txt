@@ -1,0 +1,52 @@
+TITLE: Adding GPS EXIF tags to an image
+AUTHOR: Kurt
+DATE: 04.16.2009 07:14
+DESC: pretty easy
+-----
+BODY:
+While there are many tools that now read GPS exif tags (e.g. jhead),
+most of them either can't write the headers or don't provide a way to
+write EXIF fields or make it difficult.  <a href="http://www.sno.phy.queensu.ca/~phil/exiftool/">ExifTool</a> makes it easy.  On a
+Ubuntu Linux box.  Here is the before:
+<pre>% sudo apt-get install libimage-exiftool-perl
+% <b>wget http://mgds.ldeo.columbia.edu/healy/reports/aloftcon/2009/20090201-1601.jpeg</b>
+% <b>exiftool 20090201-1601.jpeg</b>
+ExifTool Version Number         : 7.30
+File Name                       : 20090201-1601.jpeg
+Directory                       : .
+File Size                       : 114 kB
+File Modification Date/Time     : 2009:02:01 11:01:45
+File Type                       : JPEG
+MIME Type                       : image/jpeg
+JFIF Version                    : 1.1
+Resolution Unit                 : inches
+X Resolution                    : 72
+Y Resolution                    : 72
+Comment                         : Sun Feb 01 16:00:32 2009
+Image Width                     : 1280
+Image Height                    : 960
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:0 (2 2)
+Image Size                      : 1280x960</pre>
+Now to add the GPS tags.
+
+<img title="Healy image - text position" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/20090201-1601-crop.jpg"/>
+
+<pre>% <b>exiftool -GPSLongitudeRef=W 20090201-1601.jpeg</b>
+% <b>exiftool -GPSLongitude=123.02 20090201-1601.jpeg</b>
+% <b>exiftool -GPSLatitudeRef=N 20090201-1601.jpeg</b>
+% <b>exiftool -GPSLatitude=43.216666 20090201-1601.jpeg</b>
+% <b>exiftool 20090201-1601.jpeg | grep GPS</b>
+GPS Version ID                  : 2.2.0.0
+GPS Latitude Ref                : North
+GPS Longitude Ref               : West
+GPS Latitude                    : 43 deg 12' 60.00" N
+GPS Longitude                   : 123 deg 1' 12.00" W
+GPS Position                    : 43 deg 12' 60.00" N, 123 deg 1' 12.00" W</pre>
+The resulting tagged image:
+<a href="http://schwehr.org/blog/attachments/2009-04/20090201-1601-with-exif-gps.jpeg">20090201-1601-with-exif-gps.jpeg</a>
+
+See also: <a href="http://techkr.blogspot.com/2007/02/write-gps-data-on-your-photos-with.html">Write GPS data on your photos with Exiftool</a>
+-----

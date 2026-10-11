@@ -1,0 +1,74 @@
+TITLE: pdflib lite rocks for af demag
+AUTHOR: Kurt
+DATE: 02.25.2005 19:33
+DESC: First poster sized pdf
+-----
+BODY:
+Panda is definitely out.  The bus errors sent me off to try PDFlib
+Lite.  It was not long before I had a sample pdf with test af demag
+plots and discovered that they show up nicely in Illustrator.  Rockin!
+Here is my test code.  Only the C API is in fink.  It feels weird and
+clunky to go back to a C only API.  Managing allocating and destroying
+objects is much easier in C++.  I also want to see if I can get the
+python interface going.
+<pre>
+<font color="#444444">// Using the c api</font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdlib.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;stdio.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;pdflib.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;iostream&gt;</font></strong></font>
+<strong>using</strong> <strong>namespace</strong> <font color="#2040a0">std</font><font color="4444FF">;</font>
+
+<strong>int</strong> <font color="#2040a0">main</font> <font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">argc</font>,<strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">PDF</font> <font color="4444FF">*</font><font color="#2040a0">p</font><font color="4444FF">;</font>
+  <strong>int</strong> <font color="#2040a0">font</font><font color="4444FF">;</font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font><font color="4444FF">(</font><font color="#2040a0">p</font><font color="4444FF">=</font><font color="#2040a0">PDF_new</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">cerr</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;Could not create PDFlib obj<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">;</font>
+    <strong>return</strong> <font color="4444FF">(</font><font color="#2040a0">EXIT_FAILURE</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <font color="#2040a0">PDF_TRY</font><font color="4444FF">(</font><font color="#2040a0">p</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">PDF_open_file</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#008000">&quot;afdemag-poster.pdf&quot;</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF"><strong>
+{</strong></font><font color="#2040a0">cerr</font><font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;Error:&quot;</font><font color="4444FF">&lt;</font><font color="4444FF">&lt;</font><font color="#2040a0">PDF_get_errmsg</font><font color="4444FF">(</font><font color="#2040a0">p</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">endl</font><font color="4444FF">;</font><strong>return</strong> <font color="4444FF">(</font><font color="#2040a0">EXIT_FAILURE</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="4444FF"><strong>}</strong></font>
+    <font color="#2040a0">PDF_set_info</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#008000">&quot;Creator&quot;</font>,<font color="#008000">&quot;X-Core&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">PDF_set_info</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#008000">&quot;Author&quot;</font>,<font color="#008000">&quot;Kurt Schwehr&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">PDF_set_info</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#008000">&quot;Title&quot;</font>,<font color="#008000">&quot;BPSIO-04 AF Demag&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#444444">//PDF_begin_page(p,a4_width,a4_height);</font>
+    <font color="#2040a0">PDF_begin_page</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#FF0000">2592</font>,<font color="#FF0000">5184</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">font</font> <font color="4444FF">=</font> <font color="#2040a0">PDF_load_font</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#008000">&quot;Helvetica-Bold&quot;</font>,<font color="#FF0000">0</font>,<font color="#008000">&quot;host&quot;</font>,<font color="#008000">&quot;&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">PDF_setfont</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#2040a0">font</font>,<font color="#FF0000">42</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">PDF_set_text_pos</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#FF0000">800</font>,<font color="#FF0000">4900</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+    <font color="#2040a0">PDF_show</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#008000">&quot;BPSIO 2004  AF Demagnetization Curves&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+    <strong>int</strong> <font color="#2040a0">image</font><font color="4444FF">;</font>
+    <strong>for</strong> <font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">x</font><font color="4444FF">&lt;</font><font color="#FF0000">2300</font> <font color="4444FF">;</font> <font color="#2040a0">x</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">250</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+      <strong>for</strong> <font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">y</font> <font color="4444FF">&lt;</font> <font color="#FF0000">4500</font><font color="4444FF">;</font> <font color="#2040a0">y</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">200</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+	<font color="#2040a0">cout</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">x</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot; &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">y</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">endl</font><font color="4444FF">;</font>
+	<strong>if</strong> <font color="4444FF">(</font><font color="4444FF">-</font><font color="#FF0000">1</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">image</font> <font color="4444FF">=</font> <font color="#2040a0">PDF_load_image</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#008000">&quot;jpeg&quot;</font>,<font color="#008000">&quot;1.jpg&quot;</font>, <font color="#FF0000">0</font>, <font color="#008000">&quot;&quot;</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font><font color="#2040a0">cerr</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;crap&quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">endl</font><font color="4444FF">;</font><font color="4444FF"><strong>}</strong></font>
+	<strong>else</strong> <font color="4444FF"><strong>{</strong></font>
+	  <font color="#2040a0">PDF_fit_image</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#2040a0">image</font>, <font color="#2040a0">x</font>, <font color="#2040a0">y</font>, <font color="#008000">&quot;scale 0.4&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	  <font color="#2040a0">PDF_close_image</font><font color="4444FF">(</font><font color="#2040a0">p</font>,<font color="#2040a0">image</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	<font color="4444FF"><strong>}</strong></font>
+      <font color="4444FF"><strong>}</strong></font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#2040a0">PDF_end_page</font><font color="4444FF">(</font><font color="#2040a0">p</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+    <font color="#2040a0">PDF_close</font><font color="4444FF">(</font><font color="#2040a0">p</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <font color="#2040a0">PDF_CATCH</font><font color="4444FF">(</font><font color="#2040a0">p</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">cerr</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;Doh!<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">;</font>
+    <strong>return</strong><font color="4444FF">(</font><font color="#2040a0">EXIT_FAILURE</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#2040a0">PDF_delete</font><font color="4444FF">(</font><font color="#2040a0">p</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>return</strong><font color="4444FF">(</font><font color="#2040a0">EXIT_SUCCESS</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Here is the sample that generates.  Be warned that Safari wants to
+download this as afdemag-poster.pdf.bz2.  You will need to change the
+extension to .pdf.bz2 on the desktop for things to work right.  Weird.
+<pre>
+<a href="http://schwehr.org/blog/attachments/2005-02/afdemag-poster.pdf.bz2">afdemag-poster.pdf.bz2</a>
+</pre>
+-----

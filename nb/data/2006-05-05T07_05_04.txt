@@ -1,0 +1,40 @@
+TITLE: mapserver
+AUTHOR: Kurt
+DATE: 05.05.2006 07:05
+DESC: not too bad
+-----
+BODY:
+[This is pretty much straight from the book Web Mapping Illustrated, but with a fink installed mapserver]
+
+Yesterday, I made my first mapserver map.  Just a command line thing,
+but it is a start.  First I grabbed the 0.1 simple version of the world from the web:
+<pre>
+  <a href="http://ftp.intevation.de/freegis/worlddata/">http://ftp.intevation.de/freegis/worlddata/</a>
+</pre>
+Not that is will probably complain on untar, but it still works.  Here is my global.map:
+<pre>
+MAP
+  SIZE 600 300
+  EXTENT -180 -90 180 90
+  LAYER
+        NAME countries
+        TYPE POLYGON
+        STATUS DEFAULT
+        DATA countries_simpl
+        CLASS
+                STYLE
+                        OUTLINECOLOR 100 100 100
+                END
+        END
+  END
+END
+</pre>
+I then build a map with the command line mapserv.  I will try to work
+on the info file so that mapserv is in the path, but it may be a few
+days.
+<pre>
+  /sw/share/mapserver/shp2img -m global.map -o first-mapserver-map.png
+  display first-mapserver-map.png
+</pre>
+<img src="http://schwehr.org/blog/attachments/2006-05/first-mapserver-map.png">
+-----

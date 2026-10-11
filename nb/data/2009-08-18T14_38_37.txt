@@ -1,0 +1,50 @@
+TITLE: AIS Class A position database entries
+AUTHOR: Kurt
+DATE: 08.18.2009 14:38
+DESC: sql database table fields
+-----
+BODY:
+Since I keep needing this, here is my database cheat sheet for AIS
+Class A position messages.  Note that this does not match what
+ais_build_sqlite.py creates right now, but it's close.  In addition to additional fields, I'm ditching DECIMAL for REAL.
+<pre><tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> position <font color="#990000">(</font> 
+	<b><font color="#0000FF">key</font></b> <font color="#009900">INTEGER</font> <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+	MessageID <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- 1 or 2 for SOTDMA or 3 for ITDMA</font></i>
+	RepeatIndicator <font color="#009900">INTEGER</font><font color="#990000">,</font>	<i><font color="#9A1900">-- 0 means good.  1-3 means the message has been repeated (DANGER!)</font></i>
+	UserID <font color="#009900">INTEGER</font><font color="#990000">,</font>			<i><font color="#9A1900">-- MMSI</font></i>
+	NavigationStatus <font color="#009900">INTEGER</font><font color="#990000">,</font>
+	ROT <font color="#009900">INTEGER</font><font color="#990000">,</font>
+	SOG <font color="#009900">REAL</font><font color="#990000">,</font>
+	PositionAccuracy <font color="#009900">INTEGER</font><font color="#990000">,</font>
+	longitude <font color="#009900">REAL</font><font color="#990000">,</font>
+	latitude <font color="#009900">REAL</font><font color="#990000">,</font>
+	COG <font color="#009900">REAL</font><font color="#990000">,</font>
+	TrueHeading <font color="#009900">INTEGER</font><font color="#990000">,</font>
+       	sec_timestamp <font color="#009900">INTEGER</font><font color="#990000">,</font>
+	<i><font color="#9A1900">--RegionalReserved <font color="#009900">INTEGER</font>,	-- Replaced by the next field</font></i>
+        special_manoeuvre <font color="#009900">INTEGER</font><font color="#990000">,</font>	<i><font color="#9A1900">-- 0 N/A, 1: not engaged, 2: engaged</font></i>
+	Spare <font color="#009900">INTEGER</font><font color="#990000">,</font>
+	RAIM <font color="#009900">BOOL</font><font color="#990000">,</font>
+	sync_state <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- 0 UTC direct, 1 UTC indirect, 2 sync to bs, 3 sync to mobile to bs</font></i>
+	slot_timeout <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- frames until new slot.  Controls comstate type</font></i>
+	received_stations <font color="#009900">INTEGER</font><font color="#990000">,</font>	<i><font color="#9A1900">-- SOTDMA: # of stations this receiver hears</font></i>
+	slot_number <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- SOTDMA: slot number used for transmission of this message</font></i>
+	commstate_utc_hour <font color="#009900">INTEGER</font><font color="#990000">,</font>	<i><font color="#9A1900">-- SOTDMA: Hour of the day</font></i>
+	commstate_utc_min <font color="#009900">INTEGER</font><font color="#990000">,</font>	<i><font color="#9A1900">-- SOTDMA: UTC minutes</font></i>
+	commstate_utc_spare <font color="#009900">INTEGER</font><font color="#990000">,</font>    <i><font color="#9A1900">-- SOTDMA: Should be zero</font></i>
+	slot_offset <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- SOTDMA: Offset to next slot used for next transmission. 0 if done talking</font></i>
+	slot_increment <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- ITDMA:  Offset to next slot for ITDMA.  0 if done talking</font></i>
+	keep_flag <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- ITDMA:  1 means keep the slot allocated for an additional frame.</font></i>
+	slots_to_allocate <font color="#009900">INTEGER</font><font color="#990000">,</font>	<i><font color="#9A1900">-- ITDMA:  Slots to allocate.</font></i>
+<!-- -->
+        <i><font color="#9A1900">-- USCG metadata fields</font></i>
+        cg_s_rssi <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- 's' Receive strength indicator</font></i>
+        cg_d_strength <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- 'd' dBm receive strenth</font></i>
+        cg_x_count <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- 'x' Count of messages received by that station</font></i>
+	cg_t_arrival <font color="#009900">INTEGER</font><font color="#990000">,</font>	        <i><font color="#9A1900">-- 't' HHMMSS.SS receive time</font></i>
+	cg_s_slotnum <font color="#009900">INTEGER</font><font color="#990000">,</font>		<i><font color="#9A1900">-- 'S' Slot number of receive.  9999 means?</font></i>
+	cg_r <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">15</font><font color="#990000">),</font>		<i><font color="#9A1900">-- Receiver or basestation name</font></i>
+	cg_sec <font color="#009900">INTEGER</font><font color="#990000">,</font>			<i><font color="#9A1900">-- Unix UTC receive timestamp to second resolution</font></i>
+	cg_timestamp <font color="#009900">TIMESTAMP</font> 		<i><font color="#9A1900">-- UTC time of receive to second resolution</font></i>
+<font color="#990000">);</font></tt></pre>
+-----

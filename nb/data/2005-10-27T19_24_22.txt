@@ -1,0 +1,53 @@
+TITLE: PDF class to wrap pdflib_py
+AUTHOR: Kurt
+DATE: 10.27.2005 19:24
+DESC: making pdf generation even easier
+-----
+BODY:
+Here is pretty much the simplest case of a pdflib_py wrapper that I am
+making.  The API that comes with pdflib for python feels like it came
+straight out of a C programmers mouth.  This is still pretty basic.
+It only writes some text.  It takes an awful lot of work just to get
+that done in the original API.  I am a little more able to cope with a
+simple object oriented API.
+<pre>
+<font color="#FF8800">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">pdflib_py</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>class</strong> <font color="#2040a0">PDF</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;OO Wrapper for pdflib_py&quot;</font><font color="#008000">&quot;&quot;</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,filename)</font>:#,size='letter'):
+</strong>        
+        <font color="#2040a0">self</font>.<font color="#2040a0">pdf</font> <font color="4444FF">=</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_new</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="4444FF">-</font><font color="#FF0000">1</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_open_file</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>,<font color="#2040a0">filename</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#008000">&quot;Error: &quot;</font> <font color="4444FF">+</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_get_errmsg</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font><font color="4444FF">)</font> <font color="4444FF">+</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font>
+            <font color="#2040a0">sys</font>.<font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#2040a0">ams</font>.<font color="#2040a0">EXIT_FAILURE</font><font color="4444FF">)</font>
+        <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_begin_page</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>,<font color="#FF0000">595</font>, <font color="#FF0000">842</font><font color="4444FF">)</font>        <font color="#FF8800"># FIX: make page setup sane</font>
+        <font color="#FF8800"># Make a default font</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">font</font> <font color="4444FF">=</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_load_font</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>,<font color="#008000">&quot;Helvetica-Bold&quot;</font>,<font color="#008000">&quot;iso8859-1&quot;</font>,<font color="#008000">&quot;&quot;</font><font color="4444FF">)</font>
+        <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_setfont</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>,<font color="#2040a0">self</font>.<font color="#2040a0">font</font>, <font color="#FF0000">12</font><font color="4444FF">)</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> set_info</font><font color="2040a0">(self,creator,author=None,title=None)</font>:
+</strong>        <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">creator</font><font color="4444FF">:</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_set_info</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>, <font color="#008000">'Creator'</font>, <font color="#2040a0">creator</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">author</font><font color="4444FF">:</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_set_info</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>, <font color="#008000">'Author'</font>,  <font color="#2040a0">author</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">!</font><font color="4444FF">=</font>  <font color="#2040a0">title</font><font color="4444FF">:</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_set_info</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>, <font color="#008000">'Title'</font>,   <font color="#2040a0">title</font><font color="4444FF">)</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> show</font><font color="2040a0">(self,string,pos=None)</font>:
+</strong>        <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">pos</font><font color="4444FF">:</font> <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_set_text_pos</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>,<font color="#2040a0">pos</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>,<font color="#2040a0">pos</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font>
+        <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_show</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font>,<font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">string</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __del__</font><font color="2040a0">(self)</font>:
+</strong>        <strong>import</strong> <font color="#2040a0">pdflib_py</font> <font color="#FF8800"># bad ref counting in pdflib_py?</font>
+        <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_end_page</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font><font color="4444FF">)</font>
+        <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_close</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font><font color="4444FF">)</font>
+        <font color="#2040a0">pdflib_py</font>.<font color="#2040a0">PDF_delete</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">pdf</font><font color="4444FF">)</font>
+        
+<strong>import</strong> <font color="#2040a0">sys</font>, <font color="#2040a0">datetime</font>
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <font color="#2040a0">pdf</font> <font color="4444FF">=</font> <font color="#2040a0">PDF</font><font color="4444FF">(</font><font color="#008000">&quot;foo.pdf&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">pdf</font>.<font color="#2040a0">set_info</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>,<font color="#008000">'Kurt Schwehr'</font>,<font color="#008000">'clay flocs'</font><font color="4444FF">)</font>
+    <font color="#2040a0">pdf</font>.<font color="#2040a0">show</font><font color="4444FF">(</font><font color="#2040a0">datetime</font>.<font color="#2040a0">date</font>.<font color="#2040a0">today</font><font color="4444FF">(</font><font color="4444FF">)</font>,<font color="4444FF">(</font><font color="#FF0000">25</font>,<font color="#FF0000">25</font><font color="4444FF">)</font><font color="4444FF">)</font>
+</pre>
+Wait!  Why am I trying to mess with pdflib?  If I use matplotlib or
+gnuplot, I can still write in python and I do not need to deal with
+the pdflib_py API.  Feel free to take this idea and run with it, but
+I'm not going to right now.  I was just thinking about making a pdf
+figure and my brain went back to Feb of this year.
+-----

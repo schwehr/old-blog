@@ -1,0 +1,59 @@
+TITLE: Where are the vdatum zones?
+AUTHOR: Kurt
+DATE: 03.27.2012 10:58
+DESC: a little kml
+-----
+BODY:
+I wanted to know where the vdatum zones that I had downloaded from
+NOAA are located.  Turned out to be pretty easy to parse the "met"
+files that are located in the many subdirectories that come from the
+regional zip.  Here is the met file for Maine and New Hampshire:
+<pre><b>ls MENHMAgome01_8301</b>
+dtl.gtx  MENHMAgome01_8301.bnd  MENHMAgome01_8301.met  mhhw.gtx  mhw.gtx  mllw.gtx  mlw.gtx  mtl.gtx  tss.gtx
+<b>cat MENHMAgome01_8301/MENHMAgome01_8301.met</b>
+ID=0
+source=MENHMAgome01_8301
+desc=Maine, New Hampshire, Massachusetts - Gulf of Maine, Version 01
+tide_epoch=1983-2001
+maxlat=45.568
+maxlon=294.4202
+minlat=39.89
+minlon=288.8
+spacinglat=0.0017
+spacinglon=0.0017
+height=3341
+width=3307</pre>
+Here is my lazy python parser that just slams everything into a dictionary with
+the key coming from the left hand side of the '=' and the contents being what
+was on the right.  I try to convert the number to an integer or float by brute
+force.
+<pre><b><font color="#0000FF">def</font></b> <b><font color="#000000">parse_met</font></b><font color="#990000">(</font>filename<font color="#990000">):</font>
+  r <font color="#990000">=</font> <font color="#990000">{}</font>
+  <b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">open</font></b><font color="#990000">(</font>filename<font color="#990000">):</font>
+    line <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">rstrip</font></b><font color="#990000">()</font>
+    <i><font color="#9A1900">#print line</font></i>
+    key<font color="#990000">,</font>val <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'='</font><font color="#990000">)</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+      val <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>val<font color="#990000">)</font>
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+      <b><font color="#0000FF">pass</font></b>
+    <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> <b><font color="#000000">isinstance</font></b><font color="#990000">(</font>val<font color="#990000">,</font>int<font color="#990000">):</font>
+      <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        val <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>val<font color="#990000">)</font>
+      <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">pass</font></b>
+<!-- -->
+    r<font color="#990000">[</font>key<font color="#990000">]</font> <font color="#990000">=</font> val
+<!-- -->
+  <b><font color="#0000FF">return</font></b> r</pre>
+I then made a little for loop for each file and used the python '''{var}'''.format(var='my value') style python templating
+to produce some simple KML for Google Earth.
+
+VDatum zones are not yet available for Alaska.  Here is the continental US:
+
+<img width="600" height="375" title="VDatum Zones overview" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-03/vdatum-zones.jpg"/>
+
+Here is one of the Florida zones showing how I just shoved the contents of the met file into the description field of the placemarks.
+
+<img width="600" height="312" title="VDatum Zones individual example" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-03/vdatum-zones-2.jpg"/>
+-----

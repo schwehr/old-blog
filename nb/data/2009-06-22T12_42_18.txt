@@ -1,0 +1,40 @@
+TITLE: Guidelines for setting AIS draught?
+AUTHOR: Kurt
+DATE: 06.22.2009 12:42
+DESC: what is the best practice?
+-----
+BODY:
+A question for mariners: What guidelines do you use for setting
+draught for your AIS device and why?  From my perspective, I would
+expect the value to be changing with cargo and fuel such that draught
+and position combined with bathymetry yields under-keel clearance. 
+
+Comments can be <a href="http://goatbar.livejournal.com/2139.html">posted on Live Journal</a>.
+
+Mostly I see pretty constant draught values for ships, but the
+Nor`Easter caught my eye as having quite a few transitions of draught
+during 2008.  Note that I also see length starting at 181m and
+switching to 183 meters part way through the year.
+
+<img title="Nor`Easter 2008 draught" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/nor-easter-draught.png"/>
+
+And here is the code to make the data for the plot from my sqlite database.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sqlite3
+<b><font color="#000080">import</font></b> datetime
+<!-- -->
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'2008-5.unique.db3'</font><font color="#990000">)</font>
+cx<font color="#990000">.</font>row_factory <font color="#990000">=</font> sqlite3<font color="#990000">.</font>Row 
+<!-- -->
+last <font color="#990000">=</font> None
+<b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'select * from shipdata where userid=538002219;'</font><font color="#990000">):</font>
+    ts <font color="#990000">=</font> datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">strptime</font></b><font color="#990000">(</font>row<font color="#990000">[</font><font color="#FF0000">'cg_timestamp'</font><font color="#990000">],</font><font color="#FF0000">'%Y-%m-%d %H:%M:%S'</font><font color="#990000">)</font>
+    <i><font color="#9A1900">#print type(ts),ts</font></i>
+<!-- -->
+    day <font color="#990000">=</font> ts<font color="#990000">.</font><b><font color="#000000">strftime</font></b><font color="#990000">(</font><font color="#FF0000">'%j'</font><font color="#990000">)</font>
+    seconds <font color="#990000">=</font> <font color="#990000">(</font>ts <font color="#990000">-</font> datetime<font color="#990000">.</font><b><font color="#000000">datetime</font></b><font color="#990000">(</font>ts<font color="#990000">.</font>year<font color="#990000">,</font>ts<font color="#990000">.</font>month<font color="#990000">,</font>ts<font color="#990000">.</font>day<font color="#990000">)).</font>seconds
+    <b><font color="#0000FF">if</font></b> last <font color="#990000">!=</font> None<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'%s.%d %3.1f'</font> <font color="#990000">%</font> <font color="#990000">(</font>day<font color="#990000">,</font>seconds<font color="#990000">,</font>last<font color="#990000">)</font>
+    last <font color="#990000">=</font> row<font color="#990000">[</font><font color="#FF0000">'draught'</font><font color="#990000">]</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'%s.%d %3.1f'</font> <font color="#990000">%</font> <font color="#990000">(</font>day<font color="#990000">,</font>seconds<font color="#990000">,</font>row<font color="#990000">[</font><font color="#FF0000">'draught'</font><font color="#990000">])</font></tt></pre>
+-----

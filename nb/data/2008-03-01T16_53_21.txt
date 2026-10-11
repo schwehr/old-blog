@@ -1,0 +1,85 @@
+TITLE: Working towards creating debs
+AUTHOR: Kurt
+DATE: 03.01.2008 16:53
+DESC: minor progress
+-----
+BODY:
+I'm working through some notes and man pages on how to create debs on
+Ubuntu.  I indirectly create debs on the Mac all the time with fink,
+but I've always ignored what goes on under the hood.  Working with the
+info files and the documentation on <a
+href="http://finkproject.org/">finkproject.org</a> has been fairly
+easy for me.  Creating a Ubuntu deb is a little less obvious.  If you
+know of a really good tutorial/howto for creating debs with Ubuntu
+7.10, please let me know.  I've been playing with the <a
+href="http://women.debian.org/wiki/English/PackagingTutorial">Packaging
+Tutorial</a> from Debian, but it is a bit out of date or there may be
+differences between Debian and Ubuntu.
+
+I'd really like to have debs for all that I need for one of my
+datalogging boxes.  I've got 2 remote boxes deployed around
+Portsmouth/Great Bay and a third likely to go in soon up near <a
+href="http://www.mainemaritime.edu/">Maine Maritime</a>.
+<pre>
+sudo apt-get update 
+sudo apt-get upgrade
+sudo apt-get install build-essential devscripts dh-make
+export DEBEMAIL="schwehr _at_ ccom unh edu"
+export DEBFULLNAME="Kurt Schwehr"
+tar xf wmforkplop-0.9.3.tar.gz
+cd wmforkplop-0.9.3
+dh_make -f ../wmforkplop-0.9.3.tar.gz 
+cd debian
+</pre>
+My debian/control file:
+<pre>
+Source: wmforkplop
+Section: x11
+Priority: extra
+Maintainer: Kurt Schwehr &lt;schwehr _at_ ccom unh edu&gt;
+Build-Depends: debhelper (&gt;= 5), autotools-dev
+Standards-Version: 3.7.2
+Package: wmforkplop
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: &lt;insert up to 60 chars description&gt;
+ &lt;insert long description, indented with spaces&gt;
+</pre>
+The control file looks a lot like the fink info files that I am
+familiar with.
+
+Then going back to the mac with fink, I'm learning more
+debian package commands:
+<pre>
+apt-cache show tilecache-py25
+Package: tilecache-py25
+Priority: optional
+Section: web
+Installed-Size: 388
+Maintainer: Kurt Schwehr &lt;goatbar _at_ users sourceforge net&gt;
+Architecture: darwin-i386
+Source: tilecache-py25
+Version: 2.01-1
+Depends: python25, darwin (&gt;= 9-1)
+Filename: dists/local/main/binary-darwin-i386/web/tilecache-py25_2.01-1_darwin-i386.deb
+Size: 70092
+MD5sum: 78355410ea485af78bd6e3bb691e9d58
+Description: WMS-C tiling client
+ TileCache is an implementation of a WMS-C (about) compliant server
+ made available under the BSD license by MetaCarta.
+ .
+ TileCache provides a Python-based WMS/TMS server, with pluggable
+ caching mechanisms and rendering backends. In the simplest use case,
+ TileCache requires only write access to a disk, the ability to run
+ Python CGI scripts, and a WMS you want to be cached. With these
+ resources, you can create your own local disk-based cache of any WMS
+ server, and use the result in any WMS-C supporting client, like
+ OpenLayers, or any TMS supporting client, like OpenLayers and
+ worldKit.
+ .
+ Web site: http://tilecache.org/
+ .
+ Maintainer: Kurt Schwehr &lt;goatbar _at_ users sourceforge net&gt;
+BuildDependsOnly: Undefined
+</pre>
+-----

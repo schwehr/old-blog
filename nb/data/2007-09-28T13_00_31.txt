@@ -1,0 +1,35 @@
+TITLE: Making a python serial logger daemon
+AUTHOR: Kurt
+DATE: 09.28.2007 13:00
+DESC: init script
+-----
+BODY:
+I think I've got a basic serial logger daemon worked out for Ubuntu
+Linux.  My next release of noaadata should have the actual source
+files.   
+<pre>
+$ sudo ./logtide start
+ * Starting tide logging server logtide     [ OK ] 
+$ ./logtide status
+ * Tide logging server is running.
+$ sudo ./logtide stop
+ * Stopping tide logging server logtide     [ OK ]
+</pre>
+Finally, an item that has been on my to do list is done.  It could 
+use some improvements, but I will not get to it for a while.
+
+"Creating a daemon the Python way" was a big help: <a href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/278731">http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/278731</a> 
+
+And then I had to do this to get all the links setup:
+<pre>
+update-rc.d logtide defaults
+ Adding system startup for /etc/init.d/logtide ...
+   /etc/rc0.d/K20logtide -> ../init.d/logtide
+   /etc/rc1.d/K20logtide -> ../init.d/logtide
+   /etc/rc6.d/K20logtide -> ../init.d/logtide
+   /etc/rc2.d/S20logtide -> ../init.d/logtide
+   /etc/rc3.d/S20logtide -> ../init.d/logtide
+   /etc/rc4.d/S20logtide -> ../init.d/logtide
+   /etc/rc5.d/S20logtide -> ../init.d/logtide
+</pre>
+-----

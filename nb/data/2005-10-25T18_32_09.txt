@@ -1,0 +1,64 @@
+TITLE: Suggestions for anyone writing SEM acquisition software
+AUTHOR: Kurt
+DATE: 10.25.2005 18:32
+DESC: lots of ideas
+-----
+BODY:
+I am sitting here typing in the data from last weeks SEM run.
+
+QUESTION:  How can a sample have <b>-</b>1.24% carbon?  Ahem.
+
+This is a note to anyone designing SEM software.  Please, oh please
+put these features into your software.  The more info the data files,
+the better.  This stuff could go in the tiff tags, in an XML file, or
+flat file even.  Then I can write a little pdflib program to assemble
+a composite image.  With some EDX machine readable data with position
+and time, I can even lay in the spot on the pdf.
+<ul>
+  <li> Stage position including height
+  <li> The scale of the image or width
+  <li> Focusing info
+  <li> Any other tunable beam parameters
+  <li> SEM mode (environmental, low vac, or high vac)
+  <li> time and date of the acquisition system
+  <li> Oh, and enable lossless tiff compression!
+  <li> Don't even let people write jpeg's.  What is the point of
+  saving bad data? 
+  <li> Build a secure system that can publish the data to just me over
+  the net.  The SIO WinXP boxes have been force complete off the
+  network.  What a waist of CD-R's. 
+  <li> Why do I have to explicitly store images.  I would like a mode
+  that grabs frames at a slow frequency, then let me explicitly mark
+  the ones I need to pull out... Then we could do a pan/scan of most
+  of a sample and build a large Fledermaus or iv model of the surface.
+</ul>
+For the EDX mode, exporting a report to a word document is very cute,
+but a royal pain.  A machine readable format is critical.
+<ul>
+  <li> A simple ASCII table of the spectra would rock
+  <li> Put in the time and stage position for linking to the SEM images
+  <li> Include the peak locations for the elements
+  <li> Include both the found and missing elements that the detector
+  can sense (knowing that there is no detectable S is important too)
+  <li> Why not make EDX acquisition be automatic.  The moment the SEM
+  stops moving, start sampling.  Then let me know how many samples at
+  the current spot.
+</ul>
+Be warned that these are notes from my first use an SEM.  Maybe some
+of these features really are there and I just don't know about them.
+
+We also need a free and open source system for best guess mineral
+identification.  I bet a little <a
+href="http://www.cs.waikato.ac.nz/~ml/weka/">WEKA</a> setup could do a
+good matching job.
+
+Back when I was working on MER, I had the IVS (Fledermaus folks) make
+a custom setup for microscope work.  Both sides need to converge
+before the average user can just make a 3D model from an SEM and do
+analysis right in that tool.  This is the kind of stuff that I
+wanted (and still want) to do with a Viz type architecture.  Let me
+build a Rose diagram and/or 3D probability density map in the 3D
+environment quickly.  Tag locations, annotate them, and then drop in
+additional data.   Finally, let me make a publication quality figure
+and HD quality movie.  All without killing myself in the process.
+-----

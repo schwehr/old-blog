@@ -1,0 +1,31 @@
+TITLE: Badly behaved growl
+AUTHOR: Kurt
+DATE: 09.27.2011 16:16
+DESC: 18GB for growl?
+-----
+BODY:
+I've seen Guide (mr python) notice that his Growl instance was claim 18G of virtual memory.  I 
+didn't register that I could be having the same thing, but there it is
+with "top -o vsize":
+<pre>Processes: 111 total, 3 running, 2 stuck, 106 sleeping, 483 threads                                                          16:09:01
+Load Avg: 0.72, 0.75, 0.85  CPU usage: 4.28% user, 4.28% sys, 91.42% idle  SharedLibs: 12M resident, 5416K data, 0B linkedit.
+MemRegions: 18495 total, 767M resident, 36M private, 1451M shared.
+PhysMem: 1675M wired, 1563M active, 697M inactive, 3934M used, 94M free.
+VM: 265G vsize, 1122M framework vsize, 11277490(0) pageins, 3700141(0) pageouts.
+Networks: packets: 14670614/17G in, 8430222/1812M out. Disks: 7513249/172G read, 4825603/165G written.
+<!-- -->
+PID    COMMAND      %CPU TIME     #TH  #WQ  #PORT #MREG RPRVT  RSHRD  RSIZE  VPRVT  VSIZE  PGRP  PPID  STATE    UID  FAULTS
+239    GrowlMenu    0.0  00:08.56 2    1    89    263   15M    7412K  14M    335M   18G    239   174   sleeping 502  83440
+0      kernel_task  7.4  03:01:19 67/5 0    2     608   77M    0B     444M-  82M    5092M  0     0     running  0    3857713
+20     fseventsd    0.0  04:43.62 57   1    248   174   5536K  216K   9464K  1419M  3780M  20    1     sleeping 0    4233810+
+82531  Mail         0.0  00:28.93 9    2    404   857   73M    48M    152M   229M   3689M  82531 174   sleeping 502  82749
+81718  vmware-vmx   2.0  17:24.72 23   1    285   436   27M    16M    1175M+ 70M    3658M  81718 1     sleeping 0    1056463+
+81852  Colloquy     0.0  00:15.89 7    2    265   346   19M    18M    39M    170M   3529M  81852 174   sleeping 502  58575 
+14968  DashboardCli 2.0  03:04.13 6    2    141   198   11M    6200K  14M    206M   3504M  191   191   sleeping 502  118010
+2855   firefox-bin  2.5  04:07.14 26   1    241   1042  183M   52M    338M   263M   3449M  2855  174   sleeping 502  316601
+62     mds          0.1  26:12.09 7    5    170-  286   62M-   8404K  75M-   659M   3110M  62    1     sleeping 0    9675687+
+...</pre>
+The laptop has been up for 15 days.
+
+What is the deal with growl?
+-----

@@ -1,0 +1,79 @@
+TITLE: pyexiv2 - reading GPS info in JPG headers
+AUTHOR: Kurt
+DATE: 08.23.2008 22:49
+DESC: decoding images
+-----
+BODY:
+I've been working on how to manage the large number of georeferenced
+images that Matt and I collected earlier this week.  I'd like to be
+able to work directly in python.  I first tried <a
+href="http://sourceforge.net/projects/exif-py/">EXIF.py</a>.  It
+works, but it is not a proper python package.
+<pre>
+% <b>./EXIF.py IMG_6829.JPG  | grep -i gps</b>
+GPS GPSAltitude (Ratio): 7
+GPS GPSAltitudeRef (Byte): 0
+GPS GPSDOP (Ratio): 19/5
+GPS GPSDate (ASCII): 2008:08:20
+GPS GPSDestBearing (Ratio): 0/0
+GPS GPSDestBearingRef (ASCII): T
+GPS GPSDestDistance (Ratio): 0/0
+GPS GPSDestDistanceRef (ASCII): K
+GPS GPSDestLatitude (Ratio): [0/0, 0/0, 0/0]
+GPS GPSDestLatitudeRef (ASCII): 
+GPS GPSDestLongitude (Ratio): [0/0, 0/0, 0/0]
+GPS GPSDestLongitudeRef (ASCII): 
+GPS GPSImgDirection (Ratio): 0/0
+GPS GPSImgDirectionRef (ASCII): T
+GPS GPSLatitude (Ratio): [42, 80511/5000, 0]
+GPS GPSLatitudeRef (ASCII): N
+GPS GPSLongitude (Ratio): [70, 140097/2500, 0]
+GPS GPSLongitudeRef (ASCII): W
+GPS GPSMapDatum (ASCII): 
+GPS GPSMeasureMode (ASCII): 3
+GPS GPSSatellites (ASCII): 08,31,73,359,36,32,, ... ]
+GPS GPSSpeed (Ratio): 9
+GPS GPSSpeedRef (ASCII): N
+GPS GPSStatus (ASCII): A
+GPS GPSTimeStamp (Ratio): [15, 20, 3709/100]
+GPS GPSTrack (Ratio): 200
+GPS GPSTrackRef (ASCII): T
+GPS GPSVersionID (Byte): [2L, 2L, 0L, 0L]
+GPS Tag 0x001B (Undefined): [0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, ... ]
+GPS Tag 0x001C (Undefined): [0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, ... ]
+GPS Tag 0x001E (Short): 0
+Image GPSInfo (Long): 8670
+</pre>
+Then I took a look at <a
+href="http://tilloy.net/dev/pyexiv2/">pyexiv2</a>.  I was not able to
+figure out how to properly pass include and library flags to the
+compile lines, so I wrote a quick setup.py:
+<pre>
+from distutils.core import setup, Extension
+srcs = ['src/libpyexiv2.cpp','src/libpyexiv2_wrapper.cpp']
+setup(name='pyexiv2',
+      version='1.0',
+      ext_modules=[
+        Extension('libpyexiv2', 
+                  srcs,
+                  libraries=['boost_python','exiv2']), 
+        ],
+      py_modules=['pyexiv2'],
+      )
+</pre>
+Then I whipped up a fink info file: <a href="http://vislab-ccom.unh.edu/~schwehr/software/fink/pyexiv2-py.info">pyexiv2-py.info</a>
+<pre>
+% <b>ipython</b>
+import pyexiv2
+image = pyexiv2.Image('IMG_6829.JPG')
+image.readMetadata()
+lat =  image['Exif.GPSInfo.GPSLatitude']
+[str(field) for field in lat]
+lat[0].numerator/lat[0].denominator + lat[1].numerator/float(lat[1].denominator) / 60 + lat[2].numerator/lat[2].denominator / 3600.
+</pre>
+The above outputs:
+<pre>
+['42/1', '161022/10000', '0/1']
+42.268369999999997
+</pre>
+-----

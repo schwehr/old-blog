@@ -1,0 +1,35 @@
+TITLE: geodjango admin interface prototype
+AUTHOR: Kurt
+DATE: 04.09.2008 08:37
+DESC: now I need to code this for me not using the admin interface
+-----
+BODY:
+Using the admin interface, I have a quick prototype of what I'd like
+the basic report web page to be for AIS position reports using 
+geodjango.  It seems that search only works for text.  Is that true?
+
+Here is the modification I made to the Position model:
+<pre>
+class Position(models.Model):
+    # ... Same as before ...
+    # Enable admin interface
+    class Admin:
+        list_display = ('userid'
+		        ,'sog'
+		        ,'cog'
+		        ,'navigationstatus'
+		        ,'position'
+		        ,'cg_timestamp')
+        list_filter  = ('userid'
+		        ,'sog'
+		        ,'navigationstatus'
+		        ,'cg_timestamp')
+        search_fields = ('userid',)  # Broken?
+</pre>
+Here is what it looks like right now:
+
+<img src="http://schwehr.org/blog/attachments/2008-04/geodjango-pos-admin-3.png"/>
+
+I think rather than position, people will probably want distance from
+some stored location or region (e.g. distance from the TSS).
+-----

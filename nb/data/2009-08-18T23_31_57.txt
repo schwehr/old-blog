@@ -1,0 +1,154 @@
+TITLE: List of possible ferry vessels from AIS
+AUTHOR: Kurt
+DATE: 08.18.2009 23:31
+DESC: getting closer to the answer
+-----
+BODY:
+The shipandcargo field in AIS message 5 (shipdata or "static" ship
+data) mixes the type of ship and what it is doing.  This makes it
+sometimes impossible to pull a class of vessel.  We can use the
+message 5 to narrow down the possibilities.  Over the past week, I
+have been trying to figure out how to come up with the best list of
+ferry vessels in the US and Canada (including the Great Lakes).  I
+know I will miss those in places like Lake Tahoe and ships like the Mt
+Washington in Lake Winnipesaukee.  But this is the best I have come up
+with so far.  (I'm leaving out any ferries that might be using Class B
+AIS).
+
+First, I need to extract all unique type 5 messages that I've received.
+I have data logged as PREFIX-YYYY-MM-DD.bz2
+<pre>#!/bin/bash
+for file in *20[0-9][0-9]-??-??.bz2; do 
+    basename=`basename $file`
+    basename=${basename%%.bz2}
+    basename=${basename##prefix}
+    echo $basename
+    tmp=$basename.norm
+<!-- -->
+    bzcat $file | ais_normalize.py > $tmp
+<!-- -->
+    # Lookback:  125 stations * 1000 messages = 125000
+    egrep 'AIVDM,1,1,[0-9]?,[AB],5' $tmp | ais_nmea_remove_dups.py -v -l 100000 &gt; $basename.5.unique
+done</pre>
+In the above script, I first normalize the AIS messages such that they
+all take just one line.  Then I use egrep to pull just msg 5
+(shipdata).  I pass that to ais_nmea_remove_dups that looks at the payload of each message and passes only one copy of each message payload - the 5th field - in bold:
+<pre>!AIVDM,1,1,9,A,<b>576uEH02&gt;rgMI8AON20PTLR1&lt;5AE8r222222221@B`R:F5Jo0AS3lhCQiC1DvmDhH888880</b>,2*35,s25682,d-105,T30.27102750,x179634,r11CSDO1,1242917069</pre>
+I then run that same duplicate removal process on all the days combined together and put them in an SQLite database:
+<pre>cat *.5.unique |  ais_nmea_remove_dups.py -v -l 100000 &gt; 5.unique.nmea
+ais_build_sqlite.py -C -d 5.unique.db3 5.nmea
+{1: 0, 2: 0, 3: 0, 4: 0, 5: 92895, 18: 0, 19: 0}
+</pre>
+Not that I started with 94118 message 5 lines.  I'm seeing about 1.3% of
+the messages being undecodable receives of the wrong message length.
+
+Now I can start doing SQL queries to pull apart the data.  The first
+route is to look for self declared high speed craft or passenger
+vessels.  Ferries, like the Cat, can be either a passenger (60-69) or
+highspeed (40) craft, but not both in a message 5.
+<pre><b>sqlite3 5.unique.db3 'SELECT shipandcargo,count(*) FROM shipdata WHERE shipandcargo in (40,60,61,62,63,64,65,66,67,68,69) GROUP BY shipandcargo;'</b>
+shipandcargo    count(*)
+40      535
+60      5876
+61      104
+62      67
+63      47
+64      278
+65      10
+66      45
+67      40
+68      243
+69      3374</pre>
+The next thing is to bring in the flag under which the vessel is registered.  This is given by the 1st three numbers of the MMSI (aka UserID).  To get this number from a database record, just devide the MMSI by 1,000,000 (thanks to BRC for this trick).  Loading the mmsi table:
+<pre>sqlite3  5.unique.db3 &lt; /Users/schwehr/projects/src/noaadata/data/mmsi_prefix.sql</pre>
+Now do a LEFT JOIN to list vessel info and registry flag:
+<pre><tt><b><font color="#0000FF">SELECT</font></b> userid <b><font color="#0000FF">AS</font></b> mmsi<font color="#990000">,</font> name<font color="#990000">,</font> callsign<font color="#990000">,</font> imonumber<font color="#990000">,</font> shipandcargo<font color="#990000">,</font>
+       dima<font color="#990000">+</font>dimb <b><font color="#0000FF">AS</font></b> width<font color="#990000">,</font> dimc<font color="#990000">+</font>dimd <b><font color="#0000FF">AS</font></b> length<font color="#990000">,</font> synonym <b><font color="#0000FF">AS</font></b> flag 
+       <b><font color="#0000FF">FROM</font></b> shipdata
+       <b><font color="#0000FF">LEFT</font></b> <b><font color="#0000FF">JOIN</font></b> mmsi_prefix <b><font color="#0000FF">ON</font></b> mmsi_prefix<font color="#990000">.</font>code<font color="#990000">==</font>shipdata<font color="#990000">.</font>userid<font color="#990000">/</font><font color="#993399">1000000</font> 
+       <b><font color="#0000FF">WHERE</font></b> shipandcargo <b><font color="#0000FF">IN</font></b> <font color="#990000">(</font><font color="#993399">40</font><font color="#990000">,</font><font color="#993399">60</font><font color="#990000">,</font><font color="#993399">61</font><font color="#990000">,</font><font color="#993399">62</font><font color="#990000">,</font><font color="#993399">63</font><font color="#990000">,</font><font color="#993399">64</font><font color="#990000">,</font><font color="#993399">65</font><font color="#990000">,</font><font color="#993399">66</font><font color="#990000">,</font><font color="#993399">67</font><font color="#990000">,</font><font color="#993399">68</font><font color="#990000">,</font><font color="#993399">69</font><font color="#990000">)</font> 
+       <b><font color="#0000FF">GROUP</font></b> <b><font color="#0000FF">BY</font></b> mmsi<font color="#990000">,</font>name<font color="#990000">;</font></tt></pre>
+The LEFT JOIN is critical as some of the vessels do not have matching entries in the MMSI prefix table.
+<pre>1193046,"SAMUEL S COURSEN@@@@",WDB3537,303174162,60,55,19,Null
+1193046,"SAMUEL S CURSEN@@@@@",WDB3537,303174162,60,55,19,Null
+3160015,"LADY WHITE HEAD     ","VC8150 ",7947960,60,34,10,Null
+4490052," @LWHA              ","WY397P ",8835358,60,116,22,Null
+31602656,"TANDEM              ",CFB5593,813929,69,20,7,Null
+35516535,"P/B WANDERER        ",@@@@@@@,0,64,15,6,Null
+35517401,"P/B PHANTOM         ",@@@@@@@,0,69,20,6,Null
+36677150,"NAPA                ",WDE8110,0,60,38,10,Null
+100000000,"BRITANNIA           ","VY5348 ",0,60,0,0,Null
+100000001,@@@@@@@@@@@@@@@@@@@@,@@@@@@@,100000001,60,53,7,Null
+107502700,"ROBERT H. DEDMAN    ",WCY9892,920700300,69,83,23,Null
+111111111,"BLUE ICE            ",WCW8492,1111111,60,0,0,Null
+111850000,"FAST BULLET         ",WDA8488,366854890,60,50,10,Null
+123456789,"GOOSE BUMPS         ","KUME   ",123456787,60,30,6,Null
+123456789,"MADDEN TIDE@@@@@@@@@",WCX9599,0,60,0,0,Null
+203888479,@@@@@@@@@@@@@@@@@@@@,@@@@@@@,0,61,0,0,Austria
+235762000,"QUEEN MARY 2        ","GBQM   ",9241061,60,345,41,"United Kingdom"
+244078000,STATENDAM@@@@@@@@@@@,PHSG@@@,8919245,69,220,30,Netherlands
+...</pre>
+Vessels with bad MMSI settings in their transcievers must be discarded.
+In the position reports, the MMSI is the only distinguishing value, so 
+we will be unable to tell them from other vessels with that same error.
+
+The next thing we can do is to use knowledge about how ferries have to
+operate in the US.  They have to be registered with the United States,
+so we can reject any ship that is not registered to the United States,
+Canada, or Alaska as not possibly being a ferry.  (I hope this is
+really true.)
+
+We can therefor add "AND userid/1000000 in (303,316,338,358,366,367,368,369,379)" to the query:
+<pre>SELECT code,synonym FROM mmsi_prefix 
+   WHERE code IN (303,316,338,358,366,367,368,369,379);
+code    synonym
+303     Alaska
+316     Canada
+338     United States
+358     Puerto Rico
+366     United States
+367     United States
+368     United States
+369     United States
+379     United States Virgin Islands</pre>
+The final query is:
+<pre><tt><b><font color="#0000FF">SELECT</font></b> userid <b><font color="#0000FF">AS</font></b> mmsi<font color="#990000">,</font> name<font color="#990000">,</font> callsign<font color="#990000">,</font> imonumber<font color="#990000">,</font> shipandcargo<font color="#990000">,</font>
+       dima<font color="#990000">+</font>dimb <b><font color="#0000FF">AS</font></b> width<font color="#990000">,</font> dimc<font color="#990000">+</font>dimd <b><font color="#0000FF">AS</font></b> length<font color="#990000">,</font> synonym <b><font color="#0000FF">AS</font></b> flag 
+       <b><font color="#0000FF">FROM</font></b> shipdata 
+       <b><font color="#0000FF">LEFT</font></b> <b><font color="#0000FF">JOIN</font></b> mmsi_prefix <b><font color="#0000FF">ON</font></b> mmsi_prefix<font color="#990000">.</font>code<font color="#990000">==</font>shipdata<font color="#990000">.</font>userid<font color="#990000">/</font><font color="#993399">1000000</font> 
+       <b><font color="#0000FF">WHERE</font></b> shipandcargo <b><font color="#0000FF">IN</font></b> <font color="#990000">(</font><font color="#993399">40</font><font color="#990000">,</font><font color="#993399">60</font><font color="#990000">,</font><font color="#993399">61</font><font color="#990000">,</font><font color="#993399">62</font><font color="#990000">,</font><font color="#993399">63</font><font color="#990000">,</font><font color="#993399">64</font><font color="#990000">,</font><font color="#993399">65</font><font color="#990000">,</font><font color="#993399">66</font><font color="#990000">,</font><font color="#993399">67</font><font color="#990000">,</font><font color="#993399">68</font><font color="#990000">,</font><font color="#993399">69</font><font color="#990000">)</font> 
+           <b><font color="#0000FF">AND</font></b> userid<font color="#990000">/</font><font color="#993399">1000000</font> <b><font color="#0000FF">IN</font></b> <font color="#990000">(</font><font color="#993399">303</font><font color="#990000">,</font><font color="#993399">316</font><font color="#990000">,</font><font color="#993399">338</font><font color="#990000">,</font><font color="#993399">358</font><font color="#990000">,</font><font color="#993399">366</font><font color="#990000">,</font><font color="#993399">367</font><font color="#990000">,</font><font color="#993399">368</font><font color="#990000">,</font><font color="#993399">369</font><font color="#990000">,</font><font color="#993399">379</font><font color="#990000">)</font> 
+       <b><font color="#0000FF">GROUP</font></b> <b><font color="#0000FF">BY</font></b> mmsi<font color="#990000">,</font>name<font color="#990000">;</font></tt></pre>
+A little cleaning and using "sqlite3 -csv" give this result:
+<pre> mmsi,name,callsign,IMOnumber,shipandcargo,width,length,flag
+303267000,"TUSTUMENA","WNGW",6421086,60,90,18,Alaska
+303472000,"ISLAND CAPER",WAM9248,0,60,29,6,Alaska
+303488000,"BERNIE MCALL",WDC6875,936351000,60,0,0,Alaska
+303509000,"SPIRIT OF YORKTOWN",WDD5898,8949472,60,68,12,Alaska
+303556000,"MARITIME INSTRUCTOR",WCW8625,1033659,60,26,5,Alaska
+303677000,"MISS PAMELA",WDC3158,9111254,60,40,9,Alaska
+303913000,"GORDON GUNTER","WTEO",8835255,60,205,32,Alaska
+316001111,"NAUTILUS EXPLORER",CFG7418,9224647,60,35,8,Canada
+316001232,"BOWEN QUEEN","VGXR",6600967,69,88,18,Canada
+316001234,"HOWE SOUND QUEEN","CY3842",801691,60,80,20,Canada
+316001235,"KLITSA","CZ3072",0,60,52,13,Canada
+...
+338086000,"MISS CARISSA",WDB7801,8977699,69,39,8,"United States"
+338088000,"MISS BETH",WDB7803,8977687,60,36,9,"United States"
+338092962,"SEABRIGHT",,0,67,20,5,"United States"
+338116000,B AP3D P AP,SD U&lt;P4,9265809,40,36,14,"United States"
+338116000,FAIRWEATHER,WDB5604,9265809,40,72,22,"United States"
+338117000,"JENNY MCCALL",WDC3101,931679900,60,54,11,"United States"
+338163000,COPACABANA,WDE6748,1214699,60,53,9,"United States"
+338194000,"PHILIP ALAN MCCALL",WDB7424,108745800,60,51,10,"United States"
+338195000,"MATANUSKA","WN4201",5228827,69,124,22,"United States"
+...</pre>
+There are some doubles because of operator error.  For example:
+<pre>316011408,"COASTAL INSPIRATION",CFN4970,9332767,69,160,28,Canada
+316011408,"<b>COAUTAL</b> INSPIRATION",CFN4970,9332767,69,160,28,Canada</pre>
+and there are some likely corrupted packets:
+<pre>338116000,B AP3D P AP,SD U&lt;P4,9265809,40,36,14,"United States"</pre>
+Some of these are clearly cruise ships and other vessels that are really
+not ferries.  It takes extra work to get down from 490 vessels to the
+true set of ferry vessels.
+-----

@@ -1,0 +1,67 @@
+TITLE: Which C++ logging and unit test framework(s)?
+AUTHOR: Kurt
+DATE: 06.04.2010 14:10
+DESC: help please
+-----
+BODY:
+<a href="http://schwehr.blogspot.com/2010/06/which-c-logging-and-unit-test-framework.html">Please comment here!</a>
+
+Back a few years ago, I wrote <a
+href="http://freshmeat.net/projects/slogcxx">slogcxx</a> as an
+experiment in creating and easy to use logging system.  It spent a
+little under a year as the logging system for GeoZui.  I haven't
+touched the code in a long time and I am sure it can be done better.
+So, I have two questions that were triggered by a discussion with BRC.
+What packages would you suggest for C++ logging and unit testing.  I
+did not including anything real in <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/libais/">libais</a>
+and would really like to work towards the best possible infrastructure
+to make this a long lived package.  Some basic thoughts on
+requirements:
+<ul>
+  <li>Must not be GPL, but LGPL is okay.  It has to play nice</li>
+  <li>Be open source</li>
+  <li>Must be thread safe - a unit test may fire off a bunch of threads for a test</li>
+  <li>The logger must be able to handle multiple producers and consumers that are both in the same process and external</li>
+  <li>Likely to stick around for a few years</li>
+  <li>Relatively easy to use</li>
+  <li>Cross platform to Windows, Mac, and Linux</li>
+  <li>If not already available in fink, rpm, and deb form, then easily packaged</li>
+  <li>Have a safe for work project name... <a href="http://freshmeat.net/projects/testicle">ahem</a></li>
+</ul>
+Just looking on Freshmeat, there are a lot of projects out there and
+slogcxx is in the pile still: <a
+href="http://freshmeat.net/search?page=1&q=logging&with=191&without=93">C++
+logging</a> and <a
+href="http://freshmeat.net/search?page=1&q=unit+test&submit=Search&with=191&without=2751%2C2772">C++
+unit testing</a>. The thought is often to look at Boost (e.g. <a
+href="http://torjo.com/log2/index.html">Boost Logging Lib v2</a> and
+<a
+href="http://www.boost.org/doc/libs/1_43_0/libs/test/doc/html/index.html">Boost
+test</a>) because of the incredible peer review, but it is a pretty
+heavy dependency.
+
+There are just so many options.  Building a large system on the wrong
+one will lead to serious pain, but using a good one will encourage
+better software.
+
+Dreaming of being able to subscribe to an <a
+href="http://www.amqp.org">AMQP</a> feed for a cluster and user
+interface tearing through massive data crunching and knowing that the
+system passed a slew of unit tests that give us confidence that new
+code is less likely to pull the system down...
+
+Another source of info: Wikipedia <a
+href="http://en.wikipedia.org/wiki/List_of_unit_testing_frameworks#C.2B.2B">List
+of unit testing frameworks</a>.  There doesn't seem to be an
+equivalent page for loggers, but there is a little in the Java lib4j
+<a href="http://en.wikipedia.org/wiki/Log4j#Ports">ports section</a>.
+
+P.S. I'm really starting to think that GNU <a
+href="http://www.gnu.org/software/autoconf/">autoconf</a> sucks.  It
+may be the standard, but a configure system is supposed to help, not
+break my brain.  It shouldn't require massive training and
+experimentation to get it into place.  I really should go look at <a
+href="http://www.cmake.org/">cmake</a> and <a
+href="www.scons.org">scons</a> again.
+-----

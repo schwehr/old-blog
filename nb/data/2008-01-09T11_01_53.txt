@@ -1,0 +1,19 @@
+TITLE: libgeos2 in fink for 10.5
+AUTHOR: Kurt
+DATE: 01.09.2008 11:01
+DESC: I have postgis82 installed
+-----
+BODY:
+I found a patch on macports/darwin ports that changes up the cast and it seems to work.
+<pre>
+PatchScript: &lt;&lt;
+  perl -pi -e 's|safe_ctype&lt;std::tolower&gt;|(int(*)(int))std::tolower|' source/test/XMLTester.cpp
+&lt;&lt;
+<pre>
+An info file that you can put in /sw/fink/10.5/local/main/finkinfo/libs can be had from:
+<pre>
+wget http://vislab-ccom.unh.edu/~schwehr/software/fink/libgeos2.info
+</pre>
+I have tested this on 10.4 and 10.5 and it compiles on both.  I will
+leave it up to BABA Yoshihiko to commit this if he thinks it is okay.
+-----

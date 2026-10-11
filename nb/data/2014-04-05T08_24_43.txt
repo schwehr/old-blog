@@ -1,0 +1,95 @@
+TITLE: More open sensor format discussion
+AUTHOR: Kurt
+DATE: 04.05.2014 08:24
+DESC: please work
+-----
+BODY:
+Originally posted here: <a href="https://github.com/tkurki/navgauge/issues/4">https://github.com/tkurki/navgauge/issues/4</a>
+
+Kees Verruijt pinged me discussion and suggested I should add my $0.02
+on requirements.  Interesting discussion.  For me, JSON is nice to
+have on the side, but I can't really consider a text based message as
+the primary format.  I've been thinking about how to replace things
+like Generic Sensor Format (GSF) and the zillion vender binary formats
+for logging multibeam and sidescan sonars, LIDAR (e.g. tons of work in
+the PulseWave project), high rate intertial navigaton systems
+(IMU/INS), the full working set of what can be expressed for smaller
+sensors with NMEA 0183 messages, AIS, Radars, imagery, carrier phase
+GPS (aka RTK, Rinex format,...), acoustic recoders (hydrophones and
+geophones), e&m, an open version of MISLE ship incidents, whale
+sitings, data license, software versions used, the whole metadata
+world (ISO paywalled disaster), etc.  And then think about all this
+combined for a very large number of platforms... e.g. all AIS
+receivers in a network, all buoys, AUV, ASV, etc in a fleet.  On some
+systems, either because high resolution timing is key or because they
+are underwater for long periods of time without GPS (AUVs or
+dataloggers that may sit on the sea floor for months), multiple time
+sources may be essential.  And I would love to see more at the
+OpenROV, OpenCTD, Arduino/Raspberry Pi level for cheaper and smaller
+sensors.  We then as a community need the ability to conflate data
+over long time series.  e.g. Maritime Rule X changed on July 1st,
+2007... how did the env change in the years before and after?  Did
+that increase or decrease regional fuel use, ship incidents, whale
+strikes, ship noise, economic activity at local ports, etc?  I'm
+already see streams that are GB to TB per day and need to scale up
+from there.  For the browser, JSON is great for small things, but the
+overhead of strings to binary for rendering of say just 10M points in
+Chrome, forced a switch to binary over the wire.
+
+Even just the ARGOS float project has the potential to explode... they
+only have a few sensors right now, but what happens when they get tons
+more sensors and multiple routes for data to make it to a usable
+datastore.
+
+I've been worrying about this for a long time now.  I saw the issue
+with the number of sensors on the Healy all trying to spew NMEA
+0183-ish stuff to NAIS with the USCG to working with sonars.  I tried
+to start writing some of my ideas here:
+<a href="http://schwehr.org/blog/archives/2014-02.html#e2014-02-18T09_06_12.txt">http://schwehr.org/blog/archives/2014-02.html#e2014-02-18T09_06_12.txt</a>
+(and other blog posts).  However, I haven't gotten very far.  I tried
+making a message definition language of my own to support AIS, but did
+not get very far in the RTCM community.  My current thought is that
+the best core definition place to start is with Protocol Buffers
+(ProtoBufs) and RecordIO or similar.  That would allow for other
+serializations, but start off with a well defined message content that
+has a build-in binary serialization combined with the ability to add
+other serializations (e.g. JSON, XML, proto ascii, etc) to the mix
+fairly easily.  I'm also realizing that there is a need for a
+journalling style system (append only) that could allow for index
+messages to be written to log files that would make access to logs
+much faster.  This becomes especially important if you are later
+trying to join chunks of logs that might come anywhere from near
+realtime to months after the fact.  There are plenty of other issues
+in there... e.g. nothing seems to talk about recording the calibration
+process in sensor log streams or things like time from which source
+and how accurate is it?  And what license is the data released under?
+The bathymetry attributed grid (BAG) format contains ISO XML metadata,
+but they only have "classified" / "non-classified" for data.  What
+about public domain, proprietary, creative commons license X, etc. ?
+
+I think any spec has got to be totally open and it would be best to be
+machine readable and usable for all for any purpose.  e.g. paywalled
+or GPL are a real problem.  Something like the Apache 2 license seem
+like the only way to go if we really want to open up data interchange.
+
+I've spent a lot of time trying to survive the existing disaster of
+standards and want to be moving towards a world in which data is
+easier and more fun to work with from small devices to global scale
+fleets of sensors.  Hopefully some of these thoughts are useful to the
+discussion you all are having here.
+
+Some links to material that might be interesting for you all:
+
+<ul></li>
+  <li>
+ <a href="http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/">http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/</a> - me attempting to teach graduate students about how to survive marine data... I fell seriously short of the where I wanted to make it</li>
+  <li><a href="http://www.ldeo.columbia.edu/res/pi/MB-System/html/mbsystem_formats.html">http://www.ldeo.columbia.edu/res/pi/MB-System/html/mbsystem_formats.html</a></li>
+  <li><a href="https://code.google.com/p/protobuf/">https://code.google.com/p/protobuf/</a></li>
+  <li><a href="https://github.com/schwehr/libais">https://github.com/schwehr/libais</a> (an illustration of why the AIS specs suck)</li>
+  <li><a href="http://vislab-ccom.unh.edu/~schwehr/healy/">http://vislab-ccom.unh.edu/~schwehr/healy/</a> - trying to log nmea for a large number of sensors 20100417-healy-sqlite.db3.bz2</li>
+  <li> <a href="https://developers.google.com/events/io/sessions/327696300">https://developers.google.com/events/io/sessions/327696300</a> - global scale AIS talk</li>
+  <li>(I have yet to watch) <a href="http://youtu.be/zh01hkvO93U">Open Data Now (YouTube)</a> [Google TechTalk]</li>
+</ul>
+
+P.S. GSF is now homed at Leidos (which SAIC spun off) here: <a href="https://www.leidos.com/maritime/gsf">https://www.leidos.com/maritime/gsf</a> (and still not yet under an open source license).
+-----

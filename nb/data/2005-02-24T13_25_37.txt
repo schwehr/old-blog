@@ -1,0 +1,55 @@
+TITLE: gnuplot index feature
+AUTHOR: Kurt
+DATE: 02.24.2005 13:25
+DESC: very handy option to plot
+-----
+BODY:
+Today is the first time that I have played with the gnuplot index
+feature.  This helps to reduce the number of loose data files in a
+directory.  Here is a quick sample from the section boundary markers
+in my Santa Barbara data.  The key thing is to have <b>TWO</b> blank
+lines after each group.
+
+<pre>
+cat &lt;&lt; EOF &gt; dec-sec-bound.dat
+# There is no core 0
+0 0
+
+
+# Core num: 1
+37.5 0
+37.5 360
+
+
+# Core num: 2 - no values
+0 0
+
+
+# Core num: 3
+39.5 0
+39.5 360
+
+
+# Core num: 4 - no values
+0 0
+
+
+# Core num: 5
+44.0 0
+44.0 360
+
+
+# Core num: 6 - no values
+0 0
+EOF
+</pre>
+Then here are the gnuplot commands to print this.  Core 0 is there so
+core 1 is refered to as the 1 index.
+<pre>
+gnuplot
+  set xrange [-10:370]
+  set yrange [0:200] reverse # to plot with zero on top
+  plot 'dec-sec-boundary.dat' index 1 using 2:1 with lines \
+       , 'dec-sec-boundary.dat' index 3 using 2:1 with lines
+</pre>
+-----

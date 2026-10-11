@@ -1,0 +1,51 @@
+TITLE: unix file command version 5.05 - geospatial formats
+AUTHOR: Kurt
+DATE: 01.18.2011 04:34
+DESC: my first big addition
+-----
+BODY:
+Last February, I submitted a bunch of marine science file type
+definitions ("magic") to the <a
+href="http://www.darwinsys.com/file/">Fine Free File Command</a>,
+which is the file command for Linux and Mac systems.  Yesterday,
+Christos Zoulas released file-5.05, that has some of these proposed
+definitions in the package.  They live at magic/Magdir/geo.  
+
+This would be my first reasonably sized patch to make it into a widely
+used open source package.  My grep patch was too small to count for
+anything and fink is a very specific mac too so also does not count.
+
+Here are the formats I was able to include so far:
+<ul>
+  <li>RDI Acoustic Doppler Current Profiler (ADCP)</li>
+  <li>FGDC ASCII metadata</li>
+  <li>Knudsen seismic KEL binary (KEB)</li>
+  <li>LADS Caris Ascii Format (CAF) bathymetric lidar (HCA)</li>
+  <li>LADS Caris Binary Format (CBF) bathymetric lidar waveform data (HCB)</li>
+  <li>GeoSwath RDF</li>
+  <li>SeaBeam 2100 multibeam sonars</li>
+  <li>XSE multibeam</li>
+  <li>SAIC generic sensor format (GSF) sonar data</li>
+  <li>MGD77 Header, Marine Geophysical Data Exchange Format</li>
+  <li>mbsystem info cache</li>
+  <li>Caris multibeam sonar related data (HDCS)</li>
+  <li>Caris ASCII project summary</li>
+  <li>IVS Fledermaus TDR file</li>
+  <li>ECMA-363, Universal 3D (U3D)</li>
+  <li>elog journal entry</li>
+</ul>
+If you ever design a new format, please talk to me so that we can make
+sure that it works well with the file command.  Things like SEGY are
+very difficult to write a rule that will work often enough but not
+clash with other file types...  I can't use just a starting character
+of "C".  Formats with a distinct ASCII name (preferably a good number
+of characters) and version number in a fixed location at the beginning
+are really the best.  Things like BAGs are not going to work because I
+would have to inspect inside the HDF packaged data and that would make
+file get way to complicated.  file should not have to link against a 
+library to be able to understand a file type.  So, while I like the
+BAG format, it's just not going to get noticed by file.
+
+BTW, I have yet to try it as there is a change in the shared library
+handling of file that breaks the fink setup.
+-----

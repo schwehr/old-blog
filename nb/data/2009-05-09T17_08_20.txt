@@ -1,0 +1,122 @@
+TITLE: Class B static reports
+AUTHOR: Kurt
+DATE: 05.09.2009 17:08
+DESC: success
+-----
+BODY:
+I went ahead and coded msg 24 by hand.  Not the most fun, but it's not
+too much work.  I just created a fluffy database, so a single simple
+query will not be able to get a complete report for a Class B device.
+Here is decoding the two different types of the class b static data:
+<pre>% <b>ais_msg_24_handcoded.py -d '!AIVDM,1,1,,B,H5NHcTP&lt;51@4TrM&gt;10584@U&lt;D00,2*77,x337805,b003669710,1241895000'</b>
+b_staticdata:
+        MessageID:         24
+        RepeatIndicator:   0
+        UserID:            367405970
+        partnum:            0
+        name:   CAPTAIN`S PARADISE
+<!-- -->
+% <b>ais_msg_24_handcoded.py -d '!AIVDM,1,1,,B,HU2K5NTn13BijklG44oppk103210,0*06,s23294,d-114,T44.21624911,x731910,r13RSMT1,1241894986'</b>
+b_staticdata:
+        MessageID:         24
+        RepeatIndicator:   2
+        UserID:            338085242
+        partnum:            1
+        shipandcargo: 54
+        vendorid: ACR1234
+        callsign: WDD7883
+        dimA: 8
+        dimB: 3
+        dimC: 2
+        dimD: 1
+        mothership: 16789633
+        spare: 0</pre>
+I've started work on the database entries.  My new network to database
+tool always deletes previous entries so that my database size doesn't get
+out of hand.  Here is a query on the database.  You can see that for most
+vessels I have both 0 (A) and 1 (B) reports:
+<pre>% <b>SELECT repeatindicator AS rpt, userid, partnum AS prt, name, \
+    shipandcargo AS shp, callsign, vendorid AS vdr, 
+    dima,dimb,dimc,dimd,mothership 
+  FROM b_staticdata ORDER BY userid LIMIT 20;</b>
+ rpt |  userid   | prt |        name         | shp | callsign |   vdr   | dima | dimb | dimc | dimd | mothership 
+=====+===========+=====+=====================+=====+==========+=========+======+======+======+======+============
+   0 |   1126643 |   1 |                     |  52 | WDA4860  | SIMRAD  |   15 |   59 |   15 |   16 |   31699920
+   0 |   1126643 |   0 | MIRANDA PAIGE       |     |          |         |      |      |      |      |           
+   0 | 111287800 |   0 | ALLISON RACHEL      |     |          |         |      |      |      |      |           
+   0 | 111287800 |   1 |                     |  52 | WDA4860  | SIMRAD  |   10 |   60 |   17 |   15 |   21218383
+   0 | 111737900 |   0 | ELIZABETH BROWN     |     |          |         |      |      |      |      |           
+   0 | 111737900 |   1 |                     |  52 | WDA4860  | SIMRAD  |   20 |   50 |   15 |   16 |   42148816
+   0 | 118529631 |   0 | RALPH HENRY         |     |          |         |      |      |      |      |           
+   0 | 118529631 |   1 |                     |  52 | WDA4860  | SIMRAD  |   10 |   60 |   15 |   16 |   21218256
+   0 | 316001076 |   0 | DEEP COVE LIFEBOAT  |     |          |         |      |      |      |      |           
+   0 | 316001076 |   1 |                     |  51 | AUX2     | ACR1234 |    3 |    5 |    1 |    1 |    6312001
+   0 | 316007771 |   0 | MAXIMUS             |     |          |         |      |      |      |      |           
+   0 | 316007771 |   1 |                     |   0 | BW       |         |    8 |    5 |    2 |    2 |   16797826
+   0 | 316008039 |   1 |                     |  37 | VG9188   | ACR1234 |   10 |    8 |    3 |    3 |   21004483
+   0 | 316008039 |   0 | WINESK              |     |          |         |      |      |      |      |           
+   0 | 316008045 |   0 | EXPLORATHOR EXPRESS |     |          |         |      |      |      |      |           
+   0 | 316008045 |   1 |                     |  60 |          | COMAR   |    7 |    7 |    2 |    2 |   14708866
+   0 | 316008918 |   1 |                     |  36 | CFN5368  |         |    7 |    8 |    2 |    2 |   14712962
+   0 | 316008918 |   0 | PAIKEA MIST         |     |          |         |      |      |      |      |           
+   0 | 316009106 |   1 |                     |  37 | CFN4013  | COMAR   |   11 |    0 |    2 |    2 |   23068802
+   0 | 316009106 |   0 | S/V SILVERHEELS III |     |          |         |      |      |      |      |           </pre>
+It's pretty obvious that the requirement to have vendors do the
+install is still leading to invalid MMSI entries.  Also, I thought
+from talking to people who are on the AIS working groups that the
+VendorID was supposed to be a unique ID for the actual device like
+an Ethernet MAC address.  This clearly is not the case.  Here are the
+VendorID's I've seen from about a 1/2 hour of traffic:
+<pre>% <b>SELECT DISTINCT(vendorid) FROM b_staticdata;</b>
+ vendorid 
+========== 
+ ACR1234
+ COMAR
+ DYACHT
+ FEC0001
+ NAVICO
+ SHID@AE
+ SHID@BA
+ SHID@CG
+ SHID@CH
+ SIMRAD
+ TRANSAS
+ TRUEHDG
+ WESTMAR</pre>
+The fun part is with the SHID... values.  I think that the '@' character is
+generally considered the end of string character.  I'm doing a .rstrip(' @'),
+but probably I should do a find and truncate with the first '@', but the spec
+is unclear if the "@??" is actually a part of the vendor id.
+
+It does look the mothership should generally be distinguishable from
+valid lengths. However, the first time someone puts in a really large
+DimA or a mothership value under 200000000, this will break.  I just
+stored the values decode both ways.
+
+Here is what the database table looks like:
+<pre>ais=# <b>\d b_staticdata</b>
+                                        Table "public.b_staticdata"
+     Column      |            Type             |                         Modifiers                          
+=================+=============================+============================================================
+ key             | integer                     | not null default nextval('b_staticdata_key_seq'::regclass)
+ messageid       | integer                     | 
+ repeatindicator | integer                     | 
+ userid          | integer                     | 
+ partnum         | integer                     | 
+ name            | character varying(20)       | 
+ shipandcargo    | integer                     | 
+ callsign        | character varying(7)        | 
+ vendorid        | character varying(7)        | 
+ dima            | integer                     | 
+ dimb            | integer                     | 
+ dimc            | integer                     | 
+ dimd            | integer                     | 
+ mothership      | integer                     | 
+ spare           | integer                     | 
+ cg_r            | character varying(15)       | 
+ cg_sec          | integer                     | 
+ cg_timestamp    | timestamp without time zone | 
+Indexes:
+    "b_staticdata_pkey" PRIMARY KEY, btree (key)</pre>
+-----
+

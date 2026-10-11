@@ -1,0 +1,29 @@
+TITLE: python type casting and function args bytes me
+AUTHOR: Kurt
+DATE: 11.10.2005 19:47
+DESC: I sometimes miss type checking
+-----
+BODY:
+I just ran into a simple case of something that has worried me a bit
+about python.  I have a function foo that use to be like this:
+<pre>
+  def foo(arg1, argBoolFlag=False, argInt=0)
+</pre>
+Now I change foo to have a 2nd flag and I put the new flag after the
+1st.
+<pre>
+  def foo(arg1, argBoolFlag=False, argBoolFlag2=False, argInt=0)
+</pre>
+Now my older code does bad things.  Here is the old call:
+<pre>
+  badresults = foo(myarg1,True,1)
+</pre>
+Not checking that the flag args were actually boolean (True/False)
+values bit me.  This is fine now since I'm working on a program with
+about 1000 lines.  Not to bad to track down in code all written by
+me.  Now what happens in a couple hundred thousand line system written
+by a team of people?
+
+On second thought, C++ would let me shoot myself the same way by
+casting an int to a bool without fuss.
+-----

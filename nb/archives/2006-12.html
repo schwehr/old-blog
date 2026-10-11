@@ -1,0 +1,2304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Kurt's Weblog: December 2006 Archives</title>
+
+<link rel="stylesheet" href="../styles/nb_default.css" type="text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="../atom.xml" />
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span>
+</div>
+
+<div id="content">
+
+<div class="blog">
+<div id="menu">
+	<a href="../index.html">Main</a>
+</div>
+</div>
+
+<div class="blog">
+<div class="item">
+<a id="e2006-12-31T10_04_01.txt" name="e2006-12-31T10_04_01.txt"></a>
+<h2 class="date">12.31.2006 10:04</h2>
+<div class="blogbody">
+<h3 class="title">Chicago wifi</h3>
+<div class="item-description">
+The banners in the Chicago airport say that there is wireless access
+here.  Checking it out, I see only the usual "pay a rediculous amount"
+for a day of service.  But then I noticed that there is a flight status
+view on their payment page.  I appreciate that small token of help.  I
+would rather have the free wireless as they have in the Las Vegas
+airport, but I won't knock having flight status without having to
+always walk over to the monitors.  The plane location is probably just
+a linear interpolation, but it is still cool.
+<br /><br />
+<img src="../attachments/2006-12/chicago-flightview.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-31T10_04_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2007-01-01T11_52_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-29T17_17_30.txt" name="e2006-12-29T17_17_30.txt"></a>
+<h2 class="date">12.29.2006 17:17</h2>
+<div class="blogbody">
+<h3 class="title">GoogleEarth S57 ENC data</h3>
+<div class="item-description">
+As I have written about before, I have used gdal to convert an S57
+dataset to Google Earth.  I didn't release more than the screen shots
+before, but since <a
+href="http://destinsharks.com/">http://destinsharks.com/</a> has been
+talking up this kind of stuff, here is the raw gdal conversion.  It
+won't take much to make better scripts to produce more chart like
+output.  That will come soon.
+<br /><br />
+<a href="http://vislab-ccom.unh.edu/~schwehr/GoogleEarth/US5VA17M-part-on.kmz">US5VA17M-part-on.kmz</a>
+<br /><br />
+More details from my <a href="../archives/2006-12.html#e2006-12-05T15_14_52.txt">Dec 5th post</a>
+<br /><br />
+I am looking at which lines to pull, line colors, and icons.  The
+default thumbtacks are interesting, but not the best solution.  To lay
+the buoys on the ground or make them placemarks that stick up?  What's
+your take?  As always, "gdal/ogr rocks!"  I am hoping to release the
+whole set of US charts soon and have the whole process automated real
+soon now (which it basically already is).
+<br /><br />
+And... more NOAA data to GoogleEarth converters are coming, I promise.
+<br /><br />
+<img src="../attachments/2006-12/s57-ge-better.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-29T17_17_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-31T10_04_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-26T11_45_25.txt" name="e2006-12-26T11_45_25.txt"></a>
+<h2 class="date">12.26.2006 11:45</h2>
+<div class="blogbody">
+<h3 class="title">BitVector 1.3</h3>
+<div class="item-description">
+There is a new release of the python BitVector library by Avi Kak.
+Looks like lots of improvements!  The size option to the constructor
+will greatly simplify my code and the improved docstrings will make
+development easier since I work with BitVectors sporadically.  For
+anyone working with bit level system and network problems, this
+package is a real life saver.  I really do not want to ever go back to
+the C/C++ bit interface after using BitVector.
+<pre>
+from BitVector import BitVector
+bv = BitVector(intVal=65,size=16)
+print bv
+# 0000000001000001
+bv = BitVector(intVal=65,size=32)
+print bv
+# 00000000000000000000000001000001
+bv.permute?
+Type:           instancemethod
+Base Class:     &lt;type 'instancemethod'&gt;
+String Form:    &lt;bound method BitVector.permute of &lt;BitVector.BitVector object at 0x12e82d0&gt;&gt;
+Namespace:      Interactive
+File:           /Users/schwehr/projects/src/noaadata/ais/BitVector.py
+Definition:     bv.permute(self, permute_list)
+Docstring:
+    Permute a bit vector according to the indices
+    shown in the second argument list.  Return the
+    permuted bit vector as a new bit vector.
+</pre>
+<a href="http://cobweb.ecn.purdue.edu/~kak/dist/BitVector-1.3.html">BitVector-1.3.html</a> -- <a href="http://cobweb.ecn.purdue.edu/~kak/dist/BitVector-1.3.tar.bz2">BitVector-1.3.tar.bz2</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-26T11_45_25.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-29T17_17_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-26T10_42_52.txt" name="e2006-12-26T10_42_52.txt"></a>
+<h2 class="date">12.26.2006 10:42</h2>
+<div class="blogbody">
+<h3 class="title">Photoshop tutorials</h3>
+<div class="item-description">
+Things to do while out sick...  learn more of photoshop.  Revision3
+has a series called <a
+href="http://revision3.com/pixelperfect">PixelPerfect</a> by Bert
+Monroy.  He goes too fast, but it is easy enough to pause and replay
+10 times until you understand what he did.  Also, I think I am using a
+different version of photoshop than he is, so somethings are in
+different places.  I really need to upgrade my laptop to CS2 from CS.
+<br /><br />
+Here are my results from the first tutorial.  Yes, it is <b>dorky</b>
+lightning bolts coming out of a basket ball.
+<br /><br />
+<img src="../attachments/2006-12/cheesyphotoshop.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-26T10_42_52.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-26T11_45_25.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-25T06_25_45.txt" name="e2006-12-25T06_25_45.txt"></a>
+<h2 class="date">12.25.2006 06:25</h2>
+<div class="blogbody">
+<h3 class="title">OpenECDIS.org</h3>
+<div class="item-description">
+<a href="http://openecdis.org/">http://openecdis.org/</a>
+<pre>The Open ECDIS Forum (OEF) is dedicated to the development of
+Electronic Chart Display and Information Systems (ECDIS). By means of
+its consensus building activities, OEF promotes the vision of a
+maritime Geographic Information System (GIS) that supports navigation,
+environmental control and vessel traffic services. Through its
+discussion forums, meetings, promotional activities, and publications
+the OEF shall inform producers of digital charts, manufacturers of
+marine electronics and R&D organisations on issues related to
+ECDIS. The OEF supports the International Hydrographic Organization
+(IHO) in its efforts to make its S-57 standard a world wide accepted
+exchange format for Electronic Navigational Charts (ENC).
+<br /><br />
+The objectives of the Open ECDIS Forum are as follows:
+ * Encourage and support the development of ECDIS and its extensions
+ * Provide lines of communication between IMO/IHO/IEC standards users
+   and developers * Promote the S-57 data model in the marine
+   environment and monitor the usage of S-57 * Examine the development
+   proposals and advice on their validity
+ * Promote ENC production
+To achieve these goals the Open ECDIS Forum will:
+ * Consider and register the user defined S-57 objects
+ * Consider and register private producer agency codes
+ * Levy nominal fees, if necessary, to avoid abuse of registration and
+   to finance the activities of the OEF
+ * Distribute forum related freeware/shareware software and sample
+   S-57 datasets
+ * Organsize workshops on related matters and distribute associated
+   documentation
+ * Provide a link with the IHO web-site and with other organisations
+   relevant to ECDIS
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-25T06_25_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-26T10_42_52.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-25T05_47_14.txt" name="e2006-12-25T05_47_14.txt"></a>
+<h2 class="date">12.25.2006 05:47</h2>
+<div class="blogbody">
+<h3 class="title">useit.com lack of usability</h3>
+<div class="item-description">
+Merry Christmas all!
+<br /><br />
+I just checked out <a href="http://www.useit.com/">useit.com</a>, a
+website by Jakob Nielsen about computer usability.  His website has a
+<i><b>MAJOR</b></i> usability flaw.  In today's internet, I am not
+going to bookmark his site and keep checking on it for new articles.
+However, his front page has no RSS, ATOM, or other links marked as a
+news feed.  He wants people to sign up for another freakin email list.
+No thank you!  News feeds let me control if I get updates from a site.
+Every mailing list system has a different interface and it pollutes my
+email stream that I use for critical person-to-person communication.
+<br /><br />
+Jakob has a report on news letters that contains the keyword RSS in
+it, but I am not paying more than $300 for some report he wrote to
+find out that he thinks RSS is a waste of energy.
+<br /><br />
+It looks like the site has some interesting articles, but without RSS,
+I am just not going to pay attention to him unless his articles hit
+RSS feed by someone else - which is what happened this morning.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-25T05_47_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-25T06_25_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-24T08_58_23.txt" name="e2006-12-24T08_58_23.txt"></a>
+<h2 class="date">12.24.2006 08:58</h2>
+<div class="blogbody">
+<h3 class="title">Earthquakes in Google Earth by the USGS</h3>
+<div class="item-description">
+<a href="http://earthquake.usgs.gov/research/data/google_earth.php">http://earthquake.usgs.gov/research/data/google_earth.php</a>
+<br /><br />
+The USGS provides Google Earth kmz files for the last 7 days of
+quakes.  There is a network link in there, so it looks like it does
+update.  One feature request would be to have a sample seismograph
+recording for the quake from a nearby station.
+<br /><br />
+<img src="../attachments/2006-12/ge-usgs-quakes.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-24T08_58_23.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-25T05_47_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-23T16_08_00.txt" name="e2006-12-23T16_08_00.txt"></a>
+<h2 class="date">12.23.2006 16:08</h2>
+<div class="blogbody">
+<h3 class="title">isightcapture troubles</h3>
+<div class="item-description">
+isightcapture is a really great command line utility, but today is the
+2nd time that the my isight has stopped responding.  The first last
+time was to unplug/replug the camera.
+<pre>
+isightcapture -t png foo.png
+FATAL: setting data channel failed - cam busy/not connected ?
+</pre>
+How to I reset the camera/firewire system without a reboot?  I have
+other datalogging going on and definitely do not want to reboot the
+computer remotely.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-23T16_08_00.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-24T08_58_23.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-23T11_48_49.txt" name="e2006-12-23T11_48_49.txt"></a>
+<h2 class="date">12.23.2006 11:48</h2>
+<div class="blogbody">
+<h3 class="title">Will papers be competition for EndNote?</h3>
+<div class="item-description">
+Will <a href="http://mekentosj.com/papers/">Papers</a> [mekentosj.com]
+be competition to EndNote?  I hope so.
+<pre>
+Papers bundles all the great technologies that come with MacOSX Tiger
+to give you a complete new workflow for reading scientific
+articles. You find, download, archive, and organize all your articles
+within a single application. But that is just the start, using
+spotlight you instantly find back the paper you are looking for. Read
+it fullscreen, add your notes, send a copy to a colleague...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-23T11_48_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-23T16_08_00.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-20T09_53_45.txt" name="e2006-12-20T09_53_45.txt"></a>
+<h2 class="date">12.20.2006 09:53</h2>
+<div class="blogbody">
+<h3 class="title">unittest++</h3>
+<div class="item-description">
+I have been watching unittest++ for a while now.  It was definitely
+not ready for prime time a few months back, but it appears to be worth
+another look when I get back to writing C++ code again (I have been
+almost exclusively python for a couple months).
+<br /><br />
+unittest++ made it to debian unstable:
+<br /><br />
+<a href="http://packages.debian.org/unstable/source/unittest++">http://packages.debian.org/unstable/source/unittest++</a>
+<br /><br />
+And a blog post about unittest++: <a
+href="http://www.alittlemadness.com/?p=64">UnitTest++: The New Choice
+for C++ Unit Testing?</a> [alittlemadness.com]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-20T09_53_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-23T11_48_49.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-19T10_08_42.txt" name="e2006-12-19T10_08_42.txt"></a>
+<h2 class="date">12.19.2006 10:08</h2>
+<div class="blogbody">
+<h3 class="title">python OptParse choice example</h3>
+<div class="item-description">
+Here is a small example of using a choice command line option.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>if</strong> <font color="#2040a0">__name__</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>from</strong> <font color="#2040a0">optparse</font> <strong>import</strong> <font color="#2040a0">OptionParser</font>
+    <font color="#2040a0">myparser</font> <font color="4444FF">=</font> <font color="#2040a0">OptionParser</font><font color="4444FF">(</font><font color="#2040a0">usage</font><font color="4444FF">=</font><font color="#008000">&quot;%prog [options]&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">typeChoices</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#008000">'binary'</font>,<font color="#008000">'nmea'</font>,<font color="#008000">'nmeapayload'</font><font color="4444FF">)</font>
+    <font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'-t'</font>,<font color="#008000">'--type'</font>
+			,<font color="#2040a0">choices</font><font color="4444FF">=</font><font color="#2040a0">typeChoices</font>,<font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'choice'</font>
+			,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'ioType'</font>
+			,<font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'nmea'</font>
+			,<font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'What kind of string to expect ('</font>
+			<font color="4444FF">+</font><font color="#008000">', '</font>.<font color="#2040a0">join</font><font color="4444FF">(</font><font color="#2040a0">typeChoices</font><font color="4444FF">)</font>
+			<font color="4444FF">+</font><font color="#008000">') [default: %default]'</font><font color="4444FF">)</font>
+    <font color="4444FF">(</font><font color="#2040a0">options</font>,<font color="#2040a0">args</font><font color="4444FF">)</font> <font color="4444FF">=</font> <font color="#2040a0">myparser</font>.<font color="#2040a0">parse_args</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+I used a temporary variable (typeChoices) to allow the same list to
+handle both the choices option and the help.  Here is the help.
+<pre>./foo.py -h
+usage: foo.py [options]
+<br /><br />
+options:
+  -h, --help            show this help message and exit
+  -t IOTYPE, --type=IOTYPE
+                        What kind of string to expect (binary, nmea,
+                        nmeapayload) [default: nmea]
+</pre>And if all goes well:
+<pre>./foo.py -t binary
+# No output</pre>
+And when you give it something that is not allowed:
+<pre>./foo.py -t arsenic
+usage: foo.py [options]
+<br /><br />
+foo.py: error: option -t: invalid choice: 'arsenic' (choose from 'binary', 'nmea', 'nmeapayload')</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-19T10_08_42.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-20T09_53_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-19T09_45_11.txt" name="e2006-12-19T09_45_11.txt"></a>
+<h2 class="date">12.19.2006 09:45</h2>
+<div class="blogbody">
+<h3 class="title">pluggd - audio search</h3>
+<div class="item-description">
+I haven't tried this yet, but it made it to wired.
+<br /><br />
+<a href="http://www.pluggd.com/">http://www.pluggd.com/</a>
+<pre>Pluggd was founded in February 2006 with the goal of making it easier
+for people to discover, experience, and share online audio and video
+programming (often called 'podcasts.')
+<br /><br />
+Our website is an aggregation of both traditional media and
+independent online-only producers. We've built great tools to help you
+find what you want, based on topics of interest, popularity, and
+critical acclaim. We're also proud of the revolutionary search tools
+we're building to make your online experience even better including
+HearHere, our newest feature that makes it easy for people to find
+exactly and precisely what they want within a 'podcast.' Look at the
+sample on our home page.
+<br /><br />
+At Pluggd, you can:
+<br /><br />
+Discover podcasts based on your interests and the interests of others.
+Experience and listen to them online, or download to your PC or mobile device.
+Share your opinions, thoughts, and insights on podcasts by rating them
+and passing them on to friends, family, and colleagues.</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-19T09_45_11.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-19T10_08_42.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-18T13_47_26.txt" name="e2006-12-18T13_47_26.txt"></a>
+<h2 class="date">12.18.2006 13:47</h2>
+<div class="blogbody">
+<h3 class="title">OSSIM Planet</h3>
+<div class="item-description">
+Finally got OSSIM installed which now comes with OSSIM Planet in the
+dmg.  I have not yet had a chance to explore any datasets, but it
+looks promising.
+<br /><br />
+<img src="../attachments/2006-12/ossim.png">
+<br /><br />
+<img src="../attachments/2006-12/ossim-planet.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-18T13_47_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-19T09_45_11.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-18T13_04_23.txt" name="e2006-12-18T13_04_23.txt"></a>
+<h2 class="date">12.18.2006 13:04</h2>
+<div class="blogbody">
+<h3 class="title">GoogleNasa.com</h3>
+<div class="item-description">
+This has been slashdotted, so right now all I can get is the google cache text.  
+<a href="http://science.slashdot.org/article.pl?sid=06/12/18/1640230"> Google NASA Partnership Announced</a>[slashdot]
+<br /><br />
+<a href="http://64.233.161.104/search?q=cache:googlenasa.com/&hl=en&lr=&strip=1">google cache</a> <a href="http://googlenasa.com">googlenasa.gov</a>
+<pre>
+Wecome to the Google NASA collaboration site. This site is the central
+collaboration site for information regarding the partnership, and an
+extranet for people at Google and NASA. Google and NASA employees
+should register here to access collaborative workspaces, message
+boards, and contacts.
+	    
+Google and NASA employees may register to access additional
+information, including information about current collaborations,
+contacts, discussion boards, documents, and more. All Google and NASA
+employees are encouraged to register and contribute!
+<br /><br />
+Google Employees must provide their Google e-mail address, and employee ID.
+NASA employees must provide a valid NASA E-mail address, and Unique Identifier. 
+<br /><br />
+rGoogle NASA News 	
+NASA Takes Google on Journey into Space - Wednesday, July 05, 2006
+NASA Ames Research Center, located in the heart of California's
+Silicon Valley, and Mountain View-based Google Inc. today announced
+plans to collaborate on a number of technology-focused
+research-and-development activities that will couple some of Earth's
+most powerful technology resources.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-18T13_04_23.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-18T13_47_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-17T10_48_34.txt" name="e2006-12-17T10_48_34.txt"></a>
+<h2 class="date">12.17.2006 10:48</h2>
+<div class="blogbody">
+<h3 class="title">Early morning Dover, NH</h3>
+<div class="item-description">
+Here are two early morning shots from the tower above Dover.
+<br /><br />
+<img src="../attachments/2006-12/dover-sunrise.png">
+<br /><br />
+<img src="../attachments/2006-12/dover-early-morning.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-17T10_48_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-18T13_04_23.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-17T10_09_55.txt" name="e2006-12-17T10_09_55.txt"></a>
+<h2 class="date">12.17.2006 10:09</h2>
+<div class="blogbody">
+<h3 class="title">MARs Tools for Interactive ANalysis</h3>
+<div class="item-description">
+Besides pushing acronyms up to and over the edge, this sight is pretty
+cool.  This exactly why we need the Google Earth, Mars Edition.  Being
+able to load mapped and modeled data on the planets is a huge help for
+scientists and the KML/Google way is a lot easier for types like me.
+<br /><br />
+<img src="../attachments/2006-12/gm-martian.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-17T10_09_55.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-17T10_48_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-16T13_58_38.txt" name="e2006-12-16T13_58_38.txt"></a>
+<h2 class="date">12.16.2006 13:58</h2>
+<div class="blogbody">
+<h3 class="title">AGU Virtual Globes - Big Data in Google Earth</h3>
+<div class="item-description">
+From the AGU abstracts this year.
+<a href="http://conferences.images.alaska.edu/agu2006/hagemark.htm">http://conferences.images.alaska.edu/agu2006/hagemark.htm</a>
+<pre>
+ Presenting Big Data in Google Earth with KML
+.
+Bent Hagemark
+Google, 1600 Amphitheatre Pkwy, Mountain View, CA 94043, United States
+.
+KML 2.1 and Google Earth 4 provides support to enable streaming of
+very large datasets, with "smart" loading of data at multiple levels
+of resolution and incremental update to previously loaded data. This
+presentation demonstrates this technology for use with the Google
+Earth KML geometry and image primitives and shows some techniques and
+tools for creating this KML.
+.
+<a href="http://earth.google.com/">http://earth.google.com/</a>
+<a href="http://code.google.com/p/regionator/">http://code.google.com/p/regionator/</a>
+</pre>
+And another that is similiar to my survey work in Santa Barbara in early Nov.
+This is the USGS Walrus cruise database.
+<pre>
+USGS Coastal and Marine Geology Survey Data in Google Earth
+.
+Carol Reiss, Clint Steele, Alex Ma, John Chin
+.
+US Geological Survey, 345 Middlefield Rd.MS 999, Menlo Park, CA 94025,
+United States
+.
+*Invited presentation*
+.
+The U.S. Geological Survey (USGS) Coastal and Marine Geology (CMG)
+program has a rich data catalog of geologic field activities and
+metadata called InfoBank, which has been a standard tool for
+researchers within and outside of the agency. Along with traditional
+web maps, the data are now accessible in Google Earth, which greatly
+expands the possible user audience. The Google Earth interface
+provides geographic orientation and panning/zooming capabilities to
+locate data relative to topography, bathymetry, and coastal
+areas. Viewing navigation with Google Earth's background imagery
+allows queries such as, why areas were not surveyed (answer  presence
+of islands, shorelines, cliffs, etc.). Detailed box core subsample
+photos from selected sampling activities, published geotechnical data,
+and sample descriptions are now viewable on Google Earth, (for
+example, M-1-95-MB, P-2-95-MB, and P-1-97-MB box core samples).
+.
+One example of the use of Google Earth is CMG's surveys of San
+Francisco's Ocean Beach since 2004. The surveys are conducted with an
+all-terrain vehicle (ATV) and shallow-water personal watercraft (PWC)
+equipped with Global Positioning System (GPS), and elevation and echo
+sounder data collectors. 3D topographic models with centimeter
+accuracy have been produced from these surveys to monitor beach and
+nearshore processes, including sand transport, sedimentation patterns,
+and seasonal trends. Using Google Earth, multiple track line data
+(examples: OB-1-05-CA and OB-2-05-CA) can be overlaid on beach
+imagery. The images also help explain the shape of track lines as
+objects are encountered.
+.
+URL:
+<a href="http://walrus.wr.usgs.gov/infobank/programs/html/training/kml/kml.html">http://walrus.wr.usgs.gov/infobank/programs/html/training/kml/kml.html </a>
+</pre>
+There were lots of other interesting abstracts and I am kicking myself for not having been there.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-16T13_58_38.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-17T10_09_55.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-15T10_20_46.txt" name="e2006-12-15T10_20_46.txt"></a>
+<h2 class="date">12.15.2006 10:20</h2>
+<div class="blogbody">
+<h3 class="title">Google Mars</h3>
+<div class="item-description">
+This is an oldie but goodie.  <a
+href="http://www.google.com/mars/">Google Mars</a> in a Google Map
+interface.  Here is hoping that is also becomes a Google Earth like
+system.  I tried dropping a kmz on the map like with the Earth, but no luck.
+<br /><br />
+This did not work: <a
+href="http://www.google.com/mars?q=http://vislab-ccom.unh.edu/~schwehr/GoogleEarth/CCOM_JHC_Logo.kmz">CCOM
+on Mars</a>.  Dear Google, Please allow this link to work!  Thanks,
+-Kurt.
+<br /><br />
+<img src="../attachments/2006-12/google-mars.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-15T10_20_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-16T13_58_38.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-15T09_08_18.txt" name="e2006-12-15T09_08_18.txt"></a>
+<h2 class="date">12.15.2006 09:08</h2>
+<div class="blogbody">
+<h3 class="title">Iridium and GPS satellites</h3>
+<div class="item-description">
+Obviously in Google Earth <img src="../moods/smilies/smiley.gif" alt=":)" border="0" 
+<br /><br />
+<a href="http://www.gearthblog.com/blog/archives/2006/12/interesting_satellit.html">Interesting Satellite Visualizations for Google Earth</a>
+<br /><br />
+Iridium low orbit comm sats:
+<br /><br />
+<img src="../attachments/2006-12/ge-iridium.png">
+<br /><br />
+GPS satellites in higher orbits:
+<br /><br />
+<img src="../attachments/2006-12/ge-gps-1.png">
+<br /><br />
+<img src="../attachments/2006-12/ge-gps-2.png">
+<br /><br />
+<img src="../attachments/2006-12/ge-gps-3.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-15T09_08_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-15T10_20_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-14T10_57_20.txt" name="e2006-12-14T10_57_20.txt"></a>
+<h2 class="date">12.14.2006 10:57</h2>
+<div class="blogbody">
+<h3 class="title">NOAA PORTS gets a Google Map interface</h3>
+<div class="item-description">
+This is a big improvement!  Now it is really easy to figure out what
+the station names and id numbers are that I care about.
+<br /><br />
+<a href="http://tidesandcurrents.noaa.gov/cbports/cbports_south.shtml?port=cs">NOAA Ports Southern Chesapeake Bay</a>
+<br /><br />
+<img src="../attachments/2006-12/ports-cs.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-14T10_57_20.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-15T09_08_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-13T16_39_16.txt" name="e2006-12-13T16_39_16.txt"></a>
+<h2 class="date">12.13.2006 16:39</h2>
+<div class="blogbody">
+<h3 class="title">Godiva2</h3>
+<div class="item-description">
+More marine data in google earth/maps...  <a href="http://lovejoy.nerc-essc.ac.uk:8080/Godiva2/">Godiva2</a>
+<br /><br />
+<img src="../attachments/2006-12/ge-godiva2.png">
+<br /><br />
+From the list of AGU 2006 Virtual Earth section...
+<br /><br />
+<a href="http://conferences.images.alaska.edu/agu2006/blower1.htm">blower1.htm</a>
+<br /><br />
+<pre>
+In this presentation we shall discuss our experiences with using Google
+Maps and Google Earth to explore and visualize oceanographic data. We
+focus on data from General Circulation Model analyses of ocean
+circulation for operational and research purposes. These datasets are
+produced by institutions such as the UK Met Office and the National
+Oceanography Centre and are very valuable, both for environmental
+science research and for applications such as search and rescue and
+oil spill mitigation. It is important for scientists to be able to
+explore and visualize these high-resolution, terabyte-scale datasets
+efficiently; it is also important from an educational point of view to
+allow novice users to be able to explore these datasets in order to
+understand the ocean circulation. Geobrowsers such as Google Earth are
+promising tools for achieving this but have important
+limitations. These include a lack of proper treatment of the depth and
+time dimensions: geobrowsers mainly focus on surface features that do
+not vary with time.
+<br /><br />
+We present a system that works around these limitations by combining
+the geobrowser with an interactive website: this is known as the
+``Godiva2'' system. The website allows the user to select the dataset
+and variable of interest (e.g.\ sea water temperature as predicted by
+the Met Office), then select the water depth and time. The website
+includes an instant preview of the data in a dynamic map component (a
+Google Map). Having selected the required parameters, the user clicks
+on a link to display the data in Google Earth. The user can zoom into
+the virtual globe and data will be displayed at an appropriate
+resolution, allowing users to see features of ocean circulation at all
+scales. Displayed images are all generated dynamically from source
+data, giving a high degree of flexibility (e.g.\ user-defined colour
+scales). We shall discuss the design of the system and the lessons
+learned, concluding with a discussion of work in progress and future
+work, including our work towards basing the system upon international,
+open standards such as the Open Geospatial Consortium's Web Map
+Service.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-13T16_39_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-14T10_57_20.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-13T12_25_34.txt" name="e2006-12-13T12_25_34.txt"></a>
+<h2 class="date">12.13.2006 12:25</h2>
+<div class="blogbody">
+<h3 class="title">Triton - Sim City meets 3D oceans</h3>
+<div class="item-description">
+<a
+href="http://www.cs.washington.edu/homes/keithg/oceans.html">triton</a>
+is a little app for laying out under water cable networks with the cost
+changing as you alter the layout, sensors, and nodes.
+<br /><br />
+<img src="../attachments/2006-12/triton.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-13T12_25_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-13T16_39_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-13T08_25_28.txt" name="e2006-12-13T08_25_28.txt"></a>
+<h2 class="date">12.13.2006 08:25</h2>
+<div class="blogbody">
+<h3 class="title">isightcapture</h3>
+<div class="item-description">
+This is a command line app that I have been dying for...
+<br /><br />
+<a href="http://www.intergalactic.de/hacks.html">isightcapture</a>
+<pre>
+  isightcapture -t png image.png
+  photoshop image.png
+</pre>
+<img src="../attachments/2006-12/isightcapture.png">
+<br /><br />
+BTW... don't have a photoshop command line alias?  Here is my current
+code for it from my .bashrc.  I have only CS on my laptop, but CS2 is
+on my desktop.  This way, I have one bashrc that handles both cases.
+<pre>
+if [ -d /Applications/Adobe\ Illustrator\ CS2/Adobe\ Illustrator.app ]; then 
+  alias photoshop='open -a /Applications/Adobe\ Photoshop\ CS2/Adobe\ Photoshop\ CS2.app'
+  alias illustrator='open -a /Applications/Adobe\ Illustrator\ CS2/Adobe\ Illustrator.app'
+else
+  alias photoshop='open -a /Applications/Adobe\ Photoshop\ CS/Adobe\ Photoshop\ CS.app'
+  alias illustrator='open -a /Applications/Adobe\ Illustrator\ CS/Illustrator\ CS.app'
+fi
+</pre>
+NOTE: I need to wash my office window and give the camera a black hood
+so that the reflections are decreased.  And no, I am not leaving my
+isight outside in the weather!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-13T08_25_28.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-13T12_25_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-12T13_27_51.txt" name="e2006-12-12T13_27_51.txt"></a>
+<h2 class="date">12.12.2006 13:27</h2>
+<div class="blogbody">
+<h3 class="title">XMLSpear</h3>
+<div class="item-description">
+Another XML editor... it's free and better than some others I have
+seen.  I don't have a schema right now for my current project, so I
+have not tried the validation functionality.
+<br /><br />
+<a href="http://www.donkeydevelopment.com/">XMLSpear</a>
+<br /><br />
+<img src="../attachments/2006-12/xmlspear.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-12T13_27_51.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-13T08_25_28.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-12T08_01_36.txt" name="e2006-12-12T08_01_36.txt"></a>
+<h2 class="date">12.12.2006 08:01</h2>
+<div class="blogbody">
+<h3 class="title">Ship Motion Control - software for specific marine applications</h3>
+<div class="item-description">
+Another Briana and Matt link.  Ship Motion Control sells sensors and
+software for specific marine activities.  Shown here is their
+application for the fishing industry.
+<br /><br />
+<img src="../attachments/2006-12/smc-fishing.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-12T08_01_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-12T13_27_51.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-12T07_56_50.txt" name="e2006-12-12T07_56_50.txt"></a>
+<h2 class="date">12.12.2006 07:56</h2>
+<div class="blogbody">
+<h3 class="title">Rutgers marine science classroom</h3>
+<div class="item-description">
+Just found this site from some notes by Matt and Briana.  Looks like
+some good content: <a href="http://www.coolclassroom.org/">http://www.coolclassroom.org/</a>
+<br /><br />
+<img src="../attachments/2006-12/rutgers-marine-classroom.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-12T07_56_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-12T08_01_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-12T06_17_26.txt" name="e2006-12-12T06_17_26.txt"></a>
+<h2 class="date">12.12.2006 06:17</h2>
+<div class="blogbody">
+<h3 class="title">case of the letters in the python hex function</h3>
+<div class="item-description">
+I reported a bug in the python <a href="http://cobweb.ecn.purdue.edu/~kak/dist/">BitVector</a> class a couple weeks ago and
+now that classes are finish, Avi has gotten back to me with the cause
+and patch.  Thanks Avi!
+<pre>
+  Please replace line (A37) by
+        hexVal = hex( intVal ).lower().rstrip('l')          #(A37)
+</pre>
+The bug occurs when I try to make BitVectors of very large integers
+(greater than int(2**31-1) ... 2147483647).  BitVector would throw an
+exception.
+<pre>
+BitVector(intVal=3000000000)
+==================================================
+exceptions.KeyError                                  Traceback (most recent call last)
+<br /><br />
+/sw/lib/python2.4/site-packages/BitVector.py in __init__(self, *args, **kwargs)
+    602                 bitlist = []                                 #(A41)
+    603                 for item in hexVal[:]:                       #(A42)
+==&gt; 604                     bitlist += _hexdict[item][:]             #(A43)
+    605                 bitlist =  map( lambda x: int(x), bitlist )  #(A44)
+    606                 i = 0                                        #(A45)
+</pre>
+The problem stems from the hex function as Avi found.  The case of
+A..F is different between integers less than 2**31.  Lower below and
+upper above in python 2.4:
+<pre>
+ipython2.4
+In [1]:  print hex(300000000)
+0x11e1a300
+In [2]:  print hex(3000000000)
+0xB2D05E00L
+</pre>
+When I try python 2.5, I see different behavior (which I think is more
+correct):
+<pre>
+ipython2.5
+In [1]: print hex(300000000)
+0x11e1a300
+In [2]: print hex(3000000000)
+0xb2d05e00L
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-12T06_17_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-12T07_56_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-11T16_04_01.txt" name="e2006-12-11T16_04_01.txt"></a>
+<h2 class="date">12.11.2006 16:04</h2>
+<div class="blogbody">
+<h3 class="title">x11 apps crashing on mac - ssh solution</h3>
+<div class="item-description">
+<a href="http://docs.info.apple.com/article.html?artnum=302349">Mac OS
+ 10.4 or later: Remotely-based X11 applications quit unexpectedly or
+behave erratically</a> [apple.com]
+<br /><br />
+"ssh -Y" seems to do the trick.  Was using "ssh -X" before.  Someone
+had mentioned this to me before and it never really sunk in until now.  
+Now I can happily ssh -Y myserver and run emacs without troubles.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-11T16_04_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-12T06_17_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-11T15_39_59.txt" name="e2006-12-11T15_39_59.txt"></a>
+<h2 class="date">12.11.2006 15:39</h2>
+<div class="blogbody">
+<h3 class="title">USCG PDA usage</h3>
+<div class="item-description">
+<a href="http://www.uscg.mil/pacarea/News/ptol/features/PDAs/index.htm">PDA's for Small Boat Station</a> [uscg.mil]
+<br /><br />
+<pre>
+"The PDAs have streamlined the paperwork process involved in law
+enforcement boardings," said Petty Officer 1st Class Rob Goley,
+operations petty officer for Station Los Angeles. "Now, all the
+paperwork and Coast Guard law enforcement references are stored on the
+PDA. This enables boarding teams to be able to conduct an inspection,
+issue a printed copy (of form 4100) to the mariner, and download all
+the information to the (Marine Information for Safety and Law
+Enforcement) MISLE database though a very efficient process," said
+Petty Officer 2nd Class Brian McKenrick, a boarding team leader from
+Station Los Angeles.
+<br /><br />
+The PDA has replaced the large amount of redundant paperwork and work
+hours that used to be required to transfer the information from a law
+reenforcement boarding to the Coast Guard's database, said Petty Officer
+2nd Class Paul Buccat, boarding team member from.
+<br /><br />
+The PDA is the latest technological component added to the MISLE-JPAD
+project, according to the Operational Support Center's website. MISLE
+has efficiently merged the Marine Safety Network, Vessel
+Identification and Documentation database, and the Maritime Safety and
+Law Enforcement information database, said Petty Officer 2nd Class
+Brian Kelly, a reservist boarding team member of Station Los
+Angeles. It is proposed that one day the MISLE database will be
+connected to the PDAs via a real-time network that will enable field
+units to access all pertinent USCG databases. "This would give units
+mobile-technology capabilities similar to the computers already in
+police cars," said Kelly.
+<br /><br />
+In the six months since receiving the PDAs, the boarding teams here
+have continually stated how much they enjoy the advantages and
+"user-friendly" nature of this new technology, said Senior Chief Petty
+Officer Mark Preston, officer in charge of Station Los Angeles.
+</pre>
+<img src="../attachments/2006-12/uscg-PDA.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-11T15_39_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-11T16_04_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-11T15_25_16.txt" name="e2006-12-11T15_25_16.txt"></a>
+<h2 class="date">12.11.2006 15:25</h2>
+<div class="blogbody">
+<h3 class="title">USCG MISLE database</h3>
+<div class="item-description">
+Just found this on the web from 2004...
+<pre>
+USCG MISLE Web-Based GIS Application
+Presented by: Joseph Elliot Buckles
+<br /><br />
+<b>Abstract:</b>
+The Coast Guard has a need to use GIS technologies to serve as a
+dynamic visualization tool to display the location of search and
+rescue cases, oil spills, aids to navigation information, demographics
+data, readiness data, etc. to better aid CG decision makers and
+improve information services to the public. The Marine Information for
+Safety and Law Enforcement (MISLE) GIS application is an attempt at
+satisfying this need. MISLE GIS is a full featured web deployed
+application. It features a Clustered SDE Database on the back, ArcIMS
+and Web Service middle tier, and a thin rich client on the front end.
+This client is an ActiveX Control that runs inside Internet Explorer
+and emulates a desk top GIS application. This application displays
+base maps and charts, Coast Guard specific information on Facilities
+and waterways, as well as dynamic data relating to CG Cases and
+Activities.
+.
+<b>Functionally:</b>
+The purpose of the MISLE GIS application is to serve as a reference
+map for various areas of interest for the US Coast Guard. Primarily
+the application is accessed on land after the incidents have been
+entered through the non-spatial MISLE application via PDA or desktop
+reporting.
+.
+The spatial side of the application runs deeper than what can bee seen
+on the surface.  On the backend lies a SQL Server database with ArcSDE
+8.2 handling the spatial translation. ArcSDE primarily handles all of
+the spatial searching and retrieval of data requested the by the
+ArcIMS client which is running a separate web server.  ArcIMS by
+itself is a favorable client for serving spatial data to the
+web. However, it does have limitations. The MISLE users require a
+simple interface combined with advanced search and drawing
+capabilities. A number of processes to complete many of the
+capabilities had to be developed specifically for this
+application. For example adding a layer dynamically to the web based
+client and choosing which field to use as a label.
+.
+<b>Design:</b>
+The design of MISLE GIS is co-dependent on many variables. ArcIMS as
+discussed above requires significant custom development to meet the
+needs of MISLE users. Therefore various controls must be developed to
+utilize exiting ArcSDE schemas and the creation of new schemas must be
+interwoven without breaking integrity.
+.
+The most intriguing design is that of the Available layers table. This
+table is essentially a catalog table which references all layers, both
+ArcSDE and flat files. The available layers table links to the
+sde.sde_layers table found in the SDE database. This is referenced by
+the client to give the user an organized list of layers to add to
+their map service.  This layer catalog functionality gives the user
+control over color of the displayed features and how the layers are
+labeled. For ease of recreation these customizations can be saved to
+their server stored profiles.
+.
+The client takes a considerable amount of credit for being the most
+time consuming for development. However concurrently as the data is
+being displayed data sources also must be found, loaded, and
+maintained. The thin client does not have direct access to the
+database. In fact by use of the display name the actual table names of
+the ArcSDE layers are masked. But there is intent to open the database
+to read only access by various GIS savvy users in the USCG.
+.
+Therefore vector and rater layers stored in ArcSDE are cataloged
+logically by either Coast Guard wide or one of nine coast guard
+administration districts. This model would serve the logical purpose
+allowing each district or unit to store its data in separately.  There
+are many more customizations that have been implemented. Please review
+"Creating Custom GIS Web Applications using ArcIMS, ArcSDE, and
+ActiveX" Lakey, Mike UC 2004; and also "Workaround for ActiveX
+connector Shortcomings" Kowalski, Brian UC 2004 for more information
+on customization in the MISLE GIS client.
+.
+<b>Future:</b>
+The Coast Guards Enterprise GIS database started with a specific
+project to support.  However, projects evolve and new needs are
+identified. The GIS component of the MISLE application was the
+foundation for a new project in Port Security GIS support. This new
+initiative was brought about by a number of factors including the
+super bowl.  The new requirements include raster data support and
+complete focused datasets for various ports. The Port GIS requires a
+substantial increase in disk storage requirements to meet the new
+goals.
+.
+The future of the Enterprise GIS will be an independent modular
+database allowing multiple projects such as MISLE and Port Security
+GIS which are thin ArcIMS clients to seamlessly access the
+database. As Coast Guard confidence with GIS grows it is foreseeable
+that many districts will begin accessing the database directly through
+ArcGIS.
+<br /><br />
+Author Information:
+Joseph E. Buckles
+GIS Data Analyst/DBA
+Stanley Associates, Inc.
+US Coast Guard Operations System Center
+408 Coast Guard Drive Kearnysville, WV. 25430-3002
+Phone: (304) 264-2574 Email: jbuckles(at)osc.uscg.mil
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-11T15_25_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-11T15_39_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-11T10_30_41.txt" name="e2006-12-11T10_30_41.txt"></a>
+<h2 class="date">12.11.2006 10:30</h2>
+<div class="blogbody">
+<h3 class="title">Computer virus delays cruise liner</h3>
+<div class="item-description">
+I got this headline from Fairplay:
+<pre>
+Infected Freedom delays cruise
+<br /><br />
+ROYAL Caribbean (RCCL) Freedom of the Seas, the world's largest cruise
+ship, has delayed its next departure after repeated outbreaks of
+norovirus.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-11T10_30_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-11T15_25_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-10T12_24_00.txt" name="e2006-12-10T12_24_00.txt"></a>
+<h2 class="date">12.10.2006 12:24</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth - NASA Goddard Scientific Visualization Studio</h3>
+<div class="item-description">
+I think I am starting to sound like a broken record... however, this
+reminds me that I need to look more into WMS.
+<br /><br />
+<a href="http://svs.gsfc.nasa.gov/documents/available.html">http://svs.gsfc.nasa.gov/documents/available.html</a>
+<br /><br />
+<pre>
+SVS Image Server
+Available Animations List
+<br /><br />
+These image and animation layers are available through Web Map
+Services (WMS) on the SVS Image Server. Links are provided to
+explanatory pages and animations on the Scientific Visualization
+Studio web site.
+<br /><br />
+Google Earth links are now available here New! Many of these
+animations are now available to be used in Google Earth. Just look for
+this link image in the list of animations below. To view these
+animations properly, the animation slider should be set to its minimal
+size and other layers such as terrain should be turned off. You may
+also need to increase the memory cache size and disk cache size within
+the Google Earth settings. Follow this link to get more information
+about Google Earth and KML files.
+</pre>
+<img src="../attachments/2006-12/ge-goddard.png">
+<br /><br />
+<a href="http://www.gearthblog.com/blog/archives/2006/12/nasa_goddard_publish.html">NASA Goddard Publishes Huge Google Earth Time Animations</a> [googleearthblog]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-10T12_24_00.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-11T10_30_41.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-10T10_40_16.txt" name="e2006-12-10T10_40_16.txt"></a>
+<h2 class="date">12.10.2006 10:40</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth's Geographic Web</h3>
+<div class="item-description">
+I was doing some reading this morning and following along the
+locations in the text with Google Earth.  While doing that, I noticed
+the "Geographic Web <font color="red">New!</font>" and took a quick
+look.  Turns out it is pretty interesting.  It has images from <a
+href="http://www.panoramio.com/">Panoramio</a> and links to <a
+href="http://wikipedia.com/">Wikipedia</a>.  I tried a couple places
+(Portsmouth, NH and Seattle, WA) and found some interesting images,
+but noticed that there was no image taken from right on the Seattle
+Locks, so I decided to try to add one to see if it would appear.  Not
+surprisingly, it did not appear right in google earth (that would
+allow people to post some not so fun images), but there is a way to
+see a new picture along with others right away.
+<br /><br />
+First I had to turn on the Geographic Web folder on the left hand side
+of the Google Interface.
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-1.png">
+<br /><br />
+Then I went and checked out the Wikipedia entry for Portsmouth, NH.  "Big cities" in New Hampshire really are not that big...
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-2-wikipedia.png">
+<br /><br />
+The I checked out a Panoramio image out by New Castle/Kittery.  I
+figured that I can do that.  I 15000+ digital photos.  There has to be
+one in there worth posting to try this out.
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-3-pan.png">
+<br /><br />
+Here is the photo that I used for testing.  Dave R. and I went out to
+the Locks when I visited Seattle earlier this year.  Watched the fish
+swimming up the locks (there weren't many), the ships going through,
+and the million tourists.  BTW, the best view of fish jumping at that
+time was on the upstream side of the locks.  Confused fish?
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-4.png">
+<br /><br />
+Here is the Panoramio interface for adding images.  After the image is
+uploaded, you can place a tack on a Google Map display and drag it
+around until it matches the location.  Pretty cool use of Google Maps.
+Note the really tiny gray "X" when I moved the tack.  
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-5.png">
+<br /><br />
+This thing really did not like me taking a screen shot of it, but I
+finally tricked it into letting me see it.  The image did not show up in the layers area.
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-6.png">
+<br /><br />
+However, if I loaded up a <a
+href="http://www.panoramio.com/panoramio.kml">panoramio.kml</a> (which
+is just a network link), then I found my image along with a lot more
+from other Panoramio uploads from other users.
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-7.png">
+<br /><br />
+Finally, Panoramio offers an RSS feed so you can watch what specific
+users upload.  I'm sure <a href="http://flickr.com/">flickr</a> has
+RSS feeds too.  Not that I am planning to upload a million pics, but
+here is my feed just for grins.  There is only one pic for me so far
+and it is likely to stay that way for a while.
+<br /><br />
+<a href="http://www.panoramio.com/userfeed/14690.rss">http://www.panoramio.com/userfeed/14690.rss</a>
+<br /><br />
+<img src="../attachments/2006-12/ge-geographic-web-8.png">
+<br /><br />
+Lots could be improved, but this is pretty nice and by being directly attached to google, it is more likely to succeed that the previous items that I have blogged about (<a href="http://www.placeopedia.com/">http://www.placeopedia.com/</a>).
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-10T10_40_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-10T12_24_00.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-09T18_14_44.txt" name="e2006-12-09T18_14_44.txt"></a>
+<h2 class="date">12.09.2006 18:14</h2>
+<div class="blogbody">
+<h3 class="title">NOAA Great Lakes Google Earth data</h3>
+<div class="item-description">
+The NOAA GLERL now has Google Earth kml files for the Great Lakes.
+<br /><br />
+<a href="http://www.glerl.noaa.gov/res/glcfs/">http://www.glerl.noaa.gov/res/glcfs/</a>
+<br /><br />
+<img src="../attachments/2006-12/noaa-great-lakes-ge.png"> 
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-09T18_14_44.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-10T10_40_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-09T17_55_48.txt" name="e2006-12-09T17_55_48.txt"></a>
+<h2 class="date">12.09.2006 17:55</h2>
+<div class="blogbody">
+<h3 class="title">Mac OSX swap file</h3>
+<div class="item-description">
+From Dale via Val...
+<pre>
+Ever wonder where the swap file is on OS X?
+/var/vm
+-Dale
+</pre>
+Taking a closer look see:
+<pre>
+ls -l /var/vm
+total 1048576
+drwx--x--x   16 root  wheel        544 Dec  1 22:48 app_profile
+-rw------T    1 root  wheel   67108864 Dec  2 12:25 swapfile0
+-rw------T    1 root  wheel   67108864 Dec  2 20:19 swapfile1
+-rw------T    1 root  wheel  134217728 Dec  2 20:24 swapfile2
+-rw------T    1 root  wheel  268435456 Dec  2 21:14 swapfile3
+</pre>
+And this is amusing (but not surprising)...
+<pre>
+sudo file swapfile1
+swapfile1: sticky ASCII text, with very long lines
+</pre>
+I have never seen this come up before:
+<pre>
+file 107_names
+107_names:      unicos (cray) executable
+</pre>
+Never got a chance to check out the old cray machines even though I
+worked in the building next door to a couple back in the 90's.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-09T17_55_48.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-09T18_14_44.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-09T17_51_18.txt" name="e2006-12-09T17_51_18.txt"></a>
+<h2 class="date">12.09.2006 17:51</h2>
+<div class="blogbody">
+<h3 class="title">USCG suspends patrol boat operations in Florida</h3>
+<div class="item-description">
+Bummer... <a href="https://www.piersystem.com/go/doc/786/138897/">Coast Guard Suspends Converted Patrol Boat Operations</a> [piersystem.com]
+<pre>
+WASHINGTON - The U.S. Coast Guard announced today its decision to
+suspend normal operations of eight converted 123-foot patrol boats
+assigned to Coast Guard Sector Key West, Fla., due to additional
+structural damage recently discovered in the hulls.
+<br /><br />
+"I suspended the operation of all eight 123-foot cutters to ensure the
+continued safety of our crews as we assess additional structural
+damage recently discovered aboard this class of cutter," said
+Adm. Thad Allen, commandant of the Coast Guard. "The reliable, safe
+operation of our cutters and aircraft is paramount to our effective
+mission execution, including vital search and rescue and migrant
+interdiction missions in the area. We are making necessary adjustments
+to deploy aircraft and ships from other areas to maintain our robust
+coverage in the area while we develop a long-term solution."
+<br /><br />
+The Coast Guard suspended operations today following a comprehensive
+analysis of the 123-foot patrol boat's structure, including
+metallurgical examination, full-scale testing using an instrumented
+cutter, laboratory analysis, computer-based structural analysis, and a
+third party review from the designers of the original hull form.
+<br /><br />
+Following the discovery of significant buckling in the structural
+members underneath a main engine aboard one of the eight cutters, Rear
+Adm. Dale Gabel, the Coast Guard's chief engineer, personally
+inspected five more of the 123-foot patrol boats in Key West November
+16. He found similar deformations, as well as other signs of hull
+weaknesses, aboard all five cutters.
+<br /><br />
+The Coast Guard's Integrated Deepwater System had originally planned
+to convert 49 of the service's 110-foot cutters into 123-foot cutters,
+intending to increase the vessel's annual operational hours to 2,500
+versus the 110-foot boat standard, which ranges from 1,800 to 2,200
+hours. In June 2005, the Coast Guard stopped its conversion process at
+eight hulls when it determined the converted cutters lacked adequate
+capabilities to meet their expanded post 9/11 operational
+requirements.
+<br /><br />
+Following conversion, the 123-foot boats displayed deck cracking and
+hull deformation and developed shaft alignment problems related to
+other structural issues.
+<br /><br />
+The Coast Guard maintains a fleet of approximately 250 cutters and
+nearly 200 aircraft around the country. A total of 52 cutters and 39
+aircraft are assigned to the Coast Guard's Seventh District.
+<br /><br />
+The Coast Guard is exploring options to address operational gaps due
+to this decision, including temporarily assigning assets from other
+operational areas to Sector Key West and employing the crews of the
+123-foot cutters to augment other vessels.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-09T17_51_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-09T17_55_48.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-08T16_25_15.txt" name="e2006-12-08T16_25_15.txt"></a>
+<h2 class="date">12.08.2006 16:25</h2>
+<div class="blogbody">
+<h3 class="title">Maine air photos corver parts of NH</h3>
+<div class="item-description">
+I discoved that when the online maine air photo app complains and does not render an image, then just reduce the size of the browser window.  Took me quite a while to realize what the problem was.
+<br /><br />
+<a href="http://megisims.state.me.us/website/orthomap/viewer.htm">http://megisims.state.me.us/website/orthomap/viewer.htm</a>
+<br /><br />
+Now, how do I down load what I see?
+<br /><br />
+<img src="../attachments/2006-12/maine-aerial-photos.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-08T16_25_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-09T17_51_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-08T15_25_21.txt" name="e2006-12-08T15_25_21.txt"></a>
+<h2 class="date">12.08.2006 15:25</h2>
+<div class="blogbody">
+<h3 class="title">GeoMapApp</h3>
+<div class="item-description">
+I got the <a href="http://geomapapp.org/">GeoMapApp</a> Java jar to
+download to my mac and Jim G. gave me a quick tour.  Talk about an
+easy way to quickly find single channel seismic data.  If it were only
+this easy for all my data needs!
+<br /><br />
+<img src="../attachments/2006-12/geomapapp.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-08T15_25_21.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-08T16_25_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-08T14_51_09.txt" name="e2006-12-08T14_51_09.txt"></a>
+<h2 class="date">12.08.2006 14:51</h2>
+<div class="blogbody">
+<h3 class="title">Open-Source Spying</h3>
+<div class="item-description">
+<a href="http://www.nytimes.com/2006/12/03/magazine/03intelligence.html">Open-Source Spying</a> [New York Times - login required]
+<pre>
+  Intelligence heads wanted to try to find some new answers to this
+  problem. So the C.I.A. set up a competition, later taken over by the
+  D.N.I., called the Galileo Awards: any employee at any intelligence
+  agency could submit an essay describing a new idea to improve
+  information sharing, and the best ones would win a prize. The first
+  essay selected was by Calvin Andrus, chief technology officer of the
+  Center for Mission Innovation at the C.I.A. In his essay, "The Wiki
+  and the Blog: Toward a Complex Adaptive Intelligence Community,"
+  Andrus posed a deceptively simple question: How did the Internet
+  become so useful in helping people find information? 
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-08T14_51_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-08T15_25_21.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-08T10_57_47.txt" name="e2006-12-08T10_57_47.txt"></a>
+<h2 class="date">12.08.2006 10:57</h2>
+<div class="blogbody">
+<h3 class="title">GeoMapApp Google Earth files</h3>
+<div class="item-description">
+Right now, it seems that the <a
+href="http://geomapapp.org">geomapapp.org</a> Java download of
+GeoMapApp is broken.  I was going to explore a bit, but no app = no
+explore.  So I looked around the site a bit and found that they have
+some Google Earth products available.  A lot better colormap than the
+Google Earth default bathymetry.  Would be nice if they had cropped at
+the coastline and made the images transparent for the land, but it is
+still really cool.
+<br /><br />
+<a href="http://www.marine-geo.org/GeoMapApp4GoogleEarth/GMA4GE.kml">GMA4GE.kml</a>
+<br /><br />
+<img src="../attachments/2006-12/geomapapp-ge-bathymetry.png">
+<br /><br />
+There is also petrology data georeferenced.  This is cool.  A little
+more work on the html layout in the placemarks and some background
+information on what that petrology implies (for those of us who don't
+do petrology every day) would make this a great resource.
+<br /><br />
+<a href="http://www.marine-geo.org/geomapapp/GE/PetDB/Endeavor_Petrology.kml">Endeavor_Petrology.kml</a>
+<br /><br />
+<img src="../attachments/2006-12/geomapapp-petrology.png ">
+<br /><br />
+And then there are the sea floor pictures.  I recognize this photo from Dill's 1964 these, as I used it in my La Jolla Fledermaus demo: <a href="http://vislab-ccom.unh.edu/~schwehr/LaJolla/">La Jolla</a>
+<br /><br />
+<a href="http://www.marine-geo.org/geomapapp/GE/SeaFloorPhotos/LDEO_Seafloor_photos.kmz">LDEO_Seafloor_photos.kmz</a>
+<br /><br />
+<img src="../attachments/2006-12/geomapapp-photos.png">
+<br /><br />
+And a page that would have been great for my thesis (had the database contained cores in my thesis area ... it doesn't)
+<br /><br />
+<a href="http://www.marine-geo.org/geomapapp/GE/Sediment_Cores/ldeo_sediment_cores.kmz">ldeo_sediment_cores.kmz</a>
+<br /><br />
+<img src="../attachments/2006-12/geomapapp-cores.png">
+<br /><br />
+This all goes back to the Arc CD that Larry Mayer and his class made for the
+Eel River STRATAFORM area about 6 years ago.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-08T10_57_47.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-08T14_51_09.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-08T10_16_16.txt" name="e2006-12-08T10_16_16.txt"></a>
+<h2 class="date">12.08.2006 10:16</h2>
+<div class="blogbody">
+<h3 class="title">Multiple versions of Fledermaus</h3>
+<div class="item-description">
+This is in the category of things that are obvious once you think
+about them.  For many Mac applications, you install them by dropping
+the application (which is actually a directory bundling all sorts of
+resources and such) into /Applications.  This these applications, I
+often rename the old version first so that if something is broken, I
+can go back to the previous one until the new version is fixed.  I ran
+into a Fledermaus install bug with 6.3.0o where a library file got
+dropped by the installer.  Fledermaus also has a /Library/Application
+Support/IVS directory that has cmdop and a few other things in it.  I
+had assumed that the Fledermaus application had to match the version
+of the Application Support area.  I was wrong.  I copied the IVS
+applications (version 6.3.0i) from my laptop into a separate folder in
+/Applications on my desktop and I am back in business.  Now I can get
+back to exploring many of the cool new features in Fledermaus 6.3.0*.
+<br /><br />
+UPDATE 11-Dec-2006: 6.3.0o was rereleased today.  I gave it a go and
+it works for me.  Thanks to the IVS guys for a quick turnaround.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-08T10_16_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-08T10_57_47.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-08T07_46_30.txt" name="e2006-12-08T07_46_30.txt"></a>
+<h2 class="date">12.08.2006 07:46</h2>
+<div class="blogbody">
+<h3 class="title">First snow that stuck!</h3>
+<div class="item-description">
+<img src="../attachments/2006-12/first-snow.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-08T07_46_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-08T10_16_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-07T11_59_52.txt" name="e2006-12-07T11_59_52.txt"></a>
+<h2 class="date">12.07.2006 11:59</h2>
+<div class="blogbody">
+<h3 class="title">imap with Mail.app still a BIG problem</h3>
+<div class="item-description">
+I still have not heard about a resolution about this CRITICAL bug with Apple's Mail.app:
+<pre>
+ Problem ID: 4615880  	  
+ Mail loses mail when moving messages from inbox to imap folder
+ 06-Jul-2006 02:45 PM
+ Classification: Serious Bug  	  
+ State: Duplicate
+</pre>
+Just submitted another bug for the everpresent X11 app crashes from
+Linux boxes.  Problem ID: 4870037.  Now I need to submit one for no
+SSL support in iCal (even though I know that they know... they need to
+know that I know that they know)
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-07T11_59_52.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-08T07_46_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-07T11_24_17.txt" name="e2006-12-07T11_24_17.txt"></a>
+<h2 class="date">12.07.2006 11:24</h2>
+<div class="blogbody">
+<h3 class="title">density - volumetric visualization is back</h3>
+<div class="item-description">
+I have a new version of <a href="http://vislab-ccom.unh.edu/~schwehr/software/density/">density</a> out.  Not much has changed, but it now
+compiles on Mac OSX 10.4 ppc.  No idea about any other platform <img src="../moods/smilies/smiley.gif" alt=":)" border="0" 
+<br /><br />
+<a href="../attachments/2006-12/density.info">density.info</a>
+<br /><br />
+Put the info file in
+/sw/fink/10.4/local/main/finkinfo/graphics/density.info and then run
+"fink install density".  Just a warning, it uses SIM Voleon, Coin, and
+SoQt, so it can take quite a while to build.
+<br /><br />
+<img src="http://vislab-ccom.unh.edu/~schwehr/software/density/density-sml.jpg">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-07T11_24_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-07T11_59_52.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-06T19_03_46.txt" name="e2006-12-06T19_03_46.txt"></a>
+<h2 class="date">12.06.2006 19:03</h2>
+<div class="blogbody">
+<h3 class="title">USB LCD displays</h3>
+<div class="item-description">
+Roland and I were talking about these to attach to a Buffalo.  No,
+<b>not</b> the animal, the NAS device.  Roland went and found some...
+<br /><br />
+<a href="http://www.crystalfontz.com/products/index-usb.html">USB LCD
+Modules</a> (for under $100)
+<br /><br />
+<img src="../attachments/2006-12/usb-lcd.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-06T19_03_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-07T11_24_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-06T17_43_16.txt" name="e2006-12-06T17_43_16.txt"></a>
+<h2 class="date">12.06.2006 17:43</h2>
+<div class="blogbody">
+<h3 class="title">Mars:2020:Springtime</h3>
+<div class="item-description">
+Many thanks to the person who sent this to me!!
+<br /><br />
+<object width="425" height="350"><param name="movie" value="http://www.youtube.com/v/yjiGH9QNiU0"></param><param name="wmode" value="transparent"></param><embed src="http://www.youtube.com/v/yjiGH9QNiU0" type="application/x-shockwave-flash" wmode="transparent" width="425" height="350"></embed></object>
+<br /><br />
+<a href="http://www.youtube.com/watch?v=yjiGH9QNiU0">Mars:2020:Springtime</a>
+<br /><br />
+<img src="../attachments/2006-12/mars_2020_spring.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-06T17_43_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-06T19_03_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-06T14_15_37.txt" name="e2006-12-06T14_15_37.txt"></a>
+<h2 class="date">12.06.2006 14:15</h2>
+<div class="blogbody">
+<h3 class="title">The changing surface of Mars</h3>
+<div class="item-description">
+After some discussion, I think that this could be water, but I lean
+towards just a small, non-water related slope failure. With the
+underlying material being lighter, it doesn't take much material
+moving downslope to create this kind of pattern.
+<br /><br />
+<img src="../attachments/2006-12/mgs-change.png">
+<br /><br />
+<img src="../attachments/2006-12/mgs-closeup.png">
+<br /><br />
+NASA <a href="http://www.nasa.gov/mission_pages/mars/images/pia09027.html">pia09027</a>.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-06T14_15_37.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-06T17_43_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-06T08_05_53.txt" name="e2006-12-06T08_05_53.txt"></a>
+<h2 class="date">12.06.2006 08:05</h2>
+<div class="blogbody">
+<h3 class="title">NASA Briefing today - End of life for the Mars Global Surveyor</h3>
+<div class="item-description">
+<pre>
+Dec. 4, 2006  
+MEDIA ADVISORY: M06-186 
+.
+NASA Schedules Briefing to Announce Significant Find on Mars
+.
+WASHINGTON - NASA hosts a news briefing at 1 p.m. EST, Wednesday, Dec.
+6, to present new science results from the Mars Global Surveyor. The
+briefing will take place in the NASA Headquarters auditorium located at
+300 E Street, S.W. in Washington and carried live on NASA Television and
+www.nasa.gov. 
+.
+The agency last week announced the spacecraft's mission may be at its
+end. Mars Global Surveyor has served the longest and been the most
+productive of any spacecraft ever sent to the red planet. Data gathered
+from the mission will continue to be analyzed by scientists. 
+.
+Panelists include: 
+- Michael Meyer -- Lead Scientist, Mars Exploration Program, NASA
+Headquarters, Washington 
+- Michael Malin -- President and Chief Scientist, Malin Space Science
+Systems, San Diego, Calif.
+- Kenneth Edgett -- Scientist, Malin Space Science Systems 
+- Philip Christensen -- Professor, Arizona State University, Tempe,Ariz. 
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-06T08_05_53.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-06T14_15_37.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-06T06_59_52.txt" name="e2006-12-06T06_59_52.txt"></a>
+<h2 class="date">12.06.2006 06:59</h2>
+<div class="blogbody">
+<h3 class="title">Another New Hampshire sunrise</h3>
+<div class="item-description">
+It's the season again for great colors in the sky.
+<br /><br />
+<img src="../attachments/2006-12/newhampshire_sunrise.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-06T06_59_52.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-06T08_05_53.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-05T16_21_50.txt" name="e2006-12-05T16_21_50.txt"></a>
+<h2 class="date">12.05.2006 16:21</h2>
+<div class="blogbody">
+<h3 class="title">Better view of an s57</h3>
+<div class="item-description">
+This has most of the fields turned off.  Things look much more sane.
+<br /><br />
+<img src="../attachments/2006-12/s57-ge-better.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-05T16_21_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-06T06_59_52.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-05T15_14_52.txt" name="e2006-12-05T15_14_52.txt"></a>
+<h2 class="date">12.05.2006 15:14</h2>
+<div class="blogbody">
+<h3 class="title">gdal ogr2ogr from s57 to kml</h3>
+<div class="item-description">
+I just tried gdal's beta feature for writing out kmls.  This works
+only for vector data (which was not what I was aiming for).  My first
+attempt was to see what would happen if I blindly converted an S57
+electronic navigation chart (ENC) to a Google Earth KML file.  As you
+will see below, the results are not pretty.  This is not a big deal
+nor unexpected.  Displaying charts is not a simple task.
+<br /><br />
+First, the KML support only comes in the gdal 1.4.0beta versions, so
+don't expect to find the formats in gdal 1.3.2 or older.  Here is the
+build command that I used for gdal-1.4.0beta1:
+<pre>
+prefix=~/gdal
+CPPFLAGS="-Os -I/sw/include" ./configure --prefix=$prefix \
+--mandir='${prefix}/share/man' --with-local=/sw --with-libz=/sw  \
+--with-grass=no --with-cfitsio=/sw --with-pcraster=no \
+--with-netcdf=/sw --with-png=/sw --with-libtiff=/sw \
+--with-geotiff=internal --with-jpeg=/sw --with-gif=/sw --with-ogdi=/sw \
+--with-fme=no --without-hdf4 --with-hdf5=/sw --with-jasper=no \
+--with-ecw=no --with-kakadu=no --with-mrsid=no --with-bsb --with-ogr \
+--with-pg=/sw/bin/pg_config --with-mysql=no --with-xerces \
+--with-xerces-inc=/sw/include --with-xerces-lib='-L/sw/lib -lxerces-c \
+-lpthread' --with-odbc=/sw --with-oci=no --with-dods-root=no \
+--with-sqlite=/sw --with-geos=/sw/bin/geos-config \
+--with-static-proj4=/sw --without-perl --without-php --without-ruby \
+--without-python
+</pre>
+Now to give it a try and see what formats are available:
+<pre>
+# <b>~/gdal/bin/gdalinfo --version</b>
+GDAL 1.4.0.0beta1, released 2006/12/04
+# <b>~/gdal/bin/ogr2ogr -h</b>
+Usage: ogr2ogr [--help-general] [-skipfailures] [-append] [-update]
+               [-select field_list] [-where restricted_where] 
+               [-sql <sql statement>] 
+               [-spat xmin ymin xmax ymax] [-preserve_fid] [-fid FID]
+               [-a_srs srs_def] [-t_srs srs_def] [-s_srs srs_def]
+               [-f format_name] [-overwrite] [[-dsco NAME=VALUE] ...]
+               dst_datasource_name src_datasource_name
+               [-lco NAME=VALUE] [-nln name] [-nlt type] [layer [layer ...]]
+ -f format_name: output file format name, possible values are:
+     -f "ESRI Shapefile"
+     -f "MapInfo File"
+     -f "TIGER"
+     -f "S57"
+     -f "DGN"
+     -f "Memory"
+     -f "CSV"
+     -f "GML"
+     -f "KML"
+     -f "Interlis 1"
+     -f "Interlis 2"
+     -f "SQLite"
+     -f "ODBC"
+     -f "PostgreSQL"
+...
+</pre>
+I down loaded the US5VA17M S57 vector ENC from NOAA (Norfolk Harbor
+and Elizabeth River) and opened the s57 to find this:
+<pre>
+ls -l
+-rw-r--r-- 1 schwehr schwehr     3279 Dec  5 14:58 US5VA17E.TXT
+-rw-r--r-- 1 schwehr schwehr  4225184 Dec  5 14:58 US5VA17M.000
+-rw-r--r-- 1 schwehr schwehr    20689 Dec  5 14:58 US5VA17M.001
+-rw-r--r-- 1 schwehr schwehr     2637 Dec  5 14:58 US5VA17M.002
+-rw-r--r-- 1 schwehr schwehr     5243 Dec  5 14:58 US5VA17M.003
+-rw-r--r-- 1 schwehr schwehr      423 Dec  5 14:58 USEAX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      255 Dec  5 14:58 USEBX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      213 Dec  5 14:58 USEDX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      222 Dec  5 14:58 USEEX17E.TXT
+-rw-r--r-- 1 schwehr schwehr      552 Dec  5 14:58 USEFX17E.TXT
+</pre>
+Now it is time to see what happens with the default conversion to kml!
+<pre>
+~/gdal/bin/ogr2ogr -f KML 0.kml US5VA17M.000
+open 0.kml
+</pre>
+<img src="../attachments/2006-12/s57_ogr2kml.png">
+<br /><br />
+When they all stack up, Google Earth grays out a bunch and expands a
+neighborhood of thumbtacks to click.  Here I picked an OBJL of 27,
+which is a caution area.
+<br /><br />
+<img src="../attachments/2006-12/s57_ogr2kml-2.png">
+<br /><br />
+Each thumbtack is a catagory of object class (OBJL).  For example,
+<b>75</b> is a light.
+<br /><br />
+<img src="../attachments/2006-12/s57_ogr2kml-3.png">
+<br /><br />
+And <b>17</b> is a Bouy.
+<br /><br />
+<img src="../attachments/2006-12/s57_ogr2kml-4.png">
+<br /><br />
+Clearly, a lot of work needs to be done to get the s57 to look nice in
+KML format, but this shows that a good bit of the work has been done
+and this view makes it easier to understand what things are in s57 files.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-05T15_14_52.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-05T16_21_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-05T11_01_15.txt" name="e2006-12-05T11_01_15.txt"></a>
+<h2 class="date">12.05.2006 11:01</h2>
+<div class="blogbody">
+<h3 class="title">gmt-full</h3>
+<div class="item-description">
+I have updated my gmt-full package so that it works again.  Put <a
+href="../attachments/2006-12/gmt-full.info">gmt-full.info</a>
+in /sw/fink/10.4/local/main/finkinfo/sci This will eat up about 70 MB,
+but you get the full and high coastline datasets in GMT with fink.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-05T11_01_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-05T15_14_52.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-05T10_45_01.txt" name="e2006-12-05T10_45_01.txt"></a>
+<h2 class="date">12.05.2006 10:45</h2>
+<div class="blogbody">
+<h3 class="title">gmtplus down for the count</h3>
+<div class="item-description">
+I am throwing in the towel on gmtplus... I tried building it against
+GMT 4.1.4 and since I am getting an error and no one has been willing
+to test what I do, this is my "gmtplus end of life notice".  I think
+it compiles against gmt 4.1.1, but that is it.
+<pre>
+cc -g -Wimplicit -pedantic -W -Wimplicit-int -Wimplicit-function-declaration -Wnested-externs -I/sw/include -I/sw/include  -c -o gmtpluslist.o gmtpluslist.c
+gmtpluslist.c: In function 'main':
+gmtpluslist.c:389: error: 'GMT_quick' undeclared (first use in this function)
+gmtpluslist.c:389: error: (Each undeclared identifier is reported only once
+gmtpluslist.c:389: error: for each function it appears in.)
+<br /><br />
+and
+<br /><br />
+cc -g -Wimplicit -pedantic -W -Wimplicit-int -Wimplicit-function-declaration -Wnested-externs -I/sw/include   -c -o gmtplustrack.o gmtplustrack.c
+gmtplustrack.c: In function 'main':
+gmtplustrack.c:400: error: incompatible type for argument 2 of 'GMT_timestamp'
+gmtplustrack.c:400: error: too few arguments to function 'GMT_timestamp'
+gmtplustrack.c:668: error: 'struct GMT_DEFAULTS' has no member named 'last_page'
+</pre>
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/gmtplus/">http://vislab-ccom.unh.edu/~schwehr/software/gmtplus/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-05T10_45_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-05T11_01_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-05T08_10_13.txt" name="e2006-12-05T08_10_13.txt"></a>
+<h2 class="date">12.05.2006 08:10</h2>
+<div class="blogbody">
+<h3 class="title">Two interesting mac programs</h3>
+<div class="item-description">
+Two interesting mac programs:
+<br /><br />
+I don't have a personal gps, so using Google Earth to geocode images
+is a nice idea.  <a
+href="http://craig.stanton.net.nz/software/Geotagger.html">Geotagger</a>
+takes the current position from Google Earth when you drop a jpeg on
+the icon and adds the gps coords to the image meta info.  Then use <a
+href="http://craig.stanton.net.nz/software/iPhotoToGoogleEarth.html">iPhotoToGoogleEarth</a>
+(by the same guy) to make a kmz of photos.  WARNING: For me, it seems
+to hang after producing the kmz.  I have to Force Quit iPhoto after
+each use.  I have emailed a bug report to the author.
+<br /><br />
+<a href="../attachments/2006-12/geotag-sml-DSCN4932.JPG"><img src="../attachments/2006-12/geotag-sml-DSCN4932.JPG"></a>
+<br /><br />
+<a href="../attachments/2006-12/SmallCreek.kmz">SmallCreek.kmz</a>
+<br /><br />
+<img src="../attachments/2006-12/iphoto2kmz-results.png">
+<br /><br />
+<a href="http://www.giss.nasa.gov/tools/panoply/">Panoply</a> is a
+NASA Goddard netcdf world dataset viewing program written in Java.
+Have not tried this one yet.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-05T08_10_13.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-05T10_45_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-04T17_38_29.txt" name="e2006-12-04T17_38_29.txt"></a>
+<h2 class="date">12.04.2006 17:38</h2>
+<div class="blogbody">
+<h3 class="title">draft gmt 4.1.4 / fink 5.1.0</h3>
+<div class="item-description">
+I gave it a go today for upgrading fink to gmt 4.1.4 and mbsystem
+5.1.0.  They "work for me," so try them at your own risk.  If do try
+them, let me know how it goes.  These files go in
+/sw/fink/10.4/local/main/finkinfo/sci
+<br /><br />
+UPDATE:  The Dec 04 patch has a bug that causes a buffer overflow.  Remko caught and fixed it.  Thanks!
+<br /><br />
+<a
+href="../attachments/2006-12/fink-gmt-mbsystem-2006-12-05.tar.bz2">fink-gmt-mbsystem-2006-12-05.tar.bz2</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-04T17_38_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-05T08_10_13.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-04T11_35_01.txt" name="e2006-12-04T11_35_01.txt"></a>
+<h2 class="date">12.04.2006 11:35</h2>
+<div class="blogbody">
+<h3 class="title">bibtex mangling capitalization</h3>
+<div class="item-description">
+BibTex likes to mangle somethings.  For example, U.S. gets written as
+U.s. unless you add '{}' around U.S. so that it looks like this:
+{U.S.}.  This makes my EndNote databases not useful for Word, but then
+again, have never done that.  Then end result in my bibtex looks like
+this:
+<pre>
+@article{
+booth1993,
+   Author = {Booth, J.S. and O'leary, D.W. and Popenoe, P. and Danforth, W.W.},
+   Title = {{U.S.} Atlantic continental slope landslides: Their
+distribution, general attributes, and implications},
+   Journal = {US Geological Survey Bulletin},
+   Volume = {2002},
+   Pages = {14-22},
+   Year = {1993} }
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-04T11_35_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-04T17_38_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-04T09_54_18.txt" name="e2006-12-04T09_54_18.txt"></a>
+<h2 class="date">12.04.2006 09:54</h2>
+<div class="blogbody">
+<h3 class="title">The English Language</h3>
+<div class="item-description">
+The English language always gives me grief.  There are two links that will
+hopefully help me out:
+<ul>
+<li><a href="http://www.wsu.edu/~brians/errors/errors.html">Common Errors in English Usage</a> by Paul Brians </li>
+<li><a href="http://www.bartleby.com/141/">Elements of Style</a> by Strunk and White - the website is horribly slow today</li>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-04T09_54_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-04T11_35_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-04T09_01_30.txt" name="e2006-12-04T09_01_30.txt"></a>
+<h2 class="date">12.04.2006 09:01</h2>
+<div class="blogbody">
+<h3 class="title">First snow of the year</h3>
+<div class="item-description">
+It snowed for about an hour this morning.  Nothing stuck, but it is
+still the first snow of the year here.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-04T09_01_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-04T09_54_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-03T19_39_59.txt" name="e2006-12-03T19_39_59.txt"></a>
+<h2 class="date">12.03.2006 19:39</h2>
+<div class="blogbody">
+<h3 class="title">Yahoo's new interfaces</h3>
+<div class="item-description">
+I can't say that I like yahoo's new web interfaces.  They are far
+slower to load and don't work with many browsers or they work but not
+completely.  How fancy does the list of what is on TV have to be?  And
+why hide it behind a drop down arrow?  I had to guess that the little
+arrow is a menu.  And the new yahoo maps are nice and all, but the new
+interface for driving directions SUCK.  How many times did it tell me
+yesterday that an address could not be found and then a few minutes
+later it finds the address.  Where are all my saved addresses?
+<br /><br />
+Slow yahoo: <img src="../attachments/2006-12/yahoo-slow.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-03T19_39_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-04T09_01_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-03T14_09_37.txt" name="e2006-12-03T14_09_37.txt"></a>
+<h2 class="date">12.03.2006 14:09</h2>
+<div class="blogbody">
+<h3 class="title">opendns.com</h3>
+<div class="item-description">
+I am trying out <a href="http://opendns.com">opendns.com</a> for my
+name lookups.  I was excited that it might speed up name lookups over
+my ISP, but in the process I discovered I still had DNS setup for when
+I was R/V Revelle.  That was causing lookups to be over second.  When
+I fixed my DNS entries, the times dropped to under .01s.  But when I
+configured opendns as my DNS, the times jump to about .02s.  Either
+way, it is better to have correctly configured DNS on a computer!
+<br /><br />
+No idea yet if openDNS is worth it.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-03T14_09_37.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-03T19_39_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-01T16_37_41.txt" name="e2006-12-01T16_37_41.txt"></a>
+<h2 class="date">12.01.2006 16:37</h2>
+<div class="blogbody">
+<h3 class="title">slogcxx - simple c++ logger</h3>
+<div class="item-description">
+There are no changes to the slogcxx code lately, but I have updated
+the freshmeat entry to reflect its new home and it now has a bit of a
+homepage.
+<ul>
+<li><a href="http://freshmeat.net/projects/slogcxx">http://freshmeat.net/projects/slogcxx</a></li>
+<li><a href="http://vislab-ccom.unh.edu/~schwehr/software/slogcxx/">http://vislab-ccom.unh.edu/~schwehr/software/slogcxx/</a></li>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-01T16_37_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-03T14_09_37.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-12-01T12_18_44.txt" name="e2006-12-01T12_18_44.txt"></a>
+<h2 class="date">12.01.2006 12:18</h2>
+<div class="blogbody">
+<h3 class="title">Lidar to Fledermaus to GoogleEarth polygon of a road</h3>
+<div class="item-description">
+Just managed to get my first 3D object into Google Earth.  I have some
+NOAA Lidar (laser altimetry from an aircraft) that I need to extract
+the local surroundings and import them into GE so that I can give a
+view of the local environment.  Google does not have buildings for the
+area.  Roughly here is what I did.
+<br /><br />
+First I loaded the xyz data into PFMDirect and made a pfm object.  I
+then imported the PFM into Fledermaus.  I selected the whole area and
+flagged points as invalid that are not the road (this was the tricky
+part for me).  I will try to document this process more as I get more
+comfortable with it.  Then I tried to export the soundings, but this
+seems to hang Fledermaus.  Instead I loaded the pfm in AvgGrid and
+built a surface there.  Then in Fledermaus, I loaded the surface and
+selected the outline of one half of the road.  I created a polygon and
+set if from the selection.  Saved that out as xyz and then ran a
+little python script to export a filled polygon kml.
+<br /><br />
+Some images from the process:
+<br /><br />
+<img src="../attachments/2006-12/fleder2ge-road-1.png"><br/>
+<img src="../attachments/2006-12/fleder2ge-road-2.png"><br/>
+<img src="../attachments/2006-12/fleder2ge-road-3.png"><br/>
+<img src="../attachments/2006-12/fleder2ge-road-4.png">
+<br /><br />
+<a href="../attachments/2006-12/road.kml">road.kml</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-12.html#e2006-12-01T12_18_44.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-12-01T16_37_41.html#comments">Comments</a> -->
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="links">
+
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary="Calendar with links to days with entries">
+<caption class="calendarhead">December 2006</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td> <td align="center"></td> <td align="center"></td> <td align="center"></td> <td align="center"></td>    
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-01T16_37_41.txt">1</a></span></td>
+<td align="center"><span class="calendar">2</span></td>
+</tr>
+<tr>
+             
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-03T19_39_59.txt">3</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-04T17_38_29.txt">4</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-05T16_21_50.txt">5</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-06T19_03_46.txt">6</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-07T11_59_52.txt">7</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-08T16_25_15.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-09T18_14_44.txt">9</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-10T12_24_00.txt">10</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-11T16_04_01.txt">11</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-12T13_27_51.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-13T16_39_16.txt">13</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-14T10_57_20.txt">14</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-15T10_20_46.txt">15</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-16T13_58_38.txt">16</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-17T10_48_34.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-18T13_47_26.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-19T10_08_42.txt">19</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-20T09_53_45.txt">20</a></span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-23T16_08_00.txt">23</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-24T08_58_23.txt">24</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-25T06_25_45.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-26T11_45_25.txt">26</a></span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar">28</span></td>
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-29T17_17_30.txt">29</a></span></td>
+<td align="center"><span class="calendar">30</span></td>
+</tr>
+<tr>
+
+<td align="center"><span class="calendar"><a href="2006-12.html#e2006-12-31T10_04_01.txt">31</a></span></td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<br clear="all" />
+
+</body>
+</html>

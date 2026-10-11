@@ -1,0 +1,141 @@
+TITLE: attempting and failing to merge grids
+AUTHOR: Kurt
+DATE: 08.24.2005 12:56
+DESC: no success yet
+-----
+BODY:
+I have been trying to merge meshes and keep getting knocked down.  It
+seems like there are many paths to the goal, but nothing I try quite
+gets me there.  I just sent this message to the mbsystem mailing list
+asking for help.
+<pre>
+There are a couple of questions burried below...
+
+I am having a bit of trouble merging some higher
+resolution grids with a lower res 3sec coastal relief
+dataset.  Maybe some on here can point me in the right
+direction.
+
+* I have been trying to merge the two better grids as
+xyz with mbm_grid.  The first question is that mb_grid
+seems to ignore -E.0002 or -E1c for grid cell size by
+always making 100x100 grids, but -D4000/1800 seems to
+make a bigger grid.  What is a proper -E option?
+
+* When I used -Klarge.grd with mb_grid I get a silent
+seg fault with no indication of what died, where or
+why.  I did a grdcut to my local region and that went
+away.  I presume this just a memory allocation
+exceeded?  So I just need to do grdcuts in my scripts?
+
+e.g. 
+NaN values used to flag regions with no data
+MBIO parameters:
+  Ping averaging:       1
+  Longitude flipping:   0
+  Speed minimum:       0.0 km/hr
+1753756 data points processed in Orig/Eureka.xyz
+6145312 data points processed in Orig/mbari.eela.xyz
+
+Extracting background from grid file
+coastal-relief-3sec.grd...
+Segmentation fault
+All done!
+
+
+* This last one is probably a bug with how I packaged
+mbsystem in fink.  Any suggestion for how to get
+mbsystem to find grdraster.info?
+
+  Speed minimum:       0.0 km/hr
+1753756 data points processed in Orig/Eureka.xyz
+6145312 data points processed in Orig/mbari.eela.xyz
+
+Extracting background from grdraster dataset 3...
+grdraster: ERROR cannot open r
+/sw/share/dbase/grdraster.info
+grdraster:  ERROR reading grdraster.info file.
+grdinfo:  File tmpgrdraster18266.grd not found
+grdsample: No such file or directory
+[tmpgrdraster18266.grd]
+grd2xyz: No such file or directory
+[tmpgrdsample18266.grd]
+rm: tmpgrd*18266.grd: No such file or directory
+
+When I go looking for grdraster, it is in
+/sw/share/gmt/dbase, which is what is required of fink
+packages, so I am not allowed to modify the gmt
+install.  I tried setting export
+GMT_GRIDDIR=/sw/share/gmt/dbase/  but having no luck. 
+Then I get this error message:
+
+grdraster ERROR opening
+/sw/share/gmt/dbase//haxby5m_faa.i2 for read.
+grdinfo:  File tmpgrdraster18294.grd not found
+grdsample: No such file or directory
+[tmpgrdraster18294.grd]
+grd2xyz: No such file or directory
+[tmpgrdsample18294.grd]
+
+I am not turning up anything with haxby on my system.
+
+
+* Lastly, if anyone can suggest good tutorials on
+bringing together different resoluion data, I would
+really appreciate it.  I started with Nathan Becker's
+word document, but seem to be getting tripped up on...
+that's why I gave mbsystem a try.
+</pre>
+Maybe I'll go back and try the Nathan Becker method again and see if I
+can figure what I goofed up on.
+
+Here are some notes about what I did that are a little bit scattered...
+
+The script:
+<pre>
+#! /bin/csh -f
+
+set REGION          = -125/-124/40:30/41:00
+set INPUT_FILE      = datalist.dst
+set INPUT_FORMAT    = -1
+set ROOT       	= datalist.dst
+
+mbgrid -I$INPUT_FILE \
+	-R$REGION \
+	-O$ROOT \
+	-A1 -N \
+	-K3sec.grd \
+	-D4000/1800
+
+#	-Kcoastal-relief-3sec.grd \
+#	-E0.0002 \
+echo All done!
+</pre>
+
+My datalist file looks like this for ascii lon/lat/depth data:
+<pre>
+% cat datalist.dst
+
+Orig/Eureka.xyz      162 10
+Orig/mbari.eela.xyz  162 5
+</pre>
+
+Warning... incoming blather.  This includes the blockmean and nearest
+neighbor stuff that I tried from Nathan's tutorial.
+<pre>
+awk '{print $1,$2}' eel-strange-block.xyz  &gt; block.xy
+
+  521  bzcat 3sec-sub.txt.bz2 | awk '{print $1,$2,$3,.4}' |gmtconvert -bo &gt; 3sec.xyzw.bin
+  530  bzcat Orig/Eureka.xyz.bz2 | awk '{print $1,$2,$3,.8}' |gmtconvert -bo &gt; eureka.xyzw.bin
+  531  bzcat Orig/mbari.eela.xyz.bz2 | awk '{print $1,$2,$3,.8}' |gmtconvert -bo &gt; mbari.xyzw.bin
+  537  less mbari.xyzw.bin 
+  544  blockmean -bi -W {3sec,eureka,mbar}.xyzw.bin -R$R -I1c -bo &gt; all.blockmean.xyzw.bin
+  545  blockmean -bi -W {3sec,eureka,mbari}.xyzw.bin -R$R -I1c -bo &gt; all.blockmean.xyzw.bin
+  549  blockmean -bi -W {3sec,eureka,mbari}.xyzw.bin -R$R -I1c -bo &gt; all.blockmean.xyzw.bin
+  551  nearneighbor -bi all.blockmean.xyzw.bin -R$R -I1c -N4 -S4c -Gall.nearneighbor.grd
+  552  man mbdatalist
+
+  576  mbm_grid -Idatalist.dst -R$R -E1c -Kcoastal-relief-3sec.grd 
+  604  grdcut coastal-relief-3sec.grd -G3sec.grd -R$R -V -fg
+</pre>  
+-----

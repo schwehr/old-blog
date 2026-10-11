@@ -1,0 +1,108 @@
+TITLE: Using delete with class pointers
+AUTHOR: Kurt
+DATE: 08.23.2006 16:41
+DESC: make sure to initialize pointers
+-----
+BODY:
+Brian L and I were talking about pointers within C++ class and Brian
+told me something I didn't realize (because of my C background):
+calling delete on pointers that are 0 is ok!  Nice.  Here is a
+demostration program that builds itself 4 ways.  It shows that if you
+initialize all your pointers in the constructor, then life is good.
+<pre>
+./test-del.C
+
+Building test-del-dbg
+
+test-del-dbg(26565) malloc: *** Deallocation of a pointer not malloced
+test-del-dbg(26565) malloc: *** Deallocation of a pointer not malloced
+
+Building test-del-opt
+
+test-del.C: In function 'int main(int, char**)':
+test-del.C:53: warning: 'td_stack$foo' is used uninitialized in this function
+test-del.C:55: warning: 'td_stack$foobar' is used uninitialized in this function
+
+test-del-opt(26573) malloc: *** Deallocation of a pointer not malloced
+test-del-opt(26573) malloc: *** Deallocation of a pointer not malloced
+test-del-opt(26573) malloc: *** Deallocation of a pointer not malloced
+
+=========
+
+Building test-del-dbg-init
+
+Building test-del-opt-init
+</pre>
+The results above come from this code:
+
+<pre>
+<font color="0000ff"><strong>#if 0</strong></font>
+<font color="0000ff"><strong>#!/usr/bin/env bash</strong></font>
+
+<font color="#2040a0">echo</font>
+<font color="#2040a0">echo</font> <font color="#2040a0">Building</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">dbg</font>
+<font color="#2040a0">g</font><font color="4444FF">+</font><font color="4444FF">+</font> <font color="4444FF">-</font><font color="#2040a0">g</font> <font color="4444FF">-</font><font color="#2040a0">O0</font> <font color="4444FF">-</font><font color="#2040a0">Wall</font> <font color="4444FF">-</font><font color="#2040a0">o</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">dbg</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font>.<font color="#2040a0">C</font>
+./<font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">dbg</font>
+<font color="#2040a0">echo</font>
+<font color="#2040a0">echo</font> <font color="#2040a0">Building</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">opt</font>
+<font color="#2040a0">g</font><font color="4444FF">+</font><font color="4444FF">+</font> <font color="4444FF">-</font><font color="#2040a0">O3</font> <font color="4444FF">-</font><font color="#2040a0">fexpensive</font><font color="4444FF">-</font><font color="#2040a0">optimizations</font> <font color="4444FF">-</font><font color="#2040a0">DNDEBUG</font> <font color="4444FF">-</font><font color="#2040a0">Wall</font> <font color="4444FF">-</font><font color="#2040a0">o</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">opt</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font>.<font color="#2040a0">C</font>
+./<font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">opt</font>
+
+<font color="#2040a0">echo</font>
+<font color="#2040a0">echo</font> <font color="#008000">&quot;=========&quot;</font>
+<font color="#2040a0">echo</font>
+<font color="#2040a0">echo</font> <font color="#2040a0">Building</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">dbg</font><font color="4444FF">-</font><font color="#2040a0">init</font>
+<font color="#2040a0">g</font><font color="4444FF">+</font><font color="4444FF">+</font> <font color="4444FF">-</font><font color="#2040a0">g</font> <font color="4444FF">-</font><font color="#2040a0">O0</font> <font color="4444FF">-</font><font color="#2040a0">Wall</font> <font color="4444FF">-</font><font color="#2040a0">o</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">dbg</font><font color="4444FF">-</font><font color="#2040a0">init</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font>.<font color="#2040a0">C</font> <font color="4444FF">-</font><font color="#2040a0">DINITIALIZE</font>
+./<font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">dbg</font><font color="4444FF">-</font><font color="#2040a0">init</font>
+<font color="#2040a0">echo</font>
+<font color="#2040a0">echo</font> <font color="#2040a0">Building</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">opt</font><font color="4444FF">-</font><font color="#2040a0">init</font>
+<font color="#2040a0">g</font><font color="4444FF">+</font><font color="4444FF">+</font> <font color="4444FF">-</font><font color="#2040a0">O3</font> <font color="4444FF">-</font><font color="#2040a0">fexpensive</font><font color="4444FF">-</font><font color="#2040a0">optimizations</font> <font color="4444FF">-</font><font color="#2040a0">DNDEBUG</font> <font color="4444FF">-</font><font color="#2040a0">Wall</font> <font color="4444FF">-</font><font color="#2040a0">o</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">opt</font><font color="4444FF">-</font><font color="#2040a0">init</font> <font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font>.<font color="#2040a0">C</font> <font color="4444FF">-</font><font color="#2040a0">DINITIALIZE</font>
+./<font color="#2040a0">test</font><font color="4444FF">-</font><font color="#2040a0">del</font><font color="4444FF">-</font><font color="#2040a0">opt</font><font color="4444FF">-</font><font color="#2040a0">init</font>
+
+<font color="#2040a0">exit</font>
+<font color="0000ff"><strong>#endif</strong></font>
+
+<font color="#444444">// What does C++ do with pointers within a class?</font>
+<font color="#444444">// Can the compiler do the right thing with pointers that have not been newed?</font>
+
+<font color="0000ff"><strong>#include <font color="#008000">&lt;iostream&gt;</font></strong></font>
+
+<strong>class</strong> <font color="#2040a0">TestDel</font> <font color="4444FF"><strong>{</strong></font>
+<strong>public</strong><font color="4444FF">:</font>
+    <font color="#2040a0">TestDel</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    ~<font color="#2040a0">TestDel</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <strong>void</strong> <font color="#2040a0">print</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font><font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cout</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="4444FF">*</font><font color="#2040a0">bar</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">;</font><font color="4444FF"><strong>}</strong></font>
+    <strong>bool</strong> <font color="#2040a0">check</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<strong>private</strong><font color="4444FF">:</font>
+    <strong>int</strong> <font color="4444FF">*</font><font color="#2040a0">foo</font><font color="4444FF">;</font>
+    <strong>int</strong> <font color="4444FF">*</font><font color="#2040a0">bar</font><font color="4444FF">;</font>
+    <strong>double</strong> <font color="4444FF">*</font><font color="#2040a0">foobar</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+
+<font color="#2040a0">TestDel</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">TestDel</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">bar</font> <font color="4444FF">=</font> <strong>new</strong> <strong>int</strong><font color="4444FF">(</font><font color="#FF0000">123</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="0000ff"><strong>#ifdef INITIALIZE</strong></font>
+    <font color="#2040a0">foo</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">;</font>
+    <font color="#2040a0">foobar</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">;</font>
+<font color="0000ff"><strong>#endif</strong></font>
+<font color="4444FF"><strong>}</strong></font>
+
+<font color="#2040a0">TestDel</font><font color="4444FF">:</font><font color="4444FF">:</font>~<font color="#2040a0">TestDel</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>delete</strong> <font color="#2040a0">foo</font><font color="4444FF">;</font>
+    <strong>delete</strong> <font color="#2040a0">bar</font><font color="4444FF">;</font>
+    <strong>delete</strong> <font color="#2040a0">foobar</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+
+<strong>int</strong> <font color="#2040a0">main</font> <font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">argc</font>, <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+
+    <font color="4444FF"><strong>{</strong></font>
+	<font color="#2040a0">TestDel</font> <font color="#2040a0">td_stack</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#2040a0">TestDel</font> <font color="4444FF">*</font><font color="#2040a0">td_heap</font> <font color="4444FF">=</font> <strong>new</strong> <font color="#2040a0">TestDel</font><font color="4444FF">;</font>
+    <strong>delete</strong> <font color="#2040a0">td_heap</font><font color="4444FF">;</font>
+
+    <strong>return</strong> <font color="#2040a0">EXIT_SUCCESS</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+-----

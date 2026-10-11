@@ -1,0 +1,44 @@
+TITLE: plotdi colored plotxy
+AUTHOR: Kurt
+DATE: 10.19.2005 13:42
+DESC: perl replacement
+-----
+BODY:
+I just figured out how to quickly color a stereonet (equal area plot)
+that comes from Lisa's plotxy program.  This is adapted from my
+Makefile so that it is easier to understand.  The $$ and ";\" symbols
+required with GNU make to have embedded shell scripts gets a little confusing
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+ams-eigvector-plots.py
+<font color="#2040a0">cores</font>=1 2 4
+for core in ${CORES} ; do 
+    echo <font color="#2040a0">$core</font>
+    plotdi &lt; <font color="#2040a0">$core</font>-ams-max.di &gt; <font color="#2040a0">$core</font>-ams-max.di.plotxy
+    perl -p -e 's/symb 19 \.2/symb 0 \.075\ncolor 3\n/' <font color="#2040a0">$core</font>-ams-max.di.plotxy | plotxy 
+    mv mypost <font color="#2040a0">$core</font>-ams-max.ps
+    ps2pdf <font color="#2040a0">$core</font>-ams-max.ps
+done
+</pre>
+The .py python program just creates ASCII dec inc table files that can
+be passed into plotdi.  The big trick here is to use a perl search and
+replace.  The plotdi output commands to pass to plotxy.  Those
+commands are ascii.  The <em>symb</em>ol command controls the shape of
+the points of the stereonet.  I need to replace the black dots with
+squares and circles.  Additionally, I need to change the color to
+match those used for AMS eigenvector plots.  Here is a little table:
+<pre>
+  AMSEig  Eig  Color   ColorNum  Symbol    Plotxy symbol number
+  Min     V3   Red      2        Circle      17 
+  Int     V2   Yellow   7        Triangle     1
+  Max     V1   Blue     3        Square       0
+</pre>
+For the Maximum eigenvector, the perl line replaces the <b>symb 19
+.2</b> with <b>symb 0 .075</b>.  The 0 makes the symbols be squares
+and the .075 makes them much smaller.  Then the <b>color 3</b> sets
+the color for the rest of the graph.  This messes up the color for the
+error ellipse on the right hand part of the graph, but I crop that
+part anyway.
+
+<img src="http://schwehr.org/blog/attachments/2005-10/eigenvectors-v03-small.png">
+-----

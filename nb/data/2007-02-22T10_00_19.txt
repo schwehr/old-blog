@@ -1,0 +1,107 @@
+TITLE: guessable hostnames are often good
+AUTHOR: Kurt
+DATE: 02.22.2007 10:00
+DESC: what to do?
+-----
+BODY:
+I am unable to find a police at UNH for what to do about time
+synchronization.  We are going with the ntp pool, but what does UNH do
+as a whole?
+<pre>
+for name in ntp time time0 time1 timeA bigben; do ping -c 4 $name.unh.edu; done
+ping: cannot resolve ntp.unh.edu: Unknown host
+ping: cannot resolve time.unh.edu: Unknown host
+ping: cannot resolve time0.unh.edu: Unknown host
+ping: cannot resolve time1.unh.edu: Unknown host
+ping: cannot resolve timeA.unh.edu: Unknown host
+ping: cannot resolve bigben.unh.edu: Unknown host
+</pre>
+For stanford, I see this:
+<pre>
+for name in ntp time time0 time1 timeA bigben; do echo $name;ping -c 2 $name.stanford.edu; done
+ntp
+PING time.best.stanford.edu (171.64.7.89): 56 data bytes
+64 bytes from 171.64.7.89: icmp_seq=0 ttl=45 time=95.527 ms
+64 bytes from 171.64.7.89: icmp_seq=1 ttl=45 time=94.737 ms
+time
+PING time.best.stanford.edu (171.64.7.89): 56 data bytes
+64 bytes from 171.64.7.89: icmp_seq=0 ttl=45 time=96.779 ms
+64 bytes from 171.64.7.89: icmp_seq=1 ttl=45 time=94.562 ms
+time0
+ping: cannot resolve time0.stanford.edu: Unknown host
+time1
+ping: cannot resolve time1.stanford.edu: Unknown host
+timeA
+ping: cannot resolve timeA.stanford.edu: Unknown host
+bigben
+ping: cannot resolve bigben.stanford.edu: Unknown host
+</pre>
+Or ucsd
+<pre>
+cd && for name in ntp time time0 time1 timeA bigben; do echo $name;ping -c 2 $name.ucsd.edu; done
+ntp
+PING bigben.ucsd.edu (132.239.1.6): 56 data bytes
+64 bytes from 132.239.1.6: icmp_seq=0 ttl=45 time=90.293 ms
+64 bytes from 132.239.1.6: icmp_seq=1 ttl=45 time=90.036 ms
+time
+PING nodem-rsm-vl99.ucsd.edu (132.239.254.57): 56 data bytes
+64 bytes from 132.239.254.57: icmp_seq=0 ttl=237 time=91.056 ms
+64 bytes from 132.239.254.57: icmp_seq=1 ttl=237 time=91.238 ms
+time0
+ping: cannot resolve time0.ucsd.edu: Unknown host
+time1
+ping: cannot resolve time1.ucsd.edu: Unknown host
+timeA
+ping: cannot resolve timeA.ucsd.edu: Unknown host
+bigben
+PING bigben.ucsd.edu (132.239.1.6): 56 data bytes
+64 bytes from 132.239.1.6: icmp_seq=0 ttl=45 time=89.948 ms
+64 bytes from 132.239.1.6: icmp_seq=1 ttl=45 time=90.085 ms
+</pre>
+BTW, here is my current /etc/ntp.conf.  Email me if you have suggestions
+for a better ntp.conf to put on data logging boxes.  Roland likes to 
+have the Candian pool in there.
+<pre>
+server 0.north-america.pool.ntp.org
+server 1.north-america.pool.ntp.org
+server 2.north-america.pool.ntp.org
+server 3.north-america.pool.ntp.org
+server 0.us.pool.ntp.org
+server 1.us.pool.ntp.org
+server 2.us.pool.ntp.org
+server 3.us.pool.ntp.org
+     
+# --- Generate some Statistics ---
+statsdir /var/log/ntpstats/
+filegen peerstats file peerstats type day enable
+filegen loopstats file loopstats type day enable
+filegen clockstats file clockstats type day enable
+
+# ... and use the local system clock as a reference if all else fails
+# NOTE: in a local network, set the local stratum of *one* stable server
+# to 10; otherwise your clocks will drift apart if you lose connectivity.
+server 127.127.1.0
+fudge 127.127.1.0 stratum 13
+
+# Local users may interrogate the ntp server more closely.
+restrict 127.0.0.1 nomodify
+</pre>
+Here is how things look right now:
+<pre>
+ntpq -p
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
++mirror.mountain avi-lis.gw.ligh  2 u  762 1024  377   73.808   13.667   5.636
+-meow.febo.com   192.168.1.230    2 u  584 1024  377   48.095    3.216   9.631
+-hosting.midvall hydrogen.cert.u  3 u   14 1024  377   94.964   -2.920   2.836
+-msb.ernest-doss ad.67.1343.stat  3 u  597 1024  377   93.809   43.448  35.893
+*8.15.10.42      time-c.timefreq  2 u  754 1024  377   33.908   10.573   0.331
+-ns1.dns.pciwest clepsydra.dec.c  2 u  769 1024  377   91.798   -1.348   0.280
++rrcs-24-199-24- hydrogen.cert.u  3 u  590 1024  377   95.371   10.236  60.761
+-dsl081-253-134. ntp-nasa.arc.na  2 u  774 1024  377  171.063   50.813  23.529
+ LOCAL(0)        LOCAL(0)        13 l   12   64  377    0.000    0.000   0.004
+</pre>
+Our buffalo box (NAS) was cranky for a bit yesterday, but seems to have
+itself back on track.  It was going back to the LOCAL all the time.
+I am not sure why it is now happy.
+-----

@@ -1,0 +1,48 @@
+TITLE: handling xml data with namespaces with lxml
+AUTHOR: Kurt
+DATE: 05.29.2010 13:28
+DESC: better
+-----
+BODY:
+I don't know why I never got this before.  Perhaps it's because I find
+namespace handling overly awkward with the local alias to a large url.
+But I've finally used it and it works.  I can live with this and stop
+being bad... usually, my first pass through an XML dataset is to rip
+out the namespaces.  Yeah, that's bad practice and I promise to stop
+being bad (at least in this little way).  First the GML section of the
+BAG metadata:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;smXML:MD_Metadata</font></b> 
+  <font color="#009900">xmlns:smXML</font><font color="#990000">=</font><font color="#FF0000">"http://metadata.dgiwg.org/smXML"</font>
+  <font color="#009900">xmlns:xlink</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/1999/xlink"</font>
+  <font color="#009900">xmlns:xsi</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2001/XMLSchema-instance"</font>
+  <font color="#009900">xmlns:gml</font><font color="#990000">=</font><font color="#FF0000">"http://www.opengis.net/gml"</font><b><font color="#0000FF">&gt;</font></b>
+<i><font color="#9A1900">&lt;!-- ... --&gt;</font></i>
+  <b><font color="#0000FF">&lt;spatialRepresentationInfo&gt;</font></b>
+    <b><font color="#0000FF">&lt;smXML:MD_Georectified&gt;</font></b>
+      <b><font color="#0000FF">&lt;cornerPoints&gt;</font></b>
+        <b><font color="#0000FF">&lt;gml:Point&gt;</font></b>
+          <b><font color="#0000FF">&lt;gml:coordinates</font></b> <font color="#009900">decimal</font><font color="#990000">=</font><font color="#FF0000">"."</font> <font color="#009900">cs</font><font color="#990000">=</font><font color="#FF0000">","</font> <font color="#009900">ts</font><font color="#990000">=</font><font color="#FF0000">" "</font><b><font color="#0000FF">&gt;</font></b>427393.74,4085752.56 433314.44,4090295.74<b><font color="#0000FF">&lt;/gml:coordinates&gt;</font></b>
+        <b><font color="#0000FF">&lt;/gml:Point&gt;</font></b>
+      <b><font color="#0000FF">&lt;/cornerPoints&gt;</font></b>
+    <b><font color="#0000FF">&lt;/smXML:MD_Georectified&gt;</font></b>
+  <b><font color="#0000FF">&lt;/spatialRepresentationInfo&gt;</font></b>
+<i><font color="#9A1900">&lt;!-- ... --&gt;</font></i>
+<b><font color="#0000FF">&lt;/smXML:MD_Metadata&gt;</font></b></tt></pre>
+Now using xpath to pull these GML UTM coordinates out of the metadata looks like this:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> h5py
+<b><font color="#000080">from</font></b> lxml <b><font color="#000080">import</font></b> etree 
+<!-- -->
+f <font color="#990000">=</font> h5py<font color="#990000">.</font><b><font color="#000000">File</font></b><font color="#990000">(</font>infile_name<font color="#990000">)</font>
+<!-- -->
+bag_root <font color="#990000">=</font> f<font color="#990000">[</font><font color="#FF0000">'/BAG_root'</font><font color="#990000">]</font>
+metadata_xml <font color="#990000">=</font> <font color="#FF0000">''</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>bag_root<font color="#990000">[</font><font color="#FF0000">'metadata'</font><font color="#990000">])</font>
+root <font color="#990000">=</font> etree<font color="#990000">.</font><b><font color="#000000">XML</font></b><font color="#990000">(</font>metadata_xml<font color="#990000">.</font><b><font color="#000000">replace</font></b><font color="#990000">(</font><font color="#FF0000">'smXML:'</font><font color="#990000">,</font><font color="#FF0000">''</font><font color="#990000">))</font> <i><font color="#9A1900"># Me being bad with namespaces</font></i>
+<!-- -->
+utm_coords <font color="#990000">=</font> root<font color="#990000">.</font><b><font color="#000000">xpath</font></b><font color="#990000">(</font><font color="#FF0000">'//*/gml:coordinates'</font><font color="#990000">,</font> namespaces<font color="#990000">={</font><font color="#FF0000">'gml'</font><font color="#990000">:</font><font color="#FF0000">"http://www.opengis.net/gml"</font><font color="#990000">})[</font><font color="#993399">0</font><font color="#990000">].</font>text</tt></pre>
+Now the question come... how do you handle if there are many different URLs that are likely to encode the same info (e.g. KML)?  Do I have to create detection code that knows exact matches or can get if the namespace is basically the same?
+
+I really like h5py for reading hdf5 files, but it's a bummer that the
+error messages a little weak and I can't pass in a gzip or bzip2 file for reading.
+-----

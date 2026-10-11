@@ -1,0 +1,36 @@
+TITLE: upgrading fink from 10.4-transitional to 10.4
+AUTHOR: Kurt
+DATE: 05.19.2006 17:45
+DESC: no more gcc 3.3
+-----
+BODY:
+That's it, no more gcc 3.3 for me.  This business of mixing 3.3 and
+4.0.1 is just not a good thing.  This is the page that I am working
+from RangerRick's blog (his real name escapes me at the moment as I am
+sure happens to the other developers about me at times). BTW, his blog
+is full of lots of other good bits for information. 
+
+<a href="http://ranger.befunk.com/blog/archives/000654.html">http://ranger.befunk.com/blog/archives/000654.html</a>
+
+<b>NOTE:</b> There are some recent changes to this proceedure.  The
+fink cvs repository has moved (thanks to major troubles at sf.net).
+Here are the new commands.
+<pre>
+  $ cd && mkdir foo && cd foo
+  $ cvs -d :pserver:anonymous@fink.cvs.sourceforge.net:/cvsroot/fink login
+  CVS password: <PRESS ENTER>
+  $ cvs -d  :pserver:anonymous@fink.cvs.sourceforge.net:/cvsroot/fink co -P -r branch_0_24 fink
+  $ cd fink
+  $ ./bootstrap.sh
+
+  # Change cvs.sourceforge.net to fink.cvs.sourceforge.net in these two files:
+  $ sudo emacs /sw/lib/fink/URL/cvs-repository
+  $ sudo emacs /sw/lib/perl5/Fink/SelfUpdate.pm
+  $ fink selfupdate-rsync  
+
+  # Change the Trees to include unstable like this...
+  # Trees: local/main stable/main stable/crypto unstable/main unstable/crypto
+  $ sudo emacs /sw/etc/fink.conf
+</pre>
+Only developers should use the cvs tree.  Rsync is WAY faster.
+-----

@@ -1,0 +1,4059 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: September 2008 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2008-09-30T10_24_45.txt" name=
+"e2008-09-30T10_24_45.txt"></a>
+<h2 class="date">09.30.2008 10:24</h2>
+<div class="blogbody">
+<h3 class="title">Astroscam Antarctica</h3>
+<div class="item-description">Digging through the archives... This
+picture was taken at the ANI basecamp next to the Patriot Hills,
+Antarctica during summer 1997-1998.<br />
+<br />
+<img title="Kurt, Pascal, and Alex F." withgrayborder="True" src=
+"../attachments/2008-09/kurt-pascal-alex-1997-antarctica.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-30T10_24_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-10-01T20_05_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-30T09_40_53.txt" name=
+"e2008-09-30T09_40_53.txt"></a>
+<h2 class="date">09.30.2008 09:40</h2>
+<div class="blogbody">
+<h3 class="title">python ctypes and geodjango</h3>
+<div class="item-description">I have a new draft package for
+geodjango on fink. There are a number of rough spots. First, I wish
+that the fink python would know about the default location of fink
+libs, so that it would find libgeos3.
+<pre>
+% ipython
+&gt;&gt;&gt; <b>ls /sw/lib/libgeos_c.1.4.1.dylib</b>
+/sw/lib/libgeos_c.1.4.1.dylib
+&gt;&gt;&gt; <b>from ctypes.util import find_library</b>
+find_library('libgeos_c')
+# Nothing
+&gt;&gt;&gt; <b>find_library('libgeos_c.1.4.1')</b>
+# Nothing
+&gt;&gt;&gt; <b>find_library('libgeos_c.1.4.1.dylib')</b>
+# Nothing
+&gt;&gt;&gt; <b>find_library('/sw/lib/libgeos_c.1.4.1.dylib')</b>
+# Nothing
+&gt;&gt;&gt; <b>find_library('/sw/lib/libgeos_c.1.4.1')</b>
+'/sw/lib/libgeos_c.1.4.1.dylib'
+</pre>
+Then the libgeos2 package is trouble. Postgis links against
+libgeos2's libeos_c.1.dylib.
+<pre>
+psycopg2.OperationalError: could not load library
+"/sw/lib/postgresql-8.3/liblwgeom.so":
+dlopen(/sw/lib/postgresql-8.3/liblwgeom.so, 10): Library not loaded:
+/sw/lib/libgeos_c.1.dylib
+<br /><br />Ben (RangerRick) suggested to put all the libs into %p/lib/libgeos3 for
+libgeos3 so that they do not conflict with libgeos2.  That makes sense.
+libgeos3 really should have a different major version number.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-30T09_40_53.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-30T10_24_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-30T09_29_06.txt" name=
+"e2008-09-30T09_29_06.txt"></a>
+<h2 class="date">09.30.2008 09:29</h2>
+<div class="blogbody">
+<h3 class="title">Delicious social bookmarking</h3>
+<div class="item-description">I've been meaning to try delicious
+for a long time and Capt Ben just pushed me over that edge, so I
+have an account: <a href=
+"http://delicious.com/goatbar">http://delicious.com/goatbar</a><br />
+
+<br />
+<img title="Delicious social bookmarking" withgrayborder="True"
+src="../attachments/2008-09/delicous.com-social-bookmarking.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-30T09_29_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-30T09_40_53.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-29T19_28_35.txt" name=
+"e2008-09-29T19_28_35.txt"></a>
+<h2 class="date">09.29.2008 19:28</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth KMZ image troubles</h3>
+<div class="item-description">Is there some trick to putting images
+with popups/placemark/thumbtacks within the KMZ zip file structure?
+If I do a save as KMZ and then open what works, one image will work
+while the rest do not. If I unzip the generated kmz, the doc.kml
+will work just fine.<br />
+<br />
+What am I doing wrong in the kml? Here is the file:<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/GoogleEarth/GeoEndNote-20080514.kmz">
+GeoEndNote-20080514.kmz</a><br />
+<br />
+<img title="Trouble with images embedded in KMZ" withgrayborder=
+"True" src=
+"../attachments/2008-09/googleearth-kmz-broken-embedded-image.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-29T19_28_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-30T09_29_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-29T14_35_45.txt" name=
+"e2008-09-29T14_35_45.txt"></a>
+<h2 class="date">09.29.2008 14:35</h2>
+<div class="blogbody">
+<h3 class="title">Martian upward looking lidar</h3>
+<div class="item-description">Phoenix recently took images of the
+lidar in action.<br />
+<br />
+<img title="Experimental Data Record (EDR) from SSI of lidar"
+withgrayborder="True" src=
+"../attachments/2008-09/phx-lidar-SS113ESF906283514_1D2C3RBM1.jpg" />
+<br />
+<br />
+These images have been combined to get the color. Today's press
+conference released this as a movie.<br />
+<br />
+<img title="The lidar looking viewed from SSI" withgrayborder=
+"True" src=
+"../attachments/2008-09/mars-lidar.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-29T14_35_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-29T19_28_35.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-29T13_37_18.txt" name=
+"e2008-09-29T13_37_18.txt"></a>
+<h2 class="date">09.29.2008 13:37</h2>
+<div class="blogbody">
+<h3 class="title">Science on a sphere - Colin's flow
+visualizations</h3>
+<div class="item-description">Last week, Colin went to the opening
+of his Science on a Sphere demo at the Smithsonian National Museum
+of Natural History in D.C. I have to check it out in person next
+time I swing through the city.<br />
+<br />
+<a href=
+"http://www.nytimes.com/2008/09/27/arts/design/27ocea.html">Diving
+Into a New World</a> [NY Times]<br />
+<br />
+<img title="Colin's science on a sphere" withgrayborder="True" src=
+"../attachments/2008-09/science-on-a-sphere-colin.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-29T13_37_18.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-29T14_35_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-29T12_36_45.txt" name=
+"e2008-09-29T12_36_45.txt"></a>
+<h2 class="date">09.29.2008 12:36</h2>
+<div class="blogbody">
+<h3 class="title">Fall begins at UNH</h3>
+<div class="item-description">I got a short break out to College
+Woods last week. Fall is beginning, but construction is just
+beginning on the new wind tunnel.<br />
+<br />
+<img title="Closed for Wind Tunnel construction" withgrayborder=
+"True" src=
+"../attachments/2008-09/trail-closed.jpg" /><br />
+
+<br />
+Looking out over the reservoir...<br />
+<br />
+<img title="The fall colors are just about here" withgrayborder=
+"True" src=
+"../attachments/2008-09/fall-begins-at-unh.jpg" />
+<br />
+<br />
+Somewhere in College Woods...<br />
+<br />
+<img title="" withgrayborder="True" src=
+"../attachments/2008-09/college-woods.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-29T12_36_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-29T13_37_18.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-29T09_14_50.txt" name=
+"e2008-09-29T09_14_50.txt"></a>
+<h2 class="date">09.29.2008 09:14</h2>
+<div class="blogbody">
+<h3 class="title">Firefox background color printing</h3>
+<div class="item-description">Here is how in Firefox, to get the
+background colors to print. Pictured here is Firefox 3. It looks a
+bit different in Firefox 2.<br />
+<br />
+<img title=
+"How to get the background colors to show on the printer"
+withgrayborder="True" src=
+"../attachments/2008-09/firefox-background-print.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-29T09_14_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-29T12_36_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-28T21_58_35.txt" name=
+"e2008-09-28T21_58_35.txt"></a>
+<h2 class="date">09.28.2008 21:58</h2>
+<div class="blogbody">
+<h3 class="title">Octave (works like Matlab)</h3>
+<div class="item-description">If you need a subset of Matlab,
+<a href="http://www.gnu.org/software/octave/">Octave</a> may be the
+program for you. And no license keys to worry about.
+<pre>
+GNU Octave is a high-level language, primarily intended for
+numerical computations. It provides a convenient command line
+interface for solving linear and nonlinear problems numerically, and
+for performing other numerical experiments using a language that is
+mostly compatible with Matlab. It may also be used as a batch-oriented
+language.
+</pre>
+<img title="Simple Octave plot" withgrayborder="True" src=
+"../attachments/2008-09/octave.png" /><br />
+<br />
+<a href=
+"http://www.aims.ac.za/resources/tutorials/octave/node23.php">plotting</a>
+from this <a href=
+"http://www.aims.ac.za/resources/tutorials/octave/">Octave
+tutorial</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-28T21_58_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-29T09_14_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-28T13_07_46.txt" name=
+"e2008-09-28T13_07_46.txt"></a>
+<h2 class="date">09.28.2008 13:07</h2>
+<div class="blogbody">
+<h3 class="title">Government data</h3>
+<div class="item-description"><a href=
+"http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1138083">Government
+Data and the Invisible Hand</a>, Robinson et al. [Social Science
+Research Network]
+<pre>
+If the next Presidential administration really wants to embrace the
+potential of Internet-enabled government transparency, it should
+follow a counter-intuitive but ultimately compelling strategy: reduce
+the federal role in presenting important government information to
+citizens. Today, government bodies consider their own websites to be a
+higher priority than technical infrastructures that open up their data
+for others to use. We argue that this understanding is a mistake. It
+would be preferable for government to understand providing reusable
+data, rather than providing websites, as the core of its online
+publishing responsibility.
+.
+Rather than struggling, as it currently does, to design sites that
+meet each end-user need, we argue that the executive branch should
+focus on creating a simple, reliable and publicly accessible
+infrastructure that exposes the underlying data. Private actors,
+either nonprofit or commercial, are better suited to deliver
+government information to citizens and can constantly create and
+reshape the tools individuals use to find and leverage public
+data. The best way to ensure that the government allows private
+parties to compete on equal terms in the provision of government data
+is to require that federal websites themselves use the same open
+systems for accessing the underlying data as they make available to
+the public at large.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-28T13_07_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-28T21_58_35.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-27T12_09_38.txt" name=
+"e2008-09-27T12_09_38.txt"></a>
+<h2 class="date">09.27.2008 12:09</h2>
+<div class="blogbody">
+<h3 class="title">Playing with Zotero, GeoEndNote/GeoCite</h3>
+<div class="item-description"><a href=
+"http://zotero.org">Zotero</a> just got sued by EndNote. This makes
+me think more about creating a Django app for references complete
+with GeoDjango geometry. Not that I have time to try that, but it
+seems like a good basic Django app.<br />
+<br />
+<img title="Zotero viewing my pubs" withgrayborder="True" src=
+"../attachments/2008-09/zotero.png" /><br />
+<br />
+Going back to the GeoEndNote stuff that I did with Rochelle and
+Neil, here is a stripped down version of what EndNote puts out as
+xml:
+<pre>
+<tt><b><font color="#000080">&lt;?xml</font></b> <font color=
+"#009900">version</font><font color="#990000">=</font><font color=
+"#FF0000">"1.0"</font> <font color=
+"#009900">encoding</font><font color="#990000">=</font><font color=
+"#FF0000">"UTF-8"</font> <b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;xml&gt;</font></b>
+  <b><font color="#0000FF">&lt;records&gt;</font></b>
+    <b><font color="#0000FF">&lt;record&gt;</font></b>
+      <b><font color="#0000FF">&lt;database</font></b> <font color=
+"#009900">name</font><font color="#990000">=</font><font color=
+"#FF0000">"GEBCO_LIBRARY.enl"</font> <font color=
+"#009900">path</font><font color="#990000">=</font><font color=
+"#FF0000">"\\humpback\classes\SpatialAnalysis\GEBCO_LIBRARY.enl"</font><b><font color="#0000FF">&gt;</font></b>GEBCO_LIBRARY.enl<b><font color="#0000FF">&lt;/database&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;source-app</font></b> <font color=
+"#009900">name</font><font color="#990000">=</font><font color=
+"#FF0000">"EndNote"</font> <font color=
+"#009900">version</font><font color="#990000">=</font><font color=
+"#FF0000">"11.0"</font><b><font color=
+"#0000FF">&gt;</font></b>EndNote<b><font color=
+"#0000FF">&lt;/source-app&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;rec-number&gt;</font></b>99<b><font color=
+"#0000FF">&lt;/rec-number&gt;</font></b>
+      <b><font color="#0000FF">&lt;foreign-keys&gt;</font></b>
+        <b><font color="#0000FF">&lt;key</font></b> <font color=
+"#009900">app</font><font color="#990000">=</font><font color=
+"#FF0000">"EN"</font> <font color=
+"#009900">db-id</font><font color="#990000">=</font><font color=
+"#FF0000">"9f5sd9wf8wxar9et9xkxwppg9swsewzf25td"</font><b><font color="#0000FF">&gt;</font></b>99<b><font color="#0000FF">&lt;/key&gt;</font></b>
+      <b><font color="#0000FF">&lt;/foreign-keys&gt;</font></b>
+      <b><font color="#0000FF">&lt;ref-type</font></b> <font color=
+"#009900">name</font><font color="#990000">=</font><font color=
+"#FF0000">"GEBCO"</font><b><font color=
+"#0000FF">&gt;</font></b>40<b><font color=
+"#0000FF">&lt;/ref-type&gt;</font></b>
+      <b><font color="#0000FF">&lt;contributors&gt;</font></b>
+        <b><font color="#0000FF">&lt;authors&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;author&gt;</font></b>Hirano, Naoto<b><font color=
+"#0000FF">&lt;/author&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;author&gt;</font></b>Ogawa, Yujiro<b><font color=
+"#0000FF">&lt;/author&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;author&gt;</font></b>Saito, Kazuo<b><font color=
+"#0000FF">&lt;/author&gt;</font></b>
+        <b><font color="#0000FF">&lt;/authors&gt;</font></b>
+      <b><font color="#0000FF">&lt;/contributors&gt;</font></b>
+      <b><font color="#0000FF">&lt;titles&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;title&gt;</font></b>Long-lived early Cretaceous seamount volcanism in the Mariana Trench, Western Pacific Ocean<b><font color="#0000FF">&lt;/title&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;secondary-title&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/secondary-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/titles&gt;</font></b>
+      <b><font color="#0000FF">&lt;periodical&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;full-title&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/full-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/periodical&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;pages&gt;</font></b>371-379<b><font color=
+"#0000FF">&lt;/pages&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;volume&gt;</font></b>189<b><font color=
+"#0000FF">&lt;/volume&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;number&gt;</font></b>3-4<b><font color=
+"#0000FF">&lt;/number&gt;</font></b>
+      <b><font color="#0000FF">&lt;keywords&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;keyword&gt;</font></b>Pacific Ocean<b><font color=
+"#0000FF">&lt;/keyword&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;keyword&gt;</font></b>seamount<b><font color=
+"#0000FF">&lt;/keyword&gt;</font></b>
+      <b><font color="#0000FF">&lt;/keywords&gt;</font></b>
+      <b><font color="#0000FF">&lt;dates&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;year&gt;</font></b>2002<b><font color=
+"#0000FF">&lt;/year&gt;</font></b>
+      <b><font color="#0000FF">&lt;/dates&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;abstract&gt;</font></b>An alkaline volcanic rock sample, peralkaline rhyolite pillow lava, ...<b><font color="#0000FF">&lt;/abstract&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;image&gt;</font></b>0247644805Hirano.gif<b><font color="#0000FF">&lt;/image&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;caption&gt;</font></b>Fig. 2. Multi-narrowbeam map of the study area. ...<b><font color="#0000FF">&lt;/caption&gt;</font></b>
+      <b><font color="#0000FF">&lt;urls&gt;</font></b>
+        <b><font color="#0000FF">&lt;related-urls&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;url&gt;</font></b>http://www.sciencedirect.com/science/article/B6V6M-46RDBRM-2/1/fea80f95670b93f99f309ecc5366d201<b><font color="#0000FF">&lt;/url&gt;</font></b>
+        <b><font color="#0000FF">&lt;/related-urls&gt;</font></b>
+      <b><font color="#0000FF">&lt;/urls&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;custom1&gt;</font></b>POINT(147.67,15.5)<b><font color="#0000FF">&lt;/custom1&gt;</font></b> <i><font color="#9A1900">&lt;!-- This is WKT --&gt;</font></i>
+      <b><font color=
+"#0000FF">&lt;custom2&gt;</font></b>1/1<b><font color=
+"#0000FF">&lt;/custom2&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;custom4&gt;</font></b>Neil / Rochelle<b><font color=
+"#0000FF">&lt;/custom4&gt;</font></b>
+    <b><font color="#0000FF">&lt;/record&gt;</font></b>
+  <b><font color="#0000FF">&lt;/records&gt;</font></b>
+<b><font color="#0000FF">&lt;/xml&gt;</font></b>
+</tt>
+</pre>
+But if you look at the full original (plus I cleaned up the
+formatting), you will see all sorts of strange style tags that
+should not become part of a GeoCite GeoDjango application.
+<pre>
+<tt><b><font color="#000080">&lt;?xml</font></b> <font color=
+"#009900">version</font><font color="#990000">=</font><font color=
+"#FF0000">"1.0"</font> <font color=
+"#009900">encoding</font><font color="#990000">=</font><font color=
+"#FF0000">"UTF-8"</font> <b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;xml&gt;</font></b>
+  <b><font color="#0000FF">&lt;records&gt;</font></b>
+    <b><font color="#0000FF">&lt;record&gt;</font></b>
+      <b><font color="#0000FF">&lt;database</font></b> <font color=
+"#009900">name</font><font color="#990000">=</font><font color=
+"#FF0000">"GEBCO_LIBRARY.enl"</font> <font color=
+"#009900">path</font><font color="#990000">=</font><font color=
+"#FF0000">"\\humpback\classes\SpatialAnalysis\GEBCO_LIBRARY.enl"</font><b><font color="#0000FF">&gt;</font></b>GEBCO_LIBRARY.enl<b><font color="#0000FF">&lt;/database&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;source-app</font></b> <font color=
+"#009900">name</font><font color="#990000">=</font><font color=
+"#FF0000">"EndNote"</font> <font color=
+"#009900">version</font><font color="#990000">=</font><font color=
+"#FF0000">"11.0"</font><b><font color=
+"#0000FF">&gt;</font></b>EndNote<b><font color=
+"#0000FF">&lt;/source-app&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;rec-number&gt;</font></b>99<b><font color=
+"#0000FF">&lt;/rec-number&gt;</font></b>
+      <b><font color="#0000FF">&lt;foreign-keys&gt;</font></b>
+        <b><font color="#0000FF">&lt;key</font></b> <font color=
+"#009900">app</font><font color="#990000">=</font><font color=
+"#FF0000">"EN"</font> <font color=
+"#009900">db-id</font><font color="#990000">=</font><font color=
+"#FF0000">"9f5sd9wf8wxar9et9xkxwppg9swsewzf25td"</font><b><font color="#0000FF">&gt;</font></b>99<b><font color="#0000FF">&lt;/key&gt;</font></b>
+      <b><font color="#0000FF">&lt;/foreign-keys&gt;</font></b>
+      <b><font color="#0000FF">&lt;ref-type</font></b> <font color=
+"#009900">name</font><font color="#990000">=</font><font color=
+"#FF0000">"GEBCO"</font><b><font color=
+"#0000FF">&gt;</font></b>40<b><font color=
+"#0000FF">&lt;/ref-type&gt;</font></b>
+      <b><font color="#0000FF">&lt;contributors&gt;</font></b>
+        <b><font color="#0000FF">&lt;authors&gt;</font></b>
+          <b><font color="#0000FF">&lt;author&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>Hirano, Naoto<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+          <b><font color="#0000FF">&lt;/author&gt;</font></b>
+          <b><font color="#0000FF">&lt;author&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>Ogawa, Yujiro<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+          <b><font color="#0000FF">&lt;/author&gt;</font></b>
+          <b><font color="#0000FF">&lt;author&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>Saito, Kazuo<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+          <b><font color="#0000FF">&lt;/author&gt;</font></b>
+        <b><font color="#0000FF">&lt;/authors&gt;</font></b>
+      <b><font color="#0000FF">&lt;/contributors&gt;</font></b>
+      <b><font color="#0000FF">&lt;titles&gt;</font></b>
+        <b><font color="#0000FF">&lt;title&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Long-lived early Cretaceous seamount volcanism in the Mariana Trench, Western Pacific Ocean<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/title&gt;</font></b>
+        <b><font color="#0000FF">&lt;secondary-title&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;/secondary-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/titles&gt;</font></b>
+      <b><font color="#0000FF">&lt;periodical&gt;</font></b>
+        <b><font color="#0000FF">&lt;full-title&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/full-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/periodical&gt;</font></b>
+      <b><font color="#0000FF">&lt;pages&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>371-379<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;/pages&gt;&lt;volume&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>189<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/volume&gt;</font></b>
+      <b><font color=
+"#0000FF">&lt;number&gt;&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>3-4<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/number&gt;</font></b>
+      <b><font color="#0000FF">&lt;keywords&gt;</font></b>
+        <b><font color="#0000FF">&lt;keyword&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Pacific Ocean<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+        <b><font color="#0000FF">&lt;keyword&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>seamount<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+        <b><font color="#0000FF">&lt;keyword&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Ar-Ar age<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+        <b><font color="#0000FF">&lt;keyword&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>alkali-basalt<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+        <b><font color="#0000FF">&lt;keyword&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>rhyolite<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+        <b><font color="#0000FF">&lt;keyword&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>post-shield volcanism<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+        <b><font color="#0000FF">&lt;keyword&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Cretaceous<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+      <b><font color="#0000FF">&lt;/keywords&gt;</font></b>
+      <b><font color="#0000FF">&lt;dates&gt;</font></b>
+        <b><font color="#0000FF">&lt;year&gt;</font></b>
+          <b><font color=
+"#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>2002<b><font color="#0000FF">&lt;/style&gt;</font></b>
+        <b><font color="#0000FF">&lt;/year&gt;</font></b>
+      <b><font color="#0000FF">&lt;/dates&gt;</font></b>
+      <b><font color="#0000FF">&lt;abstract&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>An alkaline volcanic rock sample, peralkaline rhyolite pillow lava, in addition to some radiolarian-bearing pelagic sedimentary rocks, were collected by the Japanese submersible Shinkai 6500 from Quesada Seamount on the oceanward slope of the Mariana Trench. 40Ar-39Ar dating resulted in a plateau age of 129.3&#194;&#177;2.6 Ma, which is approximately 10 Myr younger than the radiolarian age of the oldest intercalated tuffaceous radiolarian claystone of early Berriasian age (approximately 140 Ma). Fragments of volcanic glass that are of alkali-basalt (hawaiite) composition may indicate that this tuffaceous claystone was formed during the shield-building volcanic stage. Because the peralkaline rhyolite is a very differentiated volcanic rock and commonly erupts in the post-shield stage, we interpret that the activity lasted for a long period (approximately 10 Myr). This long-lived shield-building stage may be due to the slow moving rate of the Pacific Plate during the Early Cretaceous.<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/abstract&gt;</font></b>
+      <b><font color="#0000FF">&lt;image&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>0247644805Hirano.gif<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/image&gt;</font></b>
+      <b><font color="#0000FF">&lt;caption&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>Fig. 2. Multi-narrowbeam map of the study area. The dive site is shown by an arrow. Contour interval is 100 m. Referred to Ogawa et al. (1994). <b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/caption&gt;</font></b>
+      <b><font color="#0000FF">&lt;urls&gt;</font></b>
+        <b><font color="#0000FF">&lt;related-urls&gt;</font></b>
+          <b><font color="#0000FF">&lt;url&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>http://www.sciencedirect.com/science/article/B6V6M-46RDBRM-2/1/fea80f95670b93f99f309ecc5366d201<b><font color="#0000FF">&lt;/style&gt;</font></b>
+          <b><font color="#0000FF">&lt;/url&gt;</font></b>
+        <b><font color="#0000FF">&lt;/related-urls&gt;</font></b>
+      <b><font color="#0000FF">&lt;/urls&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom1&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>POINT(147.67,15.5)<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/custom1&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom2&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>1/1<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/custom2&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom4&gt;</font></b>
+        <b><font color="#0000FF">&lt;style</font></b> <font color=
+"#009900">face</font><font color="#990000">=</font><font color=
+"#FF0000">"normal"</font> <font color=
+"#009900">font</font><font color="#990000">=</font><font color=
+"#FF0000">"default"</font> <font color=
+"#009900">size</font><font color="#990000">=</font><font color=
+"#FF0000">"100%"</font><b><font color=
+"#0000FF">&gt;</font></b>Neil / Rochelle<b><font color=
+"#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/custom4&gt;</font></b>
+    <b><font color="#0000FF">&lt;/record&gt;</font></b>
+  <b><font color="#0000FF">&lt;/records&gt;</font></b>
+<b><font color="#0000FF">&lt;/xml&gt;</font></b>
+</tt>
+</pre>
+BTW, I am now just using source-highlight for my blog...
+<pre>
+source-highlight -i geoendnote.xml -s xml --doc --out-format=html -o geoendnote.html
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-27T12_09_38.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-28T13_07_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-26T14_56_14.txt" name=
+"e2008-09-26T14_56_14.txt"></a>
+<h2 class="date">09.26.2008 14:56</h2>
+<div class="blogbody">
+<h3 class="title">Congress on Open Source software</h3>
+<div class="item-description"><a href=
+"http://www.gcn.com/print/27_23/47157-1.html?topic=&amp;CMP=OTC-RSS">
+Open-source software gets a plug from Congress</a> [GCN]
+<pre>
+IT'S RARE TO see a concept as technical as open-source software in a
+federal funding bill. But the House's proposed National Defense
+Authorization Act for Fiscal Year 2009 (H.R. 5658) (GCN.com, Quickfind
+1209) includes language that calls for military services to consider
+open-source software when procuring manned or unmanned aerial
+vehicles.
+...
+"The committee is concerned by the rising costs and decreasing
+security associated with software development for information
+technology systems.
+.
+These rising costs are linked to the increasing complexity of
+software, which has also resulted in increasing numbers of system
+vulnerabilities that might be exploited by malicious hackers and
+potential adversaries," the report states, "The committee encourages
+the department to rely more broadly on [open-source software] and
+establish it as a standard for intra-department software development."
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-26T14_56_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-27T12_09_38.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-26T13_20_59.txt" name=
+"e2008-09-26T13_20_59.txt"></a>
+<h2 class="date">09.26.2008 13:20</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth KML in Research Competition</h3>
+<div class="item-description"><a href=
+"http://www.google.com/educators/kml_contest.html">Welcome to the
+KML in Research Competition</a>
+<pre>
+Google is constantly looking for new ways to spur innovation and
+creativity in science and engineering. We are looking for the best
+examples of showing your work in Google Earth using KML. And we'll
+reward the brightest scientists, researchers, and students from all
+over the world. In addition to prizes, winning entries will be
+showcased on the Google Earth website and at our booth at the 2008
+American Geophysical Union convention.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-26T13_20_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-26T14_56_14.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-26T13_19_10.txt" name=
+"e2008-09-26T13_19_10.txt"></a>
+<h2 class="date">09.26.2008 13:19</h2>
+<div class="blogbody">
+<h3 class="title">NSF Visualization Contest results announced</h3>
+<div class="item-description"><a href=
+"http://www.sciencemag.org/cgi/content/full/321/5897/1768">2008
+Visualization Challenge Winners</a> or better yet, <a href=
+"http://www.sciencemag.org/vis2008/show/">slide show</a><br />
+<br />
+<img title="Andrew Dopheide and Gillian Lewis" withgrayborder=
+"True" src=
+"../attachments/2008-09/nsf-visualization-contest1768-10-med.gif" />
+<pre>
+One man's slime is another man's biofilm. research technician Andrew
+Dopheide of the University of Auckland in New Zealand spends his days
+studying biofilm in streams under the direction of Gillian
+Lewis. Hoping to foster wider appreciation for his subject, Dopheide
+put together an informational graphic on the science of slime.
+...
+</pre>
+Thanks to Art T. for telling me the results are out.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-26T13_19_10.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-26T13_20_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-26T10_19_53.txt" name=
+"e2008-09-26T10_19_53.txt"></a>
+<h2 class="date">09.26.2008 10:19</h2>
+<div class="blogbody">
+<h3 class="title">Mac software updates - 10.5.5 and X11 2.3.1</h3>
+<div class="item-description">I heard some troubles here and there
+on the net, but I just went through the Mac OSX 10.5.5 update and
+X11-2.3.1 updates and my machine seems to be okay and build X11
+apps okay.<br />
+<br />
+<a href=
+"http://xquartz.macosforge.org/trac/wiki/X112.3.1">http://xquartz.macosforge.org/trac/wiki/X112.3.1</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-26T10_19_53.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-26T13_19_10.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-26T09_12_25.txt" name=
+"e2008-09-26T09_12_25.txt"></a>
+<h2 class="date">09.26.2008 09:12</h2>
+<div class="blogbody">
+<h3 class="title">Open source voting software</h3>
+<div class="item-description"><a href=
+"http://www.technologyreview.com/Infotech/21429/?a=f">Counting
+Every Vote - California's secretary of state says open-source
+software is needed to safeguard electronic voting systems.</a>
+<pre>
+ California's secretary of state, Debra Bowen, believes that
+open-source software should be used in elections involving electronic
+voting machines, to protect against error and fraud.
+.
+Speaking in Cambridge, MA, yesterday during a panel discussion at the
+EmTech organized by Technology Review, Bowen noted that individual
+counties are currently responsible for purchasing voting
+machines. Often the choice is left up to an IT professional who may
+lack detailed knowledge of cryptography and computer security. But the
+biggest concern, according to Bowen, is a lack of access to the
+machines' underlying code. "Many times, a person has no legal right to
+review the software, even if they could," she said.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-26T09_12_25.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-26T10_19_53.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-26T08_23_47.txt" name=
+"e2008-09-26T08_23_47.txt"></a>
+<h2 class="date">09.26.2008 08:23</h2>
+<div class="blogbody">
+<h3 class="title">Invalid MMSI</h3>
+<div class="item-description">Ben at Panbo has an article that
+mirrors the troubles we have been seeing with AIS data: <a href=
+"http://www.panbo.com/archives/2008/09/invalid_mmsi_numbers_a_real_problem.html">
+Invalid MMSI numbers, a real problem</a><br />
+<br />
+For additional discussions, there is:<br />
+<br />
+Automatic Identification System (AIS): Data Reliability and Human
+Error Implications by Harati-Mokhtari et al, THE JOURNAL OF
+NAVIGATION (2007), 60, 373-389.
+<pre>
+This paper examines the recent introduction of the AIS to the ship's
+bridge and its potential impact on the safety of marine
+navigation. Research has shown that 80 to 85% of all recorded maritime
+accidents are directly due to human error or associated with human
+error.  Safety is an important element of marine navigation and many
+people at different levels are involved in its management. The safe
+and efficient performance of joint systems, is heavily dependent upon
+how functions are allocated between the human and the machine. This
+paper investigates different regulations, supervision for proper use,
+training, and management of AIS users. It uses previous research and
+three separate AIS studies to identify problems. The potential of the
+AIS to cause problems is analysed. The classic human factor "Swiss
+Cheese" Model of system failure has been modified for the AIS to
+investigate a possible accident trajectory. The paper then concludes
+with recommendations and suggestions for improvements and further
+work.
+</pre>
+I my work with NOAA, we've seen that anything that requires human
+data entry is going to have errors in addition to things like the
+Nauticast reset issue that cause an MMSI reset to factory defaults.
+Other things I've seen include things likes names that are all
+spaces, quotes in the name, complete empty names, mmsi's of 0 or 1,
+dimensions that are the wrong units or swapped (there are 4 you
+enter: A, B, C, D), fields not updated (destination, draught, etc),
+and so forth. Then there are fields on units that you are not sure
+what they are used in a particular area (number of persons on board
+- used in London).</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-26T08_23_47.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-26T09_12_25.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-25T15_02_57.txt" name=
+"e2008-09-25T15_02_57.txt"></a>
+<h2 class="date">09.25.2008 15:02</h2>
+<div class="blogbody">
+<h3 class="title">Tomorrow's CCOM seminar - 1-2 slides per
+person</h3>
+<div class="item-description">Tomorrow is the first CCOM seminar
+for the 2008-09 season. We've been asked to provide 1-2 slides to
+summarize our research. My work is sufficiently diverse to make
+this task difficult. Here is my attempt. I have an advantage in
+that I'm giving the CCOM seminar talk next Friday on Oct 3rd, where
+I will talk about working on the Phoenix Mars Lander. Depicted here
+topics that include: polar exploration, marine conservation, 3D
+computer vision, Mars exploration, AIS, blogs, wikis, GoogleEarth,
+global seafloor mapping, and field work at sea and on land. In the
+center is one of my all time favorite projects where I made 3D
+stereo models of <a href=
+"http://schwehr.org/yellowstone/enter.html">Yellowstone hot springs
+and geysers</a>. I threw in python and fink for good measure.<br />
+<br />
+<img title="Research summary slide" withgrayborder="True" src=
+"../attachments/2008-09/schwehr-20080926-ccom.png" />
+<br />
+<br />
+I'm having funny flashbacks to NASA project quad-charts.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-25T15_02_57.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-26T08_23_47.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-25T06_34_32.txt" name=
+"e2008-09-25T06_34_32.txt"></a>
+<h2 class="date">09.25.2008 06:34</h2>
+<div class="blogbody">
+<h3 class="title">Velociraptor</h3>
+<div class="item-description"><a style=
+" background: #000 url(http://www.bunkbeds.net/velociraptor/img/badge.jpg) no-repeat 0 0; display: block; width: 322px; height: 157px; text-align: center; padding-top: 150px; text-decoration: none; font-family: Times New Roman, serif; font-size: 30px; color: #ff9900;"
+href="http://www.bunkbeds.net/velociraptor/"><span style=
+"display: none;">I could survive for</span> 1 minute, 35 seconds
+<span style="display: none;">chained to a bunk bed with a
+velociraptor</span></a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-25T06_34_32.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-25T15_02_57.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-24T20_37_46.txt" name=
+"e2008-09-24T20_37_46.txt"></a>
+<h2 class="date">09.24.2008 20:37</h2>
+<div class="blogbody">
+<h3 class="title">How can this shared library problem happen?</h3>
+<div class="item-description">What happened to my fink pysqlite2
+package? This is the same library. What? This works:
+<pre>
+In [1]: import pysqlite2
+</pre>
+So what is going on that this does not work?
+<pre>
+In [2]: import pysqlite2.dbapi2
+======================================================================
+ImportError                               Traceback (most recent call last)
+/Users/schwehr/projects/src/noaadata/scripts/&lt;ipython console&gt; in &lt;module&gt;()
+/sw/lib/python2.5/site-packages/pysqlite2/dbapi2.py in &lt;module&gt;()
+     25 import time
+     26 
+---&gt; 27 from pysqlite2._sqlite import *
+     28 
+     29 paramstyle = "qmark"
+ImportError: dlopen(<b>/sw/lib/python2.5/site-packages/pysqlite2/_sqlite.so</b>, 2): 
+     Symbol not found: _sqlite3_enable_load_extension
+  Referenced from: <b>/sw/lib/python2.5/site-packages/pysqlite2/_sqlite.so</b>
+  Expected in: dynamic lookup
+</pre>
+After an hour and a half bouncing things off of pogma and akh, I've
+got it figured out. Turns out that extension handling for sqlite3
+in fink is turned off. Might be a tcl build issue. I haven't tried
+the latest sqlite (3.6.2) to see if things are better. The
+configure script for sqlite3 does not seem very well behaved.
+<pre>
+  perl -pi -e 's,#define HAVE_LOAD_EXTENSION,#undef HAVE_LOAD_EXTENSION,' src/connection.c
+</pre>
+Update to the latest pysqlite2-py25 in fink and all should be
+well.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-24T20_37_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-25T06_34_32.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-24T14_23_21.txt" name=
+"e2008-09-24T14_23_21.txt"></a>
+<h2 class="date">09.24.2008 14:23</h2>
+<div class="blogbody">
+<h3 class="title">TeraVision</h3>
+<div class="item-description">Andy M. pointed me to this. It looks
+cool, but there is an SGI Octane in the figure... blast from the
+past. Anyone have comments on using this system?<br />
+<br />
+<a>http://www.evl.uic.edu/cavern/teravision/</a><br />
+<br />
+<img title="EVL image of TeraVision in action" withgrayborder=
+"True" src=
+"../attachments/2008-09/teravision-evl.jpg" /><br />
+
+<br />
+<img title="Architecture figure from TeraVision site"
+withgrayborder="True" src=
+"../attachments/2008-09/teravision-fig1.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-24T14_23_21.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-24T20_37_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-24T13_48_31.txt" name=
+"e2008-09-24T13_48_31.txt"></a>
+<h2 class="date">09.24.2008 13:48</h2>
+<div class="blogbody">
+<h3 class="title">Phx on NPR Science Friday</h3>
+<div class="item-description"><a href=
+"http://podcastdownload.npr.org/anon.npr-podcasts/podcast/510221/94836803/npr_94836803.mp3">
+npr_94836803.mp3</a><br />
+<br />
+<pre>
+Science Friday travels to the home base of NASA's Phoenix Mars Lander
+in Tuscon, Ariz., to discuss the continuing exploration of
+Mars. Scientists explain how various robots, both on the surface and
+in orbit, are mapping and cataloging the Red Planet.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-24T13_48_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-24T14_23_21.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-24T13_28_37.txt" name=
+"e2008-09-24T13_28_37.txt"></a>
+<h2 class="date">09.24.2008 13:28</h2>
+<div class="blogbody">
+<h3 class="title">Jeff Riffle's new website</h3>
+<div class="item-description"><br />
+<br />
+Just found out that Jeff has a new website: <a href=
+"http://www.u.arizona.edu/~jriffell/index.html">Jeff Riffle</a>.
+Jeff gave me a tour of the lab at the UofA while I was in town for
+Phoenix operations. He showed me crazy things like raising <a href=
+"http://en.wikipedia.org/wiki/Manduca">hawk moths</a>.<br />
+<br />
+This isn't the exact species but it gives you the sense of the type
+of critter that he is raising for neuroecology studies:<br />
+<br />
+<img title="Tomato Hornworm Larva from wikipedia" withgrayborder=
+"True" src=
+"../attachments/2008-09/wikipedia-tomato-hornworm-larva.jpg" />
+<br />
+<br />
+[source: wikipedia - <a href=
+"http://en.wikipedia.org/wiki/Image:Tomato_Hornworm_Larva_-_Relic38_-_Ontario_Canada.JPG">
+Image:Tomato Hornworm Larva - Relic38 - Ontario
+Canada.JPG</a>]<br />
+<br />
+The neurology of sensing is a big topic these days. Someone just
+won a MacArthur foundation grant for fruit fly work on this:
+<a href=
+"http://www.macfound.org/site/c.lkLXJ8MQKrH/b.4537295/">Rachel
+Wilson</a>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-24T13_28_37.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-24T13_48_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-24T10_29_03.txt" name=
+"e2008-09-24T10_29_03.txt"></a>
+<h2 class="date">09.24.2008 10:29</h2>
+<div class="blogbody">
+<h3 class="title">Controlling other computers</h3>
+<div class="item-description"><b>Update:</b> Val pointed me to this
+client: <a href=
+"http://www.microsoft.com/mac/products/remote-desktop/default.mspx">
+Remote Desktop Connection Client for Mac 2</a> [microsoft]. Works
+pretty well.<br />
+<br />
+Gone are the days when every computer I used had x11 and all apps
+were x11 based. Way back when, I could just ssh -X to any computer
+and work as if I was on the console. Now I have to manage Windows,
+Mac and Linux computers all over a variety of networks. Linux is
+easy. The rest present challenges. Here is some of what I've been
+doing. Thanks to Val for adding another solution to the mix! He
+pointed me to the Mac OSX 10.5 built in "Screen Sharing".<br />
+<br />
+<a href=
+"http://arstechnica.com/reviews/os/mac-os-x-10-5.ars/12">Mac OS X
+10.5 Leopard: the Ars Technica review</a> - Screen sharing<br />
+<br />
+From the finder, select a mac and share the screen:<br />
+<br />
+<img title="10.5 Screen Sharing with another mac" withgrayborder=
+"True" src=
+"../attachments/2008-09/macosx10.5-screen-sharing.png" />
+<br />
+<br />
+You can control the connection somewhat:<br />
+<br />
+<img title="Screen Sharing Preferences" withgrayborder="True" src=
+"../attachments/2008-09/macosx10.5-screen-sharing-prefs.png" />
+<br />
+<br />
+Screen sharing can be launched from the command line...<br />
+<br />
+<img title="Using open" withgrayborder="True" src=
+"../attachments/2008-09/screen-sharing.png" /><br />
+
+<br />
+But don't try to connect to a Windows XP machine:<br />
+<br />
+<img title="" withgrayborder="True" src=
+"../attachments/2008-09/screen-sharing-no-xp.png" />
+<br />
+<br />
+I have been using something like this to connect to Windows from a
+Mac. You can specify a percent of your screen or a fixed pixel
+size.
+<pre>
+% <b>fink install rdestop</b>
+% <b>rdesktop -g 1700x800 192.168.8.182</b>
+% <b>rdesktop -g 60% 192.168.8.182</b>
+</pre>
+<img title="rdesktop talking to a windows xp computer"
+withgrayborder="True" src=
+"../attachments/2008-09/rdesktop.png" /><br />
+<br />
+There are lots of other possible ways including Apple Remote
+Desktop (ARD; $$$), VNC (of which there are many clients), <a href=
+"http://logmein.com">LogMeIn</a> (Is there a good ref on what they
+are actually doing?), pc2tv, xwd (xwindows dump), and many more...
+It all depends on the environment, available budget and what you
+are trying to do.<br />
+<br />
+<img title="Apple Remote Desktop software" withgrayborder="True"
+src="../attachments/2008-09/ard.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-24T10_29_03.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-24T13_28_37.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-23T22_52_59.txt" name=
+"e2008-09-23T22_52_59.txt"></a>
+<h2 class="date">09.23.2008 22:52</h2>
+<div class="blogbody">
+<h3 class="title">UNH Construction camera - CCOM from up on
+high</h3>
+<div class="item-description">A view of CCOM from up high...<br />
+<br />
+<img withgrayborder="True" title="UNH facilities camera" src=
+"../attachments/2008-09/unhconstruction.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-23T22_52_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-24T10_29_03.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-23T17_10_31.txt" name=
+"e2008-09-23T17_10_31.txt"></a>
+<h2 class="date">09.23.2008 17:10</h2>
+<div class="blogbody">
+<h3 class="title">FedEx flight control</h3>
+<div class="item-description">I ran into someone who hadn't seen
+this visualization of planes going around a storm, so here it is
+from youtube:<br />
+<br />
+<a href="http://www.youtube.com/watch?v=JdrSBzy8NwQ">Highly Skilled
+Air Traffic Controller</a><br />
+<br />
+<object width="425" height="344"><param name="movie" value=
+"http://www.youtube.com/v/JdrSBzy8NwQ&amp;hl=en&amp;fs=1" />
+<param name="allowFullScreen" value="true" />
+<embed src=
+"http://www.youtube.com/v/JdrSBzy8NwQ&amp;hl=en&amp;fs=1" type=
+"application/x-shockwave-flash" allowfullscreen="true" width="425"
+height="344" /></object><br />
+<br />
+<img withgrayborder="True" title="FedEx Air Traffic Controllers"
+src=
+"../attachments/2008-09/fedex-air-traffic.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-23T17_10_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-23T22_52_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-23T17_02_16.txt" name=
+"e2008-09-23T17_02_16.txt"></a>
+<h2 class="date">09.23.2008 17:02</h2>
+<div class="blogbody">
+<h3 class="title">USCG Maritime Awareness Global Network
+(MAGNET)</h3>
+<div class="item-description">Just heard about the USCG MAGNET
+system, which receives a N-AIS feed. How does this relate to tools
+like <a href="http://en.wikipedia.org/wiki/MISLE">MISLE</a>?
+[wikipedia]<br />
+<br />
+<a href=
+"http://en.wikipedia.org/wiki/Maritime_Awareness_Global_Network">Maritime
+Awareness Global Network - Wikipedia</a>
+<pre>
+...
+The United States Coast Guard, an agency of the Department of Homeland
+Security, developed the Maritime Awareness Global Network (MAGNET)
+system to use information relating to vessels and activities within
+the maritime environment to accomplish the Coast Guard's missions in
+the areas of Maritime Safety, Maritime Security, Maritime Mobility,
+National Defense, and Protection of Natural Resources. MAGNET replaces
+the Joint Maritime Information Element (JMIE) Support System
+JSS. MAGNET processes personally identifiable information (PII).
+.
+Coast Guard Intelligence uses MAGNET provides awareness to the field
+as well as to strategic planners by aggregating data from existing
+sources internal and external to the Coast Guard or the Department of
+Homeland Security. MAGNET correlates data and provides the medium to
+display information such as ship registry, current ship position, crew
+background, passenger lists, port history, cargo, known criminal
+vessels, and suspect lists. Coast Guard Intelligence serves as
+MAGNET's executive agent and shares appropriate aggregated data on a
+need to know basis with other law enforcement and intelligence
+agencies.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-23T17_02_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-23T17_10_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-23T12_20_23.txt" name=
+"e2008-09-23T12_20_23.txt"></a>
+<h2 class="date">09.23.2008 12:20</h2>
+<div class="blogbody">
+<h3 class="title">Neptune Construction</h3>
+<div class="item-description"><img withgrayborder="True" title=
+"AIS of Neptune Construction" src=
+"../attachments/2008-09/neptune-construction.png" /><br />
+
+<br />
+<a href=
+"http://www.lnglawblog.com/BlogEntry.aspx?_entry=abb1018a-1cb8-4604-b8b0-228c853c0103">
+Construction Continues on Neptune LNG Deepwater Port</a>
+[lnglawblog]<br />
+<br />
+<a href=
+"http://www.gloucestertimes.com/punews/local_story_266224126.html">LNG
+almost done; pipeline to be buried next month</a> [Gloucester
+Times]
+<pre>
+Workers on the giant barges building and burying pipeline for the
+Neptune liquefied natural gas port off the Gloucester shore have
+finished two-thirds of their work and the final phase of construction
+this year is scheduled to end next month.
+.
+The pipeline is part of a $1 billion LNG project being constructed by
+Suez Energy. Work on it began in July when the 313-foot-long Lone Star
+Horizon, run by contractor Cal Dive, started laying pipeline from the
+terminal location 10 miles southeast of Gloucester to a point 3.12
+miles from Marblehead, where it connects to the existing Algonquin
+HubLine. The HubLine runs from Salem to Weymouth, where it connects to
+overland pipe.
+.
+With the completion of the 13-mile pipeline, the Lone Star was
+replaced by the 420-foot-long Atlantic, which was responsible for
+digging a 6-foot-deep trench while stuffing the pipeline inside.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-23T12_20_23.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-23T17_02_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-23T12_14_06.txt" name=
+"e2008-09-23T12_14_06.txt"></a>
+<h2 class="date">09.23.2008 12:14</h2>
+<div class="blogbody">
+<h3 class="title">Python Papers - Call for papers</h3>
+<div class="item-description"><a href=
+"http://pythonpapers.blogspot.com/2008/09/call-for-papers-volume-3-issue-3.html">
+Call for Papers, Volume 3 Issue 3</a>
+<pre>
+We would like to call for papers, articles, opinion pieces and
+feedback to include in Volume 3, Issue 3 of The Python Papers. We
+would love to receive articles on Python for beginners and discussions
+about Python performance. Any article will be gratefully received, of
+course, so do not let the above list of suggestions deter you from
+considering an article on another topic.
+</pre>
+If you are a python person, you should consider publishing in The
+Python Papers.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-23T12_14_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-23T12_20_23.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-23T11_25_48.txt" name=
+"e2008-09-23T11_25_48.txt"></a>
+<h2 class="date">09.23.2008 11:25</h2>
+<div class="blogbody">
+<h3 class="title">Phoenix Mars Lander remote operations</h3>
+<div class="item-description">Nice timing on this article. I was
+just working on my RKSML (Rover Kinematic State Markup Language)
+converter script. The script takes the robotic arm (RA) motion and
+produces Lightwave keyframe scene files (lws) and my state stamp
+markup language (ssml) for the animation teams. A naming convention
+of one of the teams changed, so my 100 line bash control script
+needed to know about the new possible source file. This kind of
+stuff was much easier when I could just wander over to another part
+of the spacecraft operations center. Now I have to be extra
+diligent about documentation and emailing everyone who needs to
+know. Without VPN, ssh, scp, remote desktop, cell phones, email and
+collaboration web software, we would be in big trouble.<br />
+<br />
+<a href="http://www.tucsoncitizen.com/daily/local/96886.php">Most
+Phoenix Mars Lander mission scientists have gone home</a> [Tucson
+Citizen]
+<pre>
+Distance is posing challenges for researchers running the Phoenix Mars
+Lander mission.
+.
+Not only are Phoenix scientists operating a craft 230 million miles
+away, but most of the 150-member science and engineering team have in
+recent weeks left the Tucson Science Operations Center to return home.
+.
+During the summer more than 100 researchers would pack the SOC's large
+downlink room to review the previous day's data as it arrived via
+satellite from the Lander and plan the mission's next scientific
+activities.
+.
+On a recent morning, 11 researchers were in the room, with six times
+that many remotely attending the meeting using a high-tech networked
+communications system.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-23T11_25_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-23T12_14_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-22T16_14_01.txt" name=
+"e2008-09-22T16_14_01.txt"></a>
+<h2 class="date">09.22.2008 16:14</h2>
+<div class="blogbody">
+<h3 class="title">video standards</h3>
+<div class="item-description">Not sure what the original source is.
+Got this via Eric at JPL.
+<pre>
+In their press release on AVC, for the first time in public, the
+ATSC refers to "ATSC 2.0." This concept for next generation services
+for fixed receivers is part of the ATSC long-term strategic plan for
+the future of DTV. ATSC 2.0 is currently in the development stage in
+the ATSC Planning Committee, chaired by NAB Science &amp; Technology staff
+member Graham Jones, and is a separate effort from the mobile/handheld
+standard now in preparation. Various new capabilities are envisioned
+for ATSC 2.0, which is expected to trigger a new generation of
+receivers potentially including AVC.
+.
+"WASHINGTON, September 2008 - The Advanced Television Systems
+Committee, Inc. has approved and published A/72 which details the
+methodology to utilize Advanced Video Coding (AVC) within an ATSC DTV
+transmission. AVC, which was developed by the ITU-T Video Coding
+Experts Group together with the ISO/IEC Moving Picture Experts Group,
+is also known as H.264 and MPEG-4 Part 10. The A/72 Standard defines
+constraints with respect to AVC, compression format restraints, low
+delay and still picture modes, and bit stream specifications. In
+addition it specifies how CEA-708 closed captions are to be carried in
+an AVC bit stream. The new standard is in two parts, Part 1 is titled
+"Video System and Characteristics of AVC in the ATSC Digital
+Television System," and "Part 2 "AVC Video Transport Subsystem
+Characteristics."
+</pre>
+<a href=
+"http://www.testfreaks.com/forum/f13/atsc-adopts-standard-advanced-video-coding-2659/">ATSC
+ADOPTS STANDARD FOR ADVANCED VIDEO CODING</a>
+[testfreaks.com]<br />
+<br />
+<a href="http://www.atsc.org/standards/a72.php">A72</a>
+[atsc.org]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-22T16_14_01.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-23T11_25_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-21T17_06_48.txt" name=
+"e2008-09-21T17_06_48.txt"></a>
+<h2 class="date">09.21.2008 17:06</h2>
+<div class="blogbody">
+<h3 class="title">Arctic mapping on the Colbert Report</h3>
+<div class="item-description"><a href=
+"http://www.colbertnation.com/the-colbert-report-videos/185033/september-18-2008/smokin--pole---american-arctic-expert">
+Colbert Report</a> on the Arctic Mapping.<br />
+<br />
+<img title="Comedy Central" withgrayborder="True" src=
+"../attachments/2008-09/colbert-report-arctic-mapping.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-21T17_06_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-22T16_14_01.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-21T12_01_50.txt" name=
+"e2008-09-21T12_01_50.txt"></a>
+<h2 class="date">09.21.2008 12:01</h2>
+<div class="blogbody">
+<h3 class="title">View of from the Healy of Louis St. Laurent</h3>
+<div class="item-description">Betsy Baker posted a picture in
+<a href=
+"http://arctic-healy-baker-2008.blogspot.com/2008/09/conflict-in-arctic-tenacity-of-media.html">
+#19 Conflict in the Arctic? The Tenacity of Media Spin</a> where
+you can see the Canadian ice breaker.<br />
+<br />
+I found this one that I like: <a href=
+"http://mgds.ldeo.columbia.edu/healy/photos/aloftcon/2008/20080919-0101.jpeg">
+20080919-0101.jpeg</a><br />
+<br />
+<img title=
+"USCG Cutter Healy and the Canadian icebreaker Louis St. Laurent"
+withgrayborder="True" src=
+"../attachments/2008-09/healy-aloftcon-20080919-0101.jpg" />
+<br />
+<br />
+<a href=
+"http://mgds.ldeo.columbia.edu/healy/photos/aloftcon/2008/20080919-0001.jpeg">
+20080919-0001.jpeg</a> is also a realy nice image.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-21T12_01_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-21T17_06_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-21T11_43_52.txt" name=
+"e2008-09-21T11_43_52.txt"></a>
+<h2 class="date">09.21.2008 11:43</h2>
+<div class="blogbody">
+<h3 class="title">National Academy draft Report on Marine
+Debris</h3>
+<div class="item-description"><img title=
+"NOAA images of marine debris" withgrayborder="True" src=
+"../attachments/2008-09/national-academy-marine-debris-report.png" /><br />
+
+<br />
+<a href="http://www.nap.edu/catalog.php?record_id=12486">Tackling
+Marine Debris in the 21st Century</a><br />
+<br />
+<a href=
+"http://www.nap.edu/nap-cgi/execsumm.cgi?record_id=12486">Excutive
+Summary</a>
+<pre>
+...
+In its analysis, the committee identified four overarching areas in
+which additional emphasis is needed to adequately address the marine
+debris problem. Broadly, they center on; (1) marine debris management,
+leadership, and coordination; (2) information and metrics with which
+to assess effectiveness of current measures or efficiently direct
+future efforts; (3) port reception facilities for shoreside disposal;
+and (4) the distinct aspects of managing fishing gear as a source of
+marine debris. Salient supporting recommendations are presented under
+each overarching recommendation; additional recommendations and the
+basis for all of the findings and recommendations are included in
+Chapters 2, 3, and 4.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-21T11_43_52.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-21T12_01_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-21T09_09_25.txt" name=
+"e2008-09-21T09_09_25.txt"></a>
+<h2 class="date">09.21.2008 09:09</h2>
+<div class="blogbody">
+<h3 class="title">matplotlib and lidar</h3>
+<div class="item-description"><b>Update 20080926</b>: Thanks to
+Bror Jonsson for a patch to matplotlib-basemap-data-py. How to ask
+the path to the data files had changed. There is still likely
+troubles with libgeos2 lurking. If it is not working, make sure to
+install <b>libgeos2</b> in addition to <b>libgeos2-shlibs</b>.
+There is some bad version number stuff going on with libgeos[23]...
+libgeos did not increment their version numbers of the dylibs
+enough in the libgeos2 to 3 update.<br />
+<br />
+I finally got around to updating <a href=
+"http://matplotlib.sourceforge.net/tutorial.html">matplotlib</a>
+and the basemap in fink to the latest version. I really need to
+spend more time with the package. It can produce somereally great
+results. I always seem to drop back to the old standby of
+gnuplot.<br />
+<br />
+From <a href=
+"http://matplotlib.sourceforge.net/basemap/doc/html/users/aeqd.html">
+Jeff Whitaker's tutorial</a>... Azimuthal Equidistant Projection.
+<pre>
+<tt><b><font color=
+"#000080">from</font></b> mpl_toolkits<font color=
+"#990000">.</font>basemap <b><font color=
+"#000080">import</font></b> Basemap
+<b><font color="#000080">import</font></b> numpy as np
+<b><font color="#000080">import</font></b> matplotlib<font color=
+"#990000">.</font>pyplot as plt
+width <font color="#990000">=</font> <font color=
+"#993399">28000000</font><font color=
+"#990000">;</font> lon_0 <font color=
+"#990000">=</font> <font color="#990000">-</font><font color=
+"#993399">105</font><font color=
+"#990000">;</font> lat_0 <font color=
+"#990000">=</font> <font color="#993399">40</font>
+m <font color="#990000">=</font> <b><font color=
+"#000000">Basemap</font></b><font color=
+"#990000">(</font>width<font color=
+"#990000">=</font>width<font color=
+"#990000">,</font>height<font color=
+"#990000">=</font>width<font color=
+"#990000">,</font>projection<font color=
+"#990000">=</font><font color="#FF0000">'aeqd'</font><font color=
+"#990000">,</font>
+            lat_0<font color="#990000">=</font>lat_0<font color=
+"#990000">,</font>lon_0<font color=
+"#990000">=</font>lon_0<font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color=
+"#000000">drawmapboundary</font></b><font color=
+"#990000">(</font>fill_color<font color=
+"#990000">=</font><font color="#FF0000">'aqua'</font><font color=
+"#990000">)</font>
+m<font color="#990000">.</font><b><font color=
+"#000000">drawcoastlines</font></b><font color=
+"#990000">(</font>linewidth<font color=
+"#990000">=</font><font color="#993399">0.5</font><font color=
+"#990000">)</font>
+m<font color="#990000">.</font><b><font color=
+"#000000">fillcontinents</font></b><font color=
+"#990000">(</font>color<font color="#990000">=</font><font color=
+"#FF0000">'coral'</font><font color=
+"#990000">,</font>lake_color<font color=
+"#990000">=</font><font color="#FF0000">'aqua'</font><font color=
+"#990000">)</font>
+m<font color="#990000">.</font><b><font color=
+"#000000">drawparallels</font></b><font color=
+"#990000">(</font>np<font color="#990000">.</font><b><font color=
+"#000000">arange</font></b><font color=
+"#990000">(-</font><font color="#993399">80</font><font color=
+"#990000">,</font><font color="#993399">81</font><font color=
+"#990000">,</font><font color="#993399">20</font><font color=
+"#990000">))</font>
+m<font color="#990000">.</font><b><font color=
+"#000000">drawmeridians</font></b><font color=
+"#990000">(</font>np<font color="#990000">.</font><b><font color=
+"#000000">arange</font></b><font color=
+"#990000">(-</font><font color="#993399">180</font><font color=
+"#990000">,</font><font color="#993399">180</font><font color=
+"#990000">,</font><font color="#993399">20</font><font color=
+"#990000">))</font>
+xpt<font color="#990000">,</font> ypt <font color=
+"#990000">=</font> <b><font color=
+"#000000">m</font></b><font color="#990000">(</font>lon_0<font color="#990000">,</font> lat_0<font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color=
+"#000000">plot</font></b><font color=
+"#990000">([</font>xpt<font color=
+"#990000">],[</font>ypt<font color="#990000">],</font><font color=
+"#FF0000">'ko'</font><font color="#990000">)</font> 
+plt<font color="#990000">.</font><b><font color=
+"#000000">title</font></b><font color=
+"#990000">(</font><font color="#FF0000">'Azimuthal Equidistant Projection'</font><font color="#990000">)</font>
+plt<font color="#990000">.</font><b><font color=
+"#000000">savefig</font></b><font color=
+"#990000">(</font><font color=
+"#FF0000">'aeqd.png'</font><font color="#990000">)</font>
+</tt>
+</pre>
+<img title="matplotlib with basemap" withgrayborder="True" src=
+"../attachments/2008-09/matplotlib-basemap-aeqd.png" /><br />
+
+<br />
+Thanks to Jed Frechette for getting me to update the package. He
+has some open source python software for lidar: <a href=
+"http://sourceforge.net/projects/tlspy">TLSpy</a>. Check out his
+<a href="http://www.unm.edu/~lidar/Pilots.htm">photo gallery</a> I
+think this one of trees is especially cool...<br />
+<br />
+<img title="UNM terrestrial lidar" withgrayborder="True" src=
+"../attachments/2008-09/unm-lidar-trees.png" />
+<br />
+<br />
+Side note: I ran into packaging trouble with matplotlib and the
+basemap portion. Both try to put an __init__.py in the same place,
+such that there is a clash between the debs. The files are
+identical. Trying to be a good citizen, I've submitted a bug
+report:<br />
+<br />
+<a href=
+"https://sourceforge.net/tracker/?func=detail&amp;atid=560720&amp;aid=2121676&amp;group_id=80706">
+[ 2121676 ] Clash between matplotlib and matplotlib-basemap</a>
+[sf.net matplotlib tracker]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-21T09_09_25.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-21T11_43_52.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-21T07_10_21.txt" name=
+"e2008-09-21T07_10_21.txt"></a>
+<h2 class="date">09.21.2008 07:10</h2>
+<div class="blogbody">
+<h3 class="title">Phoenix mission extended</h3>
+<div class="item-description">My little contribution to Phoenix
+last week... I assisted with the image release process for
+Friday.<br />
+<br />
+<img title="IPRW products accepted" withgrayborder="True" src=
+"../attachments/2008-09/phx-sol114.png" /><br />
+
+<br />
+<a href=
+"http://www.nasa.gov/mission_pages/phoenix/images/press/16145-animated.html">
+Cloud animated gif</a><br />
+<br />
+<a href=
+"http://www.nasa.gov/mission_pages/phoenix/images/press/SS113IOF906228000_1D1A0LB12T1_full.html">
+Frost in the trench</a> - Fall is coming to NH too.<br />
+<br />
+<a href=
+"http://www.boston.com/news/science/articles/2008/09/19/nasa_extends_mars_lander_mission_again/">
+NASA extends Mars lander mission again</a> [Boston.com/AP]
+<pre>
+...
+NASA spokesman Dwayne Brown said Thursday the space agency will invest
+about $6 million to keep the $422 million mission going through
+December.
+.
+It's the second and possibly last extension since the lander may not
+survive the upcoming Martian winter.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-21T07_10_21.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-21T09_09_25.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-20T22_21_15.txt" name=
+"e2008-09-20T22_21_15.txt"></a>
+<h2 class="date">09.20.2008 22:21</h2>
+<div class="blogbody">
+<h3 class="title">photo meme</h3>
+<div class="item-description">Can you read what is on my computer
+screen from my glasses? Indoors with not enough light.<br />
+<br />
+<img title="Backlight built in iSight camera" withgrayborder="True"
+src=
+"../attachments/2008-09/kurt-photo-meme.jpg" />
+<br />
+<br />
+Instructions: Take a picture of yourself right now. Don't change
+your clothes, don't fix your hair - just take a picture. Post that
+picture with NO editing. Post these instructions with the
+picture.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-20T22_21_15.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-21T07_10_21.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-19T10_39_48.txt" name=
+"e2008-09-19T10_39_48.txt"></a>
+<h2 class="date">09.19.2008 10:39</h2>
+<div class="blogbody">
+<h3 class="title">Cosco busan article</h3>
+<div class="item-description">Track back: <a href=
+"http://gcaptain.com/maritime/blog/cosco-busan-radar-images-and-ntsb-transcript/">
+Cosco Busan - Radar Images And NTSB Transcript</a><br />
+<br />
+<a href=
+"http://gcaptain.com/maritime/blog/pilotage-paradox/">Pilotage
+Paradox by Paul Drouin</a> [gCaptain]
+<pre>
+...
+In the seven minute interval between leaving the inner harbour and
+striking the bridge pylon, the pilot gave 13 helm orders without the
+slightest indication on the bridge of the Cosco Busan that anything
+was amiss. We know this because the National Transportation Safety
+Board (NTSB) has left an amazing amount of information on their public
+docket website, including transcripts of the bridge voice recordings.
+.
+Leaving berth 56 (Port of Oakland) and passing under the San
+Francisco-Oakland Bay Bridge is a relatively simple matter, even under
+blind pilotage conditions, as only two course changes bring you
+through the span. The Delta-Echo span of the bridge is wide, with a
+horizontal clearance of 673 meters, and is equipped with a RACON dead
+center of the span. For the Cosco Busan, winds were light and the
+vessel would be stemming the flood current as it passed under the
+bridge. This maneuver should not give an experienced 3rd Mate cause to
+sweat, much less an experienced pilot.
+...
+</pre>
+<a href=
+"http://www.ntsb.gov/events/2008/San-Francisco-Bay-CA/Exhibits/389888.pdf">389888.pdf</a>
+[ntsb] from <a href=
+"http://www.ntsb.gov/events/2008/San-Francisco-Bay-CA/Exhibits/default.htm">
+NTSB Docket Management System - List of Contents</a>
+<pre>
+08:26:56     CREW full ahead full ahead.
+08:27:10     CREW starboard twenty.
+08:27:12    PILOT thank you.
+08:27:24 VTS unit romeo traffic.
+08:27:29 PILOTVHF traffic romeo.
+08:27:37    PILOT ease to ten.
+08:27:40     CREW ease to ten.
+08:27:43     CREW rudder starboard ten.
+08:27:45 PILOTVHF trafic romeo did you call.
+08:27:48      VTS unit romeo traffic uh AIS shows you on two
+three five heading what are your intentions over?
+08:27:57 PILOTVHF well I'm comin' around I'm steering two eighty right now.
+08:28:02    PILOT starboard twenty.
+08:28:02     CREW starboard twenty.
+08:28:04      VTS roger understand you still intend ** span?
+08:28:06     CREW starboard twenty sir.
+08:28:08    PILOT this is the center of the bridge right?
+08:28:11     CREW yeah yeah.
+08:28:12    PILOT yeah.
+08:28:13    PILOT hard starboard.
+08:28:14     CREW hard starboard.
+08:28:15    PILOTVHF yeah we're still delta echo.
+08:28:22     CREW hard starboard sir.
+08:28:42    PILOT midships.
+08:28:44     CREW midship.
+08:28:51    PILOT starboard twenty.
+08:28:53     CREW starboard twenty.
+08:29:01    PILOT hard starboard.
+08:29:02     CREW hard starboard.
+08:29:04 CHOFFUHF **.
+08:29:06     CAPT what did he say?
+08:29:08     CREW hard starboard sir.
+08:29:09 CHOFFUHF the bridge column the bridge column.
+08:29:11  CAPTUHF oh I see it I see it.
+08:29:14     CREW *.
+08:29:16    PILOT yeah I see it.
+08:29:22     CREW rudder hard starboard sir.
+08:29:26    PILOT midships.
+08:29:27     CREW midship.
+08:29:31    PILOT hard port.
+08:29:32     CREW hard port.
+08:29:44     CREW hard port sir.
+08:29:44     CREW rudder hard port sir.
+08:29:55     CREWwheel hard port.
+08:30:05     CREW wheel is hard port sir.
+08:30:07    PILOT okay midships.
+08:30:08     CREW midships.
+08:30:10    PILOT dead slow ahead.
+08:30:11     CREW dead slow ahead.
+08:30:12 PILOTVHF yeah traffic we just touched the delta span I'm
+gonna go to...I'm gonna try get her anchored
+anchorage nine- or anchorage seven.
+08:30:20     CREW midships sir.
+08:30:24  CREWUHF captain captain.
+08:30:25 CHOFFUHF there is a leak there is leak.
+08:30:27  CREWUHF okay okay it's all right now.
+08:30:32    PILOT is the ship all right? is the ship all right?
+08:30:34     CAPT no no no it's leaking leaking. *.
+</pre>
+<br />
+<br />
+<a alt="Movie of Cosco Busan radar during allision" href=
+"../attachments/2008-09/cosco-busan-radar.mp4">
+Cosco Busan radar movie</a> [mp4]<br />
+<br />
+<embed autostart="false" width="528" height="400" loop="true"
+title="Cosco Busan radar during allision" src=
+"../attachments/2008-09/cosco-busan-radar.mp4" />
+<br />
+<br />
+<img withgrayborder="True" title=
+"Cosco Busan radar moments before allision" src=
+"../attachments/2008-09/cosco-busan-radar.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-19T10_39_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-20T22_21_15.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-19T10_25_46.txt" name=
+"e2008-09-19T10_25_46.txt"></a>
+<h2 class="date">09.19.2008 10:25</h2>
+<div class="blogbody">
+<h3 class="title">More Healy ice breaker stuff on the web</h3>
+<div class="item-description"><a href=
+"http://gcaptain.com/maritime/blog/interesting-ship-of-the-week-uscgc-healy/">
+Interesting Ship of The Week - USCGC Healy</a> [gCaptain]<br />
+<br />
+Monica has posted <a href=
+"http://the-moni-blog.blogspot.com/2008/09/uscgc-healy-and-ccgs-louis-st-laurent.html">
+more pictures</a> from the cruise and an image of the chirp showing
+<a href="http://the-moni-blog.blogspot.com/2008/09/foot.html">the
+foot of the slope</a>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-19T10_25_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-19T10_39_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-19T09_24_44.txt" name=
+"e2008-09-19T09_24_44.txt"></a>
+<h2 class="date">09.19.2008 09:24</h2>
+<div class="blogbody">
+<h3 class="title">Global shipping patterns</h3>
+<div class="item-description">Colin just pointed me to this paper.
+I haven't redone the literature search on this topic since middle
+of 2007, so I hadn't run into it.<br />
+<br />
+Halpern et al., 2008: <a href=
+"http://www.sciencemag.org/cgi/content/full/319/5865/948">A Global
+Map of Human Impact on Marine Ecosystems</a> [sciencemag]
+<pre>
+The management and conservation of the world's oceans require
+synthesis of spatial data on the distribution and intensity of human
+activities and the overlap of their impacts on marine ecosystems. We
+developed an ecosystem-specific, multiscale spatial model to
+synthesize 17 global data sets of anthropogenic drivers of ecological
+change for 20 marine ecosystems. Our analysis indicates that no area
+is unaffected by human influence and that a large fraction (41%) is
+strongly affected by multiple drivers. However, large areas of
+relatively little human impact remain, particularly near the
+poles. The analytical process and resulting maps provide flexible
+tools for regional and global efforts to allocate conservation
+resources; to implement ecosystem-based management; and to inform
+marine spatial planning, education, and basic research.
+</pre>
+The data and more detailed figures are available here: <a href=
+"http://www.nceas.ucsb.edu/GlobalMarine/impacts">http://www.nceas.ucsb.edu/GlobalMarine/impacts</a><br />
+
+<br />
+<a href=
+"../attachments/2008-09/GlobalShippingImpactsHalpernetal.jpg">
+full image</a><br />
+<br />
+<img withgrayborder="True" title=
+"Halpern et al on global ship traffic." src=
+"../attachments/2008-09/GlobalShippingImpactsHalpernetal-sml.jpg" />
+<br />
+<br />
+Trackback: <a href=
+"http://gcaptain.com/maritime/blog/maritime-monday-128/">Maritime
+Monday 128</a> [gCaptain.com]
+<pre>
+Kurt's Weblog has an image mapping "Global shipping patterns".
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-19T09_24_44.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-19T10_25_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-18T17_40_31.txt" name=
+"e2008-09-18T17_40_31.txt"></a>
+<h2 class="date">09.18.2008 17:40</h2>
+<div class="blogbody">
+<h3 class="title">NPR Science Friday - Phoenix Mars Lander</h3>
+<div class="item-description"><a href=
+"http://www.sciencefriday.com/program/archives/200809191">Mars
+(broadcast Friday, September 19th, 2008)</a>
+<pre>
+In this segment, we'll get the big picture on science on the planet
+Mars. From orbiting observatories to roving rovers to the
+ditch-digging Phoenix -- what have planetary scientists learned about
+Mars, and what remains to be discovered?
+.
+The most recent visitor to the Red Planet is NASA's Phoenix Mars
+Lander, which launched in August 2007 as the first mission in NASA's
+Scout Program. Phoenix is designed to study the history of water and
+habitability potential in the Martian arctic's ice-rich soil. So far,
+the lander has identified water ice in soil samples, and has detected
+the chemical perchlorate in the soil, a sign of the presence of liquid
+water in the past.
+.
+The Phoenix Mars Lander joins the twin rovers of the Mars Exploration
+Rover project, Spirit and Opportunity, which have been in operation
+since 2004. Now running years past their planned lifetime on Mars, the
+rovers are still exploring the surface. Rover Opportunity recently
+exited the Victoria Crater after several months on the crater floor.
+.
+Several orbiting observatories, including Mars Odyssey, Mars Express,
+and Mars Reconnaissance Orbiter are examining the different aspects of
+the planet from above. The orbiting platforms have studied the
+planet's atmosphere, mapped its surface, and are also supporting the
+ground-based exploration missions.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-18T17_40_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-19T09_24_44.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-18T10_14_30.txt" name=
+"e2008-09-18T10_14_30.txt"></a>
+<h2 class="date">09.18.2008 10:14</h2>
+<div class="blogbody">
+<h3 class="title">Web-Of-Science star tree</h3>
+<div class="item-description">The <a href=
+"http://isiknowledge.com/">Web Of Science</a> has a tool to
+visualize references that I haven't used before. Kind of fun. Not
+sure how useful it will be down the road, but it makes it easy to
+see what references look to be promissing for finding additional
+references.<br />
+<br />
+<img title="Web of Science screen shot of star plot"
+withgrayborder="True" src=
+"../attachments/2008-09/web-of-science-star-tree.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-18T10_14_30.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-18T17_40_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-17T23_41_48.txt" name=
+"e2008-09-17T23_41_48.txt"></a>
+<h2 class="date">09.17.2008 23:41</h2>
+<div class="blogbody">
+<h3 class="title">Class B AIS in the US</h3>
+<div class="item-description"><a href=
+"http://www.panbo.com/archives/2008/09/class_b_ais_here_but_worthless.html">
+Class B AIS here?, but worthless?</a> [panbo]
+<pre>
+Today two reliable sources told me that all five FCC commissioners
+have now signed off on Class B AIS for US waters, though neither knows
+when the Order will become effective. The final step should be an
+announcement in the FCC Daily Digest.
+...
+</pre>
+For understand use of various waterways, Class B will be a huge
+step forward. I do most of my analysis on downsampled data where I
+get at most one report per minute for each vessel. However, read
+the rest of Ben's articles for issues about collision
+avoidance.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-17T23_41_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-18T10_14_30.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-17T20_50_36.txt" name=
+"e2008-09-17T20_50_36.txt"></a>
+<h2 class="date">09.17.2008 20:50</h2>
+<div class="blogbody">
+<h3 class="title">Healy Twitter</h3>
+<div class="item-description">I though I had written about this,
+but I don't see anything in my notes. The USCG Ice Breaker Healy
+has a twitter feed: <a href=
+"http://twitter.com/cgchealy">http://twitter.com/cgchealy</a><br />
+<br />
+With posts like this: <a href=
+"http://www.uscg.mil/pacarea/cgchealy/updates/AWS08/080916-update.asp">
+September 16, 2008 update</a>
+<pre>
+Greetings from the frozen north.  The ship is covered in ice and
+operations with the Louis are in full swing.  Two weeks remain in our
+operation with the Canadians and things are progressing smoothly.
+.
+After flight ops finished on Saturday, we made a beeline for our
+rendezvous point with the Louis.  On Tuesday we met them and commenced
+flight operations to allow the science parties on both vessels to meet
+and discuss the plans for the coming weeks.  After the meetings were
+finished, the Louis was able to lower its seismic gear so that we
+could commence the first transect.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-17T20_50_36.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-17T23_41_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-17T14_15_07.txt" name=
+"e2008-09-17T14_15_07.txt"></a>
+<h2 class="date">09.17.2008 14:15</h2>
+<div class="blogbody">
+<h3 class="title">Google Oceans</h3>
+<div class="item-description">I hear that Google Oceans will be out
+in the beginning of November.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-17T14_15_07.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-17T20_50_36.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-16T15_25_39.txt" name=
+"e2008-09-16T15_25_39.txt"></a>
+<h2 class="date">09.16.2008 15:25</h2>
+<div class="blogbody">
+<h3 class="title">Test transponder</h3>
+<div class="item-description">The 1st transponder...<br />
+<br />
+<img title="Screen shot from ERMA" withgrayborder="True" src=
+"../attachments/2008-09/cape-cod-noaa-test.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-16T15_25_39.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-17T14_15_07.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-16T12_04_30.txt" name=
+"e2008-09-16T12_04_30.txt"></a>
+<h2 class="date">09.16.2008 12:04</h2>
+<div class="blogbody">
+<h3 class="title">Data interoperability and integration</h3>
+<div class="item-description">I was talking to Ru Morrison this
+morning and he mentioned several additional efforts that I was not
+aware of. It's time for a summary post.<br />
+<br />
+<a href="http://www.exchangenetwork.net/">EPA Exchange
+Network</a><br />
+<br />
+<pre>
+The Exchange Network is a partnership among states, tribes, and the
+U.S. Environmental Protection Agency that is revolutionizing the
+exchange of environmental information. Partners on the Exchange
+Network share data efficiently and securely over the Internet. This
+new approach is providing real-time access to higher quality data
+while saving time, resources, and money for partner states, tribes,
+and territories.
+</pre>
+<a href="http://gcmd.nasa.gov/">NASA Global Change Master Diretory
+(GCMD)</a>
+<pre>
+Our goal is to enable users to locate and obtain access to Earth
+science data sets and services relevant to global change and Earth
+science research. The GCMD database holds more than 25,000
+descriptions of Earth science data sets and services covering all
+aspects of Earth and environmental sciences. One can use the search
+box or select from the available keywords to search for data and
+services.  We encourage your participation in writing and maintaining
+the information in our databases.  You will find authoring tools to
+assist you.  In addition, Subscription services are available to
+notify you of new entries.  The Committee on Earth Observation
+Satellites (CEOS) International Directory Network (IDN)
+Interoperability Forum is available to discuss content and database
+issues.
+</pre>
+<a href="http://marinemetadata.org/">Marine Metadata
+Interoperability Project</a> (marinemetadata.org) CCOM has been
+working in this group.<br />
+<br />
+<a href="http://www.opengeospatial.org/">Open Geospatial Consortium
+(OGC)</a> - <a href=
+"http://www.oostethys.org/ogcae-ocean-science-ie-report-has-been-submitted-to-ogc">
+OGC Ocean Science IE Report has been submitted to OGC</a>
+[oostethys.org]<br />
+<br />
+See also:
+<ul>
+<li><a href="http://www.epa.gov/geoss/">Global Earth Observation
+System of Systems (GEOSS)</a> [epa.gov]</li>
+<li><a href="http://www.neoninc.org/">National Ecological
+Observatory Network (NEON)</a></li>
+<li style="list-style: none"><a href=
+"http://www.neoninc.org/">[neoninc.org]</a></li>
+</ul>
+<a href="http://www.neoninc.org/"></a></div>
+</div>
+<div class="posted"><a href="http://www.neoninc.org/"><br />
+Posted by <span class="item-creator">Kurt</span> |</a><a href=
+"http://www.neoninc.org/"></a> <a class="link" href=
+"2008-09.html#e2008-09-16T12_04_30.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-16T15_25_39.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-15T21_54_39.txt" name=
+"e2008-09-15T21_54_39.txt"></a>
+<h2 class="date">09.15.2008 21:54</h2>
+<div class="blogbody">
+<h3 class="title">Cape Cod hardware install</h3>
+<div class="item-description">Today, the Cape Cod National
+Seashore, USCG, NOAA, and UNH all met out on Cape Cod. The first
+order of business was an antenna repair:<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/cape-cod-antenna-repair.jpg" />
+<br />
+<br />
+Here is me upstairs on a conference call.<br />
+<br />
+<img title="Photo by Mike Thompson" withgrayborder="True" src=
+"../attachments/2008-09/cape-cod-kurt.jpg" /><br />
+
+<br />
+The new station after it was installed.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/cape-cod-ais-station.jpg" />
+<br />
+<br />
+The minimum keyboard display (MKD) on the unit.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/cape-cod-mkd.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-15T21_54_39.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-16T12_04_30.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-14T14_36_28.txt" name=
+"e2008-09-14T14_36_28.txt"></a>
+<h2 class="date">09.14.2008 14:36</h2>
+<div class="blogbody">
+<h3 class="title">Fall webworms</h3>
+<div class="item-description">The <a href=
+"http://en.wikipedia.org/wiki/Fall_webworm">fall webworms</a>
+(Hyphantria cunea) have been going strong this year. My yard has
+escaped them, but UNH has lots. These two pictures show them
+starting on the south short of Lake Winnipesaukee at the end of
+July.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/fall-webworms-1.jpg" />
+<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/fall-webworms-2.jpg" />
+<br />
+<br />
+<a href=
+"http://extension.unh.edu/news/2008/09/home_horticulture_fall_apparit_2.html">
+Webworms or Halloween Decorations?</a> [unh extension]
+<pre>
+...
+Those hairy webworms eating your leaves at the moment will live in the
+soil this winter as pupae, emerging next July as pure white
+moths. Then the cycle will begin again.
+.
+Unlike that spring pest, the Eastern tent caterpillar, the fall
+webworm isn't very harmful to the plants it feeds on. Unsightly
+perhaps, but the leaf feeding happens so late in the year that little
+damage is done to the health of the tree.
+.
+Why not think of the nests as early Halloween decorations? I know I've
+seen worse draped over trees.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-14T14_36_28.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-15T21_54_39.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-14T09_01_18.txt" name=
+"e2008-09-14T09_01_18.txt"></a>
+<h2 class="date">09.14.2008 09:01</h2>
+<div class="blogbody">
+<h3 class="title">Mid-September Garden</h3>
+<div class="item-description">Fall is approaching and it looks like
+many of my attempts in the garden did not make it this year. There
+have been many surprises both in terms of successes and failures.
+The biggest failure has been swiss chard. Last year, I could do no
+wrong to the chard and all groups of the plant just kept producing
+like crazy until the frost. On the other side of things, the two
+tyes of beans that I've got in are not quite there yet, but
+producing more beans than I thought possible.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/garden-sep13-beans.jpg" />
+<br />
+<br />
+The neighbor's <a href=
+"http://en.wikipedia.org/wiki/Castor_oil_plant">castor bean</a>
+(Ricinus communis) plants are spectacular again this year.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/castor-bean-ricinus-communis.jpg" />
+<br />
+<br />
+There has been an explosion of crickets - enough that before I
+mowed the lawn yesterday, it looked like the grass was all moving
+before me when I walked. I think the lawn mower caused a
+massacre.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/cricket.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-14T09_01_18.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-14T14_36_28.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-13T17_59_32.txt" name=
+"e2008-09-13T17_59_32.txt"></a>
+<h2 class="date">09.13.2008 17:59</h2>
+<div class="blogbody">
+<h3 class="title">Django and JQuery</h3>
+<div class="item-description">I am too overloaded to go check this
+out, but sounds like what I have been hoping to try to do: <a href=
+"http://www.djangosnippets.org/snippets/1053/">Orderable inlines
+using drag and drop with jQuery UI</a> [django snipped 1053]
+<pre>
+An easy way of making inlines orderable using drag-and-drop, using
+jQuery UI's sortable() plugin.
+.
+First, add an "order" field to the inline models which is an
+IntegerField, and set that model to use 'order' as its default
+order_by.
+.
+Then hook in the JavaScript. This should make them drag-and-drop
+sortable using jQuery UI, and also hide the divs containing those
+order fields once the page has loaded. This technique is unobtrusive:
+if JavaScript is disabled, the order fields will be visible and the
+user will be able to manually set the order by entering numbers
+themselves.
+</pre>
+<br />
+<br />
+Also - <a href=
+"http://blog.doughellmann.com/2008/09/pymotw-exceptions.html">exceptions
+- Builtin error classes</a> [Doug Hellmann] Only recently, have I
+started trying to get better at using exceptions in Python.
+Definitely improves my code.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-13T17_59_32.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-14T09_01_18.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-12T09_50_05.txt" name=
+"e2008-09-12T09_50_05.txt"></a>
+<h2 class="date">09.12.2008 09:50</h2>
+<div class="blogbody">
+<h3 class="title">User activated fog signals</h3>
+<div class="item-description"><a href=
+"http://coastguardnews.com/coast-guard-reminds-boaters-about-remote-activated-fog-signals/2008/09/11/">
+Coast Guard reminds boaters about remote activated fog signals</a>
+[Coast Guard News]
+<pre>
+...
+Visibility detectors and remote activated phone line switches were
+problematic, sometimes causing continuous operation of the fog signal,
+which resulted in numerous complaints from nearby residents. The fog
+horn is now activated by mariners using VHF marine band radios. Keying
+the microphone five times while on channel 79a (156.975 MHZ) will
+activate the fog horn for a period of 30 minutes, after which the fog
+horn automatically shuts off.
+...
+</pre>
+Comment from Roland:
+<pre>
+Cool, small airports have had this for runway lights a long time ago!
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-12T09_50_05.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-13T17_59_32.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-12T06_42_23.txt" name=
+"e2008-09-12T06_42_23.txt"></a>
+<h2 class="date">09.12.2008 06:42</h2>
+<div class="blogbody">
+<h3 class="title">Delay-Tolerant Networking (DTN) in space</h3>
+<div class="item-description"><a href=
+"http://www.dtnrg.org/wiki">DTN</a> in space: <a href=
+"http://www.sstl.co.uk/News_and_Events/Latest_News/?story=1254">UK-DMC
+satellite first to transfer sensor data from space using 'bundle'
+protocol</a> [sstl.co.uk]
+<pre>
+...
+The UK-DMC satellite has delivered delay-tolerant networking 'bundles'
+carrying remote-sensing image data to NASA Glenn Research Center in
+Cleveland, Ohio, via SSTL's Guildford, England, Mission Control
+Centre. The first complete image, of South Africa's Cape of Good Hope,
+was downloaded in fragments across two separate satellite passes to a
+'bundle agent' in SSTL's ground station. The fragments were then sent
+across the Internet to NASA Glenn's agent, and reassembled into the
+image file. That file was then delivered back to SSTL for
+post-processing and orthorectification.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-12T06_42_23.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-12T09_50_05.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-11T21_48_13.txt" name=
+"e2008-09-11T21_48_13.txt"></a>
+<h2 class="date">09.11.2008 21:48</h2>
+<div class="blogbody">
+<h3 class="title">First non-localhost django site</h3>
+<div class="item-description">I finally have my first Django site
+up on the internet beyond using the built in debug server. I'm
+using apache2 with mod-python. I'd write up the SSL config with
+apache2, but I did that quite a while ago on my dev server.<br />
+<br />
+I haven't converted my application from 0.96 to 1.0. It is mostly
+just using the admin interface that I've customized. Also, I did a
+tweak by installing Django in my home directory rather than from a
+Ubuntu deb. My project is called "dt", for Django test:
+/home/schwehr/dt<br />
+<br />
+I used the <a href=
+"http://www.djangoproject.com/documentation/0.96/modpython/">Django
+modpython 0.96</a> page and a bunch of googling to figure out the
+Alias and 2nd location tag that turns off the mod python on the
+media subtree.<br />
+<br />
+Here is what I added to /etc/apache2/sites-available/ssl:
+<pre>
+<tt><b><font color="#0000FF">&lt;Location</font></b> <font color=
+"#FF0000">"/"</font><b><font color="#0000FF">&gt;</font></b>
+    PythonPath "['/home/schwehr/python-2.5/lib/python2.5/site-packages','/home/schwehr/'] + sys.path"
+    SetHandler python-program
+    PythonHandler django.core.handlers.modpython
+    SetEnv DJANGO_SETTINGS_MODULE dt.settings
+    PythonDebug On
+<b><font color="#0000FF">&lt;/Location&gt;</font></b>
+#
+Alias /media "/home/schwehr/python-2.5/lib/python2.5/site-packages/django/contrib/admin/media"
+<b><font color="#0000FF">&lt;Location</font></b> <font color=
+"#FF0000">"/media"</font><b><font color="#0000FF">&gt;</font></b>
+    SetHandler None  # Don't use mod-python on this directory
+<b><font color="#0000FF">&lt;/Location&gt;</font></b>
+</tt>
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-11T21_48_13.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-12T06_42_23.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-11T16_41_25.txt" name=
+"e2008-09-11T16_41_25.txt"></a>
+<h2 class="date">09.11.2008 16:41</h2>
+<div class="blogbody">
+<h3 class="title">Coin 3.0.0 released</h3>
+<div class="item-description"><a href="http://coin3d.org/">SIM
+Coin3D</a> - Rewrite of SGI OpenInventor.
+<pre>
+Coin 3.0.0 "Buffalo" Released
+.
+Kongsberg SIM is proud to release version 3.0.0 of the Coin 3D graphics
+library.  Coin 3.0.0 is a major release.  It breaks binary compatibility
+with previous versions of Coin, but is for the most part upward source
+code compatible with Coin 2.*.  A new major release means it was time for
+doing cleanup-duties.  Some dead-end developments were removed, certain
+ABI-preservation-related hacks were discarded and rewritten properly.
+Certain bad design choices were improved upon.
+.
+Coin 3.0.0 is not a release with a massive roll-out of new features.
+Resources have at times been stretched, but we have managed to accumulate a
+decent set of features for a release anyway, and internal to Coin we have
+many new subsystems to build future features on.
+</pre>
+Their list of new features:
+<pre>
+  - Scene graph performance profiling subsystem
+  - SoDepthBuffer node for constrolling Z-buffer settings
+  - Shaders: SoVertexAttribute and SoVertexAttributeBinding nodes
+  - Shadows: SoShadowSpotLight node
+  - SoHeightMapToNormalMap texture conversion engine
+  - SoPickStyle: new styles SHAPE_ON_TOP, BOUNDING_BOX_ON_TOP, SHAPE_FRONTFACES
+  - New XML-based GL driver feature database for tagging buggy/slow features
+    in specific drivers
+  - Statechart XML engine (2007-draft based), used to implement examiner viewer
+    mode at the Coin level
+  - Foreign file format support through SoForeignFileKit w. example SoSTLFileKit
+  - Draggers: minTranslation/maxTranslation fields in SoTranslate1Dragger and
+    SoTranslate2Dragger
+  - OS X: Coin has become more bundle-aware and will loads external libs bundled
+    with Inventor.framework or the application bundle (better encapsulation)
+  - SoLineHighlightRenderAction and SoBoxHighlightRenderAction now only
+    supports one SoSelection node (performance and OIV-compatibility)
+  - SoBumpMap will now detect height maps stored as rgb(a)
+  - SoRayPickAction picking precision improvements
+  - Include SoFieldContainer userdata when doing a deep node copy
+  - Anti-aliasing is now done around the center of each pixel
+  - Boost.Test-based testsuite
+</pre>
+e.g. <a href=
+"http://coin3d.org/usage/casestudies/users/kogeo">kogeo seismic
+toolkit</a> - open source application for 2d and 3d seismic data
+analysis.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/kogeo-open-source-coin-seismic.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-11T16_41_25.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-11T21_48_13.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-10T11_18_08.txt" name=
+"e2008-09-10T11_18_08.txt"></a>
+<h2 class="date">09.10.2008 11:18</h2>
+<div class="blogbody">
+<h3 class="title">Journals with RSS feeds</h3>
+<div class="item-description">Today, it seems rare to to find
+journals with RSS feeds. Finally I found one that is intersting to
+me: <a href="http://icesjms.oxfordjournals.org/">ICES Journal of
+Marine Science</a>. There is just too much going on for me to go
+look for a journal each month and I can't deal with any more
+email.<br />
+<br />
+e.g. stuff like this: Anderson et al., <a href=
+"http://icesjms.oxfordjournals.org/cgi/content/short/fsn061v1">Acoustic
+seabed classification: current practice and future
+directions</a>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-10T11_18_08.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-11T16_41_25.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-10T10_09_42.txt" name=
+"e2008-09-10T10_09_42.txt"></a>
+<h2 class="date">09.10.2008 10:09</h2>
+<div class="blogbody">
+<h3 class="title">List of languages I know</h3>
+<div class="item-description">based on <a href=
+"http://www.openhex.org/blogs/nicoe/200809092210_List_of_programming_languages_I_know">
+this</a> and <a href=
+"http://dealmeida.net/2008/09/10/list-of-programming-languages-i-know">
+this</a><br />
+<br />
+The exact earlier years are fuzzy in my head...
+<pre>
+1979. BASIC
+1985. <a href=
+"http://en.wikipedia.org/wiki/Turbo_pascal'%3ETurbo%20Pascal%3C/a%3E198?.%20C1990.%20%3Ca%20href=">FORTRAN 66 &amp; 77</a>
+1990. CSH/TCSH
+1991. C++
+1991. ML (painful memories)
+1991. LISP
+1991. ADA
+1991. Make
+1991. Prolog
+1991. 68K assembly
+1991. MIPS assembly
+199?. Karol the !@#$%^&amp; Robot - tutoring students with this sucked
+1993. HTML (hardly a real language, but it the impact was huge)
+1994. Matlab
+1996. TCL
+1996. <a href="http://python.org">Python</a>
+1999. BASH
+2000. Java
+2000. Fortran 90/95
+2002. SQL
+2008. JavaScript
+</pre>
+I've stumbled through Perl and PHP, but I never really programmed
+in those two.<br />
+<br />
+Or how about start of preferred/heavily-used OSes:
+<pre>
+1978?. <a href=
+"http://en.wikipedia.org/wiki/HP_2640">HP Terminal</a>
+1984. <a href=
+"http://en.wikipedia.org/wiki/HP_150">MS DOS + HP Touch screen</a>
+1985. PC-DOS
+1989. VMS
+1989. TOPS-20
+1990. Windows 3.0
+1990. SunOS 4.x
+1990. Mac OS pre OSX
+1992. NeXT 
+1992. AIX
+1992. D-UX / Alpha 64 bit
+1993. Linux 
+1993. AmigaOS (version?)
+1993. (Free?) BSD on a PC
+1994. IRIX
+1999. Windows 98
+1996. VmWare
+2001. Mac OSX
+</pre>
+Not shown are the out dates for each OS when I stopped seriously
+using it. At the moment, I am left with Linux and MacOSX as my
+primary OSes with occasional use of Solaris and Windows XP.<br />
+<br />
+Trackback: <a href=
+"http://dealmeida.net/2008/09/10/the-meme-has-mutated">the meme has
+mutated</a> [dealmeida.net]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-10T10_09_42.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-10T11_18_08.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-09T17_20_36.txt" name=
+"e2008-09-09T17_20_36.txt"></a>
+<h2 class="date">09.09.2008 17:20</h2>
+<div class="blogbody">
+<h3 class="title">GeoCoastPilot on Panbo</h3>
+<div class="item-description">Thanks go to Ben Ellison for
+mentioning the GeoCoastPilot on <a href=
+"http://www.panbo.com/">Panbo</a> to help get people to evaluate
+our research prototype: <a href=
+"http://www.panbo.com/archives/2008/09/geocoastpilot_early_adopters_needed.html">
+GeoCoastPilot, early adopters needed!</a>
+<pre>
+(Psssst!... back at work but need a little distraction, preferably for a
+good cause?)  The screen shot above is worth seeing full size, but
+even then doesn't do justice to the highly dynamic GeoCoastPilot beta
+program I've been entranced with for the last hour or so. 
+...
+</pre>
+<img withgrayborder="True" src=
+"../attachments/2008-09/panbo-geocoastpilot.png" /><br />
+
+<br />
+Make sure to check out the comments for an interesting comparison
+with <a href="http://www.maxsea.com">MaxSea's</a> TimeZero.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/maxsea-timezero.jpg" />
+<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/navnet3d.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-09T17_20_36.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-10T10_09_42.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-09T17_03_40.txt" name=
+"e2008-09-09T17_03_40.txt"></a>
+<h2 class="date">09.09.2008 17:03</h2>
+<div class="blogbody">
+<h3 class="title">Michelle Weirathmueller's defense on Monday</h3>
+<div class="item-description"><b>UPDATE</b>: time change!
+Michelle's defense is at 9 AM now. And I am bummed out that have to
+miss her defense because I'm traveling for work.<br />
+<br />
+ACOUSTIC RANGING IN A DYNAMIC, MULTIPATH ENVIRONMENT by Michelle
+Weirathmueller
+<pre>
+An acoustic experiment was carried out in October 2007 in Portsmouth
+Harbor, New Hampshire, to measure the effects of environmental
+variability on acoustic range measurements over a distance of 948
+meters.  A fixed source and receiver measured the one-way travel time
+and signal level fluctuations over four days.  Wind, current speed,
+and tidal data were collected in order to assess their effects on the
+acoustic measurements. The environmental data collected during this
+experiment showed variability at many scales, both temporally and
+spatially throughout the harbor.  The acoustic data revealed the
+presence of multipath arrivals, with 2-3 strong arrivals visible for
+each transmitted ping.  A simple geometric model was used, along with
+ray-tracing, to describe fluctuations in arrival time and signal
+level.  Acoustic travel times between a fixed source and receiver were
+converted to range measurements and compared with GPS-derived ranges.
+This study provides a basis for understanding the capabilities and
+limitations of range measurements in Portsmouth Harbor, or similar
+dynamic multipath environments.
+.
+<b>9:00</b> AM Monday, September 15, 2008
+Chase Ocean Engineering Laboratory
+CCOM-Admiral's Conference Room
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-09T17_03_40.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-09T17_20_36.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-09T14_56_49.txt" name=
+"e2008-09-09T14_56_49.txt"></a>
+<h2 class="date">09.09.2008 14:56</h2>
+<div class="blogbody">
+<h3 class="title">Thunderbird consuming massive disk space</h3>
+<div class="item-description">I was wondering where all of my
+laptop's disk space had gone. I have a lot on my computer, but did
+I really fill up my my entire 150GB internal drive in less than a
+year? And I've even removed my Windows P VMWare image a while ago
+to get more space. I happened to look in ~/Library/Thunderbird and
+found that part of the tree on my disk was 19GB!! I discovered that
+my INBOX file for IMAP was most of that. Nothing I did in the
+interface that seemed safe did anything to help. I tried to
+<em>compact</em> the folder, but there was no change. On the
+server, my $MAIL inbox file is big at 250MB, but that shouldn't be
+a problem. Finally, I decided to shutdown Thunderbird, back up the
+INBOX and INBOX.msf elsewhere and then nuke both files from within
+my Thunderbird Library directory. It took about 10 minutes to start
+up the mail reader the next time, but my INBOX on my laptop is now
+only 35MB. More better!</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-09T14_56_49.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-09T17_03_40.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-09T14_56_00.txt" name=
+"e2008-09-09T14_56_00.txt"></a>
+<h2 class="date">09.09.2008 14:56</h2>
+<div class="blogbody">
+<h3 class="title">Eon Fusion</h3>
+<div class="item-description">This program looks to have influences
+of SGI Explorer, GeoZui4D and Fledermaus. Graphical data flow
+layout, time support, and a pretty package. Pretty pictures. Thanks
+to Art for telling Roland about this who told me.<br />
+<br />
+<a href="http://eonfusion.myriax.com/">Eon Fusion</a> by
+Myriax.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/eonfusion-myriax-programming.png" />
+<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/eonfusion-mapped-fish.png" />
+<br />
+<br />
+They need to explain this one more. How are they blending the photo
+and the sea level change?<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/eonfusion-waterlevel.png" />
+<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/eonfusion-lava-flow.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-09T14_56_00.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-09T14_56_49.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-08T07_25_02.txt" name=
+"e2008-09-08T07_25_02.txt"></a>
+<h2 class="date">09.08.2008 07:25</h2>
+<div class="blogbody">
+<h3 class="title">Latex source to seismic-py paper</h3>
+<div class="item-description">In the spirit of open source
+software, I've put the LaTeX source to my latest paper online. Here
+is a little bit of it:<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/papers/schwehr2008-pythonpapers-seismic-py.tex">
+schwehr2008-pythonpapers-seismic-py.tex</a>
+<pre>
+<tt><b><font color="#0000FF">\documentclass</font></b><font color=
+"#993399">[agupp]</font><font color="#009900">{aguplus}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color=
+"#009900">{graphicx}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color=
+"#993399">[usenames]</font><font color="#009900">{color}</font> 
+<b><font color="#0000FF">\usepackage</font></b><font color=
+"#009900">{hyperref}</font>
+<i><font color="#9A1900">%\usepackage[draft]{hyperref}</font></i>
+<b><font color="#0000FF">\let\cross</font></b>=<b><font color=
+"#0000FF">\times\lefthead</font></b><font color=
+"#009900">{Schwehr}</font>
+<b><font color="#0000FF">\righthead</font></b><font color=
+"#009900">{seismic-py, Python Papers 2008}</font>
+<b><font color="#0000FF">\hypersetup</font></b>{
+   pdftitle = seismic-py: Reading seismic data with Python
+   pdfauthor = Schwehr,
+   pdfsubject = Geophysical data processing,
+   pdfkeywords = SEGY Python binary seismic time-series
+}
+<b><font color="#0000FF">\hypersetup</font></b>{
+     colorlinks = true,
+     linkcolor = red,
+     anchorcolor = red,
+     citecolor = blue, 
+     filecolor = red, 
+     pagecolor = red,
+     urlcolor = blue
+}
+<b><font color="#0000FF">\newcommand</font></b><font color=
+"#009900">{\module}</font><font color=
+"#993399">[1]</font><font color="#009900">{\texttt{#1}}</font>
+<b><font color="#0000FF">\newcommand</font></b><font color=
+"#009900">{\pythondict}</font><font color=
+"#993399">[1]</font><font color="#009900">{\texttt{#1}}</font>
+<b><font color="#0000FF">\newcommand</font></b><font color=
+"#009900">{\ascii}{\textsc{ASCII}}</font>
+<b><font color="#0000FF">\newcommand</font></b><font color=
+"#009900">{\ebcdic}{\textsc{EBCDIC}}</font>
+<i><font color="#9A1900">%cite Barry et al. [1975]</font></i>
+<i><font color="#9A1900">%citet Barry et al. [1975]</font></i>
+<i><font color="#9A1900">%citep [Barry et al., 1975]</font></i>
+<i><font color=
+"#9A1900">%citet* Barry, Cavers, and Kneale [1975]</font></i>
+<i><font color=
+"#9A1900">%citep* [Barry, Cavers, and Kneale, 1975]</font></i>
+<b><font color="#0000FF">\begin</font></b><font color=
+"#009900">{document}</font>
+<b><font color="#0000FF">\title</font></b><font color=
+"#009900">{seismic-py: Reading seismic data with Python}</font>
+<b><font color="#0000FF">\author</font></b><font color=
+"#009900">{Kurt Schwehr}</font>
+<b><font color="#0000FF">\affil</font></b><font color=
+"#009900">{Center for Coastal and Ocean Mapping, University of New Hampshire}</font>
+<b><font color="#0000FF">\authoraddress</font></b>{
+K. Schwehr, Center for Coastal and Ocean Mapping,
+University of New Hampshire,
+Chase Ocean Engineering
+24 Colovos Rd,
+Durham, NH 03824,
+schwehr@ccom.unh.edu, <b><font color=
+"#0000FF">\url</font></b><font color=
+"#009900">{http://schwehr.org}</font>
+}
+<b><font color="#0000FF">\begin</font></b><font color=
+"#009900">{abstract}</font>
+The field of seismic exploration of the Earth has changed dramatically
+over the last half a century.  The Society of Exploration
+Geophysicists (SEG) has worked to create standards to store the vast
+...
+SVN <font color=
+"#FF6600">$Id: seismic-py.tex 10096 2008-08-15 19:19:43Z schwehr $</font>
+<b><font color="#0000FF">\end</font></b><font color=
+"#009900">{abstract}</font>
+<b><font color="#0000FF">\section</font></b><font color=
+"#009900">{INTRODUCTION}</font>
+Seismic data systems use acoustic pulses to send sound waves through
+water and the solid earth to map layers within the subsurface.  They
+vary from simple single source and single receiver systems to multiple
+sources and long arrays of geophones or hydrophones.  The processing
+of the received sound waves requires a range of data storage and
+signal analysis techniques.  Python can support both the data archival
+and precessing tasks.
+...
+<b><font color="#0000FF">\bibliographystyle</font></b><font color=
+"#009900">{agu}</font>
+<b><font color="#0000FF">\bibliography</font></b><font color=
+"#009900">{seismic-py}</font>
+<b><font color="#0000FF">\end</font></b><font color=
+"#009900">{document}</font>
+</tt>
+</pre>
+The syntax highlighting of the LaTeX source was done not with
+code2html. I'm trying out <a href=
+"http://www.gnu.org/software/src-highlite/source-highlight.html">GNU
+source-highlight</a>. It's being maintained and code2html doesn't
+support as many languages.
+<pre>
+source-highlight -i short.tex -o short.html -s latex -d --out-format html
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-08T07_25_02.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-09T14_56_00.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-07T10_17_06.txt" name=
+"e2008-09-07T10_17_06.txt"></a>
+<h2 class="date">09.07.2008 10:17</h2>
+<div class="blogbody">
+<h3 class="title">Making python programs have an importable
+main</h3>
+<div class="item-description">I keep trying to make my python code
+better. Python is a great language, but as with all languages, how
+you use it strong impacts how well your code works and how
+maintainable the code is (both by the author and external people
+who will see the code). I just started switching to making the code
+behind main as a function. Here is an article that talks about why
+this is good. It also gives good reason to avoid calling sys.exit()
+as much as is possible.<br />
+<br />
+<a href=
+"http://utcc.utoronto.ca/~cks/space/blog/python/ImportableMain">Why
+your main program should be importable</a> by Chris Siebenmann.
+<ul>
+<li>For debugging your code with a python shell.</li>
+<li>For pychecker, pylint, epydoc, or other system that wants to
+import your code and and use python to understand the code</li>
+</ul>
+I should look at how I do OptionParser. It is often hard to
+interact with my code via a shell.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-07T10_17_06.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-08T07_25_02.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-06T22_57_11.txt" name=
+"e2008-09-06T22_57_11.txt"></a>
+<h2 class="date">09.06.2008 22:57</h2>
+<div class="blogbody">
+<h3 class="title">Science team leaves the Healy</h3>
+<div class="item-description">The aloftcon camera caught this image
+of the helocopter offloading the science team from the Healy. Most
+of the science team is currently in SeaTac waiting for various
+flights home.<br />
+<br />
+<img withgrayborder="True" title="Disembarking to Barrow" src=
+"../attachments/2008-09/healy-offload-20080906-0301.jpg" />
+<br />
+<br />
+Original: <a href=
+"http://mgds.ldeo.columbia.edu/healy/photos/aloftcon/2008/20080906-0301.jpeg">
+20080906-0301.jpeg</a><br />
+<br />
+The location in Google Earth:<br />
+<br />
+<img withgrayborder="True" title="Healy off of Barrow" src=
+"../attachments/2008-09/healy-location-20080906-0301.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-06T22_57_11.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-07T10_17_06.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-05T17_39_39.txt" name=
+"e2008-09-05T17_39_39.txt"></a>
+<h2 class="date">09.05.2008 17:39</h2>
+<div class="blogbody">
+<h3 class="title">Adv Tech to Explore the Oceans and Shallow Survey
+2008</h3>
+<div class="item-description">Don't for get that <a href=
+"http://shallowsurvey2008.org/">Shallow Survey 2008</a> is Oct
+21-24. The conference is just down the road from CCOM.<br />
+<br />
+<a href="http://www.usm.edu/cost/bennettsymposium">Bennett
+Symposium</a>
+<pre>
+It is my pleasure to invite you to participate in the upcoming Bennett
+Symposium on "Using Advanced Technology to Explore the Oceans" to be
+held on October 9th and 10th of 2008 on the Hattiesburg campus of the
+University of Southern Mississippi.  I will be coordinating this
+symposium as winner of the 2008-2009 Bennett Professorship which was
+established to honor the son of Mr. and Mrs. T.W. Bennett, Sr., of
+Natchez, Mississippi. This endowed professorship is named in honor of
+their son, T.W. (Buddy) Bennett, Jr., who graduated from The
+University of Southern Mississippi in 1967, but has been "missing in
+action" since his plane crashed in Viet Nam in 1972.  The symposium
+takes place every two years to honor Buddy and this year's topic
+should be of interest to many of you on this mailing list.  Speakers
+from all across the country will make presentations on topics such as:
+.
+- manned and unmanned submersibles, including AUVs 
+- autonomous gliders
+- the latest in ROV technology
+- seafloor mapping (LIDAR as well as multibeam)
+- precision navigation
+- the new NOAA ship and its telepresence technology
+- deep diving for natural product research
+- remote seafloor observatories
+- Microsensors for biological research
+- advanced sonar systems
+- satellite-based bathymetric measurements
+- and other topics!
+Regards,
+Vernon Asper
+</pre>
+And <a href=
+"http://www.hydro-international.com/news/id2681-Hydro_Symposium_Set_for_Success.html">
+Hydro8</a> [Hydro International] in Liverpool 4-6 November.
+<a href="http://www.hydro8.org.uk/">http://www.hydro8.org.uk/</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-05T17_39_39.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-06T22_57_11.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-05T17_32_50.txt" name=
+"e2008-09-05T17_32_50.txt"></a>
+<h2 class="date">09.05.2008 17:32</h2>
+<div class="blogbody">
+<h3 class="title">Building track lines over a region</h3>
+<div class="item-description">For a CCOM/JHC project, Jim G. needs
+a series of lines 500m apart over a region. This is a lot of work
+in a tool like Fledermaus to create this kind of thing. This is
+something that people normally use <a href=
+"http://www.hypack.com/">HyPack</a> to do.<br />
+<br />
+I wanted to try out doing this kind of task with PostGIS and I
+needed a quick break. Here is how I did it, but it took a bit
+longer than I was expecting. First I need to compute the
+intersection of the bounding polygon with a series of lines running
+easy west. Here is mklines.py:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#2040A0">x0</font> <font color=
+"#4444FF">=</font> <font color="#4444FF">-</font><font color=
+"#FF0000">77.4589</font>
+<font color="#2040A0">x1</font> <font color=
+"#4444FF">=</font> <font color="#4444FF">-</font><font color=
+"#FF0000">73.2555</font>
+<font color="#444444">#</font>
+<font color="#2040A0">y0</font> <font color=
+"#4444FF">=</font> <font color="#FF0000">29.9144</font>
+<font color="#2040A0">y1</font> <font color=
+"#4444FF">=</font> <font color="#FF0000">33.1567</font>
+<font color="#444444">#</font>
+<font color="#2040A0">dy</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">y1</font> <font color=
+"#4444FF">-</font> <font color="#2040A0">y0</font>
+<font color="#2040A0">ny</font> <font color=
+"#4444FF">=</font> <font color="#FF0000">1</font><font color=
+"#4444FF">+</font> <font color="#2040A0">int</font><font color=
+"#4444FF">(</font><font color="#2040A0">dy</font> / <font color=
+"#FF0000">0.005</font><font color="#4444FF">)</font> <font color=
+"#444444"># 500m</font>
+<font color="#444444">#</font>
+<font color="#2040A0">poly</font><font color=
+"#4444FF">=</font><font color=
+"#008000">'POLYGON((-73.25549438 33.04821167, -76.33447876 33.15672241, -77.41587524 31.44949341, -77.45893921 30.53608643, -77.02830444 29.91438477, -76.35857666 30.64095947, -73.88764160 31.84687744, -73.25549438 33.04821167))'</font>
+<font color="#444444">#</font>
+<strong>for</strong> <font color=
+"#2040A0">i</font> <strong>in</strong> <font color=
+"#2040A0">range</font> <font color="#4444FF">(</font><font color=
+"#2040A0">ny</font><font color="#4444FF">)</font><font color=
+"#4444FF">:</font>
+    <font color="#2040A0">y</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">y0</font> <font color=
+"#4444FF">+</font> <font color="#2040A0">i</font> <font color=
+"#4444FF">*</font> <font color="#FF0000">0.005</font>
+    <font color="#2040A0">line</font> <font color=
+"#4444FF">=</font> <font color=
+"#008000">'(%f %f, %f %f)'</font> <font color=
+"#4444FF">%</font> <font color="#4444FF">(</font><font color=
+"#2040A0">x0</font>,<font color="#2040A0">y</font>,<font color=
+"#2040A0">x1</font>,<font color="#2040A0">y</font><font color=
+"#4444FF">)</font>
+    <font color="#2040A0">linestring</font> <font color=
+"#4444FF">=</font> <font color=
+"#008000">'LINESTRING(%f %f, %f %f)'</font> <font color=
+"#4444FF">%</font> <font color="#4444FF">(</font><font color=
+"#2040A0">x0</font>,<font color="#2040A0">y</font>,<font color=
+"#2040A0">x1</font>,<font color="#2040A0">y</font><font color=
+"#4444FF">)</font>
+    <strong>print</strong> <font color=
+"#008000">"SELECT AsText( ST_Intersection('%s', '%s') );"</font> <font color="#4444FF">%</font> <font color="#4444FF">(</font><font color="#2040A0">poly</font>,<font color="#2040A0">linestring</font><font color="#4444FF">)</font>
+</pre>
+It outputs lines that look like this:
+<pre>
+<strong>SELECT</strong> AsText( 
+         ST_Intersecti<strong>on</strong>(
+         <font color=
+"#008000">'POLYGON((-73.25549438 33.04821167, -76.33447876 33.15672241, -77.41587524 31.44949341, -77.45893921 30.53608643, -77.02830444 29.91438477, -76.35857666 30.64095947, -73.88764160 31.84687744, -73.25549438 33.04821167))'</font>, 
+         <font color=
+"#008000">'LINESTRING(-77.458900 29.914400, -73.255500 29.914400)'</font>
+         )
+       );
+</pre>
+Now setup postgis on my mac:
+<pre>
+% <b>fink install postgis83</b>
+% <b>sudo -u postgres createuser -U postgres $USER</b>
+% <b>createdb somedb</b>
+% <b>psql somedb "CREATE LANGUAGE plpgsql;"</b>
+% <b>psql -f /sw/share/doc/postgis83/lwpostgis.sql -d somedb</b>
+% <b>psql -f /sw/share/doc/postgis83/spatial_ref_sys.sql -d somedb</b>
+</pre>
+Now pipe the results from mklines into PostGIS:
+<pre>
+% <b>mklines.py  | psql somedb | head -4</b>
+                             astext                              
+-----------------------------------------------------------------
+ LINESTRING(-77.0283149893808 29.9144,-77.0282904015892 29.9144)
+(1 row)
+</pre>
+That looks good, so grab the coordinates:
+<pre>
+% <b>mklines.py  | psql somedb | grep LINESTRING | cut -c12- &gt; results.txt</b>
+</pre>
+results.txt looks like this:
+<pre>
+(-77.0283149893808 29.9144,-77.0282904015892 29.9144)
+(-77.031778344859 29.9194,-77.0236815996312 29.9194)
+(-77.0352417003373 29.9244,-77.0190727976732 29.9244)
+(-77.0387050558155 29.9294,-77.0144639957152 29.9294)
+(-77.0421684112938 29.9344,-77.0098551937572 29.9344)
+</pre>
+From here, we need to get each line of two points into the form
+that will work with Fledermaus.
+<pre>
+x0 y0
+x1 y1
+</pre>
+We also need to create a shell script of cmdop commands to write
+out an sd file for each line. Here is sdfiles.py:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">#</font>
+<font color="#2040A0">script</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">file</font> <font color=
+"#4444FF">(</font><font color=
+"#008000">'make-sd-files.sh'</font>,<font color=
+"#008000">'w'</font><font color="#4444FF">)</font>
+<font color="#2040A0">script</font>.<font color=
+"#2040A0">write</font><font color="#4444FF">(</font><font color=
+"#008000">'#!/usr/bin/env bash\n'</font><font color=
+"#4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040A0">i</font> <font color=
+"#4444FF">=</font> <font color="#FF0000">0</font> <font color=
+"#444444"># Keep track of the line numbers</font>
+<strong>for</strong> <font color=
+"#2040A0">line</font> <strong>in</strong> <font color=
+"#2040A0">file</font><font color="#4444FF">(</font><font color=
+"#008000">'results.txt'</font><font color=
+"#4444FF">)</font><font color="#4444FF">:</font>
+    <font color="#2040A0">i</font> <font color=
+"#4444FF">+</font><font color="#4444FF">=</font> <font color=
+"#FF0000">1</font>
+    <font color="#2040A0">line</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">line</font>.<font color=
+"#2040A0">strip</font><font color="#4444FF">(</font><font color=
+"#008000">'()\n'</font><font color="#4444FF">)</font>
+    <font color="#2040A0">start</font>,<font color=
+"#2040A0">end</font> <font color="#4444FF">=</font> <font color=
+"#2040A0">line</font>.<font color=
+"#2040A0">split</font><font color="#4444FF">(</font><font color=
+"#008000">','</font><font color="#4444FF">)</font>
+    <font color="#2040A0">out</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">file</font><font color=
+"#4444FF">(</font><font color=
+"#008000">'%03d.xy'</font><font color="#4444FF">%</font><font color="#2040A0">i</font>,<font color="#008000">'w'</font><font color="#4444FF">)</font>
+    <font color="#2040A0">out</font>.<font color=
+"#2040A0">write</font><font color="#4444FF">(</font><font color=
+"#008000">'%s\n%s\n'</font> <font color=
+"#4444FF">%</font><font color="#4444FF">(</font><font color=
+"#2040A0">start</font>,<font color="#2040A0">end</font><font color=
+"#4444FF">)</font><font color="#4444FF">)</font>
+    <font color="#2040A0">out</font>.<font color=
+"#2040A0">close</font><font color="#4444FF">(</font><font color=
+"#4444FF">)</font>
+    <font color="#2040A0">cmd</font> <font color=
+"#4444FF">=</font> <font color=
+"#008000">'cmdop mklines -in %03d.xy -out line%03d.sd -data xy'</font> <font color="#4444FF">%</font> <font color="#4444FF">(</font><font color="#2040A0">i</font>,<font color="#2040A0">i</font><font color="#4444FF">)</font>
+    <font color="#2040A0">script</font>.<font color=
+"#2040A0">write</font><font color="#4444FF">(</font><font color=
+"#2040A0">cmd</font><font color="#4444FF">+</font><font color=
+"#008000">'\n'</font><font color="#4444FF">)</font>
+</pre>
+After running the script, we now have make-sd-files.sh that looks
+like this:
+<pre>
+#!/usr/bin/env bash
+cmdop mklines -in 001.xy -out line001.sd -data xy
+cmdop mklines -in 002.xy -out line002.sd -data xy
+cmdop mklines -in 003.xy -out line003.sd -data xy
+cmdop mklines -in 004.xy -out line004.sd -data xy
+cmdop mklines -in 005.xy -out line005.sd -data xy
+...
+</pre>
+Run the script and watch it create over 600 sd files. From here,
+open Fledermaus. Then <i>File -&gt; Open Data Object</i>. Then
+select all the sd files. <i>File -&gt; Save Scene</i> and you are
+done.<br />
+<br />
+Python and PostGIS make this task pretty easy. Don't forget to
+cleanup the 1200 temp files now sitting on your computer after
+trying this <img src=
+"../moods/smilies/smiley.gif" alt=":)" border=
+"0" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-05T17_32_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-05T17_39_39.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-05T13_40_46.txt" name=
+"e2008-09-05T13_40_46.txt"></a>
+<h2 class="date">09.05.2008 13:40</h2>
+<div class="blogbody">
+<h3 class="title">Maritime Casualty Investigation Association</h3>
+<div class="item-description"><a href=
+"http://www.maritimeaccident.org/about-2/mcia/">MCIA Maritime
+Casualty Investigation Association</a>
+<pre>
+Maritime Accident Casebook has been asked to conduct a survey
+regarding a proposal for a Maritime Casualty Investigation Association
+to feel out individuals and various industry sectors about the
+desirability of such a body. The purpose of this email is to gain
+feedback on the proposal.
+.
+It is intended that the association actively promote maritime/offshore
+casualty investigation as a profession, act as a 'watering-hole' for
+the public and private sectors, promote the concept of casualty
+investigation as an element in safety enhancement and risk reduction
+rather than liability-focussed, develop a unified set of competencies
+for maritime/offshore casualty investigation and encourage compliance
+with relevant IMO codes and obligations.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-05T13_40_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-05T17_32_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-05T08_54_38.txt" name=
+"e2008-09-05T08_54_38.txt"></a>
+<h2 class="date">09.05.2008 08:54</h2>
+<div class="blogbody">
+<h3 class="title">Bee in the garden</h3>
+<div class="item-description">A little something to offset all the
+code from early this morning:<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/bee.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-05T08_54_38.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-05T13_40_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-05T07_50_45.txt" name=
+"e2008-09-05T07_50_45.txt"></a>
+<h2 class="date">09.05.2008 07:50</h2>
+<div class="blogbody">
+<h3 class="title">trac with django</h3>
+<div class="item-description"><b>UPDATE:</b> <a href=
+"http://www.djangosnippets.org/snippets/1047/">Template filter
+implementing the Trac wiki markup language</a>
+[djangosnippets]<br />
+<br />
+I've been trying to come up with creative ways to approach learning
+django. Having django 1.0 released is very exciting, but as a
+beginner, the differences between the two books I have and what
+actually works is fairly large. My next django app is appearing to
+be somewhat complicated. I have yet to figure out what the database
+models should look like. I figured that I would look at an
+application that I think is fairly impressive and see what the
+corresponding model.py might look like. For my first try, I picked
+<a href="http://trac.edgewall.org/">trac</a> - an integrated SCM
+and project management tool.
+<pre>
+% <b>fink install trac-py25</b>
+% <b>mkdir -p ~/Desktop/trac-django/trac</b>
+% <b>cd ~/Desktop/trac-django/trac</b>
+% <b>trac-admin `pwd` initenv</b>
+% <b>htdigest -c .htdigest localhost $USER</b>
+enter the password you want
+% <b>tracd -p 9000 --auth="*",`pwd`/.htdigest,localhost `pwd`</b>
+% <b>open http://localhost:9000/</b>
+</pre>
+Now log in with your username and make some changes to the wiki
+pages and add a ticket or two with some updates. Now kill that
+tracd webserver. It's time to work with django.
+<pre>
+% <b>cd ~/Desktop/trac-django</b>
+% <b>django-admin.py startproject monitor_trac</b>
+% <b>cd monitor_trac</b>
+Edit settings.py to have a database of sqlite3 and a database of trac.db
+% <b>ln -s ../trac/db/trac.db</b>
+% <b>python manage.py inspectdb &gt; models_autogen.py</b>
+</pre>
+That last inspectdb call will go into the trac database and try to
+build the python code to represent the tables in the trac database.
+Time to see what we have.
+<pre>
+ % <b>sqlite3 trac.db .tables</b>
+sqlite3 trac.db .tables
+attachment         node_change        session_attribute  version          
+auth_cookie        permission         system             wiki             
+component          report             ticket           
+enum               revision           ticket_change    
+milestone          session            ticket_custom    
+% <b>sqlite3 trac.db ".schema wiki"</b>
+CREATE TABLE wiki (
+    name text,
+    version integer,
+    time integer,
+    author text,
+    ipnr text,
+    text text,
+    comment text,
+    readonly integer,
+    UNIQUE (name,version)
+);
+CREATE INDEX wiki_time_idx ON wiki (time);
+</pre>
+Here is what django thought about that table:
+<pre>
+<strong>class</strong> <font color=
+"#2040A0">Wiki</font><font color="#4444FF">(</font><font color=
+"#2040A0">models</font>.<font color=
+"#2040A0">Model</font><font color="#4444FF">)</font><font color=
+"#4444FF">:</font>
+    <font color="#2040A0">name</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">TextField</font><font color=
+"#4444FF">(</font><font color="#2040A0">blank</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font><font color=
+"#4444FF">)</font>
+    <font color="#2040A0">version</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">IntegerField</font><font color=
+"#4444FF">(</font><font color="#2040A0">null</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font>, <font color=
+"#2040A0">blank</font><font color="#4444FF">=</font><font color=
+"#2040A0">True</font><font color="#4444FF">)</font>
+    <font color="#2040A0">time</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">IntegerField</font><font color=
+"#4444FF">(</font><font color="#2040A0">null</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font>, <font color=
+"#2040A0">blank</font><font color="#4444FF">=</font><font color=
+"#2040A0">True</font><font color="#4444FF">)</font>
+    <font color="#2040A0">author</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">TextField</font><font color=
+"#4444FF">(</font><font color="#2040A0">blank</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font><font color=
+"#4444FF">)</font>
+    <font color="#2040A0">ipnr</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">TextField</font><font color=
+"#4444FF">(</font><font color="#2040A0">blank</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font><font color=
+"#4444FF">)</font>
+    <font color="#2040A0">text</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">TextField</font><font color=
+"#4444FF">(</font><font color="#2040A0">blank</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font><font color=
+"#4444FF">)</font>
+    <font color="#2040A0">comment</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">TextField</font><font color=
+"#4444FF">(</font><font color="#2040A0">blank</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font><font color=
+"#4444FF">)</font>
+    <font color="#2040A0">readonly</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">models</font>.<font color=
+"#2040A0">IntegerField</font><font color=
+"#4444FF">(</font><font color="#2040A0">null</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font>, <font color=
+"#2040A0">blank</font><font color="#4444FF">=</font><font color=
+"#2040A0">True</font><font color="#4444FF">)</font>
+    <strong>class</strong> <font color=
+"#2040A0">Meta</font><font color="#4444FF">:</font>
+        <font color="#2040A0">db_table</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">u</font><font color=
+"#008000">'wiki'</font>
+</pre>
+It doesn't look like this will work right. Let's check.
+<pre>
+% <b>python manage.py startapp trac</b>
+Error: 'trac' conflicts with the name of an existing Python module and cannot be used as an app name. Please try another name.
+% <b>python manage.py startapp dt</b>
+% <b>rm trac.db</b> # Get rid of the symbolic link to keep the original database intact
+</pre>
+Now put the above wiki model into dt/models.py. Then edit the
+INSTALLED_APPS in settings.py to look like this:
+<pre>
+INSTALLED_APPS = (
+    'monitor_trac.dt',
+)
+</pre>
+Time to create and view the database table that does with this
+model.
+<pre>
+% <b>python manage.py sqlall dt</b>
+BEGIN;
+CREATE TABLE "wiki" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "name" text NOT NULL,
+    "version" integer NULL,
+    "time" integer NULL,
+    "author" text NOT NULL,
+    "ipnr" text NOT NULL,
+    "text" text NOT NULL,
+    "comment" text NOT NULL,
+    "readonly" integer NULL
+)
+;
+COMMIT;
+</pre>
+Looks like there is an extra "id" field as the primary key. Django
+does not currently understand the <b>UNIQUE(name,version)</b>
+constraint on the database, but I think that it wouldn't be too
+much work to dump the trac database and rebuild it with the above
+table plus the UNIQUE.<br />
+<br />
+Looking through the rest of the tables, I don't see any other than
+UNIQUE that might trip up django. It looks like it might not be
+that hard to completely rewrite trac as a django application. If
+only I had the time! I'm thinking the hardest part would be the
+integration with svn or other revision control systems. But maybe
+if the project used the python based <a href=
+"http://www.selenic.com/mercurial">Mercurial</a> (hg), it might be
+doable in a short period of time.<br />
+<br />
+This excercise did not quite give me the insite I was hoping for on
+my application. I think next, I'll look into on of the flight
+operations tools called IPRW (Image Product Release Website). That
+database (using mysql, jQuery, php, and gallery2) has a lot of
+interesting components that I'd like to emulate in django.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-05T07_50_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-05T08_54_38.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-04T19_38_32.txt" name=
+"e2008-09-04T19_38_32.txt"></a>
+<h2 class="date">09.04.2008 19:38</h2>
+<div class="blogbody">
+<h3 class="title">seismic-py paper out in Python Papers</h3>
+<div class="item-description">Just out... this is the first time
+I've written a peer reviewed paper by myself. A very different
+experience. This paper is much better thanks to the
+reviewers.<br />
+<br />
+<a href=
+"http://ojs.pythonpapers.org/index.php/tpp/issue/current">Python
+Papers vol 3, No 2</a><br />
+<br />
+<a href=
+"http://pythonpapers.blogspot.com/2008/09/entire-volume-3-issue-2-in-one-pdf.html">
+Entire Volume 3 Issue 2 in one PDF</a><br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/pythonpapers-3-2-fig1-chirp.png" />
+<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/papers/schwehr2008-pythonpapers-seismic-py.pdf">
+seismic-py: Reading seismic data with Python</a> by Kurt Schwehr
+<pre>
+Center for Coastal and Ocean Mapping, University of New Hampshire
+Abstract. The field of seismic exploration of the Earth has changed
+dramatically over the last half a century. The Society of Exploration
+Geophysicists (SEG) has worked to create standards to store the vast
+amounts of seismic data in a way that will be portable across computer
+architectures. However, it has been impossible to predict the needs of the
+immense range of seismic data acquisition systems. As a result, vendors have
+had to bend the rules to accommodate the needs of new instruments and
+experiment types. For low level access to seismic data, there is need for a
+standard open source library to allow access to a wide range of vendor data
+files that can handle all of the variations. A new seismic software package,
+seismic-py, provides an infrastructure for creating and managing drivers for
+each particular format. Drivers can be derived from one of the known formats
+and altered to handle any slight variations. Alternatively drivers can be
+developed from scratch for formats that are very different from any previously
+defined format. Python has been the key to making driver development easy
+and efficient to implement. The goal of seismic-py is to be the base system
+that will power a wide range of experimentation with seismic data and at the
+same time provide clear documentation for the historical record of seismic
+data formats.
+</pre>
+<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/pythonpapers-3-2.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-04T19_38_32.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-05T07_50_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-04T18_41_29.txt" name=
+"e2008-09-04T18_41_29.txt"></a>
+<h2 class="date">09.04.2008 18:41</h2>
+<div class="blogbody">
+<h3 class="title">ORBCOM AIS Sat Data</h3>
+<div class="item-description">From the USCG RDC Highlights (29 Aug
+2008):
+<pre>
+<b>New AIS Satellite Data</b>
+The long anticipated launch of the ORBCOMM AIS satellite occurred on
+19 June. In all, there were six AIS satellites launched. The first
+being activated is the USCG funded satellite.  Initial indications are
+that the satellite is operating and does receive AIS signals. ORBCOMM
+has been provided with all the information needed to send the
+satellite's live AIS data to the R&amp;D Center's server. The R&amp;D Center
+received the first data in early August. The initial goal is to have a
+preliminary assessment of the satellite's coverage performance prior
+to the Technical Exchange on AIS via Satellite (TEXAS) meeting
+scheduled for 3 and 4 September in the Washington, D.C. area.
+</pre>
+This looks interesting... looks like other groups use 'Viz' in
+their software titles. I need to find out more about their Viz
+Tools.
+<pre>
+<b>Interim Viz Tools Assessment Completed</b>
+The visualization tool system AKA, Viz Tools, obtains, consolidates,
+manages, shares, and displays information on arriving vessels,
+situational status and daily operations for use by the Sector Miami
+Sector Command Center (SCC) watch team. Viz Tools consolidates
+information from USCG enterprise and commercial sources. The RDC has
+completed a concept evaluation of the software provided to and
+accessed by SCC watch standers via their standard USCG
+workstations. The informal assessment demonstrated that this
+automation effectively boosts SCC watch standers' situational
+awareness and response planning activities and thereby enhances SCC's
+operations. The results of the informal assessment are being used by
+CG-7412 to reduce performance risks in the new USCG Command 21 Program
+which is procuring data management capabilities similar to those in
+Viz Tools.
+Project: Visualization Tools for Situational Awareness and Emergency Response
+</pre>
+Wow... I talked about using commercial airlines for airphotos a
+couple years ago in my blog and now this:
+<pre>
+... Another upcoming white paper will explore the concept of
+non-traditional surveillance assets (outfitting of commercial
+airlines) as part of sovereign MDA.
+</pre>
+I was thinking more about over land, but over water works
+too.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-04T18_41_29.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-04T19_38_32.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-04T10_04_39.txt" name=
+"e2008-09-04T10_04_39.txt"></a>
+<h2 class="date">09.04.2008 10:04</h2>
+<div class="blogbody">
+<h3 class="title">UDP with python</h3>
+<div class="item-description">We have a weather station in our
+building sending UDP messages to the network. Here is some quickly
+thrown together python code to listen to UDP messages. It doesn't
+have all the fancy features, but it illustrates how easy it is to
+start getting data. I'm using the USCG N-AIS style logging format
+with a station name and Unix UTC timestamp at the end of each line.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040A0">socket</font>
+<strong>import</strong> <font color="#2040A0">time</font>
+<font color="#444444">#</font>
+<font color="#2040A0">host</font><font color=
+"#4444FF">=</font><font color=
+"#008000">'0.0.0.0'</font> <font color=
+"#444444"># All interfaces</font>
+<font color="#2040A0">device_address</font> <font color=
+"#4444FF">=</font> <font color="#008000">'192.168.8.35'</font>
+<font color="#2040A0">port</font><font color=
+"#4444FF">=</font><font color="#FF0000">4000</font>
+<font color="#2040A0">buffer</font> <font color=
+"#4444FF">=</font> <font color="#FF0000">10000</font>
+<font color="#444444">#</font>
+<font color="#2040A0">sock</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">socket</font>.<font color=
+"#2040A0">socket</font><font color="#4444FF">(</font><font color=
+"#2040A0">socket</font>.<font color=
+"#2040A0">AF_INET</font>,<font color=
+"#2040A0">socket</font>.<font color=
+"#2040A0">SOCK_DGRAM</font><font color="#4444FF">)</font>
+<font color="#2040A0">sock</font>.<font color=
+"#2040A0">bind</font><font color="#4444FF">(</font><font color=
+"#4444FF">(</font><font color="#2040A0">host</font>,<font color=
+"#2040A0">port</font><font color="#4444FF">)</font><font color=
+"#4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040A0">verbose</font><font color=
+"#4444FF">=</font><font color="#2040A0">True</font>
+<font color="#444444">#</font>
+<strong>while</strong> <font color="#FF0000">1</font><font color=
+"#4444FF">:</font>
+    <font color="#2040A0">data</font>,<font color=
+"#2040A0">addr</font> <font color="#4444FF">=</font> <font color=
+"#2040A0">sock</font>.<font color=
+"#2040A0">recvfrom</font><font color="#4444FF">(</font><font color=
+"#2040A0">buffer</font><font color="#4444FF">)</font>
+    <strong>if</strong> <font color=
+"#2040A0">addr</font><font color="#4444FF">[</font><font color=
+"#FF0000">0</font><font color="#4444FF">]</font><font color=
+"#4444FF">!</font><font color="#4444FF">=</font><font color=
+"#2040A0">device_address</font><font color="#4444FF">:</font>
+        <strong>if</strong> <font color=
+"#2040A0">verbose</font><font color="#4444FF">:</font>
+            <strong>print</strong> <font color=
+"#008000">'dropping data from '</font>,<font color=
+"#2040A0">addr</font>
+        <strong>continue</strong>
+    <strong>if</strong> <strong>not</strong> <font color=
+"#2040A0">data</font><font color="#4444FF">:</font>
+        <strong>print</strong> <font color=
+"#008000">"No data."</font>
+        <strong>break</strong>
+    <strong>else</strong><font color="#4444FF">:</font>
+        <font color="#2040A0">timestamp</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">time</font>.<font color=
+"#2040A0">time</font><font color="#4444FF">(</font><font color=
+"#4444FF">)</font>
+        <strong>print</strong> <font color=
+"#008000">'%s,r%s,%d'</font> <font color=
+"#4444FF">%</font> <font color="#4444FF">(</font><font color=
+"#2040A0">data</font>.<font color=
+"#2040A0">strip</font><font color="#4444FF">(</font><font color=
+"#4444FF">)</font>,<font color="#2040A0">addr</font><font color=
+"#4444FF">[</font><font color="#FF0000">0</font><font color=
+"#4444FF">]</font>,<font color=
+"#2040A0">timestamp</font><font color="#4444FF">)</font>
+</pre>
+And here is a bit of test code to send out a UDP test message:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040A0">socket</font>
+<font color="#2040A0">UDP_IP</font><font color=
+"#4444FF">=</font><font color="#008000">"127.0.0.1"</font>
+<font color="#2040A0">UDP_PORT</font><font color=
+"#4444FF">=</font><font color="#FF0000">4000</font>
+<font color="#2040A0">MESSAGE</font><font color=
+"#4444FF">=</font><font color="#008000">"Hello, World!"</font>
+<font color="#2040A0">sock</font> <font color=
+"#4444FF">=</font> <font color="#2040A0">socket</font>.<font color=
+"#2040A0">socket</font><font color="#4444FF">(</font> <font color=
+"#2040A0">socket</font>.<font color=
+"#2040A0">AF_INET</font>, <font color="#444444"># Internet</font>
+                       <font color=
+"#2040A0">socket</font>.<font color=
+"#2040A0">SOCK_DGRAM</font> <font color=
+"#4444FF">)</font> <font color="#444444"># UDP</font>
+<font color="#2040A0">sock</font>.<font color=
+"#2040A0">sendto</font><font color="#4444FF">(</font> <font color=
+"#2040A0">MESSAGE</font>, <font color=
+"#4444FF">(</font><font color="#2040A0">UDP_IP</font>, <font color=
+"#2040A0">UDP_PORT</font><font color=
+"#4444FF">)</font> <font color="#4444FF">)</font>
+</pre>
+See also: <a href=
+"http://wiki.python.org/moin/UdpCommunication">http://wiki.python.org/moin/UdpCommunication</a><br />
+
+<br />
+Here are the results:
+<pre>
+ % <b>./log-udp.py</b>
+Date/Time:  8.09.04 14:21:46
+01 Reference             652,r192.168.8.35,1220538575
+02 Wind Speed Avg.         0.46 m/s,r192.168.8.35,1220538579
+03 Wind Gust               0.93 m/s,r192.168.8.35,1220538583
+04 Air Temperature        25.32 Deg.C,r192.168.8.35,1220538587
+05 Wind Direction        297.10 Deg.,r192.168.8.35,1220538591
+Date/Time:  8.09.04 14:22:46
+01 Reference             652,r192.168.8.35,1220538635
+02 Wind Speed Avg.         0.62 m/s,r192.168.8.35,1220538639
+03 Wind Gust               1.55 m/s,r192.168.8.35,1220538643
+04 Air Temperature        25.32 Deg.C,r192.168.8.35,1220538647
+05 Wind Direction        269.32 Deg.,r192.168.8.35,1220538651
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-04T10_04_39.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-04T18_41_29.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-04T08_28_58.txt" name=
+"e2008-09-04T08_28_58.txt"></a>
+<h2 class="date">09.04.2008 08:28</h2>
+<div class="blogbody">
+<h3 class="title">Unknown UNH</h3>
+<div class="item-description"><a href=
+"http://www.nh.com/apps/pbcs.dll/article?AID=/20080901/NHM01/121360229">
+Unknown UNH</a>
+<pre>
+<b>AT SEA</b>
+.
+As one of 30 sea grant institutions in the country UNH is part of a
+program Congress created in the 1960s for the purpose of marine-based
+research and education. UNH focuses most of its attention on the Isles
+of Shoals off the coast of Maine, where its Marine Program operates
+the Shoals Marine Laboratory in conjunction with Cornell
+University. In the summer especially, students and professors from
+across the country make this unique and fascinating ecological zone
+their home, conducting research and taking classes on a variety of
+related topics. UNH has made plenty of enduring contributions to
+marine research; just last February, the university's Center for
+Coastal and Oceanic Mapping/Joint Hydrographic Center revealed
+evidence that Alaska's continental slope extends 100 miles farther
+than previously believed, which may entitle the U.S. to a larger area
+of natural resources.
+<br /><br /><b>AND IN SPACE</b>
+.
+The space race may be on hiatus but UNH is rocketing skyward in
+research. The Institute for the Study of Earth, Oceans and Space (EOS)
+sits alongside Harvard and Princeton as a "high-impact university" for
+scholarly citations in the fields of geoscience and environmental
+science. EOS receives millions annually in research grants from
+federal agencies to conduct its studies. It is the university's
+largest research initiative, and it has supplied instrumentation to
+roughly 22 missions - a unique accomplishment, as universities are
+rarely granted permission to design such hardware. In July, the
+university held a three-day meeting commemorating the work of NASA's
+Federation of Earth Science Information Partners. The Federation, of
+which UNH is a member institution, oversees the use of satellite data
+to help create a more sustainable planet.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-04T08_28_58.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-04T10_04_39.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-03T19_13_57.txt" name=
+"e2008-09-03T19_13_57.txt"></a>
+<h2 class="date">09.03.2008 19:13</h2>
+<div class="blogbody">
+<h3 class="title">Canadian ice sheet breaks loose</h3>
+<div class="item-description"><a href=
+"http://www.usatoday.com/weather/climate/2008-09-03-ice-sheet-breaks-loose_N.htm">
+Huge ice sheet breaks loose in Canada</a> [USA Today / AP]
+<pre>
+A massive 19-square-mile ice shelf in Canada's northern
+Arctic has broken away from Ellesmere Island, surprising scientists
+who say the floating ice shelf is another dramatic indication of how
+warmer temperatures are changing the polar frontier.
+.
+Derek Mueller, an Arctic ice shelf specialist at Trent University in
+Ontario, said Wednesday that the 4,500-year-old Markham Ice Shelf
+separated in early August and is now drifting into the Arctic Ocean.
+</pre>
+<br />
+<br />
+Update Sep 04: More details: <a href=
+"http://blog.wired.com/wiredscience/2008/09/the-arctics-new.html">The
+Arctic's "New Reality": Another Ice Shelf Collapses</a> [wired
+science]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-03T19_13_57.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-04T08_28_58.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-03T08_35_10.txt" name=
+"e2008-09-03T08_35_10.txt"></a>
+<h2 class="date">09.03.2008 08:35</h2>
+<div class="blogbody">
+<h3 class="title">A flower in the garden</h3>
+<div class="item-description">The zucchini (?) plant in the garden
+is really going crazy in the garden. It's grabbing a hold of
+everything else and growing everywhere it can. Last year, I was
+never able to get one of these started. This year, it's taking care
+of itself. The weather has been really dry for the last week or
+more, so I'm having to water frequently.<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/garden-flower.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-03T08_35_10.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-03T19_13_57.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-02T19_32_12.txt" name=
+"e2008-09-02T19_32_12.txt"></a>
+<h2 class="date">09.02.2008 19:32</h2>
+<div class="blogbody">
+<h3 class="title">A little more work with CSS</h3>
+<div class="item-description">A little bit of playing with CSS:
+<pre>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">html</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">head</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">title</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Making pre blocks stand out and an image with a border<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/title</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">style</font> <font color=
+"#2040A0">type=</font><font color=
+"#008000">"text/css"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<b>pre {background: #CCC; border: 1px solid #888; padding: 2mm}
+img[withborder] {border: 3px solid red}</b>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/style</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/head</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">body</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">pre</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>A paragraph in a box<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/pre</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">img</font> <font color=
+"#2040A0">withborder=</font><font color=
+"#008000">"true"</font> <font color=
+"#2040A0">src=</font><font color=
+"#008000">"ge-s57.png"</font><font color=
+"#2040A0">/</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/body</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/html</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+I now realize how crazy it is that I was putting borders around
+images when CSS can do it and I can later change it without having
+to modify the source image. I know this is not advanced CSS, but it
+gets me out of the dark ages of 1994 style html.<br />
+<br />
+Now if only schwehr.org were back online. The server that ACD and
+Scott White setup had an uptime of about 790 days. That way
+outweighs kds.ucsd.edu/schwehr.org that was up for just a year when
+it ran linux or the linux tide datalogger at Jackson lab that is at
+190 days.<br />
+<br />
+UPDATE 20080905: I've modified nb_default.css to do borders around
+images.
+<pre>
+img[withgrayborder] { border: 2px solid #666 } Now I
+can stop doing borders in Photoshop.  I just have to add
+<b>withgrayborder="True"</b> between <b>img</b> and <b>src</b> for any
+images that need borders.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-02T19_32_12.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-03T08_35_10.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-02T10_18_21.txt" name=
+"e2008-09-02T10_18_21.txt"></a>
+<h2 class="date">09.02.2008 10:18</h2>
+<div class="blogbody">
+<h3 class="title">Northwest passage issues</h3>
+<div class="item-description"><a href=
+"http://themaritime.wordpress.com/2008/08/29/plan-on-navigating-the-northwest-passage-plan-again/">
+Plan on navigating the Northwest Passage? Plan again.</a> [The
+Maritime blog]<br />
+<br />
+<pre>
+The U.S. tanker MANHATTAN navigates the Northwest Passage in 1969,
+making it the first commercial ship to make the voyage.
+</pre>
+<br />
+<br />
+<img withgrayborder="True" src=
+"../attachments/2008-09/northwest-passage-manhattan-1969.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-02T10_18_21.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-02T19_32_12.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-01T17_23_36.txt" name=
+"e2008-09-01T17_23_36.txt"></a>
+<h2 class="date">09.01.2008 17:23</h2>
+<div class="blogbody">
+<h3 class="title">Which way are we going?</h3>
+<div class="item-description">Matt and I had a GPS logging camera
+and an AIS receiver with a GPS logging for this cruise, but the
+neither camera had a built in compass. How do we know which way we
+are looking? How about looking across the ships analog compass?
+<img src="../moods/smilies/smiley.gif" alt=
+":)" border="0" how="" long="" until="" standard="" on="" prosumer=
+"" commeras="" have="" both="" a="" gps="" not="" as="" external=""
+next="" compass="" is="" one="" planning="" documents="" matt=""
+put="" together="" for="" day.="" it="" has="" all="" of="" the=""
+critical="" points="" and="" coast="" pilot="" features="" that=""
+we="" were="" going="" to="" looking="" out="" for.="" /><br />
+<br />
+<img src=
+"../attachments/2008-09/geocoastpilot-boston-direction.jpg" />
+<br />
+<br />
+An easy way to make sure the GPS is making sense in a GPS enabled
+camera or to check the clock in a non-gps camera is to take a
+picture of the ships GPS. This GPS display only updates every 2
+seconds, but this is plenty for our photos.<br />
+<br />
+<img src=
+"../attachments/2008-09/geocoastpilot-gps-check.jpg" />
+<br />
+<br />
+Here is the AIS+GPS SR162g logging both GPS and vessel data (why
+not log AIS?). I used iPhoto for the initial imports. Too bad
+iPhoto is not GPS EXIF aware in a real sense. It reads the EXIF
+fields and displays the text of the GPS coordinates, but no map
+view.<br />
+<br />
+<img src=
+"../attachments/2008-09/geocoastpilot-logging-setup.jpg" />
+<br />
+<br />
+Note: suddenly this afternoon, emacs is taking a very long time to
+open. What is going on with my laptop? What is the equivalent to
+strace/par for the Mac so I can see what system calls are taking a
+long time? I don't want to go learning some big GUI app like
+Shark.<br />
+<br />
+<b>Update</b>: Thanks to Jim Thompson for answering with
+<b>dtrace</b>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-01T17_23_36.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-02T10_18_21.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-01T17_05_36.txt" name=
+"e2008-09-01T17_05_36.txt"></a>
+<h2 class="date">09.01.2008 17:05</h2>
+<div class="blogbody">
+<h3 class="title">What's new in Python 2.6</h3>
+<div class="item-description">We are one month away from Python
+2.6. <a href="http://docs.python.org/dev/whatsnew/2.6.html">What's
+New in Python 2.6</a> is well worth a read. The "with"
+functionality is very cool for all sorts of programming where
+cleanup on exit is necessary, but not fun. C++ programmers often do
+this by putting an object in a new stack frame and then when the
+stack frame goes away, the object destructor gets called and cleans
+things up. I first saw this with Ace/Tao by Schmidt for making sure
+that you release locks.<br />
+<br />
+Read the document for lots of other good features.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-01T17_05_36.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-01T17_23_36.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-01T15_51_54.txt" name=
+"e2008-09-01T15_51_54.txt"></a>
+<h2 class="date">09.01.2008 15:51</h2>
+<div class="blogbody">
+<h3 class="title">Phx labor day release of images</h3>
+<div class="item-description">I had the privilege to day to be the
+one who hit the release image for the Labor Day set of Phoenix
+press images. There is a spectacular movie of the clouds going by
+and an image of the trenching.<br />
+<br />
+<img src=
+"../attachments/2008-09/phx-labor-day-release.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-01T15_51_54.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-01T17_05_36.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-01T15_44_48.txt" name=
+"e2008-09-01T15_44_48.txt"></a>
+<h2 class="date">09.01.2008 15:44</h2>
+<div class="blogbody">
+<h3 class="title">Garden update</h3>
+<div class="item-description">Finally, the garden is taking hold
+(at least some of it). Here is a photo from August 28th.<br />
+<br />
+<img src=
+"../attachments/2008-09/garden-aug-28.jpg" /><br />
+
+<br />
+It may not be as exciting to you, but I can really see the changes
+between that and 4 days later. The squash is definitely trying to
+take over. I finally decided to just leave the ultra-late starts in
+their planters. Every day matters at this point. The beans are just
+a couple days away from the first harvest. I don't think I am going
+to get any cabbage or swiss chard this year.<br />
+<br />
+<img src=
+"../attachments/2008-09/garden-sep-01.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-01T15_44_48.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-01T15_51_54.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-01T15_39_20.txt" name=
+"e2008-09-01T15_39_20.txt"></a>
+<h2 class="date">09.01.2008 15:39</h2>
+<div class="blogbody">
+<h3 class="title">Hampster during the day</h3>
+<div class="item-description">Hamsters are fun at night when they
+roll around the house in their hamster balls, but what do they look
+like during the day? This guy finally discovered his new house
+today after it being in his cage for a month.<br />
+<br />
+<img src=
+"../attachments/2008-09/hamster-during-the-day.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-01T15_39_20.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-01T15_44_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-01T08_28_14.txt" name=
+"e2008-09-01T08_28_14.txt"></a>
+<h2 class="date">09.01.2008 08:28</h2>
+<div class="blogbody">
+<h3 class="title">AIS parsing trouble</h3>
+<div class="item-description">Loic has found two more trouble spots
+with noaadata parsing AIS messages. I very much appreciate bug
+reports.<br />
+<br />
+I didn't notice that '<b>"</b>' is a validate AIS 6 bit text value
+for strings:
+<pre>
+" 34 0x22 10 0010
+</pre>
+That means that my database code (which is not up to the python db
+standards) will put a double quote ("") before the name. Why people
+put quotes in their name field, Idonno, but I should handle this
+case properly and I don't.
+<pre>
+ % <b>./ais_msg_5.py -v -d '!AIVDM,1,1,3,A,544MVC027obuD&lt;u40028lDdP4pTf1T59A&lt;EJ80168@C;36?h0=SPCU1Dh00000000000000,2*7F'</b>
+shipdata:
+    MessageID:        5
+    RepeatIndicator:  0
+    UserID:           273114700
+    AISversion:       0
+    IMOnumber:        8904367
+    callsign:         UCOQ@@@
+    name:             "MEKHANIK YARTSEV"@@
+    shipandcargo:     70
+    dimA:             66
+    dimB:             19
+    dimC:             11
+    dimD:             3
+    fixtype:          1
+    ETAminute:        35
+    ETAhour:          30
+    ETAday:           0
+    ETAmonth:         0
+    draught:          5.4
+    destination:      NANTES@@@@@@@@@@@@@@
+    dte:              0
+    Spare:            0
+</pre>
+This is one of those messages where you have to know the size to
+know how many segments are in the message. Turns out that if you
+don't fill all the blocks, AIS sends fewer bits than a slot. This
+reduces the chances that you will have bit errors in your message.
+Shorter messages are supposed to be a good thing and I've heard
+people say that 5 slot messages are a really bad idea.
+<pre>
+ % <b>./ais_msg_15.py -v -d '!AIVDM,1,1,,A,?03OvkiGRP7P000,2*31'</b>
+Traceback (most recent call last):
+  File "./ais_msg_15.py", line 902, in &lt;module&gt;
+    printFields(decode(bv)
+  File "./ais_msg_15.py", line 186, in decode
+    r['MessageID2']=int(bv[126:132])
+  File "/Users/loic/Development/Marine/_AISFON/noaadata-py-0.40/ais/BitVector.py", line 1080, in __getslice__
+    return BitVector( bitlist = slicebits )                      #(c6)
+  File "/Users/loic/Development/Marine/_AISFON/noaadata-py-0.40/ais/BitVector.py", line 725, in __init__
+    raise ValueError("wrong arg(s) for constructor")        #(A68)
+ValueError: wrong arg(s) for constructor 
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-01T08_28_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-01T15_39_20.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2008-09-01T06_47_49.txt" name=
+"e2008-09-01T06_47_49.txt"></a>
+<h2 class="date">09.01.2008 06:47</h2>
+<div class="blogbody">
+<h3 class="title">USGS Gustav Water Levels</h3>
+<div class="item-description">Note that red squares are sensors
+that are not real time.<br />
+<br />
+<a href="http://water.usgs.gov/waterwatch/gustav/">USGS Gustav
+Hydrologic Impacts map page</a><br />
+<br />
+<img src=
+"../attachments/2008-09/usgs-gustav-water-levels-monmorning.png" />
+<br />
+<br />
+<a href="http://www.nhc.noaa.gov/graphics_at2.shtml?5day">NOAA
+Gustav Page</a><br />
+<br />
+<img src=
+"../attachments/2008-09/noaa-gustav-track-mon-morning.gif" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2008-09.html#e2008-09-01T06_47_49.txt">Permalink</a> 
+<!-- <br /><a href="archives/2008-09-01T08_28_14.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">September 2008</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-01T17_23_36.txt">1</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-02T19_32_12.txt">2</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-03T19_13_57.txt">3</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-04T19_38_32.txt">4</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-05T17_39_39.txt">5</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-06T22_57_11.txt">6</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-07T10_17_06.txt">7</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-08T07_25_02.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-09T17_20_36.txt">9</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-10T11_18_08.txt">10</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-11T21_48_13.txt">11</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-12T09_50_05.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-13T17_59_32.txt">13</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-14T14_36_28.txt">14</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-15T21_54_39.txt">15</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-16T15_25_39.txt">16</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-17T23_41_48.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-18T17_40_31.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-19T10_39_48.txt">19</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-20T22_21_15.txt">20</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-21T17_06_48.txt">21</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-22T16_14_01.txt">22</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-23T22_52_59.txt">23</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-24T20_37_46.txt">24</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-25T15_02_57.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-26T14_56_14.txt">26</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-27T12_09_38.txt">27</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-28T21_58_35.txt">28</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-29T19_28_35.txt">29</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2008-09.html#e2008-09-30T10_24_45.txt">30</a></span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

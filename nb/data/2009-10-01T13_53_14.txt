@@ -1,0 +1,58 @@
+TITLE: North Polar Stereographic projection
+AUTHOR: Kurt
+DATE: 10.01.2009 13:53
+DESC: works!
+-----
+BODY:
+This took a little while to sort out.  I want to be able to use proj
+to convert to and from the Healy Law of the Sea multibeam data.  That
+far north, geographic (<a
+href="http://spatialreference.org/ref/epsg/4326/">EPSG:4326</a>) is
+terrible.  They use a North Polar Stereographic project that is
+centered on -160 degrees longitude with a latitude of true scale of
+75N.  Thankfully, I have some information to help me out.  First,
+Brian C. has created files for each line that have the data in
+geographic, the usual 0 centered north stereographic, and the 160W
+centered version used for the Healy data.
+<pre>% <b>head -2 *.txt</b>
+==&gt; 2009_241_depth.txt &lt;==
+-117.1741715 83.8010313 -606038.940 311116.433 2704.500
+-117.1904645 83.8008067 -605972.446 311300.061 2709.800
+<!-- -->
+==&gt; 2009_241_depth_ps000E.txt &lt;==
+-606038.946 311116.436 -2704.500
+-605972.446 311300.060 -2709.800
+<!-- -->
+==&gt; 2009_241_depth_ps160W.txt &lt;==
+463082.238 -499631.346 -2704.500
+462956.945 -499781.152 -2709.800</pre>
+Plus Larry had this in his Fledermaus projection list that he created.  And
+it is fantastic that Fledermaus is using proj!
+<pre>PROJCS["FPC_WGS_84_PS__75_160_HEALY",
+GEOGCS["FG_WGS_84",
+DATUM["FD_WGS_1984",
+SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],
+PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],
+UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],
+UNIT["meter",1,AUTHORITY["EPSG","9001"]],
+PROJECTION["Polar_Stereographic"],
+PARAMETER["latitude_of_origin",75],
+PARAMETER["central_meridian",-160],
+PARAMETER["scale_factor",1.0],
+PARAMETER["false_easting",000000],
+PARAMETER["false_northing",000000],
+AUTHORITY["EPSG","32661"],
+AXIS["Easting",
+UNKNOWN],
+AXIS["Northing",
+UNKNOWN]]</pre>
+Using the above information and looking at <A
+href="http://spatialreference.org/ref/epsg/32661/">EPSG:32661</a>, I
+was able to figure out first the line for north polar stereographic:
+<pre><b>echo "-117.1741715 83.8010313" | proj +proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs</b>
+-612841.39      314608.54</pre>
+And for the Healy data (lat_ts == Latitude of True Scale):
+<pre><b>echo "-117.1741715 83.8010313" | proj +proj=stere +lat_0=90 +lat_ts=75 +lon_0=-160 +k=0.994 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs</b>
+463082.24       -499631.35</pre>
+Now I can use invproj to pull data from the project back to geographic.
+-----

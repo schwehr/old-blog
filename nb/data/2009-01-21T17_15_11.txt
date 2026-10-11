@@ -1,0 +1,46 @@
+TITLE: Dealing with PPT files for an internal mediawiki site
+AUTHOR: Kurt
+DATE: 01.21.2009 17:15
+DESC: hacking mediawiki
+-----
+BODY:
+We use an internal mediawiki site at work.  We wanted to be able to
+have a template PPT file available for folks who what to start with a
+framework.  Those who know me, know that I go willy-nilly with my ppt
+formatting, but, even for me, I sometimes want to create a series of
+powerpoints across authors that all feel the same a represent our
+group in a consistent manner.  That's all well and good until
+mediawiki decided that our template ppt had embedded scripts.  I
+couldn't reproduce the problem with a test ppt.  Digging into the
+include/specials/SpecialUpload.php, I got a sense of the problem.
+Mediawiki was taking some bad drugs.  It was trying to apply checks
+that make sense for HTML on a binary ppt.  That means that it is a
+craps shoot to see if you can upload your ppt.  In this case, the ppt
+contained "SrC".  Here is my solution... just let ppt's through.  I'll
+leave it up to local virus scanners to see if the ppt is okay.  This
+should be fine for an internal site, but I have NOT thought this
+through for a wiki with public access.  If that were the case, I would
+not deploy this patch and I might spend the time to chuck any uploads
+through ClamAV or some such.  On to the patch... (remember that I'm
+definitely not a php programmer)
+<pre><tt><b><font color="#0000FF">function</font></b> <b><font color="#000000">detectScript</font></b><font color="#990000">(</font><font color="#009900">$file</font><font color="#990000">,</font> <font color="#009900">$mime</font><font color="#990000">,</font> <font color="#009900">$extension</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+        <b><font color="#0000FF">global</font></b> <font color="#009900">$wgAllowTitlesInSVG</font><font color="#990000">;</font>
+<!-- -->
+        <i><font color="#9A1900">#ugly hack: for text files, always look at the entire file.</font></i>
+        <i><font color="#9A1900">#For binarie field, just check the first K.</font></i>
+<!-- -->
+        <i><font color="#9A1900"># 4 lines added by Kurt Schwehr 21-Jan-2009 </font></i>
+        <i><font color="#9A1900"># Passes powerpoints without any checks</font></i>
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#009900">$extension</font><font color="#990000">==</font><font color="#FF0000">"ppt"</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+           <b><font color="#000000">wfDebugLog</font></b><font color="#990000">(</font><font color="#FF0000">'upload'</font><font color="#990000">,</font> <font color="#FF0000">'No scripts in the ppt extension ... allowing '</font> <font color="#990000">.</font> <b><font color="#000000">print_r</font></b><font color="#990000">(</font><font color="#009900">$extension</font><font color="#990000">,</font>true<font color="#990000">)</font> <font color="#990000">);</font>
+           <b><font color="#0000FF">return</font></b> false<font color="#990000">;</font>
+        <font color="#FF0000">}</font>
+        <i><font color="#9A1900"># End of additional code</font></i>
+<!-- -->
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#000000">strpos</font></b><font color="#990000">(</font><font color="#009900">$mime</font><font color="#990000">,</font><font color="#FF0000">'text/'</font><font color="#990000">)===</font><font color="#993399">0</font><font color="#990000">)</font> <font color="#009900">$chunk</font> <font color="#990000">=</font> <b><font color="#000000">file_get_contents</font></b><font color="#990000">(</font> <font color="#009900">$file</font> <font color="#990000">);</font>
+        <b><font color="#0000FF">else</font></b> <font color="#FF0000">{</font>
+                <font color="#009900">$fp</font> <font color="#990000">=</font> <b><font color="#000000">fopen</font></b><font color="#990000">(</font> <font color="#009900">$file</font><font color="#990000">,</font> <font color="#FF0000">'rb'</font> <font color="#990000">);</font>
+                <font color="#009900">$chunk</font> <font color="#990000">=</font> <b><font color="#000000">fread</font></b><font color="#990000">(</font> <font color="#009900">$fp</font><font color="#990000">,</font> <font color="#993399">1024</font> <font color="#990000">);</font>
+                <b><font color="#000000">fclose</font></b><font color="#990000">(</font> <font color="#009900">$fp</font> <font color="#990000">);</font>
+        <font color="#FF0000">}</font></tt></pre>
+-----

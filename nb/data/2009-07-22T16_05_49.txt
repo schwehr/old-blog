@@ -1,0 +1,19 @@
+TITLE: Byte boundaries for AIS messages
+AUTHOR: Kurt
+DATE: 07.22.2009 16:05
+DESC: possibly an answer
+-----
+BODY:
+There has been discussion around the assertion that AIS messages must
+pad to observe byte boundaries.  None of the people in the discussion
+who said this was true could remember where they saw it.  I just bumped
+into it:  ITU-R M.1371-3, Page 37, Annex 2, 3.3.7 Message structure:
+<pre>Unused bits in the last byte should be set to zero in order to
+preserve byte boundary.</pre>
+This is right below discussion of NRZI coding and bit-stuffing.  What
+is not clear is if this applies to the hardware level or this must be
+done at the message definition level.  My read of this is that the
+message sent to the transceiver or basestation does NOT have to be
+byte aligned and that the padding should happen after bit-stuffing.
+But, I could be wrong.
+-----

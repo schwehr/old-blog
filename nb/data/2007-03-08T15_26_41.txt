@@ -1,0 +1,31 @@
+TITLE: noaadata 0.21
+AUTHOR: Kurt
+DATE: 03.08.2007 15:26
+DESC: the joy of dos newlines
+-----
+BODY:
+I have finally been able to talk to a base station and have it send a
+binary message.  I have yet to work through decoding, but that comes
+next.  This release has a bunch of work on the NMEA strings to talk to
+the base station.  The base station I have is not responding to some
+of the required messages, so I am not sure what is going on.  I may
+have a bug or two (or twenty).
+<ul>
+    <li>Added ais/ais.xsl to the MANIFEST.in so that people can actually get the stylesheet.</li>
+    <li>Fixed manifest to include Makefiles and doc/*</li>
+    <li>Added to ais/nmea.py: encodeQuery, acaEncode, bcfEncode/Decode </li>
+    <li>Fixed the socket_send program to actually work</li>
+    <li>Fixed minor bug in message 14.</li>
+    <li>More doctests in ais/nmea.py</li>
+</ul>
+Here is an example of talking to the base station:
+<pre>
+./socket_send.py '!xxBBM,1,1,0,0,14,D5CDP=5CC175,0*49' -v -r -t 2
+connecting to 10.1.1.29:5505
+Using DOS EOL style: True
+sending: !xxBBM,1,1,0,0,14,D5CDP=5CC175,0*49 (dos newline)
+!AIVDO,1,1,,B,452HH&lt;h000Httt&gt;&gt;GPK&lt;7&lt;701T00,0*45
+$AIABK,,,14,0,3*6A
+!AIVDO,1,1,,B,&gt;52HH&lt;i@E=B0lE=&lt;4LD,2*17
+</pre>
+-----

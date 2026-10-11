@@ -1,0 +1,53 @@
+TITLE: Python tricks - line numbers, which function, and file location
+AUTHOR: Kurt
+DATE: 01.04.2009 09:10
+DESC: hopefully helpful
+-----
+BODY:
+Here are some python tricks that people might find handy.  The first
+is to use __file__ variable.  This is set to the current file name that
+python is in.  If you are in a python or ipython command prompt, it won't 
+work.
+<pre>% <b>python2.6</b>
+&gt;&gt;&gt; __file__
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: name '__file__' is not defined</pre>
+However, inside a running script, it can help you figure out where
+the file in question is.  This is helpful for relocatable groups of
+files such as with a Django project.  Do something like this in your manage.py.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> os<font color="#990000">.</font>path
+PROJECT_DIR <font color="#990000">=</font> os<font color="#990000">.</font>path<font color="#990000">.</font><b><font color="#000000">dirname</font></b><font color="#990000">(</font>__file__<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> PROJECT_DIR</tt></pre>
+Results in:
+<pre> % <b>`pwd`/try1.py</b>
+/Users/schwehr/Desktop</pre>
+Surprisingly, python does not have the C equivalent to __line__.  I
+often want to throw checkpoints into some code to see where it is.  I
+could use pdb and step through the debugger, but that is often too
+much trouble.  The <a
+href="http://docs.python.org/library/inspect.html">inspect</a> python
+module lets you check out live objects.  <i>currentframe()</i> returns
+where python is at the moment.  From this you can get the line, file, 
+object/function name, etc.  There is also f_back attribute that gives
+the frame one stack level up.  This lets me write a checkpoint function
+that matches the GCC compiler file:lineno convention so that emacs will
+jump to that location.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i><b>
+<font color="#0000FF">def</font></b> <b><font color="#000000">checkpoint</font></b><font color="#990000">():</font>
+    <b><font color="#000080">import</font></b> inspect
+    f <font color="#990000">=</font> inspect<font color="#990000">.</font><b><font color="#000000">currentframe</font></b><font color="#990000">().</font>f_back
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'%s:%d: Function %s CHECKPOINT'</font> <font color="#990000">%</font> <font color="#990000">(</font>__file__<font color="#990000">,</font>f<font color="#990000">.</font>f_lineno<font color="#990000">,</font>f<font color="#990000">.</font>f_code<font color="#990000">.</font>co_name<font color="#990000">)</font>
+<!-- -->
+<b><font color="#000000">checkpoint</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">test</font></b><font color="#990000">():</font>
+    <b><font color="#000000">checkpoint</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#000000">test</font></b><font color="#990000">()</font></tt></pre>
+The results:
+<pre>% <b>./try2.py</b>
+./try2.py:8: Function &lt;module&gt; CHECKPOINT
+./try2.py:11: Function test CHECKPOINT</pre>
+-----

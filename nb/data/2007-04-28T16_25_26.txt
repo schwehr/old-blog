@@ -1,0 +1,54 @@
+TITLE: opendap exploit and other opendap things
+AUTHOR: Kurt
+DATE: 04.28.2007 16:25
+DESC: What is going on
+-----
+BODY:
+I am amused to find the <a href="http://groups.google.com/group/pydap/browse_thread/thread/cdfa34d7ec71b24a/">thread</a> I started on the NOAA OpenDAP server is
+now the top hit for OpenDAP on Google Groups.
+
+<img src="http://schwehr.org/blog/attachments/2007-04/opendap-google-group.png">
+
+Which brings me to why I was search on opendap.  The NOAA OpenDAP
+waterlevel server seems to be down.  Thanks to Barry G. for pointing
+this out.  I get a continualy stream of errors that make it difficult
+to distinguish between when this is just one station off line or if
+there is something that I need to directly address.  I need to spiffy
+up the error checking on my scripts.
+
+The new error that I have been getting from my cron job:
+<pre>
+  File "/Users/schwehr/production/src/noaadata/noaadata/waterlevel_dap.py", line 36, in &lt;module&gt;
+    waterlevelDataset=dap.client.open(datasetURL)
+  File "/sw/lib/python2.5/site-packages/dap/client.py", line 30, in open
+    raise ClientError("Unable to open dataset.")
+dap.exceptions.ClientError: 'Unable to open dataset.'
+</pre>
+
+From <a href="http://opendap.org/">opendap.org</a>:<pre>
+Important security message
+<b>27 April 2007</b>
+.
+Update: We have posted a patch for the exploit. The patch is available
+as a text file that explains how to modify the server so the exploit
+will no longer work. 
+.
+Addendum: If you are patching your server and do not find the
+get_url() function in DODS_Dispatch.pm, then your server is not
+affected by the exploit - you're safe - and there's no need to
+patch. You should still consider the upgrade to Hyrax.
+<b>25 April 2007</b>
+.
+A problem has been found in the Server3 software which provides a way
+for people to run commands on a computer running the server. The best
+fix for this problem is to upgrade to Hyrax (aka. Server4). For those
+who want to continue running the old server, we will produce a patch
+which you can install, although the design of the new server is so
+much superior with respect to system security that I would urge
+everyone to carefully weigh the benefits of installing a patched
+version of the old server. Regardless of whether you choose to upgrade
+to Hyrax or patch your server, you should seriously consider stopping
+any instances of Server3 you are now running until you have addressed
+this issue.
+</pre>
+-----

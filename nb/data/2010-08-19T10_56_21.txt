@@ -1,0 +1,56 @@
+TITLE: ANSS quake catalog in Google Earth
+AUTHOR: Kurt
+DATE: 08.19.2010 10:56
+DESC: stylish in black
+-----
+BODY:
+I've been working on creating a Google Earth visualization of the <a
+href="http://quake.geo.berkeley.edu/anss/catalog-search.html">ANSS
+quake catalog</a>.  I found <a
+href="ftp://www.ncedc.org/pub/catalogs/anss/">their ftp site</a> and
+the <a
+href="http://www.ncedc.org/ftp/pub/doc/cat5/cnss.catalog.5">CNSS
+Composite Catalog Format</a>.  These allowed me to pull their entire
+catalog pretty quickly (meaning an hour or so):
+<pre><b>wget -r --no-directories --no-parent --no-host-directories ftp://www.ncedc.org/pub/catalogs/anss/</b></pre>
+I then parsed the text records to build an SQLite database.  That let me filter the records and start building the visualization with this SQL query:
+<pre><b>SELECT * FROM anss_events WHERE mag &gt; 4.5 ORDER BY timestamp DESC LIMIT 100000</b></pre>
+I started by wrapping the entire globe in black.  The normal Google
+Earth surface is distracting.  I then grabbed the <a
+href="http://rimmer.ngdc.noaa.gov/coast/">World Coast Line (designed
+for 1:5M)</a> from NGDC and put the shorelines up at 700km above 0.
+
+I then worked up some icons that show the magnitude of the quake as a
+number in the circle.  I slightly varried the size of the icons to
+help give a sense within the magnitude integral number (not sure this
+is working) by using a resize.  The entire icon creation is done with imagemagick's <a href="http://www.imagemagick.org/script/convert.php">convert</a>.  e.g.
+<pre><b>convert \
+  -fill black -draw "circle 30,30 10,10" \
+  -fill white -draw "circle 30,30 11,11" \
+  -pointsize 28 -fill black -annotate +10+40 "7.2" \
+  -resize 55% quake-1.png 7.2.png</b></pre>
+I can then use the white icons and color them with a style in google
+earth.  I took all of the quake depths and moved them up 700 km in the
+air so that deeper quakes are visible below the hanging shoreline.
+This should let people see the subducting slabs pretty easily.  I
+start the quakes at +10 to -10 km at white and the color changes
+towards red going down.  All quakes at 200km and deeper of completely
+red.
+
+Because the icons for quakes in the magnitude range of 4.5 to 5.9 are
+quite small, I have the highlight mode for the style set to blow up
+the label to a very large readable presentation.
+
+For an alternative visualization (that includes time, which I
+skipped), check out Duncan Agnew's <a
+href="http://igppweb.ucsd.edu/~agnew/udq/index.html">Upside-Down
+Quakes (UDQ)</a>.
+
+Here are some images from the visualization:
+
+<img title="South America map view" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/anss-google-earth-southamerica-1.png"/>
+
+<img title="Close up of Chile and Argentina looking North" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/anss-google-earth-southamerica-2.png"/>
+
+<img title="New Zealand looking North" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/anss-google-earth-nz.png"/>
+-----

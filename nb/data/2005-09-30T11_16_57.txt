@@ -1,0 +1,47 @@
+TITLE: PyGMT
+AUTHOR: Kurt
+DATE: 09.30.2005 11:16
+DESC: no luck yet
+-----
+BODY:
+I just cooked up a fink info file for PyGMT 0.3.  However, I am unable
+to use it with the grd files that I have.  I am not sure what is up at
+this point.  I really could use this code right now for my thesis, so
+I will give with a whirl.
+
+BTW, Aquaemacs is frustrating... only Esc for meta?  That sucks.
+
+<pre>
+ipython
+
+In [5]: import PyGMT
+
+In [6]: grdfile = open("foo.grd")
+
+In [7]: grd = PyGMT.read_grid(grdfile)
+======================================================================
+exceptions.ValueError                                Traceback (most recent
+ call last)
+
+/Users/schwehr/Desktop/pygmt-test/&lt;console&gt; 
+
+/sw/lib/python2.4/site-packages/PyGMT/PyGMTgrid.py in read_grid(file)
+    200     # new grid
+    201     grid = Grid()
+--&gt; 202     (grid.x_minmax,grid.y_minmax,grid.node_offset,grid.z_scale,grid
+.z_offset,grid.xunits,grid.yunits,grid.zunits,grid.title,grid.remark,grid.d
+ata) = gmtio.read(file)
+    203 
+    204     return grid
+
+/sw/lib/python2.4/site-packages/PyGMT/PyGMTgrid.py in __set_node_offset(sel
+f, val)
+     81     def __set_node_offset(self,val):
+     82         if val not in [0,1]:
+---&gt; 83             raise ValueError, 'Node_offset can be either 0 or 1.'
+     84         self.__node_offset = val
+     85     def __get_node_offset(self):
+
+ValueError: Node_offset can be either 0 or 1.
+</pre>
+-----

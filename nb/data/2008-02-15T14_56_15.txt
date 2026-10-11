@@ -1,0 +1,42 @@
+TITLE: updating ubuntu boxes remotely
+AUTHOR: Kurt
+DATE: 02.15.2008 14:56
+DESC: upgrading remotely
+-----
+BODY:
+Roland and I updated one of our Ubuntu based servers remotely this
+morning.  The process went pretty well accept for the box having
+multiple ethernet ports and the update swapped which was eth0 and
+eth1.  Fun.  But at least the box has a 3rd ethernet port which is a
+remote administration card from Dell, so we could see the console
+without having to be let into the locked server room.  Note to Dell:
+please stop making your tools require MS Internet Explorer.  That is
+just dumb.  The Ubuntu update page gave us almost all of the
+instructions we needed:
+
+<a href="http://www.ubuntu.com/getubuntu/upgrading">http://www.ubuntu.com/getubuntu/upgrading</a>
+
+This basically consists of doing:
+<pre>
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install update-manager-core
+sudo do-release-upgrade
+</pre>
+The first server we upgraded was running 6.10 (Edgy Eft).  When we
+upgraded, this got us up to 7.04.  We then looped back through the
+above process and that got us up to 7.10:
+<pre>
+cat /etc/lsb-release 
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=7.10
+DISTRIB_CODENAME=gutsy
+DISTRIB_DESCRIPTION="Ubuntu 7.10"
+</pre>
+We had to update trac projects:
+<pre>
+trac-admin /var/trac/projects/projectname upgrade
+</pre>
+There was also a little tweaking with apache2 where we removed the *
+from the VirutalHost entries and replace them with the host name.
+-----

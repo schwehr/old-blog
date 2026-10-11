@@ -1,0 +1,61 @@
+TITLE: compression bakeoff
+AUTHOR: Kurt
+DATE: 09.17.2005 11:52
+DESC: which is best
+-----
+BODY:
+I just did a quick test of compression systems on seimsic data.  I
+took two files from the EdgeTech xstar system (2 channels) which are
+19MB and 164MB.  My requirements were that the program be in fink.
+The results:
+<pre>
+19705360 EEL5kL05.xstar
+
+18789077 EEL5kL05.xstar-compress.Z
+15711363 EEL5kL05.xstar-zip.zip
+15704232 EEL5kL05.xstar-gzip.gz
+13580310 EEL5kL05.xstar-7z.7z
+13549235 EEL5kL05.xstar-rzip.rz
+13539313 EEL5kL05.xstar-bzip2.bz2
+
+TESTING: seismic.xstar
+
+163843600 seismic.xstar
+161645283 seismic.xstar-compress.Z
+134228345 seismic.xstar-zip.zip
+134142038 seismic.xstar-gzip.gz
+119504153 seismic.xstar-rzip.rz
+119409223 seismic.xstar-bzip2.bz2
+118475932  seismic.xstar-7z.7z
+</pre>
+The winners on size were p7za and and bzip2.  The 7z was super slow,
+so I will be sticking to bzip2.  I was surprised that rzip did not do
+better, but I think that would be the case if there were a lot more
+small files that were almost the same.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+<font color="#444444"># Testing for compression programs</font>
+<font color="#2040a0">infile</font>=test0.txt
+<font color="#2040a0">infile</font>=EEL5kL05.xstar
+<font color="#2040a0">infile</font>=seismic.xstar
+echo TESTING: <font color="#2040a0">$infile</font>
+
+rm -f <font color="#2040a0">$infile</font>-*
+
+for type in bzip2 gzip rzip zip compress; do
+    cp <font color="#2040a0">$infile</font> <font color="#2040a0">$infile</font>-<font color="#2040a0">$type</font>
+done
+
+bzip2 -9 <font color="#2040a0">$infile</font>-bzip2
+gzip -9 <font color="#2040a0">$infile</font>-gzip
+rzip -9 <font color="#2040a0">$infile</font>-rzip
+zip <font color="#2040a0">$infile</font>-zip.zip <font color="#2040a0">$infile</font>-zip
+compress <font color="#2040a0">$infile</font>-compress
+7za a <font color="#2040a0">$infile</font>-7z.7z -<font color="#2040a0">mx</font>=9 <font color="#2040a0">$infile</font>-7z 
+
+ls -l <font color="#2040a0">$infile</font> | awk '{print <font color="#2040a0">$5</font>,<font color="#2040a0">$9</font>}'
+ls -lS <font color="#2040a0">$infile</font>-*.* | awk '{print <font color="#2040a0">$5</font>,<font color="#2040a0">$9</font>}'
+
+rm -f <font color="#2040a0">$infile</font>-*
+</pre>
+-----

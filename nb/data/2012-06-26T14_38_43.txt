@@ -1,0 +1,49 @@
+TITLE: gdal to geographic bounding box
+AUTHOR: Kurt
+DATE: 06.26.2012 14:38
+DESC: finally and example that works for me
+-----
+BODY:
+This use case comes up a lot, so here is a post to keep me from
+re-inventing the wheel.  I have a spatial file in some projection.  I
+want get its bounding box in geographic.  There are lots of ways
+to do it, but I want to stay within gdal/ogr/osr.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> osgeo <b><font color="#000080">import</font></b> gdal<font color="#990000">,</font> osr
+<!-- -->
+bag <font color="#990000">=</font> gdal<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">(</font><font color="#FF0000">'F00574_MB_2m_MLLW_2of3.bag'</font><font color="#990000">)</font>
+bag_gtrn <font color="#990000">=</font> bag<font color="#990000">.</font><b><font color="#000000">GetGeoTransform</font></b><font color="#990000">()</font>
+bag_proj <font color="#990000">=</font> bag<font color="#990000">.</font><b><font color="#000000">GetProjectionRef</font></b><font color="#990000">()</font>
+bag_srs <font color="#990000">=</font> osr<font color="#990000">.</font><b><font color="#000000">SpatialReference</font></b><font color="#990000">(</font>bag_proj<font color="#990000">)</font>
+geo_srs <font color="#990000">=</font>bag_srs<font color="#990000">.</font><b><font color="#000000">CloneGeogCS</font></b><font color="#990000">()</font>
+transform <font color="#990000">=</font> osr<font color="#990000">.</font><b><font color="#000000">CoordinateTransformation</font></b><font color="#990000">(</font> bag_srs<font color="#990000">,</font> geo_srs<font color="#990000">)</font>
+<!-- -->
+bag_bbox_cells <font color="#990000">=</font> <font color="#990000">(</font>
+    <font color="#990000">(</font><font color="#993399">0</font><font color="#990000">.,</font> <font color="#993399">0</font><font color="#990000">.),</font>
+    <font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> bag<font color="#990000">.</font>RasterYSize<font color="#990000">),</font>
+    <font color="#990000">(</font>bag<font color="#990000">.</font>RasterXSize<font color="#990000">,</font> bag<font color="#990000">.</font>RasterYSize<font color="#990000">),</font>
+    <font color="#990000">(</font>bag<font color="#990000">.</font>RasterXSize<font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">),</font>
+  <font color="#990000">)</font>
+<!-- -->
+geo_pts <font color="#990000">=</font> <font color="#990000">[]</font>
+<b><font color="#0000FF">for</font></b> x<font color="#990000">,</font> y <b><font color="#0000FF">in</font></b> bag_bbox_cells<font color="#990000">:</font>
+    x2 <font color="#990000">=</font> bag_gtrn<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">+</font> bag_gtrn<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]</font> <font color="#990000">*</font> x <font color="#990000">+</font> bag_gtrn<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">]</font> <font color="#990000">*</font> y
+    y2 <font color="#990000">=</font> bag_gtrn<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">]</font> <font color="#990000">+</font> bag_gtrn<font color="#990000">[</font><font color="#993399">4</font><font color="#990000">]</font> <font color="#990000">*</font> x <font color="#990000">+</font> bag_gtrn<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">]</font> <font color="#990000">*</font> y
+    geo_pt <font color="#990000">=</font> transform<font color="#990000">.</font><b><font color="#000000">TransformPoint</font></b><font color="#990000">(</font>x2<font color="#990000">,</font> y2<font color="#990000">)[:</font><font color="#993399">2</font><font color="#990000">]</font>
+    geo_pts<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>geo_pt<font color="#990000">)</font>
+    <b><font color="#0000FF">print</font></b> x<font color="#990000">, </font>y<font color="#990000">, </font><font color="#FF0000">'-&gt;'</font><font color="#990000">, </font>x2<font color="#990000">, </font>y2<font color="#990000">, </font><font color="#FF0000">'-&gt;'</font><font color="#990000">, </font>geo_pt</tt></pre>
+The results of this code are:
+<pre>0.0 0.0 -> 369179.0 4775259.0 -> (-70.608087740520943, 43.118768822635147)                                
+0.0 1083 -> 369179.0 4773093.0 -> (-70.607577288471774, 43.099271863165256)                               
+1841 1083 -> 372861.0 4773093.0 -> (-70.56234820699548, 43.099898472783011)                               
+1841 0.0 -> 372861.0 4775259.0 -> (-70.562844311963829, 43.119395856927362)</pre>
+I was looking at <a
+href="http://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/gdalinfo.py">gdalinfo.py</a>
+in the gdal source tree, but got hung up on the very different coding
+style.  Thanks to EvenR, I now know that the b, psz, adf, h, etc
+prefixes on variable names are <a
+href="http://en.wikipedia.org/wiki/Hungarian_notation">Hungarian
+notation</a>.  While I've heard of Hungarian notation, I've never
+really had to deal with it before.  I have an easier time reading the above example.
+I hope this helps a few people.
+-----

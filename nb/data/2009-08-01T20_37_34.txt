@@ -1,0 +1,61 @@
+TITLE: message decimation reveals strange AIS transceiver behavior
+AUTHOR: Kurt
+DATE: 08.01.2009 20:37
+DESC: what unit is this
+-----
+BODY:
+I should know enough by now to not be surprised by things like this,
+but I am.  I was running checks on my decimation algorithm.  Using
+just one receiver and only position messages, I should see very few
+removed messages (or none).  I got way more than I expected: 108
+messages (0.12%).  While looking at the messages, I saw very
+unexpected behavior.  Most of these messages are from one vessel and
+are retransmissions of the same position message on the same AIS
+channel, but 0.03 to 0.19 seconds apart.
+<pre>% <b>grep ',120756572' 20080407.log.norm | grep 8LvSh5000Jr</b>
+!AIVDM,1,1,,B,38LvSh5000JrdUrH@D&lt;sk8jt0PUA,0*6B,s24733,d-110,T42.44911276,x16510,r003669947,1207565720
+!AIVDM,1,1,,B,38LvSh5000JrdUtH@D&lt;ck8jv0PSQ,0*69,s24730,d-110,T42.47580536,x16511,r003669947,1207565720
+!AIVDM,1,1,,A,38LvSh5000JrdUrH@D&lt;sk8k00PVi,0*06,s23257,d-117,T44.31575392,x16513,r003669947,1207565722
+!AIVDM,1,1,,A,38LvSh5000JrdUrH@D&lt;sk8k20PU1,0*5F,s23271,d-117,T44.47572724,x16514,r003669947,1207565722
+!AIVDM,1,1,,B,38LvSh5000JrdUrH@D&lt;sk8k40PVi,0*01,s24719,d-110,T46.10240842,x16515,r003669947,1207565724
+!AIVDM,1,1,,B,38LvSh5000JrdUrH@D&lt;sk8k40PUA,0*2A,s24698,d-111,T46.42240714,x16516,r003669947,1207565724
+!AIVDM,1,1,,B,38LvSh5000JrdUpH@D=;k8k60PTQ,0*72,s24611,d-111,T46.52908640,x16517,r003669947,1207565724
+!AIVDM,1,1,,B,38LvSh5000JrdUpH@D=;k8k60PTQ,0*72,s24609,d-111,T46.60907306,x16518,r003669947,1207565725
+!AIVDM,1,1,,B,18LvSh5000JrdUnH@D=;k8k&lt;0d0B,0*27,s24396,d-112,T50.23571518,x16522,r003669947,1207565728
+!AIVDM,1,1,,B,18LvSh5000JrdUnH@D=;k8k&lt;0d0B,0*27,s24326,d-112,T50.42236808,x16523,r003669947,1207565728</pre>
+I checked another receiver and it sees the same results, so it's not a receiver having hardware issues.
+
+Just from looking at the encoded text, I can see that it is the same
+vessel (the MMSI is not changing) putting out both ITDMA (msg 3) and
+SOTDMA (msg 1).  e.g.
+<pre>% <b>ais_msg_1.py -d '!AIVDM,1,1,,B,18LvSh5000JrdUnH@D=;k8k<0d0B,0*27,s24326,d-112,T50.42236808,x16523,r003669947,1207565728'</b>
+position:
+        MessageID:          1
+        RepeatIndicator:    0
+        UserID:             567256000
+        NavigationStatus:   5
+        ROT:                0
+        SOG:                0
+        PositionAccuracy:   0
+        longitude:          -71.06358167
+        latitude:           42.388566667
+        COG:                302
+        TrueHeading:        281
+        TimeStamp:          38
+        RegionalReserved:   0
+        Spare:              0
+        RAIM:               False
+        state_syncstate:    1
+        state_slottimeout:  3
+        state_slotoffset:   18</pre>
+This is a ship sitting at a dock on the north side of Boston to the west of the Tobin Bridge.
+Its shipdata messages (msg 5) are consistant:
+<pre>% <b>sqlite ais.db3</b>
+<b>SELECT imonumber,callsign,name,shipandcargo,dima+dimb,dimc+dimd,fixtype,destination FROM shipdata WHERE userid=567256000 GROUP BY imonumber,callsign,name,shipandcargo LIMIT 10;</b>
+IMOnumber callsign  name          shipandcargo dima+dimb  dimc+dimd  fixtype destination
+8312174   HSBE      THOR ALLIANCE 70           189 m      31 m       1       BOSTON,USA</pre>
+If anyone is able to find out what type of AIS unit the Thor Alliance,
+I would really appreciate hearing from you.   I am very curious to know why this ship's AIS
+is violating the ITU 1371-3 specification for transmissions.  Or is it's working fine, then
+there is something in the data collection hardware or software.
+-----

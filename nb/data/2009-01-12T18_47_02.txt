@@ -1,0 +1,74 @@
+TITLE: AIS Binary Message queuing format
+AUTHOR: Kurt
+DATE: 01.12.2009 18:47
+DESC: my recommended format
+-----
+BODY:
+I've been looking into how systems that are sending messages to the
+USCG AIS systems should format the AIS Binary Message content.  First an
+example message to talk about:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;fetcherformatter</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"0.1"</font><b><font color="#0000FF">&gt;</font></b>
+  <b><font color="#0000FF">&lt;binmsg</font></b> <font color="#009900">sitename</font><font color="#990000">=</font><font color="#FF0000">"Tampa"</font> <font color="#009900">msgtype</font><font color="#990000">=</font><font color="#FF0000">"8"</font> <font color="#009900">dac</font><font color="#990000">=</font><font color="#FF0000">"366"</font> <font color="#009900">fi</font><font color="#990000">=</font><font color="#FF0000">"33"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">messagetype</font><font color="#990000">=</font><font color="#FF0000">"3"</font> 
+          <font color="#009900">contenttype</font><font color="#990000">=</font><font color="#FF0000">"partial"</font> <font color="#009900">droptime</font><font color="#990000">=</font><font color="#FF0000">"1215819600"</font> <font color="#009900">priority</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;bounding_region_wkt&gt;</font></b>POLYGON((101.5555 -74.543, 104.214 -74.543, 104.214 -72.102, 101.5555 -72.102, 101.5555 -74.543))<b><font color="#0000FF">&lt;/bounding_region_wkt&gt;</font></b>
+    <b><font color="#0000FF">&lt;marktime&gt;</font></b>1215819000<b><font color="#0000FF">&lt;/marktime&gt;</font></b> <i><font color="#9A1900">&lt;!-- time the data was recorded or generated --&gt;</font></i>
+    <b><font color="#0000FF">&lt;binary&gt;</font></b>111000000110100000000001001101000000010100000000001001010000000000100100000000000000000000000000<b><font color="#0000FF">&lt;/binary&gt;</font></b>
+  <b><font color="#0000FF">&lt;/binmsg&gt;</font></b>
+<b><font color="#0000FF">&lt;/fetcherformatter&gt;</font></b></tt></pre>
+The key is to keep the processing simple and allow the format to grow
+in the future if new requirements come up.  Right now, we are just
+using bounding boxes, but I've used <a
+href="http://en.wikipedia.org/wiki/Well-known_text">WKT</a> to allow
+regions to be arbitrary in the future.  The payload is binary data so
+any routing or queueing mechanisms do not need to understand the
+message.  If the contenttype is "complete," the queueing system can
+just add the binary to the standard message header, dac, and fi.  It
+then can send a BBM (NMEA Binary Broadcast Message) sentence to a
+transponder.
+
+With XML, there is always the question of what to put in as attributes
+and what to include within the body of a <i>binmsg</i> tag.  I put most
+of the information in as attributed rather than child nodes to make XPath
+as simple as possible.  The time the message was generated (marktime), is
+not critical to sorting (only droptime is), so I put it in the body.
+
+Here is a marked up message:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<i><font color="#9A1900">&lt;!-- Kurt Schwehr, 09-Jan-2009 --&gt;</font></i>
+<i><font color="#9A1900">&lt;!-- I tried to make this XPath friendly for use in the future --&gt;</font></i>
+<b><font color="#0000FF">&lt;fetcherformatter</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"0.1"</font><b><font color="#0000FF">&gt;</font></b>
+  <i><font color="#9A1900">&lt;!-- Original FF: BMS, Tampa, 101.5555, -74.543, 104.214, -72.102, 3, 3, 0, </font></i>
+<i><font color="#9A1900">       1215819000,0101101110100001,</font></i>
+<i><font color="#9A1900">       0011010111001101111000000110100000000001001101000000010100000000001001010000000000100100000000000000000000000000 --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: sitename: is required by PAWS, but I see no need </font></i>
+<i><font color="#9A1900">       to specify a site for areas that do not have PAWS.  Something downstream </font></i>
+<i><font color="#9A1900">       can always do a geographic serach for a sitename from a bounding box.  </font></i>
+<i><font color="#9A1900">       The message might span several sites.  --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: id: station or zone this applied to / comes from --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: messagetype: the environmental message subtype or</font></i>
+<i><font color="#9A1900">       zone type --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Content type: </font></i>
+<i><font color="#9A1900">       'partial': the message needs to be place within a message and may be </font></i>
+<i><font color="#9A1900">                  joined with others.  </font></i>
+<i><font color="#9A1900">       'complete': contains the complete content of a binary message</font></i>
+<i><font color="#9A1900">    --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: droptime is the time after which this message </font></i>
+<i><font color="#9A1900">       should just be dropped.  UNIX UTC timestamp --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: priority: 10 for highest, 1 for lowest.  Leave off if </font></i>
+<i><font color="#9A1900">       no particular priority --&gt;</font></i>
+  <b><font color="#0000FF">&lt;binmsg</font></b> <font color="#009900">sitename</font><font color="#990000">=</font><font color="#FF0000">"Tampa"</font> <font color="#009900">msgtype</font><font color="#990000">=</font><font color="#FF0000">"8"</font> <font color="#009900">dac</font><font color="#990000">=</font><font color="#FF0000">"366"</font> <font color="#009900">fi</font><font color="#990000">=</font><font color="#FF0000">"33"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">messagetype</font><font color="#990000">=</font><font color="#FF0000">"3"</font> 
+          <font color="#009900">contenttype</font><font color="#990000">=</font><font color="#FF0000">"partial"</font> <font color="#009900">droptime</font><font color="#990000">=</font><font color="#FF0000">"1215819600"</font> <font color="#009900">priority</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+    <i><font color="#9A1900">&lt;!-- WKT == Well-known Text http://en.wikipedia.org/wiki/Well-known_text --&gt;</font></i>
+    <i><font color="#9A1900">&lt;!-- Using EPSG SRID 4326 http://en.wikipedia.org/wiki/SRID --&gt;</font></i>
+    <b><font color="#0000FF">&lt;bounding_region_wkt&gt;</font></b>POLYGON((101.5555 -74.543, 104.214 -74.543, 104.214 -72.102, 101.5555 -72.102, 101.5555 -74.543))<b><font color="#0000FF">&lt;/bounding_region_wkt&gt;</font></b>
+    <b><font color="#0000FF">&lt;marktime&gt;</font></b>1215819000<b><font color="#0000FF">&lt;/marktime&gt;</font></b> <i><font color="#9A1900">&lt;!-- time the data was recorded or generated --&gt;</font></i>
+    <i><font color="#9A1900">&lt;!-- binary data but without the dac and fi --&gt;</font></i>
+    <b><font color="#0000FF">&lt;binary&gt;</font></b>111000000110100000000001001101000000010100000000001001010000000000100100000000000000000000000000<b><font color="#0000FF">&lt;/binary&gt;</font></b>
+  <b><font color="#0000FF">&lt;/binmsg&gt;</font></b>
+<!-- -->
+  <i><font color="#9A1900">&lt;!-- more messages can go here... --&gt;</font></i>
+<!-- -->
+<b><font color="#0000FF">&lt;/fetcherformatter&gt;</font></b>
+</tt></pre>
+-----

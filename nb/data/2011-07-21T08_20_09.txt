@@ -1,0 +1,69 @@
+TITLE: killall versus pkill - NAIS start script
+AUTHOR: Kurt
+DATE: 07.21.2011 08:20
+DESC: faster faster faster
+-----
+BODY:
+In trying to keep up with the pace of too many projects going too
+fast, I'm trying to script things that are eating my time.  When my
+NAIS connection goes down (not hard, but twisted), I have to kill the
+java client application and restart it.  It's not difficult, but it
+takes time and the process of remembering how to do that impinges on
+everything else I'm trying to hold in my short term memory (refreshing
+from org-mode notes, calendars, and postits takes time).  I have
+always been wary of killall.  On some unix systems, killall takes out
+everything in preparation for shutdown.  That doesn't seem to be the
+common behavior anymore (was that SunOS 4.x?), but I can't seem to get
+over it.  However, there are the two commands pkill and pgrep.  The
+best part is that you can use pgrep in all kinds of scripts.
+
+The key to pgrep/pkill for me are two options.  First, "-f" extends
+searching to the arguments of the command line.  I need to kill a
+specific java instance, not all of them.  Second, "-u" lets me
+constrain the operation to a specific user.  That makes me feel safer.
+If I run a daemon as something other than root (which is what we all
+should be doing 99% of the time), then we can be sure to not bring
+down the house.
+
+In my script, I have to use nohup because the USCG code is not a
+proper daemon.  I've added a bit to push the old nohup.out into a log
+directory, change the filename to include a timestamp, and compress
+the file.  It's a bummer that AISUser does not use any of the upper
+powerful java facilities for advanced logging, monitoring, and general
+daemon/server functionality.  If only I could connect to a messaging
+bus and get notifications from the client as it negotiates network
+changes, tracks data rates, etc.
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+<!-- -->
+pkill -u <font color="#009900">$USER</font> -f AISUser
+<font color="#009900">NOHUP</font><font color="#990000">=</font>nohup<font color="#990000">.</font>out-`date <font color="#990000">+%</font>Y<font color="#990000">%</font>m<font color="#990000">%</font>dT<font color="#990000">%</font>H<font color="#990000">%</font>M`
+mv nohup<font color="#990000">.</font>out logs<font color="#990000">/</font><font color="#009900">$NOHUP</font>
+<!-- -->
+<i><font color="#9A1900"># Might take a while</font></i>
+nohup bzip2 -<font color="#993399">9</font> logs<font color="#990000">/</font><font color="#009900">$NOHUP</font>  <font color="#990000">&amp;</font>
+<!-- -->
+<i><font color="#9A1900"># Let the USCG connection settle</font></i>
+sleep <font color="#993399">2</font>
+<!-- -->
+nohup java -jar AISUser<font color="#990000">.</font>jar <font color="#990000">&amp;</font></tt></pre>
+It's very much a bummer that pkill and pgrep (aka <a
+href="http://procps.sourceforge.net/">procps</a> are not available on
+Mac OSX or in fink.  They operate on the /proc filesystem that isn't available
+on the Mac, so it would involve writing new code, not just a port.
+
+"Faster, better, cheaper."  -NASA Administrator circa 1998.  "Pick two.  Or, why not Linux?"  -Me circa 1999
+
+Or I could have written a proper init script, but I definitely do not
+have the time to do that right.  I wish there were an init script
+crafter for each of the many OSes, where I can answer a couple
+questions and get a basic init script to start with?  What user do I
+want to run this under?  What's the command line to start?  To stop?
+Or use killall/pkill?  Need any additional path tweaks?
+
+<img width="600" height="247" title="Nagios showing down time" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-07/nais-down.png"/>
+
+Interesting see alsos: <a
+href="https://launchpad.net/ubuntu/+source/run-one">run-one</a> for
+Ubuntu is a nice little shell scripts that Dan Ca. pointed me to.
+There is also the <a href="http://sabi.net/nriley/software/">launch</a> replacement for open on the mac.
+-----

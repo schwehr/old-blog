@@ -1,0 +1,44 @@
+TITLE: Number of BAGs in a survey
+AUTHOR: Kurt
+DATE: 05.31.2010 15:10
+DESC: more better viz
+-----
+BODY:
+In the case of BAG surveys, I am currently my only customer for using
+this interface.  If it confuses me, it sure will confuse someone else.
+When I zoomed in on a BAG icon, I was never sure (unless I was looking
+at something for the 10th time) how many bags would pop out of a
+survey and where the survey border was.  I've made two changes to try
+to clarify things.  First, I have changed the survey icons to show the
+number of BAGs in a survey.  This should reduce the surprise factor
+when you zoom into point where it snaps to the view of all the BAGs
+
+<img title="Survey to number of BAGs" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-05/survey-number-of-bags.png"/>
+
+The second change is to the border of the survey: it no longer goes
+away, is a different color, and is slightly higher.  It's still
+challenging when the survey bounding boxes overlap, but I definitely
+get less lost in situations like those shown here where one survey has
+18 BAG files.
+
+<img title="Survey to number of BAGs" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-05/survey-bags-in-survey.png"/>
+
+Here is the super simple imagemagick bash script to write the circles
+and numbers to an icon image:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env bash</font></i>
+<b><font color="#0000FF">in</font></b><font color="#990000">=</font>survey-icon-66x66<font color="#990000">.</font>png
+<!-- -->
+<font color="#009900">count</font><font color="#990000">=</font><font color="#993399">1</font>
+<b><font color="#0000FF">while</font></b> <font color="#990000">[[</font> <font color="#009900">$count</font> -le <font color="#993399">9</font> <font color="#990000">]];</font> <b><font color="#0000FF">do</font></b>
+    convert -fill brown -draw <font color="#FF0000">"circle 51,51 61,61"</font> -fill white -pointsize <font color="#993399">20</font> -annotate <font color="#990000">+</font><font color="#993399">46</font><font color="#990000">+</font><font color="#993399">59</font> <font color="#009900">$count</font> <font color="#009900">$in</font> survey-icon-66x66-<font color="#009900">$count</font><font color="#990000">.</font>png
+    <b><font color="#0000FF">let</font></b> <font color="#009900">count</font><font color="#990000">=</font><font color="#009900">$count</font><font color="#990000">+</font><font color="#993399">1</font>
+<b><font color="#0000FF">done</font></b>
+<!-- -->
+<font color="#009900">count</font><font color="#990000">=</font><font color="#993399">10</font>
+<b><font color="#0000FF">while</font></b> <font color="#990000">[[</font> <font color="#009900">$count</font> -le <font color="#993399">30</font> <font color="#990000">]];</font> <b><font color="#0000FF">do</font></b>
+    convert -fill brown -draw <font color="#FF0000">"circle 51,51 61,61"</font> -fill white -pointsize <font color="#993399">20</font> -annotate <font color="#990000">+</font><font color="#993399">40</font><font color="#990000">+</font><font color="#993399">59</font> <font color="#009900">$count</font> <font color="#009900">$in</font> survey-icon-66x66-<font color="#009900">$count</font><font color="#990000">.</font>png
+    <b><font color="#0000FF">let</font></b> <font color="#009900">count</font><font color="#990000">=</font><font color="#009900">$count</font><font color="#990000">+</font><font color="#993399">1</font>
+<b><font color="#0000FF">done</font></b></tt></pre>
+-----

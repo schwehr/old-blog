@@ -1,0 +1,56 @@
+TITLE: Weather data
+AUTHOR: Kurt
+DATE: 12.25.2004 18:34
+DESC: NOAA weather data
+-----
+BODY:
+I did not find anything about the Ambient Weather protocol, but I did
+install wmweather from fink.  From that I discovered that the weather
+data is really easy to get.  I looked up the location code from the
+<a href="http://www.nws.noaa.gov/tg/siteloc.shtml">NOAA Location Code
+Page</a>.  The station that came up as close to Chagrin Falls, OH is
+KCGF, Cayahoga.  Then add the code into the URL:
+<pre>
+  <a href="http://weather.noaa.gov/pub/data/observations/metar/decoded/KCGF.TXT">curl http://weather.noaa.gov/pub/data/observations/metar/decoded/KCGF.TXT</a>
+</pre>
+
+That web site is returning this right now:
+<pre>
+  Cleveland / Cuyahoga, OH, United States (KCGF) 41-34N 081-29W
+  Dec 25, 2004 - 08:45 PM EST / 2004.12.26 0145 UTC
+  Wind: from the SSE (150 degrees) at 6 MPH (5 KT):0
+  Visibility: 7 mile(s):0
+  Sky conditions: overcast
+  Temperature: 17 F (-8 C)
+  Windchill: 8 F (-13 C):1
+  Dew Point: 10 F (-12 C)
+  Relative Humidity: 72%
+  Pressure (altimeter): 30.21 in. Hg (1023 hPa)
+  ob: KCGF 260145Z 15005KT 7SM BKN080 OVC120 M08/M12 A3021
+  cycle: 2
+</pre>
+To get the location, I could probably scrape the lat/lon from here:
+<pre>
+  <a href="http://weather.noaa.gov/cgi-bin/nsd_lookup.pl?station=KCGF">http://weather.noaa.gov/cgi-bin/nsd_lookup.pl?station=KCGF</a>
+</pre>
+
+Which returns:
+
+<pre>
+  CAO Location Indicator: KCGF
+  Station Name: Cleveland / Cuyahoga
+  State: OH
+  Country: United States
+  WMO Region: 4
+  Station Position: 41-34N    081-29W (dms)
+  Station Elevation (Ha): 268 Meters
+</pre>
+
+To get bouy data, the only way I have found is to scrape the results
+on these pages:
+
+<pre>
+  <a href="http://www.ndbc.noaa.gov/">http://www.ndbc.noaa.gov/</a>
+</pre>
+
+-----

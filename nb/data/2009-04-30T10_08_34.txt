@@ -1,0 +1,37 @@
+TITLE: Updating ubuntu stuck on a LTS release
+AUTHOR: Kurt
+DATE: 04.30.2009 10:08
+DESC: more linux updating
+-----
+BODY:
+I have several machines that passed through the 8.04 long term support
+(LTS) release.  When in an LTS release version, Ubuntu does not want to
+update itself:
+<pre>% <b>sudo do-release-upgrade</b>
+Checking for a new ubuntu release
+No new release found</pre>
+The trick is to set the Prompt from lts to normal:
+<pre>% <b>sudo perl -pi -e 's|Prompt=lts|Prompt=normal|' /etc/update-manager/release-upgrades</b></pre>
+Then you can go through the normal upgrade process:
+<pre>% <b>sudo apt-get install update-manager-core</b>
+% <b>sudo do-release-upgrade</b></pre>
+It is interesting to see that the do-release-upgrade is a python
+script.  It takes a '-h' flag for help.  One option that it needs is
+to just answer y or the default to all questions for a fully automated
+upgrade.
+<pre>% <b>do-release-upgrade -h</b>
+Usage: do-release-upgrade [options]
+<!-- -->
+Options:
+  -h, --help            show this help message and exit
+  -d, --devel-release   Check if upgrading to the latest devel release is
+                        possible
+  -p, --proposed        Try upgrading to the latest release using the upgrader
+                        from $distro-proposed
+  -m MODE, --mode=MODE  Run in a special upgrade mode. Currently 'desktop' for
+                        regular upgrades of a desktop system and 'server' for
+                        server systems are supported.
+  -f FRONTEND, --frontend=FRONTEND
+                        Run the specified frontend
+  -s, --sandbox         Test upgrade with a sandbox aufs overlay</pre>
+-----

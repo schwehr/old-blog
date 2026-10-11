@@ -1,0 +1,31 @@
+TITLE: Strings as file like objects (for doctests)
+AUTHOR: Kurt
+DATE: 05.01.2006 06:14
+DESC: doctest
+-----
+BODY:
+I want to be able to use a strings as file like objects for testing
+objects that work on files, Turns out there is exactly a class
+designed for this.  Normally reading a file can be done like this:
+<pre>
+#!/usr/bin/env python
+for line in open('datafile'):
+    print 'line',line,
+</pre>
+The StringIO class has the requisite interface so that it can work the
+same way.
+<pre>
+#!/usr/bin/env python
+s='''first
+second
+'''
+from StringIO import StringIO
+for line in StringIO(s):
+    print 'line',line,
+</pre>
+When run, this gives:
+<pre>
+line: first
+line: second
+</pre>
+-----

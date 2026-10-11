@@ -1,0 +1,67 @@
+TITLE: SpaceQuest receiving AIS SART messages from orbit
+AUTHOR: Kurt
+DATE: 04.29.2010 08:35
+DESC: potential to save lives
+-----
+BODY:
+SpaceQuest has been kind enough to share what they received from the
+Honolulu, HI <a href="http://en.wikipedia.org/wiki/AIS-SART">AIS
+Search and Rescue Transmitter</a> (SART) test by the USCG.  I have
+layed out the 3 MMSI's received from 3 of the USCG's NAIS stations
+(white lines) with the SpaceQuest received messages.  They got 42
+receives from the test.  Pretty impressive for a receiver that is
+whipping past in a low orbit.  These messages are a class A position message
+with a special MMSI.  First an example receive from the USCG:
+
+<pre>!AIVDM,1,1,,A,1&gt;M4f1vP00Dd;bl&lt;=50tH?wd08?E,0*52,d-106,S9999,r14xkaa1,1264100667</pre>
+
+<table border="1">
+<tr bgcolor="orange">
+<th align="left">Field Name</th>
+<th align="left">Type</th>
+<th align="left">Value</th>
+<th align="left">Value in Lookup Table</th>
+<th align="left">Units</th>
+</tr>
+<tr><td>MessageID</td><td>uint</td> <td>1</td> <td>1</td></tr>
+<tr><td>RepeatIndicator</td><td>uint</td> <td>0</td><td>default</td></tr>
+<tr><td>UserID/MMSI</td><td>uint</td> <td><b>970010119</b></td> <td>970010119</td></tr>
+<tr><td>NavigationStatus</td><td>uint</td> <td>14</td><td>reserved for future use</td></tr>
+<tr><td>ROT</td><td>int</td> <td>-128</td> <td>-128</td><td>4.733*sqrt(val) &deg;/min</td></tr>
+<tr><td>SOG</td><td>udecimal</td> <td>0</td><td></td><td>knots</td></tr>
+<tr><td>PositionAccuracy</td><td>uint</td> <td>0</td><td>low (&gt; than 10 m)</td></tr>
+<tr><td>longitude</td><td>decimal</td> <td>-158.12038333</td> <td>-158.12038333</td><td>&deg;</td></tr>
+<tr><td>latitude</td><td>decimal</td> <td>21.328645</td> <td>21.328645</td><td>&deg;</td></tr>
+<tr><td>COG</td><td>udecimal</td> <td>316.8</td> <td>316.8</td><td>&deg;</td></tr>
+<tr><td>TrueHeading</td><td>uint</td> <td>511</td> <td>511</td><td>&deg;</td></tr>
+<tr><td>TimeStamp</td><td>uint</td> <td>54</td><td></td><td>seconds</td></tr>
+<tr><td>RegionalReserved</td><td>uint</td> <td>0</td> <td>0</td></tr>
+<tr><td>Spare</td><td>uint</td> <td>0</td> <td>0</td></tr>
+<tr><td>RAIM</td><td>bool</td> <td>False</td><td>not in use</td></tr>
+</table>
+
+Here are the two data sets together:
+
+<img title="SpaceQuest SAIS and USCG NAIS" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/spacequest-sais-sart-1.png"/>
+
+Zooming in on the SpaceQuest receives:
+
+<img title="SpaceQuest SAIS and USCG NAIS" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/spacequest-sais-sart-2.png"/>
+
+The lesson here is that AIS SARTs can be heard from orbit, but make
+sure you keep the device on for a while - with an orbital period of 90
+minutes, you can't just pulse it on and expect to be heard when you
+are far from the coast.
+
+There was an announcement from ORBCOMM about AIS SART receives, but
+they never showed any actual results: <a
+href="http://www.maritimesafetynews.com/?p=176">Satellite AIS Proves
+to Be Effective in Maritime Search and Rescue Operations</a> [Marine
+Safety News]
+
+I am sure there will be some good AIS SART discussions at the San
+Diego RTCM meeting, but I will not be attending this year.  I hope
+there are some bloggers in attendance this year so I can follow along.
+-----

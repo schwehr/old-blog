@@ -1,0 +1,43 @@
+TITLE: TCP/IP data logging
+AUTHOR: Kurt
+DATE: 03.05.2007 16:27
+DESC: how much simpler can it get?
+-----
+BODY:
+Here is a dirt simple data logger for connecting to a port and logging
+AIS data from a base station.  Your port number and IP address will
+be different depending on vendor and configuration issues.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">socket</font>,<font color="#2040a0">select</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>import</strong> <font color="#2040a0">time</font>
+<font color="#2040a0">s</font> <font color="4444FF">=</font> <font color="#2040a0">socket</font>.<font color="#2040a0">socket</font><font color="4444FF">(</font><font color="#2040a0">socket</font>.<font color="#2040a0">AF_INET</font>, <font color="#2040a0">socket</font>.<font color="#2040a0">SOCK_STREAM</font><font color="4444FF">)</font>
+<font color="#2040a0">s</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#008000">'10.1.1.29'</font>, <font color="#FF0000">5505</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#2040a0">buf</font><font color="4444FF">=</font><font color="#008000">''</font>
+<strong>while</strong> <font color="#2040a0">True</font><font color="4444FF">:</font>
+    <font color="#2040a0">readersready</font>,<font color="#2040a0">outputready</font>,<font color="#2040a0">exceptready</font> <font color="4444FF">=</font> <font color="#2040a0">select</font>.<font color="#2040a0">select</font><font color="4444FF">(</font><font color="4444FF">[</font><font color="#2040a0">s</font><font color="4444FF">]</font>,<font color="4444FF">[</font><font color="4444FF">]</font>,<font color="4444FF">[</font><font color="4444FF">]</font>,.<font color="#FF0000">1</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">sock</font> <strong>in</strong> <font color="#2040a0">readersready</font><font color="4444FF">:</font>
+        <font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">sock</font>.<font color="#2040a0">recv</font><font color="4444FF">(</font><font color="#FF0000">100</font><font color="4444FF">)</font>
+        <font color="#2040a0">buf</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">data</font>
+        <font color="#2040a0">newline</font><font color="4444FF">=</font><font color="#2040a0">buf</font>.<font color="#2040a0">find</font><font color="4444FF">(</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">newline</font><font color="4444FF">:</font>
+            <font color="#2040a0">fields</font> <font color="4444FF">=</font> <font color="#2040a0">buf</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+            <strong>print</strong> <font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">','</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+            <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">1</font><font color="4444FF">:</font>
+                <font color="#2040a0">buf</font><font color="4444FF">=</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">buf</font><font color="4444FF">[</font><font color="#2040a0">newline</font><font color="4444FF">+</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font>
+            <strong>else</strong><font color="4444FF">:</font>
+                <font color="#2040a0">buf</font><font color="4444FF">=</font><font color="#008000">''</font>
+</pre>
+Here is what the logged data looks like.  I used the USCG N-AIS time stamp format here.
+<pre>
+!AIVDO,1,1,,A,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;701P00,0*37,1173129788.26
+!AIVDO,1,1,,B,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;707T00,0*36,1173129798.26
+$AIALR,211810.00,001,A,V,AIS: Tx malfunction*57,1173129805.17
+$AIALR,211810.00,002,A,V,AIS: Antenna VSWR exceeds limit*59,1173129805.18
+$AIALR,211708.00,052,A,V,AIS: UTC Lost*7F,1173129805.2
+!AIBRF,0000012345,,0*43,1173129806.62
+!AIVDO,1,1,,B,D000h&gt;@00000,0*75,1173129808.21
+!AIVDO,1,1,,A,4000h&gt;@000Httt&gt;&gt;GPK&lt;7&lt;707P00,0*31,1173129808.26
+</pre>
+-----

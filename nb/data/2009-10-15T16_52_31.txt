@@ -1,0 +1,74 @@
+TITLE: Clarification on AIS Zone messages (old style)
+AUTHOR: Kurt
+DATE: 10.15.2009 16:52
+DESC: hope this helps
+-----
+BODY:
+Here is some notes that will hopefully help with decoding the older
+(not the proposed IMO standard) zone messages.  This is what is
+currently being broadcast from the north end of Cape Cod.  I modified
+my zonemsg_decode script to take a Unix UTC timestamp and use that to
+calculate how long the zone has until it expires.  Here are two
+examples from two days ago.  This illustrates that currently the zones
+that have no whales are set to expire after just a few minutes (here
+10).  If part of the AIS system goes offline, then after no more than
+10 minutes all the zones on peoples chart displays that appeared as no
+whales observed will disappear.
+
+Note that all times in the AIS messages <b>must be UTC</b>.  Local
+time displays should only be done as a presentation issue.
+
+If a time remaining goes negative (aka the message expired), you should
+stop displaying the message on the chart view.
+
+First with no whales heard by the autobuoy for the last 24 hours:
+<pre>!AIVDM,1,1,,A,803OvriK`PP6l`0Fg7GI63do4T;0,0*63,d-089,S0359,t204009.00,T09.57700285,r003669945,1255466410,cornell,1255466411.7</pre>
+This message decodes like this:
+<pre>{'DAC': 366, 'RepeatIndicator': 0, 'UserID': 3669739, 'Spare': 0, 'MessageID': 8, 'FI': 34}
+ZoneMsg
+  dac: 366
+  fi: 34
+  zone_id: 1
+  zone_type: 0 [Right Whales NOT OBSERVED] 
+  start_utc_day: 13
+  start_utc_hour: 20
+  start_utc_minute: 40
+  zone_duration_minutes: 10
+  num zones: 1
+  ZoneCircular 9260m radius at (-70.67832, 42.34728)
+  ZoneCircular
+	radius:		9260m
+	longitude:	-70.6783166667
+	latitude:	42.3472816667
+  Now:        2009-10-13 20:40:11
+  Start time: 2009-10-13 20:40:00
+  Expires:    2009-10-13 20:50:00
+  Remaining:   589 sec
+  Remaining:   <b>9.82 min</b>
+  Remaining:   0.16 hr</pre>
+And now for the case where a whale was heard by the hydrophone:
+<pre>!AIVDM,1,1,,B,803OvriK`R0FaqT6gOv763PKLT;0,0*25,d-089,S0392,t204010.00,T10.45701635,r003669945,1255466410,cornell,1255466411.9</pre>
+This decodes to:
+<pre>{'DAC': 366, 'RepeatIndicator': 0, 'UserID': 3669739, 'Spare': 0, 'MessageID': 8, 'FI': 34}
+ZoneMsg
+  dac: 366
+  fi: 34
+  zone_id: 4
+  zone_type: 1 [Right Whales PRESENT] 
+  start_utc_day: 13
+  start_utc_hour: 9
+  start_utc_minute: 57
+  zone_duration_minutes: 1440
+  num zones: 1
+  ZoneCircular 9260m radius at (-70.34238, 42.32606)
+  ZoneCircular
+	radius:		9260m
+	longitude:	-70.3423766667
+	latitude:	42.326065
+  Now:        2009-10-13 20:40:11
+  Start time: 2009-10-13 09:57:00
+  Expires:    2009-10-14 09:57:00
+  Remaining:   47809 sec
+  Remaining:   796.82 min
+  Remaining:   <b>13.28 hr</b></pre>
+-----

@@ -1,0 +1,59 @@
+TITLE: ASN.1 Encoding
+AUTHOR: Kurt
+DATE: 01.08.2008 14:05
+DESC: Basic Encoding Rules
+-----
+BODY:
+Brian L. just pointed me to ASN.1 and a book, Cryptography for
+Developers, that is in Safari (the online books for computer
+programmers).
+
+<pre>
+...
+Abstract Syntax Notation One (ASN.1) is an ITU-T set of standards for
+encoding and rep-resenting common data types such as printable
+strings, octet strings, bit strings, integers, and composite sequences
+of other types as byte arrays in a portable fashion. Simply put,ASN.1
+specifies how to encode nontrivial data types in a fashion such that
+any other platform or third-party tool can interpret the content.
+.
+For example, on certain platforms the literal character "a" would be
+encoded in ASCII (or IA5) as the decimal value 97, whereas on other
+non-ASCII platforms it may have another encoding. ASN.1 specifies an
+encoding such that all platforms can decode the string
+uniformly. Similarly, large integers, bit strings, and dates are also
+platform sensitive data types that benefit from standardization.
+...
+ASN.1 was originally standardized in 1994 and again in 1997 and
+2002. The current standard is ITU-T X.680, also filed as ISO/IEC
+8824-1:2002, and is freely available on the Internet (ASN.1 Reference:
+http://asn1.elibel.tm.fr/standards/). This chapter discusses the
+implementation of ASN.1 encodings more than the theory behind the
+ASN.1 design. The reader is encouraged to read the ITU-T documents for
+a deeper treatment. The standards we are aiming to support by learning
+ASN.1 are the PKCS #1/#7 and ANSI X9.62/X9.63 public key cryptography
+standards. As it turns out, to support these standards your ASN.1
+routines have to handle quite a bit of the ASN.1 types in the DER
+rule-set, resulting in encoding routines usable for a broad range of
+other tasks.
+...
+</pre>
+<a
+href="http://asn1.elibel.tm.fr/en/introduction/index.htm">Introduction
+to ASN.1</a> 
+
+and <a href="http://en.wikipedia.org/wiki/XML_Encoding_Rules">XML Encoding Rules</a> [wikipedia]
+<pre>
+XML Encoding Rules (XER) are a set of ASN.1 encoding rules for
+producing an XML-based verbose textual transfer syntax for data
+structures described in ASN.1.
+.
+A variant of XER called Canonical XML Encoding Rules (CXER) is also
+defined for uses where the encodings have to be preserved, such as
+security exchanges. Data encoded in CXER is always valid XER, but not
+vice versa.
+</pre>
+Not to be forgotten: <a href="http://en.wikipedia.org/wiki/Basic_encoding_rules">Basic Encoding Rules (BER)</a> [wikipedia]
+
+There is of course a python library for this: <a href="http://pyasn1.sourceforge.net/">pyasn1</a> [sf.net]
+-----

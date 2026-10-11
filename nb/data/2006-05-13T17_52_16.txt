@@ -1,0 +1,70 @@
+TITLE: reading xml with mixed tags and text?
+AUTHOR: Kurt
+DATE: 05.13.2006 17:52
+DESC: how to fix this?
+-----
+BODY:
+Here is a little puzzler.  I was playing with an example from
+"Learning XML" and ran into a spot of trouble.  The example was
+supposed to teach how to use entities to allow referencing them later
+in an xml file, but I hit a snag that is shown below.  First the xml
+from the book but stripped down:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!DOCTYPE</font> <font color="#2040a0">message</font> <font color="#2040a0">SYSTEM</font> <font color="#008000">&quot;/xmlstuff/dtds/message.dtd&quot;</font><font color="#2040a0">
+[
+&lt;!ENTITY</font> <font color="#2040a0">client</font> <font color="#008000">&quot;John&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!ENTITY</font> <font color="#2040a0">agent</font> <font color="#008000">&quot;Jane&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!ENTITY</font> <font color="#2040a0">phone</font> &quot;<font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">number</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>603-555-1234<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/number</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>&quot;&gt;
+]&gt;
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">message</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">opening</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>Dear <font color="ff0000">&amp;client;</font><font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/opening</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>call <font color="ff0000">&amp;agent;</font> at <font color="ff0000">&amp;phone;</font>.
+Hurry, <font color="ff0000">&amp;client;</font>. Time is running out!<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/message</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Now for the lxml python code to read it using the ElementTree API
+using a recurive desent algorithm:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">#from elementtree.ElementTree import parse # Element Tree</font>
+<strong>from</strong> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font> <strong>import</strong> <font color="#2040a0">parse</font> <font color="#444444"># lxml</font>
+<font color="#444444">#</font>
+<font color="#2040a0">def</font> <font color="#2040a0">printET</font><font color="4444FF">(</font><font color="#2040a0">ele</font>,<font color="#2040a0">indent</font><font color="4444FF">=</font><font color="#008000">'  '</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">ele</font><font color="4444FF">:</font> <strong>return</strong> <font color="#FF0000">0</font>
+    <strong>if</strong> <font color="#2040a0">ele</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+	<strong>for</strong> <font color="#2040a0">name</font>,<font color="#2040a0">val</font> <strong>in</strong> <font color="#2040a0">ele</font>.<font color="#2040a0">items</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+	    <strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font> <font color="#008000">'attr: '</font><font color="4444FF">+</font><font color="#2040a0">name</font><font color="4444FF">+</font><font color="#008000">' ... '</font><font color="4444FF">+</font><font color="#2040a0">val</font>
+    <font color="#2040a0">c</font> <font color="4444FF">=</font> <font color="#2040a0">ele</font>.<font color="#2040a0">getchildren</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">child</font> <strong>in</strong> <font color="#2040a0">c</font><font color="4444FF">:</font>
+	<font color="#2040a0">count</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+	<strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font>,
+	<strong>if</strong> <font color="#2040a0">child</font>.<font color="#2040a0">text</font> <strong>and</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">child</font>.<font color="#2040a0">text</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">' -- &quot;'</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">text</font><font color="4444FF">+</font><font color="#008000">'&quot;'</font>
+	<strong>else</strong><font color="4444FF">:</font> <strong>print</strong>
+	<font color="#2040a0">num</font> <font color="4444FF">=</font> <font color="#2040a0">printET</font><font color="4444FF">(</font><font color="#2040a0">child</font>,<font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'  '</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">num</font> <font color="4444FF">&gt;</font> <font color="#FF0000">0</font><font color="4444FF">:</font>
+	    <strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'end '</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font><font color="4444FF">+</font><font color="#008000">' numchildren = '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">num</font><font color="4444FF">)</font>
+    <strong>return</strong> <font color="#2040a0">count</font>
+<font color="#444444">#</font>
+<font color="#2040a0">root</font> <font color="4444FF">=</font> <font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#008000">'xml-sample.xml'</font><font color="4444FF">)</font>.<font color="#2040a0">getroot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">printET</font><font color="4444FF">(</font><font color="#2040a0">root</font><font color="4444FF">)</font>
+</pre>
+Now running the python program, I end up with nothing after the inline
+number tag.  How do I get at the trailing text?  Clearly the text text
+is there as can be seen with this little python program:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>
+<font color="#2040a0">root</font> <font color="4444FF">=</font> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>.<font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#008000">'xml-sample.xml'</font><font color="4444FF">)</font>.<font color="#2040a0">getroot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font>.<font color="#2040a0">tostring</font><font color="4444FF">(</font><font color="#2040a0">root</font><font color="4444FF">)</font>
+</pre>
+This 4 liner prints:
+<pre>
+&lt;message&gt;
+&lt;opening&gt;Dear John&lt;/opening&gt;
+&lt;body&gt;call Jane at &lt;number&gt;603-555-1234&lt;/number&gt;.
+Hurry, John. Time is running out!&lt;/body&gt;
+&lt;/message&gt;
+</pre>
+-----

@@ -1,0 +1,84 @@
+TITLE: A first try at graphviz
+AUTHOR: Kurt
+DATE: 11.28.2010 17:40
+DESC: not too hard
+-----
+BODY:
+I am working on being able to add graphs in my org-mode documents.  I
+want to try ditaa, but first, I wanted to take a look at graphviz.
+Graphviz has been on my "to try" list for a very long time.  The
+basics are pretty easy, but it gets challenging if you want much in
+the way of control.  I used my GIS workflow figure that I made with
+PowerPoint last week as my example.  In the future, I will be using
+graphviz to show sensor networks with their status and sensor values.
+
+Here is how I ran all the different graphviz layout programs:
+<pre>for mode in dot neato twopi circo fdp sfdp; do 
+  ${mode} -Tpng gis.dot -o gis-${mode}.png
+done</pre>
+And here is the code that I used to define the graph.  If you have a
+graph up next to the code, you can probably guess most of what it was
+doing.  Someone who really knows graphviz would likely make a much
+nicer dot file and have prettier graphics come out.
+<pre><tt><i><font color="#9A1900">// -*- c++ -*-  Sort of close as an emacs mode</font></i>
+<font color="#008080">digraph</font> GIS <font color="#FF0000">{</font>
+    size <font color="#990000">=</font><font color="#FF0000">"6,6"</font><font color="#990000">;</font>  <i><font color="#9A1900">// not working?!?</font></i>
+<!-- -->
+    <font color="#008080">subgraph</font> cluster_realworld <font color="#FF0000">{</font>
+        label<font color="#990000">=</font><font color="#FF0000">"Physical World"</font><font color="#990000">;</font>
+        bgcolor<font color="#990000">=</font>lightgrey<font color="#990000">;</font>
+        sensing <font color="#990000">[</font>shape<font color="#990000">=</font>ellipse<font color="#990000">,</font> color<font color="#990000">=</font>orange<font color="#990000">,</font> label<font color="#990000">=</font><font color="#FF0000">"Sensing the world</font><font color="#CC33CC">\n</font><font color="#FF0000">x,y,t,z values, error/uncertainty</font><font color="#CC33CC">\n</font><font color="#FF0000">metadata"</font><font color="#990000">];</font>
+    <font color="#FF0000">}</font>
+    edge <font color="#990000">[</font>color<font color="#990000">=</font>orange<font color="#990000">];</font>
+    sensing <font color="#990000">-&gt;</font> capture<font color="#990000">;</font>
+<!-- -->
+    node <font color="#990000">[</font>shape<font color="#990000">=</font>box<font color="#990000">];</font>
+    edge <font color="#990000">[</font>color<font color="#990000">=</font>blue<font color="#990000">];</font>
+<!-- -->
+    <font color="#008080">subgraph</font> cluster_internetworld <font color="#FF0000">{</font>
+        label <font color="#990000">=</font> <font color="#FF0000">"Them - Internet world"</font><font color="#990000">;</font>
+        bgcolor <font color="#990000">=</font> lightgrey<font color="#990000">;</font>
+        info_exchange <font color="#990000">[</font>label<font color="#990000">=</font><font color="#FF0000">"Information Exchange</font><font color="#CC33CC">\n</font><font color="#FF0000">Files, W[MF]S, etc"</font><font color="#990000">]</font>
+    <font color="#FF0000">}</font>
+<!-- -->
+    capture <font color="#990000">-&gt;</font> info_exchange<font color="#990000">;</font>
+    capture <font color="#990000">-&gt;</font> fmt_conversion<font color="#990000">;</font>
+<!-- -->
+    edge <font color="#990000">[</font>dir<font color="#990000">=</font>both<font color="#990000">];</font>
+    info_exchange <font color="#990000">-&gt;</font> fmt_conversion<font color="#990000">;</font>
+    fmt_conversion <font color="#990000">-&gt;</font> store<font color="#990000">;</font>
+<!-- -->
+    capture <font color="#990000">[</font>shape<font color="#990000">=</font>box<font color="#990000">,</font> label<font color="#990000">=</font><font color="#FF0000">"Information Capture</font><font color="#CC33CC">\n</font><font color="#FF0000">Acquisition</font><font color="#CC33CC">\n</font><font color="#FF0000">(</font><font color="#CC33CC">\"</font><font color="#FF0000">Level 0</font><font color="#CC33CC">\"</font><font color="#FF0000">)"</font><font color="#990000">];</font>
+    fmt_conversion <font color="#990000">[</font>label<font color="#990000">=</font><font color="#FF0000">"Format Conversion</font><font color="#CC33CC">\n</font><font color="#FF0000">(or pass as is - </font><font color="#CC33CC">\"</font><font color="#FF0000">Null</font><font color="#CC33CC">\"</font><font color="#FF0000">)"</font><font color="#990000">];</font>
+    store <font color="#990000">[</font>bgcolor <font color="#990000">=</font> grey<font color="#990000">,</font>  shape<font color="#990000">=</font>Msquare<font color="#990000">,</font> label<font color="#990000">=</font><font color="#FF0000">"Data Store</font><font color="#CC33CC">\n</font><font color="#FF0000">Files</font><font color="#CC33CC">\n</font><font color="#FF0000">Spatial Databases</font><font color="#CC33CC">\n</font><font color="#FF0000">In Memory Store"</font><font color="#990000">];</font>
+<!-- -->
+    edge <font color="#990000">[</font>dir<font color="#990000">=</font>forward<font color="#990000">];</font>
+    store <font color="#990000">-&gt;</font> query <font color="#990000">-&gt;</font> decide<font color="#990000">;</font>
+    store <font color="#990000">-&gt;</font> physical_out <font color="#990000">-&gt;</font> decide<font color="#990000">;</font>
+    store <font color="#990000">-&gt;</font> viz <font color="#990000">-&gt;</font> decide<font color="#990000">;</font>
+<!-- -->
+    edge <font color="#990000">[</font>dir<font color="#990000">=</font>both<font color="#990000">];</font>
+    store <font color="#990000">-&gt;</font> transform<font color="#990000">;</font>
+    
+    edge <font color="#990000">[</font>dir<font color="#990000">=</font>forward<font color="#990000">,</font> color<font color="#990000">=</font>blue<font color="#990000">,</font> style<font color="#990000">=</font>dashed<font color="#990000">];</font>
+    viz <font color="#990000">-&gt;</font> transform<font color="#990000">;</font>
+<!-- -->
+    physical_out <font color="#990000">[</font> label<font color="#990000">=</font><font color="#FF0000">"Physical Output</font><font color="#CC33CC">\n</font><font color="#FF0000">Maps, Printouts, &amp; 3D Models"</font> <font color="#990000">];</font>
+    query <font color="#990000">[</font> label<font color="#990000">=</font><font color="#FF0000">"Query"</font> <font color="#990000">];</font>
+    viz <font color="#990000">[</font> label<font color="#990000">=</font><font color="#FF0000">"2D/3D</font><font color="#CC33CC">\n</font><font color="#FF0000">Computer Visualizations"</font> <font color="#990000">];</font>
+    transform <font color="#990000">[</font> label<font color="#990000">=</font><font color="#FF0000">"Data transformations</font><font color="#CC33CC">\n</font><font color="#FF0000">Algorithms /</font><font color="#CC33CC">\n</font><font color="#FF0000">Projections"</font> <font color="#990000">];</font>
+<!-- -->
+    <font color="#008080">subgraph</font> cluster_result <font color="#FF0000">{</font>
+        label<font color="#990000">=</font><font color="#FF0000">"End Result"</font><font color="#990000">;</font>
+        bgcolor<font color="#990000">=</font>lightgrey<font color="#990000">;</font>
+        decide <font color="#990000">[</font> shape<font color="#990000">=</font>ellipse<font color="#990000">,</font> color<font color="#990000">=</font>orange<font color="#990000">,</font> label<font color="#990000">=</font><font color="#FF0000">"Informed decision making"</font> <font color="#990000">];</font>
+    <font color="#FF0000">}</font>
+<font color="#FF0000">}</font></tt></pre>
+Here are the best two results using dot and fdp respectively:
+
+<img title="dot" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-11/gis-dot.png"/>
+
+<img title="fdp layout" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-11/gis-fdp.png"/>
+
+Not nearly as nice as I would like, but definitely functional.
+-----

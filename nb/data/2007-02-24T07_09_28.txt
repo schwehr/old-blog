@@ -1,0 +1,32 @@
+TITLE: including xml documents in other xml documents (xinclude)
+AUTHOR: Kurt
+DATE: 02.24.2007 07:09
+DESC: not too bad once you have an example to work from
+-----
+BODY:
+Here is a really simple example of using xinclude to bring another xml
+document into a document.  First the main xml document (test.xml):
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">foo</font> <font color="#2040a0">xmlns:xi=</font><font color="#008000">&quot;http://www.w3.org/2001/XInclude&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xi:include</font> <font color="#2040a0">href=</font><font color="#008000">&quot;somewhere.xml&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/foo</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+So we are going to include somewhere.xml into this document.  somewhere.xml is pretty simple:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">atag</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>bar<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/atag</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Now use xmllint to see what the document looks like without xinclude turned on:  "xmllint test.xml"
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">foo</font> <font color="#2040a0">xmlns:xi=</font><font color="#008000">&quot;http://www.w3.org/2001/XInclude&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xi:include</font> <font color="#2040a0">href=</font><font color="#008000">&quot;somewhere.xml&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/foo</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Now turn on xinclude:  "xmllint --xinclude test.xml"
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">foo</font> <font color="#2040a0">xmlns:xi=</font><font color="#008000">&quot;http://www.w3.org/2001/XInclude&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">atag</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>bar<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/atag</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/foo</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+-----

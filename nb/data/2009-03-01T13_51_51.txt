@@ -1,0 +1,23 @@
+TITLE: Sometimes bugs are simple but hard to catch
+AUTHOR: Kurt
+DATE: 03.01.2009 13:51
+DESC: more better dates
+-----
+BODY:
+Sometimes the simplest of things can cause software to not work right.
+I did a psall (bash: alias psall='ps -a -w -w -x -O user'), and copied
+a command.  
+<pre>% <b>psall | egrep -i 'python'</b>
+15977 schwehr    ??  S      5:50.30 python ./ais-net-to-postgis -a 127.0.0.1 -I 0.0.0.0 -s 3 hours ago -S 4 hours ago -c 600 -v</pre>
+When I restarted the program, I copied the text from the ps output.
+However, that stripped off the quotes.  This code is using magicdate
+to figure out relative times "3 hours ago" became 3 and "4 hours ago" 
+became 4.  That really was not working!  magicdate treats a number as 
+the day of the current month.  The two <i>hours ago</i> were getting
+added to the general command args and ignored by the options flags
+when using python's optparse.
+
+The real command to run is:
+<pre>% <b>./ais-net-to-postgis -a 127.0.0.1 -I 0.0.0.0 -s "3 hours ago" -S "4 hours ago" -c 600 -v &</b></pre>
+That works much better!
+-----

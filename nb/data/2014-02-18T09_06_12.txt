@@ -1,0 +1,97 @@
+TITLE: A unified marine sensor logging format
+AUTHOR: Kurt
+DATE: 02.18.2014 09:06
+DESC: down with gsf
+-----
+BODY:
+This is the first of a series of posts I hope to write.
+
+<a href="https://xkcd.com/927/">https://xkcd.com/927/</a>
+
+<img width="500" height="283" title="XKCD Stanards" withgrayborder="True" src="http://schwehr.org/blog/attachments/2014-02/xkcd-standards.png"/>
+
+See also: <a
+href="https://gitorious.org/toils-of-ais/toils-of-ais/source/9fdc70ed69c3cd5ec46e672eb6aa120e335d0e77:">Toils
+of AIS</a> by Eric S. Raymond and Kurt Schwehr.
+
+I am frustrated that each sub-community of marine related sensors has
+their own data formats for raw logging.  Even worse, each vendor has
+their own format (with many different messages as they innovate over
+the years).  Those formats require a wide range of support libraries
+and often not easily extensible.  We have formats for multibeam
+sonars, seismic systems, acoustic recorders (hydro and geo-phones),
+seismic stations (really just a 3-axis, 3-channel geo-phone), lidar,
+ships' and GPS sensors, magnetometers, radar, grids, images, vectors,
+metadata, and more.  Those formats treat data in other formats as
+orthogonal.  Most of encodings used for those formats are not even described in the
+Wikipedia article on <a
+href="http://en.wikipedia.org/wiki/Comparison_of_data_serialization_formats">Comparison
+of data serialization formats</a>.  Worse yet, some key standards are
+behind paywalls, which greatly hampers adoption (e.g. try pricing all
+the ISO standards related to metadata).  On top of that, some
+of these standards are so confusing that it is nearly impossible to
+create conformant data streams.
+
+In this series, I will be arguing that the sonar community needs to
+get away from systems like the Generic Sensor Format (gsf) and move to a
+unified machine and human readable specification system for the data stream at
+the lower levels. I will be pushing for using ProtoBuffers (protobuf).
+Protobufs were created by Google and are heavily used within Google. I
+have a fair bit of experience with them as I have been working for Google
+for the last 2 years. However, there are other formats, such as BSON,
+that could work. I do feel like I'm repeating myself with this. I
+argued for a custom XML representation of AIS messages starting in
+2006 and declaring defeat in 2010 as the AIS community opted to stick
+with their amazingly terrible status quo.
+
+An additional concern is that people have proposed formats or
+tools that are either only used in a small community, are not tested
+across a number of key programming languages or revert to defining the
+raw bit level packaging such that the software engineers of every piece
+of code that will touch this format will have to understand the low
+level details.
+
+In this first post, I'd like to explore the use cases.  What are the
+range of problems that we are trying to solve?  I'm attempting to
+think about 50 or so years into the future, a near impossible task,
+but some things will most certainly be correct.  Storage of data will
+become more affordable in terms of cost, power required, volume/mass
+required.  Compute power for an available budget will increase.
+Sensors will become more affordable and their diversity will increase.
+
+I have not had a chance to flush out these use cases, but I do not
+want to wait any longer to get this starter post on line.
+
+* Single beam echo sounder from a ship
+
+* Multibeam echo sounder ship
+
+* Multi-channel seismic vessel
+
+* Lidar from an aircraft
+
+* An AUV, Glider, Argos style device with IMU
+
+* Super cheap land sensor networks without GPS
+
+* ADCP mounted on the sea floor
+
+- without external intervention for long periods
+- event based time corrections
+
+* An array of sea floor devices 
+
+- down for an extended period with slow intermittent acoustic connections 
+
+* Ping editing a multibeam sonar
+
+* Post processing to get time and location
+
+* Post collection indexing to allow fast access
+
+* Later splicing of multiple platforms into a single stream
+
+- inlining of forward and backwards index messages
+
+* Non-survey ship underway
+-----

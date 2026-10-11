@@ -1,0 +1,19 @@
+TITLE: GDAL and QGIS for BAGs and GTX VDATUM files
+AUTHOR: Kurt
+DATE: 05.08.2012 10:48
+DESC: can I do this on my own?
+-----
+BODY:
+This is pretty awesome what I was able to do using GDAL with VRT virtual files.
+I did a GDAL info and figured that the BAG is actually in EPSG2960 (not 100% sure
+of that).  The results look very promising in QGIS.
+<pre>gdalwarp -tr 2 -2 -te 369179 4773093 372861 4775259 -of VRT -t_srs EPSG:2960 \
+     MENHMAgome01_8301/mllw.gtx  mllw-2960-crop-resample.vrt
+gdal_translate mllw-2960-crop-resample.{vrt,tif}</pre>
+
+Now, how can I do this just from python without using a system call to a command line?
+
+<a href="http://stackoverflow.com/questions/10454316/how-to-project-and-resample-a-grid-to-match-another-grid-with-gdal-python">How to do this? on Stack Overflow</a>
+
+<img width="600" height="385" title="BAG and GTX in QGIS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-05/gdal-vrt-bag-and-gtx-in-qgis.png"/>
+-----

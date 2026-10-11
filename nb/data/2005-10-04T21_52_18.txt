@@ -1,0 +1,60 @@
+TITLE: Closest point to cores on the seismic line
+AUTHOR: Kurt
+DATE: 10.04.2005 21:52
+DESC: where o where
+-----
+BODY:
+Here is how I calculated the closest location of my three cores to the
+track line.  This does NOT account for layback.  The shot numbers here
+need to have an offset applied to get the shot in the seismic plot
+shown.  This assumes the fish follows exactly the path of the ship
+which is not exactly true!
+
+The navigation in the xstar files is really bad on this scale, so I
+need to get the lon,lats from somewhere other than the X and Y segy
+fields in EEL5kL03.xstar.db.  I just modified segysqldist so that it
+can import ASCII navigation files.  segysqlshiptrack.py has code that
+creates a better shiptrack, so if I tell it to prepend the shotpoint,
+segysqldist.py can use that.
+<pre>
+  segysqlshiptrack.py --dump-key='Shotpoint' -d EEL5kL03.xstar.db \
+     -g ~/Desktop/pygmt-test/Eureka.grd -Z -i
+</pre>
+The key is the -i to cause it to do interpolation.  This is not the
+best solution as it requires a gmt grid file, but that is all I have
+time for!
+
+Now pass that in to segysqldist for each of the three core locations.
+I am now using named files with the lon/lat pairs.  Much less
+confusing.  I can never remember the full coordinates.
+<pre>
+segysqldist.py --in-position-file=<b>1</b>.dat --verbosity=6 \
+  -f EEL5kL03.xstar.db  -k Shotpoint --navigation-file=track.xyz -n 1 
+
+segysqldist.py --in-position-file=<b>2</b>.dat --verbosity=6 \
+  -f EEL5kL03.xstar.db  -k Shotpoint --navigation-file=track.xyz -n 1
+
+segysqldist.py --in-position-file=<b>7</b>.dat --verbosity=6 \
+  -f EEL5kL03.xstar.db  -k Shotpoint --navigation-file=track.xyz -n 1
+</pre>
+Which gives me:
+<pre>
+BEST:  1 88850 -124.502794647 40.8387528115 0.000182643946413  88850
+BEST:  1 88802 -124.502146874 40.8386448493 0.000207362222513  88802
+BEST:  1 88765 -124.501704355 40.8385510888 0.00031133927505  88765
+</pre>
+I can then make this simpler as 
+<pre>
+ -124.502794647 40.8387528115 0.000182643946413  88850
+ -124.502146874 40.8386448493 0.000207362222513  88802
+ -124.501704355 40.8385510888 0.00031133927505  88765
+</pre>
+Here are the gnuplot commands that made the graph below.
+<pre>
+gnuplot
+set xrange [-124.504:-124.5] 
+set yrange [40.837:40.84] 
+plot 'track.xyz' using 2:3 with l, '1.dat','2.dat','7.dat', 'picks.127.xy' 
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-10/segysqldist.gif">
+-----

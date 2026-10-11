@@ -1,0 +1,84 @@
+TITLE: Fastdike - stochastic seafloor spreading simulation
+AUTHOR: Kurt
+DATE: 07.13.2005 19:44
+DESC: C++ code to do fast forward modelling
+-----
+BODY:
+From the wayback machine...
+
+There was discussion today about simulating sea floor spreading.  I
+wish had more to offer them or time that I could create a better
+simulation system.  My recommendation was to keep using
+Fortran 77, add some optimization flags, and just abuse a few G5 Macs.
+The optimization flags that I recommended (but do know know if g77
+accepts them) are:
+<pre>
+  F77FLAGS := -O3
+  F77FLAGS += -funroll-loops 
+  F77FLAGS += -fexpensive-optimizations
+  F77FLAGS += -DNDEBUG
+  F77FLAGS += -ffast-math
+  F77FLAGS += -mpowerpc
+</pre>
+There probably are more and maybe even some G5 specific arch type
+flags, but that is what I had in my density pkg Makefile.
+
+It would be nice to really turn my old C++ code into a real
+application.  It would be great to put in the magnetics forward
+modeling code to actually generate the synthetic magnetic curve.  Also
+I was thinking about a set of gengetopt command line options that
+allow selection of model sizes and flow types.  Being able to specify
+the distributions for material and flow types would really make this a
+great tool.  It would also be nice to work in the longitude and
+latitude and depth profiles so that it can be easily matched to actual
+ship or vehicle tracks.
+
+And what about a 3D model?  That would be a lot more trouble, but fun
+to work on.
+
+From <a
+href="http://schwehr.org/blog/attachments/2005-07/fastdike-0.12.tar.bz2">fastdike</a>,
+here it the README:  I added a new paragraph what was on the web and
+added that as a README... hence the jump from 1.11 to 1.12.  The code
+is all the same.  I am sure it would run a lot faster on today's
+computers :)
+<pre>
+Looking back on this code, I have to warn you that the C++ programming
+style is not great.  I used macros for TRUE and FALSE, .h on C and C++
+headers that should not have them.  This is before I learned doxygen
+and gengetopts.
+
+-Kurt 7/2005
+<hr>
+This was inspired by a seminar with J. Gee and S. Cande. We read a
+paper simulating mid ocean ridge spreading. This is an attempt to
+recreate the process, but use a different data structure. The data
+structure is a doubly linked list. Inside the each column in an array
+that grows over time as lava flows over the top. The first element in
+the array is deepest and new lava is appended on the end of the
+array. If the array becomes longer than the current space allocated,
+the program reallocs the array with more space. It also is able to
+prune things as they move far away from the spreading center. Jeff
+estimated a run might take 1/2 hour. I don't know if that was with or
+without the magnetics being calculated. This program takes about 20
+seconds (PII 333 w/196MB to produce a 6483 x 1435 simulation), but
+does not do the magnetics. Most of that time is spent writing the data
+to disk.
+
+Idea from "Central anomaly magnetization high: constraints on the
+volcanic constructin and architecture of seismic layer 2A at a
+fast-spreading mid-ocean ridge, the EPR at 9deg30'-50'N," 1999,
+H. Shouten, M. Tivey, D. Fornari, J. Cochran, EPSL 169, p37-50.
+
+Kurt Schwehr -- Feb 2002
+</pre>
+
+From the National Institude of Standards and Technology: <a href="http://nist.gov/dads/">Dictionary of Algorithms and Data Structures</a>
+
+As an example, I looked up Octrees.  It sent me to Octree Algorithms
+here <a
+href="http://www.cg.tuwien.ac.at/research/vr/lodestar/tech/octree/">http://www.cg.tuwien.ac.at/research/vr/lodestar/tech/octree/</a>
+
+It is missing things like path planning with A*, but it looks like a
+nice online resource for simple browsing.
+-----

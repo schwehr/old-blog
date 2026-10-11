@@ -1,0 +1,128 @@
+TITLE: Thoughts on GIS
+AUTHOR: Kurt
+DATE: 11.14.2010 16:23
+DESC: ouch
+-----
+BODY:
+After writing this post, I find my view of GIS more foggy than when I
+started a couple hours ago.
+
+Today, I'm trying to rethink how to present Google Earth to the
+Research Tools class on Tuesday.  Despite what some people say, I
+really do believe that tools like spatial databases, spatial data
+transformation libraries (e.g. gdal, proj, and geos), and virtual
+globes are all GIS software.  I watched two talks on GIS at CCOM in
+the last two weeks and realize that I have a very different view of
+what GIS is compared to many people.  For those who just use ArcGIS, I
+see how they like having to deal with just one view of the vocabulary
+and concepts even if it is occasionally limiting.
+
+I keep having problems where I discover that ArcGIS users have
+specific views of concepts that are focused on how ESRI interacts with
+data or defines algorithms.  I haven't really used <a
+href="http://en.wikipedia.org/wiki/ArcInfo">Arc/Info</a> since Arc 6
+back in about 1995 when several factors combined to convince me to
+stop using Arc and focus on VEVI, MarsMap, Viz, XCore, and other
+custom solutions.
+
+I need to figure out what other people think makes up GIS.  I started
+reading the Wikipedia article on <a
+href="http://en.wikipedia.org/w/index.php?title=Geographic_information_system&oldid=396337719">Geographic
+Information Systems</a>.  Now I feel like I know <b>less</b>.  What a
+confusing and poorly written article.  I'm not even sure how to jump
+in and make some improvements.  I am not sure what the "GIS
+Uncertainty" section is really trying to get at.  What is the "Getty
+Thesaurus of Geographic Names" doing in a section on uncertainty?
+
+So how do I view GIS?  I consider GIS to by any tool that works to
+process geographic space-time data (x,y,z,t,data
+values,error/uncertainty,metadata) towards the end of allowing humans
+or machines to make decisions.  This ranges form paper &amp; pencil /
+paper maps through to high end visualization systems.  Here is quick
+sketch of general GIS flow that I whipped up.  My apologies for this
+not really being readable.
+
+<img title="GIS flow" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-11/gis-workflow.jpg"/>
+
+You start with measurements or model output that has values at a point
+in space and time.  If you think you don't have time, you are
+mistaken.  Think about a map from around 1900 of roads in the United
+States.  You might not think that the roads have time for each point,
+but they do, but you can represent that time with the same time
+range.  The "meta" in my figure is the metadata.  I don't think time 
+should be considered as metadata - it's just too important.
+
+When the data is captured by some system (paper, logging, the computer
+running a simulation, ship collecting sonar data, etc), it is in its
+"level 0" or initial form.  BTW, this is data that you should be archiving
+in the deep store (e.g. NGDC) if possible.  You can then transform the
+format of the data to something else that may be more directly usable
+(or apply the "null" operator that just passes the data right
+through).  The wavy line defines what the collective "you" does with
+the data.  Think of that as sometimes just a person, but you can scale
+this up to a "you" that includes thousands of people (as in the data
+flowing around in ERMA/GeoPlatform).  On the other side are the people
+who want to pull that data into their systems or that you want to get
+data from.
+
+Then there is one or more centralized stores of data.  This could
+range from files on disk, databases, data sitting in memory caches
+etc.  This used to be a simple thing, but with the internet, this is
+now a pretty hard concept to fully define.  From that store, you can
+transform and store new data products, create physical
+maps/plots/plastic models (physical items), make queries, or use
+computer visualization techniques.
+
+However, the end goal of all this is to allow people to make decisions
+about something.  It can often be difficult to remember this in
+current GIS systems as the person making the decision might be far
+removed in space and time from the day-to-day work of GIS.  Think of
+the ship captain who has to make a decision on the bridge of a ship of
+how to navigate a complicated sea route when conditions change.  Their
+chart came through a GIS and some of the raw input that went into the
+representation of the ocean environment might come from data collected
+more than <b>150 years ago</b>!
+
+In reading though the discussion of raster versus vectors in GIS, I
+have to take a step back and view this as an issue of which <b>data
+structure</b> best represents the information in a way that it can
+effectively be used.  If you view it this way, it's not a black and
+white raster vrs vector, but a range of choices that also include all
+sorts of interesting representations that include quad-trees, image
+tiles, triangle meshes, <a
+href="http://en.wikipedia.org/wiki/Directed_graph">directed
+graphs</a>, contours, etc.  Even when it comes to a raster representation, I can
+see cases where one "value" per "band" for a cell is limiting.  The
+folks of the <a href="http://en.wikipedia.org/wiki/Nosql">nosql</a>
+databases have really brought this forward.  Certain problems, may be
+better addressed by an XML tree hanging off of each cell.
+<pre>Data capture-entering information into the system-consumes much of the
+time of GIS practitioners.</pre>
+Just like software maintenance and debugging typically consume 95% of
+the software life cycle, I believe that is the same for most GIS data
+these days.  An entire LIDAR survey might take a day to collection,
+but I would be money, that people will spend orders of magnitude more
+time working with the data to produce the intended products.
+<pre>The majority of digital data currently comes from photo
+interpretation of aerial photographs</pre>
+That's a pretty strong quote about where data comes from.  In the
+world of marine sciences, this is most definitely not true!
+
+Thinking about projections, I have a bone to pick about people
+referring to geographic implying that it means just
+one thing (Lat/Lon with the WGS84 ellipsoid; <a
+href="http://spatialreference.org/ref/epsg/4326/">EPSG 4326</a>).
+I have trouble with the terms projected and unprojected.  Geodysists
+refer to unprojected as things with spherical coordinates.  But
+looking at the Mac dictionary, I see two definitions that help to
+clarify things.  I think of projection at a generic transformation,
+but it's not really that.
+<pre>5 Geometry draw straight lines from a center of or parallel lines
+through every point of (a given figure) to produce a corresponding
+figure on a surface or a line by intersecting the surface.
+<!-- -->
+* draw (such lines).
+* produce (such a corresponding figure).
+6 make a projection of (the earth, sky, etc.) on a plane surface.
+</pre>
+-----

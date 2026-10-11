@@ -1,0 +1,43 @@
+TITLE: Guidelines to releasing open source code
+AUTHOR: Kurt
+DATE: 04.04.2009 17:01
+DESC: help
+-----
+BODY:
+What works for commercial software does not work in the open source
+world.  In the open source world, you need to "play nice."  Here are
+some quick items that I keep running into.  I'm not saying that you have
+to live 100% by the <a href="http://www.gnu.org/prep/standards/standards.html">GNU Coding Standards</a>, but software that is written with those concepts in
+mind is much easier to port and package.
+<ul>
+<li>Name your package carefully.  It's best if your name makes sense
+as all one stream of letters and numbers.  e.g. [a-z][a-z0-9]+</li>
+<li>Don't restrict your downloads and force a user to submit an email and/or click that they accept the license on a web page.  If curl or wget won't work, I don't want to use the software.</li>
+<li>Provide a tar of your source in the form of name-version.tar.bz2.  Something about zips makes things go wrong way to often.</li>
+<li>NEVER EVER re-release a tar with the same name with different content.  If the MD5 sum chances, up the minor minor version number (N.N.N+1).  Hey, it's free!  Even if it was just a couple hours ago, change the number.  One tar filename - one md5 sum.</li>
+<li>Compress your tar with "bzip2 -9" to save the worlds mirrors disk space and reduce network traffic</li>
+<li>Your tar should unpack to name-version</li>
+<li>In your main release, do not include other packages.  It's fine if you make some separate bloated beast of an archive, but don't make me download it.</li>
+<li>Do NOT put compiled binaries in the archive.  Java coders... don't just give me a jar full of compiled class files.</li>
+<li>Use a nice build system.  If you have properly used gnu autoconf for C or C++ projects (or setuptools/pip for python), I might actually be able to build your code. </li>
+<li>Add some unit tests so I know that what I've built works with the libraries on the computer that I've got.</li>
+<li>Include a history or change log.  Make sure to note big changes in dependencies.</li>
+<li>Include a README file.  Make sure to clearly specify the software's license.</li>
+<li>Use a sane and common license... one of GPL, LGPL, MIT/BSD, or straight Public Domain.  Don't try to write your own.  You won't understand it and neither will eye. </li>
+<li>If you are producing a shared library, please try to number your .so/dylib sanely and make libtool number it right.  package-1.0 and package-2.0 should have different library major numbers.  The major number should change when your libary is binary incompatible.  It's okay if package-3.0 has a libary. </li>
+<li>Use the latest version of libtool.  Learn "otool -L" if you are a mac developer</li>
+<li>Mac Developers... not everybody wants to use Frameworks.</li>
+<li>Try to give your command line programs names that don't class with other packages.  And if you let me specify a prefix to commands, all the better.</li>
+<li>Man pages are good.  Provide them and let me control where they get installed.</li>
+<li>Give me a place to submit bugs and patches.  Don't make me subscribe to your mailing list.  Give me a way to reset a password for your site without contacting you by email (Dear OGC... hint hint)</li>
+<li>If you are writing C or C++, try to use a modern version of the language.  K&R C is just not a good thing.  Turn on the compiler warnings and fix most of them.</li>
+<li>Build your code on at least two architectures.</li>
+<li>UNIX != only Solaris.  To many of us, UNIX is a superset of Cygwin, Linuxes, Solaris, HPUX, Dariwin (Mac OSX), and more.</li>
+<li>Provide examples with text describing them.  If they are big, put them in a separate archive (same goes for the test data).</li>
+<li>Provide read only access to your revision control repository (git,svn,mercurial, etc), but don't stop making point releases.  Packaging from a moving target is scary.</li>
+<li>Stop using CVS.  SVN (among others) is so much better.  It will make your code better to switch away from that crusty old beast.</li>
+<li>
+<li>... there's more but back to real work for me ...</li>
+</ul>
+No software is perfect, but it is worth while to always strive for better software.
+-----

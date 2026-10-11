@@ -1,0 +1,23 @@
+TITLE: Uninstalling MacKeeper
+AUTHOR: Kurt
+DATE: 09.15.2010 10:56
+DESC: annoying
+-----
+BODY:
+Tech support at MacKeeper said I could just throw MacKeeper in the
+trash, reboot, and empty the trash to get rid of MacKeeper, and reboot
+again.  I also got rid of files in kept in ~/Library.  Specifically,
+it left a Helper app in there that it was running.  But, my system.log
+was filling up with this:
+<pre>Sep 15 10:09:45 snipe com.apple.launchd.peruser.501[153] (com.zeobit.MacKeeper.Helper[35234]): Exited with exit code: 1
+Sep 15 10:09:45 snipe com.apple.launchd.peruser.501[153] (com.zeobit.MacKeeper.Helper): Throttling respawn: Will start in 10 seconds
+Sep 15 10:09:49 snipe login[35236]: USER_PROCESS: 35236 ttys003
+Sep 15 10:09:55 snipe com.apple.launchd.peruser.501[153] (com.zeobit.MacKeeper.Helper[35364]): posix_spawn("/Users/schwehr/Library/Application Support/MacKeeper/Helper.app/Contents/MacOS/Helper", ...): No such file or directory
+Sep 15 10:09:55 snipe com.apple.launchd.peruser.501[153] (com.zeobit.MacKeeper.Helper[35364]): Exited with exit code: 1
+Sep 15 10:09:55 snipe com.apple.launchd.peruser.501[153] (com.zeobit.MacKeeper.Helper): Throttling respawn: Will start in 10 seconds</pre>
+I went into the man page for launchctl and figured this out to stop the mac from trying to run the helper:
+<pre><b>launchctl list | grep -i zeobit</b>
+-	1	com.zeobit.MacKeeper.Helper
+<b>launchctl remove com.zeobit.MacKeeper.Helper</b></pre>
+I think that totally gets rid of the app.
+-----

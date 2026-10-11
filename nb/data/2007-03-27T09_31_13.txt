@@ -1,0 +1,49 @@
+TITLE: LaTeX output for AIS message definitions
+AUTHOR: Kurt
+DATE: 03.27.2007 09:31
+DESC: working on a paper
+-----
+BODY:
+My next release of my noaadata.ais code will have LaTeX output for the
+message definitions.  For example:
+<pre>ais_msg_22.py --latex</pre>
+gives
+<pre>
+./ais_msg_22.py --latex
+
+\begin{table}%[htb]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+Parameter & Number of bits & Description 
+\\  \hline\hline
+MessageID & 6 & AIS message number.  Must be 22 \\ \hline 
+RepeatIndicator & 2 & Indicated how many times a message has been repeated \\ \hline 
+UserID & 30 & Unique ship identification number (MMSI) \\ \hline 
+Spare & 2 & Not used.  Should be set to zero. \\ \hline 
+ChanA & 12 & Channel number from ITU-R M.1084 Annex 4 \\ \hline 
+ChanB & 12 & Channel number from ITU-R M.1084 Annex 4 \\ \hline 
+TxRxMode & 4 & FIX: find the description \\ \hline 
+power & 1 & FIX: put in a description \\ \hline 
+corner1_lon & 18 & north-east corner of area for assignment  longitude of corner \\ \hline 
+corner1_lat & 17 & north-east corner of area for assignment  latitude  of corner \\ \hline 
+corner2_lon & 18 & south-west corner of area for assignment  longitude of corner \\ \hline 
+corner2_lat & 17 & south-west corner of area for assignment  latitude  of corner \\ \hline 
+IndicatorType  & 1 & FIX: put in a description \\ \hline 
+ChanABandwidth & 1 & FIX: put in a description \\ \hline 
+ChanBBandwidth & 1 & FIX: put in a description \\ \hline 
+TransZoneSize  & 3 & FIX: put in a description \\ \hline 
+Spare & 23 & Not used.  Should be set to zero.\\ \hline
+\end{tabular}
+\caption{AIS message number 22: Base station report - F}
+\label{tab:ChanMngmt}
+\end{table}
+</pre>
+The result looks like this:
+
+<img src="http://schwehr.org/blog/attachments/2007-03/ais-latex.png">
+
+Maybe this should be a XML Stylesheet transform, but it was pretty
+easy in python.  I leave it as an excercise for the reader to make the
+XSLT additions to emit latex from the AIS XML definitions.
+-----

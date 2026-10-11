@@ -1,0 +1,44 @@
+TITLE: Command line updating a Mac
+AUTHOR: Kurt
+DATE: 06.24.2008 08:07
+DESC: lots of sysadmin
+-----
+BODY:
+I now run macs all across the country.  Updating them with remote
+desktop can be less than fun with all sorts of firewalls and such.
+Apple does provide a way to ssh into a box.  First, see what needs
+installing:
+<pre>
+% <b>softwareupdate --list</b>
+Software Update found the following new or updated software:
+   * AirPortUtility_Leopard-5.3.2
+        AirPort Utility (5.3.2), 10780K [recommended]
+   * iDVD702-7.0.2
+        iDVD Update (7.0.2), 22390K [recommended]
+   * iMovie712-7.1.2
+        iMovie Update (7.1.2), 19780K [recommended]</pre>
+Now do the install <i>all</i> (none of the above says it requires a
+reboot.  You can specify the name instead of -a to do just one.
+<pre>
+% <b>sudo softwareupdate -i -a</b>
+waiting AirPort Utility 
+waiting iDVD Update     
+waiting iMovie Update   
+Installing AirPort Utility      0..20..40..60..80..100
+Done AirPort Utility    
+Installing iDVD Update  0..20..40..60..80..100
+Done iDVD Update        
+Installing iMovie Update        0..20..40..60..80..100
+Done iMovie Update      
+Done.
+</pre>
+I got this from this site, but it works for normal (non-server) macs:
+<a href="http://support.apple.com/kb/HT1974">Mac OS X Server: How to remotely install software using the softwareupdate command-line tool</a>
+
+And if you have to use remote desktop, here it the command to restart
+the program on a remote computer when the agent freaks out (which it
+seems to do on some computers)
+<pre>
+% <b>sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -restart -agent</b></pre>
+This is from: <a href="http://docs.info.apple.com/article.html?artnum=108030">Apple Remote Desktop: Configuring remotely via command line (kickstart)</a>
+-----

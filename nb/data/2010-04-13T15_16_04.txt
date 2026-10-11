@@ -1,0 +1,37 @@
+TITLE: python's datetime.datetime and datetime.date
+AUTHOR: Kurt
+DATE: 04.13.2010 15:16
+DESC: strange python behavior
+-----
+BODY:
+This behavior in python (I only tried 2.6.4) surprised me:
+<pre>ipython
+In [1]: import datetime
+<!-- -->
+In [2]: d1 = datetime.datetime.utcnow()
+<!-- -->
+In [3]: d2 = datetime.date(2010,4,13)
+<!-- -->
+In [4]: type d1
+======> type(d1)
+Out[4]: &lt;type 'datetime.datetime'&gt;
+<!-- -->
+In [5]: type d2
+======> type(d2)
+Out[5]: &lt;type 'datetime.date'&gt;
+<!-- -->
+In [6]: isinstance(d1,datetime.datetime)
+Out[6]: True
+<!-- -->
+In [7]: isinstance(d2,datetime.datetime)
+Out[7]: False
+<!-- -->
+In [8]: isinstance(d1,datetime.date)
+Out[8]: True <font color="orange"># Really? A datetime.datetime is an instance of datetime.date?</font>
+<!-- -->
+In [9]: isinstance(d2,datetime.date)
+Out[9]: True</pre>
+There must be some inheritance being implied in there.  I don't feel
+like breaking into this with more powerful python introspection, but
+I am not up for really exploring this in more detail.
+-----

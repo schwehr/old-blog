@@ -1,0 +1,76 @@
+TITLE: fink apache2 cgi hello world tutorial
+AUTHOR: Kurt
+DATE: 01.11.2009 09:12
+DESC: just the basics
+-----
+BODY:
+It took me a while, but I finally succeeded at getting a simple cgi
+script to work with a fink apache2 setup.  This is on Mac OSX 10.5.6
+using fink with apache2 2.2.9-4.  Some of what I do here might not be
+in the best part of the apache2 config files.  Let me know if there
+is a better place to put some of these config options.  Let's get started.
+
+First, in System Preferences -&gt; Sharing, make sure the "Web Sharing" is off.
+Web Sharing will turn on Apple's apache2 server.
+<pre>% <b>fink install apache2</b> # I pick apache2-mpm-prefork when asked, but it does not matter
+% <b>open http://localhost</b></pre>
+You should now be seeing a working apache2 via fink.  It should say
+something like "It works!" in your web browser.  Now we need to set about
+configuring apache2.  Here I will use emacs as my editor (fink install 
+emacs22), but you can replace that with your favorite editor, but I don't 
+know how to edit system config files with Aqua based editors like Smultron 
+and AquaEmacs.
+<pre>% <b>sudo a2enmod cgi</b> # Enable CGI applications 
+% <b>sudo emacs /sw/etc/apache2/mods-enabled/userdir.conf &</b></pre>
+Now in emacs, edit the apache2 userdir.conf config file and add a second 
+<i>Options</i> line to look like this:
+<pre>Options +ExecCGI</pre>
+This enables CGI programs for any user web area on the computer.  You
+will likely not want to do this if this machine has untrusted users.
+Now we need to tell apache2 which files will be treated as CGI programs.
+Uncomment the cgi-script AddHandler line in the mime type config file:
+<pre>% <b>sudo emacs /sw/etc/apache2/mods-enabled/mime.conf &</b></pre>
+The line should now look like:
+<pre>AddHandler cgi-script .cgi</pre>
+The last config change we need to make is to disable suexec.  In the
+current fink setup, suexec is always enabled and breaks cgi.  If it
+is not disabled, you will your CGI will return <i>Internal Server Error</i>
+and see errors like this in the logs:
+<pre>% <b>tail -1 /sw/var/log/apache2/suexec.log</b>
+[2009-01-11 09:01:36]: user mismatch (_www instead of www)</pre>
+Alex Vial has a <a href="http://www.nabble.com/apache2:-user-mismatch-(_www-instead-of-www)-td21114233.html">post</a> on fink users about how he got
+things working again.
+<pre>% <b>sudo mv /sw/lib/apache2/suexec2{,_inactive}</b></pre>
+Now it is time to restart apache2 so we can going on the hello world program.
+<pre>% <b>sudo apache2ctl restart</b></pre>
+Let's create the cgi script:
+<pre>% <b>mkdir -p ~/Sites/test && cd ~/Sites/test</b>
+% <b>cat &lt;&lt; EOF &gt; helloworld.cgi</b>
+#!/usr/bin/perl
+print "Content-type: text/html\n\n";
+print "Hello, World.";
+EOF
+% <b>chmod +x helloworld.cgi</b>
+% <b>open http://localhost/~$USER/test/helloworld.cgi</b></pre>
+Hopefully at this point you should have "Hello, World." displaying in your
+browser.  Perl is the default for most old world cgi scripts, but since
+I like python, I will leave off with a python cgi example.
+<pre>% <b>cat &lt;&lt; EOF &gt; helloworld-py.cgi</b>
+#!/usr/bin/env python
+print "Content-type: text/html\n"
+print "Hello, World."
+EOF
+% <b>chmod +x helloworld-py.cgi</b>
+% <b>open http://localhost/~$USER/test/helloworld-py.cgi</b></pre>
+Note that the number of newlines after the content type is important.  There
+must be at least one blank line after the header.
+
+The above has been adapted from: <a href="http://httpd.apache.org/docs/2.0/howto/cgi.html">Apache Tutorial: Dynamic Content with CGI - Apache HTTP Server</a>.  This is the check to see if suexec has been built into the default setup:
+<pre>% <b>apache2ctl -V | grep suexec</b>
+ -D SUEXEC_BIN="/sw/lib/apache2/suexec2"</pre>
+suexec is trouble as there are now 'www' and '_www' user names in mac osx.  They both have the same uid (70), but suexec gets confused.
+<pre>% <b>id www</b>
+uid=70(_www) gid=70(_www) groups=70(_www)
+% <b>dscl . -read /Users/www</b>
+% <b>dscl . -read /Users/_www</b></pre>
+-----

@@ -1,0 +1,57 @@
+TITLE: FireFox 3.5 location aware
+AUTHOR: Kurt
+DATE: 07.03.2009 08:22
+DESC: more geospatial info
+-----
+BODY:
+Note: If you have Firefox 3.5, this is built in to the browser by
+default: <a href="http://www.mozilla.com/en-US/firefox/geolocation/">Firefox Geolocation</a>.  Try this URL, which doesn't work for me: <a href="http://azarask.in/local/">Local food - http://azarask.in/local/</a>.  Now the real question is: How do I tell these services where wifi access points are located if it doesn't already know?  I'd like to add access points that I am frequently around that aren't in the Google Location Services.
+
+<a href="http://www.webmonkey.com/blog/Google_and_Mozilla_Team_Up_to_Tell_Firefox_Where_You_Are">Google and Mozilla Team Up to Tell Firefox Where You Are</a> [webmonkey]
+<pre>Google and Mozilla have partnered to geo-enable the next wave of web
+applications in Firefox, the companies announced Thursday. The latest
+version of Firefox - 3.5 ... will use Google's Location Service as its
+default location provider. ...
+<!-- -->
+Once the user provides a web app with permission to do so (the
+geolocation abilities are opt-in, as they should be) the application
+can use the browser to determine the user's location. This means
+developers can provide more accurate local search results and other
+geo-aware functionality ...
+<!-- -->
+...Mozilla launched the Geode project, a location
+awareness add-on for Firefox, Yahoo brought us Fire Eagle and the
+Geocoder API, Google gave us Latitude and Microsoft is developing
+Vine. ...</pre>
+And <a href="http://worrydream.com/MagicInk/#inferring_context_from_the_environment">Inferring context from the environment</a> [Magic Ink]
+<pre><b>Geographical location.</b> Similarly, the most interesting spatial
+landmark is usually "here." Unfortunately, this currently can be
+harder to determine automatically, but the payoff is enormous.* Obviously, a
+software roadmap needs to know the user's location, but so does the
+bus schedule, as well as business listings, transportation planners,
+travel guides, and much other information software.
+<!-- -->
+* I believe that location is such vital context, Powerbooks should
+come with GPS receivers pre-installed, with an easy software
+API. Developers would then write software to take advantage of it, and
+other computer makers would follow suit. Someday, a computer without
+GPS might seem as silly as a computer without a clock.</pre>
+Just a reminder, GPS is first and formost a clock.  No time, no GPS
+position.  One day soon, I hope to install the latest version of linux
+or Mac OSX and discover that it is preconfigured to be a stratum 1 NTP
+timeserver (and PTP) using the built in GPS chip with a fallback to
+the a mobile phone service (e.g. CDMA) time source.  As a reminder,
+this is how you check how ntp is doing:
+<pre>% <b>ntpq -p -n</b>
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+-132.177.137.2   209.123.234.24   3 u  414 1024  377    4.680    4.171   0.221
+-72.18.205.156   128.138.140.44   2 u  348 1024  377   79.530   -6.882   0.450
++69.10.36.5      64.90.182.55     2 u  479 1024  377   36.526   -3.959   0.540
+-38.117.195.101  209.51.161.238   2 u  471 1024  377   12.920    7.163   0.164
+*207.171.30.106  .PPS.            1 u  514 1024  377   79.463    3.569   2.720
++72.18.205.157   128.138.140.44   2 u 1611  68m  377   79.433   -6.352   1.356
+ 66.70.29.130    66.250.45.2      3 u  46h  68m    0   18.614   -3.436   0.000
+-65.255.217.202  69.36.241.112    3 u 1654  68m  377   79.327   10.225   3.076
+ 127.127.1.0     .LOCL.          13 l   62   64  377    0.000    0.000   0.001</pre>
+-----

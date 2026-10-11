@@ -1,0 +1,42 @@
+TITLE: Jackson Lab tide and AIS dataloggers
+AUTHOR: Kurt
+DATE: 02.18.2007 15:29
+DESC: datalogging is a go
+-----
+BODY:
+Andy M. and I just deployed the Jackson Lab data logging system.  I am
+using the serial_logger.py program from noaadata/scripts to handle saving
+the data.  My program is a little timestamp happy...
+<pre>
+# START LOGGING UTC seconds since the epoch: 1171830407.66
+# SPEED: 9600
+# PORT:  /dev/ttyS0
+# 1171830504.3
+Date/Time:  7.02.18 21:23:01
+# 1171830504.34
+01 Reference             737
+# 1171830508.34
+02 Water level             2.15 m
+# 1171830512.38
+03 Water temperature      -0.15 Deg.C
+</pre>
+-0.15 is nice and warm out there.  Yesterday I saw -1.  Brrr.  The AIS
+ format tries to conform to the N-AIS format:
+<pre>
+nohup ~/projects/noaadata/scripts/serial_logger.py -p /dev/ttyS2 -l ais- -u -s nhgb &gt; /dev/null 
+</pre>
+Which looks like this:
+<pre>
+# START LOGGING UTC seconds since the epoch: 1171830267.73
+# SPEED: 38400
+# PORT:  /dev/ttyS2
+!AIVDM,1,1,,A,33=HuF5000rsnlvHbvGt5b;:0000,0*29,rnhgb,1171830306.92
+!AIVDM,1,1,,A,15NLiJ0000JsrDHHbduh09jr0@BT,0*60,rnhgb,1171830360.24
+!AIVDM,2,1,7,A,53=HuF029sA7TPlSL01&lt;TiHE8TD000000000001CB`KB&gt;4aA0BD3lU4k,0*1E,rnhgb,1171830452.12
+!AIVDM,2,2,7,A,CmE200000000000,2*7A,rnhgb,1171830452.14
+</pre>
+The N-AIS log format rounds to the fraction of a second, but I might
+as well save the complete timestamp that time.time() in python.  Now I
+just need to get the clocks on the dataloggers synced up to something
+reasonable.
+-----

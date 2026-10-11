@@ -1,0 +1,55 @@
+TITLE: shotpoint offset for the cores
+AUTHOR: Kurt
+DATE: 10.04.2005 23:10
+DESC: finding the cores on the chirp line
+-----
+BODY:
+Now that I have the closest point to the shiptracks, I need to apply
+the layback offset to see where these cores land.
+
+Using a 40 degree wire angle and a water depth of 143 meters layback is:
+<pre>
+layback = 143/tan 40&deg; = 143/.83909963 = 170 meters
+170 m / (1.08 m/shot) = 158 shots
+</pre>
+A little python can give us the 158 shot layback file for gnuplot:
+<pre>
+#!/usr/bin/env python
+offset = 158
+c=1;s=88850; print s+offset,'-460\n',s+offset,'-470\n'
+c=2;s=88802; print s+offset,'-460\n',s+offset,'-470\n'
+c=7;s=88765; print s+offset,'-460\n',s+offset,'-470\n'
+</pre>
+So we now have a gnuplot file with the cores, but need the water
+bottom to go with <em>cores-shots-158.dat</em>:
+<pre>
+89008 -460
+89008 -470
+
+88960 -460
+88960 -470
+
+88923 -460
+88923 -470
+</pre>
+We can quickly generate the water bottom like this:
+<pre>
+segywaterbottom.py -t 5000 -d xstar -k Shotpoint -D -O 143 \
+  -f EEL5kL03.xstar --noisy -n 
+</pre>
+Finally, it is time to see what we have!
+<pre>
+set ylabel 'meters below sea level'                       
+set xlabel 'Shotpoint'  
+
+set xrange [88500:90000]                                 
+set terminal gif
+set output 'cores-layback-375shots.gif' 
+
+plot 'wbt.dat' using 4:5 with l, \
+   'cores-shots-375.dat' with l, \
+   'cores-shots-158.dat' with l 
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-10/cores-layback-375shots.gif">
+I also plotted no layback and 375 shots to show where those fall.
+-----

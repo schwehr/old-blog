@@ -1,0 +1,49 @@
+TITLE: AIS time and matplotlib
+AUTHOR: Kurt
+DATE: 08.31.2009 16:12
+DESC: better visualization
+-----
+BODY:
+I have been working more on AIS time.  In the process, I pushed gnuplot
+over the edge.  I have been successfully using gnuplot since 1996, but
+it is not the most flexible plotting program.  I'm forcing myself to
+use matplotlib and not slide back into gnuplot.  Here is my latest
+attempt with matplotlib.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> numpy <b><font color="#000080">import</font></b> array
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>pyplot as plt
+<b><font color="#000080">import</font></b> sqlite3
+<!-- -->
+xmin<font color="#990000">,</font>xmax <font color="#990000">=</font> <font color="#993399">210000</font><font color="#990000">,</font><font color="#993399">220000</font>
+<!-- -->
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'ais.db3'</font><font color="#990000">)</font>
+<!-- -->
+pos_ok   <font color="#990000">=</font> <b><font color="#000000">array</font></b><font color="#990000">(</font> <font color="#990000">[</font><b><font color="#000000">tuple</font></b><font color="#990000">(</font>row<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT key,(est_sec) FROM position WHERE est_sec IS NOT NULL;'</font><font color="#990000">)]</font> <font color="#990000">).</font>T
+pos_fail <font color="#990000">=</font> <b><font color="#000000">array</font></b><font color="#990000">(</font> <font color="#990000">[</font><b><font color="#000000">tuple</font></b><font color="#990000">(</font>row<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT key,(cg_sec) FROM position WHERE est_sec IS NULL;'</font><font color="#990000">)]</font> <font color="#990000">).</font>T
+<!-- -->
+bs_ok    <font color="#990000">=</font> <b><font color="#000000">array</font></b><font color="#990000">(</font> <font color="#990000">[</font><b><font color="#000000">tuple</font></b><font color="#990000">(</font>row<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT key,.1 FROM bsreport WHERE est_sec IS NOT NULL;'</font><font color="#990000">)]</font> <font color="#990000">).</font>T
+<!-- -->
+pos_sec  <font color="#990000">=</font> <b><font color="#000000">array</font></b><font color="#990000">(</font> <font color="#990000">[</font><b><font color="#000000">tuple</font></b><font color="#990000">(</font>row<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT key,timestamp FROM position WHERE timestamp &lt; 60;'</font><font color="#990000">)]</font> <font color="#990000">).</font>T
+<!-- -->
+fig <font color="#990000">=</font> plt<font color="#990000">.</font><b><font color="#000000">figure</font></b><font color="#990000">()</font>
+ax1 <font color="#990000">=</font> fig<font color="#990000">.</font><b><font color="#000000">add_subplot</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">)</font>
+ax1<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">(</font>pos_fail<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>pos_fail<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font><font color="#FF0000">'b+'</font><font color="#990000">,</font> pos_ok<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>pos_ok<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font><font color="#FF0000">'ro'</font><font color="#990000">)</font>
+<!-- -->
+ax2 <font color="#990000">=</font> ax1<font color="#990000">.</font><b><font color="#000000">twinx</font></b><font color="#990000">()</font>
+ax2<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">(</font>bs_ok<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font> bs_ok<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font> <font color="#FF0000">'gx'</font><font color="#990000">)</font>
+<!-- -->
+ax2<font color="#990000">.</font><b><font color="#000000">set_ylim</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">)</font> <i><font color="#9A1900">#ymin, ymax  # For plotting on top of the same graph, but with a different axis</font></i>
+ax2<font color="#990000">.</font><b><font color="#000000">set_xlim</font></b><font color="#990000">(</font>xmin<font color="#990000">,</font>xmax<font color="#990000">)</font>
+<!-- -->
+ax3 <font color="#990000">=</font> fig<font color="#990000">.</font><b><font color="#000000">add_subplot</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">)</font>
+ax3<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">(</font>pos_sec<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>pos_sec<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font><font color="#FF0000">'xb-'</font><font color="#990000">)</font>
+<!-- -->
+ax3<font color="#990000">.</font><b><font color="#000000">set_xlim</font></b><font color="#990000">(</font>xmin<font color="#990000">,</font>xmax<font color="#990000">)</font>
+<!-- -->
+plt<font color="#990000">.</font><b><font color="#000000">show</font></b><font color="#990000">()</font></tt></pre>
+I've cheated a bit and used photoshop to add labels to this plot, but it is
+great to be able to add plots with different y-axes on the same graph/subplot.
+
+<img title="Time reports of one ship from a single station" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/time-for-position-reports.png"/>
+-----

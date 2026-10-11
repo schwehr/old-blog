@@ -1,0 +1,54 @@
+TITLE: major speedups
+AUTHOR: Kurt
+DATE: 04.21.2006 08:22
+DESC: great speedups
+-----
+BODY:
+I have been working on optimizing my code.  Profiling showed that I
+was calling the BitVector _getbit and _setbit calls a million times
+each to handle just a 300 line log file.  That was just way too much.
+Here are my initial speed tests:
+<pre>
+G4 1.5GHz laptop:
+0300       11.10 real        10.18 user         0.28 sys
+5000      137.85 real       131.15 user         0.97 sys
+
+4xG5 2.5 GHz:
+0300        7.41 real         7.18 user         0.22 sys
+5000       92.57 real        92.09 user         0.28 sys
+</pre>
+After optimization, here are the new numbers:
+<pre>
+G4 1.5GHz laptop:
+0300       2.39 real         1.93 user         0.27 sys
+5000      20.41 real        17.77 user         0.51 sys
+
+4xG5 2.5 GHz
+0300       1.50 real         1.23 user         0.22 sys
+5000      11.66 real        11.37 user         0.25 sys
+
+With the profiler showing:
+81K _setbit calls
+77k _getbit calls
+</pre>
+How did I get such a large speedup?  For starters, my initial coding
+was done to be as clear as possible.  I picked simple looking code
+over speed.  Only once I knew the whole system was behaving correctly,
+then I started optimizing.  That isn't to say that I was ignore speed.
+I tried to design such that it would be easy to come back for an
+optimization pass.
+
+Then I used the profiler to identify the trouble spots.  These mostly
+turned out to be abuses of calling the BitVector class too often and
+in very bad ways.  I started with lazy evaluation at my top level
+class.  This let me discard uninteresting messages by only decoding
+the first 6 bits.  Then I did my translations to bitvectors with a
+lookup table so that I have 64 BitVectors ready to go.  Finally, I
+changed the assembly of the large converted bitvector from a "bv +=
+partialBV" loop to preallocating one large BitVector and just
+assigning in the partialBV in to the right place one bit at a time.
+
+There is still more optimization possible down at level of my handler
+that pulls apart the bits to create the usable message, but I think
+the gains will be much smaller.
+-----

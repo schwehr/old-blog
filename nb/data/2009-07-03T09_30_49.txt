@@ -1,0 +1,38 @@
+TITLE: Firefox geolocation confusion - now working
+AUTHOR: Kurt
+DATE: 07.03.2009 09:30
+DESC: change in the api
+-----
+BODY:
+The "Give it a try!" link on <a
+href="http://www.mozilla.com/en-US/firefox/geolocation/">the firefox
+geolocation page</a> works, but following their code is difficult.
+
+<img title="Firefox 3.5 geolocation" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-07/geolocation-working.png"/>
+
+<a href="http://people.mozilla.com/~dolske/tmp/geoloc.html">This demo
+(http://people.mozilla.com/~dolske/tmp/geoloc.html)</a> has easy to
+follow code, but doesn't work.
+
+<img title="Firefox 3.5 geolocation" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-07/geolocation-broken.png"/>
+
+Where can I find a simple example that works?  <a href="http://labs.mozilla.com/2008/10/introducing-geode/">Introducing Geode</a> says that I can do:
+<pre>navigator.geolocation.getCurrentPosition(function(pos) {
+  alert( pos.latitude + ", " + pos.longitude );
+})</pre>
+But that doesn't seem to do it.  I get the share location request
+beneath the navigation bar, but then I get null back for the
+position... a little digging, and I found that the return structure
+has changed since the initial design.  Here is a super simple working example.
+Instead of pos.longitude, it uses pos.coords.longitude.
+
+<a href="http://schwehr.org/blog/attachments/2009-07/geolocation-alert.html">geolocation-alert.html</a>
+
+<pre><tt><b><font color="#0000FF">&lt;html</font></b> <font color="#009900">dir</font><font color="#990000">=</font><font color="#FF0000">"ltr"</font> <font color="#009900">xml:lang</font><font color="#990000">=</font><font color="#FF0000">"en-US"</font> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/1999/xhtml"</font> <font color="#009900">lang</font><font color="#990000">=</font><font color="#FF0000">"en-US"</font><b><font color="#0000FF">&gt;&lt;head&gt;</font></b>
+<b><font color="#0000FF">&lt;script</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"text/javascript"</font><b><font color="#0000FF">&gt;</font></b>
+navigator.geolocation.getCurrentPosition(function(pos) {
+  alert( pos.coords.latitude + ", " + pos.coords.longitude );
+})
+<b><font color="#0000FF">&lt;/script&gt;</font></b></tt></pre>
+Firefox could use an update to their page to point to this working demo: <a href="http://people.mozilla.com/~dolske/tmp/geoloc-new.html">geoloc-new.html</a>
+-----

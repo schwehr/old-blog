@@ -1,0 +1,1242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: April 2012 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2012-04-30T14_41_05.txt" name=
+"e2012-04-30T14_41_05.txt"></a>
+<h2 class="date">04.30.2012 14:41</h2>
+<div class="blogbody">
+<h3 class="title">Google Cloud Storage Part 2</h3>
+<div class="item-description">The last time, I showed using Google
+Cloud Storage without authentication. This time, I'd like to do
+some authenticated work with the data.<br />
+<br />
+<b>Note:</b> You won't have permission to any of what I set up, but
+hopefully, you can create your own data bucket and with two
+accounts, try the same. This is a little bit confusing.<br />
+<br />
+You can see your account here: <a href=
+"https://code.google.com/apis/console">https://code.google.com/apis/console</a><br />
+
+<br />
+Click <b>Team</b>. This will get you one way to control who can
+work with the data. As I'm going to go with the command line route,
+I haven't tried to see what the GUI will do.<br />
+<br />
+When I go to my storage manager web page (sorry, no good url), this
+is what I see:<br />
+<br />
+<img width="600" height="134" title="Google Storage Manager"
+withgrayborder="True" src=
+"../attachments/2012-04/google-cloud-store.png" />
+<br />
+<br />
+I can click the ghost check mark to "Share Publicly." e.g.<br />
+<br />
+<a href=
+"http://commondatastorage.googleapis.com/kds_gsdemo2011/data/Selection_006.png">
+kds_gsdemo2011/data/Selection_006.png</a> [an image from Google
+Earth]<br />
+<br />
+First, I'm going to activate a virtual env that has the gsutil
+package in it. See my last tutorial for how I got that set up.
+<pre>
+cd ~/virtualenvs/storage
+source bin/activate
+</pre>
+Now to try it out. First you need to get your account activated via
+oauth2. In your default web browser, log into google.com.
+<pre>
+gsutil config
+</pre>
+You will be presented with a url that you need to go to at google.
+This will give you a hash string that you will paste back into the
+command line. You password will never be used when interacting with
+google storage via the command line. The configuration is stored in
+a "boto" file in your home directory. <a href=
+"https://github.com/boto/boto">boto</a> is a python library for
+interating with cloud compute and storage services. Check out the
+<a href=
+"https://github.com/boto/boto/blob/develop/README.rst">readme</a>
+file to see which ones... there are a lot!
+<pre>
+ls -l ~/.boto
+less ~/.boto
+</pre>
+In that file you well see a lot more, but the basics are:
+<pre>
+[Credentials]
+gs_oauth2_refresh_token = 
+</pre>
+Now we need to modify the ACLs (access control lists):
+<pre>
+cd tmp
+gsutil getacl gs://kds_gsdemo2011 &gt; acl.xml
+</pre>
+I got back an XML file that looks like this:
+<pre>
+<b><font color="#000080">&lt;?xml</font></b> <font color=
+"#009900">version</font><font color="#990000">=</font><font color=
+"#FF0000">"1.0"</font> <b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;AccessControlList&gt;</font></b>
+    <b><font color="#0000FF">&lt;Owner&gt;</font></b>
+        <b><font color=
+"#0000FF">&lt;ID&gt;</font></b>00...e1<b><font color=
+"#0000FF">&lt;/ID&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Owner&gt;</font></b>
+    <b><font color="#0000FF">&lt;Entries&gt;</font></b>
+        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Scope</font></b> <font color=
+"#009900">type</font><font color="#990000">=</font><font color=
+"#FF0000">"GroupById"</font><b><font color=
+"#0000FF">&gt;</font></b>
+                <b><font color=
+"#0000FF">&lt;ID&gt;</font></b>00...e1<b><font color=
+"#0000FF">&lt;/ID&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Permission&gt;</font></b>FULL_CONTROL<b><font color=
+"#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Scope</font></b> <font color=
+"#009900">type</font><font color="#990000">=</font><font color=
+"#FF0000">"GroupById"</font><b><font color=
+"#0000FF">&gt;</font></b>
+                <b><font color=
+"#0000FF">&lt;ID&gt;</font></b>00...21<b><font color=
+"#0000FF">&lt;/ID&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Permission&gt;</font></b>FULL_CONTROL<b><font color=
+"#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Scope</font></b> <font color=
+"#009900">type</font><font color="#990000">=</font><font color=
+"#FF0000">"GroupById"</font><b><font color=
+"#0000FF">&gt;</font></b>
+                <b><font color=
+"#0000FF">&lt;ID&gt;</font></b>00...44<b><font color=
+"#0000FF">&lt;/ID&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Permission&gt;</font></b>READ<b><font color=
+"#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Entries&gt;</font></b>
+<b><font color="#0000FF">&lt;/AccessControlList&gt;</font></b>
+</pre>
+I then added my gmail address that I would like to be able to read
+the data:
+<pre>
+<tt>        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Scope</font></b> <font color=
+"#009900">type</font><font color="#990000">=</font><font color=
+"#FF0000">"UserByEmail"</font><b><font color=
+"#0000FF">&gt;</font></b>
+                <b><font color=
+"#0000FF">&lt;EmailAddress&gt;</font></b>schwehr@gmail.com<b><font color="#0000FF">&lt;/EmailAddress&gt;</font></b>
+                <b><font color=
+"#0000FF">&lt;Name&gt;</font></b>Kurt Schwehr<b><font color=
+"#0000FF">&lt;/Name&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color=
+"#0000FF">&lt;Permission&gt;</font></b>READ<b><font color=
+"#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+</tt>
+</pre>
+I then pushd that permission definition file back at the Google
+Cloud Storage bucket:
+<pre>
+gsutil setacl acl.xml gs://kds_gsdemo2011
+gsutil ls -l gs://kds_gsdemo2011/data/Selection_001.png
+gsutil cp gs://kds_gsdemo2011/data/Selection_001.png .
+</pre>
+I was then able to copy a file from the cloud to my machine.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-30T14_41_05.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-05-01T14_20_48.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-30T13_54_46.txt" name=
+"e2012-04-30T13_54_46.txt"></a>
+<h2 class="date">04.30.2012 13:54</h2>
+<div class="blogbody">
+<h3 class="title">Using Google Cloud Storage - Part 1</h3>
+<div class="item-description">This is my first attempt at a
+tutorial for Google Cloud Storage.<br />
+<br />
+Using <a href="https://developers.google.com/storage/">Google Cloud
+Storage</a> to store data objects (a blob of data of what ever type
+you want). Right now, you get 5GB of storage for free and you can
+transfer 20 GB per month. Beyond that, you'll have to check the
+<a href=
+"https://developers.google.com/storage/docs/pricingandterms">pricing</a>.<br />
+
+<br />
+This is pretty much what is on <a href=
+"https://developers.google.com/storage/docs/getting-started">https://developers.google.com/storage/docs/getting-started</a>
+and <a href=
+"https://developers.google.com/storage/docs/hellogooglestorage">https://developers.google.com/storage/docs/hellogooglestorage</a>
+I've tweaked it a bit to fit my style. I'm doing this on a mac with
+fink and splitting between two acounts. I want to end up with a way
+to transfer files from one group to another. I started off by
+watching this 2011 Google IO video:<br />
+<br />
+<a href=
+"https://developers.google.com/storage/docs/pricingandterms">Google
+I/O 2011: Storing Your Application's Data in the Google
+Cloud</a><br />
+<br />
+First setting up a virtual env in python to isolate us from messing
+up any existing python installs.
+<pre>
+cd ~/Desktop
+mkdir try-gs
+<span style=
+"color: lightsteelblue; font-weight: bold;">cd</span> try-gs
+fink install virtualenv-py27
+virtualenv ve
+<span style=
+"color: lightsteelblue; font-weight: bold;">source</span> ve/bin/activate
+wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
+tar xf gsutil.tar.gz
+<span style=
+"color: lightsteelblue; font-weight: bold;">pushd</span> gsutil
+<!-- -->
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gsutil does not have a proper setup.py that will work with virtualenv</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">so force it to play along</span>
+perl -pi -e "s|/usr|`pwd`/../ve|g" setup.py
+<!-- -->
+python setup.py install
+popd
+</pre>
+You should now have a working virtualenv with gsutil installed in
+it. Your normal python will not be effective. You will have to
+rerun the &lt;b&gt;activate&lt;/b&gt; from any other shell that you
+want to have access to gsutil. The virtualenv named "ve" will
+change your prompt:
+<pre>
+$ pwd
+/Users/schwehr/Desktop/try-gs
+(ve)
+$
+</pre>
+Let's test out setup.
+<pre>
+type python
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">python is hashed (/Users/schwehr/Desktop/try-gs/ve/bin/python)</span>
+<span style=
+"color: lightsteelblue; font-weight: bold;">type</span> gsutil
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gsutil is /Users/schwehr/Desktop/try-gs/ve/bin/gsutil</span>
+gsutil --help 
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">lots of help scrolls by</span>
+<!-- -->
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">Try a world readable test data set</span>
+gsutil ls gs://uspto-pair/applications/0800401*
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gs://uspto-pair/applications/08004010.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gs://uspto-pair/applications/08004011.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gs://uspto-pair/applications/08004012.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gs://uspto-pair/applications/08004013.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gs://uspto-pair/applications/08004016.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gs://uspto-pair/applications/08004017.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">gs://uspto-pair/applications/08004019.zip</span>
+gsutil ls -l gs://uspto-pair/applications/08004010.zip 
+<span style=
+"color: red; font-style: italic;">#       </span><span style=
+"color: red; font-style: italic;">3410  2010-09-29T20:14:15  gs://uspto-pair/applications/08004010.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style=
+"color: red; font-style: italic;">TOTAL: 1 objects, 3410 bytes (3.33 KB)</span>
+gsutil cp gs://uspto-pair/applications/08004010.zip .
+md5sum 08004010.zip
+</pre>
+I have yet to write up using the oauth2 authentication. Hopefully,
+I'll get that done soon.<br />
+<br />
+<b>See Also:</b>
+<ul>
+<li><a href=
+"http://code.google.com/p/gsutil/">http://code.google.com/p/gsutil/</a></li>
+<li><a href=
+"http://code.google.com/p/gsutil/issues/detail?id=92">Issue 92
+covers</a> using pypi / pip / distribute / setuptools</li>
+</ul>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-30T13_54_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-30T14_41_05.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-30T13_20_26.txt" name=
+"e2012-04-30T13_20_26.txt"></a>
+<h2 class="date">04.30.2012 13:20</h2>
+<div class="blogbody">
+<h3 class="title">libais 0.7</h3>
+<div class="item-description">After 2 years, I've finally done a
+point release of libais. I also put it into pypi. That took me long
+enough! I'm still working on my git skillz as Roland and I try to
+trade patches. Last Friday, I got my first Google approved open
+source patch out the door. It was just one line, but it was a
+start.<br />
+<br />
+<a href="http://pypi.python.org/pypi/libais/0.7">pypi libais 0.7
+entry</a><br />
+<br />
+<pre>
+git checkout -b release0.7
+# lots of hacking
+make -f Makefile-custom test
+python setup.py sdist
+git commit -a -m "proper sdist and go to version 0.7"
+cd dist
+wget http://vislab-ccom.unh.edu/~schwehr/software/libais/downloads/libais-0.6.tar.bz2
+tar xf libais-0.6.tar.bz2
+tar xf libais-0.7.tar.bz2
+diff -ruN libais-0.[67]
+cd ..
+git format-patch master --stdout &gt; ~/Desktop/libais-prep-0.7.patch
+# Send the patch for review
+# Get LGTM
+git checkout master
+git merge release0.7
+git tag -a v0.7 -m 'version 0.7'
+git push --tags
+</pre>
+Then send it off to pypi.
+<pre>
+python setup.py register
+python setup.py sdist --formats=bztar upload
+</pre>
+See also: <a href=
+"https://github.com/schwehr/libais">https://github.com/schwehr/libais</a><br />
+
+<br />
+<b>Trackback:</b><br />
+<br />
+2012-05-025: I was surprised to see a mention of this release on
+SlashGeo - <a href=
+"http://slashgeo.org/2012/05/25/Open-Source-Geonews-HSLayers-Proxy4OWS-Worst-OpenStreetMap-AP-moving-TileMill-Leaftlet-an">
+Open Source Geonews: HSLayers, Proxy4OWS, the Worst of
+OpenStreetMap, AP moving to TileMill + Leaftlet, and more</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-30T13_20_26.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-30T13_54_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-30T06_23_07.txt" name=
+"e2012-04-30T06_23_07.txt"></a>
+<h2 class="date">04.30.2012 06:23</h2>
+<div class="blogbody">
+<h3 class="title">schwehr.org</h3>
+<div class="item-description">Some of you might have noticed that
+schwehr.org dissapeared a week and a half ago. Turns out the
+InReach colo had an AC unit meltdown. Scott rescued the hardware
+and Justin moved it to an undisclosed secret bunker for the time
+being. This last weekend, I visited the hardware and got it online
+so that Alex could get it back online. The howling beast is alive
+again (Sun V20z). Now we need to figure out a permanent hosting
+solution.
+<pre>
+IMPORTANT:
+Attention Oakland Colo Customers. There has been a critical failure of
+the HVAC system at the Franklin Collocation Center. We are attempting
+to resolve the situation but we are not meeting with success. The heat
+is rising in the room and we suggest that all customers monitor their
+equipment and make the best business decision possible for their
+mission critical servers and services. We have no ETA at this point on
+when HVAC will be restored. We will provide more updates here as they
+become available.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-30T06_23_07.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-30T13_20_26.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-19T19_12_35.txt" name=
+"e2012-04-19T19_12_35.txt"></a>
+<h2 class="date">04.19.2012 19:12</h2>
+<div class="blogbody">
+<h3 class="title">My time on Talk of Alaska on NPR Alaska</h3>
+<div class="item-description">I just realized that I never blogged
+about my "appearance" on talk of Alaska last month. I was visiting
+the Google Cambridge, MA offices and they called me in for a 1 hour
+discussion show that aired across Alaska. Thanks to Bernie for
+dropping me an email durning the show to let me know that he was
+hearing me on the radio <img src=
+"../moods/smilies/smiley.gif" alt=":)" border=
+"0" i="" am="" on="" through="" out="" show="" with="" ray=""
+being="" half="" hour="" and="" samantha="" the="" half.=
+"" /><br />
+<br />
+<a href=
+"http://www.alaskapublic.org/2012/03/16/oil-spill-lessons/">Oil
+Spill Lessons</a> hosted by Steve Heimel with guests: Kurt Schwehr,
+Ray Highsmith, and Samantha Joye.
+<pre>
+In the 23 years since the tanker Exxon Valdez hit the reef, oil
+spill prevention has improved greatly in Alaska. Nobody wants another
+spill.  But if it happens will we be ready to respond?  Two years ago,
+a spill in the Gulf of Mexico showed there is still room for
+improvement.
+</pre>
+<a href=
+"http://media.aprn.org/2012/toa-20120320.mp3">toa-20120320.mp3</a><br />
+
+<br />
+<script language="JavaScript" src=
+"../attachments/audio/audio-player.js" type=
+"text/javascript">
+</script> <object type="application/x-shockwave-flash" data=
+"../attachments/audio/player.swf" id=
+"audioplayer1" height="24" width="290"><param name="movie" value=
+"../attachments/audio/player.swf" />
+<param name="FlashVars" value=
+"playerID=audioplayer1&amp;soundFile=http://media.aprn.org/2012/toa-20120320.mp3" />
+<param name="quality" value="high" />
+<param name="menu" value="false" />
+<param name="wmode" value="transparent" /></object></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-19T19_12_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-30T06_23_07.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-17T19_41_31.txt" name=
+"e2012-04-17T19_41_31.txt"></a>
+<h2 class="date">04.17.2012 19:41</h2>
+<div class="blogbody">
+<h3 class="title">NOAA NGDC bag web map</h3>
+<div class="item-description">Just released this week... NOAA
+NGDC's version of visualizing BAGs on a web map.<br />
+<br />
+<a href=
+"http://www.noaanews.noaa.gov/stories2012/20120416_bathymetry.html">
+NOAA releases new views of Earth's ocean floor</a> [noaa
+news]<br />
+<br />
+<a href=
+"http://maps.ngdc.noaa.gov/viewers/bathymetry">http://maps.ngdc.noaa.gov/viewers/bathymetry</a><br />
+
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/EY0BRiV_XyE" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+You might remember my bag visualizations from a few years
+ago:<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/7fOTlqqQ5O4" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+See also:<br />
+<br />
+<a href=
+"http://news.slashdot.org/story/12/04/17/1556218/noaa-releases-new-views-of-earths-ocean-floor">
+NOAA Releases New Views of Earth's Ocean Floor</a> [slashdot]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-17T19_41_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-19T19_12_35.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-15T07_56_08.txt" name=
+"e2012-04-15T07_56_08.txt"></a>
+<h2 class="date">04.15.2012 07:56</h2>
+<div class="blogbody">
+<h3 class="title">Fire on the Horizon (book)</h3>
+<div class="item-description">I just finished <a href=
+"http://www.amazon.com/Fire-Horizon-Untold-Disaster-ebook/dp/B0042FZVT4/ref=tmm_kin_title_0?ie=UTF8&amp;m=AG56TWVU5XWC2&amp;qid=1334501314&amp;sr=8-1">
+Fire on the Horizon: The Untold Story of the Gulf Oil Disaster</a>
+by Tom Shroder and John Konrad. I've been trying to read this book
+since July of last summer, but each time I started, I was just too
+close to the topic. I finally just powered through despite my blood
+pressure. It was hard enough working on the oil spill from my home
+office in New Hampshire. With this book I felt like it was
+happening to me on the rig. It's a difficult topic, but it's coming
+up on 2 years since the rig cought fire on April 20, 2010.<br />
+<br />
+<a href=
+"http://en.wikipedia.org/wiki/Deepwater_Horizon_oil_spill#Explosion">
+Wikipedia on the Deepwater Horizon (DWH) oil spill</a>
+<pre>
+At approximately 9:45 p.m. CDT, on April 20, 2010, high pressure
+methane gas from the well expanded into the drilling riser and was
+released onto the drilling rig, where it ignited and exploded,
+engulfing the drilling rig.  Most of the workers escaped the
+rig by lifeboat and were subsequently evacuated by boat or airlifted
+by helicopter for medical treatment; however, eleven workers were
+never found despite a three-day Coast Guard search operation, and are
+believed to have died in the explosion. Efforts by multiple ships
+to douse the flames were unsuccessful. After burning for approximately
+36 hours, the Deepwater Horizon sank on the morning of April 22,
+2010.
+</pre>
+<br />
+<br />
+<img width="600" height="450" title=
+"Deepwater Horizon on file (img by USCG)" withgrayborder="True"
+src="../attachments/2012-04/deepwaterhorizon-on-fire.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-15T07_56_08.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-17T19_41_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-14T22_46_41.txt" name=
+"e2012-04-14T22_46_41.txt"></a>
+<h2 class="date">04.14.2012 22:46</h2>
+<div class="blogbody">
+<h3 class="title">Right whale AIS Project (RAP) for Whale
+Alert</h3>
+<div class="item-description"><iframe width="560" height="315" src=
+"http://www.youtube.com/embed/MQBj9tlcqU0" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-14T22_46_41.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-15T07_56_08.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-13T18_18_50.txt" name=
+"e2012-04-13T18_18_50.txt"></a>
+<h2 class="date">04.13.2012 18:18</h2>
+<div class="blogbody">
+<h3 class="title">Titanic in Google Earth</h3>
+<div class="item-description">Tomorrow is the 100th anniversary of
+the sinking of the <a href=
+"http://en.wikipedia.org/wiki/RMS_Titanic">R.M.S. Titanic</a>.
+There has been tons of press coverage leading up to this date. I've
+been posting some of this on a Google Plus (G+) page: <a href=
+"https://plus.google.com/u/0/b/104429686404863416366/">G+ RMS
+Titanic</a>. One nice Google Earth example is posted on the Google
+Earth Blog (not a part of Google): <a href=
+"http://www.gearthblog.com/blog/archives/2012/04/the_voyage_of_the_titanic_in_google.html">
+The voyage of the Titanic in Google Earth</a><br />
+<br />
+Today, in honor of the memory of the Titanic, Google released a
+LatLon blog post, <a href=
+"http://google-latlong.blogspot.de/2012/04/remembering-titanic.html">
+Remembering the Titanic</a>, that includes a tour of the site that
+is now in the Google Earth Gallery: <a href=
+"http://tinyurl.com/titanic-earth-gallery">http://tinyurl.com/titanic-earth-gallery</a><br />
+
+<br />
+<img width="600" height="342" title="Titanic in the Gallery"
+withgrayborder="True" src=
+"../attachments/2012-04/titanic-google-earth-gallery.png" />
+<br />
+<br />
+<img width="600" height="392" title="Touring the Titanic"
+withgrayborder="True" src=
+"../attachments/2012-04/titanic-tour.png" /><br />
+
+<br />
+If you are not familiar with tours, hopefully, this will help. Open
+up the folders until you see the picture of the camera and "Titanic
+Tour" that I've circled in yellow below.<br />
+<br />
+<img width="800" height="499" title="tiatic in Google earth"
+withgrayborder="True" src=
+"../attachments/2012-04/titanic-in-ge.png" /><br />
+
+<br />
+<img width="600" height="378" title=
+"Running the tour in Google Earth" withgrayborder="True" src=
+"../attachments/2012-04/titanic-starting-tour.png" />
+<br />
+<br />
+I suggest you first sit back and let Jenifer take you on the tour
+in this Google Oceans YouTube video!<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/2qT5fddzELU" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+Additionally, the Titanic can now be found via the search window in
+the top left corner of Google Earth. Make sure to have at least the
+"Shipwrecks" layer enabled (if not all of them).<br />
+<br />
+<img width="600" height="336" title="Finiding the Titanic in Earth"
+withgrayborder="True" src=
+"../attachments/2012-04/titanic-ocean-layer.png" />
+<br />
+<br />
+There is also an embedded video in the shipwreck popup. Check out
+all three tabs. Take a look at your favorite parts of the ocean for
+ship wrecks.<br />
+<br />
+<img width="600" height="329" title="Finiding the Titanic in Earth"
+withgrayborder="True" src=
+"../attachments/2012-04/titanic-ocean-layer-video.png" />
+<br />
+<br />
+I hope you enjoy the experience of learning some key history. The
+suffering of the people who were on Titanic led to many
+improvements that we count on today to be safe while out at
+sea.<br />
+<br />
+<b>Trackbacks:</b><br />
+<br />
+<a href="http://gcaptain.com/tour-titanic-google-earth-3-d/">Tour
+the RMS Titanic in Google Earth 3-D!</a> [gCaptain.com] and
+<a href="http://gcaptain.com/tag/titanic/">titanic tag on
+gCaptain</a><br />
+<a href=
+"http://slashgeo.org/2012/04/20/Google-Geonews-Analytics-Google-Maps-API-Business-Snapping-Panoramio-Titanic-Google-Earth">
+Google Geonews: Analytics for Google Maps API for Business,
+Snapping in Panoramio, Titanic in Google Earth, Zombie Survival
+Map, and much more</a> [slashgeo]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-13T18_18_50.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-14T22_46_41.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-12T20_46_46.txt" name=
+"e2012-04-12T20_46_46.txt"></a>
+<h2 class="date">04.12.2012 20:46</h2>
+<div class="blogbody">
+<h3 class="title">NHPR interview about the WhaleAlert app</h3>
+<div class="item-description">Brady Carlson made being interviewed
+super easy. Here is him interviewing me today for <a href=
+"http://info.nhpr.org/atc">NHPR's All Things Considered</a>:<br />
+<br />
+<a href=
+"http://nhpr.org/post/unh-smartphone-app-helps-ships-avoid-endangered-whales">
+UNH Smartphone App Helps Ships Avoid Endangered Whales</a><br />
+<br />
+3:32 run time for the audio<br />
+<br />
+<a href=
+"http://cpa.ds.npr.org/nhpr/audio/2012/04/nht041212bc1.mp3">nht041212bc1.mp3</a>
+[npr.org]<br />
+<br />
+<script language="JavaScript" src=
+"../attachments/audio/audio-player.js" type=
+"text/javascript">
+</script> <object type="application/x-shockwave-flash" data=
+"../attachments/audio/player.swf" id=
+"audioplayer1" height="24" width="290"><param name="movie" value=
+"../attachments/audio/player.swf" />
+<param name="FlashVars" value=
+"playerID=audioplayer1&amp;soundFile=http://cpa.ds.npr.org/nhpr/audio/2012/04/nht041212bc1.mp3" />
+<param name="quality" value="high" />
+<param name="menu" value="false" />
+<param name="wmode" value="transparent" /></object></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-12T20_46_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-13T18_18_50.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-12T11_43_32.txt" name=
+"e2012-04-12T11_43_32.txt"></a>
+<h2 class="date">04.12.2012 11:43</h2>
+<div class="blogbody">
+<h3 class="title">UNH WhaleAlert press release</h3>
+<div class="item-description">If you've been following my blog of
+the years, you probably have noticed that I have been working on
+whale notices over AIS for a long time. I started working on this
+back in 2006! Last week, the iOS app came out and it's been getting
+great press. Here is the UNH press release to go with all of that.
+This has been the effort of many many people to get from ideas to a
+working implementation. I am so excited that this is finally in the
+hands of anyone who wants it. I've taken the press release that
+Beth crafted and added a few web links to it in case you are
+interested.<br />
+<br />
+<a href=
+"http://www.unh.edu/news/cj_nr/2012/apr/bp12whales.cfm">Protecting
+Whales? Thanks to UNH, There's an App for That</a> [unh.edu]
+<pre>
+Media contact: Beth Potier
+UNH Media Relations
+603-862-1566
+beth.potier@unh.edu
+@unhnews
+@unhscience
+<!-- -->
+April 12, 2012
+<!-- -->
+Reporters and editors: Kurt Schwehr is available at 650-395-7261 or schwehr@ccom.unh.edu.
+<!-- -->
+<b>Protecting Whales? Thanks to UNH, There's an App for That</b>
+<!-- -->
+DURHAM, N.H. - Researchers at the University of New Hampshire's Center
+for Coastal and Ocean Mapping (<a href=
+"http://ccom.unh.edu/">CCOM</a>) helped develop a new iPad and
+iPhone application that aims to protect critically endangered North
+Atlantic right whales from collisions with ships. <a href=
+"..">Kurt Schwehr</a>,
+affiliate assistant professor, research associate professor <a href="http://ccom.unh.edu/user/lalexander">Lee
+Alexander</a>, and research scientist <a href=
+"http://ccom.unh.edu/user/roland">Roland Arsenault</a>, led key technical
+aspects of the WhaleALERT app launched last week.
+<!-- -->
+The free app, developed by many partners led by the National Oceanic
+and Atmospheric Administration (<a href=
+"http://www.noaa.gov/">NOAA</a>), sends data about right whale
+detections directly to an iPhone or iPad on a ship's bridge. The app
+links whale calls detected by a series of <a href=
+"http://www.listenforwhales.org/page.aspx?pid=430">listening buoys</a> to captains
+transiting the busy shipping lanes in and around <a href=
+"http://stellwagen.noaa.gov/">Stellwagen Bank
+National Marine Sanctuary</a> at the mouth of Massachusetts Bay.
+<!-- -->
+Numbering between just 350 and 500, North Atlantic right whales are
+one of the world's most endangered large animals; collisions with
+ships are a leading cause of right whale deaths.
+<!-- -->
+The <a href=
+"http://unh.edu/">UNH</a> researchers leveraged their technical experience to translate
+whale call data collected by acoustic buoys, deployed and developed by
+<a href=
+"http://www.birds.cornell.edu/brp/">Cornell University's Lab of Ornithology</a>, into information that can be
+quickly accessed by busy mariners. "We grab the data, push it through
+a minefield of confusing standards and techno-babble, and get it to
+people," says Schwehr, who is also a GIS data engineer for <a href=
+"http://earth.google.com/ocean/">Oceans at
+Google</a>.
+<!-- -->
+Schwehr and Arsenault worked to ensure that the app can use Automatic
+Identification System (<a href=
+"http://en.wikipedia.org/wiki/Automatic_Identification_System">AIS</a>), a communication system onboard all ships,
+as well as Internet (wireless or satellite) or 3G networks to deliver
+information about right whales in the vicinity and right whale
+conservation measures.
+<!-- -->
+Imagine, Schwehr says, you're driving down the highway and you receive
+a cell phone call that delivers warning of an accident ahead global
+positioning system coordinates. While continuing to drive, you 
+must write down the coordinates and find them on a map to determine
+where the accident is and how you can avoid it. "Now imagine your car
+is 900 feet long," he says, noting the difficulty of maneuvering a
+ship. <a href=
+"http://earthnc.com/apps/whalealert">WhaleALERT</a> transmits the location of any whales directly to a
+relatively inexpensive and ubiquitous device making it easier for
+ships to take action.
+<!-- -->
+"This is a huge leap forward in terms of giving this information to
+mariners in a way that's part of their daily routine," he says, noting
+that a ship's bridge is a busy place and among the many pressures
+facing mariners, avoiding whales might be a lower priority. "It has to
+be easy to use."
+<!-- -->
+The CCOM contribution to WhaleALERT was developed as part of CCOM's
+<a href=
+"http://ccom.unh.edu/vislab/projects/chart_of_the_future.html">Chart of the Future</a> project, a NOAA-funded effort that fuses marine
+technology with data visualization to maximize mariner safety and
+efficiency of navigation. Schwehr says WhaleALERT is just one of many
+possible applications of the software the CCOM team developed.
+<!-- -->
+"My hope is that with the software being open-source and the app being
+free, this could be used for many situations," he says, including
+avoiding other endangered marine mammals (manatees are an example) or
+keeping watch for marine debris or oil spills. "UNH and CCOM are
+trying to be an enabler for people around the world to solve their own
+problems." Alexander and Schwehr worked to get the AIS message used
+for the whale notices accepted into an international standard with the
+International Maritime Organization (<a href=
+"http://www.imo.org/">IMO</a>), thereby ensuring that the
+technology can be used anywhere in the world.
+<!-- -->
+WhaleALERT has been developed by a collaboration of government
+agencies, academic institutions, nonprofit conservation groups and
+private sector industries, led by scientists at NOAA's Stellwagen Bank
+National Marine Sanctuary. In addition to UNH, collaborating
+organizations include the <a href=
+"http://stellwagen.noaa.gov/protect/whalealert.html">sanctuary</a>,  <a href="www.birds.cornell.edu%2Fbrp">Bioacoustics Research Program at
+Cornell University</a>, <a href=
+"http://earthnc.com/">EarthNC</a>, <a href=
+"http://www.excelerateenergy.com/project/northeast-gateway-deepwater-port">Excelerate Energy</a>, <a href="http://eomoffshore.com/">EOM Offshore</a>, <a href="http://www.gaiagps.com/">Gaia
+GPS</a>, <a href=
+"http://www.ifaw.org/us/news/new-ipad-iphone-app-helps-protect-endangered-whales">International Fund for Animal Welfare</a>, <a href="http://www.massport.com/">Massachusetts Port
+Authority</a>, <a href=
+"http://www.nmfs.noaa.gov/">NOAA Fisheries Service</a>, <a href=
+"http://www.nps.gov/caco/index.htm">National Park Service, Cape Cod
+National Seashore</a>, <a href=
+"http://nykline.com/">NYK Lines (North America)</a>, <a href=
+"http://www.uscg.mil/hq/cg9/rdc/">United States Coast
+Guard</a> and the <a href=
+"http://www.whoi.edu/oceanus/viewArticle.do?id=57146">Woods Hole Oceanographic Institution</a>.
+<!-- -->
+Learn more about WhaleALERT here:
+<a href=
+"http://www.whoi.edu/oceanus/viewArticle.do?id=57146">http://www.noaanews.noaa.gov/stories2012/20120404_whale_app.html</a>.
+Download the app from the iTunes store here:
+<a href=
+"http://itunes.apple.com/us/app/whale-alert-ship-strike-reduction/id511707112?mt=8&amp;ls=1">http://itunes.apple.com/us/app/whale-alert-ship-strike-reduction/id511707112?mt=8&amp;ls=1</a>.
+Learn more about UNH's Center for Coastal and Ocean Mapping here:
+<a href=
+"http://itunes.apple.com/us/app/whale-alert-ship-strike-reduction/id511707112?mt=8&amp;ls=1">www.ccom.unh.edu</a>.
+<!-- -->
+The University of New Hampshire, founded in 1866, is a world-class
+public research university with the feel of a New England liberal arts
+college. A land, sea, and space-grant university, UNH is the state's
+flagship public institution, enrolling 12,200 undergraduate and 2,300
+graduate students.
+<!-- -->
+-30-
+<!-- -->
+Images available to download:
+<a href=
+"http://itunes.apple.com/us/app/whale-alert-ship-strike-reduction/id511707112?mt=8&amp;ls=1">http://www.noaanews.noaa.gov/stories2012/images/Whale-Alert-screen-view-April-2012-full.jpg</a>
+Caption: WhaleALERT iPad display as seen by a mariner approaching Boston Harbor.
+Credit: NOAA
+<!-- -->
+<a href=
+"http://itunes.apple.com/us/app/whale-alert-ship-strike-reduction/id511707112?mt=8&amp;ls=1">http://www.noaanews.noaa.gov/stories2012/images/whalealert_icon_v01_02_512x512.jpg</a>
+Caption: WhaleALERT, a free app for iPads and iPhones, can be downloaded from the iTunes store.
+Credit: NOAA
+</pre>
+Here are two photos that Jake Levenson of IFAW shared with me that
+show the iPad version of the app on the bridge of a ship.<br />
+<br />
+<img width="600" height="450" title=
+"WhaleAlert on the bridge of a ship" withgrayborder="True" src=
+"../attachments/2012-04/whalealert-ifaw-1.jpg" />
+<br />
+<br />
+<img width="600" height="450" title=
+"WhaleAlert on the bridge of a ship" withgrayborder="True" src=
+"../attachments/2012-04/whalealert-ifaw-2.jpg" />
+<br />
+<br />
+press:<br />
+<br />
+<a href=
+"http://www.nashuatelegraph.com/granitegeek/956961-440/want-an-app-to-tell-you-if.html">
+Want an app to tell you if you're about to run into a whale? UNH
+helped make it</a> [Nashua Telegraph]<br />
+<a href=
+"http://www.fosters.com/apps/pbcs.dll/article?AID=/20120414/GJNEWS_01/704149945/">
+Protecting whales? Thanks to UNH, there's an app for that</a>
+[Foster's Daily Democrat] (the Dover, NH News Paper)<br />
+<a href=
+"http://www.nhpr.org/post/unh-smartphone-app-helps-ships-avoid-endangered-whales">
+UNH Smartphone App Helps Ships Avoid Endangered Whales</a> [NHPR
+ATC]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-12T11_43_32.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-12T20_46_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-05T16_21_54.txt" name=
+"e2012-04-05T16_21_54.txt"></a>
+<h2 class="date">04.05.2012 16:21</h2>
+<div class="blogbody">
+<h3 class="title">Audio from today's CCOM seminar</h3>
+<div class="item-description">Brad Winney and Virgil Zetterlind of
+EarthNC gave a nice talk today at CCOM. I only got to attended
+remotely. Here is the audio. I worked with EarthNC and GaiaGPS to
+build the Whale Alert iOS app (with Roland taking over my role).
+Virgil and I have known each other for quite a few years.<br />
+<br />
+<a href=
+"http://vislab-ccom.unh.edu/~schwehr/rap/2012-Apr-05-earthnc-ccom-seminar.mp3">
+2012-Apr-05-earthnc-ccom-seminar.mp3</a><br />
+<br />
+<script language="JavaScript" src=
+"../attachments/audio/audio-player.js" type=
+"text/javascript">
+</script> <object type="application/x-shockwave-flash" data=
+"../attachments/audio/player.swf" id=
+"audioplayer1" height="24" width="290"><param name="movie" value=
+"../attachments/audio/player.swf" />
+<param name="FlashVars" value=
+"playerID=audioplayer1&amp;soundFile=http://vislab-ccom.unh.edu/~schwehr/rap/2012-Apr-05-earthnc-ccom-seminar.mp3" />
+<param name="quality" value="high" />
+<param name="menu" value="false" />
+<param name="wmode" value="transparent" /></object></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-05T16_21_54.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-12T11_43_32.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-04T19_06_02.txt" name=
+"e2012-04-04T19_06_02.txt"></a>
+<h2 class="date">04.04.2012 19:06</h2>
+<div class="blogbody">
+<h3 class="title">Whale Alert iPad app time lapse</h3>
+<div class="item-description">Watching these things in real time is
+like watching the grass grow. Here is 9 hours of me hitting the
+screen capture on the ipad every so often. Time does not move
+linearly. Keep your eye on the time displayed on the top center.
+This app was released to the public yesterday and has libais in it
+to decode AIS messages if you are out in the area around Cape Cod
+in your vessel.<br />
+<br />
+<iframe width="420" height="315" src=
+"http://www.youtube.com/embed/sWbDgnFDBOE" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-04T19_06_02.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-05T16_21_54.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-04T12_54_30.txt" name=
+"e2012-04-04T12_54_30.txt"></a>
+<h2 class="date">04.04.2012 12:54</h2>
+<div class="blogbody">
+<h3 class="title">Right whale AIS iPad/iPhone app</h3>
+<div class="item-description"><a href=
+"http://www.noaanews.noaa.gov/stories2012/20120404_whale_app.html">http://www.noaanews.noaa.gov/stories2012/20120404_whale_app.html</a>
+<pre>
+<b>New iPad, iPhone app helps mariners avoid 
+endangered right whales</b>
+<!-- -->
+Mariners along the U.S. east coast can now download a new iPad and
+iPhone application that warns them when they enter areas of high risk
+of collision with critically endangered North Atlantic right
+whales. The free Whale Alert app provides one source for information
+about right whale management measures and the latest data about right
+whale detections, all overlaid on NOAA digital charts. 
+<!-- -->
+"Whale Alert represents an innovative collaboration to protect this
+critically endangered species," said David Wiley, s Stellwagen
+Bank National Marine Sanctuary research coordinator and project
+lead. "Whale conservation is greater than any one organization and
+this project shows how many organizations can unite for a good cause." 
+<!-- -->
+A key feature of Whale Alert is a display linking near real-time
+acoustic buoys that listen for right whale calls to an iPad or iPhone
+on a s bridge showing the s presence to captains transiting
+the shipping lanes in and around Stellwagen Bank National Marine
+Sanctuary. "The idea that right whales are directly contributing to
+conservation through their own calls is pretty exciting," said
+Christopher Clark, whose team at the Bioacoustics Research Program at
+the Cornell Lab of Ornithology helped develop the acoustic detection
+and warning system. 
+<!-- -->
+North Atlantic right whales, which live along North s east
+coast from Nova Scotia to Florida, are one of the s rarest large
+animals and a species on the brink of extinction. Recent estimates put
+the population of North Atlantic right whales at approximately  350 to
+550 animals. Collision with ships is a leading cause of right whale
+death.
+<!-- -->
+"Massport is proud to be part of this effort. We are working with our
+cruise and shipping vessel partners to educate mariners about the
+whales, and the importance of this great new tool," said Michael
+Leone, port director for the Massachusetts Port Authority. "The
+maritime community has always sought ways to increase right whale
+survival. Whale Alert does this by using science and technology to let
+mariners know where their vessel is in relation to the whales and
+conservation measures."
+<!-- -->
+The link to the listening network is only part of what Whale Alert
+does. The app uses GPS, Automatic Identification System, Internet and
+digital nautical chart technologies to alert mariners to s right
+whale conservation measures that are active in their immediate
+vicinity. NOAA, through its NOAA Fisheries Service, is the U.S. agency
+with responsibility for protecting and recovering this endangered
+species. 
+<!-- -->
+"Endangered right whales are particularly vulnerable to being hit and
+killed by ships, but we can save them," said Patrick Ramage, global
+whale director for the International Fund for Animal Welfare and one
+of the collaborators on Whale Alert. "Right whales need dramatic
+conservation progress to survive.  This new iPad app gives these
+whales a fighting chance."
+<!-- -->
+"The app also moves whale conservation into the 21st century," said
+Brad Winney co-founder of EarthNC, the developer of the Whale Alert
+mobile application. "Whale Alert highlights the powerful role today's
+web and mobile based technologies can have in the preservation efforts
+of endangered species worldwide."
+<!-- -->
+Whale Alert has been developed by a collaboration of government
+agencies, academic institutions, non-profit conservation groups and
+private sector industries, led by scientists at s Stellwagen Bank
+National Marine Sanctuary. Collaborating organizations include the
+sanctuary, Bioacoustics Research Program at Cornell University, Center
+for Coastal and Ocean Mapping at the University of New Hampshire,
+EarthNC, Excelerate Energy, EOM Offshore, Gaia GPS, International Fund
+for Animal Welfare, Massachusetts Port Authority, NOAA Fisheries
+Service, National Park Service, Cape Cod National Seashore, NYK Lines
+(North America), United States Coast Guard and the Woods Hole
+Oceanographic Institution.
+<!-- -->
+Whale Alert can be downloaded free of charge from the App store. More
+information on Whale Alert and the groups responsible for its
+development can be found at
+<a href=
+"http://stellwagen.noaa.gov/protect/whalealert.html">http://stellwagen.noaa.gov/protect/whalealert.html</a>
+</pre>
+See also:<br />
+<br />
+<a href=
+"http://itunes.apple.com/us/app/whale-alert-ship-strike-reduction/id511707112?mt=8">
+Apple App store link to Whale Alert</a><br />
+<a href=
+"http://www.marinelink.com/news/mariners-iphone-whales343589.aspx">New
+iPad, iPhone App Helps Mariners Avoid Right Whales</a>
+[MarineLink.com]<br />
+<a href=
+"http://newswatch.nationalgeographic.com/2012/04/04/weird-wild-new-app-tracks-rare-whales-with-iphone-and-ipad/">
+Weird &amp; Wild: New App Tracks Rare Whales With iPhone and
+iPad</a> [National Geographic]<br />
+<a href="http://radioboston.wbur.org/2012/04/04/whale-app">New App
+Helps Ship Captains Avoid Hitting Endangered Whales</a> [WBUR
+Boston Radio]<br />
+<a href=
+"http://www.seacoastonline.com/articles/20120408-NEWS-120409775">App
+aims to spare whales from ships in Atlantic</a> [SeaCoast
+Online/AP]<br />
+<br />
+<img width="600" height="602" title="Whale Alert on SBNMS"
+withgrayborder="True" src=
+"../attachments/2012-04/noaa-sbnms-whale-alert-app.png" />
+<br />
+<br />
+<img width="600" height="450" title="Screenshot of the actual app"
+withgrayborder="True" src=
+"../attachments/2012-04/rap-actual-ipad-app.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-04T12_54_30.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-04T19_06_02.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-03T22_17_31.txt" name=
+"e2012-04-03T22_17_31.txt"></a>
+<h2 class="date">04.03.2012 22:17</h2>
+<div class="blogbody">
+<h3 class="title">Chikyu JFAST first video</h3>
+<div class="item-description"><a href=
+"http://gcaptain.com/drilling-tsunami-update-chikyu/">Drilling Into
+The Tsunami - An Update From The Chikyu</a> [gCaptain]<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/uzksWiNwkBk" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+And from last fall: <a href=
+"http://gcaptain.com/damaged-tsunami-drillship-fights/">Damaged by
+the Tsunami, A Drillship Fights Back</a> [gCaptain]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-03T22_17_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-04T12_54_30.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-02T21_22_49.txt" name=
+"e2012-04-02T21_22_49.txt"></a>
+<h2 class="date">04.02.2012 21:22</h2>
+<div class="blogbody">
+<h3 class="title">JFAST project on station</h3>
+<div class="item-description">The Chikyu just arrived in the last
+couple hours on station where they will be drilling for the JFAST
+project.<br />
+<br />
+<img width="600" height="418" title="JFAST on station"
+withgrayborder="True" src=
+"../attachments/2012-04/jfast-on-station.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-02T21_22_49.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-03T22_17_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-04-02T20_36_21.txt" name=
+"e2012-04-02T20_36_21.txt"></a>
+<h2 class="date">04.02.2012 20:36</h2>
+<div class="blogbody">
+<h3 class="title">Verified VDatum transformation</h3>
+<div class="item-description">I finally have a vdatum
+transformation that I have a way to verify. I had started out
+creating a KML of the Epoch tables for all of the tide stations in
+the United States.<br />
+<br />
+<img width="600" height="420" title=
+"All your stations are belong to us" withgrayborder="True" src=
+"../attachments/2012-04/vdatum-tide-stations-google-earth.png" />
+<br />
+<br />
+I pulled the <a href=
+"http://tidesandcurrents.noaa.gov/station_index.shtml?state=Complete+Index&amp;id1=06&amp;id2=1&amp;id3=2&amp;id4=7&amp;id5=8&amp;id6=9">
+tide station locations</a> and use that as a list of station
+positions and station ids so that I could get the Epoch table.
+Unfortunetly, those tables are in feet (booo! no SI?). But how do I
+get from Mean Lower Low Water to NAVD88? e.g.<br />
+<br />
+<a href=
+"http://tidesandcurrents.noaa.gov/epoch_datum_check.shtml?stnid=9410230">
+epoch_datum_check.shtml?stnid=9410230</a><br />
+<br />
+<img width="514" height="388" title="Epoch Check" withgrayborder=
+"True" src=
+"../attachments/2012-04/vdatum-epoch-ft.png" />
+<br />
+<br />
+Then, Barry pointed me to a benchmark page for a station and things
+made more sense!<br />
+<br />
+<a href=
+"http://tidesandcurrents.noaa.gov/data_menu.shtml?stn=9410230%20La%20Jolla,%20CA&amp;type=Bench%20Mark%20Data%20Sheets">
+Bench Mark Data Sheets La Jolla, CA Station ID: 9410230</a><br />
+<br />
+<img width="600" height="420" title=
+"SIO tide station making some sense" withgrayborder="True" src=
+"../attachments/2012-04/vdatum-benchmark.png" />
+<br />
+<br />
+I can see that there is a consistant 1.33 meter offset between the
+Epoch table and the SIO benchmark info. The best part is that I
+have the difference between NAVD88 and MLLW, which is 0.058 meters.
+I brought up VDatum 2.3.3 and gave it a try. It's off by less than
+1mm. I'll take that! One good earthquake could provide more error
+than that!<br />
+<br />
+<img width="600" height="366" title="VDatum transform documented"
+withgrayborder="True" src=
+"../attachments/2012-04/vdatum-transform-verified.png" />
+<br />
+<br />
+I'm feeling more comfortable with my VDatum transformations! I've
+still got a lot of work to do before I've got the whole process
+nailed down, but there is nothing like getting a first successful
+check. I'm making the assumption that the surveyors for the
+benchmark have this process pretty well nailed down.<br />
+<br />
+Trackback:<br />
+<br />
+<a href=
+"http://slashgeo.org/2012/04/08/Batch-Geonews-Landsat-5-Suspended-Wikipedia-Mobile-Switch-OpenStreetMap-Your-Facebook-Con">
+Batch Geonews: Landsat 5 Suspended, Wikipedia Mobile Switch to
+OpenStreetMap, Your Facebook Connections Map, Vertical Datums, and
+much more</a> [slashgeo]</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-04.html#e2012-04-02T20_36_21.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-04-02T21_22_49.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">April 2012</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"><span class="calendar">1</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-02T21_22_49.txt">2</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-03T22_17_31.txt">3</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-04T19_06_02.txt">4</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-05T16_21_54.txt">5</a></span></td>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar">7</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">8</span></td>
+<td align="center"><span class="calendar">9</span></td>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-12T20_46_46.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-13T18_18_50.txt">13</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-14T22_46_41.txt">14</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-15T07_56_08.txt">15</a></span></td>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-17T19_41_31.txt">17</a></span></td>
+<td align="center"><span class="calendar">18</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-19T19_12_35.txt">19</a></span></td>
+<td align="center"><span class="calendar">20</span></td>
+<td align="center"><span class="calendar">21</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar">28</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">29</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-04.html#e2012-04-30T14_41_05.txt">30</a></span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

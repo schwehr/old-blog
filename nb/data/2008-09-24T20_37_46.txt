@@ -1,0 +1,38 @@
+TITLE: How can this shared library problem happen?
+AUTHOR: Kurt
+DATE: 09.24.2008 20:37
+DESC: grrr
+-----
+BODY:
+What happened to my fink pysqlite2 package?  This is the same library.  What?
+This works:
+<pre>
+In [1]: import pysqlite2
+</pre>
+So what is going on that this does not work?
+<pre>
+In [2]: import pysqlite2.dbapi2
+======================================================================
+ImportError                               Traceback (most recent call last)
+/Users/schwehr/projects/src/noaadata/scripts/&lt;ipython console&gt; in &lt;module&gt;()
+/sw/lib/python2.5/site-packages/pysqlite2/dbapi2.py in &lt;module&gt;()
+     25 import time
+     26 
+---&gt; 27 from pysqlite2._sqlite import *
+     28 
+     29 paramstyle = "qmark"
+ImportError: dlopen(<b>/sw/lib/python2.5/site-packages/pysqlite2/_sqlite.so</b>, 2): 
+     Symbol not found: _sqlite3_enable_load_extension
+  Referenced from: <b>/sw/lib/python2.5/site-packages/pysqlite2/_sqlite.so</b>
+  Expected in: dynamic lookup
+</pre>
+After an hour and a half bouncing things off of pogma and akh, I've got it
+figured out.  Turns out that extension handling for sqlite3 in fink is turned
+off.  Might be a tcl build issue.  I haven't tried the latest sqlite (3.6.2)
+to see if things are better.  The configure script for sqlite3 does not
+seem very well behaved.
+<pre>
+  perl -pi -e 's,#define HAVE_LOAD_EXTENSION,#undef HAVE_LOAD_EXTENSION,' src/connection.c
+</pre>
+Update to the latest pysqlite2-py25 in fink and all should be well.
+-----

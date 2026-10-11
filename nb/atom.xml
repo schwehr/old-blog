@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<feed version="0.3"
+xmlns="http://purl.org/atom/ns#"
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+>
+<title mode="escaped">Kurt's Weblog</title>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog"/>
+<modified>2013-08-04T09:59:12-04:00</modified>
+<author>
+<name>Kurt</name>
+<url>http://schwehr.org/blog</url>
+</author>
+
+<entry>
+<title mode="escaped">python webbrowser module</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-08.html#e2013-08-04T09_58_21.txt"/>
+<id>http://schwehr.org/blog/archives/2013-08.html#e2013-08-04T09_58_21.txt</id>
+<issued>2013-08-04T09:58:21-04:00</issued>
+<modified>2013-08-04T09:58:21-04:00</modified>
+<created>2013-08-04T09:58:21-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+This is a web only version of the mac <a href="https://developer.apple.com/library/mac/documentation/darwin/reference/manpages/man1/open.1.html">open</a> or linux <a href="http://linux.die.net/man/1/xdg-open">xdg-open</a> commands:
+<pre><tt><b><font color="#000080">import</font></b> webbrowser
+webbrowser<font color="#990000">.</font><b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'http://docs.python.org/2/library/webbrowser.html'</font><font color="#990000">)</font>
+</tt></pre>
+I heard about <a href="http://docs.python.org/2/library/webbrowser.html">webbrowser</a> via
+<a href="http://www.leancrew.com/all-this/2013/08/sorting-with-pythonista/">Sorting with Pythonista</a>, which also introduced me to the iOS <a href="http://omz-software.com/pythonista/">Pythonista app</a> for the ipad/iphone.
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">python and numpy with slices</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-31T19_08_10.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-31T19_08_10.txt</id>
+<issued>2013-07-31T19:08:10-04:00</issued>
+<modified>2013-07-31T19:08:10-04:00</modified>
+<created>2013-07-31T19:08:10-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+I never really got python slices before now.
+I read <a href="http://docs.python.org/2/library/functions.html#slice">http://docs.python.org/2/library/functions.html#slice</a> and <a href="http://docs.python.org/2/library/itertools.html#itertools.islice">http://docs.python.org/2/library/itertools.html#itertools.islice</a>.  These 3 examples all make a hole
+in a np.zeros((10,10)) grid:
+<pre><tt>grid <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">zeros</font></b><font color="#990000">((</font><font color="#993399">10</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">))</font>
+grid<font color="#990000">[</font><b><font color="#000000">slice</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">),</font> <b><font color="#000000">slice</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">7</font><font color="#990000">)]</font> <font color="#990000">=</font> <font color="#993399">1</font>
+<!-- -->
+<i><font color="#9A1900"># is equivalent to:</font></i>
+<!-- -->
+grid <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">zeros</font></b><font color="#990000">((</font><font color="#993399">10</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">))</font>
+<b><font color="#0000FF">for</font></b> y <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">7</font><font color="#990000">):</font>
+    grid<font color="#990000">[</font><b><font color="#000000">slice</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">5</font><font color="#990000">),</font> y<font color="#990000">]</font> <font color="#990000">=</font> <font color="#993399">1</font>
+<!-- -->
+<i><font color="#9A1900"># and also:</font></i>
+<!-- -->
+grid <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">zeros</font></b><font color="#990000">((</font><font color="#993399">10</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">))</font>
+<b><font color="#0000FF">for</font></b> x <b><font color="#0000FF">in</font></b> <b><font color="#000000">xrange</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">):</font>
+    <b><font color="#0000FF">for</font></b> y <b><font color="#0000FF">in</font></b> <b><font color="#000000">xrange</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">7</font><font color="#990000">):</font>
+        grid<font color="#990000">[</font>x<font color="#990000">][</font>y<font color="#990000">]</font> <font color="#990000">=</font> <font color="#993399">1</font>
+</tt></pre>
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">TrailBehind's Skipper</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-30T18_46_02.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-30T18_46_02.txt</id>
+<issued>2013-07-30T18:46:02-04:00</issued>
+<modified>2013-07-30T18:46:02-04:00</modified>
+<created>2013-07-30T18:46:02-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+An interesting new entry into the iPad charting world: <a href="http://www.tryskipper.com/">http://www.tryskipper.com/</a>.  NOAA Charts, Weather Radar, the ability to try out the for pay app from the free with no hassle.
+<br /><br />
+<img width="600" height="450" title="TrailBehind Skipper" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/trailbehind-skipper-0.png"/>
+<br /><br />
+<img width="600" height="450" title="TrailBehind Skipper" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/trailbehind-skipper-1.png"/>
+<br /><br />
+<img width="600" height="450" title="TrailBehind Skipper" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/trailbehind-skipper-2.png"/>
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">GMT5 will use CMake</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-25T00_31_52.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-25T00_31_52.txt</id>
+<issued>2013-07-25T00:31:52-04:00</issued>
+<modified>2013-07-25T00:31:52-04:00</modified>
+<created>2013-07-25T00:31:52-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+Oh hell.  I don't like cmake.  Autoconf is hard, but cmake and scons
+just make me want to walk away.  And this after we got mb-system to
+build with autoconf.  GMT 5 switches from autoconf to cmake:
+<br /><br />
+<a href="http://gmtrac.soest.hawaii.edu/projects/gmt/wiki/CMake">Transition from GNU Autotools to CMake</a>
+<br /><br />
+</p>
+<table border="2" cellspacing="0" cellpadding="6">
+<tbody>
+<tr><td >GNU autotools</td><td >CMake</td></tr>
+<tr><td >./configure</td><td >cmake &lt;source-dir&gt;</td></tr>
+<tr><td >make distclean</td><td >rm &lt;build-dir&gt;</td></tr>
+<tr><td >rm config.cache</td><td >rm CMakeCache.txt</td></tr>
+<tr><td >&ndash;prefix</td><td >CMAKE_INSTALL_PREFIX</td></tr>
+<tr><td >&ndash;enable-netcdf</td><td >NETCDF_ROOT</td></tr>
+<tr><td >&ndash;enable-gdal</td><td >GDAL_ROOT</td></tr>
+<tr><td >&ndash;enable-pcre</td><td >PCRE_ROOT</td></tr>
+<tr><td >&ndash;enable-matlab</td><td >MATLAB_ROOT</td></tr>
+<tr><td >&ndash;enable-debug</td><td >CMAKE_BUILD_TYPE</td></tr>
+<tr><td >&ndash;enable-triangle</td><td >LICENSE_RESTRICTED</td></tr>
+<tr><td >&ndash;enable-US</td><td >UNITS</td></tr>
+<tr><td >&ndash;enable-flock</td><td >FLOCK</td></tr>
+<tr><td >CFLAGS</td><td >CMAKE_C_FLAGS</td></tr>
+<tr><td >guru/gmtguru.macros</td><td >cmake/ConfigUser.cmake</td></tr>
+</tbody>
+</table>
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">The dangers of automation</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-23T10_14_37.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-23T10_14_37.txt</id>
+<issued>2013-07-23T10:14:37-04:00</issued>
+<modified>2013-07-23T10:14:37-04:00</modified>
+<created>2013-07-23T10:14:37-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+United Airlines on over-reliance on automation.  I had discussions
+with a NOAA captain a few years ago.  The captain said that he often
+gives his bridge crew a twist on many of the transits into or out of
+harbors.  For example, he would hide the radar from the bridge crew.
+He can keep an eye on things and take over should something come up.
+The idea is to make sure the crew is effective no matter what and not
+dependent on any one technology to safely navigate.  Or navigate only
+with paper charts.  And so forth.
+<br /><br />
+An old video, but still very interesting.  "Task saturating the crew"
+and using an autopilot to try to avoid a mid-air collision.
+<br /><br />
+<iframe width="480" height="360" src="//www.youtube.com/embed/jZDjkIjuHGE" frameborder="0" allowfullscreen></iframe>
+<br /><br />
+And this would be an under-reliance on technology... it's not the
+smartest thing ever to put yourself in the path of a feeding animal.
+Did these people have permit for this?  Seems like even if they did,
+this is far beyond stupid.
+<br /><br />
+<iframe width="640" height="360" src="//www.youtube.com/embed/0Ut7wK9l9mk" frameborder="0" allowfullscreen></iframe>
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">Big Data discussion at Ocean Exploration 2020</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-21T15_47_57.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-21T15_47_57.txt</id>
+<issued>2013-07-21T15:47:57-04:00</issued>
+<modified>2013-07-21T15:47:57-04:00</modified>
+<created>2013-07-21T15:47:57-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+<br /><br />
+I recorded the panel session for the question on big data and cloud
+computing.  I was sitting in the back and the audio is not very good.
+To help with that, I transcribed the video.  This text is available as
+CC in in the video.  It should be pretty close to what <a
+href="https://plus.google.com/u/0/112724324866129338402/posts">Dawn
+Wright</a> [ESRI] and <a
+href="https://plus.google.com/u/0/108769582781233692534/posts">Jenifer
+Austin Foulkes</a> [Google] were saying.  I've added some links and
+the video is at the end of this post.
+<br /><br />
+<a href="http://en.wikipedia.org/wiki/Marcia_McNutt">MARCIA</a>: [missed the first part of the question]
+<br /><br />
+grabbing video data, photographic information, high bandwidth data.
+What are your thoughts as representatives of organizations that are
+familiar with handling large amounts of data as to what are the
+prospects for rapid <a
+href="http://en.wikipedia.org/wiki/Quality_assurance">QA</a>/<a href="http://en.wikipedia.org/wiki/Quality_control">QC</a> and effective effective technologies for
+serving up that data to the public and in particular when we think of
+like HD (high definition) data that scientists are going to demand
+for doing research, how one can actually deliver that data to those
+who might need it in it's full quality?
+<br /><br />
+[Jenifer passes the question to Dawn to go first]
+<br /><br />
+DAWN: Fantastic question Marcia.  And I think in terms of
+dealing with all of these, I mentioned among
+the 4 V's, was "variety."  We had not really had a discussion yet
+about video data as a part of that V, and that's going to be very critical.
+<br /><br />
+[<a
+href="http://www.geospatialworld.net/Magazine/MArticleView.aspx?aid=30512">The 
+4 V's</a>:  Volume, Variety, Velocity, Veracity]
+<br /><br />
+MARCIA: So that's a 5th V?
+<br /><br />
+DAWN: No.  That's actually within the V of variety.  In terms of, we
+have photographs, videos, text files, points, lines and polygons and
+observations, visualizations, scientific models.  But within all that
+variety, we have not spoken that much about videos.  And Christian
+Germain's [<a
+href="http://www.ims-bordeaux.fr/IMS/pages/pageAccueilPerso.php?email=christian.germain">possibly
+the right person</a>] comments to that extent were very pertinent to this, because
+with these long archives of these videos that we want to not only
+preserve, but also make available quickly, that's again where
+partnerships are very important.  Because, with our academic and
+government agencies there has been a lot of work and a lot of funding
+to creating these archives, maintaining them, but sometimes the next
+step is not always easily attainable, particularly if your funding
+runs out And so for instance with <a
+href="http://www.oceannetworks.ca/about-us/meet-our-team/kate-moran">Kate</a>'s
+situation with <a href="http://www.neptunecanada.ca/">Neptune
+Canada</a>, where there's been a data management system put in place, and
+your looking to do the next step, this is where I think the
+public-private partnership can really play a role. Because if your are
+able to work with companies who are actually looking at some of these
+problems in terms research.  So I'd like to just step to the side a
+little bit to talk about how important this is when we think about
+research versus exploration.  We've talked about "Is exploration part
+of research?"  Is there a continuum of these two.  Are they broad end
+points?  Or are you really a scientist?  I think in terms of ocean
+exploration.  The ocean exploration challenges are actually the
+research questions, the research problems of information technology or
+data science.  So, we want those kinds of challenges.  So, being able
+to archive, QA/QC, and quickly disseminate video and other kinds of
+observations is something that is DELICIOUS to Google, to ESRI, to our
+partners.  So, <a href="https://marinexplore.com/">Marinexplore</a> is a new startup company in Silicon
+Valley, that is building a marine platform.  They are even building a
+marine operating system.  And they are working now on specific machine
+learning techniques to automatically go through and QA/QC satellite
+observations and I think that could be applied to video.  So I think
+it is just a matter of getting in.  There was a discussion of a
+national "huddle."  We could have a data or technology huddle and talk
+about some of these challenges in smaller groups and come up with very
+useful partner ships to solve these problems.
+<br /><br />
+MARCIA: Okay.  Great.  Jen?
+<br /><br />
+JENIFER: Yeah, I think that all sounds wonderful.  You know I would
+say that towards your question, Google has some tools that can help
+dealing with large data.  And those that I'm familiar with YouTube for
+video and so there's several groups like NOAA [<a
+href="http://www.youtube.com/playlist?list=PL05ED679DD1E1DB17">NOAA
+Ship Okeanos Explorer - Best VIDEOS Of 2012-2010</a>] and <a href="http://www.youtube.com/user/SchmidtOceanVideos/videos">Schmidt Ocean
+Institute</a> who are using <a href="https://support.google.com/youtube/answer/2474026?hl=en">YouTube Live</a>, you know, to record and share
+video from their expeditions
+<br /><br />
+MARCIA: Is it full HD TV?
+<br /><br />
+JENIFER: It has full <a href="http://en.wikipedia.org/wiki/High-definition_television">HD TV</a>.  Yeah.  So I think that's a great tool for
+video.  With regard to analysis, I'm not sure.  I'm sure if it can do
+automated feature extraction.  That would be something to look
+into. And Chris might have mentioned that.  so I think the other thing
+would be Kurt has done a lot of work using our <a href="https://cloud.google.com/">cloud hosting
+infrastructure</a> to upload large amount of data.  Specifically, looking
+at the space-based AIS ship tracking data [<a
+href="http://www.spacequest.com/">SpaceQuest</a>] and then using <a href="https://cloud.google.com/products/compute-engine">Compute
+Engine</a> to do really fast query analysis.  I think that is a tool.
+He's been working on a bit of a how-to, how you can do it as well, to
+come out in the future.  You can see <a
+href="https://developers.google.com/events/io/sessions/327696300">his
+talk from Google I/O</a>.  [<a href="http://youtu.be/MT7cd4M9vzs">Google I/O 2013 - All the Ships in the World: Visualizing Data with Google Cloud and Maps</a>]  Kurt
+Schwehr, formerly from UNH, in the back there.  He'd be happy to talk
+to anyone about his explorations using our <a href="cloud.google.com/storage">Cloud Store</a> for handling
+big data.  And there is another tools, <a href="maps.google.com/engine">Google Maps Engine</a>, which has
+been used for geospatial data and <a href="earthengine.google.org">Earth Engine</a> is a project where they
+look at cloud hosting large amounts of imagery data.  So they put all
+the Landsat imagery in the cloud to allow scientists to do really fast
+change analysis for forest fires now and forest coverage changes.  And
+that's been really powerful.  Analysis that before took months, they
+do in like a day or a really short period of time.  So I think that
+whole power of being able to, you know, do queries across lots and
+lots and lots of machines is a future tool that can be really really
+powerful.  And I'm happy to be a part of the story.
+<br /><br />
+DAWN: I think what Jenifer is referring to in terms of <a href="http://en.wikipedia.org/wiki/Cloud_computing">the cloud</a>.  You
+know, the cloud is another one of these terms that may be a mystery
+term.  And I tend to think of a, literally, an atmospheric cloud in my
+head.  But, we are talking about really a paradigm shift in computing
+and data distribution and there is some bit of trepidation about it
+But I think it is something that is really becoming more secure, more
+powerful, and easier to use.  In the information technology world, we
+are all going that way. And so the cloud infrastructure is somthing
+that is going to be very powerful and something that ocean exploration
+really needs to embrace to a certain extent or to at least
+investigate.  Be willing to have an open mind to investigate it.  This
+is also It's going to be much more efficient, much faster.  To the
+point that I made earlier about not just moving our datasets back and
+forth, but actually moving analysis, the analyses that Jenifer and I
+have been talking about, moving that to the data once and then you
+have your outputs from that can go out much more quickly including to
+the general public and to school kids on their tablets
+<br /><br />
+MARCIA: So, let's suppose we're at a point [video cut off]
+<br /><br />
+<iframe width="640" height="360"
+src="//www.youtube.com/embed/9f-KYg33oho" frameborder="0"
+allowfullscreen></iframe>
+<br /><br />
+Since Dawn mentioned security, you can check out: <a
+href="https://cloud.google.com/files/Google-CommonSecurity-WhitePaper-v1.4.pdf">Google-CommonSecurity-WhitePaper-v1.4.pdf:
+Google’s Approach to IT Security
+A Google White Paper</a> [2012].  Google has <a
+href="https://en.wikipedia.org/wiki/ISO/IEC_27000-series">ISO
+27001</a> certification.  <a
+href="http://youtu.be/T51xcOpz6Js">Michael Manoocheri: Google I/O
+2011: Compliance and Security in the Cloud</a> [YouTube video]
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">OceanExploration 2020 meeting at the Aquarium of the Pacific</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-20T12_10_25.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-20T12_10_25.txt</id>
+<issued>2013-07-20T12:10:25-04:00</issued>
+<modified>2013-07-20T12:10:25-04:00</modified>
+<created>2013-07-20T12:10:25-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+Lots of discussion of where we want to go in the future (next 7 years)
+at the <a
+href="http://oceanexplorer.noaa.gov/oceanexploration2020/agenda.html">Ocean
+Exploration 2020 meeting</a> at the <a
+href="http://www.aquariumofpacific.org/">Aquarium of the Pacific</a>.
+You can join in for a lot of this via web streaming.
+<br /><br />
+This morning, we've heard from people like <a href="http://en.wikipedia.org/wiki/Marcia_McNutt">Marcia
+McNutt</a> and <a href="http://en.wikipedia.org/wiki/Kathryn_D._Sullivan">Kathy Sullivan</a>
+<br /><br />
+From yesterday:
+<br /><br />
+<img width="600" height="265" title="OpenROV's David and Eric presenting" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/openrov.jpg"/>
+<br /><br />
+<img width="600" height="339" title="Jenifer Foulkes presenting Google Ocean" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/jaustin-google-ocean.jpg"/>
+<br /><br />
+From today:
+<br /><br />
+<img width="600" height="339" title="David Gallo from WHOI" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/david-gallo-whoi-orig.jpg"/>
+<br /><br />
+<img width="600" height="347" title="MTJ on the Elephants in the room" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/oe2020-mtj-elephants-in-the-room.jpg"/>
+<br /><br />
+<img width="600" height="136" title="Long Beach" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/long-beach-ca.jpg"/>
+<br /><br />
+Walter Monk recommended that conference include a dedication to <a
+href="http://en.wikipedia.org/wiki/James_D._Watkins">ADM James
+D. Watkins</a> who passed away a year ago.  The oceans community owes
+ADM Watkins quite a bit.
+<br /><br />
+Dave Caress and I have been working a bunch on the autoconf setup for
+mb-system while at the conference.  I'm looking at parts of the <a
+href="https://svn.osgeo.org/mapserver/trunk/mapserver/configure.in">mapserver
+configure.in</a> setup when figuring out how mb-system will make sure
+that it can link against libraries like gdal.
+<br /><br />
+<a href="https://twitter.com/search?q=%23oe2020">#oe2020</a>
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">Python logging module</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-14T23_19_16.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-14T23_19_16.txt</id>
+<issued>2013-07-14T23:19:16-04:00</issued>
+<modified>2013-07-14T23:19:16-04:00</modified>
+<created>2013-07-14T23:19:16-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+I made big use of the python logging module in my Google I/O talk 2
+months ago, but you'd never know it from the talk.  I created a python
+logging module around the boto library that periodically writes to
+cloud store.  And you can also register a logger to log locally with
+log rotation, etc.
+<br /><br />
+<iframe width="420" height="315" src="//www.youtube.com/embed/24_4WWkSmNo" frameborder="0" allowfullscreen></iframe>
+<br /><br />
+<a href="https://github.com/gmr/pycon2013-logging">https://github.com/gmr/pycon2013-logging</a>
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">First contribution to gdal</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-10T11_48_52.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-10T11_48_52.txt</id>
+<issued>2013-07-10T11:48:52-04:00</issued>
+<modified>2013-07-10T11:48:52-04:00</modified>
+<created>2013-07-10T11:48:52-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+Yesterday, I made my first contribution to gdal.  Frank pinged me with
+bug <a href="http://trac.osgeo.org/gdal/ticket/5152">5152 - False
+northing in BAG georeferencing is ignored</a>.  I took a quick walk
+through <a
+href="http://surveys.ngdc.noaa.gov/mgg/NOS/coast/W00001-W02000/W00158/BAG/W00158_MB_128m_MLLW_8of8.bag.gz>W00158_MB_128m_MLLW_8of8.bag.gz</a>
+from survey <a
+href="http://surveys.ngdc.noaa.gov/mgg/NOS/coast/W00001-W02000/W00158/">W00158</a>
+(NOAA Hydrographic survey from the R/V AHI in American Samoa).  gdal was
+placing the survey way up in the artic.
+<br /><br />
+I got the extra bonus of being able to have Frank look over my
+shoulder at each step and I had a working solution in short order.
+Frank was then kind enough to put in my patch and add an explanation
+comment:  <a href="http://trac.osgeo.org/gdal/changeset/26159">r26159</a>
+<br /><br />
+<img width="600" height="322" title="gdal patch" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/gdal-bag-patch.png"/>
+<br /><br />
+<img width="546" height="280" title="Descriptive Report (DR) bathymetry" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/W00158-DR-brooks-bank.png"/>
+]]>
+</content>
+
+</entry>
+<entry>
+<title mode="escaped">Illegal, Unreported and Unregulated (IUU) Fishing</title>
+<author>
+<name>Kurt</name>
+</author>
+<link rel="alternate" type="text/html" href="http://schwehr.org/blog/archives/2013-07.html#e2013-07-07T23_31_55.txt"/>
+<id>http://schwehr.org/blog/archives/2013-07.html#e2013-07-07T23_31_55.txt</id>
+<issued>2013-07-07T23:31:55-04:00</issued>
+<modified>2013-07-07T23:31:55-04:00</modified>
+<created>2013-07-07T23:31:55-04:00</created>
+
+<content type="application/xhtml+xml" xml:lang="en" xml:space="preserve" mode="escaped">
+<![CDATA[
+Analyze recently hosted a meeting on IUU fishing.  I did not attend, but
+Analyze has released notes from the meeting.
+<br /><br />
+<a href="http://analyzecorp.com/?p=489">Analyze Hosts First IUU Fishing Roundtable</a>: <a href="http://analyzecorp.com/wp-content/uploads/2013/07/IUU-Fishing-Meeting-Notes-June-2013_published-V2.docx">word doc</a> [Analyze] and <a href="http://schwehr.org/blog/attachments/2013-07/IUU-Fishing-Meeting-Notes-June-2013_published-V2.pdf">pdf</a>
+<br /><br />
+<img width="498" height="513" title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-07/iuu-fishing.png"/>
+]]>
+</content>
+
+</entry>
+
+</feed>

@@ -1,0 +1,26 @@
+TITLE: Deluo mouse GPS
+AUTHOR: Kurt
+DATE: 11.30.2005 07:50
+DESC: serial devices
+-----
+BODY:
+I just got a nice reply from Deleo about their GPS...
+<pre>
+
+Open a new terminal window and type stty -f /dev/cu.usbserial 4800 or
+-f /dev/cu.usbserial0 4800 depending on whether you used usbserial or
+usbserial0 on the first window.  On the first window that opened you
+will now start seeing incoming NMEA sentences which will look like
+this: cat /dev/cu.usbserial
+
+$GPGGA,212333.880,4738.3090,N,12219.2978,W,1,03,03.4,00080.6,M,-18.8,M,,*55
+$GPGSA,A,2,,,,10,,06,,,,24,,,03.5,03.4,*1D
+$GPGSV,2,1,07,17,30,238,,05,24,175,,25,18,286,,10,52,091,34*7A
+$GPGSV,2,2,07,06,71,302,34,24,25,058,35,30,54,202,36*45
+$GPRMC,212333.880,A,4738.3090,N,12219.2978,W,000.0,000.0,090303,018.6,E*71
+$GPGGA,212334.880,4738.3088,N,12219.2978,W,1,03,03.4,00080.6,M,-18.8,M,,*5B
+</pre>
+Which is a basic NMEA stream... why do all these things default to
+4800 baud serial?  So slow.  At least it is better than the KLY-2
+Kappabridge in the pmag lab which only does 300 baud.
+-----

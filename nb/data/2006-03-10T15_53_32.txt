@@ -1,0 +1,57 @@
+TITLE: tcpdump
+AUTHOR: Kurt
+DATE: 03.10.2006 15:53
+DESC: gpscat is better
+-----
+BODY:
+We have a VLinx device that is reading RS422 data and spitting out UDP
+broadcast packets.  Yesterday, I got pretty confused trying to
+understand what it was doing by looking at the tcpdump output.  Now
+that Roland has a given me his nice little SDL based application to
+read UDP traffic, the tcpdump stuff is not as important, but here is
+the tcpdump line I just came up with.
+<pre>
+sudo tcpdump -i en0 -A -n src IP-ADDRESS-OF-VLINX and udp port 4003
+</pre>
+<ul>
+<li>The "-i en0" reads my mac laptops built in ethernet port.
+<li>"-A" dumps an ascii version of the package payload
+<li>"-n" says just give the numeric port and ip numbers
+<li>"src IP-ADDRESS-OF-VLINX" only receive packets from that address
+<li>"and" logical glue to the next statement
+<li>"udp port 4003" says we only want to see that port.
+</ul>
+This gives results like this...
+<pre>
+15:27:54.796096 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 14
+E..*4.@...9.
+0
+        ............s.!AIVDO,1,1,,,1rks 27..
+15:27:54.800100 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 14
+E..*4.@...9.
+0
+        ..............018lEgP?w&lt;tSF0rks .G..
+15:27:54.803785 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 14
+E..*4.@...9.
+0
+        ..............l4Q@&gt;4?wp1d00,rks d.f\
+15:27:54.805363 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 6
+E.."4.@...9.
+0............_)0*78
+</pre>
+Which is not as nice as
+<pre>
+@GZTIM,185.807016
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1l00,0*70
+@GZTIM,186.858809
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1l00,0*70
+@GZTIM,187.907003
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1d00,0*78
+@GZTIM,188.955972
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1d00,0*78
+@GZTIM,190.007628
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1l00,0*70
+@GZTIM,191.055809
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1h00,0*74
+</pre>
+-----

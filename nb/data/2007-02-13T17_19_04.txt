@@ -1,0 +1,27 @@
+TITLE: Able to talk to postgres from python
+AUTHOR: Kurt
+DATE: 02.13.2007 17:19
+DESC: awesome
+-----
+BODY:
+The sea of postgres python interfaces is confusing for sure.  Here is
+my first successful mini script.  I figured this out by looking inside
+of the SQLAlchemy source tree at lib/sqlalchemy/databases/postgres.py,
+which uses psycopg2.
+<pre>
+import psycopg2 as psycopg
+conn = psycopg.connect("dbname='kurttest' user='schwehr' host='localhost'")
+cur = conn.cursor()
+cur.execute('INSERT INTO position (UserID,COG,SOG) Values (1234,2,3);')
+conn.commit()
+cur.execute('SELECT UserID,COG,SOG FROM position;')
+cur.fetchall()
+</pre>
+The output was then...
+<pre>
+Out[8]: [(1234, Decimal("2.0"), Decimal("3.0"))]
+</pre>
+I did have to tweak the psycopg2 fink info package to depend on
+postgres82 instead of postgres81.  Now I am ready to build my grand
+post{gres,gis}82 database {creation,import} script for noaadata.ais.
+-----

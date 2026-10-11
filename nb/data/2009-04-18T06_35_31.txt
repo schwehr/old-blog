@@ -1,0 +1,67 @@
+TITLE: Tips for working with MS Access Jet DB files
+AUTHOR: Kurt
+DATE: 04.18.2009 06:35
+DESC: hopefully much easier in the future
+-----
+BODY:
+If anybody has an alternate point of view or other suggestions, please send them my
+way.
+
+MS Access is an easy way for people to quickly create a database, even if
+they have never used databases before.  However, MS Access doesn't do
+a great job of giving background on how you should setup a DB.  Here
+is a short set of suggestions for people who are creating new
+databases with spatial content.  Before you begin, think carefully
+about your requirements and consider PostgreSQL+PostGIS, 
+MySQL+Spatial Extensions, or SQLite+Spatial Lite.
+
+A few general comments:  For all of your critical fields, set the
+Required attribute to "Yes" such that people have to enter in a value.
+For your field names, make sure to avoid spaces or symbols.  If you
+stick to characters, numbers, and the underscore, it will be easier to
+migrate your data to other databases if the need ever arises - this is
+something that comes up all the time.  Back in March of 2008, I talked
+a bit about <a
+href="http://schwehr.org/blog/archives/2008-03.html#e2008-03-04T21_50_19.txt">using
+mdbtools to dump SQL statements from an Access DB</a> (Jet DB format)
+with the mdb-export command - this tips make it easier to import your
+data into other databases.
+
+It is generally a good idea to give every table a primary key
+(the key icon in the left column).  The primary key is often an
+automatically created index number (AutoNumber) and should be unique such
+that there is only one instance of any particular number.
+
+Next, make sure that you create your coordinates as numbers with WGS84
+decimal degrees.  Use the sign of the number to specify the hemisphere
+- do not use N, S, E, W.  Do not use degrees minute seconds inside the
+database.  You can always provide this format later in the
+presentation layer of any application.
+
+Finally, you generally want a timestamp with your observation.  Make
+sure it is a Date/Time type and always use UTC timestamps.  If you use
+some other timezone and you data ends up in the hands of someone in
+another timzezone or worse your data is being collected by people in
+different timezones, things will get out of hand.  Also, keep all data
+of the same type together.  Don't break your database tables on time
+periods (e.g. one for each year).  The overall rule is to try to keep
+things consistant.
+
+Hopefully, if you follow these tips, you will have a database that
+surveys you well and makes analysis go quickly.  For those who are
+used to saying "lat long," I argue for aways writing "long lat" so
+that the data always appears in "x y" order.
+
+<img title="A style sample" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/ms-access-spatial.png"/>
+
+Here is a quick tips for when someone sends you an Access DB.  I
+wasn't able to open a database.  I tried duplicating the file, but no
+luck.  I just kept getting this error:
+
+<img title="MS Access Error Message" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/ms-access-unhappy.png"/>
+
+Matt helped me figure out that I needed to "Unblock" the database.
+Then it worked as expected.
+
+<img title="Need to Unblock" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/ms-access-blocked.png"/>
+-----

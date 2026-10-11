@@ -1,0 +1,58 @@
+TITLE: simple enum
+AUTHOR: Kurt
+DATE: 04.09.2006 08:12
+DESC: song enum
+-----
+BODY:
+I am not sure this is exactly how it should be done, but here is a
+pretty stripped down example of xml enums.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:schema</font> <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;SONG&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;songType&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:simpleType</font> <font color="#2040a0">name=</font><font color="#008000">&quot;oligopolyMember&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:restriction</font> <font color="#2040a0">base=</font><font color="#008000">&quot;xsd:string&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:enumeration</font> <font color="#2040a0">value=</font><font color="#008000">&quot;Capitol Records, Inc.&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:enumeration</font> <font color="#2040a0">value=</font><font color="#008000">&quot;BMG Music&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:restriction</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:simpleType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font> 
+ 
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:complexType</font> <font color="#2040a0">name=</font><font color="#008000">&quot;songType&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;PUBLISHER&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;oligopolyMember&quot;</font> <font color="#2040a0">
+</font>        <font color="#2040a0">minOccurs=</font><font color="#008000">&quot;0&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:sequence</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:complexType</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+ 
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+With the above xsd schema file, this validates:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">SONG</font> <font color="#2040a0">xmlns:xsi=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>BMG Music<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/SONG</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+and this fails to validate...
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">SONG</font> <font color="#2040a0">xmlns:xsi=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>foo<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/PUBLISHER</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/SONG</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+like so:
+<pre>
+xmllint --schema enum.xsd enum.xml
+
+enum.xml:3: element PUBLISHER: Schemas validity error : 
+    Element 'PUBLISHER': [facet 'enumeration'] 
+       The value 'foo' is not an element of the set 
+         {'Capitol Records, Inc.', 'BMG Music'}.
+enum.xml:3: element PUBLISHER: Schemas validity error : 
+    Element 'PUBLISHER': 'foo' is not a valid value of the atomic type 
+       'oligopolyMember'.
+enum.xml fails to validate
+</pre>
+I started with an example from this web page, but it was too complicated, so I stripped it down... <a href="http://www.cafeconleche.org/slides/xmlonelondon2001/schemas/38.html">http://www.cafeconleche.org/slides/xmlonelondon2001/schemas/38.html</a>
+-----

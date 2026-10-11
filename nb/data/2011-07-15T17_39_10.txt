@@ -1,0 +1,95 @@
+TITLE: virtualenv for python
+AUTHOR: Kurt
+DATE: 07.15.2011 17:39
+DESC: finally
+-----
+BODY:
+Update 2011-Jul-26: I've submitted a first patch back to PyKML for getting the samples up to the current API.  There is 
+still some work to do before I can pass back another patch that will make
+handling coordinates a lot easier.
+
+I have been trying to figure out <a
+href="http://code.google.com/p/pykml/">PyKML</a> without success.  I
+thought I would try to back up and go with the <a
+href="http://packages.python.org/pykml/installation.html">installation
+instruction</a> pages, but I don't want to let easy_install at my
+system or fink installed pythons.  I've been following a number of
+blogs where they describe using <a href="http://pypi.python.org/pypi/virtualenv">virtualenv</a> to create a small play area
+that they can let easy_install run wild.  When they are done, they
+just nuke that tree of files and they are back to where they were at
+the start.
+
+I figured it was time to finally give it a try.  At least then I can
+have a little more info for a bug report to the author (who I am
+hoping to meet next week).  I just put virtualenv and yolk into fink.
+<pre>fink selfupdate
+fink install virtualenv-py27
+cd ~/Desktop
+mkdir virt_env
+virtualenv virt_env/virt1
+source virt_env/virt1/bin/activate
+easy_install pykml
+hg clone https://code.google.com/p/pykml/ pykml
+cd pykml/src/examples</pre>
+Now I've got pykml installed.  Time to give it a try.
+<pre><b>python gxtrack.py</b>
+Traceback (most recent call last):
+  File "gxtrack.py", line 9, in &lt;module&gt;
+    from pykml.kml_gx import schema
+ImportError: No module named kml_gx
+(virt1)</pre>
+Okay, no luck.  That's the same error that I've been getting since
+yesterday.  I was assuming that there was something I was missing
+with the packaging.
+
+While I have a virtualenv setup, I might as well try out a package that 
+shows what python packages are installed.
+<pre><b>easy_install yolk
+yolk -l</b>
+BeautifulSoup   - 3.0.7a       - active development (/sw32/lib/python2.7/site-packages)
+BitVector       - 3.0          - active development (/sw32/lib/python2.7/site-packages)
+Django          - 1.3          - active development (/sw32/lib/python2.7/site-packages)
+FormEncode      - 1.2.4        - active development (/sw32/lib/python2.7/site-packages)
+Jinja2          - 2.5.5        - active development (/sw32/lib/python2.7/site-packages)
+Magic file extensions - 0.2          - active development (/sw32/lib/python2.7/site-packages)
+Numeric         - 24.2         - active development (/sw32/lib/python2.7/site-packages/Numeric)
+PyYAML          - 3.09         - active development (/sw32/lib/python2.7/site-packages)
+Pygments        - 1.3.1        - active development (/sw32/lib/python2.7/site-packages)
+Python          - 2.7.2        - active development (/sw32/lib/python2.7/lib-dynload)
+...</pre>
+Handy package.  <a href="http://pypi.python.org/pypi/yolk">Yolk</a> can also query 
+PyPi.  Here I am checking to see which installed python packages have updates available
+on pypi.  Handy for a fink packager!  Errr... this shows that I am behind on a 
+good number of packages.  Bummer.
+<pre><b>yolk -U</b>
+ BeautifulSoup 3.0.7a (3.2.0)
+ PyYAML 3.09 (3.10)
+ Pygments 1.3.1 (1.4)
+ Sphinx 1.0.5 (1.0.7)
+ docutils 0.7 (0.8)
+ hgsubversion 1.2 (1.2.1)
+ ipython 0.10 (0.10.2)
+ logilab-common 0.55.0 (0.56.0)
+ nose 0.11.4 (1.0.0)
+ pexpect 2.3 (2.4)
+ psycopg2 2.4 (2.4.2)
+...</pre>
+I've been thinking about writing a script that uses the pypi entry for a program 
+to generate a rough draft fink python info page.  Yolk clearly does something 
+pretty similar.  That would still leave a good number of packaging issues to 
+finish up, but things like the SourceURL, MD5, Description and so forth could be  
+filled in.  Logically following that is to query fink to list only the packages
+in fink that are out of date for which I'm the maintainer, possibly with the option
+to update the URL, MD5 and Version as a draft. 
+
+Then I can undo everything I did.
+<pre>(virt1)
+<b>deactivate</b>
+<b>rm -rf virt_env/virt1</b></pre>
+That virtual environment is history.
+
+I read up on some of this stuff here while trying out virtualenv and yolk:
+SimonOnSoftware's <a href="http://simononsoftware.com/virtualenv-tutorial/">Virtualenv Tutorial</a>
+
+My pykml troubles have been submitted as <a href="http://code.google.com/p/pykml/issues/detail?id=3">Issue 3: No module named kml_gx</a>
+-----

@@ -1,0 +1,117 @@
+TITLE: fink mac osx seismic unix (cwp-su)
+AUTHOR: Kurt
+DATE: 09.13.2005 15:51
+DESC: not great, but this is progress
+-----
+BODY:
+I just got my first seismic unix image generated on Mac OSX.  It is
+truely ugly, but at least that is something :) I got seismic unix into
+fink quite a while ago, but never got a chance to dig into it.  Today
+I found a Masters Thesis by Robert Galway where he used CWP-SU on the
+very same Huntec data that I am trying to process.  His script jumped
+a few steps that I don't totally understand, but this got me quite a
+ways.  
+
+<a href="http//www.omg.unb.ca/omg/papers/galway.pdf">The
+Integration of Multibeam Sonar Data with Huntec Sub-bottom Profile
+Data into a Marine GIS</a>, 2000. [PDF]
+
+Here is what I did...
+
+Start off by converting segy to the internal seismic unix program.
+Mac OSX 10.3 PPC is bigendian, so conv=1.
+<pre>
+# ~/x/src/density/endian
+BIGENDIAN
+# segyread tape=line43.sgy conv=1 endian=1 verbose=1 &gt; line43.su
+
+    103772752 Sep  9 13:34 line43.sgy
+    201794624 Sep 13 14:18 line43.su
+</pre>
+That doubled the size of my seismic data file.  Yikes!  Now find out
+the ranges of the trace header parameters and split the data into the
+two Huntec receiver channels.
+<pre>
+surange < line43.su
+
+23932 traces:
+ tracl=(1,11966)  tracr=(1,11966)  fldr=(1,11966)  tracf=(1,2)  trid=1
+ sx=(364964,382927)  sy=(4519354,4524110)  gx=(364964,382927)  gy=(4519354,4524110)  delrt=(100,710) 
+ ns=2048 dt=125 year=95 day=256 hour=(19,22) 
+ minute=(0,59)  sec=(0,59)  timbas=2
+
+suwind < line43.su key=tracf min=1 max=1 > line43.ch1.su
+suwind < line43.su key=tracf min=2 max=2 > line43.ch2.su
+</pre>
+Now use segy-py to figure out what is closest to my cores.
+<pre>
+segysqldist.py -X -124.50211667 -Y 40.8388500 -n 1 -u -z 10 --verbosity=3
+
+BEST fields: fileKey, shotpoint, x, y, distance, EnsembleNo,FieldRecNo
+BEST:  1 0 -124.502286138 40.8382818195 0.000592915087008 0 5861
+
+CMP = 5861
+
+</pre>
+So I want to plot tracf from 4000 - 7000.  Subset the data using the
+window command.
+<pre>
+suwind < line43.ch1.su key=tracl min=4000 count=3000 > line43.ch1.4000-7000.su
+
+surange < line43.ch1.4000-7000.su 
+3000 traces:
+ tracl=(4000,6999)  tracr=(4000,6999)  fldr=(4000,6999)  tracf=1 trid=1
+ sx=(370650,374952)  sy=(4521460,4522604)  gx=(370650,374952)  gy=(4521460,4522604)  delrt=(510,610) 
+ ns=2048 dt=125 year=95 day=256 hour=(20,21) 
+ minute=(0,59)  sec=(0,59)  timbas=2
+</pre>
+Now that I have the subset to plot, I have to mush all the data into a
+common unit with only one delay time (dt, or time from shot until the
+recording starts).
+<pre>
+# python
+delrt=(510,610)
+ns=2048
+dt=125/100000.
+tmax = delrt[1]/1000. + dt*ns
+print tmax
+
+  0.866
+
+tmin = delrt/1000.
+print tmin
+
+  0.510
+
+import sys; sys.exit ('see ya')
+
+# sushift < line43.ch1.4000-7000.su tmin=0.510 tmax=0.866 > line43.ch1.4000-7000.nodelay.su 
+</pre>
+Now I start running into problems with the CWP-SU setup in fink.  This
+stuff is my fault, but it is a bummer that the build arch for su is so
+strange and there are conflicts with GMT's psimage.
+<pre>
+# supswigb < line43.ch1.4000-7000.nodelay.su key=tracl nbpi=250 interp=1 xbox=1.0 ybox=1.2 hbox=9.0 wbox=428  > foo.ps
+sh: line 1: /sw/lib/cwp-su/bin/bin/pswigb: No such file or directory
+
+# export CWPROOT=/sw/lib/cwp-su
+# !sups
+</pre>
+Now supsimage fails.  I had to go do some minor hacks...
+<pre>
+sudo -s
+cd /sw/lib/cwp-su/bin
+ln -s psimage _psimage 
+</pre>
+Whoops.  Well, now it works.
+<pre>
+# supsimage < line43.ch1.4000-7000.nodelay.su  > foo.ps
+
+# gv foo.ps
+</pre>
+Finally I see this ugly thing, but I can see the bottom-water
+interface.<br>
+<img src="http://schwehr.org/blog/attachments/2005-09/firstlight-seimicunix.png">
+
+<a href="http://woodshole.er.usgs.gov/operations/sfmapping/SUchirp.htm">SUchirp</a> at the USGS which I am pretty sure was written by Jenna Hill.
+-----

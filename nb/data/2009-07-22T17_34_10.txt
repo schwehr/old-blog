@@ -1,0 +1,57 @@
+TITLE: ITDMA comm state for AIS Position Message 3
+AUTHOR: Kurt
+DATE: 07.22.2009 17:34
+DESC: more time
+-----
+BODY:
+I've now added commstate to the position messages.  Note that in these
+examples, I'm still not parsing ROT correctly.
+
+First an ITDMA example with a msg type 3:
+<pre>% <b>ais_msg_3_handcoded.py -d '!AIVDM,1,1,,B,35Mpib001:Jss`@H?5TTn3kP00mi,0*54'</b>
+position:
+        MessageID:          3
+        RepeatIndicator:    0
+        UserID:             366883240
+        NavigationStatus:   0
+        ROT:                0
+        SOG:                7.4
+        PositionAccuracy:   0
+        longitude:          -70.7938
+        latitude:            42.35501667
+        COG:                124
+        TrueHeading:        121
+        TimeStamp:          48
+        RegionalReserved:   0
+        Spare:              0
+        RAIM:               False
+        sync_state:                   0
+        slot_increment:               215
+        slots_to_allocate:            0
+        keep_flag:                    1</pre>
+There are several cases of SOTDMA commstate, just like with the basestation
+reports.  Bot msg types 1 and 2 are SOTDMA.
+<pre>% <b>ais_msg_1_handcoded.py -d '!AIVDM,1,1,,B,14Rhln001iJtfCHGpQla&gt;7@80H2t,0*37</b>
+        MessageID:          1
+	... snip ...
+        sync_state:                   0
+        slot_timeout:                 6
+        received_stations:            n/a
+        slot_number:                  188
+        commstate_utc_hour:           n/a
+        commstate_utc_min:            n/a
+        commstate_utc_spare:          n/a
+        slot_offset:                  n/a</pre>
+And a final example with the hours and minutes:
+<pre>ais_msg_1_handcoded.py -d '!AIVDM,1,1,,A,15MwqdOP04Js6:pH&gt;OTtq?wP04KT,0*38'</b>
+        MessageID:          1
+	... snip ...
+        sync_state:                   0
+        slot_timeout:                 1
+        received_stations:            n/a
+        slot_number:                  n/a
+        commstate_utc_hour:           3
+        commstate_utc_min:            57
+        commstate_utc_spare:          0
+        slot_offset:                  n/a</pre>
+-----

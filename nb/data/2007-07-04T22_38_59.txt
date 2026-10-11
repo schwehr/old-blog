@@ -1,0 +1,46 @@
+TITLE: My first working plpgsql function
+AUTHOR: Kurt
+DATE: 07.04.2007 22:38
+DESC: getting better at this database thing
+-----
+BODY:
+This took a while before it actually worked.  I got tripped up about
+where BEGIN and END go.  Also, I completely messed up the DECLARE
+section in several different ways.  This function lists all the
+userids (MMSI) in the transit table.  Pretty brain dead, but it is a
+start!
+<pre>
+CREATE OR REPLACE FUNCTION try1 () RETURNS text 
+AS '
+  DECLARE
+       text_output TEXT := '' '';
+       arow transit%ROWTYPE;
+  BEGIN
+       FOR arow IN SELECT * FROM transit LOOP
+           text_output := text_output || arow.userid || ''\n'';
+       END LOOP;
+       RETURN text_output;
+  END;
+' LANGUAGE 'plpgsql';
+</pre>
+It complains about the new line when I put in the function, but oh well!
+<pre>
+WARNING:  nonstandard use of escape in a string literal
+LINE 2: AS '
+           ^
+HINT:  Use the escape string syntax for escapes, e.g., E'\r\n'.
+CREATE FUNCTION
+</pre>
+And the results of using this little function:
+<pre>
+select try1();
+  33187
+ 10622474
+ 33951750
+ 42716912
+ 220396000
+ 220396000
+ 220396000
+...
+</pre>
+-----

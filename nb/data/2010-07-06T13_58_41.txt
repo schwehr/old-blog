@@ -1,0 +1,89 @@
+TITLE: Why has a vessel in AIS not been updated recently?
+AUTHOR: Kurt
+DATE: 07.06.2010 13:58
+DESC: trying to explain
+-----
+BODY:
+I am getting this question a lot lately now that part of NAIS is
+exposed on the ERMA/GeoPlatform public website: <a
+href="http://gomex.erma.noaa.gov/erma.html#x=-88.85742&y=28.36240&z=8&layers=5386+3796+5416+497+5431+3392">Example
+View with AIS</a>.  Here is what it can look like with last reports
+spanning 4 days:
+
+<img title="Note the range of times" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/ais-date-time-issues.png"/>
+
+Here are basic reasons that I can think of for why a vessel has not
+showing up as recently 
+<ol>
+<li>The vessel is not broadcasting position reports</li>
+<li>The messages are not coming through correctly across the VHF link</li>
+<li>The messages are not being received</li>
+<li>Communications from the receiver to the display are not fuctioning.</li>
+</ol>
+Ships are supposed to broadcast their position reports from as fast as
+every 2 seconds to as slow as every few minutes depending on speed and
+if they have a Class A (which has priority) or Class B transceiver.
+And a warning, unless this is a SOLAS class vessel or meets the
+requirements set out by the USCG for requiring a Class A AIS
+transceiver, it is up to the ship owner to decide if they want to put
+a Class A or Class B transceiver on board, or just a receiver, or
+have no AIS capability at all.
+
+There are a large number of things that could cause a vessel to not be
+transmitting.  The simplest two are that the vessel has left the
+covered area or the AIS unit is not powered.  Other posibilites
+include that that AIS is broken, using an incorrect MMSI/name, or is a
+blue force vessel in silent or secure mode.  Cabling and antenna
+failures are another common cause of trouble.  Also, a non-functioning GPS
+will mean that the ship is transmitting position reports, but my
+software will discard them because that contain no actual positioning
+information.
+
+The second class of trouble comes from VHF signals and how AIS uses
+the spectrum.  The problems can start right away at the transmit side.
+Ships superstructure can often block the transmissions in certain
+directions (aspect oriented issues).  AIS works based on local cells
+and the receiver might be hearing multiple cells at the same time -
+this is known as message collision.  As distance increases, it is
+harder to receive VHF signals.  There are other factors that make it
+harder to hear (low signal-to-noise [SNR]): antennas that are close to
+the water or far away get less power to the receiver.  There might
+also be noise in the VHF spectrum.  The classic noise issue that NAIS
+receive stations had to watch out for was NOAA weather radio
+broadcasts.  Putting a receiver right next to a weather radio
+transmitter is not going to work well as they are broadcasting at
+162.400 to 162.550 MHz and there are 1000 transmitters.
+
+The previous 2 can be sometimes very challenging to figure out.
+
+The 3 group encompasses the problems that happen at the receiver.  It
+is easy to detect a failure in areas that always have lots of ships.
+This can be trouble in remote corners where there are not always a
+ship to be seen, so a quiet receiver might be okay.  In New England,
+the most common problem is power outages that last longer than the
+battery backups, but in that cause it also leads to the final group.
+With mobile receivers (planes, ships, buoys, platforms, and
+spacecraft) that feed back to the ground, the platform might not be in
+the area or it may be storing up the data for a while until it gets to
+a place to send data back into the network.
+
+The final group (4) are all the things that happen as the data gets
+from the receiver to the end display.  The most common problem in this
+group comes from power outages and line issues.  If the receiver is on
+a DSL connection far from a major city, storms can take down the
+receiver.  The data has to successfully get back to the USCG in West
+Virginia and then get transmitted up to UNH.  UNH has to have power
+and internet functioning, the computers have to be working, and the
+database has to be storing the positions.  From there, the WMS
+Mapserver feed has to work and then the NOAA operations center in
+Silver Spring serves up the GeoPlatform.gov site.
+
+I'm sure I left a lot out, but hopefully that gives you a sense of how
+things work.  If you need realtime AIS for mission critical
+operations, you should have your own receiver (or transceiver) on your
+ship, plane, or shore station and be looking at a local plotting
+application, radar, and looking out the windows!!!
+
+AIS is a powerful technology, but it has to be used with care and
+understanding of the limitations.
+-----

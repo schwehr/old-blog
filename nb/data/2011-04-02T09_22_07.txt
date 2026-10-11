@@ -1,0 +1,65 @@
+TITLE: gtest - getting it to actually work
+AUTHOR: Kurt
+DATE: 04.02.2011 09:22
+DESC: use the system
+-----
+BODY:
+I've just pushed changed to github for libais that have working
+google framework tests (gtest).  Turns out that compiling my test code
+with "-D_GLIBCXX_DEBUG" brings out what I think might some bugs in
+either gtest, libc on the mac or gcc 4.2.  I've reported it and don't
+have time to dig farther into the trouble.  The build system right now
+in libais is a hack, so it will take a few minutes of hacking to make
+this work on other platforms.
+<pre><b>make test2</b>
+g++ -m32 -g -Wall -Wimplicit  -W  -Wredundant-decls \
+  -Wmissing-prototypes -Wunknown-pragmas -Wunused -Wunused \
+  -Wendif-labels -Wnewline-eof -Wno-sign-compare -Wshadow -O \
+  -Wuninitialized ais1_2_3_unittest.cpp ais.cpp ais1_2_3.cpp -o \
+  ais1_2_3_unittest -I/sw32/include -D_THREAD_SAFE -L/sw32/lib -lgtest \
+  -D_THREAD_SAFE -lgtest_main -lpthread
+./ais1_2_3_unittest
+Running main() from gtest_main.cc
+[==========] Running 3 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 3 tests from TestAis1_2_3
+[ RUN      ] TestAis1_2_3.AisMsg
+[       OK ] TestAis1_2_3.AisMsg (0 ms)
+[ RUN      ] TestAis1_2_3.BitDecoding
+[       OK ] TestAis1_2_3.BitDecoding (1 ms)
+[ RUN      ] TestAis1_2_3.AisMsg1
+[       OK ] TestAis1_2_3.AisMsg1 (0 ms)
+[----------] 3 tests from TestAis1_2_3 (1 ms total)
+<!-- -->
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test case ran. (1 ms total)
+[  PASSED  ] 3 tests.</pre>
+As unittests usually do, I've already found 3-4 bugs with one of them
+being critical just from writing the first couple tests.  However,
+I'm now realizing how much code I will have to write to get reasonable coverage
+and push in all my sample messages.  I can either write C++ code from python
+that tests the methods or I'm contemplating writing a xml, yaml, json or csv style
+file of alternating AIS and decoded messages.  If there was an obvious json parser
+for me to use from C++, I might go that route as it seems friendlier to the eyes
+than XML.  
+
+For JSON, ESR and I have talked about <a
+href="http://gpsd.berlios.de/AIVDM.html#_json_ais_encoding">his
+implementation of AIS JSON</a> and we both agree that <a
+href="http://wiki.ham.fi/JSON_AIS.en">http://wiki.ham.fi/JSON_AIS.en</a>
+is an interesting start, but it doesn't cover all the fields and not
+all of the message types.
+
+As for my Mac OSX gtest troubles, with malloc/free, Vlad pointed me to
+gtest <a href="">Issue 189: 10.6 SL : pointer being freed was not
+allocated</a> and as discussed in <a
+href="http://discussions.apple.com/thread.jspa?messageID=10244508">this
+apple dev thread</a>, I hit the trouble when I have
+<b>_GLIBCXX_DEBUG</b> defined.
+<pre>2(13993) malloc: *** error for object 0xa0ab8db0: pointer being freed
+was not allocated
+*** set a breakpoint in malloc_error_break to debug
+2(13993) malloc: *** error for object 0xa0ab8db0: pointer being freed
+was not allocated
+*** set a breakpoint in malloc_error_break to debug</pre>
+-----

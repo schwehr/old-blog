@@ -1,0 +1,56 @@
+TITLE: matplotlib polar rgrids
+AUTHOR: Kurt
+DATE: 10.10.2005 12:53
+DESC: labeling the degrees of dip
+-----
+BODY:
+I a little baffled by the matplotlib documentation for polar plots, so
+I am going to go by examples with trial and error.  My first task is
+to create direction angles.  Note that the grids want to go counter
+clockwise with 0 degrees to the East!!!  This is the normal
+mathematical definition, but not what we want for a stereo net.  But
+now just the labeling.  The projections of points will come later.
+<pre>thetagrids( range(0,360,45), ('E', 'NE', 'N','NW', 'W', 'SW', 'S', 'SE') )</pre>
+Next comes the dip angle rings on the stereo net.  This is done with
+rgrids, but zero is in the center and moves out.  The
+list<b>.reverse()</b> call flips the order in place.  Gareth would
+appreciate this code, as it is my frst use of list comprehensions.
+<pre>ring_angles = [ x * (pi/180.) for x in range(0,100,10)]
+ring_labels = [ str(x) for x in range(0,100,10)]
+ring_labels.reverse()
+rgrids (ring_angles,ring_labels)</pre>
+That draws from 90..0&deg; on the plot.  The only question is how to
+make the dip of 0&deg; be a solid line.  Putting it all together:
+<pre>
+<font color="#FF8800">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">pylab</font> <strong>import</strong> <font color="4444FF">*</font>
+<strong>from</strong> <font color="#2040a0">math</font> <strong>import</strong> <font color="#2040a0">pi</font>  <font color="#FF8800"># seems to get pulled in by pylab too</font>
+
+<font color="#2040a0">N</font> <font color="4444FF">=</font> <font color="#FF0000">150</font>
+<font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">rand</font><font color="4444FF">(</font><font color="#2040a0">N</font><font color="4444FF">)</font>
+<font color="#2040a0">theta</font> <font color="4444FF">=</font> <font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">rand</font><font color="4444FF">(</font><font color="#2040a0">N</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">theta</font>,<font color="#2040a0">r</font>
+<font color="#2040a0">area</font> <font color="4444FF">=</font> <font color="#FF0000">200</font><font color="4444FF">*</font><font color="#2040a0">r</font><font color="4444FF">*</font><font color="4444FF">*</font><font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">rand</font><font color="4444FF">(</font><font color="#2040a0">N</font><font color="4444FF">)</font>
+<font color="#2040a0">colors</font> <font color="4444FF">=</font> <font color="#2040a0">theta</font>
+<font color="#2040a0">figure</font><font color="4444FF">(</font><font color="#2040a0">figsize</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="#FF0000">4</font>,<font color="#FF0000">4</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="#2040a0">ax</font> <font color="4444FF">=</font> <font color="#2040a0">subplot</font><font color="4444FF">(</font><font color="#FF0000">111</font>, <font color="#2040a0">polar</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+<font color="#2040a0">c</font> <font color="4444FF">=</font> <font color="#2040a0">scatter</font><font color="4444FF">(</font><font color="#2040a0">theta</font>, <font color="#2040a0">r</font>, <font color="#2040a0">c</font><font color="4444FF">=</font><font color="#2040a0">colors</font>, <font color="#2040a0">s</font><font color="4444FF">=</font><font color="#2040a0">area</font><font color="4444FF">)</font>
+<font color="#2040a0">c</font>.<font color="#2040a0">set_alpha</font><font color="4444FF">(</font><font color="#FF0000">0.75</font><font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+<font color="#2040a0">ring_angles</font> <font color="4444FF">=</font> <font color="4444FF">[</font> <font color="#2040a0">x</font> <font color="4444FF">*</font> <font color="4444FF">(</font><font color="#2040a0">pi</font>/<font color="#FF0000">180</font>.<font color="4444FF">)</font> <strong>for</strong> <font color="#2040a0">x</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#FF0000">100</font>,<font color="#FF0000">10</font><font color="4444FF">)</font><font color="4444FF">]</font>
+<font color="#2040a0">ring_labels</font> <font color="4444FF">=</font> <font color="4444FF">[</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">)</font> <strong>for</strong> <font color="#2040a0">x</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#FF0000">100</font>,<font color="#FF0000">10</font><font color="4444FF">)</font><font color="4444FF">]</font>
+<font color="#2040a0">ring_labels</font>.<font color="#2040a0">reverse</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">rgrids</font> <font color="4444FF">(</font><font color="#2040a0">ring_angles</font>,<font color="#2040a0">ring_labels</font><font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+<font color="4444FF">=</font> <font color="#2040a0">thetagrids</font><font color="4444FF">(</font> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#FF0000">360</font>,<font color="#FF0000">45</font><font color="4444FF">)</font>, <font color="4444FF">(</font><font color="#008000">'E'</font>, <font color="#008000">'NE'</font>, <font color="#008000">'N'</font>,<font color="#008000">'NW'</font>, <font color="#008000">'W'</font>, <font color="#008000">'SW'</font>, <font color="#008000">'S'</font>, <font color="#008000">'SE'</font><font color="4444FF">)</font> <font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+<font color="#2040a0">show</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-10/polar-rgrids.png">
+
+Maybe I should use <a
+href="http://www.scipy.org/wikis/topical_software/Transformations">Transformations</a>,
+but I don't totally understand.  Will they get me from 0&deg; is East
+and counter clockwise to 0&deg; is North and clockwise?  Oh, and how
+about 90&deg; is down too?
+----- 

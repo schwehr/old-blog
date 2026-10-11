@@ -1,0 +1,71 @@
+TITLE: Dirt simple javascript hello world
+AUTHOR: Kurt
+DATE: 11.09.2007 14:52
+DESC: handy
+-----
+BODY:
+I'm trying to quickly get comfortable with JavaScript (errr... ECMA
+script).  I figured one way to be able to understand what is going on
+is to play with the Mozilla command line JavaScript systems.  There
+are two ways to do this.  The simplest is with <a
+href="http://www.mozilla.org/js/spidermonkey/">spidermonkey</a>.  I'm on a 
+mac for this...
+<pre>
+fink install spidermonkey
+</pre>
+I now have a command line javascript interpreter available as /sw/bin/js.
+Time to try it.
+<pre>
+% js
+js&gt; print ("Hello world")
+Hello world
+</pre>
+Then I hit Ctrl-D for an end-of-file character and I am back to the
+command prompt.  What if we want to execute JavaScript from a script
+file?  Not a problem.  Here is my "helloworld.js" script.
+<pre>
+#!/usr/bin/env js
+print("Hello");
+print(1+2);
+</pre>
+Run it:
+<pre>
+% chmod +x helloworld.js
+% ./helloworld.js
+Hello
+3
+</pre>
+
+Now on to the 2nd method.  This uses rhino, which is a JavaScript
+system writen in Java. (<a
+href="http://www.thefrontside.net/blog/taming_the_rhino">Taming the
+Rhino: Making Mozilla's Javascript Command Line a Little Less
+Brutish</a>).  Here is the hello-rhino.js.  If someone can tell me how
+to doe this without hard coding the path to js.jar, please let me
+know.
+<pre>
+#!/usr/bin/env java -jar /sw/share/java/rhino/js.jar
+print("Hello");
+print (1+2);
+</pre>
+Now running this:
+<pre>
+fink install rhino
+chmod +x hello-rhino.js
+./hello-rhino.js
+Hello
+3
+</pre>
+
+Rob De Almeida chimed in with a 3rd method:
+<pre>
+   <a href="http://dealmeida.net/talks/3/shell.html">http://dealmeida.net/talks/3/shell.html</a>
+.
+A Javascript shell written in Javascript (it's not mine, I copied from 
+somewhere else, and it has no dependencies, you can just copy it to your 
+machine). The advantage is that you can interact with the browser, eg:
+.
+   alert('foobar!');
+</pre>
+
+-----

@@ -1,0 +1,95 @@
+Info2: <<
+
+Package: pyro-py%type_pkg[python]
+Version: 3.6
+Revision: 1
+Type: python (2.5)
+Description: Python Remote Objects
+DescDetail: <<
+  Pyro is short for PYthon Remote Objects. It is an advanced and
+  powerful Distributed Object Technology system written entirely in
+  Python, that is designed to be very easy to use. Never worry about
+  writing network communication code again, when using Pyro you just
+  write your Python objects like you would normally. With only a few
+  lines of extra code, Pyro takes care of the network communication
+  between your objects once you split them over different machines on
+  the network. All the gory socket programming details are taken care
+  of, you just call a method on a remote object as if it were a local
+  object!
+
+  Pyro provides an object-oriented form of RPC. You can use Pyro
+  within a single system but also use it for IPC. For those that are
+  familiar with Java, Pyro resembles Java's Remote Method Invocation
+  (RMI). It is less similar to CORBA - which is a system- and language
+  independent Distributed Object Technology and has much more to offer
+  than Pyro or RMI. But Pyro is small, simple and free!
+
+  Pyro is written by Irmen de Jong.
+
+  This is the homepage of Python Remote Objects. If you are looking
+  for Python Robotics, which is unfortunately also called 'Pyro',
+  visit pyrorobotics.org.
+<<
+Source: mirror:sourceforge:pyro/Pyro-%v.tar.gz
+Source-MD5: 0d20ab74d6d72a529961ab17067a35ad
+Depends: python%type_pkg[python] | python%type_pkg[python]-nox
+PatchScript: <<
+#!/bin/sh -ex
+
+  # perl -pi -e 's/\#\[install/\[install/' setup.cfg
+  # perl -pi -e 's/\#unattended/unattended/' setup.cfg
+  cat setup.cfg
+<<
+CompileScript: <<
+ %p/bin/python%type_raw[python] setup.py build
+<<
+InstallScript: <<
+ %p/bin/python%type_raw[python] setup.py install --root=%d
+
+# mv %i/bin/esd %i/bin/esd-pyro%type_raw[python]
+# mv %i/bin/es %i/bin/es%type_raw[python]
+# mv %i/bin/genguid %i/bin/genguid%type_raw[python]
+# mv %i/bin/ns %i/bin/ns%type_raw[python]
+# mv %i/bin/nsc %i/bin/nsc%type_raw[python]
+# mv %i/bin/nsd %i/bin/nsd%type_raw[python]
+# mv %i/bin/rns %i/bin/rns%type_raw[python]
+# mv %i/bin/wxnsc %i/bin/wxnsc%type_raw[python]
+# mv %i/bin/xnsc %i/bin/xnsc%type_raw[python]
+
+ cp bin/esd %i/bin/esd-pyro%type_raw[python]
+ cp bin/es %i/bin/es%type_raw[python]
+ cp bin/genguid %i/bin/genguid%type_raw[python]
+ cp bin/ns %i/bin/ns%type_raw[python]
+ cp bin/nsc %i/bin/nsc%type_raw[python]
+ cp bin/nsd %i/bin/nsd%type_raw[python]
+ cp bin/rns %i/bin/rns%type_raw[python]
+ cp bin/wxnsc %i/bin/wxnsc%type_raw[python]
+ cp bin/xnsc %i/bin/xnsc%type_raw[python]
+
+ (cd %i/bin && ln -s es{%type_raw[python],} )
+ (cd %i/bin && ln -s esd-pyro{%type_raw[python],} )
+ (cd %i/bin && ln -s genguid{%type_raw[python],} )
+ (cd %i/bin && ln -s ns{%type_raw[python],} )
+ (cd %i/bin && ln -s nsc{%type_raw[python],} )
+ (cd %i/bin && ln -s nsd{%type_raw[python],} )
+ (cd %i/bin && ln -s rns{%type_raw[python],} )
+ (cd %i/bin && ln -s wxnsc{%type_raw[python],} )
+ (cd %i/bin && ln -s xnsc{%type_raw[python],} )
+<<
+DocFiles: LICENSE PKG-INFO MANIFEST.in README.txt docs/* examples/*
+
+SplitOff: <<
+  Package:   pyro-py%type_pkg[python]-bin
+  Depends:   pyro-py%type_pkg[python]
+  Conflicts: pyro-py25-bin
+  Replaces:  pyro-py25-bin
+  Files:     bin/es bin/esd-pyro bin/genguid bin/ns bin/nsc bin/nsd bin/rns bin/wxnsc bin/xnsc
+  DocFiles:  LICENSE PKG-INFO README.txt
+<<
+
+# MIT
+License: OSI-Approved
+Homepage: http://pyro.sourceforge.net/
+Maintainer: Kurt Schwehr <goatbar@users.sourceforge.net>
+
+<<

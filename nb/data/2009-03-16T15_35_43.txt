@@ -1,0 +1,62 @@
+TITLE: matplotlib basemap with SqlSoup/SqlAlchemy
+AUTHOR: Kurt
+DATE: 03.16.2009 15:35
+DESC: with coastline
+-----
+BODY:
+Here is my first take on trying to better handle plotting of data from my 
+big database.  On a mac, install matplotlib and basemap (make sure you enable the unstable tree in fink... run "fink configure").  [Thanks to Dale for the suggested clarification]
+<pre>% <b>fink install matplotlib-basemap-data-py25</b></pre>
+First import needed modules and open the database.
+<pre>% <b>ipython2.5 -pylab -pprint</b>
+from sqlalchemy.ext.sqlsoup import SqlSoup
+from sqlalchemy import or_, and_, desc
+from sqlalchemy import select, func
+<!-- -->
+db = SqlSoup('sqlite:///ais.db3')</pre>
+Here is the first style of trying to fetch the data from all vessels with
+the invalid MMSI of 0.
+<pre><b>p = db.position.filter(db.position.UserID==0).all()</b>
+<b>len(p)</b>
+Out: 1878
+<b>p[0]</b>
+Out: MappedPosition(key=54,MessageID=1,RepeatIndicator=0,UserID=0,
+NavigationStatus=0,ROT=-128,SOG=Decimal("0"),PositionAccuracy=0,
+longitude=Decimal("-76.2985983333"),latitude=Decimal("36.8414283333"),
+COG=Decimal("274.7"),TrueHeading=511,TimeStamp=36,RegionalReserved=0,
+Spare=0,RAIM=True,state_syncstate=0,state_slottimeout=1,state_slotoffset=0,
+cg_r=None,cg_sec=1222819224,
+cg_timestamp=datetime.datetime(2008, 10, 1, 0, 0, 24))
+<b>x = np.array([float(report.longitude) for report in p])</b>
+<b>y = np.array([float(report.latitude) for report in p])</b>
+</pre>
+That brings in way too much of the database when I just need x and y.
+<pre><b>pos = db.position._table</b>
+<b>s = select([pos.c.longitude,pos.c.latitude],from_obj=[pos],whereclause=(pos.c.UserID==0))</b>
+<b>track = np.array([ (float(p[0]),float(p[1])) for p in s.execute().fetchall()])</b>
+<b>print track</b>
+[[-76.29859833  36.84142833]
+ [-76.29859333  36.84143833]
+ [-76.29858667  36.84143667]
+ ..., 
+ [-76.60878     37.16643833]
+ [-76.60878167  37.16644   ]
+ [-76.60878667  37.16643333]]</pre>
+That's better, but I really need it split into x and y for matplotlib.
+<pre>s_x = select([pos.c.longitude],from_obj=[pos],whereclause=(pos.c.UserID==0))
+s_y = select([pos.c.latitude],from_obj=[pos],whereclause=(pos.c.UserID==0))
+track_x = np.array([ float(p[0]) for p in s_x.execute().fetchall()])
+track_y = np.array([ float(p[0]) for p in s_y.execute().fetchall()])
+</pre>
+Now it is time to plot it!
+<pre>from mpl_toolkits.basemap import Basemap</b>
+xmin = track_x.min()
+xmax = track_x.max()
+ymin = track_y.min()
+ymax = track_y.max()
+# The best coastline is the 'h' version.
+map = Basemap(llcrnrlon=xmin-.25, llcrnrlat=ymin-.25, urcrnrlon=xmax+0.25, urcrnrlat=ymax+.25, resolution='h')
+map.plot(track_x,track_y)
+map.drawcoastlines()</pre>
+<img title="Basemap" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/sqlsoup-matplotlib-basemap.png"/>
+-----

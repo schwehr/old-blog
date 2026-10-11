@@ -1,0 +1,27 @@
+TITLE: SQL repetitions
+AUTHOR: Kurt
+DATE: 07.17.2009 15:44
+DESC: easy once you know
+-----
+BODY:
+I was trying to list ships where I have more than one report (aka drop
+singletons).  Les found this in the MySQL Cookbook:
+<pre>SELECT COUNT(*) AS repetitions, last_name, first_name\
+   FROM catalog_list
+   GROUP BY last_name, first_name
+   HAVING repetitions &gt; 1;</pre>
+Jason confirmed that for MySQL that does indeed work.  SQLite - not so much.
+This did get me close and here is my final query.  I do wish I could name the
+HAVING expression.
+<pre>SELECT COUNT(userid),userid
+    FROM position 
+    GROUP BY userid 
+    HAVING COUNT(userid) &gt; 1;</pre>
+This is the first time I've used HAVING.  It's basically WHERE, but
+for handling groups.  I can then sort by the count:
+<pre>SELECT * FROM (
+    SELECT count(userid) as cnt,userid 
+        FROM position 
+        GROUP BY userid 
+    ) ORDER BY cnt LIMIT 10;</pre>
+-----

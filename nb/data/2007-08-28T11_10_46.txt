@@ -1,0 +1,43 @@
+TITLE: External sensors to verify AIS ship data (e.g. dimensions)
+AUTHOR: Kurt
+DATE: 08.28.2007 11:10
+DESC: if I had more time
+-----
+BODY:
+AIS is notorious for having ships that broadcast incorrect data.  There is
+even a group that got a publication out of this:
+<pre>
+A. Harati-Mokhtari, A. Wall, P. Brooks, J. Wang, J., "Automatic
+Identification System (AIS): Data Reliability and Human Error
+Implications," The Journal of Navigation, vol. 60:3, pp. 373-389,
+2007.
+</pre>
+A while back, I wanted to setup an AIS receiver with a webcam and
+trigger the web camera off of the AIS receive position.  Then I could
+automatically start building a database of ship images.  Convenient to
+have the ship telling you when it is in the field of view of the
+camera.  Then I was looking at the sensors available in the NOAA PORTS
+system and realized that there is a similar idea available.  A few
+bridges have been outfitted with airgap sensors.  If we combine high
+rate air gap measurements with the GPS from the AIS broadcasts, we can
+calculate the length of the ship. We can then check the length of the
+ship (Dimensions A+B in AIS Msg 5) to see if it is within tolerances
+to what the airgap sensor seas.  Then an alert can be sent to a VTS
+operator who can inform the ship that they need to correct the values
+in their GPS.
+
+I imagine that there are other sensors available in locks and other
+tight areas that could do the same for width.  For IMO number, a
+webcam can capture a picture of the ships IMO number and a human can
+quickly verify that it matches the AIS if a simple display showing both
+is available.  Then if we have an upward looking sonar on the bottom,
+we could also check the draft.  NOAA uses bottom mounted ADCP's to
+look at currents.  They could also look for ships passing over.  An
+alternative is to use computer vision to look at the lines on the side
+of the ship showing the load level, but that might be much less
+reliable.
+
+The minimum keyboard displays are difficult to use and this could be
+a gentle way to let the mariner know that he has some values that
+need to be updated.
+-----

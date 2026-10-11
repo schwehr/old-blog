@@ -1,0 +1,80 @@
+TITLE: Hacking emacs - emacs lisp
+AUTHOR: Kurt
+DATE: 01.02.2011 09:20
+DESC: trying to learn more
+-----
+BODY:
+During 2011, I would really like to start writing org-spatial for
+emacs.  I spend most of my life in emacs and it is crazy that org-mode
+and emacs do not know about location and projections.  If that is going
+to change, I'm going to have to step up and get it started.  However, I 
+suck at reading lisp.  What is a great source for getting going?  ShowMeDo 
+only has one video <a href="http://showmedo.com/videotutorials/emacs">tagged with emacs</a>.
+
+I just found <a
+href="http://www.youtube.com/user/rpdillon">rpdillon</a> on youtube.  I just wish he had more videos.
+
+<object width="600" height="362"><param name="movie" value="http://www.youtube.com/v/BwTMzYo84Ao?fs=1&amp;hl=en_US&amp;rel=0&amp;color1=0x3a3a3a&amp;color2=0x999999"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/BwTMzYo84Ao?fs=1&amp;hl=en_US&amp;rel=0&amp;color1=0x3a3a3a&amp;color2=0x999999" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="600" height="362"></embed></object>
+
+I really have a hard time with most emacs lisp tutorials or manuals.
+I spend most of my time thinking about parsing and processing data
+from files.  I think I need more tutorials like this where emacs is
+used to do stuff from the command line: <a
+href="http://www.leancrew.com/all-this/2008/04/emacs-lisp-as-a-scripting-language/">Emacs
+Lisp as a scripting language</a>.  Dropping into the middle of the entire emacs world is a lot overwhelming.
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="GNU source-highlight 3.1.4
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite">
+<title>out.el</title>
+</head>
+<body bgcolor="white">
+<pre><tt>#!/usr/bin/emacs --script
+<!-- -->
+<font color="#FF0000">(</font>require <font color="#009900">'calendar</font><font color="#FF0000">)</font>
+<!-- -->
+<i><font color="#9A1900">; Use current date if no date is given on the command line</font></i>
+<font color="#FF0000">(</font><b><font color="#0000FF">if</font></b> <font color="#FF0000">(</font>= <font color="#993399">3</font> <font color="#FF0000">(</font>length command-line-args-left<font color="#FF0000">))</font>
+ <font color="#FF0000">(</font>setq my-date <font color="#FF0000">(</font>mapcar <font color="#009900">'string-to-int</font> command-line-args-left<font color="#FF0000">))</font>
+ <font color="#FF0000">(</font>setq my-date <font color="#FF0000">(</font>calendar-current-date<font color="#FF0000">)))</font>
+<!-- -->
+<i><font color="#9A1900">; Make the conversions and print the results</font></i>
+<font color="#FF0000">(</font>princ
+  <font color="#FF0000">(</font>concat
+    <font color="#FF0000">"Gregorian:  "</font> <font color="#FF0000">(</font>calendar-date-string          my-date<font color="#FF0000">)</font>  <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font>
+    <font color="#FF0000">"      ISO:  "</font> <font color="#FF0000">(</font>calendar-iso-date-string      my-date<font color="#FF0000">)</font>  <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font>
+    <font color="#FF0000">"   Julian:  "</font> <font color="#FF0000">(</font>calendar-julian-date-string   my-date<font color="#FF0000">)</font>  <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font>
+    <font color="#FF0000">"   Hebrew:  "</font> <font color="#FF0000">(</font>calendar-hebrew-date-string   my-date<font color="#FF0000">)</font>  <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font>
+    <font color="#FF0000">"  Islamic:  "</font> <font color="#FF0000">(</font>calendar-islamic-date-string  my-date<font color="#FF0000">)</font>  <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font>
+    <font color="#FF0000">"  Chinese:  "</font> <font color="#FF0000">(</font>calendar-chinese-date-string  my-date<font color="#FF0000">)</font>  <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font>
+    <font color="#FF0000">"    Mayan:  "</font> <font color="#FF0000">(</font>calendar-mayan-date-string    my-date<font color="#FF0000">)</font>  <font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font> <font color="#FF0000">))</font></tt></pre>
+Which looks like this when run:
+<pre><b>./cal.el</b>
+Gregorian:  Sunday, January 2, 2011
+      ISO:  Day 7 of week 52 of 2010
+   Julian:  December 20, 2010
+   Hebrew:  Teveth 26, 5771
+  Islamic:  Muharram 26, 1432
+  Chinese:  Cycle 78, year 27 (Geng-Yin), month 11 (Wu-Zi), day 28 (Ding-Si)
+    Mayan:  Long count = 12.19.18.0.1; tzolkin = 13 Imix; haab = 14 Kankin
+
+<b>./cal.el 12 31 2010</b>
+Gregorian:  Friday, December 31, 2010
+      ISO:  Day 5 of week 52 of 2010
+   Julian:  December 18, 2010
+   Hebrew:  Teveth 24, 5771
+  Islamic:  Muharram 24, 1432
+  Chinese:  Cycle 78, year 27 (Geng-Yin), month 11 (Wu-Zi), day 26 (Yi-Mao)
+    Mayan:  Long count = 12.19.17.17.19; tzolkin = 11 Cauac; haab = 12 Kankin</pre>
+The first bummer that I notice is that the comment character for lisp
+is the ";" character, so the shebang ("#!") is not going to co-exist
+well with a loadable lisp file that can be used either as a library or a script, which is a typical use in python.
+
+I think the trouble with lisp is that I've spent too much time with <A href="http://en.wikipedia.org/wiki/ALGOL">ALGOL</a> influenced programming languages (Pascal, C, C++, Java, Python) and the command line.
+
+Comments and suggestions can go here: <a href="http://schwehr.blogspot.com/2011/01/how-to-learn-emacs-lisp.html">How to learn emacs lisp?</a>
+-----

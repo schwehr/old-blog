@@ -1,0 +1,115 @@
+TITLE: AIS commstate
+AUTHOR: Kurt
+DATE: 07.21.2009 17:04
+DESC: more work to do
+-----
+BODY:
+I'm finally taking a look at the communication state that comes along
+with AIS.  I've hacked my working version of noaadata to have a
+ais_msg_4_handcoded.py that has hooks for the commstate.  I have a helper
+that handles the commstate stuff:
+<pre><tt>sotdma_fields <font color="#990000">=</font> <font color="#990000">(</font>
+    <font color="#FF0000">'syncstate'</font><font color="#990000">,</font>
+    <font color="#FF0000">'slottimeout'</font><font color="#990000">,</font>
+    <font color="#FF0000">'received_stations'</font><font color="#990000">,</font>
+    <font color="#FF0000">'slotnumber'</font><font color="#990000">,</font>
+    <font color="#FF0000">'commstate_utc_hour'</font><font color="#990000">,</font>
+    <font color="#FF0000">'commstate_utc_min'</font><font color="#990000">,</font>
+    <font color="#FF0000">'commstate_utc_spare'</font><font color="#990000">,</font>
+<i><font color="#9A1900">    'slotoffset'</font></i>
+<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">sotdma_sql_fields</font></b><font color="#990000">(</font>c<font color="#990000">):</font>
+<i><font color="#9A1900">    'sqlhelp fields for commstate'</font></i>
+    <b><font color="#0000FF">for</font></b> field <b><font color="#0000FF">in</font></b> sotdma_fields<font color="#990000">:</font>
+        c<font color="#990000">.</font><b><font color="#000000">addInt</font></b><font color="#990000">(</font>field<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">sotdma_parse_bits</font></b><font color="#990000">(</font>bv<font color="#990000">):</font>
+    <b><font color="#0000FF">assert</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>bv<font color="#990000">)==</font><font color="#993399">19</font><font color="#990000">)</font>
+    r <font color="#990000">=</font> <font color="#990000">{}</font>
+    r<font color="#990000">[</font><font color="#FF0000">'syncstate'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>bv<font color="#990000">[:</font><font color="#993399">2</font><font color="#990000">])</font>
+    r<font color="#990000">[</font><font color="#FF0000">'slottimeout'</font><font color="#990000">]</font> <font color="#990000">=</font> slottimeout <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>bv<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">:</font><font color="#993399">5</font><font color="#990000">])</font>
+    submessage <font color="#990000">=</font> bv<font color="#990000">[-</font><font color="#993399">14</font><font color="#990000">:]</font>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> slottimeout <b><font color="#0000FF">in</font></b> <font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">,</font><font color="#993399">7</font><font color="#990000">):</font>
+        r<font color="#990000">[</font><font color="#FF0000">'received_stations'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>submessage<font color="#990000">)</font>
+    <b><font color="#0000FF">elif</font></b> slottimeout <b><font color="#0000FF">in</font></b> <font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">6</font><font color="#990000">):</font>
+        r<font color="#990000">[</font><font color="#FF0000">'slotnumber'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>submessage<font color="#990000">)</font>
+    <b><font color="#0000FF">elif</font></b> slottimeout <font color="#990000">==</font> <font color="#993399">1</font><font color="#990000">:</font>
+        r<font color="#990000">[</font><font color="#FF0000">'commstate_utc_hour'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>submessage<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">:</font><font color="#993399">5</font><font color="#990000">])</font>
+        r<font color="#990000">[</font><font color="#FF0000">'commstate_utc_min'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>submessage<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">:</font><font color="#993399">12</font><font color="#990000">])</font>
+        r<font color="#990000">[</font><font color="#FF0000">'commstate_utc_spare'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>submessage<font color="#990000">[-</font><font color="#993399">2</font><font color="#990000">:])</font>
+    <b><font color="#0000FF">elif</font></b> slottimeout <font color="#990000">==</font> <font color="#993399">0</font><font color="#990000">:</font>
+        r<font color="#990000">[</font><font color="#FF0000">'slotoffset'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>submessage<font color="#990000">)</font>
+    <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">assert</font></b> False
+<!-- -->
+    <b><font color="#0000FF">return</font></b> r</tt></pre>
+Of course, theis is research, so I'm not starting where you would expect.  This is the AIS Basestation SOTDMA that I'm looking at.
+Here are some decoded messages to give a feel for how things look:
+<pre>% <b>./ais_msg_4_handcoded.py -d '!AIVDM,1,1,,A,4h3OvjAuUrGsqo=cf0Knevo00l3a,0*4C'</b>
+bsreport:
+        MessageID:           4
+        RepeatIndicator:     3
+        UserID:              3669705
+        Time_year:           2009
+        Time_month:          7
+        Time_day:            20
+        Time_hour:           23
+        Time_min:            59
+        Time_sec:            57
+        PositionAccuracy:    1
+        Position_longitude:  -122.84
+        Position_latitude:   48.6800983
+        fixtype:             7
+        Spare:               0
+        RAIM:                False
+        syncstate:                    1
+        slottimeout:                  5
+        received_stations:            233
+        slotnumber:                   n/a
+        commstate_utc_hour:           n/a
+        commstate_utc_min:            n/a
+        commstate_utc_spare:          n/a
+        slotoffset:                   n/a</pre>
+And one with the slottimeout of 1, which is the time report:
+<pre>% <b>./ais_msg_4_handcoded.py -d '!AIVDM,1,1,,A,403OwlAuUr000mPN&lt;`RsuT700T00,0*2A'</b>
+bsreport:
+        MessageID:           4
+        RepeatIndicator:     0
+        UserID:              3669969
+        Time_year:           2009
+        Time_month:          7
+        Time_day:            20
+        Time_hour:           0
+        Time_min:            0
+        Time_sec:            0
+        PositionAccuracy:    1
+        Position_longitude:  -146.69756667
+        Position_latitude:   61.0566666667
+        fixtype:             7
+        Spare:               0
+        RAIM:                False
+        syncstate:                    1
+        slottimeout:                  1
+        received_stations:            n/a
+        slotnumber:                   n/a
+        commstate_utc_hour:           0
+        commstate_utc_min:            0
+        commstate_utc_spare:          0
+        slotoffset:                   n/a</pre>
+And a slottimeout of 4, for slot number:
+<pre>% <b>./ais_msg_4_handcoded.py -d '!AIVDM,1,1,,B,4030p81uUrP0OG;V8hKtT8A00@C5,0*78,b003669703,1248134432'</b>
+bsreport:
+	... snip ...
+        syncstate:                    0
+        slottimeout:                  4
+        received_stations:            n/a
+        slotnumber:                   1221
+        commstate_utc_hour:           n/a
+        commstate_utc_min:            n/a
+        commstate_utc_spare:          n/a
+        slotoffset:                   n/a</pre>
+Of course, this work points out how badly I need to rewrite the whole
+way I handle AIS messages (and not just for the speed improvements).
+-----

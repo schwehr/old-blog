@@ -1,0 +1,26 @@
+TITLE: Python and JavaScript debugging/development
+AUTHOR: Kurt
+DATE: 11.19.2007 12:09
+DESC: rhino and pdb
+-----
+BODY:
+<a href="http://ynniv.com/blog/2007/11/debugging-python.html">
+Debugging Python</a> by ynniv has some interesting notes about using
+debuggers in python.  I don't end up using the debugger much (or
+really at all).  I did play with python debugging in Eclipse and that
+was pretty awesome.  His work to trap exceptions in the debugger:
+
+On the JavaScript front: <a
+href="http://workingrhino.blogspot.com/2007/10/getting-started.html">putting
+rhino to work</a> gives a tip on how to get a readline like interface
+for a javascript interpreter.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+<font color="#2040a0">dir</font>=$(dirname <font color="#2040a0">$0</font>)
+export <font color="#2040a0">CLASSPATH</font>=${CLASSPATH}${CLASSPATH:+:}${dir}/rhino/\*
+echo using <font color="#2040a0">CLASSPATH</font>=$(printenv CLASSPATH) &gt; /dev/stderr
+[ <font color="#008000">&quot;<font color="#2040a0">$1</font>&quot;</font> = <font color="#008000">&quot;-f&quot;</font> ] || { <font color="#2040a0">RLWRAP</font>=<font color="#008000">&quot;rlwrap -C js&quot;</font> ;}
+exec <font color="#2040a0">$RLWRAP</font> java ${JAVAOPTS} \
+org.mozilla.javascript.tools.shell.Main -strict <font color="#008000">&quot;$@&quot;</font>
+</pre>
+-----

@@ -1,0 +1,103 @@
+TITLE: Looking at gaps of time with no messages received for an AIS receiver
+AUTHOR: Kurt
+DATE: 04.07.2010 21:19
+DESC: uptime/downtime
+-----
+BODY:
+I have been looking to create some sort of model of up verses downtime
+with AIS data feeds.  I am having to base my estimate of downtime on
+when I do not have timestamped packets of AIS data.  There are a good
+number of reasons that I might not have any AIS messages of the VDL
+(VHF Data Link):
+<ol>
+ <li>No ships were within the normal coverage range of the receiver</li>
+ <li>Obstructions between the tranmitters and receiver (smoke stack azimuth issues or equipment parked near the antenna</li>
+ <li>Antenna failure (lightning, bio-fowling, etc)
+ <li>Propagation conditions were very poor reducing the ability to hear messages.</li>
+ <li>RF noise in the area</li>
+ <li>Jamming - this really is just RF noise</li>
+ <li>Packet collisions between transmitters</li>
+ <li>The receiver malfunctioned</li>
+ <li>The logging software failed (AISSource)</li>
+ <li>The sense of time of AISSource or the Windows logging computer jumped</li>
+ <li>The logging computer failed</li>
+ <li>The receiver sites power is offline</li>
+ <li>The internet link from the receiver site to the USCG was down</li>
+ <li>Problems with the USCG network and AIS distrution system</li>
+ <li>Network link failure between USCG and the logging site</li>
+ <li>Authentication issues with AISUser (aka inode of directory changed)</li>
+ <li>Logging software failed</li>
+ <li>Logging computer failed</li>
+</ol>
+There are probably plenty of other failure modes that can crop up, but
+that is what I can come up with in a couple of minutes.  If the 1st 12
+items are not happening, we have the ability to pull the logs for the
+SBNMS logging computers to compensate for any of the higher numbered
+issues.
+
+I have now run a draft of my ais_info.py code on all of the 2006 data
+for station r003669945 in Scituate, MA.  This station should have the
+highest uptime / lowest downtime of the 3 receivers I am looking at
+owing to being in the best location for network and power uptime.
+
+Here are some of the results.  The system logged from 1136091501
+1167627754 (UNIX UTC seconds) for a total of 31536253 seconds (525604
+minutes or 8760 hours or 365 days).  That means we didn't loose much
+time at either end of the year.  Next, we need to examine the gaps in
+time between received packets.  I start counting when gaps are
+anything other than 0 or 1 second.  The following table shows the
+center of the gaps around 0:
+
+<table  border="1" cellspacing="0" cellpadding="6" rules="all" frame="all">
+<tr><td><b>delta T (s)</td><td>Count</td></b></tr>
+<tr><td>-8</td><td>9</td></tr>
+<tr><td>-7</td><td>5</td></tr>
+<tr><td>-6</td><td>13</td></tr>
+<tr><td>-5</td><td>14</td></tr>
+<tr><td>-4</td><td>18</td></tr>
+<tr><td>-3</td><td>42</td></tr>
+<tr><td>-2</td><td>71</td></tr>
+<tr><td>-1</td><td>49</td></tr>
+<tr><td>2</td><td>4188158</td></tr>
+<tr><td>3</td><td>1636592</td></tr>
+<tr><td>4</td><td>660937</td></tr>
+<tr><td>5</td><td>240663</td></tr>
+<tr><td>6</td><td>87267</td></tr>
+<tr><td>7</td><td>33069</td></tr>
+<tr><td>8</td><td>16361</td></tr>
+<tr><td>9</td><td>8535</td></tr>
+<tr><td>10</td><td>8395</td></tr>
+<tr><td>11</td><td>770</td></tr>
+</table>
+Just to give you a sense of what we are dealing with, that is 4.8
+million gaps of 2 seonds -- 1 second where we did not hear anything
+from the radio or did not receive a status message from the system.
+The largest negative gap was -90 seconds and the largest positive gap
+was 119566 s (33.2 hours).  In this graph, I have clipped the x axes 
+to 20000 seconds and made the y-axis a log scale of count.
+
+<img title="r003669945 gaps less than 20000 seconds" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/r003669945-gaps.png"/>
+
+The question then becomes, at what time gap do we consider the system
+down?  We have to factor the W32time jumps - see: Calder and McLeod,
+2007, "High Precision Absolute Time Synchronization in Distributed
+Data Capture Systems", IEEE Journal of Oceanic Engineering, 32(4).
+Then we have the possibility of time between receive messages if there
+are no ships moving.  If there are any Class A vessels in the area,
+the will transmit every 3 minutes if not moving or more often if
+moving or turning.  Can we assume that there is always a class A in
+range of this station?  I will have to address that with a receiver
+range check that will come later.  For now, I am going to use 10 seconds
+as the threshold for being offline.
+
+I summed up all positive gaps of 10 seconds or larger for a total of
+1766929 s of "downtime" (20.4 days).  The negative time jumps sum up to
+-1998 s or -33.3 minutes.
+
+Based on W32Time issues with only trying to maintain time for
+kerberos, I am leaning towards 5 minutes or a bit higher to declare a
+bit of downtime.  However, that -90 time jump makes me think that 
+maybe a minute and a half might be a better number.
+
+-----

@@ -1,0 +1,60 @@
+TITLE: LaTeX table centering trouble fixed
+AUTHOR: Kurt
+DATE: 07.21.2005 09:53
+DESC: how to use centering correctly
+-----
+BODY:
+I have been having issues with centering a table in my paper.  I
+wanted this table to be a floating figure (aka not in 2 column mode
+like the rest of the paper). I got that to work with \begin{table*}.
+Note the * that makes this a "floating" table.  But when I centered
+the table so it looked nicer, the references to the table in the
+document disappeared and no error or warning was being issued.  Grrr.
+Turns out I was doing the centering wrong.  You can not include the
+caption in the centering.  Do <b>NOT</b> do this:
+<pre>
+\documentclass{article}
+%[agupp]{aguplus}
+\usepackage{graphicx}
+
+\begin{document}
+
+\begin{table*}[htb]
+<b>\begin{center}</b>
+\begin{tabular}{|c|c|}
+aa & b \\
+c & d 
+\end{tabular}
+\caption{Locations and lengths of the cores}
+<b>\end{center}</b>
+\label{tab:coreloctab} 
+\end{table*}
+
+970 meters of ODP holes 893A,B (see Table~\ref{tab:coreloctab} for
+
+\end{document}
+</pre>
+Instead do this, which works just fine:
+<pre>
+\documentclass{article}
+%[agupp]{aguplus}
+\usepackage{graphicx}
+
+\begin{document}
+
+\begin{table*}[htb]
+<b>\begin{center}</b>
+\begin{tabular}{|c|c|}
+aa & b \\
+c & d 
+\end{tabular}
+<b>\end{center}</b>
+\caption{Locations and lengths of the cores}
+\label{tab:coreloctab} 
+\end{table*}
+
+970 meters of ODP holes 893A,B (see Table~\ref{tab:coreloctab} for
+
+\end{document}
+</pre>
+-----

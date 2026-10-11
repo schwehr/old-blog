@@ -1,0 +1,68 @@
+TITLE: Xah Lee's emacs lisp excercise in python
+AUTHOR: Kurt
+DATE: 11.30.2011 14:29
+DESC: mangling character types
+-----
+BODY:
+Here is my answers to <a
+href="http://xahlee.blogspot.com/2011/11/emacs-lisp-exercise-latitude-longitude.html">emacs
+lisp exercise: latitude-longitude-decimalize</a>.  The first is dumb.
+It hard codes the characters, which I think source-highlight mangled
+pretty badly.  The code wasn't very pretty to start with.  The second solution is much more robust.  It allows and
+character(s) to be the separator(s).
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<i><font color="#9A1900"># -*- coding: utf-8 -*-</font></i>
+<!-- -->
+test_data <font color="#990000">=</font> r<font color="#FF0000">"37Â°26â²36.42â³N 06Â°15â²14.28â³W"</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">decimal_deg_simple</font></b><font color="#990000">(</font>coord_str<font color="#990000">):</font>
+    lat_str<font color="#990000">,</font> lon_str <font color="#990000">=</font> coord_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()</font>
+    lat <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>lat_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'Â°'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font>
+    lat <font color="#990000">+=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>lat_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'Â°'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'â²'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">60</font><font color="#990000">.</font>
+    lat <font color="#990000">+=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>lat_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'â²'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">][:-</font><font color="#993399">4</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> <font color="#FF0000">'S'</font> <b><font color="#0000FF">in</font></b> lat_str<font color="#990000">:</font>
+        lat <font color="#990000">=</font> <font color="#990000">-</font>lat
+<!-- -->
+    lon <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>lon_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'Â°'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font>
+    lon <font color="#990000">+=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>lon_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'Â°'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'â²'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">60</font><font color="#990000">.</font>
+    lon <font color="#990000">+=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>lon_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'â²'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">][:-</font><font color="#993399">4</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> <font color="#FF0000">'W'</font> <b><font color="#0000FF">in</font></b> lon_str<font color="#990000">:</font>
+        lon <font color="#990000">=</font> <font color="#990000">-</font>lon
+<!-- -->
+    <b><font color="#0000FF">return</font></b> lat<font color="#990000">,</font>lon
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'simple:'</font><font color="#990000">,</font> <b><font color="#000000">decimal_deg_simple</font></b><font color="#990000">(</font>test_data<font color="#990000">)</font>
+<!-- -->
+<i><font color="#9A1900">########################################</font></i>
+<i><font color="#9A1900"># Use a regular expression</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> re
+<!-- -->
+rawstr <font color="#990000">=</font> r<font color="#FF0000">"""(?P&lt;lat_deg&gt;\d{1,2})\D+</font>
+<font color="#FF0000">(?P&lt;lat_min&gt;\d{1,2})\D+</font>
+<font color="#FF0000">(?P&lt;lat_sec&gt;\d{1,2}(\.\d+))\D+</font>
+<font color="#FF0000">(?P&lt;lat_hemi&gt;[NS])</font>
+<font color="#FF0000">\s+</font>
+<font color="#FF0000">(?P&lt;lon_deg&gt;\d{1,3})\D+</font>
+<font color="#FF0000">(?P&lt;lon_min&gt;\d{1,2})\D+</font>
+<font color="#FF0000">(?P&lt;lon_sec&gt;\d{1,2}(\.\d+))\D+</font>
+<font color="#FF0000">(?P&lt;lon_hemi&gt;[EW])</font>
+<font color="#FF0000">"""</font>
+<!-- -->
+compile_obj <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>rawstr<font color="#990000">,</font>  re<font color="#990000">.</font>VERBOSE<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">decimal_deg_re</font></b><font color="#990000">(</font>coord_str<font color="#990000">):</font>
+    g <font color="#990000">=</font> compile_obj<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>coord_str<font color="#990000">).</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font> <i><font color="#9A1900"># m is match</font></i>
+    lat <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lat_deg'</font><font color="#990000">])</font> <font color="#990000">+</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lat_min'</font><font color="#990000">])/</font><font color="#993399">60</font><font color="#990000">.</font> <font color="#990000">+</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lat_sec'</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> g<font color="#990000">[</font><font color="#FF0000">'lat_hemi'</font><font color="#990000">]</font> <font color="#990000">==</font> <font color="#FF0000">'S'</font><font color="#990000">:</font>
+        lat <font color="#990000">=</font> <font color="#990000">-</font>lat
+    lon <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lon_deg'</font><font color="#990000">])</font> <font color="#990000">+</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lon_min'</font><font color="#990000">])/</font><font color="#993399">60</font><font color="#990000">.</font> <font color="#990000">+</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>g<font color="#990000">[</font><font color="#FF0000">'lon_sec'</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+    <b><font color="#0000FF">if</font></b> g<font color="#990000">[</font><font color="#FF0000">'lon_hemi'</font><font color="#990000">]</font> <font color="#990000">==</font> <font color="#FF0000">'S'</font><font color="#990000">:</font>
+        lon <font color="#990000">=</font> <font color="#990000">-</font>lon
+    <b><font color="#0000FF">return</font></b> <font color="#990000">{</font><font color="#FF0000">'y'</font><font color="#990000">:</font>lat<font color="#990000">,</font> <font color="#FF0000">'x'</font><font color="#990000">:</font>lon<font color="#990000">}</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'re:'</font><font color="#990000">,</font> <b><font color="#000000">decimal_deg_re</font></b><font color="#990000">(</font>test_data<font color="#990000">)</font></tt></pre>
+This would be a lot harder without kodos for building regular expressions in python:
+
+<img width="450" height="530" title="Kodos building the parser" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-11/parsing-coords.png"/>
+-----

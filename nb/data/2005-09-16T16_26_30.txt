@@ -1,0 +1,79 @@
+TITLE: Batch conversion
+AUTHOR: Kurt
+DATE: 09.16.2005 16:26
+DESC: xstar 2 segy
+-----
+BODY:
+<img src="http://schwehr.org/blog/attachments/2005-09/portsmouth-lighthouse-wx.png"><br>It's lighthouse weather in Portsmouth.
+
+I now have a script that takes all of the xstar files that I would
+like to use and batch processes them into standard SEGY.  At first
+that may not sound like much.  Jenna, JP, and other people have done
+just that.  What is different here is that my script uses segyslice to
+work around the changes in sweep frequencies that trip up sioseis.  I
+call this script "chunk-and-process.bash"
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+
+<font color="#FF8800"># Convert all original xstar type files into </font>
+<font color="#FF8800">#  1. chunks with uniform chirp band
+#  2. use sioseis to convert to standard sgy with 1 channel
+</font>
+rm -f sioseis_tmp[0-9]*
+
+for orig in xstar/*.xstar; do
+    <font color="#2040a0">file</font>=${orig##xstar/}
+    <font color="#2040a0">name</font>=${file%%.xstar}
+   <font color="#FF8800"> #echo $orig $file</font>
+    echo ==========    <font color="#2040a0">$file</font>   ==========
+    echo
+   <font color="#FF8800"> # Do a scary hard link</font>
+    ln $orig .</font>
+</font>
+
+   <font color="#FF8800"> # Make sure we have only one frequence band per file.</font>
+    if [ ! -f ${name}-00001.xstar ]; then
+	echo SLICING <font color="#2040a0">$name</font>
+	segyslice.py -d xstar -k -i <font color="#2040a0">$file</font> SweepFreqStart SweepFreqEnd --<font color="#2040a0">verbosity</font>=2 -x .xstar -o ${file%%.xstar}
+    else
+	echo no need to slice.  already done
+    fi
+
+    if [ ! -f ${name}-00001.sgy ]; then
+	for xstar in ${name}*-[0-9][0-9][0-9][0-9]*.xstar; do
+	   <font color="#FF8800"> #echo ./xstar2segy.bash $xstar</font>
+	    ./xstar2segy.bash $xstar
+	done
+    fi</font>
+
+    if [ ! -f ${file}.db ]; then
+	segysql.py -d xstar <font color="#2040a0">$file</font> -f <font color="#2040a0">$file</font>.db
+    fi
+
+   <font color="#FF8800"> #</font>
+   <font color="#FF8800"> # CLEANUP</font>
+   <font color="#FF8800"> #</font>
+    rm -f <font color="#2040a0">$file</font> <font color="#FF8800"> # Remove the hard link</font>
+    echo
+    echo
+done
+
+for file in *-[0-9]*.xstar; do
+    echo checking <font color="#2040a0">$file</font> for db
+    if [ ! -f <font color="#2040a0">$file</font>.db ]; then
+	segysql.py -d xstar <font color="#2040a0">$file</font> -f <font color="#2040a0">$file</font>.db
+    fi
+done
+
+<font color="#FF8800"># Just in case sioseis barfed</font>
+ls -l sioseis_tmp*
+rm -f sioseis_tmp[0-9]*
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>
+
+ 
+-----

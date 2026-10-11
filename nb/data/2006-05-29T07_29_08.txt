@@ -1,0 +1,59 @@
+TITLE: calling the parent class in python
+AUTHOR: Kurt
+DATE: 05.29.2006 07:29
+DESC: inheritance
+-----
+BODY:
+Here is a little something that I picked up from Alex a couple of
+months ago, but only now put into use.  When doing inheritance in
+python, people usually do an explicit call to the parent's __init__
+method like this:
+<pre>
+class a:
+  def __init__(self):
+    self.foo='a'
+class b(a):
+  def __init__(self):
+    a.__init__(self)
+</pre>
+That works, but there is what I think is a better way.  What if the
+inheritance tree changes?  It is up to the programmer to go in and
+change every refernce to the base (aka parent) class to the new base
+class.  Here is the method that Alex told me about:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>class</strong> <font color="#2040a0">foo</font><font color="4444FF">:</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self)</font>:
+</strong>	<font color="#2040a0">self</font>.<font color="#2040a0">x</font><font color="4444FF">=</font><font color="#FF0000">1</font> 
+<strong>class</strong> <font color="#2040a0">bar</font><font color="4444FF">:</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self)</font>:
+</strong>	<font color="#2040a0">self</font>.<font color="#2040a0">y</font><font color="4444FF">=</font><font color="#FF0000">2</font>
+<strong>class</strong> <font color="#2040a0">foobar</font><font color="4444FF">(</font><font color="#2040a0">foo</font>,<font color="#2040a0">bar</font><font color="4444FF">)</font><font color="4444FF">:</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self)</font>:
+</strong>	<font color="#2040a0">self</font>.<font color="#2040a0">__class__</font>.<font color="#2040a0">__bases__</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">__init__</font><font color="4444FF">(</font><font color="#2040a0">self</font><font color="4444FF">)</font>
+	<font color="#444444">#self.__class__.__bases__[1].__init__(self)</font>
+	<font color="#2040a0">self</font>.<font color="#2040a0">z</font><font color="4444FF">=</font><font color="#FF0000">3</font>
+<font color="#444444">##############################</font>
+<font color="#2040a0">f</font> <font color="4444FF">=</font> <font color="#2040a0">foobar</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">f</font>.<font color="#2040a0">__class__</font>.<font color="#2040a0">__bases__</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#008000">'base['</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'] is '</font>,<font color="#2040a0">f</font>.<font color="#2040a0">__class__</font>.<font color="#2040a0">__bases__</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="#008000">'f.x'</font>,<font color="#2040a0">f</font>.<font color="#2040a0">x</font>
+<strong>print</strong> <font color="#008000">'f.y'</font>,<font color="#2040a0">f</font>.<font color="#2040a0">y</font>
+</pre>
+The key is to call every base __init__ method so that the local world
+is setup correctly.  I have commented out the 2nd init to show that by
+missing one __init__ from the parents, the child is damaged goods:
+<pre>
+./bar.py
+base[0] is  __main__.foo
+base[1] is  __main__.bar
+f.x 1
+f.y
+Traceback (most recent call last):
+  File "./bar.py", line 20, in ?
+    print 'f.y',f.y
+AttributeError: foobar instance has no attribute 'y'
+</pre>
+-----

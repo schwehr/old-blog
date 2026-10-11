@@ -1,0 +1,29 @@
+TITLE: python cheeseshop runs postgres and psycopg
+AUTHOR: Kurt
+DATE: 07.05.2007 17:12
+DESC: sqlite for firefox
+-----
+BODY:
+Bummer that the cheeseshop website is down at the momemt, but it does
+tell me something very interesting (to me at least)...  The cheeseshop
+is using postgreSQL and psycopg to handle the package database.  
+<pre>
+There's been a problem with your request
+.
+psycopg.ProgrammingError: ERROR:  current transaction is aborted, commands ignored until end of transaction block
+.
+select packages.name as name, stable_version, version, author,
+                  author_email, maintainer, maintainer_email, home_page,
+                  license, summary, description, description_html, keywords,
+                  platform, download_url, _pypi_ordering, _pypi_hidden,
+                  cheesecake_installability_id,
+                  cheesecake_documentation_id,
+                  cheesecake_code_kwalitee_id
+                 from packages, releases
+                 where packages.name='lxml' and version='1.3'
+                  and packages.name = releases.name
+</pre>
+And in other funky news, Firefox 2 is getting <a
+href="http://developer.mozilla.org/en/docs/Storage">Storage</a>, a
+database using sqlite.  API I think I remember reading that Firefox
+-----

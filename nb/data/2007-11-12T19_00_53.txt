@@ -1,0 +1,175 @@
+TITLE: X3D and digital charting
+AUTHOR: Kurt
+DATE: 11.12.2007 19:00
+DESC: progress
+-----
+BODY:
+I have been skeptical of X3D ever since I first heard about it.  I
+felt like VRML was a step backwards from the OpenInventor ASCII file
+format.  X3D has long suffered from poor support and from no one else
+around me using it.  I think now the tide is changing for me.  Roland
+was looking for a new file format for some of his work and he was
+feeling some of the same frustrations I was having.  Things like OBJ
+just down have the flexibility to allow for us to do research with the
+format.  Inventing our own format has the drawback of working on our
+own little island.  Roland got really excited by X3D and really took
+off with it.  I've been holding back judgement to see how it worked
+for him.  Then came Matt into the mix.  I now have two separate people
+who keep showing me how great X3D is.  There is still the issue of
+complete support for the file format in 3D programs, but these guys
+have shown me first hand that there is enough critical mass for this
+format to win out.  The final 1-2 punch was: 
+<ol>
+<li>doing some additional work in OpenInventor and getting frustrated with the format not being as uniform as XML</li>
+<li>Matt gave me a tour of X3D and showed me that it has all the benefits of XML and all the good things that I count on in OpenInventor</li>
+</ol>
+Now if only Coin3D would read X3D.
+
+Matt has been doing some really awesome ground work that I have to
+show off a bit.  Back in the day (aka before I got to CCOM), the
+VisLab created some great demos with billboard images in the
+Portsmouth Harbor.  They took it one step further and tried a running
+mosaic along the water, but the results caused them to conclude that
+ribbon mosaics just are not the correct solution.  However, Briana's
+masters thesis demonstrated that billboards do work.  The alternative
+to billboards are CAD models of a harbor objects.  When done right
+(aka by Chris and not by me), critical visual features can be really
+powerful.  But there are two drawbacks two CAD models:
+<ul>
+<li>They take a lot of time (and consequently $$$) to create.</li>
+<li>They miss many of the surrounding textural details that are not directly on the buildings.</li>
+</ul>
+After much discussion between Matt, Colin, and myself, Matt went out
+for a day with Capt. Ben and the labs nice digital camera.  He took
+hundreds of pictures of all the key features along the harbor
+entrance.  The images included sets of photos of the same object but
+from different directions.  He then worked up a prototype in GeoZui of
+an application that switches which photo is display based on the
+direction from which the object is viewed.  Many objects (.e.g light
+houses) look very different when viewed from different locations.
+This first prototype still relies on the old TCL engine in GeoZui, so 
+the idea needs a more modern as TCL has pretty much reached the end of
+development.
+
+Here is a quick bit of code that Matt sent me from his initial
+explorations of X3D.  The idea is to have either embedded JavaScript
+and/or Python handle the switching.
+
+First his simple show an image file:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;UTF-8&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!DOCTYPE</font> <font color="#2040a0">X3D</font> <font color="#2040a0">PUBLIC</font> <font color="#008000">&quot;ISO//Web3D//DTD X3D 3.1//EN&quot;</font> <font color="#008000">&quot;http://www.web3d.org/specifications/x3d-3.1.dtd&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">X3D</font> <font color="#2040a0">profile=</font><font color="#008000">&quot;Immersive&quot;</font> <font color="#2040a0">version=</font><font color="#008000">&quot;3.1&quot;</font><font color="#2040a0">
+</font>  <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</font> <font color="#2040a0">
+</font>  <font color="#2040a0">xsd:noNamespaceSchemaLocation=</font><font color="#008000">&quot;http://www.web3d.org/specifications/x3d-3.1.xsd&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Scene</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Group</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Transform</font> <font color="#2040a0">rotation=</font><font color="#008000">&quot;0 1 0 0&quot;</font> <font color="#2040a0">scale=</font><font color="#008000">&quot;149.35 1 19&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">IndexedFaceSet</font> <font color="#2040a0">coordIndex=</font><font color="#008000">&quot;0 1 3 -1 2 3 1 -1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Coordinate</font> <font color="#2040a0">DEF=</font><font color="#008000">&quot;UnitSquare&quot;</font> <font color="#2040a0">point=</font><font color="#008000">&quot;-0.5 0 -0.5 -0.5 0 0.5 0.5 0 0.5 0.5 0 -0.5&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Normal</font> <font color="#2040a0">vector=</font><font color="#008000">&quot;0 1 0 0 1 0 0 1 0 0 1 0&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">TextureCoordinate</font> <font color="#2040a0">point=</font><font color="#008000">&quot;0 1 0 0 1 0 1 1&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/IndexedFaceSet</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ImageTexture</font> <font color="#2040a0">url=</font><font color="#008000">&quot;FortConstitution_429.JPG&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">LineProperties</font> <font color="#2040a0">applied=</font><font color="#008000">&quot;true&quot;</font><font color="#2040a0">
+</font>              <font color="#2040a0">containerField=</font><font color="#008000">&quot;lineProperties&quot;</font> <font color="#2040a0">linewidthScaleFactor=</font><font color="#008000">&quot;5&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">IndexedLineSet</font> <font color="#2040a0">colorPerVertex=</font><font color="#008000">&quot;false&quot;</font> <font color="#2040a0">coordIndex=</font><font color="#008000">&quot;0 1 2 3 0 -1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Coordinate</font> <font color="#2040a0">USE=</font><font color="#008000">&quot;UnitSquare&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Color</font> <font color="#2040a0">color=</font><font color="#008000">&quot;0.9 0.7 0.6&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/IndexedLineSet</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Transform</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Group</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Scene</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/X3D</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Then Matt upped the ante to use a <b>Proto</b>.  Based on what he
+showed me here, it looks pretty good!
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font> <font color="#2040a0">encoding=</font><font color="#008000">&quot;UTF-8&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#444444">&lt;!--Warning:  transitional DOCTYPE in source .x3d file--&gt;</font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">!DOCTYPE</font> <font color="#2040a0">X3D</font> <font color="#2040a0">PUBLIC</font> <font color="#008000">&quot;http://www.web3d.org/specifications/x3d-3.1.dtd&quot;</font> <font color="#008000">&quot;file:///www.web3d.org/TaskGroups/x3d/translation/x3d-3.1.dtd&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">X3D</font> <font color="#2040a0">profile=</font><font color="#008000">&quot;Immersive&quot;</font> <font color="#2040a0">version=</font><font color="#008000">&quot;3.1&quot;</font><font color="#2040a0">
+</font>  <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</font> <font color="#2040a0">xsd:noNamespaceSchemaLocation=</font><font color="#008000">&quot;http://www.web3d.org/specifications/x3d-3.1.xsd&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Scene</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ProtoDeclare</font> <font color="#2040a0">name=</font><font color="#008000">&quot;TextureScreen&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ProtoInterface</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">accessType=</font><font color="#008000">&quot;inputOutput&quot;</font> <font color="#2040a0">name=</font><font color="#008000">&quot;scale&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;SFVec3f&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;1 1 1&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">accessType=</font><font color="#008000">&quot;inputOutput&quot;</font> <font color="#2040a0">name=</font><font color="#008000">&quot;rotation&quot;</font><font color="#2040a0">
+</font>          <font color="#2040a0">type=</font><font color="#008000">&quot;SFRotation&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;0 0 1 0&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">accessType=</font><font color="#008000">&quot;inputOutput&quot;</font> <font color="#2040a0">name=</font><font color="#008000">&quot;url&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;MFString&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">field</font> <font color="#2040a0">accessType=</font><font color="#008000">&quot;inputOutput&quot;</font> <font color="#2040a0">name=</font><font color="#008000">&quot;lineColor&quot;</font> <font color="#2040a0">type=</font><font color="#008000">&quot;MFColor&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;0.9 0.7 0.6&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ProtoInterface</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ProtoBody</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Transform</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">IS</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">connect</font> <font color="#2040a0">nodeField=</font><font color="#008000">&quot;scale&quot;</font> <font color="#2040a0">protoField=</font><font color="#008000">&quot;scale&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">connect</font> <font color="#2040a0">nodeField=</font><font color="#008000">&quot;rotation&quot;</font> <font color="#2040a0">protoField=</font><font color="#008000">&quot;rotation&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/IS</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">IndexedFaceSet</font> <font color="#2040a0">coordIndex=</font><font color="#008000">&quot;0 1 3 -1 2 3 1 -1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Coordinate</font> <font color="#2040a0">DEF=</font><font color="#008000">&quot;UnitSquare&quot;</font> <font color="#2040a0">point=</font><font color="#008000">&quot;-0.5 0 -0.5 -0.5 0 0.5 0.5 0 0.5 0.5 0 -0.5&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Normal</font> <font color="#2040a0">vector=</font><font color="#008000">&quot;0 1 0 0 1 0 0 1 0 0 1 0&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">TextureCoordinate</font> <font color="#2040a0">point=</font><font color="#008000">&quot;0 1 0 0 1 0 1 1&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/IndexedFaceSet</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ImageTexture</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">IS</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">connect</font> <font color="#2040a0">nodeField=</font><font color="#008000">&quot;url&quot;</font> <font color="#2040a0">protoField=</font><font color="#008000">&quot;url&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/IS</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ImageTexture</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">LineProperties</font> <font color="#2040a0">applied=</font><font color="#008000">&quot;true&quot;</font><font color="#2040a0">
+</font>                <font color="#2040a0">containerField=</font><font color="#008000">&quot;lineProperties&quot;</font> <font color="#2040a0">linewidthScaleFactor=</font><font color="#008000">&quot;5&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Appearance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">IndexedLineSet</font> <font color="#2040a0">colorPerVertex=</font><font color="#008000">&quot;false&quot;</font> <font color="#2040a0">coordIndex=</font><font color="#008000">&quot;0 1 2 3 0 -1&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Coordinate</font> <font color="#2040a0">USE=</font><font color="#008000">&quot;UnitSquare&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">Color</font> <font color="#2040a0">color=</font><font color="#008000">&quot;0.9 0.7 0.6&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">IS</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">connect</font> <font color="#2040a0">nodeField=</font><font color="#008000">&quot;color&quot;</font> <font color="#2040a0">protoField=</font><font color="#008000">&quot;lineColor&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+                <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/IS</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+              <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Color</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+            <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/IndexedLineSet</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+          <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Shape</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+        <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Transform</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ProtoBody</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ProtoDeclare</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ProtoInstance</font> <font color="#2040a0">containerField=</font><font color="#008000">&quot;children&quot;</font> <font color="#2040a0">name=</font><font color="#008000">&quot;TextureScreen&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;scale&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;149.35 1 19&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;rotation&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;0 0 1 -0.17453&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;url&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;FortConstitution_429.JPG&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;lineColor&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;1.0 0.3 0.3&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ProtoInstance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ProtoInstance</font> <font color="#2040a0">containerField=</font><font color="#008000">&quot;children&quot;</font> <font color="#2040a0">name=</font><font color="#008000">&quot;TextureScreen&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;scale&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;116.78 1 17&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;rotation&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;0 0 1 -0.8726646&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;url&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;FortConstitution_444.JPG&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ProtoInstance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ProtoInstance</font> <font color="#2040a0">containerField=</font><font color="#008000">&quot;children&quot;</font> <font color="#2040a0">name=</font><font color="#008000">&quot;TextureScreen&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;scale&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;107.45 1 18&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;rotation&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;0 0 1 -1.4835299&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">fieldValue</font> <font color="#2040a0">name=</font><font color="#008000">&quot;url&quot;</font> <font color="#2040a0">value=</font><font color="#008000">&quot;FortConstitution_446.JPG&quot;</font><font color="#2040a0">/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ProtoInstance</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/Scene</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/X3D</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+So, with a series of images like this:
+
+<img src="http://schwehr.org/blog/attachments/2007-11/X3D_FortConstitution.jpg"/>
+
+We are able to get all the images to show:
+
+<img src="http://schwehr.org/blog/attachments/2007-11/X3D_prototype_example.png"/>
+
+Once again, all this stuff was done by Matt P. Go Matt!
+-----

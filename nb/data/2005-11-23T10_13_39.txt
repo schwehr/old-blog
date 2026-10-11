@@ -1,0 +1,19 @@
+TITLE: Where iPods stash music
+AUTHOR: Kurt
+DATE: 11.23.2005 10:13
+DESC: lsof
+-----
+BODY:
+Here is a fun thing to try... I had a song that is on my iPod, but not
+on my laptop.  I am far away from my music collection, su I would like
+to get it back on my laptop.  Since iTunes will not let me drag
+<b>from</b> my iPod, I had to figure out where the actual file is
+stashed on the iPod.  Apple has tried to make it hard to see where the
+files are by not doing an artist/album hierarchy.  The trick is to
+play the song so that the mp3 file is open and use lsof (list of open
+files) to find out what file is open...
+<pre>
+&gt; lsof | egrep -i 'mp3|aac|m4a'
+iTunes    15748 schwehr   21r  VREG       14,6   62808865     3996 /Volumes/myiPodRev2/iPod_Control/Music/F18/somesong.mp3
+</pre>
+-----

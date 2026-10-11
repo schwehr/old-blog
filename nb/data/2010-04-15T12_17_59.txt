@@ -1,0 +1,77 @@
+TITLE: NAIS network delay and clock skew
+AUTHOR: Kurt
+DATE: 04.15.2010 12:17
+DESC: strange behavior
+-----
+BODY:
+I have been running an experiment for the last week.  On a UNH machine
+running NTP, I have been logging NAIS and with each line, I log the
+local timestamp.  This logging is done by my port-server python code
+listening to AISUser and calling time.time() when it receives a line
+over TCP.  I picked the day with the most data, which turned out to be
+April 11th.  
+
+First, take a look at the Scituate and Cape Ann receive stations.
+These two stations are running NTP.  I am plotting the local (UNH)
+timestamp for when packet gets logged minus the USCG receive station
+timestamp.  If timing were perfect, positive times would be the
+network delay for the message to travel from the receive station,
+though the USCG network, and back through the internet to UNH.  The
+width of the graph would be the jitter in the network path.  There is
+a first clue that this is not totally the case in this plot.  There
+are a few times that dip below zero by a quarter second.  Times below
+zero imply packets that were received in the future.  NTP should be
+good to at least 100ms (probably way better), so this is the hint that
+I am seeing something wrong.
+
+<img title="delay time for two stations with NTP" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/nais-delay-1-ntp.png"/>
+
+Next, let's take a look at 4 stations.  I've included a basestation
+from downtown Boston, the Scituate receiver for comparison,
+Portsmouth, NH, because that is the closest station to one of mine
+(&lt; 100m antenna to antenna), and Peurto Rico (which might have
+longer network delays).  Only Scituate is running NTP.  The rest are
+running W32Time.  Boston looks to be consitantly the worst where it is
+recording messages 10-20s in the future.  
+
+<img title="4 stations with only Scituate using NTP" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/nais-delay-2.png"/>
+
+These plots tell me that NTP is really helping keep make the
+situation.  A rough guess is that it is taking an averge of 1.3
+seconds for a message to go from the receiver back through the NAIS
+network and to UNH.  The basestation's average delta is -7.4 seconds.
+Combining the basestation info and the delay time from Scituate, I
+would guess that that I would expect an average error of 8.7 seconds
+with a standard deviation of 4.5 seconds.  When you consider that the
+time error is non-monotonic and that the full range of the error can
+be more than a minute and a half (I have seen up to 480 seconds), it
+makes time very difficult to deal with.  I still worry about time with
+the stations running NTP because of how the AISSource software uses
+ZDA's to calculate a clock offset once a minute - java and windows
+issues can inject noticable time problems.
+
+And for completeness, here is the code to make the plot with two sample
+log lines.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<i><font color="#9A1900"># 2010-Apr-15</font></i>
+<i><font color="#9A1900">'''</font></i>
+<i><font color="#9A1900">!AIVDM,1,1,,A,15N1BigP00JrmgJH?FduI?vT0H:e,0*6A,b003669713,1270944091,runhgall-znt,1270944079.61</font></i>
+<i><font color="#9A1900">!AIVDM,1,1,,B,15N1doPP00JrmvjH?GdIkwv`0@:u,0*34,b003669713,1270944091,runhgall-znt,1270944079.61</font></i>
+<i><font color="#9A1900">'''</font></i>
+<b><font color="#000080">from</font></b> aisutils<font color="#990000">.</font>uscg <b><font color="#000080">import</font></b> uscg_ais_nmea_regex
+<!-- -->
+ts_min <font color="#990000">=</font> None
+<b><font color="#0000FF">for</font></b> line_num<font color="#990000">,</font>line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font><b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'11'</font><font color="#990000">)):</font>
+    <b><font color="#0000FF">if</font></b> <font color="#FF0000">'AIVDM'</font> <b><font color="#0000FF">not</font></b> <b><font color="#0000FF">in</font></b> line<font color="#990000">:</font> <b><font color="#0000FF">continue</font></b>
+    ts_local <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">','</font><font color="#990000">)[-</font><font color="#993399">1</font><font color="#990000">])</font>
+    <b><font color="#0000FF">if</font></b> ts_min <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font>
+        ts_min <font color="#990000">=</font> ts_local
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+         match <font color="#990000">=</font> uscg_ais_nmea_regex<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>line<font color="#990000">).</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font>      
+    <b><font color="#0000FF">except</font></b> AttributeError<font color="#990000">:</font>
+         <b><font color="#0000FF">continue</font></b>
+    ts_uscg <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>match<font color="#990000">[</font><font color="#FF0000">'timeStamp'</font><font color="#990000">])</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'%.2f %.2f %s'</font> <font color="#990000">%</font> <font color="#990000">(</font>ts_local <font color="#990000">-</font> ts_min<font color="#990000">,</font> ts_local <font color="#990000">-</font> ts_uscg<font color="#990000">,</font> match<font color="#990000">[</font><font color="#FF0000">'station'</font><font color="#990000">])</font></tt></pre>
+-----

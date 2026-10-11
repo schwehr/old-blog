@@ -1,0 +1,21 @@
+TITLE: Resurrecting endnote databases
+AUTHOR: Kurt
+DATE: 07.06.2005 13:58
+DESC: Mac file attribute hacking
+-----
+BODY:
+When you have an EndNote file that has only been cp'ed rather than Mac
+OSX dragged, it looses its resource fork info.  EndNote will refuse to
+open this file.  I get something like this:
+<pre>
+open references.end
+
+2005-07-06 13:55:22.831 open[1271] LSOpenFromURLSpec() returned -10814
+   for application (null) path references.end.
+2005-07-06 13:55:22.831 open[1271] Couldn't open file: references.end
+</pre>
+There is an easy solution:
+<pre>
+  /Developer/Tools/SetFile -c ENDN -t ENDB references.end
+</pre>
+-----

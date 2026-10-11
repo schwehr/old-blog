@@ -1,0 +1,123 @@
+TITLE: Yet more on time with Windows and Java
+AUTHOR: Kurt
+DATE: 04.08.2010 10:58
+DESC: the badness of it all
+-----
+BODY:
+BRC, AndyM, Jordan, and I have been bouncing some emails back and
+forth about timing, and I have a few final notes before I continue on
+with my AIS analysis.  First some notes about W32time.  If I had more
+energy on this topic, I would turn on logging for a Windows machine
+running W32time and see how it was actually slewing the clock.
+Experiences by others in the past have indicated that, "because it's
+running SNTP rather than full XNTP (now called just NTP now that NTP is at version 4.x, right?), the corrections can also be far
+apart and radical".  There is a MSDN blog post on <a
+href="http://blogs.msdn.com/w32time/archive/2008/02/28/configuring-the-time-service-enabling-the-debug-log.aspx">Configuring
+the Time Service: Enabling the Debug Log</a>.  I could then look at
+frequency and size of the time changes.  There is also a blog post on
+technet, <a
+href="http://blogs.technet.com/askds/archive/2007/10/23/high-accuracy-w32time-requirements.aspx">High
+Accuracy W32time Requirements</a>, that explains why W32time does not
+support high accuracy timing.  In that article, I find the source of
+the 5 minute jumps:
+<pre>With the introduction to W32Time, the W32Time.dll was developed for
+Windows 2000 and up to support a specification by the Kerberos V5
+authentication protocol that require clocks on a network to be
+"synchronized".  I'll save you from the very long (but interesting)
+read on RFC 1510 Kerberos documentation and pull out what is relevant.
+<!-- -->
+     RFC 1510: "If the local (server) time and the client time in the
+     authenticator differ by more than the allowable clock skew (e.g.,
+     5 minutes), the KRB_AP_ERR_SKEW error is returned."</pre>
+With that, I want to at least document how to start looking at the settings
+on Windows.  I don't use Windows very often, so I always have to ask others
+how to do this.  Thanks to Jordan for the instructions.
+<pre><b>Run -&gt; cmd -&gt; &lt;enter&gt;</b>
+<b>reg query HKLM\SYSTEM\CurrentControlSet\Services\W32Time\Parameters /s</b>
+<!-- -->
+! REG.EXE VERSION 3.0
+<!-- -->
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Parameters
+    ServiceMain REG_SZ  SvchostEntry_W32Time
+    ServiceDll  REG_EXPAND_SZ   C:\WINDOWS\system32\w32time.dll
+    NtpServer   REG_SZ  time.windows.com,0x1
+    Type        REG_SZ  NTP
+<!-- -->
+<b>reg query HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Config</b>
+<!-- -->
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Config
+    LastClockRate       REG_DWORD       0x2625a
+    MinClockRate        REG_DWORD       0x260d4
+    MaxClockRate        REG_DWORD       0x263e0
+    FrequencyCorrectRate        REG_DWORD       0x4
+    PollAdjustFactor    REG_DWORD       0x5
+    LargePhaseOffset    REG_DWORD       0x138800
+    SpikeWatchPeriod    REG_DWORD       0x5a
+    HoldPeriod  REG_DWORD       0x5
+    MaxPollInterval     REG_DWORD       0xf
+    LocalClockDispersion        REG_DWORD       0xa
+    EventLogFlags       REG_DWORD       0x2
+    PhaseCorrectRate    REG_DWORD       0x1
+    MinPollInterval     REG_DWORD       0xa
+    UpdateInterval      REG_DWORD       0x57e40
+    MaxNegPhaseCorrection       REG_DWORD       0xd2f0
+    MaxPosPhaseCorrection       REG_DWORD       0xd2f0
+    AnnounceFlags       REG_DWORD       0xa
+    MaxAllowedPhaseOffset       REG_DWORD       0x1</pre>
+I don't know the units on these and it is extra fun that they are in hex.
+The parameters can be interpreted by reading way down this MS technet article:
+<a
+href="http://technet.microsoft.com/en-us/library/cc773263%28WS.10%29.aspx">Windows
+Time Service Tools and Settings</a>.  Just make sure to scroll down a
+ways. (Thanks again Jordan!)
+
+You can also explore these parameters using regedit:
+<pre><b>Run -&gt; regedit -&gt; &lt;enter&gt;</b></pre>
+
+<img title="Using reg edit to export W32Time settings" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/winxp-regedit-ntpclient.png"/>
+
+The question after that is, how well does Windows XP running <a
+href="http://www.meinberg.de/english/sw/index.htm">Meinberg's NTP
+software</a> (<a
+href="http://schwehr.org/blog/archives/2009-03.html#e2009-03-30T12_06_11.txt">me
+installing it</a>) do in setting the clock?
+
+Time keeping and updating on a computer can be altered by the quality
+of the power and power supply unit, operating temperature of the
+oscillator (is it near RAM, graphics chips, or CPU?), system load (can
+it service all the interups quickly?), load of the network delivering
+the time signal (in the case of NTP), and a number of other
+parameters.
+
+Next comes a discussion of how well the system can tag time.  There
+will be delays in serial transmission, the system <a
+href="http://en.wikipedia.org/wiki/Universal_asynchronous_receiver/transmitter">UART</a>,
+task swapping of the process doing the logging, and how well the
+logging software performs.  Up to the actual logging software, we are
+likely looking at up to 100ms (guestimate) of delay.  A nice feature
+of the ShineMicro receivers is that they can have a feature where they
+timestamp the message on the receiver.  I don't have one myself, so I
+can't comment on the details, but I have seen the USCG NMEA metadata
+for them.
+
+The comes the Java runtime issues (similar issues are likely to occur
+with python).  Java is an automatic garbage collecting language (GC),
+unlike C, where the author of the code has to explicitly allocate and
+deallocate memory.  This means that the Java virtual machine can just
+up and decide to up and collect garbage.  This issue has plagued many
+systems and NASA spent well over $10M having a realtime LISP system
+built for the <a href="http://en.wikipedia.org/wiki/Deep_Space_1">Deep
+Space 1 probe (DS1)</a> Remote Agent software.  There is a paper worth
+reading that Jordan pointed me to for Java: <a
+href="http://javolution.org/doc/Man33955.pdf">Validating Java for
+Safety-Critical Applications</a> by Jean-Marie Dautelle.  To quote one of the footnotes:
+<pre>Major GCs occur regularly producing up to 90 ms delays in execution time.</pre>
+The paper shows that timing can be all over the place and that it
+really needs to be experimentally determined.  It matters which JVM is
+being used, the system priority for the process, the details of how
+the program creates/deletes objects, if <a
+href="http://en.wikipedia.org/wiki/Just-in-time_compilation">Just-in-Time
+compilation (JIT)</a> is being used, and if it is <a
+href="http://en.wikipedia.org/wiki/Real_time_Java">Real-Time Java</a>
+-----

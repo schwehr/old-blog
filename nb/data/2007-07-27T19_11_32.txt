@@ -1,0 +1,34 @@
+TITLE: fink binary deb mirror goodness
+AUTHOR: Kurt
+DATE: 07.27.2007 19:11
+DESC: woot!
+-----
+BODY:
+I finally got around to trying out having my own local deb server for
+fink compiles and this is really awesome!  I did an install of coin3d
+and it took about 30 seconds rather than the hours that the original
+build took.  I've done a powerpc box and now I need to do another to
+serve up to the many intel boxes around here.  To bad this is
+restricted to within the local firewalls.
+
+I used RangerRick's instructions here:
+<a href="http://www.racoonfink.com/archives/000258.html">Sharing the Fink</a>
+
+On the server box, I added this set of lines to /etc/httpd/httpd.conf
+and then turned on personal web sharing:
+<pre>
+Alias /fink /sw/fink
+&lt;Directory /sw/fink&gt;
+  Options Indexes FollowSymLinks
+&lt;/Directory&gt;
+</pre>
+Then on the client, I added these three lines to /sw/etc/apt/sources.list:
+<pre>
+deb http://my.ppc.server.com/fink stable main crypto
+deb http://my.ppc.server.com/fink unstable main crypto
+#deb http://my.ppc.server.com/fink local main
+</pre>
+I figured it would be good to leave out the local stuff.
+
+Finally, run "fink scanpackages" on the client.
+-----

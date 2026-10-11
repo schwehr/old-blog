@@ -1,0 +1,22 @@
+TITLE: generating HTML from python
+AUTHOR: Kurt
+DATE: 07.04.2009 10:52
+DESC: pretty easy
+-----
+BODY:
+For a long time now, I've been generating HTML by hand in python.  I
+just write out the tags as text and it's up to me to close all the
+tags and such.  I finally reached the point where I am tired of doing
+this.  I just tried the <a href="http://codespeak.net/lxml/lxmlhtml.html#creating-html-with-the-e-factory">E-factory style</a> from lxml and it works well.
+<pre>% fink install lxml-py26 ipython-py26
+% ipython
+&gt;&gt;&gt; from lxml.html import builder as E
+&gt;&gt;&gt; import lxml.html
+&gt;&gt;&gt; table = E.TABLE(E.TR(E.TD('hello'),E.TD('there')))
+&gt;&gt;&gt; lxml.html.tostring(table)
+'&lt;table&gt;&lt;tr&gt;&lt;td&gt;hello&lt;/td&gt;&lt;td&gt;there&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;'
+&gt;&gt;&gt; table[0].append(E.TD('another column'))
+&gt;&gt;&gt; lxml.html.tostring(table)
+'&lt;table&gt;&lt;tr&gt;&lt;td&gt;hello&lt;/td&gt;&lt;td&gt;there&lt;/td&gt;&lt;td&gt;another column&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;'
+</pre>
+-----

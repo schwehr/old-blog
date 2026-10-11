@@ -1,0 +1,36 @@
+TITLE: Time zones with PostgreSQL
+AUTHOR: Kurt
+DATE: 05.07.2009 15:17
+DESC: quick tutorial
+-----
+BODY:
+I haven't messed with anything other than straight UTC data in
+PostgreSQL before now.  Here are some quick notes on using time zones.
+First, CURRENT_TIMESTAMP gives the time right now and defaults to the local
+time zone.
+<pre><b>SELECT CURRENT_TIMESTAMP;</b>
+              now              
+==============================
+ 2009-05-07 15:03:50.233617-04
+<!-- -->
+<b>SELECT CURRENT_TIMESTAMP(2) AT TIME ZONE 'UTC';</b>
+        timezone        
+========================
+ 2009-05-07 19:04:30.23</pre>
+Up until now, I have just been creating TIMESTAMP fields.  Here is
+how to create a table with a timezone.
+<pre>% <b>CREATE TABLE foo (val INTEGER, ts TIMESTAMP WITH TIME ZONE DEFAULT now());</b></pre>
+Now, add a line with everything set to the default values:
+<pre>% <b>INSERT INTO foo DEFAULT VALUES;</b></pre>
+Now query the table in the default time zone and then ask for UTC.
+<pre>% <b>SELECT * FROM foo;</b>
+ val |              ts               
+=====+===============================
+     | 2009-05-07 15:06:46.585944-04
+<!== ==>
+<b>SELECT ts  AT TIME ZONE 'UTC' FROM foo;</b>
+          timezone          
+============================
+ 2009-05-07 19:06:46.585944</pre>
+See this page for more: <a href="http://www.postgresql.org/docs/8.3/interactive/functions-datetime.html">Date/Time Functions and Operators</a>
+-----

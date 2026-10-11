@@ -1,0 +1,104 @@
+TITLE: Python Sqlite3 Row factory
+AUTHOR: Kurt
+DATE: 04.04.2009 08:07
+DESC: faster better cheaper
+-----
+BODY:
+Python's sqlite3 module can <a
+href="http://docs.python.org/library/sqlite3.html#accessing-columns-by-name-instead-of-by-index">access
+rows by name rather than index</a>... no fancy ORM needed.  It does
+require using Python 2.6.  Python 2.5 intruduced the sqlite3 interface
+module, but it does not have the field/column by name feature.  Here
+is getting started.  The key is to enable the "Row Factory"
+<pre><tt><i><font color="#9A1900">ipython</font></i>
+<b><font color="#000080">import</font></b> sqlite3
+<b><font color="#000080">import</font></b> numpy as np <i><font color="#9A1900"># For arrays</font></i>
+<!-- -->
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'transits.db3'</font><font color="#990000">)</font>
+cx<font color="#990000">.</font>row_factory <font color="#990000">=</font> sqlite3<font color="#990000">.</font>Row  <i><font color="#9A1900"># Enable the row factory</font></i></tt></pre>
+sqlite3 also has a feature that we don't need to create a database cursor.  Grab one row from the database:
+<pre><tt>row <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT * FROM raw_transits LIMIT 1;'</font><font color="#990000">).</font><b><font color="#000000">fetchone</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> row <i><font color="#9A1900"># Get the row the normal way</font></i>
+<!-- -->
+<b><font color="#0000FF">print</font></b> row<font color="#990000">.</font><b><font color="#000000">keys</font></b><font color="#990000">()</font> <i><font color="#9A1900"># Get the column/field names</font></i>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'Direct access'</font><font color="#990000">,</font>row<font color="#990000">[</font><font color="#FF0000">'key'</font><font color="#990000">],</font>row<font color="#990000">[</font><font color="#FF0000">'UserID'</font><font color="#990000">]</font></tt></pre>
+This prints out:
+<pre>(1, 205493000, 72, 1226580085, 1226597127, 0.5, 0.20000000000000001, 300.0, 600.0, 0)
+['key', 'UserID', 'shipandcargo', 'start_time', 'end_time', 'active_sog', 'static_sog', 'static_time', 'max_timeg
+ap', 'dubious']
+Direct access 1 205493000</pre>
+Since we have the column/field names, we can loop over all the fields or use the new python string templating "format" function.  It helps that a row can now be turned into a dict, but by asking it to become a dict.
+<pre><tt><b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> row<font color="#990000">.</font><b><font color="#000000">keys</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">print</font></b> key<font color="#990000">,</font> row<font color="#990000">[</font>key<font color="#990000">]</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <b><font color="#000000">dict</font></b><font color="#990000">(</font>row<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b><font color="#FF0000"> '''A row...</font>
+<font color="#FF0000">key:            {0[key]} </font>
+<font color="#FF0000">MMSI:           {0[UserID]}</font>
+<font color="#FF0000">Ship and Cargo: {0[shipandcargo]}</font>
+<font color="#FF0000">'''</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font><b><font color="#000000">dict</font></b><font color="#990000">(</font>row<font color="#990000">))</font></tt></pre>
+The results...
+<pre>UserID 205493000
+shipandcargo 72
+start_time 1226580085
+end_time 1226597127
+active_sog 0.5
+static_sog 0.2
+static_time 300.0
+max_timegap 600.0
+dubious 0
+<!-- -->
+{'shipandcargo': 72, 'static_sog': 0.20000000000000001, 'start_time': 1226580085, 'UserID': 205493000, 'static_ti
+me': 300.0, 'dubious': 0, 'end_time': 1226597127, 'key': 1, 'max_timegap': 600.0, 'active_sog': 0.5}
+<!-- -->
+A row...
+key:            1 
+MMSI:           205493000
+Ship and Cargo: 72</pre>
+We can now also do a <i>list comprehension</i> to convert a fetched list of a column.  The numpy array allows for more effient storage of a list where every element is the same.
+<pre><tt>mmsi <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">array</font></b><font color="#990000">([</font>row<font color="#990000">[</font><font color="#FF0000">'UserID'</font><font color="#990000">]</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT UserID from raw_transits;'</font><font color="#990000">)])</font>
+<i><font color="#9A1900"># Avoid as many replacements by using AS</font></i>
+active_sog <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">array</font></b><font color="#990000">([</font>row<font color="#990000">[</font><font color="#FF0000">'data'</font><font color="#990000">]</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT active_sog AS data from raw_transits;'</font><font color="#990000">)])</font> 
+<!-- -->
+<i><font color="#9A1900">#</font></i>
+<i><font color="#9A1900"># Pull in the whole database into memory</font></i>
+<i><font color="#9A1900">#</font></i>
+keys <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT * FROM raw_transits LIMIT 1;'</font><font color="#990000">).</font><b><font color="#000000">fetchone</font></b><font color="#990000">().</font><b><font color="#000000">keys</font></b><font color="#990000">()</font>
+<!-- -->
+data <font color="#990000">=</font> <font color="#990000">{}</font>
+<b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> keys<font color="#990000">:</font>
+    data<font color="#990000">[</font>key<font color="#990000">]</font> <font color="#990000">=</font> np<font color="#990000">.</font><b><font color="#000000">array</font></b><font color="#990000">([</font>row<font color="#990000">[</font><font color="#FF0000">'data'</font><font color="#990000">]</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT %s AS data from raw_transits;'</font> <font color="#990000">%</font> <font color="#990000">(</font>key<font color="#990000">,))])</font> 
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'MMSI Array:'</font><font color="#990000">,</font><b><font color="#000000">len</font></b><font color="#990000">(</font>mmsi<font color="#990000">),</font><b><font color="#000000">type</font></b><font color="#990000">(</font>mmsi<font color="#990000">)</font>
+</tt></pre>
+This results in mmsi being an array:
+<pre>MMSI Array: 15785 &lt;type 'numpy.ndarray'&gt;</pre>
+Now that we have a dictionary call <i>data</i> we can start plotting up the data.  If you want to do this interactively, pylab will help (<i>ipython -pylab</i>):
+<pre>import pylab
+<!-- -->
+pylab.plot(data['shipandcargo'])
+pylab.savefig('shipandcargo.gif')
+pylab.show()</pre>
+However, if you want to plot straight to a file and prevent a GUI from popping up, do this:
+<pre><tt><b><font color="#000080">import</font></b> matplotlib
+matplotlib<font color="#990000">.</font><b><font color="#000000">use</font></b><font color="#990000">(</font><font color="#FF0000">'Agg'</font><font color="#990000">)</font>
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>pyplot as plt
+<!-- -->
+fig <font color="#990000">=</font> plt<font color="#990000">.</font><b><font color="#000000">figure</font></b><font color="#990000">()</font>
+ax <font color="#990000">=</font> fig<font color="#990000">.</font><b><font color="#000000">add_subplot</font></b><font color="#990000">(</font><font color="#993399">111</font><font color="#990000">)</font>
+ax<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">(</font>data<font color="#990000">[</font><font color="#FF0000">'shipandcargo'</font><font color="#990000">])</font>
+ax<font color="#990000">.</font><b><font color="#000000">set_title</font></b><font color="#990000">(</font><font color="#FF0000">'Ship and Cargo'</font><font color="#990000">)</font>
+fig<font color="#990000">.</font><b><font color="#000000">savefig</font></b><font color="#990000">(</font><font color="#FF0000">'shipandcargo.png'</font><font color="#990000">)</font></tt></pre>
+<img title="Plotting just one variable/column" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/shipandcargo.png"/>
+<pre><tt>fig2 <font color="#990000">=</font> plt<font color="#990000">.</font><b><font color="#000000">figure</font></b><font color="#990000">()</font>
+ax <font color="#990000">=</font> fig2<font color="#990000">.</font><b><font color="#000000">add_subplot</font></b><font color="#990000">(</font><font color="#993399">111</font><font color="#990000">)</font>
+ax<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">(</font>data<font color="#990000">[</font><font color="#FF0000">'UserID'</font><font color="#990000">],</font>data<font color="#990000">[</font><font color="#FF0000">'shipandcargo'</font><font color="#990000">],</font> <font color="#FF0000">'o'</font><font color="#990000">)</font>
+ax<font color="#990000">.</font><b><font color="#000000">set_xlabel</font></b><font color="#990000">(</font><font color="#FF0000">'Vessel MMSI'</font><font color="#990000">)</font>
+ax<font color="#990000">.</font><b><font color="#000000">set_ylabel</font></b><font color="#990000">(</font><font color="#FF0000">'Ship and Cargo number'</font><font color="#990000">)</font>
+ax<font color="#990000">.</font><b><font color="#000000">set_title</font></b><font color="#990000">(</font><font color="#FF0000">'Ship and Cargo'</font><font color="#990000">)</font>
+fig2<font color="#990000">.</font><b><font color="#000000">savefig</font></b><font color="#990000">(</font><font color="#FF0000">'ship-shipandcargo.png'</font><font color="#990000">)</font></tt></pre>
+<img title="Plotting two different columns against each other, but with dots" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/ship-shipandcargo.png"/>
+-----

@@ -1,0 +1,38 @@
+TITLE: sioseis filter
+AUTHOR: Kurt
+DATE: 07.01.2005 09:24
+DESC: band pass filter
+-----
+BODY:
+
+Yesterday, I tried to do some seismic processing while writing up a
+blog entry.  When I did a display line.tif and an doing a ghostscript
+conversion at the same time.  That totally locked up laptop.  I got a
+blue screen and a rainbow pinwheel of doom.  Music kept playing and
+the mouse worked, but after 20 minutes, it was still very hung.  Lost
+the blog entry too :(
+
+Yesterday, I talked to Jeff Dingler about what made the difference
+between the seismic images he makes verses what Dan Brothers made.
+Turns out the difference is primarily with the band pass filter.  To
+get rid of the banding, just turn up the frequency of the bottom limit
+of the band pass filter.
+
+I was using this filter before:
+<pre>
+  filter
+    fno $FNO lno $LNO ftype 99  pass 150 6500 end
+  end
+</pre>
+Moving from 150 Hz to 600 Hz made a big difference:
+<pre>
+  filter
+    fno $FNO lno $LNO ftype 99  pass 600 6500 end
+  end
+</pre>
+The problem with this narrower band pass is that a lot of detail is
+getting washed out.
+
+Another good note.  The gif image format does an excellent job of
+encoding these images at a small file size.
+-----

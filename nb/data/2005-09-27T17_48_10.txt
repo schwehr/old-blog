@@ -1,0 +1,53 @@
+TITLE: sql query builder
+AUTHOR: Kurt
+DATE: 09.27.2005 17:48
+DESC: need help
+-----
+BODY:
+I really need a simple SQL statement builder.  I am ending up with
+some seriously ugly code deciding when to put AND's and WHERE's in a
+query!  It would be nice to say something like this:
+<pre>
+q = sqlselect()
+q.fields(['name','address','occupation'])
+q.where('age>200')
+q.where('weight<50')
+q.limit(10)
+q.from('strangePeople')
+q.close()
+print q
+
+SELECT name,address,occupation FROM strangePeople \
+  WHERE age>200 AND weight<50 LIMIT 10;
+</pre>
+instead of this mess...
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">buildFledermausLines</font><font color="4444FF">(</font><font color="#2040a0">cx</font>, <font color="#2040a0">options</font><font color="4444FF">)</font><font color="4444FF">:</font>
+
+    <font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">searchStr</font>  <font color="4444FF">=</font> <font color="#008000">&quot;SELECT fileKey,x,y FROM segyTrace &quot;</font>
+
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">minFileKey</font><font color="4444FF">)</font> <strong>or</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">maxFileKey</font><font color="4444FF">)</font> \
+           <strong>or</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">traceRangeMin</font><font color="4444FF">)</font> <strong>or</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">traceRangeMax</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' WHERE'</font>
+
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">minFileKey</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' fileKey&gt;='</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">options</font>.<font color="#2040a0">minFileKey</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">minFileKey</font><font color="4444FF">)</font> <strong>and</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">maxFileKey</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' and'</font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">maxFileKey</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' fileKey&lt;='</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">options</font>.<font color="#2040a0">maxFileKey</font><font color="4444FF">)</font>
+
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">maxFileKey</font><font color="4444FF">)</font> <strong>and</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">minFileKey</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' AND '</font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">traceRangeMin</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">options</font>.<font color="#2040a0">traceKey</font><font color="4444FF">+</font><font color="#008000">'&lt;='</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">options</font>.<font color="#2040a0">traceRangeMin</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">maxFileKey</font><font color="4444FF">)</font> <strong>and</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">minFileKey</font><font color="4444FF">)</font> \
+           <strong>and</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">traceRangeMin</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' AND '</font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">options</font>.<font color="#2040a0">traceRangeMax</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' AND '</font><font color="4444FF">+</font><font color="#2040a0">options</font>.<font color="#2040a0">traceKey</font><font color="4444FF">+</font><font color="#008000">'&lt;='</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">options</font>.<font color="#2040a0">traceRangeMax</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">searchStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">';'</font>
+</pre>
+How to handle AND vrs OR?  I know that C# can do all this and it is
+just like typing the sql query right into the code (except backwards).
+But I'm doing python.
+-----

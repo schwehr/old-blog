@@ -1,0 +1,26 @@
+TITLE: Roi has fink troubles
+AUTHOR: Kurt
+DATE: 02.14.2005 19:42
+DESC: OSX compiler troubles
+-----
+BODY:
+I took a l look Roi's fink installation today.  Fink seems to be fine
+but what happened to his developer tools?  First I tried
+helloworld.c.  No crt2.o.  What?  So I copied that from my machine to
+his.  helloworld works fine.  Then I tried building something in fink
+and ncurses still will not build.  I also got rid of the UseBinaryDist
+flag in his /sw/etc/fink.  Yikes.  That is not a good thing to have.
+Here is where I am now with fink failing build anything.  autoconf
+dies with the c pre processor...
+<pre>
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking version of gcc... 3.3
+checking how to run the C preprocessor... /lib/cpp
+configure: error: C preprocessor "/lib/cpp" fails sanity check
+### execution of /var/tmp/tmp.2.UHpHJC failed, exit code 1
+Failed: compiling ncurses-5.4-20041023-4 failed
+</pre>
+I tried to reinstall the developer tools but they say there is a newer
+version on the machine and refuse to install.  Doh.
+-----

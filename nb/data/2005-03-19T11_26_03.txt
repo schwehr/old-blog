@@ -1,0 +1,54 @@
+TITLE: cwp-su 38 now in fink
+AUTHOR: Kurt
+DATE: 03.19.2005 11:26
+DESC: hope this works
+-----
+BODY:
+Version 38 of cwp-su is now in fink unstable.  This is still not
+perfect.  Here are some of my notes about the rough edges:
+
+I am not able to build the Mesa GL GLUT based packages do to a
+clashing symbol, but hopefully I have fixed the problem for those that
+had undefined ICE symbols in xgraph.
+
+psimage, pscontour are still _psimage, _pscontour in /sw/bin to avoid
+clashing with GMT.  You will find them without the leading _ in
+${CWPROOT}
+
+The include files and static libs are not installed, so if I you write
+software against seismic unix, you are still out of luck.
+<pre>
+  cc -I/Users/schwehr/Desktop/su/src/../include
+  -I/Users/schwehr/Desktop/su/src/../include/MGL -I/usr/X11R6/include
+  -I/usr/X11R6/include -O3 -Wall -ansi -pedantic -D_POSIX_SOURCE
+  -DCWP_BIG_ENDIAN trip.c -L/Users/schwehr/Desktop/su/src/../lib
+  -L/usr/X11R6/lib -L/usr/X11R6/lib -lglut -lXmu -lXt -lSM -lICE
+  -lXext -lXi -lX11 -lm -lGL -lGLU -lglut -ltrack -lpar -lcwp -lm -o
+  /Users/schwehr/Desktop/su/src/../bin/trip -I/sw/include -L/sw/lib
+  ld: multiple definitions of symbol _err /usr/lib/libm.dylib(err.So)
+  definition of _err
+  /Users/schwehr/Desktop/su/src/../lib/libpar.a(errpkge.o) definition
+  of _err in section (__TEXT,__text) ld: multiple definitions of
+  symbol _warn /usr/lib/libm.dylib(err.So) definition of _warn
+  /Users/schwehr/Desktop/su/src/../lib/libpar.a(errpkge.o) definition
+  of _warn in section (__TEXT,__text)
+</pre>
+and if I remove the -lm, it will conflict with libSystem (which also
+provides the equiv to libm)
+<pre>
+  cc -I/Users/schwehr/Desktop/su/src/../include
+  -I/Users/schwehr/Desktop/su/src/../include/MGL -I/usr/X11R6/include
+  -O3 -Wall -ansi -pedantic -D_POSIX_SOURCE -DCWP_BIG_ENDIAN trip.c
+  -L/Users/schwehr/Desktop/su/src/../lib -L/usr/X11R6/lib
+  -L/usr/X11R6/lib -lglut -lXmu -lXt -lSM -lICE -lXext -lXi -lX11 -lGL
+  -lGLU -lglut -ltrack -lpar -lcwp -o
+  /Users/schwehr/Desktop/su/src/../bin/trip -I/sw/include -L/sw/lib
+  ld: warning multiple definitions of symbol _err
+  /Users/schwehr/Desktop/su/src/../lib/libpar.a(errpkge.o) definition
+  of _err in section (__TEXT,__text) /usr/lib/libSystem.dylib(err.So)
+  definition of _err ld: warning multiple definitions of symbol _warn
+  /Users/schwehr/Desktop/su/src/../lib/libpar.a(errpkge.o) definition
+  of _warn in section (__TEXT,__text) /usr/lib/libSystem.dylib(err.So)
+  definition of _warn
+</pre>
+-----

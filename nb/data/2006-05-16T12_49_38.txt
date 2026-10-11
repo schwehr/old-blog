@@ -1,0 +1,128 @@
+TITLE: cppunit
+AUTHOR: Kurt
+DATE: 05.16.2006 12:49
+DESC: complicated
+-----
+BODY:
+CppUnit looks like an interesting test framework, but unfortunately,
+the cookbook example is very hard to follow.  Thankfully, I found the
+<a
+href="http://c2.com/cgi/wiki?DirtSimpleCppUnitExample">DirtSimpleCppUnitExample</a>
+which does seem to work.  This is yet another example of why I prefer
+to program in python.  I can basically see what is going on, but it is
+way more complicated that why I have to do in python.
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;memory&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cppunit/extensions/TestFactoryRegistry.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cppunit/ui/text/TestRunner.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cppunit/CompilerOutputter.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cppunit/TestCase.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cppunit/extensions/HelperMacros.h&gt;</font></strong></font>
+
+<strong>class</strong> <font color="#2040a0">ExampleTestCase</font> <font color="4444FF">:</font> <strong>public</strong> <font color="#2040a0">CppUnit</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">TestCase</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">CPPUNIT_TEST_SUITE</font><font color="4444FF">(</font> <font color="#2040a0">ExampleTestCase</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_TEST</font><font color="4444FF">(</font> <font color="#2040a0">example</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_TEST</font><font color="4444FF">(</font> <font color="#2040a0">anotherExample</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_TEST</font><font color="4444FF">(</font> <font color="#2040a0">testEquals</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_TEST_SUITE_END</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>double</strong>	<font color="#2040a0">m_value1</font><font color="4444FF">;</font>
+  <strong>double</strong>	<font color="#2040a0">m_value2</font><font color="4444FF">;</font>
+  <strong>void</strong>	<font color="#2040a0">example</font> <font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>void</strong>	<font color="#2040a0">anotherExample</font> <font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>void</strong>	<font color="#2040a0">testEquals</font> <font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<strong>public</strong><font color="4444FF">:</font>
+  <strong>void</strong>	<font color="#2040a0">setUp</font> <font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+
+<font color="#2040a0">CPPUNIT_TEST_SUITE_NAMED_REGISTRATION</font><font color="4444FF">(</font> <font color="#2040a0">ExampleTestCase</font>, <font color="#008000">&quot;ExampleTestCase&quot;</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+
+<strong>void</strong> <font color="#2040a0">ExampleTestCase</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">setUp</font> <font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">m_value1</font> <font color="4444FF">=</font> <font color="#FF0000">2.0</font><font color="4444FF">;</font>
+  <font color="#2040a0">m_value2</font> <font color="4444FF">=</font> <font color="#FF0000">3.0</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+
+<strong>void</strong> <font color="#2040a0">ExampleTestCase</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">example</font> <font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">CPPUNIT_ASSERT</font> <font color="4444FF">(</font><font color="#FF0000">1</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+
+<strong>void</strong> <font color="#2040a0">ExampleTestCase</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">anotherExample</font> <font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">CPPUNIT_ASSERT</font> <font color="4444FF">(</font><font color="#FF0000">2</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">2</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+
+<strong>void</strong> <font color="#2040a0">ExampleTestCase</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">testEquals</font> <font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">auto_ptr</font><font color="4444FF">&lt;</font><strong>long</strong><font color="4444FF">&gt;</font>	<font color="#2040a0">l1</font> <font color="4444FF">(</font><strong>new</strong> <strong>long</strong> <font color="4444FF">(</font><font color="#FF0000">12</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">auto_ptr</font><font color="4444FF">&lt;</font><strong>long</strong><font color="4444FF">&gt;</font>	<font color="#2040a0">l2</font> <font color="4444FF">(</font><strong>new</strong> <strong>long</strong> <font color="4444FF">(</font><font color="#FF0000">12</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <font color="#2040a0">CPPUNIT_ASSERT_DOUBLES_EQUAL</font> <font color="4444FF">(</font><font color="#2040a0">m_value1</font>, <font color="#FF0000">2.0</font>, <font color="#FF0000">0.01</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_ASSERT_DOUBLES_EQUAL</font> <font color="4444FF">(</font><font color="#2040a0">m_value2</font>, <font color="#FF0000">3.0</font>, <font color="#FF0000">0.01</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_ASSERT_EQUAL</font> <font color="4444FF">(</font><font color="#FF0000">12</font>, <font color="#FF0000">12</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_ASSERT_EQUAL</font> <font color="4444FF">(</font><font color="#FF0000">12L</font>, <font color="#FF0000">12L</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_ASSERT_EQUAL</font> <font color="4444FF">(</font><font color="4444FF">*</font><font color="#2040a0">l1</font>, <font color="4444FF">*</font><font color="#2040a0">l2</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <font color="#2040a0">CPPUNIT_ASSERT</font><font color="4444FF">(</font><font color="#FF0000">12L</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">12L</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">CPPUNIT_ASSERT_DOUBLES_EQUAL</font> <font color="4444FF">(</font><font color="#FF0000">12.0</font>, <font color="#FF0000">11.99</font>, <font color="#FF0000">0.5</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+
+<font color="#2040a0">CppUnit</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">Test</font> <font color="4444FF">*</font><font color="#2040a0">suite</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">CppUnit</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">TestFactoryRegistry</font> <font color="4444FF">&amp;</font><font color="#2040a0">registry</font> <font color="4444FF">=</font>
+    <font color="#2040a0">CppUnit</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">TestFactoryRegistry</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">getRegistry</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <font color="#2040a0">registry</font>.<font color="#2040a0">registerFactory</font><font color="4444FF">(</font> <font color="4444FF">&amp;</font><font color="#2040a0">CppUnit</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">TestFactoryRegistry</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">getRegistry</font><font color="4444FF">(</font> <font color="#008000">&quot;ExampleTestCase&quot;</font> <font color="4444FF">)</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>return</strong> <font color="#2040a0">registry</font>.<font color="#2040a0">makeTest</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+
+
+<strong>int</strong> <font color="#2040a0">main</font><font color="4444FF">(</font> <strong>int</strong> <font color="#2040a0">argc</font>, <strong>char</strong><font color="4444FF">*</font> <font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font> <font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#444444">// if command line contains &quot;-selftest&quot; then this is the post build check</font>
+  <font color="#444444">// =&gt; the output must be in the compiler error format.</font>
+  <strong>bool</strong> <font color="#2040a0">selfTest</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">argc</font> <font color="4444FF">&gt;</font> <font color="#FF0000">1</font><font color="4444FF">)</font>  <font color="4444FF">&amp;</font><font color="4444FF">&amp;</font>
+    <font color="4444FF">(</font><font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">string</font><font color="4444FF">(</font><font color="#008000">&quot;-selftest&quot;</font><font color="4444FF">)</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+
+  <font color="#2040a0">CppUnit</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">TextUi</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">TestRunner</font> <font color="#2040a0">runner</font><font color="4444FF">;</font>
+  <font color="#2040a0">runner</font>.<font color="#2040a0">addTest</font><font color="4444FF">(</font> <font color="#2040a0">suite</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="4444FF">)</font><font color="4444FF">;</font>   <font color="#444444">// Add the top suite to the test runner</font>
+
+  <strong>if</strong> <font color="4444FF">(</font> <font color="#2040a0">selfTest</font> <font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font> <font color="#444444">// Change the default outputter to a compiler error format outputter</font>
+      <font color="#444444">// The test runner owns the new outputter.</font>
+      <font color="#2040a0">runner</font>.<font color="#2040a0">setOutputter</font><font color="4444FF">(</font> <font color="#2040a0">CppUnit</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">CompilerOutputter</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">defaultOutputter</font><font color="4444FF">(</font>
+									<font color="4444FF">&amp;</font><font color="#2040a0">runner</font>.<font color="#2040a0">result</font><font color="4444FF">(</font><font color="4444FF">)</font>,
+									<font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cerr</font> <font color="4444FF">)</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">// Run the test.</font>
+  <strong>bool</strong> <font color="#2040a0">wasSucessful</font> <font color="4444FF">=</font> <font color="#2040a0">runner</font>.<font color="#2040a0">run</font><font color="4444FF">(</font> <font color="#008000">&quot;&quot;</font> <font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <font color="#444444">// Return error code 1 if any tests failed.</font>
+  <strong>return</strong> <font color="#2040a0">wasSucessful</font> ? <font color="#FF0000">0</font> <font color="4444FF">:</font> <font color="#FF0000">1</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+The GNU makefile to go with it for mac osx with fink
+10.4-transitional.  The c++ compiler must match what was used to build
+CppUnit, so if you are using the 10.4 fink tree, chage g++-3.3 to just
+g++.
+<pre>
+CXX:=g++-3.3
+CXXFLAGS:=-I/sw/include 
+LDFLAGS:=-lcppunit -L/sw/lib
+
+dirtsimple:
+</pre>
+Then build and run it:
+<pre>
+$ make
+g++-3.3 -I/sw/include   -lcppunit -L/sw/lib  dirtsimple.C   -o dirtsimple
+
+$ ./dirtsimple 
+...
+
+OK (3 tests)
+</pre>
+-----

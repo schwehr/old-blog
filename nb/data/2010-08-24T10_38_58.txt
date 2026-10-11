@@ -1,0 +1,30 @@
+TITLE: undeleting files from a Mac HFS+ partition
+AUTHOR: Kurt
+DATE: 08.24.2010 10:38
+DESC: no luck yet
+-----
+BODY:
+I've accidentally delete data files from a Mac server that we have
+removed from the backup pool as it is in the process of being
+decommissioned.  Unfortunetly, the system was removed from the backup
+system more than 3 months ago, so the backup tapes for this machine
+have been recycled.  I've been looking for undelete solutions, but I
+don't want to drop $ on something that is not likely to work.  I gave
+the 15 day trial of MacKeeper a go and it did great for a lot of files
+(mostly iphoto pics that I've deleted), but at 7.4GB of potential
+files (out of 60GB of space containing deleted files), it basically
+hung the machine with 100% load on one CPU and things were
+unresponsive. The last I had checked before was that after about 6
+hours it had found 2GB of files it could undelete.  Here is the hog
+that was killing the machine:
+<pre><b>ps aux | grep 30881</b>
+schwehr  30881  98.9 33.6   856556 704724   ??  Rs   Wed08AM 1398:47.27 \
+   webdavfs_agent -o nobrowse http://127.0.0.1:55172 /Volumes/D4841BF6-8C4B-4CCA-8334-F2C73CEF1E01</pre>
+I might try a more powerful machine next time.  I started with trying
+this with a MacMini Core2 Duo 2GHz with 2GB of RAM.  My next attempt
+will be with a MacPro 3.3GHz Quad-Core Xeon with 8GB of RAM.
+
+Here is what the display looked like when it was stuck on the mini:
+
+<img title="MacKeeper stuck" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-08/mackeeper-lockup.png"/>
+-----

@@ -1,0 +1,108 @@
+TITLE: NOAA's VDatum
+AUTHOR: Kurt
+DATE: 03.26.2012 18:57
+DESC: wtf?
+-----
+BODY:
+I'm giving a go at working through NOAA's documentation on <a
+href="http://vdatum.noaa.gov/">VDatum</a> for vertical datum
+transformations.  I'm definitely hitting trouble.  If anyone
+has their own tutorial that they are willing to share, please
+let me know.  This is my story of non-success.
+
+<a href="http://vdatum.noaa.gov/subdownload/howto_install.html">http://vdatum.noaa.gov/subdownload/howto_install.html</a>
+
+I started with <a
+href="http://vdatum.noaa.gov/download.html">http://vdatum.noaa.gov/download.html</a>.
+I downloaded a zip that dropped files in the current directory.  Not
+good, but I can work around that.
+<pre><b>wget http://vdatum.noaa.gov/download/software/VDatum_233.zip
+unzip VDatum_233.zip</b>
+# I skipped the tidal_area.zip as that is a subset of what comes next
+<b>wget http://vdatum.noaa.gov/download/data/vdatum_Regional150312.zip
+unzip vdatum_Regional150312.zip</b>
+# Lots of files dump all over the current working directory.  I assume this was intentional
+<b>java -jar VDatum.jar</b></pre>
+The unzip dumped a huge pile of stuff that I will spare you from.  I'm
+now staring at the VDatum graphical user interface (GUI):
+
+<img width="600" height="366" title="VDatum GUI" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-03/vdatum-gui.png"/>
+
+So I figured I would try the first example to get a feel for things:
+
+<a href="http://vdatum.noaa.gov/docs/userguide_screenshot.html#FLTampa99">http://vdatum.noaa.gov/docs/userguide_screenshot.html#FLTampa99</a>
+
+Needless to say, there was no Tampa in the download everything
+regional zip.  I found the Tampa file in the data directory,
+downloaded it, unzipped it, restarted VDatum, and still nothing.
+<pre><b>wget http://vdatum.noaa.gov/download/data/FLtampab01_6078_99.zip
+unzip FLtampab01_6078_99.zip
+java -jar VDatum.jar</b></pre>
+When I picked a random entry from the top drop down, I got this.  Are these
+messages good, bad or otherwise?
+<pre>15:42:38 : The TSS grid of the selected area is built with the GEOID 1999 model.
+              Tidal Epoch: 1983-2001
+15:42:38 : Transformation to 3-D datums required GEOID grids at:
+         /home/schwehr/vdatum</pre>
+Still nothing.  Drat.  I thought maybe I could figure out the command line
+interface.  <a href="http://vdatum.noaa.gov/docs/userguide_cmd.html">http://vdatum.noaa.gov/docs/userguide_cmd.html</a>
+
+<pre><b>java -jar VDatum.jar -help</b>
+# ACK!  That just reopened the web page.  How do I know the options are in sync?
+<!-- -->
+<b>java -jar VDatum.jar -checkupdate</b>
+You currently have version 2.3.3 and the lastest version is 2.3.3
+<!-- -->
+<b>java -jar VDatum.jar -allinfo | grep -i tamp</b>
+# Nothing
+<!-- -->
+<b>java -jar VDatum.jar -allinfo | egrep -v '^[0-9]' | grep -v Index | grep '[A-Z]'</b>
+Currently available VDatum project areas
+Supported Horizontal Datums
+Supported Vertical Datums
+Embedded GEOID models
+Supported coordinate systems
+<!-- -->
+<b>java -jar VDatum.jar -areainfo</b>
+Currently available VDatum project areas
+Index     Folder Name      Description 
+0         MENHMAgome01_8301            Maine, New Hampshire, Massachusetts - Gulf of Maine, Version 01 (1983-2001) (1983-2001)
+1         RICT_bis02_8301_03           New York/Connecticut/Rhode Island - Outer NY Bight, eastern Long Island Sound, Block Island Sound, Version 02 (1983-2001)
+...
+<!-- -->
+<b>java -jar VDatum.jar -horizontalinfo</b>
+Invalid syntax. No conversions will be executed.
+<!-- -->
+<b>java -jar VDatum.jar -verticalinfo</b>
+Invalid syntax. No conversions will be executed.
+<!-- -->
+<b>java -jar VDatum.jar -geoidinfo</b>
+Embedded GEOID models
+Index    Name  Description 
+0        g99   GEOID 1999
+1        g03   GEOID 2003
+2        g06   GEOID 2006
+3        g09   GEOID 2009</pre>
+Lovely!  Two of the options don't work.  I guess I can decompile the
+java class files inside the jar, but really, I'm not excited about
+doing that.  I tried the command line example also without success:
+
+<a href="http://vdatum.noaa.gov/docs/userguide_cmd.html#cmd_egfile">http://vdatum.noaa.gov/docs/userguide_cmd.html#cmd_egfile</a>
+<pre><b>java -jar VDatum.jar FLtampab01_6078_99 nad83 navd88 mllw g99 -f -h gcs none utm -p 27.600561 -82.738612 36.8091</b>
+16:22:27 : GTX Error: Cannot initialize TSS transformation grids.
+16:22:27 : GTX Error: Cannot initialize MLLW transformation grids.
+<!-- -->
+16:22:27 : Invalid input (Datum Information/Coordinate System): Cannot convert input point.
+Input in GCS 
+Latitude: 27.600561
+Longitude : -82.738612
+Height: 36.8091
+Output UTM zone: -1
+Northing: -999999.0000
+Easting: -999999.0000
+Output Height: -999999.0000
+<!-- -->
+<b>echo $?</b>
+0</pre>
+And for the record, my env is Ubuntu linux 10.04 LTS w/ Java OpenJDK 1.6.0.
+-----

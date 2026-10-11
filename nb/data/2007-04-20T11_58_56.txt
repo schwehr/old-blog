@@ -1,0 +1,73 @@
+TITLE: Python to Excel (.xls)
+AUTHOR: Kurt
+DATE: 04.20.2007 11:58
+DESC: how easy is this!
+-----
+BODY:
+I just tried out pyExcelerator to create Excel spreadsheets from
+Python.  It works pretty well even if the code has not been updated in
+a couple years...
+
+<img src="http://schwehr.org/blog/attachments/2007-04/python-xls.png">
+
+The source:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">pyExcelerator</font> <strong>import</strong> <font color="4444FF">*</font>
+<strong>from</strong> <font color="#2040a0">datetime</font> <strong>import</strong> <font color="#2040a0">datetime</font>
+<font color="#444444">#</font>
+<font color="#2040a0">w</font> <font color="4444FF">=</font> <font color="#2040a0">Workbook</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">ws</font> <font color="4444FF">=</font> <font color="#2040a0">w</font>.<font color="#2040a0">add_sheet</font><font color="4444FF">(</font><font color="#008000">'Transits'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#444444">######################################################################</font>
+<font color="#444444">#</font>
+<font color="#2040a0">row</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+<font color="#2040a0">col</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'Vessel Transits based on AIS data'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#444444">#</font>
+<font color="#444444">######################################################################</font>
+<font color="#444444"># Title the columns</font>
+<font color="#2040a0">row</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">col</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+<font color="#444444">#</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'Key'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'MMSI'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'Transit_ID'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'Start (UTC sec)'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'Start (UTC)'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'End (UTC sec)'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'End (UTC)'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#008000">'Transit Length (hours)'</font><font color="4444FF">)</font><font color="4444FF">;</font><font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#444444">#</font>
+<font color="#444444">######################################################################</font>
+<font color="#444444">#</font>
+<font color="#2040a0">dateTimeStyle</font> <font color="4444FF">=</font> <font color="#2040a0">XFStyle</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">dateTimeStyle</font>.<font color="#2040a0">num_format_str</font> <font color="4444FF">=</font> <font color="#008000">'M/D/YY h:mm:ss'</font>
+<font color="#444444">#</font>
+<font color="#444444">######################################################################</font>
+<font color="#444444"># This will loop through all the transits and add them to the spreadsheet</font>
+<font color="#2040a0">row</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">col</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+<font color="#444444">#</font>
+<font color="#2040a0">key</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">mmsi</font><font color="4444FF">=</font><font color="#FF0000">63601237</font>
+<font color="#2040a0">timestamp</font> <font color="4444FF">=</font> <font color="#FF0000">1138753083</font>
+<font color="#2040a0">dt</font><font color="4444FF">=</font><font color="#2040a0">datetime</font>.<font color="#2040a0">utcfromtimestamp</font><font color="4444FF">(</font><font color="#2040a0">timestamp</font><font color="4444FF">)</font>
+<font color="#2040a0">timestamp_end</font> <font color="4444FF">=</font> <font color="#FF0000">1138755763</font>
+<font color="#2040a0">dt_end</font><font color="4444FF">=</font><font color="#2040a0">datetime</font>.<font color="#2040a0">utcfromtimestamp</font><font color="4444FF">(</font><font color="#2040a0">timestamp</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#2040a0">key</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#2040a0">mmsi</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">mmsi</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'_'</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">timestamp</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#2040a0">timestamp</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#2040a0">dt</font>,<font color="#2040a0">dateTimeStyle</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#2040a0">timestamp_end</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="#2040a0">dt_end</font>,<font color="#2040a0">dateTimeStyle</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#2040a0">ws</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">row</font>,<font color="#2040a0">col</font>,<font color="4444FF">(</font><font color="#2040a0">timestamp_end</font><font color="4444FF">-</font><font color="#2040a0">timestamp</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.<font color="4444FF">)</font>  <font color="4444FF">;</font> <font color="#2040a0">col</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#444444">#</font>
+<font color="#444444">######################################################################</font>
+<font color="#444444"># Done, so save the workbook</font>
+<font color="#444444">#</font>
+<font color="#2040a0">w</font>.<font color="#2040a0">save</font><font color="4444FF">(</font><font color="#008000">'transit-tmp.xls'</font><font color="4444FF">)</font>
+</pre>
+-----

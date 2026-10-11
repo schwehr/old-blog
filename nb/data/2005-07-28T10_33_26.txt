@@ -1,0 +1,116 @@
+TITLE: gmt contour map
+AUTHOR: Kurt
+DATE: 07.28.2005 10:33
+DESC: works ok
+-----
+BODY:
+I just created a very basic contour basemap for me to add currents to.
+I uses mbm_grdplot to get the basic file and then edited from there.
+I switched grdimage to be grdcontour along with other changes.  Why in
+the world can illustrator not properly read the output of gnuplot and
+gmt that then goes through ps2pdf?  Other programs can do this.  And
+illustrator is up to correctly reading gmt ps files without mangling
+the line strokes. Really drives me crazy! Here are the final
+results:<br>
+<img src="http://schwehr.org/blog/attachments/2005-07/sbb-contours.png">  
+<pre>
+<font color="0000ff"><strong>#! /bin/csh -f</strong></font>
+<font color="#444444"># 
+# This shellscript created by following command line:
+# mbm_grdplot -IsantabarbC_bath.grd
+#
+# Then hacked by Kurt Schwehr
+</font>
+set PS_FILE         = santabarbC_bath.grd.ps
+set CPT_FILE        = santabarbC_bath.grd.cpt
+set MAP_PROJECTION  = m
+set MAP_SCALE       = 7.5
+set MAP_REGION      = -120:30/-119:20/33:52/34.5
+set X_OFFSET        = 1
+set Y_OFFSET        = 2.2175
+<font color="#444444">#</font>
+<font color="#444444"># Save existing GMT defaults
+echo Saving GMT defaults...
+gmtdefaults -L &gt; gmtdefaults$$</font>
+<font color="#444444">#</font>
+<font color="#444444"># Set new GMT defaults
+echo Setting new GMT defaults...</font>
+gmtset MEASURE_UNIT inch
+gmtset PAPER_MEDIA archA+
+gmtset ANOT_FONT Helvetica
+gmtset LABEL_FONT Helvetica
+gmtset HEADER_FONT Helvetica
+gmtset ANOT_FONT_SIZE 8
+gmtset LABEL_FONT_SIZE 8
+gmtset HEADER_FONT_SIZE 10
+gmtset FRAME_WIDTH 0.075
+gmtset TICK_LENGTH 0.075
+gmtset PAGE_ORIENTATION LANDSCAPE
+gmtset COLOR_BACKGROUND 0/0/0
+gmtset COLOR_FOREGROUND 255/255/255
+gmtset COLOR_NAN 255/255/255
+gmtset DEGREE_FORMAT 3
+<font color="#444444">#</font>
+<font color="#444444"># Make color pallette table file
+echo Making color pallette table file...</font>
+echo   -625  37  57 175 -562.5  40 127 251 &gt; <font color="#2040a0">$CPT_FILE</font>
+echo -562.5  40 127 251   -500  50 190 255 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo   -500  50 190 255 -437.5 106 235 255 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo -437.5 106 235 255   -375 138 236 174 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo   -375 138 236 174 -312.5 205 255 162 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo -312.5 205 255 162   -250 240 236 121 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo   -250 240 236 121 -187.5 255 189  87 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo -187.5 255 189  87   -125 255 161  68 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo   -125 255 161  68  -62.5 255 186 133 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+echo  -62.5 255 186 133      0 255 255 255 &gt;&gt; <font color="#2040a0">$CPT_FILE</font>
+<font color="#444444">#</font>
+<font color="#444444"># Define data files to be plotted:
+set DATA_FILE        = santabarbC_bath.grd</font>
+set INTENSITY_FILE   = 
+
+<font color="#444444">#set CONTOURS = -C200  # for quick look</font>
+set CONTOURS = -C25
+
+echo Running grdcontour...
+grdcontour <font color="#2040a0">$DATA_FILE</font> <font color="#2040a0">$CONTOURS</font> -J<font color="#2040a0">$MAP_PROJECTION</font><font color="#2040a0">$MAP_SCALE</font> \
+	-R<font color="#2040a0">$MAP_REGION</font>  \
+	-X<font color="#2040a0">$X_OFFSET</font> -Y<font color="#2040a0">$Y_OFFSET</font> -K -V  &gt;! <font color="#2040a0">$PS_FILE</font>
+
+<font color="#444444"># 188 143 143             rosy brown
+# 188 143 143             RosyBrown
+# 139  69  19             saddle brown</font>
+<font color="#444444"># 139  69  19             SaddleBrown</font>
+<font color="#444444"># 244 164  96             sandy brown</font>
+<font color="#444444"># 244 164  96             SandyBrown
+set brown = 165/42/42             </font>
+<font color="#444444"># 255 193 193             RosyBrown1
+# 238 180 180             RosyBrown2</font>
+<font color="#444444"># 205 155 155             RosyBrown3
+# 139 105 105             RosyBrown4</font>
+<font color="#444444"># 255  64  64             brown1
+# 238  59  59             brown2</font>
+<font color="#444444"># 205  51  51             brown3
+# 139  35  35             brown4</font>
+
+
+<font color="#444444"># Where are all the rivers at?  -Ia should be ALL</font>
+pscoast -Ia30 -Df -W -G<font color="#2040a0">$brown</font> -C0/0/255 -J<font color="#2040a0">$MAP_PROJECTION</font><font color="#2040a0">$MAP_SCALE</font> \
+	-R<font color="#2040a0">$MAP_REGION</font> -O -K -V &gt;&gt; <font color="#2040a0">$PS_FILE</font>
+
+
+echo Running psbasemap...
+
+set TITLE = <font color="#008000">&quot;Santa Barbara Basin Circulation&quot;</font>
+
+psbasemap -J<font color="#2040a0">$MAP_PROJECTION</font><font color="#2040a0">$MAP_SCALE</font> \
+         -Lfx1i/1i/0/10 \
+	-R<font color="#2040a0">$MAP_REGION</font> \
+	-B5m/5m:.<font color="#008000">&quot;${TITLE}&quot;</font>: \
+	-O -V &gt;&gt; <font color="#2040a0">$PS_FILE</font>
+
+echo Resetting GMT fonts...
+/bin/mv gmtdefaults$$ .gmtdefaults
+
+gv santabarbC_bath.grd.ps &amp;
+</pre>
+-----

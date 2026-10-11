@@ -1,0 +1,109 @@
+TITLE: USCG MISLE database
+AUTHOR: Kurt
+DATE: 12.11.2006 15:25
+DESC: What does this look like?
+-----
+BODY:
+Just found this on the web from 2004...
+<pre>
+USCG MISLE Web-Based GIS Application
+Presented by: Joseph Elliot Buckles
+
+<b>Abstract:</b>
+The Coast Guard has a need to use GIS technologies to serve as a
+dynamic visualization tool to display the location of search and
+rescue cases, oil spills, aids to navigation information, demographics
+data, readiness data, etc. to better aid CG decision makers and
+improve information services to the public. The Marine Information for
+Safety and Law Enforcement (MISLE) GIS application is an attempt at
+satisfying this need. MISLE GIS is a full featured web deployed
+application. It features a Clustered SDE Database on the back, ArcIMS
+and Web Service middle tier, and a thin rich client on the front end.
+This client is an ActiveX Control that runs inside Internet Explorer
+and emulates a desk top GIS application. This application displays
+base maps and charts, Coast Guard specific information on Facilities
+and waterways, as well as dynamic data relating to CG Cases and
+Activities.
+.
+<b>Functionally:</b>
+The purpose of the MISLE GIS application is to serve as a reference
+map for various areas of interest for the US Coast Guard. Primarily
+the application is accessed on land after the incidents have been
+entered through the non-spatial MISLE application via PDA or desktop
+reporting.
+.
+The spatial side of the application runs deeper than what can bee seen
+on the surface.  On the backend lies a SQL Server database with ArcSDE
+8.2 handling the spatial translation. ArcSDE primarily handles all of
+the spatial searching and retrieval of data requested the by the
+ArcIMS client which is running a separate web server.  ArcIMS by
+itself is a favorable client for serving spatial data to the
+web. However, it does have limitations. The MISLE users require a
+simple interface combined with advanced search and drawing
+capabilities. A number of processes to complete many of the
+capabilities had to be developed specifically for this
+application. For example adding a layer dynamically to the web based
+client and choosing which field to use as a label.
+.
+<b>Design:</b>
+The design of MISLE GIS is co-dependent on many variables. ArcIMS as
+discussed above requires significant custom development to meet the
+needs of MISLE users. Therefore various controls must be developed to
+utilize exiting ArcSDE schemas and the creation of new schemas must be
+interwoven without breaking integrity.
+.
+The most intriguing design is that of the Available layers table. This
+table is essentially a catalog table which references all layers, both
+ArcSDE and flat files. The available layers table links to the
+sde.sde_layers table found in the SDE database. This is referenced by
+the client to give the user an organized list of layers to add to
+their map service.  This layer catalog functionality gives the user
+control over color of the displayed features and how the layers are
+labeled. For ease of recreation these customizations can be saved to
+their server stored profiles.
+.
+The client takes a considerable amount of credit for being the most
+time consuming for development. However concurrently as the data is
+being displayed data sources also must be found, loaded, and
+maintained. The thin client does not have direct access to the
+database. In fact by use of the display name the actual table names of
+the ArcSDE layers are masked. But there is intent to open the database
+to read only access by various GIS savvy users in the USCG.
+.
+Therefore vector and rater layers stored in ArcSDE are cataloged
+logically by either Coast Guard wide or one of nine coast guard
+administration districts. This model would serve the logical purpose
+allowing each district or unit to store its data in separately.  There
+are many more customizations that have been implemented. Please review
+"Creating Custom GIS Web Applications using ArcIMS, ArcSDE, and
+ActiveX" Lakey, Mike UC 2004; and also "Workaround for ActiveX
+connector Shortcomings" Kowalski, Brian UC 2004 for more information
+on customization in the MISLE GIS client.
+.
+<b>Future:</b>
+The Coast Guards Enterprise GIS database started with a specific
+project to support.  However, projects evolve and new needs are
+identified. The GIS component of the MISLE application was the
+foundation for a new project in Port Security GIS support. This new
+initiative was brought about by a number of factors including the
+super bowl.  The new requirements include raster data support and
+complete focused datasets for various ports. The Port GIS requires a
+substantial increase in disk storage requirements to meet the new
+goals.
+.
+The future of the Enterprise GIS will be an independent modular
+database allowing multiple projects such as MISLE and Port Security
+GIS which are thin ArcIMS clients to seamlessly access the
+database. As Coast Guard confidence with GIS grows it is foreseeable
+that many districts will begin accessing the database directly through
+ArcGIS.
+
+Author Information:
+Joseph E. Buckles
+GIS Data Analyst/DBA
+Stanley Associates, Inc.
+US Coast Guard Operations System Center
+408 Coast Guard Drive Kearnysville, WV. 25430-3002
+Phone: (304) 264-2574 Email: jbuckles(at)osc.uscg.mil
+</pre>
+-----

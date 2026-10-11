@@ -1,0 +1,37 @@
+TITLE: keyword arguments in python
+AUTHOR: Kurt
+DATE: 05.01.2006 21:09
+DESC: not too hard
+-----
+BODY:
+I want to be able to have a flexible lookup table system.  As a part
+of that I don't know ahead of time what kind of information will be
+stored.  This is an excuse to look at python "keyword arguments".
+This could be done with a dictionary, but I wanted to try it the
+python way.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">testkeys</font><font color="4444FF">(</font><font color="#2040a0">foo</font>,<font color="4444FF">*</font><font color="4444FF">*</font><font color="#2040a0">keywords</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#008000">'foo'</font>,<font color="#2040a0">foo</font>
+    <strong>print</strong> <font color="#008000">'keywords'</font>,<font color="#2040a0">keywords</font>
+
+<font color="#2040a0">testkeys</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">blah</font><font color="4444FF">=</font><font color="#FF0000">3</font>,<font color="#2040a0">bar</font><font color="4444FF">=</font><font color="#FF0000">5</font><font color="4444FF">)</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">testargs</font><font color="4444FF">(</font><font color="#2040a0">first</font>, <font color="4444FF">*</font><font color="#2040a0">others</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#008000">'first'</font>,<font color="#2040a0">first</font>
+    <strong>print</strong> <font color="#008000">'others'</font>,<font color="#2040a0">others</font>
+
+<font color="#2040a0">testargs</font><font color="4444FF">(</font><font color="#008000">'1st'</font>,<font color="#FF0000">2</font>,<font color="#FF0000">3</font>,<font color="#FF0000">4</font><font color="4444FF">)</font>
+</pre>
+Which when run...
+<pre>
+./foo3.py
+
+foo 1
+keywords {'blah': 3, 'bar': 5}
+
+first 1st
+others (2, 3, 4)
+</pre>
+-----

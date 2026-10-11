@@ -1,0 +1,220 @@
+TITLE: segy troubles with the Eel UTexas data
+AUTHOR: Kurt
+DATE: 08.22.2005 15:42
+DESC: 
+-----
+BODY:
+Arg!  I hit control C at the wrong time and lost the blog entry.  Try
+number 2.  Much safer to great a short entry and get it saved.  Then I
+do an "nb -e 1" to write the content.  Sigh.
+
+I have a bunch of files in the UTexas Eel seismic survey that have
+been giving me some troubles.  segydump.py and segysql.py were both
+hitting an exception within the getTraceSize code.  I can see the
+first trace, but any higher freaks out when it tries to calculate the
+offset to the start of that trace.
+<pre>
+segydump -t 1 ar54.4178.w9605b.eel010.migration.segy
+
+filename="ar54.4178.w9605b.eel010.migration.segy"
+
+# FILE HEADER
+CorrelatedTraces=0
+TraceSorting=4
+SweepTaperLenStart=0
+SweepLen=0
+MeasurementSystem=1
+<b>SampleFormat=6</b>
+SweepTaperLenEnd=0
+JobId=0
+SegYRev=0
+LineNo=10
+TracesPerEnsemble=0
+SweepType=0
+SamplesPerTrace=4200
+TaperType=0
+VibPolarity=0
+BinGainRecovered=0
+AmpRecovMeth=0
+OrigSampleInterval=500
+FixedLenTraceFlag=0
+EnsembleFold=0
+ImpulsePolarity=0
+ReelNo=0
+VerticalSum=0
+NumExtendedTextHeaders=0
+TraceSweepChannel=0
+SweepStart=0
+OrigSamplesPerTrace=0
+SweepEnd=0
+SampleInterval=500
+AuxTracesPerEnsemble=0
+SweepType= Unknown value - '0'
+TraceSorting='Horizontally stacked'
+<b>SampleFormat='Not currently used'</b>
+1:  SweepFreqStart=0
+1:  InstrInitGain=0
+1:  RecvGrpElev=0
+1:  SweepLen=0
+1:  OverTravel=0
+1:  GapSize=0
+1:  SrcEDirTenths=0
+1:  LowCutFreq=0
+1:  ShotpointScaler=0
+1:  ElevRcvGrp=0
+1:  Day=206
+1:  MuteStart=0
+1:  TraceSamples=4200
+1:  InstrGainConst=0
+1:  AliasFiltFreq=0
+1:  X=0
+1:  SrcDepth=0
+1:  SubWxVel=0
+1:  SrcMeasExp=0
+1:  Yensemble=0
+1:  TransdConstMant=0
+1:  HorzStackedNo=0
+1:  LineSeqNo=0
+1:  GrpY=0
+1:  GrpX=0
+1:  TimeScaler=0
+1:  Unassigned233=4294967296
+1:  TimeBasis=0
+1:  TraceNoEnsemble=1
+1:  FieldRecNo=1
+1:  HighCutSlope=0
+1:  DataUse=1
+1:  HighCutFreq=0
+1:  SweepType=0
+1:  TaperType=0
+1:  SrcMeasMantisa=0
+1:  Hour=22
+1:  GrpCorr=0
+1:  PostInLineNo=0
+1:  TotStatic=0
+1:  SrcEDir=0
+1:  DistanceCenter=0
+1:  WaterDepthSrc=0
+1:  SweepFreqEnd=0
+1:  SampleInterval=500
+1:  TraceWeight=0
+1:  SrcMeasUnits=0
+1:  TransdConstExp=0
+1:  GeopGrpTr1=0
+1:  TraceNo=1
+1:  Min=28
+1:  ESrcPtNo=0
+1:  SweepTaperLenEnd=0
+1:  GainType=0
+1:  UpholeTSrc=0
+1:  WxVel=0
+1:  AliasFiltSlope=0
+1:  LagTA=0
+1:  Correlated=0
+1:  FileSeqNo=1
+1:  PostCrossLineNo=0
+1:  LowCutSlope=0
+1:  TransdUnits=0
+1:  UpholeTGrp=0
+1:  GeopGrpRlSw1=0
+1:  Sec=0
+1:  TraceUnits=0
+1:  WaterDepthGrp=0
+1:  SweepTaperLenStart=0
+1:  Delay=0
+1:  LagTB=0
+1:  Xensemble=0
+1:  SurfElevSrc=0
+1:  SrcTypeOrient=0
+1:  ElevSrc=0
+1:  EnsembleNo=200
+1:  DevTrId=0
+1:  TraceId=1
+1:  NotchFiltFreq=0
+1:  GeopGrpNoLstTr=0
+1:  Y=0
+1:  SrcCorr=0
+1:  MuteEnd=0
+<b>1:  ScalerCoord=-1000</b>
+1:  CoordUnits=2
+1:  NotchFiltSlope=0
+1:  ScalerElevDepth=0
+1:  Shotpoint=0
+1:  Year=1996
+1:  VertSumNo=0
+<b>1:  CoordUnits_ascii='Seconds of arc'</b>
+1:  TraceId_ascii='Seismic data'
+1:  TransdUnits_ascii='Unknown'
+1:  SrcTypeOrient_ascii='Unknown'
+1:  DataUse_ascii='Production'
+1:  SrcMeasUnits_ascii='Unknown'
+1:  OverTravel_ascii='__UNKOWN__'
+1:  GainType_ascii='__UNKOWN__'
+1:  SweepType_ascii='__UNKOWN__'
+1:  TimeBasis_ascii='__UNKOWN__'
+1:  TaperType_ascii='__UNKOWN__'
+<b>1:  TraceUnits_ascii='Unknown'</b>
+</pre>
+I marked the troublesome SampleFormat lines above.  Type 6 is listed
+as not used in both the Rev 0 and Rev 1 specifications.  I looked in
+the text header and nothing there too.
+<pre>
+SEG-Y ASCII HEADER 39 LINES                                                    **********************************************
+************************          INPUT STREAM STARTED FROM DISK FILE:                                            /home/mcspad
+/spad/data/w9605b/seismic_segy/10.v.1.stolt                          LINE NUMBER FORCED TO    10                              
+                       ACQUISTION YEAR FORCED TO 1996                                                 ************************
+**********************************************          **********************************************************************
+           INPUT SAMPLE INTERVAL is   500 MICROSECONDS                                      INPUT STREAM MODIFIED AS FOLLOWS: 
+                                              CDP   TRACES USED 0001 THROUGH 0001                                             
+MAX TAPE SECS=  3    MAX STAR MSECS=   3000                                     1ST MSECS TO USE=     0    MAX MSECS TO USE=  
+3000                                                                                                             PROGRAM:    S
+TAR                   11/15/00  12:17:53                           DIRECTORY:  /home/mcsusers/w9605b                          
+                     USER:       jp                                                                  PARAMETER FILE om.stk.cop
+y                                                       VELOCITY FILE: /data/mcsdb/vels/ih/w9605b/10.v.1                      
+            0 DIFFERENT VELOCITIES. SEE NMO FOR VELOCITY CHANGES                           FIRST CDP   200, LAST CDP  4189, TO
+TAL CDPS    24, # OF LAYERS 40             LINE   10  SAMPLE INTERVAL   500 MICROSECONDS OUTPUT                             AL
+L TRACES USED                                                               OUTPUT STREAM TO DISK FILE:                       
+                              /home/mcspad/ldata/w9605b/stolt/10.v.1.stolt                                    ****************
+******************************************************          INPUT STREAM STARTED FROM DISK FILE:                          
+                  /data/mcs/w9605b/stolt/10.v.1.stolt                                              ACQUISTION YEAR FORCED TO 1
+996                                                  INPUT SAMPLE INTERVAL IS   500 MICROSECONDS                              
+       PROGRAM:  TAPECOPY                  11/16/00  10:26:29                          OUTPUT SAMPLE INTERVAL IS   500 MICROSE
+CONDS                                     ALL TRACES USED                                                                ACQUI
+STION YEAR FORCED TO 1996                                                  INPUT SAMPLE INTERVAL IS   500 MICROSECONDS        
+                             PROGRAM:  TAPECOPY                  11/16/00  10:40:09                          OUTPUT SAMPLE INT
+ERVAL IS   500 MICROSECONDS                                     ALL TRACES USED                                               
+                OUTPUT STREAM TO DISK FILE:                                                     /data/mstore/ldeo/users/mcsdat
+a/w9605b/10.v.1.stolt
+</pre>
+I put a try statement into segy.py to default to 4 bytes per sample if
+it finds nothing valid.  That seems to work since I am now able to get
+(mostly) valid latitude and longitude values for each trace.  The
+files start off with 0,0 location samples for a bit and then get
+settled.  There is also a new twist (for me at least) that I have to
+use the scale factor setting (marked in bold above).  Here is the
+sqlite command line to get valid lon lat pairs:
+<pre>
+    sqlite eel-utexas-migration.db 'select x/3600.0/ScalerCoord, y/3600.0/ScalerCoord from segyTrace' \
+      | tr '|' ' ' | egrep -v '^-0 -0$' > test.xy
+
+head test.xy 
+
+124.522895 -40.7113669444444
+124.522828888889 -40.7113433333333
+124.522762777778 -40.7113197222222
+124.522696944444 -40.7112963888889
+124.522630833333 -40.7112727777778
+124.522564722222 -40.7112491666667
+124.522498611111 -40.7112255555556
+124.5224325 -40.7112019444444
+124.522366388889 -40.7111783333333
+124.522300555556 -40.7111547222222
+
+</pre>
+Well, it's close.  The -1000 probably should be 1000 for the scaler,
+but it's right other than being is not in the eastern and southern
+hemispheres.
+
+
+No ground hog sightings out the office window in the last week.  Where is that fat sucker?
+-----

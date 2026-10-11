@@ -1,0 +1,29 @@
+TITLE: Debugging python programs in emacs
+AUTHOR: Kurt
+DATE: 04.23.2006 07:30
+DESC: just a hack
+-----
+BODY:
+I was having trouble figuring out how to get M-x pdb to start the
+debugger.  I found a way around it.  Add this to where you would like
+to start debugging:
+<pre>
+	import pdb
+	pdb.set_trace()
+</pre>
+Then start pdb in emacs like this.  First do M-x pdb.  When it says:
+<pre>
+Run pdb (like this): pdb
+</pre>
+Replace pdb with your program.
+<pre>
+Run pdb (like this): ./myprogram.py --foo -bar
+</pre>
+It will then drop into the pdb debugger when you get to the set_trace
+call and act like pdb, but emacs will follow along in the other view
+so you do not have to type list all the time.
+
+The big drawback of this is that you must restart the debugger each
+time and this will loose any debugger state that you want to keep
+between runs (like break points).
+-----

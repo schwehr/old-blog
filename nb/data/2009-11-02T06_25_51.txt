@@ -1,0 +1,49 @@
+TITLE: ssh tunneling made easier
+AUTHOR: Kurt
+DATE: 11.02.2009 06:25
+DESC: easier to use my systems
+-----
+BODY:
+At CCOM, we have a nat'ed address space for 99% of our systems.  They
+live in a a ccom.nh local domain spread over a bunch of 192.168.*.*
+subnets.  This reduces the exposure of our windows machines to trouble
+from the outside internet and lets our IT team manage IP addresses
+without having to interact with with university IP networking team
+most of the time.  For me, this presents a challenge as we do not have
+VPN setup.  Some CCOM members get to their Windows boxes via 
+<a href="http://www.bitvise.com/download-area">Tunnelier</a> (not free
+software).  I use Macs that come standard with OpenSSH.  I have a number of
+bash alias that make life easier, e.g.:
+<pre>alias wikitunnel='ssh -L 8080:wiki.ccom.nh:80 ccom.unh.edu'
+alias wiki='open http://localhost:8080'
+alias mymactunnel='ssh -L 8001:mymac.ccom.nh:22 ccom.unh.edu'
+alias mymac='ssh -p 8001 localhost'</pre>
+The first two let me use the internal wiki website remotely, while the
+second two let me lot into my Mac desktop.  Managing all those port
+numbers is no fun and it requires I keep my port numbers straight.
+Chaoyi recently pointed out that, for ssh, having all these aliases is not
+required.  I now have a file that manages the proxy for ssh into CCOM for me:
+~/.ssh/config:
+<pre>Host *.ccom.nh
+ProxyCommand ssh USERNAME@ccom.unh.edu /home/USERNAME/bin/nc -w 1 %h %p</pre>
+Change the USERNAME to be your login and tweak the home path to point to 
+where ever nc is installed.
+I had to put a copy of netcat in my bin directory, but now I am able to 
+connect to any machine inside our domain that has sshd available.
+<pre>ssh snares.ccom.nh
+Last login: Mon Nov  2 06:25:42 2009 from gateway.ccom.nh
+<!-- -->
+# schwehr@mymac.ccom.nh 1 $ cd && exit
+logout
+Connection to mymac.ccom.nh closed.
+Killed by signal 1.</pre>
+That killed by sig 1 is a bit weird, but I don't notice it any more.
+scp also works for copying files:
+<pre>scp mymac.ccom.nh:foo bar
+foo                                       100% 5869     5.7KB/s   00:00    
+Killed by signal 1.</pre>
+Not as easy as living in a VPN.  However, it works and what would you do if you
+had to be VPN'ed into 2 or 3 different institutions to get your job done?
+
+Trackback: Val mentions using fuse and autossh for <a href="http://www.aliceandval.com/valswork/blog/archives/2009/12/29/ssh_tunneling/index.html">SSH tunneling</a> [Val's Brain Log]
+-----

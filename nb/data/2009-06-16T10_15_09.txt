@@ -1,0 +1,95 @@
+TITLE: Finding unique vessel descriptions from AIS
+AUTHOR: Kurt
+DATE: 06.16.2009 10:15
+DESC: still lots of trouble spots
+-----
+BODY:
+I just went through the processing a years worth of AIS shipdata
+messages (msg 5) to create a list of all the unique vessel
+descriptions.  This is more than just a list of unique MMSI.  For 
+each MMSI, I want to know what different configurations there are
+in terms of size, draft, name, callsign, and IMO number.  Often
+multiple vessels are using the same MMSI (which you are not supposed
+to do)...
+
+I start by normalizing all the multipart messages and then extracting
+just the msg 5 lines with an egrep call.  Then I loop through the data
+in python and build a "vessel id" that is a tuple of the key parameters
+that I'm interested in.  I use the python set data type to key the 
+unique list of vessel id's so I can tell if the current NMEA line
+represents a new combination.  If it's new, I write out the NMEA line.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sys
+<!-- -->
+<b><font color="#000080">from</font></b> BitVector <b><font color="#000080">import</font></b> BitVector
+<b><font color="#000080">import</font></b> ais<font color="#990000">.</font>binary as binary
+<b><font color="#000080">import</font></b> ais<font color="#990000">.</font>ais_msg_5
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__<font color="#990000">==</font><font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    <b><font color="#0000FF">for</font></b> filename <b><font color="#0000FF">in</font></b> sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">:]:</font>
+        vessels_set <font color="#990000">=</font> <b><font color="#000000">set</font></b><font color="#990000">()</font>
+<!-- -->
+        <b><font color="#0000FF">for</font></b> linenum<font color="#990000">,</font>line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font><b><font color="#000000">file</font></b><font color="#990000">(</font>filename<font color="#990000">)):</font>
+            <b><font color="#0000FF">if</font></b> linenum<font color="#990000">%</font><font color="#993399">10000</font> <font color="#990000">==</font> <font color="#993399">0</font><font color="#990000">:</font>
+                sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%d %d\n'</font><font color="#990000">%</font> <font color="#990000">(</font>linenum<font color="#990000">,</font><b><font color="#000000">len</font></b><font color="#990000">(</font>vessels_set<font color="#990000">)))</font>
+            fields<font color="#990000">=</font>line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">','</font><font color="#990000">)</font>
+            <b><font color="#0000FF">if</font></b> <b><font color="#000000">len</font></b><font color="#990000">(</font>fields<font color="#990000">)&lt;</font><font color="#993399">5</font><font color="#990000">:</font> <b><font color="#0000FF">continue</font></b>
+<!-- -->
+            bv <font color="#990000">=</font> binary<font color="#990000">.</font><b><font color="#000000">ais6tobitvec</font></b><font color="#990000">(</font>fields<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">])</font>
+            m <font color="#990000">=</font> ais<font color="#990000">.</font>ais_msg_5<font color="#990000">.</font><b><font color="#000000">decode</font></b><font color="#990000">(</font>bv<font color="#990000">)</font>
+<!-- -->
+            vessel_id <font color="#990000">=</font> <font color="#990000">(</font>m<font color="#990000">[</font><font color="#FF0000">'UserID'</font><font color="#990000">],</font>m<font color="#990000">[</font><font color="#FF0000">'IMOnumber'</font><font color="#990000">],</font>m<font color="#990000">[</font><font color="#FF0000">'callsign'</font><font color="#990000">].</font><b><font color="#000000">rstrip</font></b><font color="#990000">(</font><font color="#FF0000">' @'</font><font color="#990000">),</font>m<font color="#990000">[</font><font color="#FF0000">'name'</font><font color="#990000">].</font><b><font color="#000000">rstrip</font></b><font color="#990000">(</font><font color="#FF0000">' @'</font><font color="#990000">),</font>m<font color="#990000">[</font><font color="#FF0000">'shipandcargo'</font><font color="#990000">],</font>
+                         m<font color="#990000">[</font><font color="#FF0000">'dimA'</font><font color="#990000">]+</font>m<font color="#990000">[</font><font color="#FF0000">'dimB'</font><font color="#990000">],</font> m<font color="#990000">[</font><font color="#FF0000">'dimC'</font><font color="#990000">]+</font>m<font color="#990000">[</font><font color="#FF0000">'dimD'</font><font color="#990000">],</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>m<font color="#990000">[</font><font color="#FF0000">'draught'</font><font color="#990000">]))</font>
+<!-- -->
+            <b><font color="#0000FF">if</font></b> vessel_id <b><font color="#0000FF">not</font></b> <b><font color="#0000FF">in</font></b> vessels_set<font color="#990000">:</font>
+                vessels_set<font color="#990000">.</font><b><font color="#000000">add</font></b><font color="#990000">(</font>vessel_id<font color="#990000">)</font>
+                <b><font color="#0000FF">print</font></b> line<font color="#990000">,</font></tt></pre>
+I run that for each month, cat those results together into a year
+file, rerun the unique detection code and build an sqlite database
+from the final NMEA.  From this final NMEA, I build a CSV report (which can easily be loaded into a spreadsheet).  I use a lookup table of the MMSI prefix country codes to tag each ship with the country where it is registered.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sqlite3
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__<font color="#990000">==</font><font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'2008-5.unique.db3'</font><font color="#990000">)</font>
+    cx<font color="#990000">.</font>row_factory <font color="#990000">=</font> sqlite3<font color="#990000">.</font>Row 
+<!-- -->
+    mmsi_prefixes <font color="#990000">=</font> <b><font color="#000000">dict</font></b><font color="#990000">([</font><b><font color="#000000">tuple</font></b><font color="#990000">(</font>row<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b>  cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT code,country FROM mmsi_prefix;'</font><font color="#990000">)])</font>
+<!-- -->
+    vessels <font color="#990000">=</font> <font color="#990000">[</font>row<font color="#990000">[</font><font color="#FF0000">'UserID'</font><font color="#990000">]</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT DISTINCT(userid) FROM shipdata;'</font><font color="#990000">)]</font>
+    vessels<font color="#990000">.</font><b><font color="#000000">sort</font></b><font color="#990000">()</font>
+    vessels <font color="#990000">=</font> <b><font color="#000000">tuple</font></b><font color="#990000">(</font>vessels<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'#'</font><font color="#990000">,</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">', '</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font> <font color="#990000">(</font><font color="#FF0000">'userid'</font><font color="#990000">,</font><font color="#FF0000">'IMOnumber'</font><font color="#990000">,</font> <font color="#FF0000">'name'</font><font color="#990000">,</font> <font color="#FF0000">'callsign'</font><font color="#990000">,</font> <font color="#FF0000">'shipandcargo'</font><font color="#990000">,</font>
+                      <font color="#FF0000">'length'</font><font color="#990000">,</font> <font color="#FF0000">'width'</font><font color="#990000">,</font> <font color="#FF0000">'draught'</font><font color="#990000">,</font> <font color="#FF0000">'country'</font><font color="#990000">)</font> <font color="#990000">)</font>
+    <b><font color="#0000FF">for</font></b> vessel_count<font color="#990000">,</font>vessel <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>vessels<font color="#990000">):</font>
+        <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'select * from shipdata where userid = :vessel ; '</font><font color="#990000">,</font> <font color="#990000">{</font><font color="#FF0000">'vessel'</font><font color="#990000">:</font>vessel<font color="#990000">}):</font>
+            r <font color="#990000">=</font> row
+            prefix <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>r<font color="#990000">[</font><font color="#FF0000">'userid'</font><font color="#990000">])/</font><font color="#993399">1000000</font>
+            country <font color="#990000">=</font> <font color="#FF0000">'unknown'</font>
+            <b><font color="#0000FF">if</font></b> prefix <b><font color="#0000FF">in</font></b> mmsi_prefixes<font color="#990000">:</font>
+                country <font color="#990000">=</font> <font color="#FF0000">'"'</font><font color="#990000">+</font>mmsi_prefixes<font color="#990000">[</font>prefix<font color="#990000">].</font><b><font color="#000000">replace</font></b><font color="#990000">(</font><font color="#FF0000">' '</font><font color="#990000">,</font><font color="#FF0000">'_'</font><font color="#990000">)+</font><font color="#FF0000">'"'</font>
+            params <font color="#990000">=</font> <font color="#990000">(</font>r<font color="#990000">[</font><font color="#FF0000">'userid'</font><font color="#990000">],</font> r<font color="#990000">[</font><font color="#FF0000">'IMOnumber'</font><font color="#990000">],</font> r<font color="#990000">[</font><font color="#FF0000">'name'</font><font color="#990000">].</font><b><font color="#000000">rstrip</font></b><font color="#990000">(</font><font color="#FF0000">' @'</font><font color="#990000">),</font> r<font color="#990000">[</font><font color="#FF0000">'callsign'</font><font color="#990000">].</font><b><font color="#000000">rstrip</font></b><font color="#990000">(</font><font color="#FF0000">' @'</font><font color="#990000">),</font> 
+                      r<font color="#990000">[</font><font color="#FF0000">'shipandcargo'</font><font color="#990000">],</font>
+                      r<font color="#990000">[</font><font color="#FF0000">'dimA'</font><font color="#990000">]+</font>r<font color="#990000">[</font><font color="#FF0000">'dimB'</font><font color="#990000">],</font> r<font color="#990000">[</font><font color="#FF0000">'dimC'</font><font color="#990000">]+</font> r<font color="#990000">[</font><font color="#FF0000">'dimD'</font><font color="#990000">],</font> r<font color="#990000">[</font><font color="#FF0000">'draught'</font><font color="#990000">],</font> country<font color="#990000">)</font>
+            <b><font color="#0000FF">print</font></b> <font color="#FF0000">','</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">([</font><b><font color="#000000">str</font></b><font color="#990000">(</font>item<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> item <b><font color="#0000FF">in</font></b> params<font color="#990000">])</font></tt></pre>
+Here is a decimated list to give a sense of the types of things that I
+see.  Most of the MMSI values below 200000000 are not valid.  There
+are more 1193046 vessels that I show here.  This is the well known
+value for unconfigured or power glitched Nauticast devices.  If you
+are a mariner, please check your class A settings regularly!  Entering
+things like draught draft) might not seem important, but, in the
+future, it will be getting used for things like determining dredging
+and hydrographic survey priorities.  If your draft is zero or you
+entered feet when you should have entered meters (or the other way
+around), you are preventing managers from understanding your needs.
+
+<img title="AIS ship descriptions" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/unique-5-ais.png"/>
+
+Note, 3669734 is the transceiver out at Cape Cod that provides the
+right whale notices.  In the initial deployment, it broadcast its
+position and idenity.  It showed up as RDC (meaning USCG Research and
+Development Center) and NOAA TEST and would have been seen as an icon
+at the National Seashores Visitor Center.
+-----

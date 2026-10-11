@@ -1,0 +1,110 @@
+TITLE: Rock-solid C++ development
+AUTHOR: Kurt
+DATE: 02.05.2006 08:21
+DESC: ut some guide lines
+-----
+BODY:
+An article over on slashdot (<a
+href="http://ask.slashdot.org/article.pl?sid=06/02/05/0119223">
+Ultra-Stable Software Design in C++?</a>) made me think about they
+ways that I use to develop better C++ code.
+<ul>
+<li> Use STL, but only lightly.  Do not go crazy with templates.
+
+<li> Use <b>asserts</b> to document all calling conditions for each
+method or function.  If a variable can only be 0 to 10, then say so
+with assert(0<=i &amp;&amp; 10>=i);
+
+<li> Read Peter van der Linden's Expert C Programming.  Then start
+writing "if (10 == i) rather than "if (i=10)"... Kaboom.
+
+<li> Develop on multiple platforms... say Linux, Mac OSX and a BSD.
+Testing in a different architecture may force bugs to come to the
+surface (you also get to hit more OS bugs and learn how to cope).
+
+<li> Document each function, method, class.  Why does it have to
+exist?  If the code is not necessary, then it should not be in your
+program!
+
+<li> Make the compiler work for you... "gcc -g3 -Wall -Werror -pedantic" and there must be others that I am forgetting.  
+
+<li> Test with both debugging enabled and with full optimization
+enabled.  You may see some errors only in one side of the house.
+
+<li> purify, valgrind, electric fense.  Use them all regularly.  These
+checkers exist for a reason.  I just wish SGI developers had used
+purify on the IRIX libraries.  Life would have been better in the 90's
+for me.
+
+<li> Test cases are critical.  If you can capture input data and know
+how the code should behave with it, setup test cases.  If you have,
+for example, a GPS input stream.  Capture a number of conditions with
+the GPS and build a test harness.  You know the answer, so make sure
+your GPS subsystem concurs.
+
+<li> Automate testing.  Have machines that do a full checkout and
+build of your entire system daily (or less frequently if the code
+takes longer to build).
+
+<li> Throw bad data at your system.  Consider sending explicitly
+corrupt data at your program.  Add different amounts of noise
+(BER... bit error rates) at your code.  For a GPS subsystem, throw one
+bit error per message in, then slowly crank up the BER.
+
+<li> Be careful what libraries you depend on.  Just because something
+is commercial+closed source or open source (depending on your
+political leaning) does not mean that it is good.  Beware the closed
+source package.  Tracking down errors into their code may be a
+nightmare.  Beware the stale, crumbling, abandoned open source
+project.  Don't just pick something because it sounds cool, has a
+flashy ad, or whatever.
+
+<li> Watch out for programs that use the stack to much.  Running out
+of space on the stack can be hard to trace.  Try turning down the
+stack size on your program and see how it really behaves.  This is
+crucial for multi-threaded applications.
+
+<li> Use a logging package.  Write out log files!  Make sure the log
+files do not grow out of control and crash the system!
+
+<li> Use revision control.  If code is not under revision control,
+either put it under control or throw it out.
+
+<li> Don't use Fortran 90 libraries.  You will be doomed to
+failure/compiler ugliness.
+
+<li> Read the Scott Meyers books about C++!
+
+<li> Make it easy to get info about deployed software, but do not
+violate someones privacy.  If someone calls with a problem, make it
+easy for them to get you information about what happened.  However, it
+is unwise to automate sending data back from someones machine unless
+they know and agree that it is okay.  See also, log files above.
+
+<li> Keep file formats simple.  Complicated data structures are
+nightmares for years to come.
+
+<li> Each developer should keep a log that is public to the other
+developers of notes and thoughts.  This is the place for things
+like...  we won't support Mac OSX 10.3 because Apple introduced new
+code that breaks the SDL library for good.  This should be searchable!
+I use a big flat text file, but wikis can be good too.
+
+<li> Build your libraries as both shared and static libs.  Test with both
+combinations.  Some errors will crop up with only one of these methods.
+
+<li> Some people advocate never using shared libraries or stuffing all
+shared libs into a directory with the application.  I don't know what
+I think of this yet.
+
+<li> Learn to use the debugger well.  Use the debugger.
+
+<li> Instrument your program.  Too bad there is not an open/free
+version of what Scope/Probe (now owned by WindRiver) does.  Being able
+to graph the state of your program is powerful.
+
+<li> Read the man page of a call before you use it.
+
+</ul>
+That's all I can think of right now, which seems to be quite a lot.
+-----

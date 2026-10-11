@@ -1,0 +1,331 @@
+<div class="item">
+<a id="e2006-01-31T15_19_10.txt" name="e2006-01-31T15_19_10.txt"></a>
+<h2 class="date">01.31.2006 15:19</h2>
+<div class="blogbody">
+<h3 class="title">xstar nav file decimators</h3>
+<div class="item-description">
+Here are two little python scripts to help out those who have to deal
+with decimating navigation data from the SIO XStar system.  This will
+not work close to the prime meridian because of a bug in the
+processing software or chirp... that would be the lines that looks for
++/- .1 degrees.
+<br /><br />
+To use these commands, just pass a list of files in like "./filter.py
+foo.txt bar.txt sos.tex justshootmenow.txt"
+<br /><br />
+The first script sends the results to stdout (a.ka. the screen or console).
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>for</strong> <font color="#2040a0">file</font> <strong>in</strong> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">file</font>
+    <font color="#2040a0">linenum</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">file</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>.<font color="#2040a0">readlines</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">fields</font><font color="4444FF">=</font><font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'lat'</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#2040a0">line</font>, <font color="#444444"># keep the header</font>
+            <strong>continue</strong>    <font color="#444444"># but do NOT count it</font>
+        <strong>if</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font> .<font color="#FF0000">1</font> <strong>and</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&gt;</font> <font color="4444FF">-</font>.<font color="#FF0000">1</font><font color="4444FF">:</font>
+            <strong>continue</strong> <font color="#444444"># skip nasty bad nav points from the xstar</font>
+        <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">linenum</font><font color="4444FF">%</font><font color="#FF0000">500</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#2040a0">line</font>,
+        <font color="#2040a0">linenum</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+</pre>
+The next one gets a little be more tricky.  It dumps the decimated
+data to a new file with ".500" appended to the original file name.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>for</strong> <font color="#2040a0">file</font> <strong>in</strong> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">file</font>
+    <font color="#2040a0">linenum</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+    <font color="#2040a0">out</font><font color="4444FF">=</font><font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">+</font><font color="#008000">'.500'</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+    
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">file</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>.<font color="#2040a0">readlines</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">fields</font><font color="4444FF">=</font><font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<br /><br />
+        <strong>if</strong> <font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'lat'</font><font color="4444FF">:</font>
+            <strong>if</strong> <font color="#2040a0">linenum</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font> <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font> <font color="#444444"># keep the header</font>
+            <strong>continue</strong>    <font color="#444444"># but do NOT count it</font>
+<br /><br />
+        <strong>if</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font> .<font color="#FF0000">1</font> <strong>and</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&gt;</font> <font color="4444FF">-</font>.<font color="#FF0000">1</font><font color="4444FF">:</font>
+            <strong>continue</strong> <font color="#444444"># skip nasty bad nav points from the xstar</font>
+<br /><br />
+        <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">linenum</font><font color="4444FF">%</font><font color="#FF0000">500</font><font color="4444FF">:</font>
+            <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+<br /><br />
+        <font color="#2040a0">linenum</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+</pre>
+The second script also drops any following header info about which
+field is which when generated by the lsd command.
+<br /><br />
+Enjoy!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-01.html#e2006-01-31T15_19_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-02-01T13_26_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-01-31T11_07_15.txt" name="e2006-01-31T11_07_15.txt"></a>
+<h2 class="date">01.31.2006 11:07</h2>
+<div class="blogbody">
+<h3 class="title">ucsd latex thesis</h3>
+<div class="item-description">
+I just worked out how to control the citations in my thesis.  I first
+read <a
+href="http://www.andy-roberts.net/misc/latex/latextutorial3.html">Getting
+to Grips with Latex - Bibliography Management</a> by Andy Roberts.
+Then here is what I did.  The beginning of my thesis document looks
+like this:
+<pre>
+  \documentclass[12pt]{report}
+  \usepackage{natbib}
+  \bibpunct{(}{)}{;}{a}{,}{,}
+  \usepackage{ucsd-thesis}
+  \usepackage{graphicx}
+  \begin{document}
+</pre>
+I just added the natbib and bibpunct commands.  Then I modified the
+end of the document to look like this:
+<pre>
+  a \nocite{schwehr2003}
+  b \cite{schwehr2003}
+  c \citet{schwehr2003}
+  d \citep{schwehr2003}
+  e \citet*{schwehr2003}
+  f \citep*{schwehr2003}
+  %\bibliographystyle{plain}  % this was numbered, which I do not want.
+  \bibliographystyle{plainnat}
+  \bibliography{schwehr}
+  \end{document}
+</pre>
+The results come out something like this:
+<pre>
+  a
+  b Schwehr and Tauxe (2003)
+  c Schwehr and Tauxe (2003)
+  d (Schwehr and Tauxe, 2003)
+  e Schwehr and Tauxe (2003)
+  f (Schwehr and Tauxe, 2003)
+<br /><br />
+  Bibliography
+    K.D. Schwehr and L. Tauxe. Characterization of soft sediment deformation:
+    dectection of crypto-slumps using magnetic methods. Geology, 31(3):203-206,
+    2003.
+</pre>
+BTW, the bibtex entry for schwehr2003 is:
+<pre>
+@article{
+schwehr2003,
+   Author = {Schwehr, K.D. and Tauxe, L.},
+   Title = {Characterization of soft sediment deformation: dectection of crypto-slumps using magnetic methods},
+   Journal = {Geology},
+   Volume = {31},
+   Number = {3},
+   Pages = {203-206},
+   Year = {2003} }
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-01.html#e2006-01-31T11_07_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-01-31T15_19_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-01-31T09_27_23.txt" name="e2006-01-31T09_27_23.txt"></a>
+<h2 class="date">01.31.2006 09:27</h2>
+<div class="blogbody">
+<h3 class="title">messing with gsf</h3>
+<div class="item-description">
+I took a quick look at the Generic Sensor Format (gsf) this morning
+and got it to compile.  Here is what I changed in gsf.h:
+<pre>
+<font color="0000ff"><strong>#ifndef __APPLE__</strong></font>
+<font color="0000ff"><strong>#if (!defined (_STRUCT_TIMESPEC_) &amp;&amp; !defined (_TIMESPEC_T) &amp;&amp; !defined (_STRUCT_TIMESPEC) &amp;&amp; !defined (_SYS_TIMESPEC_H) &amp;&amp; !defined (__timespec_defined))</strong></font>
+<font color="0000ff"><strong>#define _STRUCT_TIMESPEC_</strong></font>
+<font color="0000ff"><strong>#define _TIMESPEC_T</strong></font>
+<font color="0000ff"><strong>#define _STRUCT_TIMESPEC</strong></font>
+<font color="0000ff"><strong>#define _SYS_TIMESPEC_H</strong></font>
+<font color="0000ff"><strong>#define __timespec_defined</strong></font>
+    <strong>struct</strong> <font color="#2040a0">timespec</font>
+    <font color="4444FF"><strong>{</strong></font>
+        <font color="#2040a0">time_t</font>          <font color="#2040a0">tv_sec</font><font color="4444FF">;</font>
+        <strong>long</strong>            <font color="#2040a0">tv_nsec</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+<font color="0000ff"><strong>#endif</strong></font>
+<font color="0000ff"><strong>#endif # __APPLE__ </strong></font>
+</pre>
+Val brought up that there is a command to see everything that the c
+preprocessor (cpp) defines:
+<pre>
+cpp -dM gsf.h | egrep -i 'APPLE|DARWIN'
+<br /><br />
+ #define __APPLE_API_STANDARD 
+ #define __SYS_APPLEAPIOPTS_H__ 
+ #define __APPLE_API_OBSOLETE 
+ #define __APPLE__ 1
+ #define __APPLE_API_STABLE 
+ #define __APPLE_API_EVOLVING 
+ #define __APPLE_API_UNSTABLE 
+ #define __APPLE_API_PRIVATE 
+ #define __VERSION__ "3.3 20030304 (Apple Computer, Inc. build 1495)"
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-01.html#e2006-01-31T09_27_23.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-01-31T11_07_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-01-31T08_33_37.txt" name="e2006-01-31T08_33_37.txt"></a>
+<h2 class="date">01.31.2006 08:33</h2>
+<div class="blogbody">
+<h3 class="title">input managers on osx - a security nightmare?</h3>
+<div class="item-description">
+From: <a href="http://daringfireball.net/2006/01/smart_crash_reports">http://daringfireball.net/2006/01/smart_crash_reports</a>
+<pre>
+  As stated before, every installed input manager loads into (nearly)
+  every application. Input managers that are targeting one specific
+  application, such as the way Saft and PithHelmet patch Safari or the
+  way Smart Crash Reports patches Crash Reporter, typically perform
+  some identifier checking so as only to deliver their actual payload
+  inside the application they're targeting. But, no bones about it,
+  the nature of input managers is such that they're loaded into every
+  app on your system. The basic gist is that when they're loaded, they
+  check to see whether this app is the app they're looking to patch,
+  and if it isn't. do nothing more. Unsanity has gone so far as to
+  post a FAQ with example Objective-C code showing their technique:
+</pre>
+When I read this, my first thought was "oh crap".  Is this going to be
+the security nightmare of the Mac world?  What an easy way to inject
+spyware.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-01.html#e2006-01-31T08_33_37.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-01-31T09_27_23.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-01-30T13_23_21.txt" name="e2006-01-30T13_23_21.txt"></a>
+<h2 class="date">01.30.2006 13:23</h2>
+<div class="blogbody">
+<h3 class="title">Seismic Data Set Directory</h3>
+<div class="item-description">
+This just came across the Seismic Unix mailing list. SPOT (at mtu.edu)
+has a <a href="http://www.geo.mtu.edu/spot/SeismicData/">Seicmic Data
+Set Directory</a>.  Some of this stuff costs and some of the links are
+broken, but looks like the start of a good resource.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-01.html#e2006-01-30T13_23_21.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-01-31T08_33_37.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-01-26T21_07_18.txt" name="e2006-01-26T21_07_18.txt"></a>
+<h2 class="date">01.26.2006 21:07</h2>
+<div class="blogbody">
+<h3 class="title">schematic of a chirp pulse</h3>
+<div class="item-description">
+I told Becca that I would show her how much easier it was to do a
+chirp pulse in python as compared to C/C++, so here it is.  This is
+just a schematic, so do <b>not</b> take this as implying that this is
+exactly the pulse shape for the XStar.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">math</font> <strong>import</strong> <font color="4444FF">*</font>
+<font color="#2040a0">samples</font><font color="4444FF">=</font><font color="#FF0000">5000</font>
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">samples</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">i</font>/<font color="#FF0000">100</font>.
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">sin</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">*</font> <font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">+</font>.<font color="#FF0000">7</font><font color="4444FF">*</font><font color="#2040a0">x</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#FF4400"># cosine taper</font>
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">y</font> <font color="4444FF">*</font> <font color="4444FF">(</font>.<font color="#FF0000">5</font> <font color="4444FF">-</font> .<font color="#FF0000">5</font><font color="4444FF">*</font> <font color="#2040a0">cos</font> <font color="4444FF">(</font> <font color="#2040a0">i</font> <font color="4444FF">*</font> <font color="#FF0000">2</font><font color="4444FF">*</font>  <font color="#2040a0">pi</font> / <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">samples</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#2040a0">x</font>, <font color="#2040a0">y</font>
+</pre>
+I then ran the program like this to see what it produces:
+<pre>
+./taper.py > taper.dat
+gnuplot
+gnuplot&gt; plot 'taper.dat' with l
+</pre>
+<br /><br />
+This produces a tapered pulse that looks like this:
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-01/chirp.gif">
+<br /><br />
+<a
+href="http://schwehr.org/blog/attachments/2006-01/chirp.svg">SVG</a>
+version if your browser supports SVG and assuming that gnuplot is
+putting out totally valid SVG that will work on the web.
+<br /><br />
+NOTE: See Gutowski et al. 2005 for more details on CHIRP.
+<br /><br />
+This example uses the <a
+href="http://en.wikipedia.org/wiki/Hamming_window#Hann_window">Hann
+window</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-01.html#e2006-01-26T21_07_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-01-30T13_23_21.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-01-14T21_38_22.txt" name="e2006-01-14T21_38_22.txt"></a>
+<h2 class="date">01.14.2006 21:38</h2>
+<div class="blogbody">
+<h3 class="title">median destructive field</h3>
+<div class="item-description">
+I just finished writing a little python program to calculate the
+median destructive field (MDF) for my cores.  This should give me a
+sense of the coercivity the magnetic carrier minerals down core.
+Clearly they are pretty different at the top of the core.  The program
+is called mdf.py.  Right now, it only works off of sqlite databases
+layed out in the same way as my thesis.
+<br /><br />
+<img src='http://schwehr.org/blog/attachments/2006-01/mdf.gif'>
+<br /><br />
+The purple line is the maximum applied afdemag field in mT.  Here is a
+bit of the output from mdf.py:
+<pre>
+./mdf.py -n 4
+# Median Destructive Field (MDF)
+# samplename, mdf, depth, numberoftreats(n), minInt, maxInt, minTreat, maxTreat
+bp04-4gw-s1-006 35.2 6.0 12 2.039e-06 0.0001741 0.0 100.0
+bp04-4gw-s1-009 34.3 9.0 12 1.695e-06 0.0002063 0.0 100.0
+bp04-4gw-s1-012 36.9 12.0 13 3.671e-06 0.0002324 0.0 100.0
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-01.html#e2006-01-14T21_38_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-01-26T21_07_18.html#comments">Comments</a> -->
+</div>
+</div>

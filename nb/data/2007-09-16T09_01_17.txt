@@ -1,0 +1,112 @@
+TITLE: State Boundaries
+AUTHOR: Kurt
+DATE: 09.16.2007 09:01
+DESC: python plus census data
+-----
+BODY:
+I need to have a decent representation of the boundaries of the 50
+states.  I had trouble finding what I wanted.  Eventually, I broke
+down and wrote some code to cope with what I found from the US Census.
+
+<a href="http://www.census.gov/geo/cob/bdy/st/st00ascii/st99_d00_ascii.zip">http://www.census.gov/geo/cob/bdy/st/st00ascii/st99_d00_ascii.zip</a>
+
+The source files look like Arc ascii export formats.  st99_d00a.dat is
+a lookup table saying for what state a polygon is associated.
+<pre>
+ 1
+ "02"
+ "Alaska"
+ "01"
+ " "
+ 
+ 2
+ "02"
+ "Alaska"
+ "01"
+ " "
+...
+</pre>
+Then st99_d00.dat contains the polygons:
+<pre>
+         1      -0.152594121361715E+03       0.650971279135803E+02
+      -0.147787110884357E+03       0.702453634941157E+02
+      -0.147765104000000E+03       0.702198060000000E+02
+      -0.147681722000000E+03       0.701999540000000E+02
+      -0.147648000000000E+03       0.702032990000000E+02
+      -0.147585678000000E+03       0.702033980000000E+02
+      -0.147505270000000E+03       0.702003840000000E+02
+...
+      -0.147789357000000E+03       0.702479720000000E+02
+      -0.147787110884357E+03       0.702453634941157E+02
+END
+         2      -0.166124169422343E+03       0.662409026111111E+02
+      -0.166053153000000E+03       0.662649440000000E+02
+      -0.166031870000000E+03       0.662646390000000E+02
+...
+</pre>
+I then created a python program that reads these two files and fills
+a directory full of these polygons.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">#</font>
+<font color="#444444"># Build LUT for what state each e00 entry is</font>
+<font color="#444444">#</font>
+<font color="#2040a0">states</font><font color="4444FF">=</font><font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font>
+<strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#008000">'st99_d00a.dat'</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">line</font> <font color="4444FF">=</font> <font color="#2040a0">line</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font><font color="4444FF">&lt;</font><font color="#FF0000">1</font><font color="4444FF">:</font> <strong>continue</strong>
+    <strong>if</strong> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">isdigit</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">stateNum</font><font color="4444FF">=</font><font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'&quot;'</font> <strong>and</strong> <font color="#2040a0">line</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>.<font color="#2040a0">isupper</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">state</font><font color="4444FF">=</font><font color="#2040a0">line</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+        <font color="#2040a0">states</font><font color="4444FF">[</font><font color="#2040a0">stateNum</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#2040a0">state</font>
+        <font color="#2040a0">stateNum</font><font color="4444FF">=</font><font color="#2040a0">None</font>
+<font color="#444444">#</font>
+<font color="#444444"># Write out a file for each poly that we find in the file</font>
+<font color="#444444">#</font>
+<font color="#2040a0">polyNum</font><font color="4444FF">=</font><font color="#2040a0">None</font>
+<font color="#2040a0">o</font><font color="4444FF">=</font><font color="#2040a0">None</font>
+<strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#008000">'st99_d00.dat'</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">fields</font><font color="4444FF">=</font><font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>if</strong> <strong>not</strong> <font color="#2040a0">polyNum</font><font color="4444FF">:</font>
+        <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">3</font><font color="4444FF">:</font>
+            <font color="#2040a0">polyNum</font><font color="4444FF">=</font><font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font>
+            <font color="#444444"># This first coordinate must just be a point inside polygon</font>
+            <font color="#2040a0">count</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+            <font color="#444444">#print '#',states[polyNum]</font>
+            <font color="#2040a0">numStr</font><font color="4444FF">=</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#008000">'%03d'</font> <font color="4444FF">%</font> <font color="#2040a0">polyNum</font><font color="4444FF">)</font><font color="4444FF">)</font>
+            <font color="#2040a0">o</font> <font color="4444FF">=</font> <font color="#2040a0">file</font><font color="4444FF">(</font><font color="#2040a0">numStr</font><font color="4444FF">+</font><font color="#008000">'-'</font><font color="4444FF">+</font><font color="#2040a0">states</font><font color="4444FF">[</font><font color="#2040a0">polyNum</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">'.dat'</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+            <font color="#2040a0">o</font>.<font color="#2040a0">write</font><font color="4444FF">(</font> <font color="#008000">'#'</font><font color="4444FF">+</font><font color="#2040a0">states</font><font color="4444FF">[</font><font color="#2040a0">polyNum</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+        <strong>continue</strong>
+    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">:</font>
+        <strong>assert</strong>  <font color="#2040a0">line</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'END'</font>
+        <font color="#2040a0">polyNum</font><font color="4444FF">=</font><font color="#2040a0">None</font>
+        <font color="#2040a0">o</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+        <font color="#2040a0">o</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">o</font><font color="4444FF">=</font><font color="#2040a0">None</font>
+        <strong>continue</strong>
+    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">2</font><font color="4444FF">:</font>
+        <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+        <strong>if</strong> <font color="#2040a0">count</font><font color="4444FF">%</font><font color="#FF0000">2</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font>
+            <font color="#444444">#print line,</font>
+            <font color="#2040a0">o</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+</pre>
+That gives me a all the polygons as separate files.  With gnuplot, I
+went though and found the key polygon(s) for each state.  Places like
+Hawaii Michigan deserve more than one polygon to look reasonable.  The
+script also reduces the vertex count by half with an algorithm that is
+not so smart.  After picking all the files that I want, I used 'cat'
+to mush them all together in one big file:
+<pre>
+wc -l states.gp.dat 
+67042 states.gp.dat
+</pre>
+Then to take a look at the results.  Not to shabby.
+<pre>
+gnuplot
+set term gif
+set output 'states.gif'
+plot 'states.gp.dat' with l
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-09/states.gif">
+-----

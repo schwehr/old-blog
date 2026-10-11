@@ -1,0 +1,51 @@
+TITLE: Yet another reason to turn up warnings in gcc
+AUTHOR: Kurt
+DATE: 04.19.2007 08:33
+DESC: doh!
+-----
+BODY:
+I have the misfortune of being back to writing C++ code.  Coding in
+python is fun.  C++ likes mess with you if you let down your guard.
+My latest was an unexplained segfault.  I brought up the debugger and
+what?  My looping variable looked corrupted, but why?  This code is
+not very exciting.  It has been a few months since I really coded C++.
+Apparently that is enough to get me introuble.  I used -Wall and fixed
+all the warnings...
+<pre>
+g++  -Wall  -I/sw/include -g -o bitvector BitVector.cxx -DWITH_MAIN
+</pre>
+That should be pretty safe right?  It built without complaints.  Then
+I decided to go back to an old makefile (sorry Roland!!  I promise I
+will switch to scons real soon now).  
+<pre>
+++  -Wall -Wimplicit -pedantic -W -Wredundant-decls -I/sw/include -g3 -O0 -D_GLIBCXX_DEBUG -o bitvector BitVector.cxx -DWITH_MAIN
+BitVector.cxx: In member function 'void BitVector::print()':
+BitVector.cxx:62: warning: comparison of unsigned expression &gt;= 0 is always true
+</pre>
+Whoops!  I was't thinking.  unsigned values like site_t can never be
+less than 0!!  No wonder bad things happen!
+<pre>
+/usr/include/c++/4.0.0/debug/vector:192:error: attempt to subscript 
+    container with out-of-bounds index 134217727, but container only holds 1    
+     elements.
+
+Objects involved in the operation:
+sequence "this" @ 0x0xbfffe714 {
+  type = N15__gnu_debug_def6vectorImSaImEEE;
+}
+000101000001
+Abort trap
+</pre>
+The moral is... don't do this:
+<pre>
+    for (<b>size_t</b> i=bitSize-1; <b>i&gt;=0</b> ; i--) {
+	cout &lt;&lt; (bits[i]?'1':'0');
+    }
+</pre>
+Perhaps if I had just used an iterator, this would never have
+happened!  Back to working on why my algorithm doesn't work.
+
+<b>Update:</b> Lookst at the <a href="http://www.boost.org/libs/dynamic_bitset/dynamic_bitset.html">dynamic_bitset</a> documentation, I see that
+it does not provide iterators, so I am back to coding something really
+strange.
+-----

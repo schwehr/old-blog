@@ -1,0 +1,47 @@
+TITLE: GNU make .PHONY
+AUTHOR: Kurt
+DATE: 03.21.2006 08:38
+DESC: being phony can be a good thing
+-----
+BODY:
+I just went and read the GNU make info page on ".PHONY" targets.  I
+have read this many times, but I guess I never really internalized
+what it means I should do.  Phony rules are those that do not depend
+on files being created.  The classic is the clean rule, but I think
+test will be more informative.  Normally a test rule might look
+something like this:
+<pre>
+test:
+	cd test && make test
+</pre>
+or this (depending on your style preference)
+<pre>
+test:
+	make -f test/Makefile test
+</pre>
+If the test directory exists, make will see that directory and think
+that everything for test is already done.  make will say:
+<pre>
+make: `test' is up to date.
+</pre>
+Clearly, that is not what needs to happen.  Make should go run the
+test!  By saying that test is a phony target, make will ignore the
+test directory and happily run the commands for that target.  Here is
+a dummy test target.
+<pre>
+.PHONY: test
+test:
+	cd test && pwd
+</pre>
+Which when run will work just fine:
+<pre>
+mkdir test
+make test
+  cd test &amp;&amp; pwd
+  SOME_LONG_PATH/test
+</pre>
+And finally, the info page says this speeds up the make process
+because make is no longer looking for those targets.  This is not a
+huge speedup, but in large projects this time will add up as the build
+system gets larger and if building happens frequently.
+-----

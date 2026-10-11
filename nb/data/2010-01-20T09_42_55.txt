@@ -1,0 +1,40 @@
+TITLE: quick test of running an IRC server
+AUTHOR: Kurt
+DATE: 01.20.2010 09:42
+DESC: super easy
+-----
+BODY:
+Les and I have been discussing the rolls that IRC might play at the
+office and on ships for at least the last 6 months.  I finally did a
+quick test to see if I could get things running in just a few minutes.
+The results were great!  I have a running server and we had two
+different users from one local account and one out on our private
+network.  Here is the process:
+<pre>
+<b>fink install ngircd</b>
+<b>sudo ngircd -n -p</b> # Keep it forground and don't try to connect to other servers
+<!-- -->
+[58376:5    0] ngircd 13-SYSLOG+ZLIB+SSL+TCPWRAP+ZEROCONF+IDENT+IRCPLUS+IPv6-powerpc/apple/darwin9.8.0 started.
+[58376:6    0] Activating: no-daemon-mode, passive-mode.
+[58376:6    0] Reading configuration from "/sw/etc/ngircd.conf" ...
+[58376:4    0] No administrative information configured but required by RFC!
+[58376:5    0] No SSL server key configured, SSL disabled.
+[58376:4    0] Warning: Error during SSL initialization, continuing ...
+[58376:6    0] ServerUID must not be 0, using "nobody" instead.
+[58376:6    0] Running as user nobody(-2), group nobody(-2), with PID 58376.
+[58376:6    0] Not running with changed root directory.
+[58376:6    0] IO subsystem: kqueue (initial maxfd 100, masterfd 3)
+[58376:6    0] Now listening on [0::]:6667 (socket 4).
+[58376:6    0] Now listening on [0.0.0.0]:6667 (socket 5).
+[58376:6    1] Successfully registered "Server Info Text" with Rendezvous.
+[58376:6    1] Successfully registered "Server Info Text" with Rendezvous.
+[58376:6  142] Accepted connection 6 from 192.168.8.236:60588 on socket 5.
+[58376:6  142] IDENT lookup for connection 6: no result.
+[58376:5  142] User "goatbar_!~goatbar_@eel.ccom.nh" registered (connection 6).
+</pre>
+Then I fired up Converstation on the mac and added a new server.  Then
+I added a channel to the server.  Jordan then joined the channel from his
+machine and we have a working channel.
+
+<img title="Conversation connected to ngircd" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-01/converstation-ngircd.png"/>
+-----

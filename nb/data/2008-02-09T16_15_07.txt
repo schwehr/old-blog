@@ -1,0 +1,85 @@
+TITLE: How not to write python code
+AUTHOR: Kurt
+DATE: 02.09.2008 16:15
+DESC: better code for better people
+-----
+BODY:
+This article actually has a lot of create tips on how to write quality
+python code despite what the title says.
+
+<a href="http://eikke.com/how-not-to-write-python-code/"> How not to write Python code</a>
+
+Haven't actually used this one, but I am sure I will soon enough:
+<pre>
+<b>Use Pythonesque coding pattern</b>
+This is very related to the previous item, obviously. Python has some
+well-known constructs to handle some situations. Get to know and
+understand them.  An example: as you might know, Python has no
+switch/case construct. There's a very neat way to implement this
+though by simply using a dict and function objects (or lambda
+functions). An example:
+
+def handle_one():
+    return 'one'
+def handle_two():
+    return 'two'
+def handle_default():
+    return 'unknown'
+cases = {
+    'one': handle_one,
+    'two': handle_two,
+    'three': lambda: 'three',
+}
+for i in ('one', 'two', 'three', 'four', ):
+    handler = cases.get(i, handle_default)
+    print handler()
+We're using the dict.get method here, which can take an optional
+'default' argument. Pretty neat, huh?
+</pre>
+I also need to use <b>isinstance(arg, MyClass)</b>.
+
+The article mentions documentation.  Here is my take on a
+template/boiler plate for python files.  For here, I've removed the blank
+lines, but please don't do that in your code.  The resulting html from
+epydoc >= 3.0.1 is very usable.  But I still am wondering if a better
+pylint score actually makes for better code.  I kind of like variables
+that haveCapsLikeThis, but pylint definitely does not.  What do people
+think of pylint???  I definitely like the module usage graph and it 
+does find some trouble spots, but it really alters the way I code to
+get a good score.
+<pre>
+<font color="orange">#!/usr/bin/env python</font>
+<font color="orange"># Consider this template file public domain.  The __license__ is just an example.</font>
+<font color="orange"># Replace values as needed</font>
+<font color="#2040a0">__author__</font>    <font color="4444FF">=</font> <font color="#008000">'Kurt Schwehr'</font>
+<font color="#2040a0">__version__</font>   <font color="4444FF">=</font> <font color="#008000">'$Revision: 4799 $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">__revision__</font>  <font color="4444FF">=</font> <font color="#2040a0">__version__</font> <font color="orange"># For pylint</font>
+<font color="#2040a0">__date__</font> <font color="4444FF">=</font> <font color="#008000">'$Date: 2006-09-25 11:09:02 -0400 (Mon, 25 Sep 2006) $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#2040a0">__copyright__</font> <font color="4444FF">=</font> <font color="#008000">'2008'</font>
+<font color="#2040a0">__license__</font>   <font color="4444FF">=</font> <font color="#008000">'GPL v3'</font>
+<font color="#2040a0">__contact__</font>   <font color="4444FF">=</font> <font color="#008000">'kurt at ccom.unh.edu'</font>
+<font color="orange">#__deprecated__</font>
+<font color="#2040a0">__doc__</font> <font color="4444FF">=</font><font color="#008000">''</font><font color="#008000">'
+Example python file that is all tricked out.  Designed for epydoc,
+unittest and doctest.  Please keep updating to make this the best
+possible template file. Decimate these requirements to meet what you need.
+@requires: U{Python&lt;http://python.org/&gt;} &gt;= 2.5
+@requires: U{epydoc&lt;http://epydoc.sourceforge.net/&gt;} &gt;= 3.0.1
+@requires: U{psycopg2&lt;http://http://initd.org/projects/psycopg2/&gt;} &gt;= 2.0.6
+@undocumented: __doc__ parser
+@since: 2008-Feb-09
+@status: under development
+@organization: U{CCOM&lt;http://ccom.unh.edu/&gt;} 
+@bug: epydoc --check complains about unittest additions
+@bug: Bug two
+@todo: logging, fuzzing, etc
+@todo: To make your code executable after check-in (to allow for doc and unittest), do svn propset svn:executable ON yourfile.py
+@todo: &quot;svn propedit svn:keywords yourfile.py&quot;, then put in &quot;Date Revision&quot;
+@todo: What to make of &quot;pylint --with-line-length=150&quot; ... does this really lead to better code?
+@todo: Run pychecker on your files.
+@see: U{python idioms&lt;http://jaynes.colorado.edu/PythonIdioms.html&gt;} - Read this before modifying any code here.
+'</font><font color="#008000">''</font>
+</pre>
+Look for template.py in my next release of noaadata... I forgot to add it
+to the MANIFEST.in this time around.
+-----

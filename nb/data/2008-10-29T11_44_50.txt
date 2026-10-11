@@ -1,0 +1,42 @@
+TITLE: what metadata needs to be in log files?
+AUTHOR: Kurt
+DATE: 10.29.2008 11:44
+DESC: better living through better logging
+-----
+BODY:
+Several of us are all working on generating log files of data from
+sensors.  It's not a terribly hard thing to do and we each have
+slightly different requirements.  I spent some time today working on
+the noaadata port_server script that connects to a TCP/IP port and
+logs the data while allowing other clients to receive the passed
+through port_server.  I added a couple things:
+<ul>
+<li>Logging both the UTC human readable time of open and close of a log file</li>
+<li>UNIX UTC timestamp seconds to open and close</li>
+<li>On open, the logger calls "<b>ntpq -p -n</b> to find out how time is doing</li>
+<li>Records the logging host OS, name and version</li>
+<li>Optionally adding a USCG style station and UNIX timestamp to each line</li>
+<li>Optional file extension... e.g. .ais or .txt</li>
+</ul>
+Running the command on a computer to test it:
+<pre>% <b>port_server.py -v -i 35000 -o 40000 --in-host=eel.ccom.nh -r -lrnhsomewhere -srnhsomewhere  -v -v -u -e .ais</b></pre>
+The resulting log file:
+<pre># Opening log file at 2008-10-29 15:02 UTC,1225292534.55
+# Logging host: Darwin eel.ccom.nh 8.11.0
+# NTP status:
+# ntp:      remote           refid      st t when poll reach   delay   offset  jitter
+# ntp: ==============================================================================
+# ntp: +64.73.32.134    64.73.0.9        2 u 184m  36h  377   50.946   -2.955  29.451
+# ntp: -72.233.76.194   72.232.210.196   3 u 184m  36h  377   67.790   -7.215   2.654
+# ntp: +64.202.112.65   64.202.112.75    2 u 184m  36h  377   33.511   -4.957  29.519
+# ntp: -69.36.240.252   69.36.224.15     2 u 184m  36h  377   79.967   -8.633  26.402
+# ntp: -75.144.70.35    99.150.184.201   2 u 184m  36h  375   65.124   14.143  52.945
+# ntp: -209.67.219.106  74.53.198.146    3 u   8h  36h  177   52.204   60.177 118.591
+# ntp: *192.43.244.18   <b>.ACTS.</b>           1 u 183m  36h  377   85.405   -3.497  29.069
+# ntp: -63.240.161.99   64.202.112.75    2 u 184m  36h  377   40.248    3.536  35.421
+!AIVDM,1,1,,A,15N00t0P19G?evbEbgatswvH05p8,0*5B,x157918,b003669712,1225292534,rnhsomewhere,1225292534.89
+!AIVDM,1,1,,A,?03OwmQifbo@000,2*6E,x161035,b003669976,1225292534,rnhsomewhere,1225292534.89
+!AIVDM,1,1,,B,?03OwpQGILL8000,2*04,x153483,b003669985,1225292535,rnhsomewhere,1225292535.54
+# Closing log file at 2008-10-29 15:02 UTC,1225292535.64</pre>
+What is ACTS?
+-----

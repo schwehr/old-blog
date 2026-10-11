@@ -1,0 +1,203 @@
+TITLE: More on the network time protocol (NTP)
+AUTHOR: Kurt
+DATE: 04.03.2010 17:09
+DESC: getting it figured out
+-----
+BODY:
+See also: <a
+href="http://www.meinberg.de/english/info/ntp.htm">Meinberg's NTP
+Overview</a> and <a
+href="http://www.eecis.udel.edu/~ntp/ntpfaq/NTP-a-faq.htm">The NTP FAQ
+and HOWTO</a> [UDel EECIS] (the later is helpful, but out of date).  Things to read: <a href="http://www.eecis.udel.edu/~mills/ntp.html">Network Time Synchronization Research Project</a>
+
+As I was just working more with time, I figured I should dig into NTP
+more.  Val got me kick started a couple of years ago.  I need to
+really know what NTP is doing to make sure I am don't have a lurking
+time problem.  First time commands to see what is happening.  All of
+what I am showing here is on Mac OSX 10.6.3.  I was playing with ntp
+in fink (4.6.2) and a development version of ntp (ntpq
+4.2.7p22@1.2125-o Sat Apr 3 20:04:44 UTC 2010 (1) ), but for this post,
+I will use the stock ntp.
+
+First, I need to describe my ntp setup, as it is different than the
+default Apple configuration.  I am giving NTP a whole bunch of servers
+to choose from.  NTP works best when it has at least 3 servers to pick
+from.  I am using servers from the <a
+href="http://www.pool.ntp.org/en/">NTP Pool project</a>.  Here are the
+relevant lines that I added in my /etc/ntp.conf:
+<pre>server time.apple.com
+server 0.us.pool.ntp.org minpoll 12 maxpoll 17
+server 1.us.pool.ntp.org minpoll 12 maxpoll 17
+server 2.us.pool.ntp.org minpoll 12 maxpoll 17
+server 3.us.pool.ntp.org minpoll 12 maxpoll 17
+server 0.north-america.pool.ntp.org minpoll 12 maxpoll 17
+server 1.north-america.pool.ntp.org minpoll 12 maxpoll 17
+server 2.north-america.pool.ntp.org minpoll 12 maxpoll 17
+<!-- -->
+# And revert to the local clock (".LOCL." in the ntpq list) if all else fails
+server 127.127.1.0
+fudge 127.127.1.0 stratum 13
+<!-- -->
+# Include any local servers or official servers here:
+server wilmot.unh.edu</pre>
+I can look to see that ntp is indeed running on my laptop:
+<pre><b>ps aux | grep ntp</b>
+root     51659   0.0  0.0  2435212   1188   ??  Ss   10:52AM   0:01.37 \
+  /usr/sbin/ntpd -c /private/etc/ntp-restrict.conf -n -g \
+  -p /var/run/ntpd.pid -f /var/db/ntp.drift</pre>
+To restart NTP, you can use this command.  Once NTP is stopped, MacOSX will
+automatically restart ntpd.
+<pre>sudo launchctl stop org.ntp.ntpd</pre>
+<a
+href="http://www.eecis.udel.edu/~ntp/ntp_spool/html/ntpq.html">ntpq</a>
+has an interactive mode that provides quite a bit of information, but
+the first thing to do is find out which version of ntpq I am using.
+There are supposed to be "-v" options to the commands, but non of them
+worked for me.
+<pre><b>echo version | ntpq</b>
+ntpq 4.2.4p4@1.1520-o Mon May 18 19:38:36 UTC 2009 (1)</pre>
+Now, lets get a listing of the servers that ntpd is listening to 
+right now.  It tries to pick the best server and the one it is using
+is marked with a "*".  The "+" denotes the next best server.  I added the
+"-n" flag to not look up the names of the servers.  This is faster and the
+IP addresses do not get clipped.
+<pre><b>ntpq -p -n</b>
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+<i>*17.151.16.22    17.254.0.49      2 u  397 1024  377  115.966  -10.589   2.441</i>
+ 74.88.39.232    129.6.15.29      2 u 1945  68m    3  100.529  -29.152  30.756
+ 70.86.250.6     129.7.1.66       2 u 1908  68m    3  321.470  -124.26 127.291
+ 67.222.149.177  66.96.98.9       3 u 1923  68m    3  357.534  -145.33 130.226
+ 38.229.71.1     192.168.0.16     2 u 1948  68m    3  274.057  -110.85 113.097
+ 169.229.70.183  169.229.128.214  3 u 1937  68m    3  415.429  -157.87 157.765
+ 72.9.108.133    67.128.71.65     3 u 1908  68m    3  266.445  -116.93 121.686
+ 169.229.70.64   128.32.206.54    2 u 1954  68m    3  394.899  -155.73 146.651
+ 127.127.1.0     .LOCL.          13 l   12   64  377    0.000    0.000   0.001
+<i>+132.177.137.2   204.9.136.253    3 u  236 1024  377   42.310   -3.545   2.498</i></pre>
+Remote is the host name that ntp is talking to.  refid is the host
+that is the "parent" of the remote host.  NTP works like a tree
+propagating time from host to host.  The "st" denotes the stratum or
+distance from a true time source (e.g. a GPS, cell phone, or other
+radio signal).  A computer attached to a time source is <b>stratum
+1</b>.  "t" is the type of connection that the remote has:
+<pre>u: unicast or manycast client
+b: broadcast or multicast client
+l: local (reference clock)
+s: symmetric (peer)
+A: manycast server
+B: broadcast server
+M: multicast server</pre>
+<i>When</i> says how long it has been since ntpd has talked to the
+remote ntp server.  <i>Pool</i> is how the time between talking to
+this remote server. <i>reach</i> is an set of flags that I have not
+looked into.  <i>Delay</i> is the number of milliseconds roundtrip
+from the remote to the root server (stratum 1) and back.
+<i>Offset</i> is estimated different in time in milliseconds from that
+host to the root clock that it is synced to.  <i>Jitter</i> is how
+much time varies in milliseconds between several time queries for that host.
+
+Sometimes you hit a stratum 1 server in the ntp pool.  There are a
+number of fields in the refid depending on which time source is being
+used, but here is one I happend apon:
+<pre>     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*207.171.30.106  .PPS.            1 u 1283  68m   37   83.255    3.331   0.251</pre>
+If you want to trace up the stratum levels for your computer, you can use <a href="http://www.eecis.udel.edu/~ntp/ntp_spool/html/ntptrace.html">ntptrace</a>:
+<pre><b>ntptrace</b>
+localhost: stratum 3, offset -0.005283, synch distance 0.403253
+17.151.16.22: timed out, nothing received
+***Request timed out</pre>
+However, as you can see here, not all hosts respond to the trace
+requests.  To give a view of what a successful trace looks like, I've
+put in an address for a timeserver:
+<pre><b>ntptrace  72.18.205.157</b>
+point2.adamantsys.com: stratum 3, offset -0.000391, synch distance 0.053617
+mainframe.cynacom.com: stratum 2, offset -0.000652, synch distance 0.020873
+time-c.timefreq.bldrdoc.gov: stratum 1, offset 0.000000, synch distance 0.002650, refid 'ACTS'</pre>
+The next command to try is <a
+href="http://www.eecis.udel.edu/~ntp/ntp_spool/html/ntpdc.html">ntpdc</a>
+- the "special query program".  There are two key command to use here
+to monitor how well NTP is doing.  I am still learning how to
+interpret these values.
+
+The sysinfo command to ntpdc is the real meat of monitoring ntp:
+<pre><b>ntpdc -c sysinfo</b>
+system peer:          time6.apple.com
+system peer mode:     client
+leap indicator:       00
+stratum:              3
+precision:            -20
+root distance:        0.11617 s
+root dispersion:      0.24869 s
+reference ID:         [17.151.16.22]
+reference time:       cf62343e.0039f289  Sat, Apr  3 2010 17:40:14.000
+system flags:         auth monitor ntp kernel stats 
+jitter:               0.203140 s
+stability:            0.000 ppm
+broadcastdelay:       0.003998 s
+authdelay:            0.000000 s</pre>
+The loopinfo is also important and has the offset which is the
+estimate of how far off of the reference clock we are.  But note, if
+you drop back to the local clock, time will be right on, but the local
+oscillator in your computer is horrible at keeping time.
+<pre><b>ntpdc -c loopinfo</b>
+offset:               -0.013710 s
+frequency:            -3.706 ppm
+poll adjust:          30
+watchdog timer:       173 s</pre>
+That is the basics of looking at ntp with commands.  You can also
+enable logging in the ntp.conf file and plot out values over time.
+Hopefully, I will talk through doing that another time.  For now, I am
+going to show you how to get some of the above information from within
+python using <a href="http://pypi.python.org/pypi/ntplib/">ntplib</a>.
+There is a test_ntplib.py program in the source distribution that shows
+how to use the library.  Here is cut down example:
+<pre><b>fink install ntplib-py26</b>
+<b>ipython</b>
+<b><font color="#000080">import</font></b> ntplib
+<b><font color="#000080">from</font></b> time <b><font color="#000080">import</font></b> ctime
+<!-- -->
+client <font color="#990000">=</font> ntplib<font color="#990000">.</font><b><font color="#000000">NTPClient</font></b><font color="#990000">()</font>
+response <font color="#990000">=</font> client<font color="#990000">.</font><b><font color="#000000">request</font></b><font color="#990000">(</font><font color="#FF0000">'localhost'</font><font color="#990000">,</font> version<font color="#990000">=</font><font color="#993399">3</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Offset : %f'</font> <font color="#990000">%</font> response<font color="#990000">.</font>offset<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Stratum : %s (%d)'</font> <font color="#990000">%</font> <font color="#990000">(</font>ntplib<font color="#990000">.</font><b><font color="#000000">stratum_to_text</font></b><font color="#990000">(</font>response<font color="#990000">.</font>stratum<font color="#990000">),</font> response<font color="#990000">.</font>stratum<font color="#990000">))</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Precision : %d'</font> <font color="#990000">%</font> response<font color="#990000">.</font>precision<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Root delay : %f '</font> <font color="#990000">%</font> response<font color="#990000">.</font>root_delay<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Root dispersion : %f'</font> <font color="#990000">%</font> response<font color="#990000">.</font>root_dispersion<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Delay : %f'</font> <font color="#990000">%</font> response<font color="#990000">.</font>delay<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Poll : %d'</font> <font color="#990000">%</font> response<font color="#990000">.</font>poll<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Transmit timestamp : '</font> <font color="#990000">+</font> <b><font color="#000000">ctime</font></b><font color="#990000">(</font>response<font color="#990000">.</font>tx_time<font color="#990000">))</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Reference timestamp : '</font> <font color="#990000">+</font> <b><font color="#000000">ctime</font></b><font color="#990000">(</font>response<font color="#990000">.</font>ref_time<font color="#990000">))</font>
+<b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Reference clock identifier : '</font> <font color="#990000">+</font> ntplib<font color="#990000">.</font><b><font color="#000000">ref_id_to_text</font></b><font color="#990000">(</font>response<font color="#990000">.</font>ref_id<font color="#990000">,</font> response<font color="#990000">.</font>stratum<font color="#990000">))</font></pre>
+The results look like this:
+<pre>Offset : 0.000066
+Stratum : secondary reference (NTP) (3)
+Precision : -20
+Root delay : 0.116165 
+Root dispersion : 0.264694
+Delay : 0.000264
+Poll : 0
+Transmit timestamp : Sat Apr  3 18:00:55 2010
+Reference timestamp : Sat Apr  3 17:40:14 2010
+Reference clock identifier : 17.151.16.22</pre>
+When working with data, I always keep everything in UTC.  In python, the easiest way to timestamp 
+data is by calling <i>time.time()</i>, which returns a UNIX UTC timestamp number and datetime can help
+too:
+<pre><b>ipython</b>
+import time, datetime, calendar
+timestamp = time.time()
+# 1270332482.344033
+datetime.datetime.utcfromtimestamp(1270332482.344033)
+# datetime.datetime(2010, 4, 3, 22, 8, 2, 344033)
+datetime.datetime.utcnow()
+# datetime.datetime(2010, 4, 3, 22, 9, 36, 132771)
+calendar.timegm(datetime.datetime.utctimetuple(datetime.datetime.utcnow()))
+# 1270332678</pre>
+However, a
+lot of software gives you date and time in a local timezone.  On the Mac, you
+can see your timezone this way:
+<pre><b>ls -l /etc/localtime</b>
+lrwxr-xr-x 1 root wheel 36 Dec 28 16:22 /etc/localtime -> /usr/share/zoneinfo/America/New_York</pre>
+That's enough time on time for now.
+-----

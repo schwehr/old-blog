@@ -1,0 +1,60 @@
+TITLE: Sensor data in GeoRSS?
+AUTHOR: Kurt
+DATE: 03.19.2010 14:19
+DESC: eh?
+-----
+BODY:
+<a href="http://schwehr.blogspot.com/2010/03/sensor-data-in-georss.html">Any discussions can go here...</a>
+
+Chaoyi gave a go at publishing the CCOM weather (wx) station data in a GeoRSS and has brought up a number of issues.  Line number referer to the example below (which we know is not right).
+<ol>
+<li>The OGC Atom+GeoRSS validation results are confusing.  <a href="http://feedvalidator.org/check.cgi?url=http%3A%2F%2Fschwehr.org%2Fblog%2Fattachments%2F2010-03%2Fweather-try1-georss.xml">Feed Validator</a> has a better presentation</li>
+<li>It loosk like the OGC version only supports GML</li>
+<li>How should the payload be encoded?  This is the big question.  See line 24, where we make hard to parse human readable text.</li>
+<li>I think the ID is wrong, but it still not clear to me how id's should be handled.</li>
+<li>How many data points should be in the feed?  If we are collecting a point every 12 seconds, do we want to just have 120 seconds of data?  Do we need a realtime feed an one that is decimated?  And if decimated, what is the "best" algorithm?  I hate systems where you can't find out the actual algorithm used (Ahem!  You know who you are!)</li>
+<li>Does anything actually pay attention to the syndication flags?  We definitely need to have these match the data window (see previous point)</li>
+<li>And lots of other issues that escape me right now...</li>
+</ol>
+And is there an easy way from pure python to serve up a WFS?
+
+Example output from the OGC validator:
+<pre>Validation for 'weather-short.xml':
+<!-- -->
+There were 3 validation errors:
+1) Line 16, Column 14 - bad character content for element
+2) Line 35, Column 70 - bad character content for element
+3) Line 40, Column 12 - unfinished element</pre>
+Remember that the example here is not meant to be a best practices example.
+The full xml: <a href="http://schwehr.org/blog/attachments/2010-03/weather-try1-georss.xml">weather-try1-georss.xml</a>
+
+A shortened example with just one entry:
+<pre><font color="#000000">01:</font> <b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b> 
+<font color="#000000">02:</font> <b><font color="#0000FF">&lt;feed</font></b> <font color="#009900">xmlns:dc</font><font color="#990000">=</font><font color="#FF0000">"http://purl.org/dc/elements/1.1/"</font> 
+<font color="#000000">03:</font>   <font color="#009900">xmlns:georss</font><font color="#990000">=</font><font color="#FF0000">"http://www.georss.org/georss"</font> 
+<font color="#000000">04:</font>   <font color="#009900">xmlns:sy</font><font color="#990000">=</font><font color="#FF0000">"http://purl.org/rss/1.0/modules/syndication/"</font>
+<font color="#000000">05:</font>   <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2005/Atom"</font><b><font color="#0000FF">&gt;</font></b>
+<font color="#000000">06:</font> 
+<font color="#000000">07:</font>   <b><font color="#0000FF">&lt;sy:updatePeriod&gt;</font></b>hourly<b><font color="#0000FF">&lt;/sy:updatePeriod&gt;</font></b>
+<font color="#000000">08:</font>   <b><font color="#0000FF">&lt;sy:updateFrequency&gt;</font></b>60<b><font color="#0000FF">&lt;/sy:updateFrequency&gt;</font></b>
+<font color="#000000">09:</font> 
+<font color="#000000">10:</font>   <b><font color="#0000FF">&lt;title&gt;</font></b>Weather data from serial port<b><font color="#0000FF">&lt;/title&gt;</font></b>   
+<font color="#000000">11:</font>   <b><font color="#0000FF">&lt;link</font></b> <font color="#009900">href</font><font color="#990000">=</font><font color="#FF0000">"http://sardine.ccom.nh:8080/weather-rss/weather-latest.georss"</font> <font color="#009900">rel</font><font color="#990000">=</font><font color="#FF0000">"self"</font><b><font color="#0000FF">/&gt;</font></b>
+<font color="#000000">12:</font>   <b><font color="#0000FF">&lt;id&gt;</font></b>http://sardine.ccom.nh:8080/weather-rss/<b><font color="#0000FF">&lt;/id&gt;</font></b>   
+<font color="#000000">13:</font>   <b><font color="#0000FF">&lt;updated&gt;&lt;/updated&gt;</font></b>
+<font color="#000000">14:</font>   <b><font color="#0000FF">&lt;generator</font></b> <font color="#009900">uri</font><font color="#990000">=</font><font color="#FF0000">"http://schwehr.org/"</font><b><font color="#0000FF">&gt;</font></b>Kurt Schwehr<b><font color="#0000FF">&lt;/generator&gt;</font></b>
+<font color="#000000">15:</font> 
+<font color="#000000">16:</font>   <b><font color="#0000FF">&lt;entry&gt;</font></b>
+<font color="#000000">17:</font>     <b><font color="#0000FF">&lt;title&gt;</font></b>Weather read from serial port<b><font color="#0000FF">&lt;/title&gt;</font></b>
+<font color="#000000">18:</font>     <b><font color="#0000FF">&lt;author&gt;</font></b>       
+<font color="#000000">19:</font>       <b><font color="#0000FF">&lt;name&gt;</font></b>UNH CCOM<b><font color="#0000FF">&lt;/name&gt;</font></b>
+<font color="#000000">20:</font>     <b><font color="#0000FF">&lt;/author&gt;</font></b> 
+<font color="#000000">21:</font>     <b><font color="#0000FF">&lt;georss:point&gt;</font></b>43.135947,-70.939432<b><font color="#0000FF">&lt;/georss:point&gt;</font></b>
+<font color="#000000">22:</font>     <b><font color="#0000FF">&lt;link</font></b> <font color="#009900">href</font><font color="#990000">=</font><font color="#FF0000">"http://sardine.ccom.nh:8080"</font><b><font color="#0000FF">/&gt;</font></b>
+23:     <b><font color="#0000FF">&lt;published&gt;</font></b>2009-10-02T13:01:00Z2010-03-18T20:47:29Z<b><font color="#0000FF">&lt;/published&gt;</font></b>     
+24:     <b><font color="#0000FF">&lt;content</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"html"</font><b><font color="#0000FF">&gt;</font></b>&lt;![CDATA[wind speed is 2.09, wind gust is 3.72, air temperature is 14.8
+25: ]]&gt;<b><font color="#0000FF">&lt;/content&gt;</font></b>
+26:   <b><font color="#0000FF">&lt;/entry&gt;</font></b>
+27:
+28: <b><font color="#0000FF">&lt;/feed&gt;</font></b></pre>
+-----

@@ -1,0 +1,63 @@
+TITLE: Finding your location
+AUTHOR: Kurt
+DATE: 11.03.2010 00:10
+DESC: progress?
+-----
+BODY:
+All this year, I've been wanting to work on an emacs org-mode addition
+that would let you automatically add your location to entries.  I've
+been thinking that your .emacs could contain a configuration that would let you pick from:
+<ul>
+<li>Fixed address or lon,lat for desktop machines</li>
+<li>GPS attached via serial, TCP/IP, or GPSD for those with a GPS or on a ship with a network GPS</li>
+<li>Google Maps click (e.g. extending jd's <a href="http://julien.danjou.info/google-maps-el.html">Google Maps for Emacs</a>)  </li>
+<li>Through an IP lookup service that handles everything on the server side</li>
+</ul>
+That last entry is suddenly looking more possible now that I've found
+<a href="http://www.hostip.info">hostip.info</a>.  Most of the other
+sites that I've found have a bunch of JavaScript that I'm not going to
+run inside of emacs.  This one is just a simple URL.  I ran this from work:
+<pre><b>curl http://api.hostip.info/ &gt; where.xml</b></pre>
+Which returns this:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"ISO-8859-1"</font> <b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;HostipLookupResultSet</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0.1"</font> <font color="#009900">xmlns:gml</font><font color="#990000">=</font><font color="#FF0000">"http://www.opengis.net/gml"</font> <font color="#009900">xmlns:xsi</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2001/XMLSchema-instance"</font> <font color="#009900">xsi:noNamespaceSchemaLocation</font><font color="#990000">=</font><font color="#FF0000">"http://www.hostip.info/api/hostip-1.0.1.xsd"</font><b><font color="#0000FF">&gt;</font></b>
+ <b><font color="#0000FF">&lt;gml:description&gt;</font></b>This is the Hostip Lookup Service<b><font color="#0000FF">&lt;/gml:description&gt;</font></b>
+ <b><font color="#0000FF">&lt;gml:name&gt;</font></b>hostip<b><font color="#0000FF">&lt;/gml:name&gt;</font></b>
+ <b><font color="#0000FF">&lt;gml:boundedBy&gt;</font></b>
+  <b><font color="#0000FF">&lt;gml:Null&gt;</font></b>inapplicable<b><font color="#0000FF">&lt;/gml:Null&gt;</font></b>
+ <b><font color="#0000FF">&lt;/gml:boundedBy&gt;</font></b>
+ <b><font color="#0000FF">&lt;gml:featureMember&gt;</font></b>
+  <b><font color="#0000FF">&lt;Hostip&gt;</font></b>
+   <b><font color="#0000FF">&lt;ip&gt;</font></b>132.177.103.226<b><font color="#0000FF">&lt;/ip&gt;</font></b>
+   <b><font color="#0000FF">&lt;gml:name&gt;</font></b>Durham, NH<b><font color="#0000FF">&lt;/gml:name&gt;</font></b>
+   <b><font color="#0000FF">&lt;countryName&gt;</font></b>UNITED STATES<b><font color="#0000FF">&lt;/countryName&gt;</font></b>
+   <b><font color="#0000FF">&lt;countryAbbrev&gt;</font></b>US<b><font color="#0000FF">&lt;/countryAbbrev&gt;</font></b>
+   <i><font color="#9A1900">&lt;!-- Co-ordinates are available as lng,lat --&gt;</font></i>
+   <b><font color="#0000FF">&lt;ipLocation&gt;</font></b>
+    <b><font color="#0000FF">&lt;gml:pointProperty&gt;</font></b>
+     <b><font color="#0000FF">&lt;gml:Point</font></b> <font color="#009900">srsName</font><font color="#990000">=</font><font color="#FF0000">"http://www.opengis.net/gml/srs/epsg.xml#4326"</font><b><font color="#0000FF">&gt;</font></b>
+      <b><font color="#0000FF">&lt;gml:coordinates&gt;</font></b>-70.9232,43.1395<b><font color="#0000FF">&lt;/gml:coordinates&gt;</font></b>
+     <b><font color="#0000FF">&lt;/gml:Point&gt;</font></b>
+    <b><font color="#0000FF">&lt;/gml:pointProperty&gt;</font></b>
+   <b><font color="#0000FF">&lt;/ipLocation&gt;</font></b>
+  <b><font color="#0000FF">&lt;/Hostip&gt;</font></b>
+ <b><font color="#0000FF">&lt;/gml:featureMember&gt;</font></b>
+<b><font color="#0000FF">&lt;/HostipLookupResultSet&gt;</font></b>
+</tt></pre>
+The front page showed me the location and it's at least in Durham.
+However, this site is great about letting you set the location of your
+IP address, so people could flag static IPs with the correct location.
+
+<img title="hostip location for CCOM without any updating" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-11/hostip-ccom.png"/>
+
+Now in emacs, I can do:
+<pre>(require 'url)
+(url-retrieve-synchronously "http://api.hostip.info/")</pre>
+Now I just have to get better at writing emacs lisp, which I spent
+some time with this evening because the guy at Barnes and Noble did
+not listen to me and made that coffee caffeinated.  I found <a
+href="http://xahlee.org/emacs/google-earth.html">Emacs Lisp: Writing a
+google-earth Function</a>, which got me thinking and then there was <a
+href="http://julien.danjou.info/google-weather-el.html">Google Weather
+for Emacs</a>.  I have a long long ways to go.
+-----

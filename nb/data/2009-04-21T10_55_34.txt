@@ -1,0 +1,80 @@
+TITLE: Optical Character Recognition (OCR)
+AUTHOR: Kurt
+DATE: 04.21.2009 10:55
+DESC: possible, but it will take more work
+-----
+BODY:
+Last week, <a
+href="http://brillig.org/people/acd/images/Arctic98/">Alex (ACD)</a>
+gave me a hand evaluating the potential to pull positions out of the
+text written on the Healy Aloftcon images.  He suggested looking at <a
+href="http://jocr.sourceforge.net/">GOCR/JOCR</a> and if that didn't
+work, to try <a
+href="http://code.google.com/p/tesseract-ocr/">tesseract-ocr</a>
+
+I was able to give GOCR a try with moderate success, but don't have
+the time to look into it more.  I started with an aloftcon image: <a
+href="http://mgds.ldeo.columbia.edu/healy/reports/aloftcon/2009/20090201-1601.jpeg">20090201-1601.jpeg</a>
+<pre>% <b>fink install gocr</b>
+% <b>gocr 20090201-1601.jpeg</b>
+,' .!Oft CaOnC Sv0C Fb, 01,16,,O,t Ow.p3,,GM0T02,Q,O, 2O,O,?d'^,?'n'>',&?^ aaog 'nd03?9V??,''?'i9?  ???v? ,'D?",,?  ???i,'c,i,'0t,  0o  clq?p6;tgg?,  
+        , , '',    ' ..
+;'..'i..;î'.',..'oo..?P0'0,,,F,,0,,D'?,,'U0O',,,,,,,',,,,p0,,,,,,  ,,   ,      , ,   ,,     '                           , ,,,,,,',n,O,0-
+:,.,.ti'''.. !,.   ', t. . 00 0 0vOnO08c,B' 8 0,8,00,,,,,n8'0'8,,,  00    ,,,        ,  ,            l,    0,,,p08 '''
+'  :', ' :''  ''i'r.l?',  t.   '   '   .l     , :,  .    08''   '  ...Wr :: '' ,0,,,q, g  ,   ,,  ,   , ' 00'B 0,  8,  
+...
+</pre>
+The first line looks like it might be seeing the text and after that,
+it degenerates into interpreting the noise.  We then tried cropping the
+image and making it gray scale.
+
+<img title="Text for OCR" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/gray-crop.jpg"/>
+<pre>% <b>gocr gray-crop.jpg</b>
+=C 00uuu=06i0csJ;000 =000 ci ,v c rW,2,M'-'!   er!n,.tr 3;x4X</pre>
+It probably does not help that there are two different fonts here and that
+there are substantial JPEG compression artifacts.  Croping to just the
+position that I'd like to parse doesn't really help.
+
+<img title="Text for OCR" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/gray-crop2.jpg"/>
+<pre>% <b>gocr gray-crop2.jpg</b>
+, lt,3 e'l,,,,</pre>
+However, thresholding the image has better results, but is not quite there.
+
+<img width="150" title="Text for OCR" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/gray-crop3.jpg"/>
+<pre>% <b>gocr gray-crop3.jpg</b>
+48 1 3.C N</pre>
+Closer.  Trying to constrain the characters does not appeart to change how it is matching.
+<pre>% <b>gocr -C "0123456789.NSEW " gray-crop3.jpg</b>
+48 1 3. N</pre>
+And changing the certainty still does not let it pick up the 0.
+<pre>% <b>gocr -a 0 -C "0123456789.NSEW " gray-crop3.jpg</b>
+48 1 3. N</pre>
+Setting the space width helps with the spacing, but still doesn't get the 0.
+<pre>% <b>gocr -a 0 -C "0123456789.NSEW " gray-crop3.jpg -s 9</b>
+48 13. N</pre>
+Turning up the verbosity gives some info on what it is seeing.
+<pre>% <b>gocr -C "0123456789.NSEW " gray-crop3.jpg -v 4</b>
+# list shape for charlist _
+# list shape   5 x=  47    2 d=   7  10 vf=1 ac=0 e000 (?)
+# list box      x=   47    2 d=   7  10 r=   1   0 nrun=0 p=0x802a00
+#  dots=0 boxes=1 subboxes=0 c=(?) mod=(0x00) line=1 m= 0 2 9 12
+#  frames= 1 (sumvects=22)
+#  frame 0 ( +26, 43,22)  #00  1  0 #01  1  1 #02  0  2 #03  0  8 #04  1  \
+  8 #05  2  9 #06  4  9 #07  5  8 #08  5  7 #09  6  6 #10  6  3 #11  5  \
+  3 #12  6  4 #13  6  6 #14  3  9 #15  2  9 #16  0  7 #17  0  2 #18  2  \
+  0 #19  4  0 #20  5  1 #21  5  0
+# list pattern  x=   47    2 d=   7  10 t= 1 1
+.$$@$$.  .@@@@@.&lt;-
+.$...$.  .@...@.  
+$......  @......&lt; 
+@....$$  @....@@  
+@.....$  @.....@  
+@.....@  @.....@  
+@.....$  @.....@  
+$....$.  @....@.  
+$$..@$.  @@..@@.  
+..$$$..  ..@@@..&lt;-</pre>
+And that is about all I have time for right now.  I am sure that with
+more time spent on the filtering, an imagemagick script could be setup
+to give a reliable decoding of the text.
+-----

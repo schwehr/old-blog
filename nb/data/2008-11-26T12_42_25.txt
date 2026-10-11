@@ -1,0 +1,45 @@
+TITLE: mbsystem in fink for PPC
+AUTHOR: Kurt
+DATE: 11.26.2008 12:42
+DESC: wtf
+-----
+BODY:
+I got a little to clever for my own good...
+<pre>% <b>fink install mbsystem</b>
+#!/bin/bash -ve
+  # NOTE: do not set -e for bash in the line above.  That will break the grep
+  perl -pi.bak -e  's|\@FINKPREFIX\@|/sw|g' install_makefiles
+  cpp -dM /dev/null | grep __LITTLE_ENDIAN__
+### execution of /var/tmp/tmp.1.TrwYax failed, exit code 1
+</pre>
+On PPC, the little endian check fails and grep has an exit status of
+1.  This is fine, but bash then sees it as an error and quits with
+a failure.  Sigh.
+
+Here are some options.  First is 'uname -m' 
+<pre>big endian machine % <b>uname -m</b>
+Power Macintosh
+little endian machine $ <b>uname -m</b>
+i386</pre>
+That works, but if uname -m ever changes, we are sunk.  Here is my
+new, more robust endian check that doesn't require actually compiling
+anything.
+<pre>big endian ppc machine % <b>cpp -dM /dev/null | grep -i ENDIAN__ | cut -d_ -f 3</b>
+BIG
+little endian i386 machine % <b>cpp -dM /dev/null | grep -i ENDIAN__ | cut -d_ -f 3</b>
+LITTLE
+</pre>
+Of course, now I'm getting mbsystem failing to build.  I thought I had mbsystem not building
+with OpenGL stuff...
+<pre>mbview_callbacks.c:1719: warning: too many arguments for format
+mbview_callbacks.c:1720: warning: format '%f' expects type 'double', but argument 4 has type 'int'
+mbview_callbacks.c:1720: warning: too many arguments for format
+mbview_callbacks.c:1775: error: 'GLwNrgba' undeclared (first use in this function)
+mbview_callbacks.c:1775: error: (Each undeclared identifier is reported only once
+mbview_callbacks.c:1775: error: for each function it appears in.)
+mbview_callbacks.c:1775: warning: left-hand operand of comma expression has no effect
+mbview_callbacks.c:1777: error: 'GLwNdepthSize' undeclared (first use in this function)
+mbview_callbacks.c:1777: warning: left-hand operand of comma expression has no effect
+mbview_callbacks.c:1779: error: 'GLwNdoublebuffer' undeclared (first use in this function)</pre>
+-----
+

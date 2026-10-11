@@ -1,0 +1,31 @@
+TITLE: Cloning a mediawiki to a Mac for going to Sea
+AUTHOR: Kurt
+DATE: 10.06.2009 07:07
+DESC: part way there
+-----
+BODY:
+Brian C. and I have been thinking about how to most effectively take
+our internal <a href="http://mediawiki.org/">mediawiki</a> based wiki to sea.  Since we both use Macs,
+I've defaulted to starting with creating a fink package for mediawiki.
+Assuming that this will be a local only wiki server (probably on a laptop),
+I am not going to be too concerned with security.
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/fink/mediawiki.info">mediawiki.info</a>
+<pre>sudo mysqld_safe --user=mysql &
+mysqladmin -u root password PASSWDHERE
+mysql -u root -p mysql
+enter passwd
+mysqladmin -u root -p create wikidb;
+GRANT ALL PRIVILEGES ON wikidb.* TO 'wikiuser'@'localhost' WITH GRANT OPTION;
+sudo a2ensite mediawiki
+sudo apache2ctl restart
+open http://localhost/mediawiki</pre>
+The info package creates a /sw/etc/apache2/sites-available/mediawiki file
+allowing you to a2ensite/a2dissite to turn on and off the wiki.  Next will
+come working on injecting a mysql dump of the wiki rather than configure it
+through the webpage.  I will also need to create a custom /sw/var/mediawiki/LocalSettings.php file to talk to that database.
+
+<img title="Installing mediawiki" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-10/mediawiki-installing.png"/>
+
+<img title="Installed and running with a blank wiki" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-10/mediawiki-installed.png"/>
+-----

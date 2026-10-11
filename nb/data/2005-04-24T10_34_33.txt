@@ -1,0 +1,169 @@
+TITLE: Inheritance in python, Space Shuttle flash website
+AUTHOR: Kurt
+DATE: 04.24.2005 10:34
+DESC: Subclassing GenIV to make more specific objects
+-----
+BODY:
+My general idea now is to put all the OpenInventor ASCII basics into
+the GenIV class.  Then for each application domain, authors can
+subclass GenIV and provide additional high level constructs.  For me
+right now, I am creating the GenXCore subclass for sediment cores.  I
+will then have things for marking regions in the core, making
+texturemapped rectangles for core photos, etc.  If someone wants to do
+some other domain, say ships, houses, multibeam terrains, etc., then
+that would be great!
+
+Here is the code for just the bare minimum system.  I have not done
+inheritance/subclassing design before in python.  It is <b>way
+simpler</b> than with C++.  The only thing I am missing is the
+destructor.  I do not use that often in C++, it can occasionally pay
+off big.  In C++ the main (and unexciting) use for destructors is
+deleting new'ed data structures, but in python, the garbage collector
+(gc) or some similiar type mechanism is taking care of memory for us.
+
+This is pretty long, but I think it makes a nice simple use of
+inheritance to add and isolate functionality.  It might bite me in the
+long run, but I like it so far.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+XCORE Utilities for generating OpenInventor ASCII files
+Copyright (C) 2005  Kurt Schwehr.  GPL Version 2
+&quot;</font><font color="#008000">&quot;&quot;</font>
+
+<strong>import</strong> <font color="#2040a0">os</font>	<font color="#444444"># os.remove()</font>
+<strong>import</strong> <font color="#2040a0">sys</font>	<font color="#444444"># sys.exit()</font>
+<strong>import</strong> <font color="#2040a0">string</font>
+<strong>import</strong> <font color="#2040a0">platform</font> <font color="#444444"># system information like mac_ver()</font>
+<strong>import</strong> <font color="#2040a0">datetime</font>	<font color="#444444"># for date.today()</font>
+
+<font color="#2040a0">red</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#FF0000">1</font>,<font color="#FF0000">0</font>,<font color="#FF0000">0</font><font color="4444FF">]</font>
+
+<strong>class</strong> <font color="#2040a0">GenIV</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    Class that handles generating OpenInventor 2.1/Coin ASCII geometry
+    files.  The class tracks indenation for you and provides helpers
+    for both low level and high level constructs.
+
+    Most methods for this class emit IV geometry into the open file
+    handle.
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,filename=&quot;tmp.iv&quot;)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">ivFile</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="#008000">&quot;w&quot;</font><font color="4444FF">)</font> 
+        <font color="#2040a0">self</font>.<font color="#2040a0">indentChar</font><font color="4444FF">=</font><font color="#008000">'  '</font> <font color="#444444"># Could also set this to '\t'</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">indentLevel</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> header</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        Write an OpenInventor header
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;#Inventor V2.1 ascii<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# Date:       &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">datetime</font>.<font color="#2040a0">date</font>.<font color="#2040a0">today</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# PWD:        &quot;</font><font color="4444FF">+</font><font color="#2040a0">os</font>.<font color="#2040a0">getcwd</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# os:         &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">os</font>.<font color="#2040a0">uname</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# osver:      &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">os</font>.<font color="#2040a0">uname</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">2</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# OSX ver:    &quot;</font><font color="4444FF">+</font><font color="#2040a0">platform</font>.<font color="#2040a0">mac_ver</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;&quot;</font><font color="4444FF">)</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> indent</font><font color="2040a0">(self,numlevels=1)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">indentLevel</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">numlevels</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> unindent</font><font color="2040a0">(self,numlevels=1)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">indentLevel</font> <font color="4444FF">-</font><font color="4444FF">=</font> <font color="#2040a0">numlevels</font>
+        <strong>if</strong> <font color="#2040a0">numlevels</font> <font color="4444FF">&lt;</font> <font color="#FF0000">0</font><font color="4444FF">:</font> <font color="#2040a0">numlevels</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> write</font><font color="2040a0">(self,string=&quot;\n&quot;,newline=True)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        Write a string to the open IV file.  Appends a newline unless
+        you tell it not to do that.  Handles indenting in the process.
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">pad</font><font color="4444FF">=</font><font color="#008000">&quot;&quot;</font>
+        <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">indentLevel</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">pad</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">indentChar</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">ivFile</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">pad</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">newline</font><font color="4444FF">:</font> <font color="#2040a0">outString</font> <font color="4444FF">=</font> <font color="#2040a0">string</font> <font color="4444FF">+</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font>
+        <strong>else</strong><font color="4444FF">:</font> <font color="#2040a0">outString</font> <font color="4444FF">=</font> <font color="#2040a0">string</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">ivFile</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">outString</font><font color="4444FF">)</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> comment</font><font color="2040a0">(self,string=&quot;#&quot;)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;# &quot;</font><font color="4444FF">+</font><font color="#2040a0">string</font><font color="4444FF">)</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> beginSeparator</font><font color="2040a0">(self,comment=None)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Begin a separator block and increase indentation&quot;</font><font color="#008000">&quot;&quot;</font>
+        <strong>if</strong> <font color="#2040a0">comment</font><font color="4444FF">:</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;Separator { &quot;</font>,<font color="#2040a0">newline</font><font color="4444FF">=</font><font color="#2040a0">False</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">comment</font><font color="4444FF">(</font><font color="#2040a0">comment</font><font color="4444FF">)</font>
+        <strong>else</strong><font color="4444FF">:</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;Separator {&quot;</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">indent</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> endSeparator</font><font color="2040a0">(self,comment=None)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;End the last separator and unindent&quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">unindent</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">comment</font><font color="4444FF">:</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;} &quot;</font>,<font color="#2040a0">newline</font><font color="4444FF">=</font><font color="#2040a0">False</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">comment</font><font color="4444FF">(</font><font color="#008000">&quot;End Separator: &quot;</font><font color="4444FF">+</font><font color="#2040a0">comment</font><font color="4444FF">)</font>
+        <strong>else</strong><font color="4444FF">:</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;} # End Separator&quot;</font><font color="4444FF">)</font>
+
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> baseColor</font><font color="2040a0">(self, color)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        Write a basecolor node
+        color - [r,g,b] list or tuple - red, green, blue must be in
+                the range of [0..1]
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">s</font><font color="4444FF">=</font><font color="#008000">&quot; &quot;</font>
+        <font color="#2040a0">r</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">g</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">;</font> <font color="#2040a0">b</font><font color="4444FF">=</font><font color="#FF0000">2</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;BaseColor {rgb [&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">color</font><font color="4444FF">[</font><font color="#2040a0">r</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#2040a0">s</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">color</font><font color="4444FF">[</font><font color="#2040a0">g</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#2040a0">s</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">color</font><font color="4444FF">[</font><font color="#2040a0">b</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot;]}&quot;</font><font color="4444FF">)</font>
+
+<font color="#444444">######################################################################</font>
+<strong>class</strong> <font color="#2040a0">GenXCore</font><font color="4444FF">(</font><font color="#2040a0">GenIV</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Create XCore Open Inventor ascii geometry files&quot;</font><font color="#008000">&quot;&quot;</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self,filename=&quot;tmp.iv&quot;)</font>:
+</strong>        <font color="#2040a0">GenIV</font>.<font color="#2040a0">__init__</font><font color="4444FF">(</font><font color="#2040a0">self</font>,<font color="#2040a0">filename</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">header</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> markRegions</font><font color="2040a0">(self,layerList,width=10, color=red)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        layerlist - list of range tuples to be marked
+            e.g. [(74,76),(82,84),(104,105), (120,120.5) ]
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">beginSeparator</font><font color="4444FF">(</font><font color="#008000">&quot;markRegions&quot;</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">baseColor</font><font color="4444FF">(</font><font color="#2040a0">color</font><font color="4444FF">)</font>
+        <strong>for</strong> <font color="#2040a0">layer</font> <strong>in</strong> <font color="#2040a0">layerList</font><font color="4444FF">:</font>
+            <font color="#2040a0">top</font> <font color="4444FF">=</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">layer</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#2040a0">bot</font> <font color="4444FF">=</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">layer</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;Coordinate3 { point [ -&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">width</font>/<font color="#FF0000">2</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; 0 -&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">top</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot;,     &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">width</font>/<font color="#FF0000">2</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; 0.0 -&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">top</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot;,&quot;</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;                      -&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">width</font>/<font color="#FF0000">2</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; 0 -&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">bot</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot;,     &quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">width</font>/<font color="#FF0000">2</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; 0.0 -&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">bot</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">&quot; ] }&quot;</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;&quot;</font><font color="4444FF">)</font>
+            <font color="#2040a0">self</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;IndexedFaceSet { coordIndex [ 2, 1, 0, -1,    2, 3, 1, -1 ]}&quot;</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">endSeparator</font><font color="4444FF">(</font><font color="#008000">&quot;markRegions&quot;</font><font color="4444FF">)</font>
+
+<font color="#444444">######################################################################</font>
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <font color="#2040a0">iv1</font> <font color="4444FF">=</font> <font color="#2040a0">GenIV</font><font color="4444FF">(</font><font color="#008000">&quot;1.iv&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">header</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">indent</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">comment</font><font color="4444FF">(</font><font color="#008000">&quot;indent1&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">indent</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">comment</font><font color="4444FF">(</font><font color="#008000">&quot;indent2&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">unindent</font><font color="4444FF">(</font><font color="#FF0000">2</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">comment</font><font color="4444FF">(</font><font color="#008000">&quot;hello&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">beginSeparator</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">comment</font><font color="4444FF">(</font><font color="#008000">&quot;in sep&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">iv1</font>.<font color="#2040a0">endSeparator</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">xc1</font> <font color="4444FF">=</font> <font color="#2040a0">GenXCore</font><font color="4444FF">(</font><font color="#008000">&quot;3.iv&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">xc1</font>.<font color="#2040a0">markRegions</font><font color="4444FF">(</font><font color="4444FF">[</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#FF0000">10</font><font color="4444FF">)</font>,<font color="4444FF">(</font><font color="#FF0000">150</font>,<font color="#FF0000">200</font><font color="4444FF">)</font><font color="4444FF">]</font><font color="4444FF">)</font>
+</pre>
+NASA has gone cheese ball.  Flash web site: <a
+href="http://www.nasa.gov/externalflash/rtf_flash/start.html">NASA's
+Return to Flight</a>.  How about designing something new that has some
+potential and is not so darn expensive.  Maybe aiming for simple and
+redundant would be better?  This looks like NASA is too hard to try to
+look "cool."  The space shuttles and space station are amazing
+accomplishments, but they are a big drag on space exploration.  Then
+again, it is clear that space is not a US priority since we just hit
+$300 billion for invading Afghanistan and Iraq and killed 1500
+soldiers so far since 2001.  In the same time, NASA spent something
+like $60 billion and lost 7 people.
+-----

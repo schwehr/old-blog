@@ -1,0 +1,122 @@
+TITLE: A first pass at evaluating NTP
+AUTHOR: Kurt
+DATE: 04.06.2010 09:40
+DESC: looks okay to me
+-----
+BODY:
+You can do a lot better than what I did here, but this is enough to
+get a sense of what NTP was doing on the N-AIS host logging computer
+that is r003669945 that I presented last week.  First, let's look at
+the log file that I'll be using to see how things are.  It's loopstats.20100326:
+<pre>55281 610.766 0.003964577 -30.829 0.001042694 0.042301 10
+55281 1634.929 0.003274964 -30.848 0.001005363 0.040147 10
+55281 2659.093 0.003658357 -30.821 0.000950150 0.038725 10
+55281 4708.420 0.002458421 -30.846 0.000984844 0.037242 10
+55281 6760.748 0.002162450 -30.845 0.000927161 0.034837 10
+55281 7785.913 0.002674196 -30.816 0.000885951 0.034184 10
+55281 8810.076 0.001050992 -30.863 0.001008040 0.036084 10
+...</pre>
+I got the definitions of the fields in loopstats from here: <a href="http://www.eecis.udel.edu/~mills/ntp/html/monopt.html">Monitoring Options by Walt Kelly</a>
+
+<table width="100%" border="1" cellspacing="2" cellpadding="2">
+			<tr bgcolor="orange">
+				<td>Item</td>
+				<td>Units</td>
+				<td>Description</td>
+			</tr>
+			<tr>
+				<td><tt>50935</tt></td>
+				<td>MJD</td>
+				<td>date</td>
+			</tr>
+			<tr>
+				<td><tt>75440.031</tt></td>
+				<td>s</td>
+				<td>time past midnight</td>
+			</tr>
+			<tr>
+				<td><tt>0.000006019</tt></td>
+				<td>s</td>
+				<td>clock offset</td>
+			</tr>
+			<tr>
+				<td><tt>13.778</tt></td>
+				<td>PPM</td>
+				<td>frequency offset</td>
+			</tr>
+			<tr>
+				<td><tt>0.000351733</tt></td>
+				<td>s</td>
+				<td>RMS jitter</td>
+			</tr>
+			<tr>
+				<td><tt>0.013380</tt></td>
+				<td>PPM</td>
+				<td>RMS&nbsp;frequency jitter (aka wander)</td>
+			</tr>
+			<tr>
+				<td><tt>6 </tt></td>
+				<td>log<sub>2</sub> s</td>
+				<td>clock discipline loop time constant</td>
+			</tr>
+		</table>
+Here, I've plotted the 5th column, estimated error, over the 54 points
+that I have for that day agains the seconds past midnight for the day.  It looks like
+this computer's time is always under 0.0014 seconds (1.4 ms), which seems pretty good.
+
+<img title="NTP loopstats for r003669945 on Mar 26, 2010" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/r003669945-ntp-2010036-est-err.png"/>
+
+But to get a sense of how that compares to another machine, I pulled
+the logs from my new quad core xeon 3GHz desktop that runs on the CCOM
+network.  This time, I am plotting the days since I got the machine up
+and running.  There were a lot of reboots during the first couple of
+days, but then it seems to settle down to under 15 ms:
+
+<img title="NTP loopstats for CCOM Mac desktop over the last month" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/snipe-ntp-35-days.png"/>
+
+It appeards that my desktop occasionally does as well as the logging
+computer, but the Mar 26 timing is pretty darn good.
+
+It wouldn't be fair to leave you without the code that I used to
+create these plots.  It's pretty simple:
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+<!-- -->
+<b><font color="#0000FF">declare</font></b> -ar <font color="#009900">field_names</font><font color="#990000">=(</font> <font color="#FF0000">"0"</font> day second offset drift_compensation estimated_error stability polling_interval <font color="#990000">)</font>
+<b><font color="#0000FF">declare</font></b> -ar <font color="#009900">field_label</font><font color="#990000">=(</font> <font color="#FF0000">"0"</font> <font color="#FF0000">"day (MJD)"</font> <font color="#FF0000">"time past midnight (s)"</font> <font color="#FF0000">"clock offset (s)"</font> <font color="#FF0000">"freq offset (PPM)"</font> <font color="#FF0000">"RMS jitter (s)"</font> <font color="#FF0000">"RMS freq jitter/wander (PPM)"</font> <font color="#FF0000">"clock discipline loop time const (log_2 s)"</font> <font color="#990000">)</font> 
+<!-- -->
+<b><font color="#0000FF">for</font></b> col <b><font color="#0000FF">in</font></b> <font color="#993399">3</font> <font color="#993399">4</font> <font color="#993399">5</font> <font color="#993399">6</font> <font color="#990000">;</font> <b><font color="#0000FF">do</font></b>
+echo Column <font color="#009900">$col</font> <font color="#FF0000">"..."</font> <font color="#009900">${field_names[$col]}</font> <font color="#FF0000">"..."</font> <font color="#009900">${field_label[$col]}</font>
+gnuplot <font color="#990000">&lt;&lt;</font>EOF
+<b><font color="#0000FF">set</font></b> term png
+<b><font color="#0000FF">set</font></b> output <font color="#FF0000">"$col-${field_names[$col]}.png"</font>
+<b><font color="#0000FF">set</font></b> title <font color="#FF0000">"${field_names[$col]}"</font>
+<b><font color="#0000FF">set</font></b> xlabel <font color="#FF0000">"${field_names[2]}"</font>
+<b><font color="#0000FF">set</font></b> ylabel <font color="#FF0000">"${field_label[$col]}"</font>
+plot <font color="#FF0000">"$1"</font> using <font color="#993399">2</font><font color="#990000">:</font><font color="#009900">$col</font> with lp
+EOF
+<b><font color="#0000FF">done</font></b></tt></pre>
+The above script builds 4 plots against seconds of the day past
+midnight.  To plot agains the day, I wrote this little python script
+to make the first column be decimal days and changed the above gnuplot
+command's using statement to be "using 1:$col".
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sys
+baseday <font color="#990000">=</font> None
+<b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">file</font></b><font color="#990000">(</font>sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]):</font>
+    day <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()[</font><font color="#993399">0</font><font color="#990000">])</font>
+    <b><font color="#0000FF">if</font></b> baseday <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font>
+        baseday <font color="#990000">=</font> day
+    <b><font color="#0000FF">if</font></b> baseday <font color="#990000">&gt;</font> day<font color="#990000">:</font>
+        baseday <font color="#990000">=</font> day
+<b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">file</font></b><font color="#990000">(</font>sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]):</font>
+    fields <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()</font>
+    day <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>fields<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])</font>
+    day <font color="#990000">=</font> <font color="#990000">(</font>day<font color="#990000">-</font>baseday<font color="#990000">)</font> <font color="#990000">+</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>fields<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">])</font> <font color="#990000">/</font> <font color="#990000">(</font><font color="#993399">24</font><font color="#990000">*</font><font color="#993399">3600</font><font color="#990000">.)</font>
+    fields<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">str</font></b><font color="#990000">(</font>day<font color="#990000">)</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">' '</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>fields<font color="#990000">)</font></tt></pre>
+Not fancy, but it gets the job done.  There is a <a href="http://www.opensource.apple.com/source/ntp/ntp-12/ntp/scripts/plot_summary.pl">summary_plot.pl</a>
+script around on the net, but not being a heavy duty perl user, I am
+not up for figuring it out.
+-----

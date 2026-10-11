@@ -1,0 +1,169 @@
+TITLE: Using segysqldist and pltsegy
+AUTHOR: Kurt
+DATE: 06.22.2005 19:28
+DESC: core 4
+-----
+BODY:
+Now I am actually working on data that I know is of use to my thesis.
+I need to make the plot look 'reel purdy' this evening.  Here are some
+notes on how I am doing this.
+
+I am starting with the same xstar file that I was working with
+yesterday: bpsio04L04.xstar.  It would be nice to have a little option
+that would calculate the bounding box for a line, but I do not have
+that at the moment.  What I do have is segysqldist.py.  First I need a
+database just for this line (so it will go quickly).
+<pre>
+  &gt; segysql.py -f bpsio04L04.db  -d xstar   bpsio04L04.xstar
+  &gt; ls -l bpsio04L04.db
+    -rw-r--r--    1 schwehr  staff    27310080 Jun 22 19:18 bpsio04L04.db
+</pre>
+Now I would like to see how this line compares to the core 4
+location.  My new app segysqldist.py is designed just for this job.
+<pre>
+  &gt; segysqldist.py -x -120.05716666 -y 34.37899999 -n 100 \
+        -d line.dat -f bpsio04L04.db 
+
+Starting SQL select.  This make take quite a while
+Finished SQL select
+# Beginning search
+Using slower search for many points.  Suggest using -n 1 for faster
+Inspecting data:
+1000
+2000
+...
+
+&gt; ls -ltr | tail -4
+-rw-r--r--    1 schwehr  staff         168 Jun 22 19:26 coreloc.dat
+-rw-r--r--    1 schwehr  staff          21 Jun 22 19:32 point.dat
+-rw-r--r--    1 schwehr  staff        3500 Jun 22 19:32 results-lonlat.dat
+-rw-r--r--    1 schwehr  staff      552863 Jun 22 19:32 line.dat
+</pre>
+The program created 3 new files.  point.dat contains the location that
+was specified on the command line to search for.  results-lonlat.dat
+has the closest 100 shots (ignoring all the shots with duplicate
+locations).  Finally line.dat has a subsampled set of x,y pairs of the
+input data so that we can see the track lines.  Now I need to use my
+trusty friend gnuplot to see what the world looks like.
+<pre>
+  gnuplot&gt; plot 'line.dat','results-lonlat.dat','coreloc.dat' 
+  gnuplot&gt; set label 4 '4' at -120.055,34.37899999
+  gnuplot&gt; set terminal png
+  gnuplot&gt; set output '4-distance.png'
+  gnuplot&gt; plot 'line.dat','results-lonlat.dat','coreloc.dat'
+</pre>
+In the graph, the green section (I know... red/green = bad) marks the
+closest 100 shot locations that surround core 4.<br>
+<img src="http://schwehr.org/blog/attachments/2005-06/4-distance.png">
+
+Now I just have to look in the <em>results-lonlat.dat</em> file to
+find out which shots to work with in pltsegy.
+<pre>
+&gt; head -15 results-lonlat.dat 
+# segysqldist.py
+# 
+# distance    - currently is in "degrees"... sort of
+# traceNumber - the offset in the particular segy file
+# fileKey     - use the segyFile table in *.db to translate
+# 
+# longitude latitude "distance" fileKey Shotpoint traceNumber
+  -120.057222  34.378889  0.000124 1 83033 6424
+  -120.056944  34.378889  0.000248 1 83059 6476
+  -120.056944  34.379167  0.000278 1 83069 6496
+  -120.057222  34.378611  0.000393 1 82994 6346
+  -120.056944  34.379444  0.000497 1 83106 6570
+  -120.057222  34.378333  0.000669 1 82956 6270
+  -120.056944  34.379722  0.000756 1 83143 6645
+  -120.057222  34.378056  0.000946 1 82922 6202
+</pre>
+There is a handy program called <em>minmax</em> in GMT that will
+summarize the situation for us!
+<pre>
+&gt; minmax results-lonlat.dat 
+
+results-lonlat.dat: N = 100     
+   <-120.059/-120.055>   <34.3672/34.3908>  <0.000124/0.012083>
+   <1/1>                 <81820/84782>      <4001/9921>
+</pre>
+This means that the key range in pltsegy is in the neighborhood of
+shotpoints 81820 to 84782.  I am going to round this to be a nicer
+range for plotting in pltsegy.
+<pre>
+  81800 to 84800
+</pre>
+Hopefully my makepltsegy.py script will actually work to give a plot
+in this range.  I need to adjust <em>sioseis-wbt.bash</em> to only
+spit out this region for the maximum turnaround time.
+<pre>
+  declare -r FNO="81800"
+  declare -r LNO="84800"
+  declare -r INFILE=$1
+  declare -r OUTFILE=$2
+  declare -r WBTFILE=$3
+</pre>
+And run sioseis something like this:
+<pre>
+  &gt; ./sioseis-wbt.bash bpsio04L04.sgy bpsio04L04-wbt03.sgy \
+                     bpsio04L04-02.h2o
+
+  &gt; ls -l *.sgy
+-rwxr-xr-x    1 schwehr  staff    81956368 Jun 21 11:31 bpsio04L04-wbt01.sgy
+-rwxr-xr-x    1 schwehr  staff    81956368 Jun 21 21:04 bpsio04L04-wbt02.sgy
+-rwxr-xr-x    1 schwehr  staff    24890896 Jun 22 20:20 bpsio04L04-wbt03.sgy
+</pre>
+This gives a much smaller (24MB) seismic file to work with in the
+short term.  Off to constructing the pltsegy file.  Ouch... I am
+getting a slightly frustrating error:
+<pre>
+&gt; rm -f sort*; pltsegy test.pltsegy 
+***NMLST error. Supplied name doesnt appear in table                                            
+ Error was in
+timescal =
+reduc -2.58253e-29
+ *** Error (PLOTS).  Invalid device number = -1073744224
+Valid devices are:-
+X Landscape: device 16
+X Portrait: device 17
+(Default)X Landscape: device -1
+Postscript Portrait: device 14
+Postscript Landscape: device 15
+</pre>
+I am not sure what that means.  My previous pltsegy file still works
+fine and is not too different.  Would help if I knew what kind of
+parser is in pltsegy, but I am not motivated enough to go look.  Here
+is the beginning of the offending file:
+<pre>
+plot
+       dtfile = bpsio04L04-wbt03.sgy;
+       plfile = test.ps;
+       srtfile = sort.test.pltsegy.sort;
+       cdp = t;
+       device = 16;
+       interact = 1;
+       size = 550, 350;
+       sort = shot;
+       shb = 81800; { beginning shot
+       shf = 84800; { ending shot
+       noinc = 1;
+       ntrab = 1;
+       ntraf = 1;
+       ntrinc = 1;
+       speq = t;
+       delt = 0.000083;
+       tbi = 0.0;
+       tfi = 0.75;
+       timescal = 200;
+       tmark = 0.01;
+       spa = 0.025;
+...
+</pre>
+Oh... typo!  Should be timscal, not tim<b>e</b>scal.  Got it.  Now I have a
+happy pltsegy.  To make the plot take up more of the horizontal screen
+space I had to adjust the horizontal shot spacing (spa).
+<pre>
+  &gt; makepltsegy.py -o test.pltsegy -p test.ps -i bpsio04L04-wbt03.sgy \
+       -s 81800 -S 84800 --spa=0.100 --timscal=200
+  &gt; rm -f sort*; pltsegy test.pltsegy
+</pre>
+Works!
+-----

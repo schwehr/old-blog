@@ -1,0 +1,37 @@
+TITLE: Little OpenInventor Visualization
+AUTHOR: Kurt
+DATE: 04.11.2006 18:59
+DESC: crufty code
+-----
+BODY:
+Here is a quick and dirty OpenInventor file to view a sequence of
+images.  Dirty is the key word.  Everything is hard coded.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>print</strong> <font color="#008000">&quot;#Inventor V2.0 ascii&quot;</font>
+<strong>import</strong> <font color="#2040a0">glob</font>
+<font color="#2040a0">files</font> <font color="4444FF">=</font> <font color="#2040a0">glob</font>.<font color="#2040a0">glob</font><font color="4444FF">(</font><font color="#008000">'*.png'</font><font color="4444FF">)</font>
+<font color="#2040a0">offset</font> <font color="4444FF">=</font> <font color="4444FF">-</font><font color="#FF0000">500</font>
+<strong>for</strong> <font color="#2040a0">file</font> <strong>in</strong> <font color="#2040a0">files</font><font color="4444FF">:</font>
+    <font color="#2040a0">offset</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">100</font>
+    <strong>print</strong> <font color="#008000">''</font><font color="#008000">'Separator {'</font><font color="#008000">''</font>
+    <strong>if</strong> <font color="#2040a0">abs</font><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">50</font><font color="4444FF">:</font>
+	<strong>print</strong> <font color="#008000">''</font><font color="#008000">'	Material {transparency 0.8}'</font><font color="#008000">''</font>
+    <strong>print</strong> <font color="#008000">''</font><font color="#008000">'
+        Translation {translation 0 '</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">' 0 }
+	Coordinate3 { point [ 0. 0. 0.0, 340 0.0 0.0,
+		  0. 0. -200, 340 0.0 -200 ] }
+	BaseColor { rgb [ 0.5 0.5 0.5 ] }
+	Texture2 { filename &quot;'</font><font color="#008000">''</font><font color="4444FF">+</font><font color="#2040a0">file</font><font color="4444FF">+</font><font color="#008000">''</font><font color="#008000">'&quot; model DECAL }
+	TextureCoordinate2 { point [
+		0.0 1.0,
+		1.0 1.0,
+		0.0 0.0,
+		1.0 0.0,
+	] }
+	IndexedFaceSet { coordIndex [ 0, 1, 2, -1,
+				      1, 3, 2, -1 ]}
+	IndexedLineSet { coordIndex [ 0, 1, 3, 2, 0 ] }
+}'</font><font color="#008000">''</font>
+</pre>
+-----

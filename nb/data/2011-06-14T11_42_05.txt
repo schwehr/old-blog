@@ -1,0 +1,67 @@
+TITLE: Switching between 32-bit and 64-bit versions of fink
+AUTHOR: Kurt
+DATE: 06.14.2011 11:42
+DESC: finally documenting my fink switch scripts
+-----
+BODY:
+Hopefully we will soon get to the world of only having to worry about
+64-bit code on the Mac, but there are still too many programs that are
+not 32 and 64 bit clean.  Seems crazy as I think is was ~1993 when I
+first started using 64-bit machines: <a
+href="http://en.wikipedia.org/wiki/Tru64_UNIX">OSF/1 aka Tru64</a> on
+the <a href="">Dec Alpha</a> workstations in <a href="http://en.wikipedia.org/wiki/Stanford_Sweet_Hall">Sweet Hall at Stanford</a>.
+
+Here is how I have my fink installs setup so
+that I can have both on the same machine.
+
+I first do two source installs of fink.  The first, I tell to be
+32-bit and to install in /sw32, rather than /sw.  The second is 64-bit
+and installs in /sw64.  I then make a symbolic link (ln -s) from /sw
+to /sw32, just in case there are fink programs that aren't properly
+handling the location of the fink tree or if there are other scripts
+that hardcode the /sw (boo!).
+
+I then added two aliases to my .bashrc that start the switch process:
+<pre>alias fink32='source $HOME/bin/fink32'
+alias fink64='source $HOME/bin/fink64'</pre>
+In my ~/bin directory, I have the three files that do the work of
+unsetting the old environment and get fink to set up the new 
+environment.  First is the <b>unfink</b> script.  You will likely have to 
+check for other environment variables that need to be unset.  Perhaps
+I should be cleaver and push the entire environment somewhere when I
+first create a shell and then pop that entire environment back.  I
+leave that to someone else to do.
+<pre>export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:$HOME/bin:/usr/local/bin:/Developer/tools:/usr/X11R6/bin
+export MANPATH=/usr/share/man:/usr/X11/man:/usr/X11R6/man
+<!-- -->
+unset CLASSPATH
+unset PERL5LIB
+unset QTDIR
+unset ANT_HOME
+unset XAPPLRESDIR
+unset SGML_CATALOG_FILES
+unset XDG_CONFIG_DIRS
+unset XML_CATALOG_FILES
+unset GDL_PATH
+unset XDG_DATA_DIRS
+unset R_HOME
+unset INFOPATH</pre>
+Finally, here is the ~/bin/fink64 script:
+<pre>source /Users/schwehr/bin/unfink
+. /sw64/bin/init.sh</pre>
+There is one just like it in ~/bin/fink32.  Then just make sure it
+works by checking where fink comes from:
+<pre><b>type -a fink</b>
+fink is /sw32/bin/fink
+<!-- -->
+<b>fink64</b>
+<!-- -->
+<b>type -a fink</b>
+fink is /sw64/bin/fink
+<!-- -->
+<b>fink32</b>
+<!-- -->
+<b>type -a fink</b>
+fink is /sw32/bin/fink</pre>
+Not elegant, but it gets the job done.
+-----

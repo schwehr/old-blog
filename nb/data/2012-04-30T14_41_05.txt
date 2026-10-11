@@ -1,0 +1,93 @@
+TITLE: Google Cloud Storage Part 2
+AUTHOR: Kurt
+DATE: 04.30.2012 14:41
+DESC: gsutil
+-----
+BODY:
+The last time, I showed using Google Cloud Storage without authentication.
+This time, I'd like to do some authenticated work with the data.
+
+<b>Note:</b> You won't have permission to any of what I set up, but hopefully,
+you can create your own data bucket and with two accounts, try the same.  This is
+a little bit confusing.
+
+You can see your account here: <a href="https://code.google.com/apis/console">https://code.google.com/apis/console</a>
+
+Click <b>Team</b>.  This will get you one way to control who can work
+with the data.  As I'm going to go with the command line route, I
+haven't tried to see what the GUI will do.  
+
+When I go to my storage manager web page (sorry, no good url), this is what I see:
+
+<img width="600" height="134" title="Google Storage Manager" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-04/google-cloud-store.png"/>
+
+I can click the ghost check mark to "Share Publicly."  e.g.
+
+<a href="http://commondatastorage.googleapis.com/kds_gsdemo2011/data/Selection_006.png">kds_gsdemo2011/data/Selection_006.png</a> [an image from Google Earth]
+
+First, I'm going to activate a virtual env that has the gsutil package
+in it.  See my last tutorial for how I got that set up.
+<pre>cd ~/virtualenvs/storage
+source bin/activate</pre>
+Now to try it out.  First you need to get your account activated via
+oauth2.  In your default web browser, log into google.com.
+<pre>gsutil config</pre>
+You will be presented with a url that you need to go to at google.
+This will give you a hash string that you will paste back into the command
+line.  You password will never be used when interacting with google storage
+via the command line.  The configuration is stored in a "boto" file in your
+home directory.  <a href="https://github.com/boto/boto">boto</a> is a python
+library for interating with cloud compute and storage services.  Check out the <a href="https://github.com/boto/boto/blob/develop/README.rst">readme</a> file to
+see which ones... there are a lot!
+<pre>ls -l ~/.boto
+less ~/.boto</pre>
+In that file you well see a lot more, but the basics are:
+<pre>[Credentials]
+gs_oauth2_refresh_token = </pre>
+Now we need to modify the ACLs (access control lists):
+<pre>cd tmp
+gsutil getacl gs://kds_gsdemo2011 &gt; acl.xml</pre>
+I got back an XML file that looks like this:
+<pre><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;AccessControlList&gt;</font></b>
+    <b><font color="#0000FF">&lt;Owner&gt;</font></b>
+        <b><font color="#0000FF">&lt;ID&gt;</font></b>00...e1<b><font color="#0000FF">&lt;/ID&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Owner&gt;</font></b>
+    <b><font color="#0000FF">&lt;Entries&gt;</font></b>
+        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color="#0000FF">&lt;Scope</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"GroupById"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;ID&gt;</font></b>00...e1<b><font color="#0000FF">&lt;/ID&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color="#0000FF">&lt;Permission&gt;</font></b>FULL_CONTROL<b><font color="#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color="#0000FF">&lt;Scope</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"GroupById"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;ID&gt;</font></b>00...21<b><font color="#0000FF">&lt;/ID&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color="#0000FF">&lt;Permission&gt;</font></b>FULL_CONTROL<b><font color="#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color="#0000FF">&lt;Scope</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"GroupById"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;ID&gt;</font></b>00...44<b><font color="#0000FF">&lt;/ID&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color="#0000FF">&lt;Permission&gt;</font></b>READ<b><font color="#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Entries&gt;</font></b>
+<b><font color="#0000FF">&lt;/AccessControlList&gt;</font></b>
+</pre>
+I then added my gmail address that I would like to be able to read the data:
+<pre><tt>        <b><font color="#0000FF">&lt;Entry&gt;</font></b>
+            <b><font color="#0000FF">&lt;Scope</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"UserByEmail"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;EmailAddress&gt;</font></b>schwehr@gmail.com<b><font color="#0000FF">&lt;/EmailAddress&gt;</font></b>
+                <b><font color="#0000FF">&lt;Name&gt;</font></b>Kurt Schwehr<b><font color="#0000FF">&lt;/Name&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Scope&gt;</font></b>
+            <b><font color="#0000FF">&lt;Permission&gt;</font></b>READ<b><font color="#0000FF">&lt;/Permission&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Entry&gt;</font></b>
+</tt></pre>
+I then pushd that permission definition file back at the Google Cloud Storage
+bucket:
+<pre>gsutil setacl acl.xml gs://kds_gsdemo2011
+gsutil ls -l gs://kds_gsdemo2011/data/Selection_001.png
+gsutil cp gs://kds_gsdemo2011/data/Selection_001.png .</pre>
+I was then able to copy a file from the cloud to my machine.
+-----

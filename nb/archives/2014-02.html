@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: February 2014 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2014-02-24T00_12_23.txt" name=
+"e2014-02-24T00_12_23.txt"></a>
+<h2 class="date">02.24.2014 00:12</h2>
+<div class="blogbody">
+<h3 class="title">pkg-config</h3>
+<div class="item-description">I had never really used <a href=
+"http://pkgconfig.freedesktop.org">pkg-config</a> before today.
+Turns out to be reasonably simple. I read through the man page an
+here is me messing with it.
+<pre>
+<b><font color="#0000FF">type</font></b> -a pkg-config
+<i><font color=
+"#9A1900">pkg-config is /sw/bin/pkg-config</font></i>
+<!-- -->
+dpkg -S /sw/bin/pkg-config
+<i><font color="#9A1900">pkgconfig: /sw/bin/pkg-config</font></i>
+<!-- -->
+fink list -i pkgconfig <font color=
+"#990000">|</font> grep -v virtual
+<i><font color=
+"#9A1900"> i  pkgconfig                0.25-2  Manager for library compile/link flags</font></i>
+<!-- -->
+pkg-config --help
+pkg-config --list-all
+pkg-config --list-all <font color="#990000">|</font> wc -l
+<i><font color="#9A1900">    300</font></i>
+pkg-config --list-all <font color=
+"#990000">|</font> head -<font color="#993399">4</font>
+<font color=
+"#990000">gstreamer-tag-0.10 GStreamer Tag Library - Tag base classes and helper functions
+libmetalink libmetalink - Metalink library
+xf86rushproto XF86RushProto - XF86Rush extension headers
+fontsproto FontsProto - Fonts extension headers</font>
+<!-- -->
+pkg-config x11 <font color=
+"#990000">&amp;&amp;</font> echo <font color="#FF0000">'yes'</font>
+<i><font color="#9A1900">yes</font></i>
+<!-- -->
+pkg-config missing <font color=
+"#990000">&amp;&amp;</font> echo <font color="#FF0000">'yes'</font>
+pkg-config missing <font color=
+"#990000">||</font> echo <font color="#FF0000">'do not have "missing"'</font>
+<i><font color="#9A1900">do not have "missing"</font></i>
+<!-- -->
+pkg-config --print-variables x11
+<font color="#990000">xthreadlib
+exec_prefix
+prefix
+includedir
+libdir</font>
+<!-- -->
+pkg-config --print-provides x11
+x11 <font color="#990000">=</font> <font color=
+"#993399">1.6</font><font color="#990000">.</font><font color=
+"#993399">2</font>
+<!-- -->
+pkg-config --print-requires x11
+<i><font color="#9A1900">xproto</font></i>
+<i><font color="#9A1900">kbproto</font></i>
+<!-- -->
+pkg-config --cflags x11
+<i><font color="#9A1900">-I/opt/X11/include</font></i>
+<!-- -->
+pkg-config --libs x11
+<i><font color="#9A1900">-L/opt/X11/lib -lX11</font></i>
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2014-02.html#e2014-02-24T00_12_23.txt">Permalink</a> 
+<!-- <br /><a href="archives/#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2014-02-18T09_06_12.txt" name=
+"e2014-02-18T09_06_12.txt"></a>
+<h2 class="date">02.18.2014 09:06</h2>
+<div class="blogbody">
+<h3 class="title">A unified marine sensor logging format</h3>
+<div class="item-description">This is the first of a series of
+posts I hope to write.<br />
+<br />
+<a href="https://xkcd.com/927/">https://xkcd.com/927/</a><br />
+<br />
+<img width="500" height="283" title="XKCD Stanards" withgrayborder=
+"True" src=
+"../attachments/2014-02/xkcd-standards.png" /><br />
+
+<br />
+See also: <a href=
+"https://gitorious.org/toils-of-ais/toils-of-ais/source/9fdc70ed69c3cd5ec46e672eb6aa120e335d0e77:">
+Toils of AIS</a> by Eric S. Raymond and Kurt Schwehr.<br />
+<br />
+I am frustrated that each sub-community of marine related sensors
+has their own data formats for raw logging. Even worse, each vendor
+has their own format (with many different messages as they innovate
+over the years). Those formats require a wide range of support
+libraries and often not easily extensible. We have formats for
+multibeam sonars, seismic systems, acoustic recorders (hydro and
+geo-phones), seismic stations (really just a 3-axis, 3-channel
+geo-phone), lidar, ships' and GPS sensors, magnetometers, radar,
+grids, images, vectors, metadata, and more. Those formats treat
+data in other formats as orthogonal. Most of encodings used for
+those formats are not even described in the Wikipedia article on
+<a href=
+"http://en.wikipedia.org/wiki/Comparison_of_data_serialization_formats">
+Comparison of data serialization formats</a>. Worse yet, some key
+standards are behind paywalls, which greatly hampers adoption (e.g.
+try pricing all the ISO standards related to metadata). On top of
+that, some of these standards are so confusing that it is nearly
+impossible to create conformant data streams.<br />
+<br />
+In this series, I will be arguing that the sonar community needs to
+get away from systems like the Generic Sensor Format (gsf) and move
+to a unified machine and human readable specification system for
+the data stream at the lower levels. I will be pushing for using
+ProtoBuffers (protobuf). Protobufs were created by Google and are
+heavily used within Google. I have a fair bit of experience with
+them as I have been working for Google for the last 2 years.
+However, there are other formats, such as BSON, that could work. I
+do feel like I'm repeating myself with this. I argued for a custom
+XML representation of AIS messages starting in 2006 and declaring
+defeat in 2010 as the AIS community opted to stick with their
+amazingly terrible status quo.<br />
+<br />
+An additional concern is that people have proposed formats or tools
+that are either only used in a small community, are not tested
+across a number of key programming languages or revert to defining
+the raw bit level packaging such that the software engineers of
+every piece of code that will touch this format will have to
+understand the low level details.<br />
+<br />
+In this first post, I'd like to explore the use cases. What are the
+range of problems that we are trying to solve? I'm attempting to
+think about 50 or so years into the future, a near impossible task,
+but some things will most certainly be correct. Storage of data
+will become more affordable in terms of cost, power required,
+volume/mass required. Compute power for an available budget will
+increase. Sensors will become more affordable and their diversity
+will increase.<br />
+<br />
+I have not had a chance to flush out these use cases, but I do not
+want to wait any longer to get this starter post on line.<br />
+<br />
+* Single beam echo sounder from a ship<br />
+<br />
+* Multibeam echo sounder ship<br />
+<br />
+* Multi-channel seismic vessel<br />
+<br />
+* Lidar from an aircraft<br />
+<br />
+* An AUV, Glider, Argos style device with IMU<br />
+<br />
+* Super cheap land sensor networks without GPS<br />
+<br />
+* ADCP mounted on the sea floor<br />
+<br />
+- without external intervention for long periods - event based time
+corrections<br />
+<br />
+* An array of sea floor devices<br />
+<br />
+- down for an extended period with slow intermittent acoustic
+connections<br />
+<br />
+* Ping editing a multibeam sonar<br />
+<br />
+* Post processing to get time and location<br />
+<br />
+* Post collection indexing to allow fast access<br />
+<br />
+* Later splicing of multiple platforms into a single stream<br />
+<br />
+- inlining of forward and backwards index messages<br />
+<br />
+* Non-survey ship underway</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2014-02.html#e2014-02-18T09_06_12.txt">Permalink</a> 
+<!-- <br /><a href="archives/2014-02-24T00_12_23.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2014-02-07T10_50_55.txt" name=
+"e2014-02-07T10_50_55.txt"></a>
+<h2 class="date">02.07.2014 10:50</h2>
+<div class="blogbody">
+<h3 class="title">Google Docs Mac OSX 10.9 Mavericks</h3>
+<div class="item-description">For my desktop, I have linux (I gave
+up on macs for the desktop), but for my mobile devices, I've been
+using Mac devices. Mac OSX is really frustrating at a low level
+compared to Linux, but I like the hardware (minus the lack of
+easily fixing). Here is what I do to survive in the Mac OS X world.
+I've given up Microsoft Office, Photoshop and Illustrator now that
+I'm not a full time professor making posters and living in the
+painful UNH IT environment. I used to do this in MediaWiki format
+inside of CCOM, but I don't want to have to tunnel into CCOM for
+this and I'd like it to get more eyeballs. I rarely got feedback
+from others, so why would I keep it closed? I will be leaving out
+stuff specific to the places I work in a lot of cases, but I will
+share a bit when it doesn't expose confidential business
+practices.<br />
+<br />
+At the time of this post, the document is hardly even a
+Work-In-Progress (WIP).<br />
+<br />
+<a href=
+"https://docs.google.com/document/d/1HwoFtCYRw3xY0KjqbF7Pr4E1Cu34HrDg67aGm_owBek/pub">
+Mac OSX 10.9 Setup</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2014-02.html#e2014-02-07T10_50_55.txt">Permalink</a> 
+<!-- <br /><a href="archives/2014-02-18T09_06_12.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2014-02-07T10_17_51.txt" name=
+"e2014-02-07T10_17_51.txt"></a>
+<h2 class="date">02.07.2014 10:17</h2>
+<div class="blogbody">
+<h3 class="title">AutoAwesome winter in NH</h3>
+<div class="item-description">AutoAwesome on G+ is often just
+cheesy, but I really like this one.<br />
+<br />
+<img width="360" height="360" title="AutoAwesome NH Winter"
+withgrayborder="True" src=
+"../attachments/2014-02/nh-autoawesome-snow.gif" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2014-02.html#e2014-02-07T10_17_51.txt">Permalink</a> 
+<!-- <br /><a href="archives/2014-02-07T10_50_55.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">February 2014</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar">1</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar">5</span></td>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar"><a href=
+"2014-02.html#e2014-02-07T10_50_55.txt">7</a></span></td>
+<td align="center"><span class="calendar">8</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">9</span></td>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar">12</span></td>
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar">17</span></td>
+<td align="center"><span class="calendar"><a href=
+"2014-02.html#e2014-02-18T09_06_12.txt">18</a></span></td>
+<td align="center"><span class="calendar">19</span></td>
+<td align="center"><span class="calendar">20</span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar"><a href=
+"2014-02.html#e2014-02-24T00_12_23.txt">24</a></span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar">28</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

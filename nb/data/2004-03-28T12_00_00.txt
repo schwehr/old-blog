@@ -1,0 +1,40 @@
+TITLE: DEM/Terrain tool, system papers, VICAR
+AUTHOR: Kurt
+DATE: 03.28.2004 12:00
+DESC: Old blog
+-----
+BODY:
+<a
+href="http://gatekeeper.dec.com/pub/DEC/SRC/publications/levin/SOSPhowto.html">How
+to write a systems paper</a> by Roy Levin and David D. Redell
+
+<a href="http://stellar-one.com/nuclear/prologue.htm">Three mile
+island accident</a>
+
+<a href="http://appft1.uspto.gov/netacgi/nph-Parser?Sect1=PTO2&amp;Sect2=HITOFF&amp;u=%2Fnetahtml%2FPTO%2Fsearch-adv.html&amp;r=1&amp;p=1&amp;f=G&amp;l=50&amp;d=PG01&amp;S1=20040055446&amp;OS=20040055446&amp;RS=20040055446">Apple
+   iPod patent application</a>
+
+I am getting close to releasing my new DEM/Terrain tool.  As of this
+morning it passes the <a href="http://www-mipl.jpl.nasa.gov/external/vicar.html">Vicar</a> gen4x4 tests that Steve Levoe made for me.
+Need to get some sample DEMs in Vicar from Jeff Hall to see if the
+code can handle the real thing.  The GMT reader was amazingly easy.
+In 2002, I spent a couple days trying to figure out how use the GMT
+libraries to read in a grd netcdf file.  This time, the whole process
+took just a couple hours from start to finish.  I used grdinfo.c as my
+documentation for the API.  I discovered that it has a mode where it
+reads all the data.  So I fashioned my code after that.  Just had to
+make sure that I initialized all the global variables by calling a
+couple mysterious setup functions.
+
+Still working on the PovRay writer.  It produces okay geometry, but
+the normals are not working and I'm having a little trouble figuring
+out the camera.  Up has to be perpendicular to the lookat direction,
+so I just need to do some math.  I might just use the right vector
+since it is the result of the cross product of the up and lookat
+vectors.  So it is pretty trivial to compute.
+
+Also, still need to write a gnugetopt interface for the whole deal.
+
+Thanks to Steve Levoe, Myche McAuley, and Jeff Hall for sample data
+sets to test my Vicar reader code on.
+-----

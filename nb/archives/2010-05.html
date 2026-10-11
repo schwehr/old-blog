@@ -1,0 +1,1489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Kurt's Weblog: May 2010 Archives</title>
+
+<link rel="stylesheet" href="../styles/nb_default.css" type="text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="../atom.xml" />
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span>
+</div>
+
+<div id="content">
+
+<div class="blog">
+<div id="menu">
+	<a href="../index.html">Main</a>
+</div>
+</div>
+
+<div class="blog">
+<div class="item">
+<a id="e2010-05-31T15_10_26.txt" name="e2010-05-31T15_10_26.txt"></a>
+<h2 class="date">05.31.2010 15:10</h2>
+<div class="blogbody">
+<h3 class="title">Number of BAGs in a survey</h3>
+<div class="item-description">
+In the case of BAG surveys, I am currently my only customer for using
+this interface.  If it confuses me, it sure will confuse someone else.
+When I zoomed in on a BAG icon, I was never sure (unless I was looking
+at something for the 10th time) how many bags would pop out of a
+survey and where the survey border was.  I've made two changes to try
+to clarify things.  First, I have changed the survey icons to show the
+number of BAGs in a survey.  This should reduce the surprise factor
+when you zoom into point where it snaps to the view of all the BAGs
+<br /><br />
+<img title="Survey to number of BAGs" withgrayborder="True"
+src="../attachments/2010-05/survey-number-of-bags.png"/>
+<br /><br />
+The second change is to the border of the survey: it no longer goes
+away, is a different color, and is slightly higher.  It's still
+challenging when the survey bounding boxes overlap, but I definitely
+get less lost in situations like those shown here where one survey has
+18 BAG files.
+<br /><br />
+<img title="Survey to number of BAGs" withgrayborder="True"
+src="../attachments/2010-05/survey-bags-in-survey.png"/>
+<br /><br />
+Here is the super simple imagemagick bash script to write the circles
+and numbers to an icon image:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env bash</font></i>
+<b><font color="#0000FF">in</font></b><font color="#990000">=</font>survey-icon-66x66<font color="#990000">.</font>png
+<!-- -->
+<font color="#009900">count</font><font color="#990000">=</font><font color="#993399">1</font>
+<b><font color="#0000FF">while</font></b> <font color="#990000">[[</font> <font color="#009900">$count</font> -le <font color="#993399">9</font> <font color="#990000">]];</font> <b><font color="#0000FF">do</font></b>
+    convert -fill brown -draw <font color="#FF0000">"circle 51,51 61,61"</font> -fill white -pointsize <font color="#993399">20</font> -annotate <font color="#990000">+</font><font color="#993399">46</font><font color="#990000">+</font><font color="#993399">59</font> <font color="#009900">$count</font> <font color="#009900">$in</font> survey-icon-66x66-<font color="#009900">$count</font><font color="#990000">.</font>png
+    <b><font color="#0000FF">let</font></b> <font color="#009900">count</font><font color="#990000">=</font><font color="#009900">$count</font><font color="#990000">+</font><font color="#993399">1</font>
+<b><font color="#0000FF">done</font></b>
+<!-- -->
+<font color="#009900">count</font><font color="#990000">=</font><font color="#993399">10</font>
+<b><font color="#0000FF">while</font></b> <font color="#990000">[[</font> <font color="#009900">$count</font> -le <font color="#993399">30</font> <font color="#990000">]];</font> <b><font color="#0000FF">do</font></b>
+    convert -fill brown -draw <font color="#FF0000">"circle 51,51 61,61"</font> -fill white -pointsize <font color="#993399">20</font> -annotate <font color="#990000">+</font><font color="#993399">40</font><font color="#990000">+</font><font color="#993399">59</font> <font color="#009900">$count</font> <font color="#009900">$in</font> survey-icon-66x66-<font color="#009900">$count</font><font color="#990000">.</font>png
+    <b><font color="#0000FF">let</font></b> <font color="#009900">count</font><font color="#990000">=</font><font color="#009900">$count</font><font color="#990000">+</font><font color="#993399">1</font>
+<b><font color="#0000FF">done</font></b></tt></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-31T15_10_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-06-01T09_46_47.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-29T17_38_04.txt" name="e2010-05-29T17_38_04.txt"></a>
+<h2 class="date">05.29.2010 17:38</h2>
+<div class="blogbody">
+<h3 class="title">Handling large number of BAGs in a Survey</h3>
+<div class="item-description">
+I'm working back through NOAA's published BAG archive as fast as I
+can.  In my December 2009 take on things, I had one bounding box and
+icon per bag file that I got from NGDC's server.  I have 2059 bag
+files, but only 406 surveys.  I am using an idea I picked up from
+Trey's work at NASA Ames.  When you are zoomed out, I present an icon from the Survey and
+hide all the individual bags.  I've created a small database of the
+bags, so it is trivial to get the over all bounding box for the
+survey.  The one feature I am missing that Trey had for his photo
+viewer is a count on the icon of the number of bags that are being
+hidden.  I think that is outside of the scope for the time that I have
+(e.g. negative 1 day)
+<br /><br />
+<img title="Survey view in Google Earth" withgrayborder="True"
+src="../attachments/2010-05/ge-survey-bbox.png"/>
+<br /><br />
+As you zoom in, the <i>Region</i> control in the KML switches the view
+over to the individual bags.  I use the same icon, but inverted
+<br /><br />
+<img title="" withgrayborder="True"
+src="../attachments/2010-05/ge-bag-bbox.png"/>
+<br /><br />
+I have also switched my code to use the UTM bounding box.  I never saw
+the tiled bathymetry out of place, but some of the geographic bounding
+boxes were off by multiple degrees.  I am not seeing any more crazy
+survey bounding boxes in my quick look.  Example delta degrees between
+the Metdata Geographic and UTM coordinate (when projected back to
+geographic of course):  
+<pre>
+bag file, deltas     x_min    y_min    x_max    y_max
+H11536_1_of_4       0.9380  -6.5251   0.1306  -7.3478
+H11554_1_of_1_BAG   0.2377  -8.0011  -0.5709  -8.7929
+H11555_1_of_1       0.1354  -8.1659  -0.6326  -8.9748
+H11612_1_of_2     -14.7299 -16.4563 -15.6013 -17.3354
+</pre>
+Those are the worst ones.  The nice thing is that the venders are writing
+info about their software (not correctly, but there are only a few), so I can
+noticify the software vendor.  It will be critical to create ERRATA sheets, so 
+that we know what kind of bugs are likely to be present in the archived
+data.
+<br /><br />
+There is also the possibility of a Caris generated GML export that I
+just found out about yesterday.  Here is an example boundry created by
+running this gdal command:
+<pre>ogr2ogr -f kml survey.kml caris_survey.gml</pre>
+<img title="Caris GML to Google Earth with gdal" withgrayborder="True"
+src="../attachments/2010-05/ge-survey-caris-gml.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-29T17_38_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-31T15_10_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-29T13_28_35.txt" name="e2010-05-29T13_28_35.txt"></a>
+<h2 class="date">05.29.2010 13:28</h2>
+<div class="blogbody">
+<h3 class="title">handling xml data with namespaces with lxml</h3>
+<div class="item-description">
+I don't know why I never got this before.  Perhaps it's because I find
+namespace handling overly awkward with the local alias to a large url.
+But I've finally used it and it works.  I can live with this and stop
+being bad... usually, my first pass through an XML dataset is to rip
+out the namespaces.  Yeah, that's bad practice and I promise to stop
+being bad (at least in this little way).  First the GML section of the
+BAG metadata:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;smXML:MD_Metadata</font></b> 
+  <font color="#009900">xmlns:smXML</font><font color="#990000">=</font><font color="#FF0000">"http://metadata.dgiwg.org/smXML"</font>
+  <font color="#009900">xmlns:xlink</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/1999/xlink"</font>
+  <font color="#009900">xmlns:xsi</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2001/XMLSchema-instance"</font>
+  <font color="#009900">xmlns:gml</font><font color="#990000">=</font><font color="#FF0000">"http://www.opengis.net/gml"</font><b><font color="#0000FF">&gt;</font></b>
+<i><font color="#9A1900">&lt;!-- ... --&gt;</font></i>
+  <b><font color="#0000FF">&lt;spatialRepresentationInfo&gt;</font></b>
+    <b><font color="#0000FF">&lt;smXML:MD_Georectified&gt;</font></b>
+      <b><font color="#0000FF">&lt;cornerPoints&gt;</font></b>
+        <b><font color="#0000FF">&lt;gml:Point&gt;</font></b>
+          <b><font color="#0000FF">&lt;gml:coordinates</font></b> <font color="#009900">decimal</font><font color="#990000">=</font><font color="#FF0000">"."</font> <font color="#009900">cs</font><font color="#990000">=</font><font color="#FF0000">","</font> <font color="#009900">ts</font><font color="#990000">=</font><font color="#FF0000">" "</font><b><font color="#0000FF">&gt;</font></b>427393.74,4085752.56 433314.44,4090295.74<b><font color="#0000FF">&lt;/gml:coordinates&gt;</font></b>
+        <b><font color="#0000FF">&lt;/gml:Point&gt;</font></b>
+      <b><font color="#0000FF">&lt;/cornerPoints&gt;</font></b>
+    <b><font color="#0000FF">&lt;/smXML:MD_Georectified&gt;</font></b>
+  <b><font color="#0000FF">&lt;/spatialRepresentationInfo&gt;</font></b>
+<i><font color="#9A1900">&lt;!-- ... --&gt;</font></i>
+<b><font color="#0000FF">&lt;/smXML:MD_Metadata&gt;</font></b></tt></pre>
+Now using xpath to pull these GML UTM coordinates out of the metadata looks like this:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> h5py
+<b><font color="#000080">from</font></b> lxml <b><font color="#000080">import</font></b> etree 
+<!-- -->
+f <font color="#990000">=</font> h5py<font color="#990000">.</font><b><font color="#000000">File</font></b><font color="#990000">(</font>infile_name<font color="#990000">)</font>
+<!-- -->
+bag_root <font color="#990000">=</font> f<font color="#990000">[</font><font color="#FF0000">'/BAG_root'</font><font color="#990000">]</font>
+metadata_xml <font color="#990000">=</font> <font color="#FF0000">''</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>bag_root<font color="#990000">[</font><font color="#FF0000">'metadata'</font><font color="#990000">])</font>
+root <font color="#990000">=</font> etree<font color="#990000">.</font><b><font color="#000000">XML</font></b><font color="#990000">(</font>metadata_xml<font color="#990000">.</font><b><font color="#000000">replace</font></b><font color="#990000">(</font><font color="#FF0000">'smXML:'</font><font color="#990000">,</font><font color="#FF0000">''</font><font color="#990000">))</font> <i><font color="#9A1900"># Me being bad with namespaces</font></i>
+<!-- -->
+utm_coords <font color="#990000">=</font> root<font color="#990000">.</font><b><font color="#000000">xpath</font></b><font color="#990000">(</font><font color="#FF0000">'//*/gml:coordinates'</font><font color="#990000">,</font> namespaces<font color="#990000">={</font><font color="#FF0000">'gml'</font><font color="#990000">:</font><font color="#FF0000">"http://www.opengis.net/gml"</font><font color="#990000">})[</font><font color="#993399">0</font><font color="#990000">].</font>text</tt></pre>
+Now the question come... how do you handle if there are many different URLs that are likely to encode the same info (e.g. KML)?  Do I have to create detection code that knows exact matches or can get if the namespace is basically the same?
+<br /><br />
+I really like h5py for reading hdf5 files, but it's a bummer that the
+error messages a little weak and I can't pass in a gzip or bzip2 file for reading.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-29T13_28_35.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-29T17_38_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-29T07_00_06.txt" name="e2010-05-29T07_00_06.txt"></a>
+<h2 class="date">05.29.2010 07:00</h2>
+<div class="blogbody">
+<h3 class="title">Science support of Deepwater Horizon</h3>
+<div class="item-description">
+NOAA has just made announcements about some of the support coming in
+from the academic world.
+<br /><br />
+This press release mentions both MBARI and UNH: <a href="http://www.noaanews.noaa.gov/stories2010/20100528_gunter.html">NOAA Research Ship Gordon Gunter Expands Gulf Mission</a> [noaanews]
+<pre>...
+The Gunter will sail to the vicinity of the well head and begin a
+systematic survey using its 18 and 38 kHz sonar to define the shape
+and extent of the underwater plume. University of New Hampshire Joint
+Hydrographic Center scientists onboard will explore the feasibility of
+using mid-water mapping sonar to image the submerged plume in
+combination with new software that could result in 3-D images of what
+is happening underneath the surface.
+<!-- -->
+If potential plumes are identified, the Gunter will deploy a unique
+autonomous underwater vehicle provided by the Monterey Bay Aquarium
+Research Institute. Called the Gulper, the vehicle will take discrete
+water samples at various depths to allow precise characterization of
+any oil, dispersants, or other substances in the plume.
+...</pre>
+For those not familar with the <a href="http://mbari.org">MBARI</a> AUV with its "Gulper", check out this video:
+<br /><br />
+<object width="640" height="385"><param name="movie" value="http://www.youtube.com/v/0d3KHbGqSMA&hl=en_US&fs=1&rel=0&color1=0x006699&color2=0x54abd6"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/0d3KHbGqSMA&hl=en_US&fs=1&rel=0&color1=0x006699&color2=0x54abd6" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="385"></embed></object>
+<br /><br />
+This press release mentions some of the UNH <a href="http://www.crrc.unh.edu">CRRC</a>'s involvement:
+<a href="http://www.noaanews.noaa.gov/stories2010/20100528_dispersant.html">UNH Coastal Response Research Center, NOAA, EPA and Coast Guard Convene Science Meeting to Study Dispersant Use and Ecosystem Impacts of Dispersed Oil in the Gulf of Mexico</a> [noaanews]
+<br /><br />
+Also, the <a href="http://www.doi.gov/news/pressreleases/Flow-Rate-Group-Provides-Preliminary-Best-Estimate-Of-Oil-Flowing-from-BP-Oil-Well.cfm">Flow Rate Group has their estimate out</a> [doi.gov]:
+<pre>Based on three separate methodologies, outlined below, the independent
+analysis of the Flow Rate Technical Group has determined that the
+overall best initial estimate for the lower and upper boundaries of
+flow rates of oil is in the range of 12,000 and 19,000 barrels per
+day.
+...
+On May 25, 2010, at approximately 17:30 CDT, the RITT logged oil
+collection at a rate of 8,000 barrels of oil per day, as measured by a
+meter whose calibration was verified by a third-party. Based on
+observations of the riser, the team estimated that at least 10% of the
+flow was not being captured by the riser at the time oil collection
+was logged, increasing the estimate of total flow to 8,800 barrels of
+oil per day. Factoring in the flow from the kink in the riser, the
+RITTI Team calculated that the lower bound estimate of the total oil
+flow is at least 11,000 barrels of oil per day, depending on whether
+the flow through the kink is primarily gas or oil.
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-29T07_00_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-29T13_28_35.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-28T09_00_12.txt" name="e2010-05-28T09_00_12.txt"></a>
+<h2 class="date">05.28.2010 09:00</h2>
+<div class="blogbody">
+<h3 class="title">Time Machine excludes</h3>
+<div class="item-description">
+Managing backups is always a tricky thing.  I really miss having AFS
+as my primary home filesystem.  I don't think it would work with my
+current laptop situation, but it was so nice to have the ability to go
+get accidentally deleted files from yesterday's backup without having
+to talk to an admin.  I created the equivalent at SIO with a 2nd
+Solaris 8 server doing rsync 2x per week and mounting the copy back
+read only.  I've been missing that until I got time machine up again.
+We have corporate offsite backups with EMC Networker (when it isn't
+being grouchy), but I could neither see the backup status nor easily
+grab or diff a file from EMC's system.  If the tape was already
+offsite, it becomes a major hassle.  Also, we really want to know what
+changes when Networker breaks.  So, I setup a time machine drive to
+backup my desktop.  The problem is that I have a 0.5TB USB drive
+backing up a 2TB internal drive.  What to do?  Well, networker really
+can not handle large churn in files, so I have already worked with our
+IT guy Will to have our Macs setup with /nobackup as a place for
+temporary files to go without triggering backup.  I typically have .2
+to 1.5 TB of data at any one time in that area and that can turn over
+day-to-day as I process data.  So, I just added that and the fink
+areas to the nobackup area.  I am thinking of putting /sw32 back into
+the backup pool as that removes the /sw32/var areas that contain
+things like PostgreSQL data.  I definitely want that backed up.  From
+System Preferences, select Time Machine and then Options. 
+<br /><br />
+<img title="Time Machine Excludes" withgrayborder="True"
+src="../attachments/2010-05/timemachine-excludes.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-28T09_00_12.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-29T07_00_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-28T06_31_34.txt" name="e2010-05-28T06_31_34.txt"></a>
+<h2 class="date">05.28.2010 06:31</h2>
+<div class="blogbody">
+<h3 class="title">Video tour of the UDel Visualization lab</h3>
+<div class="item-description">
+<a href="http://www.geology.udel.edu/cshel/CSHEL/">Art Trembanis</a>
+has setup a very nice visualization and computation space in his
+building.  I haven't been down there since before the construction
+started.  Art really did a bang up job creating a flexible space that
+will really support research for years to come.  He has added a number
+of features on my wish list that I have not had time to implement.
+Although, I have yet to see anyone do the one feature that I am really
+dying to have in an environment like this: ceiling mounted projectors
+that point <b>down</b> so that the floor can also be a work space.  We
+then need a user interface that understands gesters that use the
+location of shadows on the floor to interact.  I should have just gone
+and done that when I was at the SOC in Tucson with the huge empty
+warehouse space so that we could have walked on a 1:1 surface of Mars.
+<br /><br />
+<object width="640" height="505"><param name="movie" value="http://www.youtube.com/v/GlkMMlX7K9Y&hl=en_US&fs=1&color1=0x006699&color2=0x54abd6"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/GlkMMlX7K9Y&hl=en_US&fs=1&color1=0x006699&color2=0x54abd6" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="505"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-28T06_31_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-28T09_00_12.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-27T16_52_16.txt" name="e2010-05-27T16_52_16.txt"></a>
+<h2 class="date">05.27.2010 16:52</h2>
+<div class="blogbody">
+<h3 class="title">Aerial view of top kill operations</h3>
+<div class="item-description">
+I can see this in AIS and it looked crowded.  Now I can see it in this
+USCG overflight:
+<br /><br />
+<object width="640" height="385"><param name="movie" value="http://www.youtube.com/v/Ns2AMKzYr0k&hl=en_US&fs=1&color1=0x5d1719&color2=0xcd311b"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/Ns2AMKzYr0k&hl=en_US&fs=1&color1=0x5d1719&color2=0xcd311b" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="385"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-27T16_52_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-28T06_31_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-27T08_54_17.txt" name="e2010-05-27T08_54_17.txt"></a>
+<h2 class="date">05.27.2010 08:54</h2>
+<div class="blogbody">
+<h3 class="title">SQLite Manager in Firefox</h3>
+<div class="item-description">
+Thanks to Monica's post on SQLite Manager, <a
+href="http://the-moni-blog.blogspot.com/2010/05/free-sqlite-manager-for-mac-os.html">Free
+SQLite Manager for Mac OS</a>, I am now a happy user of <a
+href="http://code.google.com/p/sqlite-manager/">sqlite-manager</a>.
+Note that this tool should run on any platform if you have firefox.
+And thanks to Myche back in early 2004 for pushing me into trying
+sqlite for my thesis work.
+<br /><br />
+First install it by opening Firefox and Going to Tools -&gt; Add-ons
+-&gt; Get Add-ons.  Search on sqlite and install sqlite manager.
+After firefox restarts, byou are good to go.  Then It's pretty easy to
+get a table up and going, especially if you don't do this kind of
+thing very often.
+<br /><br />
+<img title="SQLite Manager - Creating a table" withgrayborder="True"
+src="../attachments/2010-05/sqlitemanager-table-create.png"/>
+<br /><br />
+Then viewing data is a snap:
+<br /><br />
+<img title="SQLite Manager - Viewing a table" withgrayborder="True"
+src="../attachments/2010-05/sqlitemanager-table-view.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-27T08_54_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-27T16_52_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-26T13_14_22.txt" name="e2010-05-26T13_14_22.txt"></a>
+<h2 class="date">05.26.2010 13:14</h2>
+<div class="blogbody">
+<h3 class="title">Phoenix landing on Mars</h3>
+<div class="item-description">
+Before today, I hadn't see this video by Chelsea from when Phoenix
+landing on Mars.  I was around the corner controlling the 50 ft screen
+from on Mac desktop plus a video switcher on the serial port with
+Shigeru shipping out a number of video feeds from JPL.  The room shown in the video
+is the Science Operations Center (SOC) in Tucson, AZ.  The folks that I'm showing up on the screen were at JPL.
+<br /><br />
+<object width="640" height="505"><param name="movie" value="http://www.youtube.com/v/lRgdEBtaJhU&hl=en_US&fs=1&color1=0xe1600f&color2=0xfebd01"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/lRgdEBtaJhU&hl=en_US&fs=1&color1=0xe1600f&color2=0xfebd01" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="505"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-26T13_14_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-27T08_54_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-25T18_57_02.txt" name="e2010-05-25T18_57_02.txt"></a>
+<h2 class="date">05.25.2010 18:57</h2>
+<div class="blogbody">
+<h3 class="title">Roland on the NBP in Antarctica</h3>
+<div class="item-description">
+I've never been able to work in a polar region during the dark season.
+Roland and Colin are on the ice hardened NSF ship Palmer tracking
+whales.  Roland has set up a nice SLR camera on a pan-tilt unit up on
+the top of the Palmer and has a linux program capturing and creating
+mosaics to observe the ice coverage in the area.  The Palmer does not
+have a full internet feed, so these images do not do justice to the
+quality of the images returned by the camera.  The observers who sit
+next to the setup apparently refer to it as "The Droid".
+<br /><br />
+<img title="Mosaics from Antarctica by Roland" withgrayborder="True"
+src="../attachments/2010-05/nbp-roland-3.png"/>
+<br /><br />
+<img title="Mosaics from Antarctica by Roland" withgrayborder="True"
+src="../attachments/2010-05/nbp-roland-2.png"/>
+<br /><br />
+<img title="Mosaics from Antarctica by Roland" withgrayborder="True"
+src="../attachments/2010-05/nbp-roland-1.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-25T18_57_02.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-26T13_14_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-25T14_44_20.txt" name="e2010-05-25T14_44_20.txt"></a>
+<h2 class="date">05.25.2010 14:44</h2>
+<div class="blogbody">
+<h3 class="title">libais 0.5 - good enough for first production use</h3>
+<div class="item-description">
+This code is good enough that it is being used in an operational
+environment.  It's handling 60KB/sec with more than 8000 vessels.  It
+is by no means perfect.  Suggestions and comments are more than
+welcome.  I would like to do more with class inheritance, for example
+decoding the message type, MMSI, and repeat indicator that is all
+messages, but the C++ BitSet class prevents that.  If only the dynamic
+bitset type would migrate from Boost to the C++ standard library.
+<br /><br />
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/libais/downloads/libais-0.5.tar.bz2">libais-0.5.tar.bz2</a> (still only 31K)
+<ul>
+    <li>docs: Include ESR's AIVDM.txt with permission</li>
+    <li>docs: MID / DAC / MMSI prefixes now listed in mid.csv</li>
+    <li>docs: dac/fi list</li>
+    <li>docs: More notes for message designers</li>
+    <li>Added msg 8 - 1:11 - IMO Met/Hydro</li>
+    <li>Added AIS msg 9 - SAR Position</li>
+    <li>nais2py.py: Added try except wrapper on ProcessingThread.  Also
+  try to track one off error found on call with timestamp converting
+  to float</li>
+    <li>send_data.py: new file for testing</li>
+    <li>nais2py.py: LineQueue now has a custom drop handler for too many lines waiting.
+    Could be better.  </li>
+    <li>nais2py.py: Added threaded network interface.
+    Seeing the network side overwhelm the processing thread</li>
+    <li>nais2py.py: Added response_class handling to VesselNames.  Can be preloaded.
+    Allows periodic name dump</li>
+    <li>nais2py.py: Added ENABLE_DB flag to try runs without database execute commands.
+    Faster debugging</li>
+ </ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-25T14_44_20.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-25T18_57_02.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-25T09_58_59.txt" name="e2010-05-25T09_58_59.txt"></a>
+<h2 class="date">05.25.2010 09:58</h2>
+<div class="blogbody">
+<h3 class="title">ERMA and the Deepwater Horizon Incident</h3>
+<div class="item-description">
+Now that I've seen the link elsewhere, I will point to it.  ERMA is
+being used for the Deepwater Horizon indicent response.  I can't go
+into the details and there is much of the system that is not visible
+public interface.
+<br /><br />
+<a href="http://rucool.marine.rutgers.edu/deepwater/">IOOS Deepwater
+Horizon Oil Spill Page</a> points to <a
+href="https://gomex.erma.unh.edu/">https://gomex.erma.unh.edu/</a>
+<br /><br />
+Other things just recently made public... There are two releated
+Congressional Research Reports (CRS) on OpenCRS: <a
+href="http://opencrs.com/document/RL33705/2010-04-30/?24765">Oil
+Spills in U.S. Coastal Waters: Background, Governance, and Issues for
+Congress</a> and <a
+href="http://opencrs.com/document/R40645/2010-04-26/?24856">U.S. Offshore
+Oil and Gas Resources: Prospects and Processes</a> (dated April 26 and
+includes a reference to Deepwater Horizon).  The next <a
+href="http://news.slashdot.org/story/10/05/24/2349257/Random-Hacks-of-Kindness">Random
+Hacks of Kindness</a> (warning... slashdot article).  NASA Ames/CMU did
+some really cool stuff at last years event... <a href="http://www.cmu.edu/silicon-valley/news-events/news/2009/geocam-wins.html">Carnegie Mellon Team Wins First Prize at Random Hacks of Kindness</a>
+<br /><br />
+In somewhat distantly related news (e.g. oil and gas + <a href="http://www.listenforwhales.org/">environmental protection</a>), <a href="http://www.lnglawblog.com/BlogEntry.aspx?_entry=8d2a0a30-a507-46e4-a599-0323a8f93db5">Neptune LNG Deepwater Port Expects First Cargo Delivery in August</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-25T09_58_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-25T14_44_20.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-25T09_08_16.txt" name="e2010-05-25T09_08_16.txt"></a>
+<h2 class="date">05.25.2010 09:08</h2>
+<div class="blogbody">
+<h3 class="title">ORBCOM SAIS data - my first view</h3>
+<div class="item-description">
+I was running some tests on my desktop and braught up my latest view
+of my realtime_ais database for something else... this is the first
+time I made a plot where ORBCOM S-AIS (Satellite AIS) was in the mix.
+My new code can easily deal with the full rate undecimated NAIS feed
+(63KB/s with a load of about 2% on the machine).  This completely
+threw me off what I was trying to test.  You can clearly see a good
+portion of the outline of Africa.  Plot made with QGIS and libais-0.5
+with the data going through PostgreSQL 8.4.4 with PostGIS 1.5.1.
+<br /><br />
+<img title="NAIS with ORBCOM SAIS" withgrayborder="True"
+src="../attachments/2010-05/nais-with-orbcom.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-25T09_08_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-25T09_58_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-21T12_19_09.txt" name="e2010-05-21T12_19_09.txt"></a>
+<h2 class="date">05.21.2010 12:19</h2>
+<div class="blogbody">
+<h3 class="title">Live video from BP of the oil spill source</h3>
+<div class="item-description">
+<a href="http://globalwarming.house.gov/spillcam/">http://globalwarming.house.gov/spillcam/</a>
+<br /><br />
+<img title="Deepwater Horizon live oil" withgrayborder="True"
+src="../attachments/2010-05/bp-oil-spill-live-video.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-21T12_19_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-25T09_08_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-21T08_55_15.txt" name="e2010-05-21T08_55_15.txt"></a>
+<h2 class="date">05.21.2010 08:55</h2>
+<div class="blogbody">
+<h3 class="title">Noaadata 0.44 released</h3>
+<div class="item-description">
+It has been almost 10 months since I released an update to noaadata.
+I'm now putting more energy into libais, but noaadata is a reference
+to how I developed a lot of my processing techniques and it is much
+easier to try things out in noaadata and BitVector.  This really is
+the release where I realized that my XML language is not currently up
+to the task.  It has been a while since I've heard from the European
+group that is exploring the same idea using FreeAIS.  Also, I've added
+links to FreeAIS, gpsd, noaadata, and libais to the <a
+href="http://en.wikipedia.org/wiki/Automatic_Identification_System">wikipedia
+AIS</a> page.  Thanks to ESR, the state of non-paywalled documentation
+for AIS has greatly improved.  His <a
+href="http://gpsd.berlios.de/AIVDM.txt">AIVDM.txt</a> is currently the
+best non-code and open documentation of the NMEA side of AIS. Eric and
+I have had some really good discussion over IRC on #gpsd that have
+helped to illuminate some of the most confusing aspects of AIS
+messages.  Many issues still remain, so please join in the
+conversation.  For example, why do messages 22 and 23 have huge spare
+blocks when it is important to keep messages short to decrease the
+chance of noise on the VHF channel from corrupting the message?
+<br /><br />
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.44.tar.bz2">noaadata-py-0.44.tar.bz2</a>
+<ul>
+  <li>Started working on the new and separate libais C++ library for AIS with C-Python bridge for Deepwater Horizon</li>
+   <li>Allow ais_bin_msgs.py to print out the corresponding AIVDM line</li>
+   <li>Msgs 6 and 8 decode dac and fi</li>
+	<li>Msg 21 fixed for ATONS to handle two new flags</li>
+	<li>Msg 21 handcoded can now deal with the extended name</li>
+	<li>ZNT NMEA string for NTP time quality</li>
+	<li>ais_normalize can handle data w/out timestamps</li>
+	<li>Add first C++ AIS code - ais_filter_by_mmsi</li>
+	<li>In ais.binary, fixed a 2's complement bug for the lowest negative number... this was bad!</li>
+	<li>Msg 7 had the spare as 1 bit when it should have been 2.
+      Creating a handcoded version to deal with shorter messages</li>
+	<li>This version corresponds to working on libais-0.1 to libais-0.2</li>
+   <li>New INSTALL file base on report from gemiller on irc:gpsd</li>
+   <li>NEW FILES: ais_msg_21_handcoded.py ais_msg_7_handcoded.py imo_001_11_handcoded.py </li>
+   <li>NEW FILES: template.bash nmea_error.py znt.py ais_filter_by_mmsi.cxx ais_bin_msgs.py </li>
+   <li>NEW FILES: ais_decimate_traffic.py ais_distance.py ais_info.py ais_nmea_find_matches.py </li>
+   <li>NEW FILES: ais_nmea_uptime2.py ais_nmea_uscg_timeshift.py ais_pg_grid_transits.py </li>
+   <li>NEW FILES: find_missing_logs.py logger_handlers.py serial-logger2.py </li>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-21T08_55_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-21T12_19_09.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-21T08_27_09.txt" name="e2010-05-21T08_27_09.txt"></a>
+<h2 class="date">05.21.2010 08:27</h2>
+<div class="blogbody">
+<h3 class="title">Python decorators</h3>
+<div class="item-description">
+I still don't feel like I have a handle on <a
+href="http://www.artima.com/weblogs/viewpost.jsp?thread=240808">python
+decorators</a>.  The seem pretty interesting, but I have no sense of
+when and how in my code to use them.  Here is an interesting example
+that actually seems to make sense to me: <a
+href="http://djangosnippets.org/snippets/2029/">Capture Stack Trace
+Decorator</a>.  I've wrapped it in an example program that works with
+both python 2.6 and 3.x (hence the from __future__ ... yeah time
+travel).  If you call this function and it barfs, your program keeps
+running and leaves you a stack trace.  Sometimes, you just can't
+afford to have a program fail.  It's time to log the error and keep
+moving forward.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> __future__ <b><font color="#000080">import</font></b> print_function
+<!-- -->
+<b><font color="#000080">import</font></b> traceback
+<b><font color="#000080">import</font></b> sys
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">catch</font></b><font color="#990000">(</font>func<font color="#990000">):</font>
+<i><font color="#9A1900">    'Catches any exception and prints a stack trace.'</font></i>
+    <b><font color="#0000FF">def</font></b> <b><font color="#000000">wrapper</font></b><font color="#990000">(*</font>args<font color="#990000">,**</font>kwargs<font color="#990000">):</font>
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">return</font></b> <b><font color="#000000">func</font></b><font color="#990000">(*</font>args<font color="#990000">,**</font>kwargs<font color="#990000">)</font>
+        <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'Caught exception'</font><font color="#990000">)</font>
+            traceback<font color="#990000">.</font><b><font color="#000000">print_exc</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">return</font></b> wrapper
+<!-- -->
+@catch
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">face_palm</font></b><font color="#990000">():</font>
+    <b><font color="#000000">int</font></b><font color="#990000">(</font><font color="#FF0000">"a"</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#000000">face_palm</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'still running'</font><font color="#990000">)</font></tt></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-21T08_27_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-21T08_55_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-21T07_41_53.txt" name="e2010-05-21T07_41_53.txt"></a>
+<h2 class="date">05.21.2010 07:41</h2>
+<div class="blogbody">
+<h3 class="title">GPS 2F-SV1 launch today</h3>
+<div class="item-description">
+Hopefully today, the new 2F-2V1 GPS satellite will be launched: <a href="http://c4isrjournal.com/story.php?F=4623759">Next-generation GPS satellite ready for launch</a> and <a href="http://www.satellitetoday.com/st/headlines/ULA-Postpones-GPS-2F-Launch_34178.html">ULA Postpones GPS 2F Launch</a> till today.  Look for IIF on the wikipedia page <a href="http://en.wikipedia.org/wiki/Global_Positioning_System">Global Positioning System</a>.  Also check out the M-code and L5 sections of <a href="http://en.wikipedia.org/wiki/GPS_modernization">GPS modernization</a> on wikipedia.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-21T07_41_53.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-21T08_27_09.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-20T12_05_01.txt" name="e2010-05-20T12_05_01.txt"></a>
+<h2 class="date">05.20.2010 12:05</h2>
+<div class="blogbody">
+<h3 class="title">2009 CCOM / JHC annual report</h3>
+<div class="item-description">
+The 2009 CCOM/JHC annual report has now been officially released.  If
+you want an overview of what we have been up to, this is the place to
+go.  It doesn't cover everything, but it definitely is the best place
+to find out about us.  This is the first year that the report includes
+a link to a YouTube video.  Page 55 links to <a href="http://www.youtube.com/watch?v=mN1IFdgAEiA">my video of Aldebaran II</a>
+showing the right whale zones off of Boston from received AIS
+messages.  There are far more figures in this report compared to prior
+years, which I think is a very good thing. But I am definitely biased as I
+had a hand in about 15 of the images.
+<br /><br />
+<a href="http://ccom.unh.edu/about_us/reports/2009_ccom_progressReport.pdf">2009_ccom_progressReport.pdf</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-20T12_05_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-21T07_41_53.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-20T09_42_14.txt" name="e2010-05-20T09_42_14.txt"></a>
+<h2 class="date">05.20.2010 09:42</h2>
+<div class="blogbody">
+<h3 class="title">Experiences with an Apple RAID card</h3>
+<div class="item-description">
+My newest desktop is a 3.32 GHz quad core xeon with 8 GB of ram and an
+Apple RAID card with two 1 TB disks.  We decided to put the machine in
+RAID 0 configuration because it is being backed up by EMC Networker
+(which is a pretty lame and expensive backup program... sorry EMC, but
+your product is a steaming pile) for offsites and a Time Machine USB
+external disk for hourly backups.  Therefore, I feel like it is pretty
+safe to run in RAID 0.  Generally, RAID 0 is a bad idea because any
+disk failing brings the system down and with more than one hard disks
+the probability of catastrophy increases.  The RAID card seems
+generally okay, but has been responsible for several kernel panics and
+prevents me from dual booting windows.  Today I came in to find this
+dialog on the screen:
+<br /><br />
+<img withgrayborder="True" title="Apple RAID Card" src="../attachments/2010-05/apple-raid-card-1.png"/>
+<br /><br />
+Going to the RAID utility, you can see that it already did the battery
+conditioning, so it didn't give me a choice if to postpone.  So don't
+go putting a RAID card in anything that doesn't have great backups, a
+good UPS and decent power.  This is troubling in NH where my office
+often looses power for long enought to run out of UPS backup.  It's
+also interesting to see that an external firewire RAID drive shows up
+in the utility.  Although, I have no idea what "State JBOD" means for
+the external.  While this machine is fast, I can't say that the RAID card
+is really worth it.  Perhaps if I was doing more video editing, I might see more
+benefit from the card.
+<br /><br />
+UPDATE: Less pointed out that JBOD means "Just a Bunch Of Disks".
+<br /><br />
+<img withgrayborder="True" title="Apple RAID Card" src="../attachments/2010-05/apple-raid-card-2.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-20T09_42_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-20T12_05_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-18T14_23_32.txt" name="e2010-05-18T14_23_32.txt"></a>
+<h2 class="date">05.18.2010 14:23</h2>
+<div class="blogbody">
+<h3 class="title">AIS in Qgis</h3>
+<div class="item-description">
+I just tweaked my new table design for realtime AIS updates in PostGIS
+to add WITH OIDS so I can view the database in Qgis.  I like it!  This
+is just a couple minutes of a full US feed.  My new design puts only a
+very small load on PostgreSQL and the python job is using about %10 of
+one core to keep up with the entire US (~650 NMEA strings per second).
+Most of my system load is coming from an unrelated wget pulling data
+from a NOAA server across the country at 1.8MB/s.
+<pre>Processes: 119 total, 3 running, 1 stuck, 115 sleeping, 402 threads                                                       14:10:00
+Load Avg: 0.31, 0.23, 0.21  CPU usage: 1.54% user, 0.66% sys, 97.78% idle  SharedLibs: 6656K resident, 7072K data, 0B linkedit.
+<!-- -->
+PID    COMMAND      %CPU TIME     #TH   #WQ  #POR #MREG RPRVT  RSHRD  RSIZE  VPRVT  VSIZE  PGRP  PPID  STATE    UID  FAULTS
+3670-  python2.6    <b>12.2</b> 01:03.75 3/1   0    40   156   13M+   1672K  15M+   90M    663M   3670  234   running  501  4536+
+3671-  postgres     <b>1.0</b>  00:07.86 1     0    9    63    988K   13M    7756K+ 1212K  604M   3671  43481 sleeping 252  2098+
+3632-  Qgis         0.2  00:13.95 2     1    101- 512-  41M-   56M    76M-   123M-  1120M- 3632  173   sleeping 501  42320 
+...</pre>
+Here is my current PostGIS setup:
+<pre><tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> vessel_pos <font color="#990000">(</font>
+       mmsi INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+       cog INTEGER<font color="#990000">,</font>
+       sog REAL<font color="#990000">,</font>
+       time_stamp <font color="#009900">TIMESTAMP</font> <b><font color="#0000FF">WITH</font></b> <font color="#009900">TIME</font> ZONE <b><font color="#0000FF">DEFAULT</font></b> now<font color="#990000">(),</font>
+       nav_status <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">30</font><font color="#990000">)</font> <i><font color="#9A1900">-- convert the code to a string for presentation</font></i>
+       <font color="#990000">)</font> <b><font color="#0000FF">WITH</font></b> OIDS<font color="#990000">;</font>
+<b><font color="#0000FF">SELECT</font></b> AddGeometryColumn<font color="#990000">(</font><font color="#FF0000">'vessel_pos'</font><font color="#990000">,</font><font color="#FF0000">'pos'</font><font color="#990000">,</font><font color="#993399">4326</font><font color="#990000">,</font><font color="#FF0000">'POINT'</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<b><font color="#0000FF">SELECT</font></b> AddGeometryColumn<font color="#990000">(</font><font color="#FF0000">'vessel_pos'</font><font color="#990000">,</font><font color="#FF0000">'track'</font><font color="#990000">,</font><font color="#993399">4326</font><font color="#990000">,</font><font color="#FF0000">'LINESTRING'</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- CREATE INDEX vessel_pos_pkey ON vessel_pos(mmsi); -- created automatically if done through psql</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">INDEX</font></b> vessel_pos_ts_idx <b><font color="#0000FF">ON</font></b> vessel_pos<font color="#990000">(</font>time_stamp<font color="#990000">);</font>
+<!-- -->
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> vessel_name <font color="#990000">(</font>
+       mmsi INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+       name <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">25</font><font color="#990000">),</font> <i><font color="#9A1900">-- only need 20</font></i>
+       type_and_cargo INTEGER<font color="#990000">,</font>
+       response_class INTEGER <i><font color="#9A1900">-- 0 do not display differently.  1 == response vessel</font></i>
+<font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- CREATE INDEX vessel_name_pkey ON vessel_name(mmsi); -- created automatically</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">INDEX</font></b> vessel_name_rc_idx <b><font color="#0000FF">ON</font></b> vessel_name<font color="#990000">(</font>response_class<font color="#990000">);</font>
+</tt></pre>
+Here is the resulting image.  You can see the basic outline of the US (and the fact that some vessels are using the same MMSI).
+<br /><br />
+<img title="Water level via radar" withgrayborder="True"
+src="../attachments/2010-05/libais-in-qgis.png"/>
+<br /><br />
+Some fun statistics from a 4 day trial run on the US: I have seen 8600
+unique MMSI's from class A and class B transmitters and 4700 names
+from MMSIs greater than 200,000,000.  And yes, there are many many
+vessels that seem to have miss a digit when configuring their AIS
+units.  For example:
+<pre>mmsi = 36898800 name: ALTAIR</pre>
+ALTAIR is missing a digit somewhere.  Perhaps a "0" on the right.  It is really frustrating
+to have so many ships with bad MMSIs.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-18T14_23_32.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-20T09_42_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-17T17_53_46.txt" name="e2010-05-17T17_53_46.txt"></a>
+<h2 class="date">05.17.2010 17:53</h2>
+<div class="blogbody">
+<h3 class="title">Oil suspended below the surface in the gulf of mexico</h3>
+<div class="item-description">
+Storries about oil hanging out in the water column (e.g. <a
+href="http://www.guardian.co.uk/environment/2010/may/16/gulf-oil-spill-bp">Submerged
+oil plumes suggest gulf spill is worse than BP claims</a> [UK
+Guardian]</a>) remind me of the oceanographic term <a
+href="http://en.wikipedia.org/wiki/Nepheloid_layer">Nepheloid
+layer</a>.  I don't know if the term really covers oil/water mixes,
+but the idea is the saye.  Depending on density, liquids will find
+depends where they match the density of the surrounding liquids.  In
+the geology world, we ususually think of suspended sediment causing
+the change in desity of water.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-17T17_53_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-18T14_23_32.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-17T17_43_29.txt" name="e2010-05-17T17_43_29.txt"></a>
+<h2 class="date">05.17.2010 17:43</h2>
+<div class="blogbody">
+<h3 class="title">Django 1.2 released</h3>
+<div class="item-description">
+Today, the Django project release version 1.2.  I know they have been
+working hard to make this a great release.  I will try to update the
+fink package later this week.  If you have tried this new release,
+please drop me an email letting me know how it went and if you ran
+into any issues.
+<br /><br />
+<a href="http://pypi.python.org/pypi/Django/1.2">Django 1.2 on PyPi</a> and <a href="http://www.djangoproject.com/weblog/2010/may/17/12/">Django 1.2 released</a>.  Be sure to check out the <a href="http://docs.djangoproject.com/en/dev/releases/1.2/">release notes</a>.  There are few backward incompatible changes.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-17T17_43_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-17T17_53_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-16T06_14_05.txt" name="e2010-05-16T06_14_05.txt"></a>
+<h2 class="date">05.16.2010 06:14</h2>
+<div class="blogbody">
+<h3 class="title">Lamprey from the Cocheco River</h3>
+<div class="item-description">
+Yesterday, we got <a
+href="http://dailyme.com/story/2010050900002645/outdoor-roundup-discover-dovers-migrating-fish.html">a</a> <a href="http://www.wildlife.state.nh.us/Newsroom/News_2010/News_2010_Q2/Fish_ladder_tour_050410.html">tour</a>
+of the the Dover fish ladder.  Here is the host showing off a <a
+href="http://en.wikipedia.org/wiki/Lamprey">Lamprey</a> from the
+holding tank at the top of the ladder.  Unlike for the Great Lakes,
+Lamprey are native to this river.  This guy has to come out every day
+to take fish from the holding tank at the top and get them into the
+river.  This is one of the few ladders where the fish cannot get to
+the river on their own.  I didn't know until yesterday, that there is a small hydro-electric generator at the falls and that is why there is the wood riser at the top of the dam.
+<br /><br />
+<img title="Lamprey" withgrayborder="True"
+src="../attachments/2010-05/dover-fish-ladder-lamprey.jpg"/>
+<br /><br />
+The mill buildings: <a href="http://www.dovernh.org/index.php?option=com_content&view=article&id=15&Itemid=27">A Yarn to Follow:  The Dover Cotton Factory 1812-1821</a> [dovernh.org]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-16T06_14_05.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-17T17_43_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-14T14_47_34.txt" name="e2010-05-14T14_47_34.txt"></a>
+<h2 class="date">05.14.2010 14:47</h2>
+<div class="blogbody">
+<h3 class="title">Radar water level</h3>
+<div class="item-description">
+We've got a radar based water level measurement system that we are
+about to try out in the wave tank.  Every type of water level
+measurement device has it's trade offs.  It will be interesting to see
+how this unit performs.
+<br /><br />
+<img title="Water level via radar" withgrayborder="True"
+src="../attachments/2010-05/wave-tank-radar.jpg"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-14T14_47_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-16T06_14_05.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-13T09_42_07.txt" name="e2010-05-13T09_42_07.txt"></a>
+<h2 class="date">05.13.2010 09:42</h2>
+<div class="blogbody">
+<h3 class="title">Open request for visualization</h3>
+<div class="item-description">
+I have a great mini project for anyone who is willing to volunteer a
+bit of their time.  The USCG has been <a
+href="http://www.deepwaterhorizonresponse.com/go/doc/2931/543771/">releasing
+timelines</a> of the Deepwater Horizon oil spill.  It would be
+fantastic to have this as a <a
+href="http://www.simile-widgets.org/timeline/">SIMILE Timeline</a>
+visualization.  Any takers?  This time, I've save a copy locally of
+the timeline in case the USCG breaks the link to the timeline again or
+wipes the content (which they did for the last URL).
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-13T09_42_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-14T14_47_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-12T21_22_43.txt" name="e2010-05-12T21_22_43.txt"></a>
+<h2 class="date">05.12.2010 21:22</h2>
+<div class="blogbody">
+<h3 class="title">A view of the source of the spill</h3>
+<div class="item-description">
+Posted by the USCG
+<br /><br />
+<object width="640" height="505"><param name="movie" value="http://www.youtube.com/v/WYFYVNvgg-A&hl=en_US&fs=1&color1=0x5d1719&color2=0xcd311b"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/WYFYVNvgg-A&hl=en_US&fs=1&color1=0x5d1719&color2=0xcd311b" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="505"></embed></object>
+<br /><br />
+<object width="640" height="505"><param name="movie" value="http://www.youtube.com/v/2JTM2QyAfCI&hl=en_US&fs=1&color1=0x5d1719&color2=0xcd311b"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/2JTM2QyAfCI&hl=en_US&fs=1&color1=0x5d1719&color2=0xcd311b" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="505"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-12T21_22_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-13T09_42_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-08T22_03_40.txt" name="e2010-05-08T22_03_40.txt"></a>
+<h2 class="date">05.08.2010 22:03</h2>
+<div class="blogbody">
+<h3 class="title">When you know you have a memory leak...</h3>
+<div class="item-description">
+<pre>python(9483,0xa0ae34e0) malloc: *** mmap(size=262144) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug
+python(9483,0xa0ae34e0) malloc: *** mmap(size=262144) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug
+Traceback (most recent call last):
+  File "./ais2pg.py", line 233, in <module>
+    match = uscg_ais_nmea_regex.search(line).groupdict()
+python(9483,0xa0ae34e0) malloc: *** mmap(size=262144) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug
+MemoryError
+</pre>
+This probably comes from me missing something with python's reference counting.
+Clearly switching from pure python brings with it some risks <img src="../moods/smilies/smiley.gif" alt=":)" border="0" 
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-08T22_03_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-12T21_22_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-08T18_28_56.txt" name="e2010-05-08T18_28_56.txt"></a>
+<h2 class="date">05.08.2010 18:28</h2>
+<div class="blogbody">
+<h3 class="title">Fast AIS name database creation and highlighting of bad AIS data</h3>
+<div class="item-description">
+We really need a system in the US that helps mariners get their AIS
+units configured correctly.  Using an incorrect MMSI is dangerous.
+Your vessel may appear to change names on other peoples displays and
+if you call for help, the USCG may go to the location of the other
+vessel(s) with that MMSI.  I'm redoing some code to cache vessel names
+to be easier on the database and as a result my code is highlighting
+some invalid MMSI's.  The number after the name is the type and cargo field.
+<pre>UPDATING: 100000000    SYMMETRY 147 -&gt; CDA 64
+UPDATING: 101010101    JEAN RIBAULT 80 -&gt; RIP 148
+UPDATING: 101010101    RIP 148 -&gt; JEAN RIBAULT 80
+UPDATING: 111111111     0 -&gt; SOLO TU 243
+UPDATING: 111111111    CABLE FERRY ICW130 16 -&gt; ISLAND PROGRESS 51
+UPDATING: 111111111    GALLANT LADY 19 -&gt;  0
+UPDATING: 111111111    GALLANT LADY 19 -&gt; GRENADIER 33
+UPDATING: 111111111    GRENADIER 33 -&gt;  0
+UPDATING: 111111111    ISLAND PROGRESS 51 -&gt; GALLANT LADY 19
+UPDATING: 111111111    ISLAND PROGRESS 51 -&gt; GRENADIER 33
+UPDATING: 111111111    SOLO TU 243 -&gt; CABLE FERRY ICW130 16
+UPDATING: 111111111    SOLO TU 243 -&gt; ISLAND PROGRESS 51
+UPDATING: 123456789    IRONWOOD 35 -&gt; MV PATHFINDER USACE 104
+UPDATING: 123456789    ISLAND PILOT 51 -&gt; IRONWOOD 35
+UPDATING: 123456789    MV PATHFINDER USACE 104 -&gt; ISLAND PILOT 51
+UPDATING: 319892000    GIGA-BYTE 145 -&gt; SEA FEVER 80
+UPDATING: 319892000    SEA FEVER 80 -&gt; GIGA-BYTE 145
+UPDATING: 366759130    WSF PUYALLUP 49 -&gt; PUYALLUP WSF 86
+UPDATING: 366773060    ELWHA 197 -&gt;  ELWHA 83
+UPDATING: 367178330    SHELL AUGER NE 129 -&gt; SHELL AUGER SW 129
+UPDATING: 367178330    SHELL AUGER SW 129 -&gt; SHELL AUGER NE 129
+UPDATING: 367341450    ENCHILADA 224 -&gt; ENCHILADA/SHELL RIG 224
+UPDATING: 367341450    ENCHILADA/SHELL RIG 224 -&gt; ENCHILADA 224
+USELESS: mmsi = 0 name: 
+USELESS: mmsi = 0 name: LADY BROWARD
+USELESS: mmsi = 0 name: P301
+USELESS: mmsi = 0 name: P\B SANDY HOOK
+USELESS: mmsi = 0 name: SUBMARINE
+USELESS: mmsi = 1 name: 
+USELESS: mmsi = 1 name: BIL HOLMAN DREDGE
+USELESS: mmsi = 1 name: SANLORENZ0 108
+USELESS: mmsi = 1193046 name: ANGIE M BRUSCO
+USELESS: mmsi = 1193046 name: AUDREY
+USELESS: mmsi = 1193046 name: HARDHEAD
+USELESS: mmsi = 1193046 name: JAY GENE
+USELESS: mmsi = 1193046 name: MAJESTIC
+USELESS: mmsi = 1193046 name: MUSE
+USELESS: mmsi = 1193046 name: NAUTICAST
+USELESS: mmsi = 1193046 name: NIKOLA
+USELESS: mmsi = 1193046 name: NORWEGIAN QUEEN</pre>
+All mariners should take a few minutes and make sure that they have
+the correct MMSI and name for their vessel.  Ask a buddy or
+neighboring ship to see what they are receiving for you.  All ships
+should have a number that is 201,000,000 or higher.  The first 3
+digits on the left are a DAC, basically a country code, where the
+vessel is registered.  These are refered to by ITU as <a
+href="http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E">Maritime
+Identification Digits</a>.  Some countries have more than one,
+e.g. the United States has 338, 366, 367, 368, 369, and even more
+(there is one marked as Alaska).
+<br /><br />
+In environments such as the Deepwater Horizon incident in the Gulf of Mexico,
+it is especially important to have your information correct to aid in the
+coordination of the response.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-08T18_28_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-08T22_03_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-08T09_42_38.txt" name="e2010-05-08T09_42_38.txt"></a>
+<h2 class="date">05.08.2010 09:42</h2>
+<div class="blogbody">
+<h3 class="title">A look inside the incident command center for Deepwater Horizon</h3>
+<div class="item-description">
+This video has the incident command center in the background.  Looks
+not to different from the room that was using for the <a href="../archives/2010-03.html#e2010-03-25T19_00_16.txt">Northeast 2010 SONS drill</a> back in March.
+<br /><br />
+I have a few Delicious bookmarks for thngs related to the spill: <a href="http://delicious.com/goatbar/deepwaterhorizon">http://delicious.com/goatbar/deepwaterhorizon</a>.
+<br /><br />
+<object width="640" height="385"><param name="movie" value="http://www.youtube.com/v/ON9luL-w8tE&hl=en_US&fs=1&color1=0x006699&color2=0x54abd6"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/ON9luL-w8tE&hl=en_US&fs=1&color1=0x006699&color2=0x54abd6" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="385"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-08T09_42_38.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-08T18_28_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-07T14_33_10.txt" name="e2010-05-07T14_33_10.txt"></a>
+<h2 class="date">05.07.2010 14:33</h2>
+<div class="blogbody">
+<h3 class="title">Postgresql insert or update</h3>
+<div class="item-description">
+If anyone has a better suggestion on this, please let me know.  I am
+trying to update a table or insert a new entry if it doesn't exist and
+I would like to do this as fast as possible.  I found a really nice
+example of code that works fine when talking to postgresql over psql,
+but does not work inside of a psycopg2 connection.  Turns out that I got
+introuble by trying the update first.  If I try it with the insert first,
+I am then able to talk to the database only once per record.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> psycopg2
+cx <font color="#990000">=</font> psycopg2<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">"dbname='ais_test'"</font><font color="#990000">)</font>
+cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> i <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">):</font>
+    <b><font color="#0000FF">print</font></b> i
+<!-- -->
+    cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'''BEGIN;</font>
+<font color="#FF0000">SAVEPOINT sp1;</font>
+<font color="#FF0000">  INSERT INTO vessel_name VALUES(12345678, 'RUST BUCKET1', 67);</font>
+<font color="#FF0000">ROLLBACK TO sp1;</font>
+<font color="#FF0000">  UPDATE vessel_name SET name='RUST BUCKET', type_and_cargo=66 WHERE mmsi = 123456789;</font>
+<font color="#FF0000">COMMIT;'''</font><font color="#990000">)</font>
+<!-- -->
+    cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font></tt></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-07T14_33_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-08T09_42_38.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-05T14_49_51.txt" name="e2010-05-05T14_49_51.txt"></a>
+<h2 class="date">05.05.2010 14:49</h2>
+<div class="blogbody">
+<h3 class="title">Handling errors in C++ and passing them back to python</h3>
+<div class="item-description">
+The bridge between C++ and Python really isn't very fun.  I'm trying
+to keep my structure simple.  I have never made friends with
+exceptions in C++ and now is not the time to try them.  I have an enum
+of status/error codes defined in ais.h and here is an example of what happens
+when I get a bad character in a NMEA payload.  Just the act of starting
+to write the error handling cause me to rethink how I go about it.  
+<br /><br />
+Let me walk through decoding a Class A position message.
+<pre><tt>PyObject <font color="#990000">*</font>
+<b><font color="#000000">ais1_2_3_to_pydict</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>nmea_payload<font color="#990000">)</font> <font color="#FF0000">{</font>
+    <b><font color="#000000">assert</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+<!-- -->
+    <font color="#008080">Ais1_2_3</font> <b><font color="#000000">msg</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>msg<font color="#990000">.</font><b><font color="#000000">had_error</font></b><font color="#990000">())</font> <font color="#FF0000">{</font>
+        <b><font color="#000000">PyErr_Format</font></b><font color="#990000">(</font>ais_py_exception<font color="#990000">,</font> <font color="#FF0000">"Ais123: %s"</font><font color="#990000">,</font> AIS_STATUS_STRINGS<font color="#990000">[</font>msg<font color="#990000">.</font><b><font color="#000000">get_error</font></b><font color="#990000">()]);</font>
+        <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+    <font color="#FF0000">}</font></tt></pre>
+I create an position object (AIS message 1, 2, or 3) by passing in the
+NMEA payload.  If in the process of building the instance the code
+detects a problem, it will set the status to be something other than
+AIS_OK and return.  I have a method "had_error()" to check for
+something being off.  If it is, I use the get_error() call to return
+the status code and use that to construct and ais.decode.error.  The
+exception type was created in the module init by <i>ais_py_exception =
+PyErr_NewException("ais.decode.error", 0, 0);</i>.  Calling PyErr_Format
+tells python that an error occured and I return a NULL pointer since the
+object is no good.  And yes, there are quite a few bad objects floating 
+around in the 300G of compressed AIS log files that I have saved.
+<pre><tt><font color="#000000">01:</font> Ais1_2_3<font color="#990000">::</font><b><font color="#000000">Ais1_2_3</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>nmea_payload<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">02:</font>     <b><font color="#000000">assert</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+<font color="#000000">03:</font> 
+<font color="#000000">04:</font>     <b><font color="#000000">init</font></b><font color="#990000">();</font>
+<font color="#000000">05:</font> 
+<font color="#000000">06:</font>     <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#000000">strlen</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">)</font> <font color="#990000">!=</font> <font color="#993399">168</font><font color="#990000">/</font><font color="#993399">6</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">07:</font>         status <font color="#990000">=</font> AIS_ERR_BAD_BIT_COUNT<font color="#990000">;</font>
+<font color="#000000">08:</font>         <b><font color="#0000FF">return</font></b><font color="#990000">;</font>
+<font color="#000000">09:</font>     <font color="#FF0000">}</font>
+<font color="#000000">10:</font> 
+<font color="#000000">11:</font>     std<font color="#990000">::</font><font color="#008080">bitset&lt;168&gt;</font> bs<font color="#990000">;</font> <i><font color="#9A1900">// 1 slot</font></i>
+<font color="#000000">12:</font>     status <font color="#990000">=</font> <b><font color="#000000">aivdm_to_bits</font></b><font color="#990000">(</font>bs<font color="#990000">,</font> nmea_payload<font color="#990000">);</font>
+<font color="#000000">13:</font>     <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#000000">had_error</font></b><font color="#990000">())</font> <b><font color="#0000FF">return</font></b><font color="#990000">;</font></tt></pre>
+In the constructor above, I call the parent class init() function and
+then start trying to pull apart the payload.  Lines 6-9 make sure that
+the string has the right number of characters (all position messages
+come back as 28 characters).  If not, it sets the error code and
+bails out of the constructor.
+<pre><tt><font color="#000000">01:</font> <b><font color="#0000FF">template</font></b><font color="#990000">&lt;</font><font color="#008080">size_t</font> T<font color="#990000">&gt;</font>
+<font color="#000000">02:</font> <font color="#008080">AIS_STATUS</font> <b><font color="#000000">aivdm_to_bits</font></b><font color="#990000">(</font>std<font color="#990000">::</font><font color="#008080">bitset&lt;T&gt;</font> <font color="#990000">&amp;</font>bits<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>nmea_payload<font color="#990000">)</font> <font color="#FF0000">{</font>
+<font color="#000000">03:</font>     <b><font color="#000000">assert</font></b> <font color="#990000">(</font>nmea_payload<font color="#990000">);</font>
+<font color="#000000">04:</font>     <b><font color="#000000">assert</font></b> <font color="#990000">(</font><b><font color="#000000">strlen</font></b><font color="#990000">(</font>nmea_payload<font color="#990000">)</font> <font color="#990000">&lt;=</font> T<font color="#990000">/</font><font color="#993399">6</font> <font color="#990000">);</font>
+<font color="#000000">05:</font>     <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> char_idx<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> nmea_payload<font color="#990000">[</font>char_idx<font color="#990000">]</font> <font color="#990000">!=</font> <font color="#FF0000">'</font><font color="#CC33CC">\0</font><font color="#FF0000">'</font> <font color="#990000">&amp;&amp;</font> char_idx <font color="#990000">&lt;</font> T<font color="#990000">/</font><font color="#993399">6</font><font color="#990000">;</font> char_idx<font color="#990000">++)</font> <font color="#FF0000">{</font>
+<font color="#000000">06:</font>         <font color="#009900">int</font> c <font color="#990000">=</font> <font color="#009900">int</font><font color="#990000">(</font>nmea_payload<font color="#990000">[</font>char_idx<font color="#990000">]);</font>
+<font color="#000000">07:</font> 
+<font color="#000000">08:</font>         <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> c<font color="#990000">&lt;</font><font color="#993399">48</font> <font color="#008080">or</font> c<font color="#990000">&gt;</font><font color="#993399">119</font> <b><font color="#000000">or</font></b> <font color="#990000">(</font>c<font color="#990000">&gt;=</font><font color="#993399">88</font> <font color="#008080">and</font> c<font color="#990000">&lt;=</font><font color="#993399">95</font><font color="#990000">)</font> <font color="#990000">)</font>
+<font color="#000000">09:</font>             <b><font color="#0000FF">return</font></b> AIS_ERR_BAD_NMEA_CHR<font color="#990000">;</font>
+<font color="#000000">10:</font> 
+<font color="#000000">11:</font>         <b><font color="#0000FF">const</font></b> std<font color="#990000">::</font><font color="#008080">bitset&lt;6&gt;</font> bs_for_char <font color="#990000">=</font> nmea_ord<font color="#990000">[</font> c <font color="#990000">];</font>
+<font color="#000000">12:</font>         <b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> offset<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> offset <font color="#990000">&lt;</font> <font color="#993399">6</font> <font color="#990000">;</font> offset<font color="#990000">++)</font>
+<font color="#000000">13:</font>             bits<font color="#990000">[</font>char_idx<font color="#990000">*</font><font color="#993399">6</font> <font color="#990000">+</font> offset<font color="#990000">]</font> <font color="#990000">=</font> bs_for_char<font color="#990000">[</font>offset<font color="#990000">];</font>
+<font color="#000000">14:</font>     <font color="#FF0000">}</font>
+<font color="#000000">15:</font>     <b><font color="#0000FF">return</font></b> AIS_OK<font color="#990000">;</font>
+<font color="#000000">16:</font> <font color="#FF0000">}</font></tt></pre>
+Handling the bit decoding is done outside of the class, so there is no
+<i>status</i> member to be set.  I handle the status through the
+return code rather than a non-const argument (which was my first
+strategy).  The above template handles the conversion for AIS 6 bit
+NMEA characters to a bitset.  At line 8, I check to make sure that
+each character is one of the allowed characters.  If not, I return an
+AIS status code representing the error.  There is no point to
+continuing on with the decoding when the message is known to be
+garbage.  At line 15, I know that everything decoded okay, so I return AIS_OK.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-05T14_49_51.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-07T14_33_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-05T07_20_07.txt" name="e2010-05-05T07_20_07.txt"></a>
+<h2 class="date">05.05.2010 07:20</h2>
+<div class="blogbody">
+<h3 class="title">Google's Crisis Response oil spill page</h3>
+<div class="item-description">
+Finally something I can talk about 14 days into this incident.  I
+didn't have anything to do with the creation of Google's page.
+Thank's to Pete and his coworkers for creating this page on the
+Deepwater Horizon incident:
+<br /><br />
+<a href="http://www.google.com/crisisresponse/oilspill/">Google crisis response - Gulf of Mexico Oil Spill</a>
+<br /><br />
+<img title="Google crisis response"
+src="../attachments/2010-05/google-crisis-response-oilspill.png"/>
+<br /><br />
+There is also a lot of good stuff on <a href="http://gcaptain.com/maritime/blog/">gCaptain</a>: e.g. <a href="http://gcaptain.com/forum/offshore/4805-deepwater-horizon-transocean-oil-rig-fire.html">Deepwater Horizon - Transocean Oil Rig Fire</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-05T07_20_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-05T14_49_51.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-03T19_23_21.txt" name="e2010-05-03T19_23_21.txt"></a>
+<h2 class="date">05.03.2010 19:23</h2>
+<div class="blogbody">
+<h3 class="title">Supporting Python 2.6 and 3.1 for a C extension/module</h3>
+<div class="item-description">
+I just managed to make my python extension in libais work with both
+python 2.6 and python 3.  I followed the well hidden guide on the
+python web page: <a
+href="http://docs.python.org/howto/cporting.html">Porting Extension
+Modules to 3.0</a>.  It basically boils down to these two changes for me:
+<ul>
+<li>PyString_FromString -&gt; PyUnicode_FromString</li>
+<li>PyInt_FromLong -&gt; PyLong_FromLong</li>
+</ul>
+I then copied in their example module initialization code.  Then I
+convered "myextension" to "ais" and commented out their example
+error_out function and myextension_methods.  I then hacked up my
+makefile and it worked, once I had my python path pointing at the
+right .so.  You most definitely will get an error message when trying
+to load a 2.6 module in 3.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-03T19_23_21.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-05T07_20_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-05-03T15_21_47.txt" name="e2010-05-03T15_21_47.txt"></a>
+<h2 class="date">05.03.2010 15:21</h2>
+<div class="blogbody">
+<h3 class="title">libais 0.1 - a C++ library for decoding AIS and a python wrapper</h3>
+<div class="item-description">
+In the spirit of open source, I have made my first release of my
+libais source code... version 0.1.  The code really isn't usable yet,
+but it can decode messages 1-5.  The decoding happens in C++ and I've
+written a C++ wrapper for python that given a message NMEA payload, is
+able to return a dictionary back to python.  I expect this to be about
+50x faster than my noaadata code.  Why another library for AIS?  I
+like the code that ESR did for GPSD, but I wanted:
+<ul>
+<li>A C++ interface with a class heirarchy.  Why polute GPSD with C++?</li>
+<li>I am uncomfortable with unions and I am not smart enough to program with more than just simple unions (libais uses one small union for signed integer decoding)</li>
+<li>Being able to decode AIS in the same process</li>
+<li>I really wanted to use the C++ bitset type to handle the bit level stuff</li>
+</ul>
+So, should you use libais or gpsd?  My answer is right now you should
+be using gpsd.  My code is really rough.  But, you might find using
+libais fun and a good learning tool.  I took the function names for
+ubits and sbits from gpsd.  I've made use of templating to get around
+the issue of bitset size being a compile time fixed constant.
+Here is an example of using libais.  (Doing anything else right now will make it crash).
+<pre>wget http://vislab-ccom.unh.edu/~schwehr/software/libais/downloads/libais-0.1.tar.bz2
+tar xf libais-0.1.tar.bz2
+cd libais-0.1
+make python
+export PYTHONPATH=build/lib.*
+ipython
+import ais
+ais.decode('15PIIv7P00D5i9HNn2Q3G?wB0t0I')
+ais.decode('402u=TiuaA000r5UJ`H4`?7000S:')
+ais.decode('55NBjP01mtGIL@CW;SM&lt;D60P5Ld000000000000P0`&lt;3557l0&lt;50@kk@K5h@00000000000') 
+</pre>
+The return dictionaries look like this:
+<pre>{'cog': 86.0,
+ 'id': 1,
+ 'mmsi': 369515000,
+ 'nav_status': 7,
+ 'position_accuracy': 0,
+ 'raim': False,
+ 'received_stations': 25,
+ 'repeat_indicator': 0,
+ 'rot': -53.547782897949219,
+ 'rot_over_range': True,
+ 'sog': 0.0,
+ 'spare': 0,
+ 'special_manoeuvre': 0,
+ 'timestamp': 41,
+ 'true_heading': 511,
+ 'x': -166.51214599609375,
+ 'y': 53.904434204101562}
+<!-- -->
+{'day': 2,
+ 'fix_type': 7,
+ 'hour': 0,
+ 'id': 4,
+ 'minute': 0,
+ 'mmsi': 3100051,
+ 'month': 5,
+ 'position_accuracy': 1,
+ 'raim': True,
+ 'repeat_indicator': 0,
+ 'second': 0,
+ 'slot_offset': 2250,
+ 'spare': 0,
+ 'x': -82.666099548339844,
+ 'y': 42.069435119628906,
+ 'year': 2010}
+<!-- -->
+{'ais_version': 0,
+ 'callsign': 'WDD9287',
+ 'destination': 'TACOMA,WA@@@@@@@@@@@',
+ 'dim_a': 5,
+ 'dim_b': 12,
+ 'dim_c': 3,
+ 'dim_d': 5,
+ 'draught': 4,
+ 'dte': 0,
+ 'eta_day': 15,
+ 'eta_minute': 0,
+ 'eta_month': 4,
+ 'fix_type': 1,
+ 'id': 5,
+ 'imo_num': 7729526,
+ 'mmsi': 367309440,
+ 'name': 'SEA HAWK@@@@@@@@@@@@',
+ 'repeat_indicator': 0,
+ 'spare': 0,
+ 'type_and_cargo': 80}
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-05.html#e2010-05-03T15_21_47.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-05-03T19_23_21.html#comments">Comments</a> -->
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="links">
+
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary="Calendar with links to days with entries">
+<caption class="calendarhead">May 2010</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td> <td align="center"></td> <td align="center"></td> <td align="center"></td> <td align="center"></td> <td align="center"></td>  
+<td align="center"><span class="calendar">1</span></td>
+</tr>
+<tr>
+             
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-03T19_23_21.txt">3</a></span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-05T14_49_51.txt">5</a></span></td>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-07T14_33_10.txt">7</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-08T22_03_40.txt">8</a></span></td>
+</tr>
+<tr>
+       
+<td align="center"><span class="calendar">9</span></td>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-12T21_22_43.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-13T09_42_07.txt">13</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-14T14_47_34.txt">14</a></span></td>
+<td align="center"><span class="calendar">15</span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-16T06_14_05.txt">16</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-17T17_53_46.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-18T14_23_32.txt">18</a></span></td>
+<td align="center"><span class="calendar">19</span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-20T12_05_01.txt">20</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-21T12_19_09.txt">21</a></span></td>
+<td align="center"><span class="calendar">22</span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-25T18_57_02.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-26T13_14_22.txt">26</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-27T16_52_16.txt">27</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-28T09_00_12.txt">28</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-29T17_38_04.txt">29</a></span></td>
+</tr>
+<tr>
+ 
+<td align="center"><span class="calendar">30</span></td>
+<td align="center"><span class="calendar"><a href="2010-05.html#e2010-05-31T15_10_26.txt">31</a></span></td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<br clear="all" />
+
+</body>
+</html>

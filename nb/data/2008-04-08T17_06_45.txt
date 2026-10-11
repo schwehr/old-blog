@@ -1,0 +1,65 @@
+TITLE: GeoDjango can parse geometries
+AUTHOR: Kurt
+DATE: 04.08.2008 17:06
+DESC: killer!
+-----
+BODY:
+I've managed now to get GeoDjango to work with my ship reports table!
+This is a big deal for me.  I'm trying to make a reporting and
+summarization tool.  First I tried to just connect to the database
+to see if the gis contrib module hijacks the database cursor.  It 
+clearly does not.
+<pre>
+% <b>ipython manage.py shell</b>
+In [1]: <b>from django.db import connection</b>
+In [2]: <b>cursor = connection.cursor()</b>
+In [3]: <b>cursor.execute('SELECT position FROM position LIMIT 5')</b>
+In [4]: <b>all = cursor.fetchall()</b>
+In [5]: <b>all[0]</b>
+Out[5]: ('0101000020E6100000E0A96DB05DB851C034AAF9172E9A4540',)
+</pre>
+The position comes out at the WKB hex string for the Point field position.
+That's okay, but there is something strange.  ipython is not working 
+correctly.  I wanted to see the history and nothing happened.  This is
+how it is supposed to work:
+<pre>
+% <b>ipython</b>
+In [1]: <b>import os</b>
+In [2]: <b>import sys</b>
+In [3]: <b>hist</b>
+1: import os
+2: import sys
+3: _ip.magic("hist ")
+</pre>
+But what I see with django:
+<pre>
+In [14]: <b>hist</b>
+NameError                                 Traceback (most recent call last)
+/Users/schwehr/Desktop/gdj/ais_www/<ipython console> in <module>()
+NameError: name 'hist' is not defined
+In [15]: <b>%hist</b>
+ERROR: Magic function `hist` not found.
+</pre>
+Enough of that.  On to a working example.  I had loaded some AISdata
+into postgis in my last post about geodjango.  Now I want to really
+see it!
+<pre>
+% <b>ipython manage.py shell</b>
+In [1]: <b>from ais_msgs.models import Position</b>
+In [2]: <b>pos_list = Position.objects.all()</b>
+In [3]: <b>p.position.x</b>
+Out[3]: -70.880718333333334
+In [4]: <b>p.userid</b>
+Out[4]: 265000000
+</pre>
+Sweet!
+
+I've turned on the Admin interface and it knows to decode the WKB to
+WKB (aka AsText).  This is the behavior that I would hope for.  I think
+this is better than fields for x,y that would explode for other geometry
+types.
+
+<img src="http://schwehr.org/blog/attachments/2008-04/geodjango-pos-admin-1.png"/>
+
+<img src="http://schwehr.org/blog/attachments/2008-04/geodjango-pos-admin-2.png"/>
+-----

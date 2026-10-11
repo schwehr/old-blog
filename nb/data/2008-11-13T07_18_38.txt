@@ -1,0 +1,135 @@
+TITLE: tappy - tidal analysis in python
+AUTHOR: Kurt
+DATE: 11.13.2008 07:18
+DESC: progress, but am I there yet?
+-----
+BODY:
+Yesterday, I tried <a
+href="http://sourceforge.net/projects/tappy">tappy</a>.  The program
+crashed and I sent Tim, the author, a crash report.  Last night, he 
+put a new version up on source forge and it seems to work!  I need 
+to look at the output to see if it makes sense, but here is the 
+process so far.
+<pre>% <b>head tide2.raw</b>
+# START LOGGING UTC seconds since the epoch: 1221162698.25
+# SPEED:       9600
+# PORT:        /dev/ttyS0
+# TIMEOUT:     300.0
+# STATIONID:   memma
+# DAEMON MODE: True
+635  222  497,rmemma,1221162708.95
+635  222  497,rmemma,1221162721.07
+635  222  497,rmemma,1221162733.2
+635  223  497,rmemma,1221162745.32</pre>
+Then I converted the engineering units to meters above the sensor.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> datetime
+<!-- -->
+<i><font color="#9A1900"># Coefficients for water level in meters</font></i>
+A<font color="#990000">=-</font><font color="#993399">1.008E-01</font>
+B<font color="#990000">=</font><font color="#993399">5.125E-03</font>
+C<font color="#990000">=</font><font color="#993399">7.402E-08</font>
+D<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">.</font>
+<!-- -->
+out <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'tide-tappy.dat'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'tide2.raw'</font><font color="#990000">):</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        fields <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()</font>
+<!-- -->
+        station_id <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>fields<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])</font>
+        waterlevel_raw <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>fields<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">])</font>
+<!-- -->
+        temp_c<font color="#990000">,</font> station_name<font color="#990000">,</font> timestamp <font color="#990000">=</font> fields<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">].</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">','</font><font color="#990000">)</font>
+        temp_c <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>temp_c<font color="#990000">)</font>
+        timestamp <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>timestamp<font color="#990000">)</font>
+<!-- -->
+        N <font color="#990000">=</font> waterlevel_raw
+        waterlevel <font color="#990000">=</font> <font color="#990000">(</font> A <font color="#990000">+</font> B<font color="#990000">*</font>N <font color="#990000">+</font> C<font color="#990000">*(</font>N<font color="#990000">**</font><font color="#993399">2</font><font color="#990000">)</font> <font color="#990000">+</font> D<font color="#990000">*(</font>N<font color="#990000">**</font><font color="#993399">3</font><font color="#990000">)</font> <font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'bad data:'</font><font color="#990000">,</font>line
+        <b><font color="#0000FF">continue</font></b>
+<!-- -->
+    time_str <font color="#990000">=</font> datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">utcfromtimestamp</font></b><font color="#990000">(</font>timestamp<font color="#990000">).</font><b><font color="#000000">strftime</font></b><font color="#990000">(</font><font color="#FF0000">"%Y %m %d %H %M %S"</font><font color="#990000">)</font>
+    out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s %s\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>time_str<font color="#990000">,</font>waterlevel<font color="#990000">))</font>
+<!-- -->
+</tt></pre>
+The metric result was this:
+<pre>% <b>head tide-tappy.dat</b>
+2008 09 11 19 51 48 1.04059800168
+2008 09 11 19 52 01 1.04059800168
+2008 09 11 19 52 13 1.04059800168
+2008 09 11 19 52 25 1.04575594058
+2008 09 11 19 52 37 1.04575594058
+2008 09 11 19 52 49 1.04575594058
+2008 09 11 19 53 01 1.04575594058
+2008 09 11 19 53 13 1.04575594058
+2008 09 11 19 53 25 1.04575594058
+2008 09 11 19 53 38 1.04575594058</pre>
+Note that this data is going to be non-zero mean and all the data is way
+above 0.  I don't know if that will cause problems with the tidal analysis.
+After clipping out a large continuous chunk of data, I still had 247K
+water levels.  That will take a long time, so I ran my decimate script to
+get it down to 22K samples:
+<pre>decimate -l 10 tide-tappy-short.dat > tide-tappy-short2.dat</pre>
+Now that I have a reasonably sized data set so it will run faster,
+here are the results:
+<pre> % <b>tappy.py tide-tappy-short2.dat</b>
+<!-- -->
+#        NAME        SPEED            H        PHASE
+#        ====        =====            =        =====
+           Mm   0.54437626       0.1129      41.9029
+          MSf   1.01589577       0.0358     287.9779
+          2Q1  12.85428307       0.0115     188.2313
+           Q1  13.39865933       0.0248     200.5201
+           O1  13.94303559       0.1089     187.5583
+          NO1  14.49669238       0.0201      93.0352
+           K1  15.04106864       0.1053     173.8819
+           J1  15.58544490       0.0046     165.1417
+          OO1  16.13910169       0.0065     316.7976
+         ups1  16.68347795       0.0056     214.2090
+         MNS2  27.42383220       0.0128     164.7614
+          mu2  27.96820846       0.0873     291.0659
+           N2  28.43972797       0.2989      78.1917
+           M2  28.98410423       1.5892     105.8615
+           L2  29.52848049       0.0857     119.4599
+           S2  30.00000000       0.2055     129.5660
+         eta2  30.62651354       0.0193      21.9170
+         2SM2  31.01589577       0.0032     315.2719
+          MO3  42.92713982       0.0056     240.8188
+           M3  43.47615634       0.0011     145.7261
+          MK3  44.02517287       0.0039     147.9154
+          SK3  45.04106864       0.0031       8.1197
+          MN4  57.42383220       0.0186      26.3005
+           M4  57.96820846       0.0210      73.1954
+          SN4  58.43972797       0.0097     275.5858
+          MS4  58.98410423       0.0075      68.4415
+           S4  60.00000000       0.0011     315.0172
+         2MN6  86.40793643       0.0169     117.4640
+           M6  86.95231269       0.0407     124.8344
+         2MS6  87.96820846       0.0234     164.1220
+         2SM6  88.98410423       0.0075     256.1520
+           S6  90.00000000       0.0026     304.1771
+           M8 115.93641692       0.0068     174.5350
+<!-- -->
+# INFERRED CONSTITUENTS
+#        NAME        SPEED            H        PHASE
+#        ====        =====            =        =====
+         rho1  13.47151608       0.0041      58.4877
+           M1  14.49205211       0.0077     248.6799
+           P1  14.95893136       0.0349     260.5434
+          2N2  27.89535171       0.0413      76.3025
+          nu2  28.51258472       0.0604     175.2170
+      lambda2  29.45562374       0.0111     331.9892
+           T2  29.95893332       0.0121     101.4720
+           R2  30.04106668       0.0016     110.5621
+           K2  30.08213728       0.0559      63.0246
+<!-- -->
+# AVERAGE (Z0) =  2.21195756363
+</pre>
+I now need to plot this up agains the data to see how it did.
+I might need to add some flags to tappy, but I need more
+time to give it a look.
+-----

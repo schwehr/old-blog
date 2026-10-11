@@ -1,0 +1,60 @@
+TITLE: django security update - 1.2.5 / 1.1.4
+AUTHOR: Kurt
+DATE: 02.09.2011 10:23
+DESC: cvs down
+-----
+BODY:
+UPDATE 2011-Feb-14: Django has been updated to 1.2.5 in fink unstable.
+
+Fink django users: there is a security update for django that was
+released today and with the CVS outage at sourceforge, you will have
+to take extra action to make sure your installations of django through
+fink are secure.  Here is a rough procedure:
+<pre>sudo -s
+mkdir -p /sw/fink/10.6/local/main/finkinfo/web
+cd /sw/fink/10.6/local/main/finkinfo/web
+curl -o django-py-1.2.5.info http://vislab-ccom.unh.edu/~schwehr/software/fink/django-py-1.2.5.info
+fink scanpackages
+fink install django-py27</pre>
+<a
+href="http://www.djangoproject.com/weblog/2011/feb/08/security/">Security
+releases issued</a> (djangoproject)
+<pre>Flaw in CSRF handling
+<!-- -->
+Django includes a CSRF-protection mechanism, which makes use of a
+token inserted into outgoing forms. Middleware then checks for the
+token's presence on form submission, and validates it. 
+<!-- -->
+Previously, however, our CSRF protection made an exception for AJAX requests, on the following basis:
+<!-- -->
+   1. Many AJAX toolkits add an X-Requested-With header when using
+      XMLHttpRequest. 
+   2. Browsers have strict same-origin policies regarding XMLHttpRequest.
+   3. In the context of a browser, the only way that a custom header
+      of this nature can be added is with XMLHttpRequest. 
+<!-- -->
+Therefore, for ease of use, we did not apply CSRF checks to requests
+that appeared to be AJAX on the basis of the X-Requested-With
+header. The Ruby on Rails web framework had a similar exemption. 
+<!-- -->
+Recently, engineers at Google made members of the Ruby on Rails
+development team aware of a combination of browser plugins and
+redirects which can allow an attacker to provide custom HTTP headers
+on a request to any website. This can allow a forged request to appear
+to be an AJAX request, thereby defeating CSRF protection which trusts
+the same-origin nature of AJAX requests. 
+<!-- -->
+Michael Koziarski of the Rails team brought this to our attention, and
+we were able to produce a proof-of-concept demonstrating the same
+vulnerability in Django's CSRF handling. 
+<!-- -->
+To remedy this, Django will now apply full CSRF validation to all
+requests, regardless of apparent AJAX origin. This is technically
+backwards-incompatible, but the security risks have been judged to
+outweigh the compatibility concerns in this case.
+...</pre>
+
+CSRF == <a
+href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">Cross-site
+request forgery</a> (wikipedia)
+-----

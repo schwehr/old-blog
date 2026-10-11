@@ -1,0 +1,68 @@
+TITLE: Finding the necessary seismic lines
+AUTHOR: Kurt
+DATE: 06.19.2005 09:56
+DESC: lots of sql queries
+-----
+BODY:
+I just used the GMT shiptrack and shot counts to figure out what lines
+must be processed to match my cores.  I could have added the filename
+or fileKey to the plot, but it would have gotten even more cluttered.
+the fileKey would not be too bad.  Here is the process.  First record
+the shot numbers around the cores on the map.
+<pre>
+  cores 1,2:  244000 - 248000
+  cores 3,4:  82000 - 84000
+  core    5: 138000 - 142000 
+  core    6: 506000 - 508000
+</pre>
+Next run a series of sqlite queries on the segyTrace table.  This is
+where I discoved that shot point is hardly unique.  For cores 3 and 4,
+here is what I got.
+<pre>
+  sqlite bp-segy.db 'SELECT fileKey,x/3600.0,y/3600.0 FROM segyTrace\
+  WHERE shotpoint=82000;'
+ 
+17|-120.058333333333|34.3691666666667
+17|-120.058333333333|34.3691666666667
+104|-119.919722222222|34.2608333333333
+104|-119.919722222222|34.2608333333333
+127|-119.874722222222|34.2966666666667
+127|-119.874722222222|34.2966666666667
+142|-119.551944444444|34.3816666666667
+142|-119.551944444444|34.3816666666667
+
+   Actual core locations:
+
+-120.05883333 34.36566666
+-120.05716666 34.37899999
+</pre>
+So it looks like it must be in file 17.  Then I need a final SQL query
+to lookup the filenames.  A join in the beginning would be slow on a
+database of this size.  Here I am lazy and just use grep instead of
+SQL WHERE. 
+<pre>
+  sqlite bp-segy.db 'select fileKey,filename,lineno FROM segyFile' |\
+    tr '|' '\t' | egrep '^(48|17|112|88)' 
+
+17      bpsio04L04.xstar        6
+48      bpsio08L07.xstar        16
+88      bpsio13L05.xstar        26
+112     bpsio16L10.xstar        33
+</pre>
+That's it.  Now I have to crank through those 4 files.
+
+<a href="http://www.myfonts.com/WhatTheFont/">WhatTheFont</a> - try to
+figure out the font used in a URL.
+
+<a href="http://www.johnnyslack.com/duckhunt/">DuckHunt</a> in flash.
+
+Update from JWZ: he likes <a
+href="http://antirsi.inhelsinki.nl/">AntiRSI</a> more than TimeOut.
+
+<a href="http://www.koders.com/">koders.com</a> - search through lots
+of source code.
+
+<a href="http://www.engadget.com/entry/1234000453047251/">NASA
+demonstrates nanosatellite system</a> - This was worked on in Code IC
+at NASA Ames when I was there.
+-----

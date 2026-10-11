@@ -1,0 +1,32 @@
+TITLE: Icon heading in Google Earth - broken?
+AUTHOR: Kurt
+DATE: 11.24.2009 07:49
+DESC: not so much fun
+-----
+BODY:
+I throught I would give the <a
+href="http://code.google.com/apis/kml/documentation/kmlreference.html#heading">&gt;heading&lt;</a>
+tag in KML a try.  At first, the results looked great:
+
+<img title="Icons with north up" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-11/googleearth-heading-ok.png"/>
+
+When I rotate the camera, the ship position reports disintegrate.  It
+really seams like the heading should apply relative to the earth, not
+relative to the camera!  <b>This is a bug in the Mac version.  Google Earth on Windows XP appears to work correctly.</b>
+
+<img title="Icons with a view rotation - WHAT?" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-11/googleearth-heading-broken.png"/>
+
+Try it for yourself: <a href="http://schwehr.org/blog/attachments/2009-11/ship.kmz">ship.kmz</a>
+
+Also, Google Earth definitely needs a more compact (both in terms of
+disk space and memory when loaded) representation of Points.  I wish
+that Points could look something like this:
+<pre><tt><b><font color="#0000FF">&lt;Placemark&gt;</font></b>
+  <b><font color="#0000FF">&lt;name&gt;</font></b>ship<b><font color="#0000FF">&lt;/name&gt;</font></b>
+  <b><font color="#0000FF">&lt;Point</font></b> <font color="#009900">heading</font><font color="#990000">=</font><font color="#FF0000">"315.2"</font> <font color="#009900">icon</font><font color="#990000">=</font><font color="#FF0000">"tug.png"</font> <font color="#009900">color</font><font color="#990000">=</font><font color="#FF0000">"ff0000ff"</font> <font color="#009900">scale</font><font color="#990000">=</font><font color="#FF0000">"0.5"</font> <font color="#009900">unix_timestamp</font><font color="#990000">=</font><font color="#FF0000">"1259066628.96"</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;coordinates&gt;</font></b>-70.39408,42.35226,0<b><font color="#0000FF">&lt;/coordinates&gt;</font></b>
+  <b><font color="#0000FF">&lt;/Point&gt;</font></b>
+<b><font color="#0000FF">&lt;/Placemark&gt;</font></b>
+</tt></pre>
+With other software that I use, it's not a big deal to pull in millions of points.  Google earth starts to slow down with just 3K points.
+-----

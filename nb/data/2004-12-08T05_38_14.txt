@@ -1,0 +1,18 @@
+TITLE: Stopping cron emails
+AUTHOR: Kurt
+DATE: 12.08.2004 05:38
+DESC: Put the smackdown on cron
+-----
+BODY:
+In the quest of setting up webalizer correctly, I had forgotten that
+cron will send you an email for each time that it runs.  That's great
+if the email actually gets sent to you, but on my machine, I have not
+setup email to actually get beyond /var/mail/schwehr.  The edge router
+blocks smtp and I couldn't convince the powers that be to lift the
+block.  So the mail was just building up for no good reason.  The
+trick to stopping vixie cron from sending email is pretty simple.  Do
+<b>crontab -e</b> and add this line to the beginning of the file:
+<pre>
+  MAILTO=''
+</pre>
+-----

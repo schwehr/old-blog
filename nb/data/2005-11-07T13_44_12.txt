@@ -1,0 +1,34 @@
+TITLE: agupp style for submitting
+AUTHOR: Kurt
+DATE: 11.07.2005 13:44
+DESC: document class fun
+-----
+BODY:
+Today, I am working on the final touches before resubmitting my Santa
+Barbara Basin paper.  This is the standard header that I use for LaTeX
+typesetting of my paper.
+<pre>\documentclass[agupp]{aguplus}</pre>
+For actually submitting the paper, it has to be in a very funky
+special style that does double spacing and shoves my tables to the end
+of the paper.  The submission format requires this first line instead
+of the one above.
+<pre>\documentclass[agums]{aguplus} % For review - double spaced</pre>
+It does not seem right to keep editing the paper for each format.  I
+decided to create another mode much like I have for creating a copy
+without the figures (so it is much smaller).  Here is the submit rule
+from my Makefile:
+<pre>
+submit:
+	echo "\documentclass[agums]{aguplus}" &gt; ${NAME}-submit.tex
+	egrep -v 'documentclass|\$Id:' ${NAME}.tex |perl -p -e "s/bibliography{santabarbara}/bibliography{santabarbara-submit}/g"   &gt;&gt; ${NAME}-submit.tex
+	cp ${NAME}.bib ${NAME}-submit.bib
+	pdflatex ${NAME}-submit.tex
+	bibtex ${NAME}-submit.aux
+	pdflatex ${NAME}-submit.tex
+	pdflatex ${NAME}-submit.tex
+	rm -f *-submit.{aux,bbl,blg,log,tex}
+</pre>
+The first each creates the new header in a file.  Then I append the
+original tex file but strip the old documentclass and the RCS/CVS Id, and
+change the bibtex file name (why do I have to do this?)
+-----

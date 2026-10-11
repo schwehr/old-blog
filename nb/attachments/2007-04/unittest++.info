@@ -1,0 +1,49 @@
+Package: unittest++
+Version: 1.2
+Revision: 1
+Maintainer: Kurt Schwehr <kurt@ccom.unh.edu>
+Source: mirror:sourceforge:unittest-cpp/unittest-cpp-%v.zip
+Source-MD5: fd9c21904b59de6815bb0dc99bd15f9d
+SourceDirectory: UnitTest++
+# MIT License
+License: BSD
+Homepage: http://unittest-cpp.sourceforge.net/
+Description: Unit testing for c++
+DescDetail: <<
+
+UnitTest++ is a lightweight unit testing framework for C++.
+
+It was designed to do test-driven development on a wide variety of
+platforms. Simplicity, portability, speed, and small footprint are all
+very important aspects of UnitTest++.
+
+UnitTest++ is free software. You may copy, distribute, and modify it
+under the terms of the license contained in the file COPYING
+distributed with this package. This license is the same as the MIT/X
+Consortium license.
+
+UnitTest++ is ANSI portable C++ and makes minimal use of advanced
+library and languages features, which means it should be easily
+portable to just about any platform. Out of the box, the following
+platforms are supported:
+
+    * Win32
+    * Linux
+    * Mac OS X
+<<
+DescPort: <<
+Looks like a derivative of CxxTest.  The project had an initial
+release in 2006 where as the last release of CxxTest was in Dec 2004
+<<
+CompileScript: <<
+  make
+<<
+InstallScript: <<
+  mkdir -p %i/bin %i/include/UnitTest++/Posix %i/share/doc/%n/tests %i/lib
+  cp -r src/*.h %i/include/UnitTest++
+  cp -r src/Posix/*.h %i/include/UnitTest++/Posix
+  cp -r src/tests/*.{cpp,h} %i/share/doc/%n/tests/
+  cp libUnitTest++.a %i/lib/libUnitTest++.a
+  ranlib %i/lib/libUnitTest++.a
+<<
+DocFiles: COPYING README

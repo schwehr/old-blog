@@ -1,0 +1,96 @@
+TITLE: AIS talkers for NMEA VDM/VDO messages
+AUTHOR: Kurt
+DATE: 03.17.2014 10:45
+DESC: jerks
+-----
+BODY:
+I got an email with this question:
+<pre>In my data feed m getting some sentences with packet types I do not
+recognize.  Could you tell me what they mean?
+<!-- -->
+!BSVDM
+!ABVDM
+<!-- -->
+I'm also getting multi-sentences with different packet types. Is that
+allowed? First part can be ABVDM and second part AIVDM.</pre>
+I was just asked in email to explain the first field in the CSV that
+is the AIS NMEA armored messages.  Sadly, the NMEA specification is
+paywalled by the annoying folks at NMEA so I can't share with you
+where talkers are defined.  The same goes for the IEC standards that
+define AIS device messages and testing procedures.  And I only have
+draft versions of a few of those that people on the commitees have
+given me over the years.  For example, I have "Maritime navigation and
+radiocommunication equipment and systems - Digital interfaces - Part
+100: Single talker and multiple listeners - Extra requirements to IEC
+61162-1 for the UAIS".
+
+Back before <a
+href="http://www.itu.int/rec/R-REC-M.1371-4-201004-I/en">ITU 1371</a>
+was opened up, I helped Eric Raymond (ESR) a bit with his writing of <a
+href="http://gpsd.berlios.de/AIVDM.html">AIVDM/AIVDO protocol
+decoding</a>.  I still think that his document is drastically better
+written than the crap that is in the ITU documents.  ESR also has <a
+href="http://gpsd.berlios.de/NMEA.html#_talker_ids">NMEA Revealed with
+a list of talker ID</a>.
+
+Let's start with a sample message:
+<pre>!AIVDO,1,1,,B,403OvpQuUwgBMJRe6VE5Aai005q8,0*6F,b003669730,1249053583</pre>
+The first two letters after the bang ("!") are the "talker."  In NMEA
+speak, this is the device that generated the text in your local
+environment.  It has nothing to do with any remote AIS devices and
+what they sent over the VHF radio.  Above, we have "AI".  This is the
+classic "AIS" device talker.  It is what you get with most AIS
+receivers and transceivers (they are NOT transponders).
+
+Following the talker are 3 letters that define the "sentence type."
+In the world of NMEA, this is the type of message that you are about
+to parse.  VDO is a type that not many people know about.  It says
+that the message that follows is an AIS message that is about "own
+ship."  This really means that the device is talking about itself.
+The more commonly observed VDM means "AIS message that the device
+received over a VHF radio channel."  The VDO in the above sample
+message makes sense as this is an AIS basestation telling us the
+message 4 (basestation report) for itself.  The message has two extra
+fields on the right: ",b003669730,1249053583".  This is the older
+USCG logging format and has a receiver identifier and UNIX UTC
+timestamp.  The b at the beginning of the receiver name says that the 
+message was logged from a basestation.  If we decode that message,
+we should find that the MMSI of the basestation report should match
+the receiver name.
+
+This next sample message has "BSVDM".  The talker is "BS".  This
+means that we are hearing from a basestation.  The logger has added
+",r003669717" with an "r" for receiver, but it might just be
+missconfigured.  This message is from my 2006 notes and I was just
+figuring out AIS and what the USCG was doing back then.  I did have a
+basestation on my desk for a while.
+<pre>!BSVDM,1,1,,A,85MwpwQKf7sgdeioePgqI0@Q;F=0q3va1sdLFPCS4wB7PtDMD:62,0*34,r003669717,1165850344</pre>
+And a final sample that has "ANVDM".  This was an AIS ATON
+(aid-to-navigation) device that uses "AN" as the talker:
+<pre>!ANVDM,1,1,,B,35MnbiPP@PJutdlH2M1sIq:80000,0*10,r003669947,1294012804</pre>
+As for "AB", I was unsure.  I did receive some sample data with an AB
+talker, but I do not know what kind of device was doing the logging.
+AB might stand for Ais Basestation in someones mind.  Looking at
+NMEA's closed documentation (yes, I paid rediculous amount for version
+4.0 of the spec), I found:
+<pre>AB Independent AIS Base Station
+AD Dependent AIS Base Station 
+AI Mobile Class A or B AIS Station
+AN AIS Aids to Navigation Station
+AR AIS Receiving Station
+AS Limited Base Station
+AT AIS Transmitting Station
+AX AIS Simplex Repeater Station
+SA Physical Shore AIS Station</pre>
+There was no "BS" talker in there.  Don't ask me to explain the
+differences between all those codes.
+
+Please, please, please: If you have the opportunity to talk to people
+at NMEA, IMO, IALA, IHO, ITU, or IEC, tell them that closed /
+paywalled specifications are the work of the devil (and contradictory
+to the mission of SOLAS).  It's bad enough that people aren't willing
+to put the discussion leading up to these specs online with their
+names attached.  Can we please at least get ALL specs for these public
+data standards (because they are mandated by law in many cases) out
+there for free distribution licenses?!?!?
+-----

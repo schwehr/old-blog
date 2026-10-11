@@ -1,0 +1,61 @@
+TITLE: ubuntu static ip bug
+AUTHOR: Kurt
+DATE: 04.17.2008 14:50
+DESC: fun with ubuntu
+-----
+BODY:
+
+<b>UPDATE:</b> I did a 'sudo apt-get update' and uncheck and check the
+static interface active icon and the 'auto eth0' line in
+/etc/network/interfaces.  
+
+This is really more of a gnome bug, but it is hitting me with Ubuntu
+8.04 beta.  Thanks to Roland for sitting through a debug session with
+me.  The problem is that a machine (actually 3 new machines)
+configured for a static IP was not coming up on the network on boot.
+Kind of important for a machine that will be remotely deployed for 
+data logging.  The machines do come up on the network if I do
+<pre>sudo ifup eth0</pre>
+This is listed as bug <a
+href="http://bugzilla.gnome.org/show_bug.cgi?id=526137">526137</a> for
+gnome.  Or on ubuntu launchpad: <a href="https://bugs.launchpad.net/ubuntu/+source/gnome-system-tools/+bug/185854">185854</a>
+
+The solution is to add the bold line below.
+<pre>
+cat /etc/network/interfaces 
+auto lo
+iface lo inet loopback
+<b>auto eth0</b>
+iface eth0 inet static
+address 10.0.0.243
+netmask 255.255.255.224
+gateway 10.0.0.225
+</pre>
+Replace 10.0.0. with your local network config.
+
+Asked and answered with google:
+
+<b>QUESTION:</b> How am I supposed to control init scripts on Ubuntu.
+Not all of them appear in the Services GUI.  And I'd rather not use a
+GUI.  Is there no chkconfig equivalent?  I remember learning that on
+IRIX 5 way back when I was learning to admin SGI's back in 96.
+
+<a href="http://ubuntuforums.org/showthread.php?t=190464">Ubuntu equivalence for chkconfig</a>
+
+Answers:
+<pre>update-rc.d</pre>
+and
+<pre>You rename and/or chmod -x the various in /etc/rc_.d
+Or you use BUM (Boot-up-Manager).</pre>
+and
+<pre><a href="http://sysv-rc-conf.sourceforge.net/">http://sysv-rc-conf.sourceforge.net/</a>
+sudo apt-get install sysv-rc-conf
+sysv-rc-conf
+</pre>
+I think I've used the last one.
+And finally... this sounds a bit sketchy.  I'd like to stay standard
+<pre>$ apt-get install libnewt0.51
+$ ln -s /usr/lib/libnewt.so.0.51 /usr/lib/libnewt.so.0.50
+$ wget http://www.tuxx-home.at/projects/chkconfig-for-debian/chkconfig_1.2.24d-1_i386.deb
+$ dpkg --force-all -i chkconfig_1.2.24d-1_i386.deb</pre>
+-----

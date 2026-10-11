@@ -1,0 +1,51 @@
+TITLE: python dynamic module loading
+AUTHOR: Kurt
+DATE: 05.28.2005 12:05
+DESC: simple example
+-----
+BODY:
+I have been wanting to implement a system for dynamically loading of
+driver information.  I want to have a set of files where each one
+contains the python information needed to load SEGY files for that
+particular vender version.  I would then have one for standard segy
+rev1 and possibly one for rev 0.  After that, there would be drivers
+for xstar/Edgetech and other venders.  These files would be a function
+to help ID the file followed by custom readers and lookup tables for
+what fields are where in the file.  Today, I started figuring out how
+to load in these files.  I was thinking that I would want to load the
+module into a "driver" namespace.  Doing "import segy_xstar" is not
+very flexible.  I want to do something like "<b>drv =
+load_driver("xstar")</b>" or "<b>drv = load_driver("rev1")</b>".
+Turns out that this is not to hard to do!  Here is my first test
+example using the <a
+href="http://docs.python.org/lib/module-imp.html">imp</a> module.
+
+First the file <b>foo.py</b> that will be loaded:
+<pre>
+<font color="#2040a0">bar</font> <font color="4444FF">=</font> <font color="#008000">'this is in foo'</font>
+</pre>
+Here is <b>main.py</b>:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+Test out module loading
+&quot;</font><font color="#008000">&quot;&quot;</font>
+
+<strong>import</strong> <font color="#2040a0">imp</font>
+
+<font color="#2040a0">file</font> <font color="4444FF">=</font> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'foo.py'</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>
+<font color="#2040a0">modFoo</font> <font color="4444FF">=</font> <font color="#2040a0">imp</font>.<font color="#2040a0">load_module</font><font color="4444FF">(</font><font color="#008000">'chirp'</font>,<font color="#2040a0">file</font>,<font color="#008000">'foo.py'</font>,<font color="4444FF">(</font><font color="#008000">'.py'</font>,<font color="#008000">'r'</font>,<font color="#2040a0">imp</font>.<font color="#2040a0">PY_SOURCE</font><font color="4444FF">)</font><font color="4444FF">)</font>
+
+<strong>print</strong> <font color="#2040a0">modFoo</font>.<font color="#2040a0">bar</font>
+</pre>
+Then to run it:
+<pre>
+  chmod +x main.py
+  ./main.py
+
+  this is in foo
+</pre>
+
+
+<a href="http://www.findsounds.com/">findsounds.com</a>
+-----

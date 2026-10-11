@@ -1,0 +1,34 @@
+TITLE: Having django generate SQL database tables
+AUTHOR: Kurt
+DATE: 02.07.2008 14:02
+DESC: a little bit farther
+-----
+BODY:
+To see what would happen, I had django try to generate the SQL
+database tables for postgresql based on the classes that it build from
+the database inspection.  Completing the circle.  That is a lot of
+"NOT NULL"'s.  This command only writes out the SQL without actually 
+altering the database.
+<pre>
+% python manage.py sqlall msgs
+</pre>
+<img src="http://schwehr.org/blog/attachments/2008-02/django-sqlall.png"/>
+
+Compare that to the the track_lines table:
+<pre>
+ais=# \d track_lines
+                                   Table "public.track_lines"
+ Column  |         Type          |                           Modifiers                           
+=========+=====================--+===============================================================
+ ogc_fid | integer               | not null default nextval('track_lines_ogc_fid_seq'::regclass)
+ userid  | integer               | 
+ name    | character varying(20) | 
+ track   | geometry              | 
+Indexes:
+    "track_lines_pkey" PRIMARY KEY, btree (ogc_fid)
+Check constraints:
+    "enforce_dims_track" CHECK (ndims(track) = 2)
+    "enforce_geotype_track" CHECK (geometrytype(track) = 'LINESTRING'::text OR track IS NULL)
+    "enforce_srid_track" CHECK (srid(track) = 4326)
+</pre>
+-----

@@ -1,0 +1,127 @@
+TITLE: Fun with decompiling Java jar files
+AUTHOR: Kurt
+DATE: 03.27.2012 17:43
+DESC: investigations
+-----
+BODY:
+To try to figure out what was going on with the VDatum.jar program, I
+ended up pulling it a part.  Here is a little of what I found.  First I unpacked
+the jar file, which really is just a zip archive:
+<pre><b>unzip ../VDatum.jar</b>
+Archive:  ../VDatum.jar
+   creating: META-INF/
+ extracting: META-INF/MANIFEST.MF    
+   creating: gov/
+   creating: gov/noaa/
+   creating: gov/noaa/ngs/
+   creating: gov/noaa/ngs/vdatum/
+ extracting: gov/noaa/ngs/vdatum/Area.class  
+ extracting: gov/noaa/ngs/vdatum/BrowserLaunch.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum$VFileConvert.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum.gif  
+ extracting: gov/noaa/ngs/vdatum/VDatum_CMD.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum_GUI$1.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum_GUI$10.class  
+...
+ extracting: gov/noaa/ngs/vdatum/VDatum_GUI$9.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum_GUI.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum_Main$1.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum_Main$WorkFolderGetter.class  
+ extracting: gov/noaa/ngs/vdatum/VDatum_Main.class</pre>
+My goal was to figure out what was wrong with the vert and horiz info command
+line options described like so on the -help web page:
+<pre>-help   Displays the help file on screen
+-checkupdate          Checks for software update. Note: an internet connection is required.
+-allinfo              Displays all information such as Disclaimer, available VDatum areas, etc..
+-disclaimer           Displays the Disclaimer
+-areainfo             Displays information of available VDatum project areas
+-horizontalinfo       Displays information of supported horizontal datums
+-verticalinfo         Displays information of supported vertical datums
+-geoidinfo            Displays information of supported Geoid models</pre> 
+I tried first with the unix string command that returns the readable 
+text in a binary file:
+<pre><b>strings *.class | egrep 'vertical|horizontal'</b>
+-horizontaldatuminfo
+-verticaldatuminfo
+N* vertically transform geospatial data among a variety of tidal, orthometric *
+N* and ellipsoidal vertical datums - allowing users to convert their data from*
+N* different horizontal/vertical references into a common system and enabling *
+N* Although many of the vertical datum transformations between the North      *
+N* vertically transform geospatial data among a variety of tidal, orthometric *
+N* and ellipsoidal vertical datums - allowing users to convert their data from*
+N* different horizontal/vertical references into a common system and enabling *
+N* Although many of the vertical datum transformations between the North      *</pre>
+That showed me that there was a typo in the web page.  Or it is describing a new or older
+version of the program.  A nice illustration of why it is good practice for command line help to be
+generated from the actually command line option code.  I wanted to look a bit closer to
+see if there were other options I was missing, so I decompiled the class files
+into java (this doesn't fully work, but it is good enough).
+<pre><b>wget http://www.varaneckas.com/sites/default/files/jad/jad158e.linux.static.zip
+for file in *.class; do 
+  ./jad -sjava $file
+done</b>
+Parsing Area.class...The class file version is 49.0 (only 45.3, 46.0 and 47.0 are supported)
+ Generating Area.java
+Parsing BrowserLaunch.class...The class file version is 49.0 (only 45.3, 46.0 and 47.0 are supported)
+ Generating BrowserLaunch.java
+Parsing VDatum.class...The class file version is 49.0 (only 45.3, 46.0 and 47.0 are supported)
+Parsing inner class VDatum$VFileConvert.class...The class file version is 49.0 (only 45.3, 46.0 and 47.0 are supported)
+ Generating VDatum.java
+Parsing VDatum_CMD.class...The class file version is 49.0 (only 45.3, 46.0 and 47.0 are supported)
+ Generating VDatum_CMD.java
+...
+)
+ Generating VDatum_Main$WorkFolderGetter.java
+Parsing VDatum$VFileConvert.class...The class file version is 49.0 (only 45.3, 46.0 and 47.0 are supported)
+ Generating VDatum$VFileConvert.java
+Couldn't resolve all access$ methods in method run</pre>
+Then I used grep to search for options.
+<pre><b>grep 'verticaldatum' *.java</b>
+VDatum_CMD.java:            if(scmd.equalsIgnoreCase("-verticaldatuminfo"))
+<!-- -->
+<b>egrep '[(]"-' VDatum_CMD.java</b>
+            if(scmd.equalsIgnoreCase("-help"))
+            if(scmd.equalsIgnoreCase("-disclaimer"))
+            if(scmd.equalsIgnoreCase("-allinfo"))
+            if(scmd.equalsIgnoreCase("-areainfo"))
+            if(scmd.equalsIgnoreCase("-horizontaldatuminfo"))
+            if(scmd.equalsIgnoreCase("-verticaldatuminfo"))
+            if(scmd.equalsIgnoreCase("-geoidinfo"))
+            if(scmd.equalsIgnoreCase("-coorinfo"))
+            if(scmd.equalsIgnoreCase("-checkupdate"))
+        if(vdatumcmd[5].equalsIgnoreCase("-m") || vdatumcmd[5].equalsIgnoreCase("-meter"))
+        if(vdatumcmd[6].equalsIgnoreCase("-s") || vdatumcmd[6].equalsIgnoreCase("-sounding"))
+        if(vdatumcmd[10].equalsIgnoreCase("-p") || vdatumcmd[10].equalsIgnoreCase("-point"))</pre>
+Looking at the code, you can see the argument parsing logic.  Not that
+the original code might not really look like this as compiling and decompiling
+can change things around.
+<pre><tt>        <b><font color="#0000FF">for</font></b><font color="#990000">(;</font> i <font color="#990000">&lt;</font> cmdlen<font color="#990000">;</font> i<font color="#990000">++)</font>
+        <font color="#FF0000">{</font>
+            <font color="#008080">String</font> scmd <font color="#990000">=</font> cmd<font color="#990000">[</font>i<font color="#990000">].</font><b><font color="#000000">trim</font></b><font color="#990000">();</font>
+            <b><font color="#0000FF">if</font></b><font color="#990000">(</font>scmd<font color="#990000">.</font><b><font color="#000000">equalsIgnoreCase</font></b><font color="#990000">(</font><font color="#FF0000">"-help"</font><font color="#990000">))</font>
+            <font color="#FF0000">{</font>
+                <b><font color="#000000">getHelp</font></b><font color="#990000">();</font>
+                <b><font color="#0000FF">continue</font></b><font color="#990000">;</font>
+            <font color="#FF0000">}</font>
+            <b><font color="#0000FF">if</font></b><font color="#990000">(</font>scmd<font color="#990000">.</font><b><font color="#000000">equalsIgnoreCase</font></b><font color="#990000">(</font><font color="#FF0000">"-disclaimer"</font><font color="#990000">))</font>
+            <font color="#FF0000">{</font>
+                <b><font color="#000000">displayDisclaimer</font></b><font color="#990000">();</font>
+                <b><font color="#0000FF">continue</font></b><font color="#990000">;</font>
+            <font color="#FF0000">}</font>
+            <b><font color="#0000FF">if</font></b><font color="#990000">(</font>scmd<font color="#990000">.</font><b><font color="#000000">equalsIgnoreCase</font></b><font color="#990000">(</font><font color="#FF0000">"-allinfo"</font><font color="#990000">))</font>
+            <font color="#FF0000">{</font>
+                <b><font color="#000000">displayDisclaimer</font></b><font color="#990000">();</font>
+                <b><font color="#000000">getAreaInfo</font></b><font color="#990000">();</font>
+                <b><font color="#000000">getHorizontalInfo</font></b><font color="#990000">();</font>
+                <b><font color="#000000">getVerticalInfo</font></b><font color="#990000">();</font>
+                <b><font color="#000000">getGeoidInfo</font></b><font color="#990000">();</font>
+                <b><font color="#000000">getCoorInfo</font></b><font color="#990000">();</font>
+                <b><font color="#0000FF">continue</font></b><font color="#990000">;</font>
+            <font color="#FF0000">}</font></tt></pre>
+And looking at the getHelp function, it's pretty clear what it's doing:
+<pre>private void getHelp()
+{
+  BrowserLaunch.openURL("<a href="http://vdatum.noaa.gov/docs/userguide_cmd.html">http://vdatum.noaa.gov/docs/userguide_cmd.html</a>");
+}</pre>
+-----

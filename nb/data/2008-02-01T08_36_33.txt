@@ -1,0 +1,52 @@
+TITLE: Dealing with OSX 10.5 X11 Applications menu
+AUTHOR: Kurt
+DATE: 02.01.2008 08:36
+DESC: getting better
+-----
+BODY:
+Apple has yet to apply some basic fixes to the 10.5 X11 package.  Here
+is a quick workaround for the inability of Application menu items to
+take parameters.  The trick is to make a shell script in your ~/bin
+directory (or anywhere else that you want).  Inside the script, call
+the program with the arguments that you want.  I also want the same
+script to pass through any arguments I give it on the command line. 
+Therefore, I added "$*" to the call.  The * means all arguments passed to
+the script.  For xterm here is what I have:
+<pre>
+#!/bin/bash
+xterm -r -sl 1000 -j -sb $* &
+</pre>
+For emacs, I like a certain font:
+<pre>
+#!/bin/bash
+/sw/bin/emacs -fn 6x13 -bg black -fg white $* &
+</pre>
+Then in the X11 Applications menu, select "Customize".  Then select
+the terminal and press "Duplicate".  Change the Command by double
+clicking it and put in "/Users/<yourshortname>/bin/xterm".  Now I
+don't have to stare at obnoxious black text with white backgrounds.
+The other option is to put these in preferences into the X environment.
+<pre>
+echo "xterm*geometry: 80x40" | xrdb -merge
+echo "xterm*foreground: white" | xrdb -merge
+echo "xterm*background: black" | xrdb -merge
+echo "emacs*foreground: white" | xrdb -merge
+echo "emacs*background: black" | xrdb -merge
+echo "emacs*font: 6x13" | xrdb -merge
+</pre>
+You can also create a ~/.Xresources file which I believe (but have not
+tested) Apple's xinitrc still respects.
+<pre>
+! Is the comment character
+! XTerm settings that are easier on the eyes
+xterm*background: black
+xterm*foreground: wheat
+xterm*cursorColor: orchid
+xterm*scrollBar: true
+xterm*reverseWrap: true
+xterm*eightBitInput: false
+!xterm*titleBar: false
+</pre>
+Remember that color names are defined in rgb.txt, which seems to
+be in /usr/X11/share/X11/rgb.txt on my system.
+-----

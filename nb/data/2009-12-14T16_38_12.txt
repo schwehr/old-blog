@@ -1,0 +1,52 @@
+TITLE: Date in BAG metadata
+AUTHOR: Kurt
+DATE: 12.14.2009 16:38
+DESC: needs improvement
+-----
+BODY:
+In working through a data type an trying to use it, you often discover
+the design requirements that were overlooked.  With BAG's, I'd like to
+pull the date range for the survey and make that the <a
+href="http://code.google.com/apis/kml/documentation/kmlreference.html#timespan">KML
+TimeSpan</a>.  I pulled out the xml from one bag and decimated it down to where I just have the time related fields:
+<pre><tt><b><font color="#0000FF">&lt;date&gt;</font></b>
+  <b><font color="#0000FF">&lt;smXML:CI_Date&gt;</font></b>
+    <b><font color="#0000FF">&lt;date&gt;</font></b>2008-03-10<b><font color="#0000FF">&lt;/date&gt;</font></b>
+    <b><font color="#0000FF">&lt;dateType&gt;</font></b>creation<b><font color="#0000FF">&lt;/dateType&gt;</font></b>
+  <b><font color="#0000FF">&lt;/smXML:CI_Date&gt;</font></b>
+<b><font color="#0000FF">&lt;/date&gt;</font></b>
+<!-- -->
+<b><font color="#0000FF">&lt;abstract&gt;</font></b>Project: OPR-O193-FA-07; Survey: H11334; State: Alaska;
+General Locality: Rudyeard Bay; Sublocality: Eastern Rudyeard Bay ;
+Date of Survey: 10/23/2004 - 11/06/2004; Surveyed by: NOAA Ship
+Fairweather; Verification by: Pacific Hydrographic Branch<b><font color="#0000FF">&lt;/abstract&gt;</font></b>
+<!-- -->
+<b><font color="#0000FF">&lt;processStep&gt;</font></b>
+  <b><font color="#0000FF">&lt;smXML:BAG_ProcessStep&gt;</font></b>
+    <b><font color="#0000FF">&lt;description&gt;</font></b>Software: CARIS HIPS and SIPS; Version: 6.0; Method: Finalize; Parameters: Apply_Designated = YES<b><font color="#0000FF">&lt;/description&gt;</font></b>
+    <b><font color="#0000FF">&lt;dateTime&gt;</font></b>2006-03-29T00:00:00Z<b><font color="#0000FF">&lt;/dateTime&gt;</font></b>
+    <b><font color="#0000FF">&lt;processor&gt;</font></b>
+      <b><font color="#0000FF">&lt;smXML:CI_ResponsibleParty&gt;</font></b>
+        <b><font color="#0000FF">&lt;individualName&gt;</font></b>peter.holmberg<b><font color="#0000FF">&lt;/individualName&gt;</font></b>
+        <b><font color="#0000FF">&lt;role&gt;</font></b>processor<b><font color="#0000FF">&lt;/role&gt;</font></b>
+      <b><font color="#0000FF">&lt;/smXML:CI_ResponsibleParty&gt;</font></b>
+    <b><font color="#0000FF">&lt;/processor&gt;</font></b>
+    <b><font color="#0000FF">&lt;trackingId&gt;</font></b>-1<b><font color="#0000FF">&lt;/trackingId&gt;</font></b>
+  <b><font color="#0000FF">&lt;/smXML:BAG_ProcessStep&gt;</font></b>
+<b><font color="#0000FF">&lt;/processStep&gt;</font></b>
+<b><font color="#0000FF">&lt;processStep&gt;</font></b>
+<!-- -->
+<b><font color="#0000FF">&lt;dateStamp&gt;</font></b>2008-03-10<b><font color="#0000FF">&lt;/dateStamp&gt;</font></b></tt></pre>
+For starters, <a
+href="http://metadata.dgiwg.org/smXML">http://metadata.dgiwg.org/smXML</a>
+that is listed as the schema for the CI_Date is a broken link.
+However, this is listed as the ISO 19115 reference data for the
+feature.  It's clear from the abstract that the reference data should
+be from 2004.  In my opinion, A hydrographic survey should reference
+the date(s) that the sonar ensonified the bottom.  The CI_Date is 4
+years later.  There are also processing dateTimes and a final
+dateStamp, but both of those are later.  Perhaps the bag metadata should 
+be reqired to have a structure to represent a machine readable survey 
+collection date range(s).  For this work, I will just have to use the CI_Date,
+but that is not very satifying.
+-----

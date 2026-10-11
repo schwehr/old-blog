@@ -1,0 +1,68 @@
+TITLE: Network toolkits and depth level in Open Inventor
+AUTHOR: Kurt
+DATE: 05.06.2005 07:51
+DESC: 
+-----
+BODY:
+Terry Fong based me a CMU tech report yesterday that is pretty cool.
+Jay Gowdy compares network transport packages for robotics.
+
+<a href="http://www.ri.cmu.edu/pubs/pub_3333.html">A Qualitative
+Comparison of Interprocess Communications Toolkits for Robotics</a>
+
+It is missing a some of the things that I consider with network
+toolkits and it is a bit dated at 2000, but definitely a great read.
+
+On another note, I just added a draggable depth line to my xcore
+displays.  I was getting annoyed with trying to figure out what depth
+an object is at and I did not want to go write a ray pick call back.
+This is based on the floating ocean for my Eel River / Humboldt 2002
+project.
+<pre>
+<font color="#FF4400">#Inventor V2.1 ascii
+# Small IV file to give a depth reference line so that I stop
+# spending so much time guessing depths.
+</font>
+Separator {
+    Separator {
+	Transform {
+	    rotation	0 -1 0  1.57
+	}
+	DEF +2 Translate1Dragger {}
+    }
+    Separator {
+	Translation { translation -20 0 5 }
+	Scale { scaleFactor .3 .3 .3 }
+	RotationXYZ { axis X angle 1.57 }
+	Text3 { string <font color="#008000">&quot;Depth in cm&quot;</font> = 
+		Calculator {
+		    C	0 0 0 =
+		    USE +2
+		    . translation
+		    expression	<font color="#008000">&quot;oa = -C[0]&quot;</font>
+		}
+		. oa
+	    }
+    }
+    Translation { translation 5 -.2 0 }
+    Transform {
+	translation	0 0 0 =
+	Calculator {
+	    C	0 0 0 =
+	    USE +2
+	    . translation
+	    expression	<font color="#008000">&quot;oA = vec3f(0,0,C[0])&quot;</font>
+		}
+		. oA
+
+    }
+    Coordinate3 { point [ 
+	    0 0 0,
+	    300 0 0,
+	] }<font color="#FF4400"> # Coord3 </font>
+    IndexedLineSet { coordIndex [
+	    0,     1,     -1,     
+	    ]}<font color="#FF4400"> # IndexedLineSet</font>
+}
+</pre>
+-----

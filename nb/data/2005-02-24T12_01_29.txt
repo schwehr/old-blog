@@ -1,0 +1,93 @@
+TITLE: ODP database, GroupDAV
+AUTHOR: Kurt
+DATE: 02.24.2005 12:01
+DESC: cool stuff
+-----
+BODY:
+I hope Apple adds this kind of thing to iCal and Address Book.  <a
+href="http://www.groupdav.org/">GroupDAV</a>.  I haven't looked
+closely, but this is the right direction.  It is time that the world
+catch up to what Solaris could do in the mid 90's.
+
+I got a really nice response from David Flacker at IODP.  When I get
+back to the odp data in a day or two, I will try this out.  I am
+currently trying to rotate my cores bases on the nrm direction in a
+way that is easy to tweak.  I am aiming for a zero centered -180 to
+180 graph.
+<pre>
+USING WGET
+
+Yes, you can use tools like wget:
+
+	wget
+http://iodp.tamu.edu/janusweb/physprops/msldat.cgi?leg=146&site=893&hole=a&outputtype=5&depthmin=5&depthmax=10
+
+There is no formal publication of the input parameters accepted, but
+the variable names and the variable range and form can generally be
+gleaned from the "name" parameters found when viewing the source of our
+.shtml pages.
+
+	outputtype=5	is equivalent to the Excel Integration delimiter
+preference on the Report Options popup and should result in fairly
+clean, non-html comma-separated vector files
+
+	depthmax=10	when only upper limit is specified depths <=
+limit are returned, vice versa for depthmin parameter; when both a
+depthmin and depthmax are specified, values between and including the
+range end-points are returned ( depthmin <= x <= depthmax)
+
+All of the reports you can run are browseable in the janusweb URL tree:
+ http://iodp.tamu.edu/janusweb 
+or are otherwise summarized in the links here:
+http://iodp.tamu.edu/janusweb/links/links_all.shtml 
+
+
+QUERY CAVEATS and RECOMMENDATIONS
+
+Apologies for the aggravations. While it serves the bulk of data
+request needs without additional human intervention, it is very possible
+to generate queries that will not run to completion within the timeouts
+of the typical web-browser. The query system in place generates reports
+directly from the underlying database. We do not provide any kind of
+pre-query analysis to offer automated estimates on how long a query will
+take. The amount of time is highly variable with data type, data model
+structure, the exact specifics of the query inputs, and the amount of
+data being searched/sorted.
+
+Best practice suggestions:
+
+	Look at the Database Overview page
+(http://iodp.tamu.edu/janusweb/general/dbtable.cgi) to see what data is
+available on-line.
+
+	Be as specific as possible about what you want: e.g. if you know
+the site, specify the expedition with it--often the database can bring a
+data index into play that result in orders of magnitude improvements on
+turn-around time. The problem from the server perspective is not how
+much data is returned, but how much data has to be sifted through to
+figure out what should be returned.
+
+	Avoid doing queries by depth ranges where possible. Depth is a
+calculated value, not an absolute stored value. A lot of overhead is
+incurred by the database server in the way these depth filters are
+currently implemented. If you need it, though, it will work, just set
+your timeout limits for wget high (quarters of hours rather than
+minutes).
+
+Experience notes:
+
+The CGI-based query system does use cookies to remember expedition,
+site, hole, and report options settings throughout a browser session.
+The values remembered are prefilled in forms. Enable cookies for the
+iodp.tamu.edu site if that fits your usage patterns at all.
+
+The query system uses popups for the Report Options dialog and for
+query result errors and warnings. E.g. default query behaviour when no
+data is found is to generate a popup window and a page-back event. When
+popups are disabled by the browser, all you see is the page-back
+event--no time to look at the empty result page.
+
+Regards,
+Fackler
+</pre>
+-----

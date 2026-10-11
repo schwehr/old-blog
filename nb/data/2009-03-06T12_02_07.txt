@@ -1,0 +1,186 @@
+TITLE: GMT Grid to 3D model in a PDF
+AUTHOR: Kurt
+DATE: 03.06.2009 12:02
+DESC: getting closer to a usable product
+-----
+BODY:
+Here are my instructions on how to create your own 3D object in a PDF.
+I'm going to start with a GMT grid, but if you already have a model that
+MeshLab can read, you can skip the GMT portion.
+
+Before I start into the details, here are the results:
+
+<a
+href="http://schwehr.org/blog/attachments/2009-03/u3d-bathymetry-in-a-document.pdf">u3d-bathymetry-in-a-document.pdf</a>
+Note, the bathymetry is upside down, so you can't see it until you
+spin it.
+
+<img title="3D model in a PDF" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/u3d-pdf-measuring.png"/>
+
+First I extended my GMT grid reader to write an Alias Wavefront OBJ
+file.  This is a really just a proof of concept.  I'm missing normals,
+coloring, and have the exact geographic coordinate off for some files.
+But, it give should give the basic idea.
+<pre><tt><b><font color="#0000FF">class</font></b> Grd<font color="#990000">:</font>
+    <i><font color="#9A1900"># __init__ and info methods the same as I had previously</font></i>
+<!-- -->
+    <b><font color="#0000FF">def</font></b> <b><font color="#000000">xy2point</font></b><font color="#990000">(</font>self<font color="#990000">,</font>x<font color="#990000">,</font>y<font color="#990000">):</font>
+<i><font color="#9A1900">        '''convert x, y offsets to whatever units the grid is in.</font></i>
+<i><font color="#9A1900">        FIX: not properly doing the pixel vrs cell registration!!'''</font></i>
+        <i><font color="#9A1900"># FIX: Not right!!!</font></i>
+        <b><font color="#0000FF">assert</font></b> <font color="#990000">(</font>x <font color="#990000">&lt;</font> self<font color="#990000">.</font>width<font color="#990000">)</font>
+        <b><font color="#0000FF">assert</font></b> <font color="#990000">(</font>y <font color="#990000">&lt;</font> self<font color="#990000">.</font>height<font color="#990000">)</font>
+        X <font color="#990000">=</font> self<font color="#990000">.</font>x_range<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">+</font> self<font color="#990000">.</font>dx <font color="#990000">*</font> x
+        Y <font color="#990000">=</font> self<font color="#990000">.</font>y_range<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">+</font> self<font color="#990000">.</font>dy <font color="#990000">*</font> y
+        Z <font color="#990000">=</font> self<font color="#990000">.</font>z<font color="#990000">[</font>x <font color="#990000">+</font> y <font color="#990000">*</font> self<font color="#990000">.</font>width<font color="#990000">]</font> 
+        <b><font color="#0000FF">if</font></b> self<font color="#990000">.</font>scale_factor <b><font color="#0000FF">not</font></b> <b><font color="#0000FF">in</font></b> <font color="#990000">(</font><font color="#993399">0</font><font color="#990000">.,</font><font color="#993399">1</font><font color="#990000">.):</font>
+            Z <font color="#990000">*=</font> self<font color="#990000">.</font>scale_factor
+        Z <font color="#990000">+=</font> self<font color="#990000">.</font>add_offset
+        <b><font color="#0000FF">return</font></b> X<font color="#990000">,</font>Y<font color="#990000">,</font>Z
+<!-- -->
+    <b><font color="#0000FF">def</font></b> <b><font color="#000000">write_obj</font></b><font color="#990000">(</font>self<font color="#990000">,</font>out<font color="#990000">=</font>sys<font color="#990000">.</font>stdout<font color="#990000">,</font>convert_coords<font color="#990000">=</font>True<font color="#990000">,</font> scale_xy<font color="#990000">=</font>None<font color="#990000">,</font> scale_z<font color="#990000">=</font>None<font color="#990000">,</font> offset_z<font color="#990000">=</font>None<font color="#990000">,</font> center<font color="#990000">=</font>False<font color="#990000">):</font>
+<i><font color="#9A1900">        '''http://local.wasp.uwa.edu.au/~pbourke/dataformats/obj/'''</font></i>
+        <b><font color="#0000FF">if</font></b> <b><font color="#000000">isinstance</font></b><font color="#990000">(</font>out<font color="#990000">,</font>str<font color="#990000">):</font>
+            out <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font>out<font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+<!-- -->
+        <b><font color="#000080">import</font></b> datetime
+        o <font color="#990000">=</font> out
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'# Alias Wavefront OBJ from a GMT grid\n'</font><font color="#990000">)</font>
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'# %s\n'</font> <font color="#990000">%</font> <b><font color="#000000">str</font></b><font color="#990000">(</font>datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">utcnow</font></b><font color="#990000">()))</font>
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'\n'</font><font color="#990000">)</font>
+        filename <font color="#990000">=</font> self<font color="#990000">.</font>filename
+        self<font color="#990000">.</font>filename <font color="#990000">=</font> <font color="#FF0000">'# %s'</font> <font color="#990000">%</font> filename
+        self<font color="#990000">.</font><b><font color="#000000">info</font></b><font color="#990000">(</font>out<font color="#990000">=</font>out<font color="#990000">)</font>
+        self<font color="#990000">.</font>filename <font color="#990000">=</font> filename
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'\n'</font><font color="#990000">)</font>
+<!-- -->
+        width <font color="#990000">=</font> self<font color="#990000">.</font>width
+        height <font color="#990000">=</font> self<font color="#990000">.</font>height
+<!-- -->
+        <b><font color="#0000FF">for</font></b> y <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font>height<font color="#990000">):</font>
+            <b><font color="#0000FF">for</font></b> x <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font>width<font color="#990000">):</font>
+                <b><font color="#0000FF">if</font></b> convert_coords<font color="#990000">:</font>
+                    o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'v %f %f %f\n'</font> <font color="#990000">%</font> self<font color="#990000">.</font><b><font color="#000000">xy2point</font></b><font color="#990000">(</font>x<font color="#990000">,</font>y<font color="#990000">))</font>
+                <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+                    Z <font color="#990000">=</font> self<font color="#990000">.</font>z<font color="#990000">[</font>x<font color="#990000">+</font>y<font color="#990000">*</font>self<font color="#990000">.</font>width<font color="#990000">]</font>
+                    X <font color="#990000">=</font> x
+                    Y <font color="#990000">=</font> y
+                    <b><font color="#0000FF">if</font></b> center<font color="#990000">:</font>
+                        X <font color="#990000">-=</font> width
+                        Y <font color="#990000">-=</font> height
+                    <b><font color="#0000FF">if</font></b> scale_xy<font color="#990000">:</font>
+                        X <font color="#990000">*=</font> scale_xy
+                        Y <font color="#990000">*=</font> scale_xy
+                    <b><font color="#0000FF">if</font></b> scale_z<font color="#990000">:</font>
+                        Z <font color="#990000">*=</font> scale_z
+                    <b><font color="#0000FF">if</font></b> offset_z<font color="#990000">:</font>
+                        Z <font color="#990000">+=</font> offset_z
+                    o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'v %f %f %f\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>X<font color="#990000">,</font>Y<font color="#990000">,</font>Z<font color="#990000">))</font>
+<!-- -->
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'\n# Faces.  No normals.  Sorry\n'</font><font color="#990000">)</font>
+        <b><font color="#0000FF">for</font></b> y <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font>height<font color="#990000">-</font><font color="#993399">1</font><font color="#990000">):</font>
+            <b><font color="#0000FF">for</font></b> x <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font>width<font color="#990000">-</font><font color="#993399">1</font><font color="#990000">):</font>
+                <i><font color="#9A1900"># vertex count starts at 1, so an extra +1 to ul and ll</font></i>
+                ul <font color="#990000">=</font> x <font color="#990000">+</font> y<font color="#990000">*</font>width <font color="#990000">+</font> <font color="#993399">1</font>
+                ur <font color="#990000">=</font> ul <font color="#990000">+</font> <font color="#993399">1</font>
+                ll <font color="#990000">=</font> x <font color="#990000">+</font> <font color="#990000">(</font>y<font color="#990000">+</font><font color="#993399">1</font><font color="#990000">)*</font>width <font color="#990000">+</font> <font color="#993399">1</font>
+                lr <font color="#990000">=</font> ll <font color="#990000">+</font> <font color="#993399">1</font>
+                o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'f %d %d %d\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>ul<font color="#990000">,</font>ll<font color="#990000">,</font>ur<font color="#990000">))</font>
+                o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'f %d %d %d\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>ur<font color="#990000">,</font>ll<font color="#990000">,</font>lr<font color="#990000">))</font>
+<!-- -->
+grd <font color="#990000">=</font> <b><font color="#000000">Grd</font></b><font color="#990000">(</font><font color="#FF0000">'g3.grd'</font><font color="#990000">)</font>
+grd<font color="#990000">.</font><b><font color="#000000">write_obj</font></b><font color="#990000">(</font><font color="#FF0000">'g3.obj'</font><font color="#990000">,</font>convert_coords<font color="#990000">=</font>False<font color="#990000">,</font> scale_xy<font color="#990000">=</font><font color="#993399">100</font><font color="#990000">,</font> offset_z<font color="#990000">=</font><font color="#993399">12000</font><font color="#990000">,</font> scale_z<font color="#990000">=</font><font color="#993399">40</font><font color="#990000">,</font> center<font color="#990000">=</font>True<font color="#990000">)</font>
+</tt></pre>
+Here I've rerun the code, but kept the coordinates in geographic.  It
+makes for a terrible looking mode, but it is easier to see the file
+format.
+<pre># Alias Wavefront OBJ from a GMT grid
+# 2009-03-06 17:17:44.653066
+<!-- -->
+# g3.grd: Title: 
+# g3.grd: Command: grdcut santabarbF_bath.grd -Gg3.grd -R-120.150001013862/-120.139997147338/34.3899087775448/34.4000213817476 -V
+# g3.grd: gridline node registration
+# g3.grd: xmin: -120.150001 x_max: -120.139997 x_inc: 0.000109 name: user_x_unit nx: 93 
+# g3.grd: ymin: 34.389909 y_may: 34.400021 y_inc: 0.000109 name: user_y_unit ny: 94 
+# g3.grd: z_min: -260.718994 x_max: -206.770004 name: user_z_unit 
+# g3.grd: scale_factor: 1.000000 add_offset: 0.000000
+<!-- -->
+v -120.150001 34.389909 -211.416000
+v -120.149892 34.389909 -211.160995
+v -120.149784 34.389909 -210.335999
+#...
+v -120.140323 34.400021 -259.582001
+v -120.140215 34.400021 -259.614014
+v -120.140106 34.400021 -259.188995
+v -120.139997 34.400021 -259.316986
+<!-- -->
+# Faces.  No normals.  Sorry
+f 1 94 2
+f 2 94 95
+f 2 95 3
+...
+f 8647 8739 8740
+f 8647 8740 8648
+f 8648 8740 8741
+f 8648 8741 8649
+f 8649 8741 8742</pre>
+When I models into MeshLab on the Mac and try to export them to U3D, I get this crash:
+
+<img title="Mac crash of U3D export" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/meshlab-u3d-macosx-crash.png"/>
+
+I had to switch over to a Windows XP Virtual Machine and then it worked:
+
+<img title="Using MS Windows to get a U3D" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/meshlab-windows-u3d.png"/>
+
+I copied the u3d and tex files that MeshLab created back to my mac.  I edited the LaTeX a bit:
+<pre><tt><b><font color="#0000FF">\documentclass</font></b><font color="#993399">[a4paper]</font><font color="#009900">{article}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#993399">[3D]</font><font color="#009900">{movie15}</font>
+<b><font color="#0000FF">\usepackage</font></b><font color="#993399">[UKenglish]</font><font color="#009900">{babel}</font>
+<b><font color="#0000FF">\begin</font></b><font color="#009900">{document}</font>
+<b><font color="#0000FF">\includemovie</font></b>[
+	poster,
+	toolbar, <i><font color="#9A1900">%same as `controls'</font></i>
+	label=g3.u3d,
+	text=(g3.u3d),
+	3Daac=60, 3Droll=0, 3Dc2c=0 13258.5 0, 3Droo=13258.5, 3Dcoo=4700 2650.22 -4750,
+	3Dlights=CAD,
+]<font color="#009900">{\linewidth}{\linewidth}{g3.u3d}</font>
+Imagine a cruise report that contained a 3D model of the Bathymetry in
+addition to the usaual GMT and Fledermaus images.  Here I've a poor job
+of converting a GMT grid to an Alias WaveFront OBJ.  I did not implement
+surface normals or give it a nice colormap.
+<!-- -->
+This pdf was created using MeshLab to import the obj and then exporting
+it to an U3D formatted model.  MeshLab also produces a stub LaTeX stub
+that uses the movie15 package to embed the model.  I had to run MeshLab
+on a Windows XP virtual machine, as the Mac OSX version of MeshLab 
+crashes when exporting to an U3D file.
+<!-- -->
+-Kurt 3/2009
+<b><font color="#0000FF">\end</font></b><font color="#009900">{document}</font></tt></pre>
+Then I had to install the movie15 package to allow LaTeX to include the model.
+<pre>% <b>fink install movie15</b></pre>
+Now run latex on the file until this error message goes away:
+<pre>Package movie15 Warning: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+(movie15)                @@ Rerun to get object references right! @@
+(movie15)                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.</pre>
+It takes three times for the references to build:
+<pre>% <b>pdflatex g3.tex</b>
+% <b>pdflatex g3.tex</b>
+% <b>pdflatex g3.tex</b>
+% <b>open g3.pdf</b></pre>
+I then have my PDF containing my model of the bathymetry.  If you are not
+a LaTeX user, then I'm not sure how you can do this other than to use
+Adobe Acrobat Pro and insert the model.
+
+<img title="3D tool" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/acrobat-pro-3D-tool.png"/>
+
+Then drag a region in your document and this menu should appear.  Now
+select the 3D model.
+
+<img title="Adding 3D Content" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-03/acrobat-pro-add-3d-content.png"/>
+
+There are some much more impressive models out there on the web.  Check out the <a href="http://www.david-laserscanner.com/wiki/_media/user_page/bongobat/pdf/elephant.pdf">elephant.pdf</a> at <a href="http://www.david-laserscanner.com/wiki/david_laserscanner_multimedia_gallery#bongobat_s_gallery">David's Laserscanner Multimedia gallery</a>
+
+
+-----

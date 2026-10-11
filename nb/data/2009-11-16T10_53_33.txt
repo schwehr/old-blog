@@ -1,0 +1,77 @@
+TITLE: mdbtools for working with MS Access databases
+AUTHOR: Kurt
+DATE: 11.16.2009 10:53
+DESC: adventures in databases
+-----
+BODY:
+I'm working on some schema migrations for a MS Access database and
+again <a href=" http://mdbtools.sourceforge.net">mdbtools</a> is
+proving to be very helpful.  I started off thinking about writing to tool to
+parse the XML XSD schema output, but while not to hard, it was going
+to take some time.
+<pre><b>grep '<xsd:element name'  sightings.xsd  | grep sqlSType</b>
+<tt><b><font color="#0000FF">&lt;xsd:element</font></b> <font color="#444400">name</font><font color="#990000">=</font><font color="#FF0000">"key"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"autonumber"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">od:autoUnique</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">od:nonNullable</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"ood"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">od:nonNullable</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"rid"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">od:nonNullable</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"sighting_date_time"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"datetime"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"datetime"</font> <font color="$444400">od:nonNullable</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:dateTime"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"species"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"group_size"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"longitude"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"double"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"float"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:double"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"latitude"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"double"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"float"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:double"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"geographic_accuracy"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">od:nonNullable</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"region"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">od:nonNullable</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"species_id"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">od:nonNullable</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"behav1"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"behav2"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;xsd:element</font></b> <font color="$444400">name</font><font color="#990000">=</font><font color="#FF0000">"duplicate"</font> <font color="$444400">minOccurs</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="$444400">od:jetType</font><font color="#990000">=</font><font color="#FF0000">"longinteger"</font> <font color="$444400">od:sqlSType</font><font color="#990000">=</font><font color="#FF0000">"int"</font> <font color="$444400">type</font><font color="#990000">=</font><font color="#FF0000">"xsd:int"</font><b><font color="#0000FF">&gt;</font></b>
+...</tt></pre>
+Instead, I gave mdbtools a try...
+<pre><b>mdb-schema -T sightings new-schema.mdb</b>
+<tt>mdb<font color="#990000">-</font>schema <font color="#990000">-</font>T sightings sightings<font color="#990000">-</font>prototype<font color="#990000">-</font>v05<font color="#990000">.</font>mdb 
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> sightings
+ <font color="#990000">(</font>
+        sighting_date_time      <font color="#009900">DateTime</font> <font color="#990000">(</font>Short<font color="#990000">),</font> 
+        group_size              Long Integer<font color="#990000">,</font> 
+        longitude               <font color="#009900">Double</font><font color="#990000">,</font> 
+        ood                     Long Integer<font color="#990000">,</font> 
+        region                  Long Integer<font color="#990000">,</font> 
+        species_id              Long Integer<font color="#990000">,</font> 
+        duplicate               Long Integer<font color="#990000">,</font> 
+        reporting_source        Long Integer<font color="#990000">,</font> 
+        reporting_entity        Long Integer<font color="#990000">,</font> 
+        <b><font color="#0000FF">key</font></b>                     Long Integer<font color="#990000">,</font> 
+        rid                     Long Integer<font color="#990000">,</font> 
+        behav1                  Long Integer<font color="#990000">,</font> 
+        behav2                  Long Integer<font color="#990000">,</font> 
+        action                  Long Integer<font color="#990000">,</font> 
+        latitude                <font color="#009900">Double</font><font color="#990000">,</font> 
+        comments_private        <font color="#009900">Text</font> <font color="#990000">(</font><font color="#993399">500</font><font color="#990000">),</font> 
+        comments_public         <font color="#009900">Text</font> <font color="#990000">(</font><font color="#993399">500</font><font color="#990000">),</font> 
+        species                 Long Integer<font color="#990000">,</font> 
+        geographic_accuracy     Long Integer
+<font color="#990000">);</font></tt></pre>
+A little text replacement transformation makes this valid sql...
+<pre><tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> sightings
+ <font color="#990000">(</font>
+        sighting_date_time      <font color="#009900">TIMESTAMP</font><font color="#990000">,</font> 
+        group_size              INTEGER<font color="#990000">,</font> 
+        longitude               REAL<font color="#990000">,</font> 
+        ood                     INTEGER<font color="#990000">,</font> 
+        region                  INTEGER<font color="#990000">,</font> 
+        species_id              INTEGER<font color="#990000">,</font> 
+        duplicate               INTEGER<font color="#990000">,</font> 
+        reporting_source        INTEGER<font color="#990000">,</font> 
+        reporting_entity        INTEGER<font color="#990000">,</font> 
+        <b><font color="#0000FF">key</font></b>                     INTEGER<font color="#990000">,</font> 
+        rid                     INTEGER<font color="#990000">,</font> 
+        behav1                  INTEGER<font color="#990000">,</font> 
+        behav2                  INTEGER<font color="#990000">,</font> 
+        action                  INTEGER<font color="#990000">,</font> 
+        latitude                REAL<font color="#990000">,</font> 
+        comments_private        <font color="#009900">VARCHAR</font> <font color="#990000">(</font><font color="#993399">500</font><font color="#990000">),</font> 
+        comments_public         <font color="#009900">VARCHAR</font> <font color="#990000">(</font><font color="#993399">500</font><font color="#990000">),</font> 
+        species                 INTEGER<font color="#990000">,</font> 
+        geographic_accuracy     INTEGER
+<font color="#990000">);</font></tt></pre>
+This looses all the info about foreign and primary keys, constraints, and other important db information, but it gets me pretty close to what I need.
+-----

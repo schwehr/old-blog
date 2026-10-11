@@ -1,0 +1,92 @@
+TITLE: What python packages are installed?
+AUTHOR: Kurt
+DATE: 02.24.2013 09:32
+DESC: getting going faster
+-----
+BODY:
+Work at Google on a team that works primarily in python has pushed me
+to get tons better at python.  It's one thing to know and working a
+language.  It's a whole nother thing to get to that expert level.  I
+have been trying to figure out how to get others the hard won
+knowledge that makes for amazing python.  The is always the danger of
+getting overly clever and writing code that is difficult to
+understand.  Writing and managing python packages is an area that I
+have felt like was too difficult.  I finally feel like I am starting
+to break through some of the confusion.  This might not be the right
+thing in the long run with python 3 working on a new distribution
+package, but with the advent of the <a
+href="https://pypi.python.org/pypi/distribute">distribute</a> package
+(a fork of <a
+href="https://pypi.python.org/pypi/setuptools">setuptools</a>), I'm
+feeling more comfortable.
+
+I few years ago, I discovered the python module <a
+href="https://pypi.python.org/pypi/yolk">yolk</a> (<a
+href="https://github.com/cakebread/yolk">https://github.com/cakebread/yolk</a>).
+This is a nice module that makes it easy to ask questions about your
+python install from the command line.
+<pre><b>virtualenv test-ve
+source test-ve/bin/activate
+pip install yolk
+yolk --list</b>
+Python          - 2.7.3        - active development (/sw/lib/python2.7/lib-dynload)
+pip             - 1.2.1        - active 
+setuptools      - 0.6c11       - active 
+wsgiref         - 0.1.2        - active development (/sw/lib/python2.7)
+yolk            - 0.4.3        - active
+<!-- -->
+# "<b>yolk -U</b>" or
+<b>yolk --show-updates</b>
+No newer packages found at The Cheese Shop</pre>
+Going back to my normal python environment, you can see a list of packages
+that are out of date:
+<pre><b>yolk -U | head</b>
+ Cython 0.16 (0.18)
+ Pygments 1.5 (1.6)
+ SQLAlchemy 0.7.9 (0.7.10)
+ Shapely 1.2.16 (1.2.17)
+ distribute 0.6.34 (0.6.35)
+ docutils 0.8 (0.10)
+ logilab-common 0.58.3 (0.59.0)
+ Mercurial 2.4.2 (2.5.1)
+ mock 0.7.0b3 (1.0.1)
+ numexpr 1.4.2 (2.0.1)</pre>
+That's nice, but I've blogged about yolk before and it would be better
+to know how to do this kind of thing from within python.
+What if I want to list which packages I have installed from within
+an IPython notebook to document the state of the world that I used?
+I'd like the names of all python modules as found in pypi and the
+versions of a few critical packages.
+<pre><b>deactivate</b> # drop out of test-ve
+<b>virtualenv --system-site-packages test2-ve
+source test2-ve/bin/activate
+pip install bigquery</b> # This is Google's <a href="https://developers.google.com/bigquery/">BigQuery</a> python interface.
+<b>ipython notebook --pylab=inline</b></pre>
+And now, how do I ask about packages in the notebook?
+<pre><tt><b><font color="#000080">import</font></b> pkg_resources
+<!-- --> 
+pkgs <font color="#990000">=</font> <font color="#990000">[</font>pkg <b><font color="#0000FF">for</font></b> pkg <b><font color="#0000FF">in</font></b> pkg_resources<font color="#990000">.</font><b><font color="#000000">Environment</font></b><font color="#990000">()]</font>
+<b><font color="#000000">len</font></b><font color="#990000">(</font>pkgs<font color="#990000">)</font>
+<!-- -->
+pkgs<font color="#990000">[:</font><font color="#993399">10</font><font color="#990000">]</font>
+<font color="#990000">[</font><font color="#FF0000">'configobj'</font><font color="#990000">,</font>
+ <font color="#FF0000">'logilab-astng'</font><font color="#990000">,</font>
+ <font color="#FF0000">'shapely'</font><font color="#990000">,</font>
+ <font color="#FF0000">'pyproj'</font><font color="#990000">,</font>
+ <font color="#FF0000">'distribute'</font><font color="#990000">,</font>
+ <font color="#FF0000">'yolk'</font><font color="#990000">,</font>
+ <font color="#FF0000">'python-dateutil'</font><font color="#990000">,</font>
+ <font color="#FF0000">'pygments'</font><font color="#990000">,</font>
+ <font color="#FF0000">'mysql-python'</font><font color="#990000">,</font>
+ <font color="#FF0000">'numexpr'</font><font color="#990000">]</font>
+<!-- -->
+bq_version <font color="#990000">=</font> pkg_resources<font color="#990000">.</font><b><font color="#000000">get_distribution</font></b><font color="#990000">(</font><font color="#FF0000">'bigquery'</font><font color="#990000">).</font>version
+bq_version
+<!-- -->
+<i><font color="#9A1900">'2.0.12'</font></i>
+<!-- -->
+pkg_resources<font color="#990000">.</font><b><font color="#000000">parse_version</font></b><font color="#990000">(</font>version<font color="#990000">)</font>
+<font color="#990000">(</font><font color="#FF0000">'00000002'</font><font color="#990000">,</font> <font color="#FF0000">'00000000'</font><font color="#990000">,</font> <font color="#FF0000">'00000012'</font><font color="#990000">,</font> <font color="#FF0000">'*final'</font><font color="#990000">)</font>
+</tt></pre>
+So, I'm using version 2.0.12 of the <a href="https://pypi.python.org/pypi/bigquery">BigQuery python module</a>.
+-----

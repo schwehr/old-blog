@@ -1,0 +1,998 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Kurt's Weblog: June 2006 Archives</title>
+
+<link rel="stylesheet" href="../styles/nb_default.css" type="text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="../atom.xml" />
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span>
+</div>
+
+<div id="content">
+
+<div class="blog">
+<div id="menu">
+	<a href="../index.html">Main</a>
+</div>
+</div>
+
+<div class="blog">
+<div class="item">
+<a id="e2006-06-26T07_21_06.txt" name="e2006-06-26T07_21_06.txt"></a>
+<h2 class="date">06.26.2006 07:21</h2>
+<div class="blogbody">
+<h3 class="title">macosx dhcp servering strangeness</h3>
+<div class="item-description">
+Last week, I ran into some odd behavior from the mac.  I wanted to hook up
+a machine to the internet via the 2nd ethernet port on my desktop machine.
+I opened up the System Preferences application and went to
+networking.  I use the en0 ethernet interface for the my connection
+inside the work firewall, so I need a different subnet.  10.x.x.x
+should be fine, so I setup en1 as 10.0.0.1.  Then I went to
+Sharing-Internet and turned it on.  Then I got a message saying that I
+have to turn on "Personal Web Sharing" so that the shared network can
+use the web.  <b>WHAT?</b>.  That is crazy.  I then took a look at the
+output from ifconfig and discovered that dhcp has setup this new box
+at 192.168.2.3 (not on 10.0.0.x like I wanted).  Look below and see
+that en1 has both 192.168.2.1 and 10.0.0.1.  I now know that the mac
+can support multiple IP addresses on the same interface, but that was
+not what I was trying to do.  At least it works for this instance.  But
+what happens if in the future I must be able to pick the address range
+for dhcp?  I guess this is when Apple tries to make me buy OSX
+Server.  They should just roll the server capabilities into standard
+OSX and do away with making admin life difficult.
+<pre>
+en1: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+        inet 192.168.2.1 netmask 0xffffff00 broadcast 192.168.2.255
+        inet6 fe80::216:cbff:fe37:6daf%en1 prefixlen 64 scopeid 0x5 
+        inet 10.0.0.1 netmask 0xffffff00 broadcast 10.0.0.255
+        ether 00:xx:xx:xx:xx:xx 
+        media: autoselect (100baseTX <full-duplex>) status: active
+        supported media: none autoselect 10baseT/UTP <half-duplex> 
+              ...  1000baseT <full-duplex,flow-control>
+en2: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+        ether 00:xx:xx:xx:xx:xx 
+        media: autoselect (<unknown type>) status: inactive
+        supported media: autoselect
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-26T07_21_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-07-11T17_08_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-25T20_11_22.txt" name="e2006-06-25T20_11_22.txt"></a>
+<h2 class="date">06.25.2006 20:11</h2>
+<div class="blogbody">
+<h3 class="title">house centipedes are back</h3>
+<div class="item-description">
+Ugh... they are back.  <a href="http://www.uark.edu/depts/entomolo/museum/house_centipede.html">house centipedes</a>.  I hadn't seen the part before about them biting.
+<br /><br />
+<img src="../attachments/2006-06/house-centipede.jpg">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-25T20_11_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-26T07_21_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-23T22_03_01.txt" name="e2006-06-23T22_03_01.txt"></a>
+<h2 class="date">06.23.2006 22:03</h2>
+<div class="blogbody">
+<h3 class="title">trac, trac webadmin, and bitten</h3>
+<div class="item-description">
+I am getting closer to having continuous build integration working
+(with quite a bit of help from Roland).  I've been getting fink pacages 
+crafted for the project.  I had to update trac to 0.9.5 (from 0.9) and
+made the package force using the sqlite3 database format.  I also have
+packages for bitten and trac webadmin.
+<ul>
+<li><a href="../attachments/2006-06/trac-py.info">trac-py.info</a></li>
+<li><a href="../attachments/2006-06/tracwebadmin-py.info">tracwebadmin-py.info</a></li>
+<li><a href="../attachments/2006-06/bitten-py.info">bitten-py.info</a></li>
+</ul>
+<img src="../attachments/2006-06/trac-bitten-menu.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-23T22_03_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-25T20_11_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-23T22_00_39.txt" name="e2006-06-23T22_00_39.txt"></a>
+<h2 class="date">06.23.2006 22:00</h2>
+<div class="blogbody">
+<h3 class="title">scipy tutorials</h3>
+<div class="item-description">
+<a href="http://www.scipy.org/SciPy2006/TutorialSessions">http://www.scipy.org/SciPy2006/TutorialSessions</a> - I wish I was going!
+<ul>
+<li>"3D visualization in Python using tvtk and MayaVi"</li>
+<li>"Scientific Data Analysis and Visualization using  IPython and  Matplotlib."</li>
+<li>"Building Scientific Applications using the  Enthought Tool Suite (Envisage, Traits, Chaco, etc.)"</li>
+<li>"NumPy (migration from Numarray & Numeric, overview of NumPy)"</li>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-23T22_00_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-23T22_03_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-23T07_56_53.txt" name="e2006-06-23T07_56_53.txt"></a>
+<h2 class="date">06.23.2006 07:56</h2>
+<div class="blogbody">
+<h3 class="title">seismic-py submitted to freshmeat</h3>
+<div class="item-description">
+I finally got around to submitting seismic-py to freshmeat.  I got
+motivated by reading back through a paper before resubmitting it and
+realized that I need to change the segy-py to seismic-py and might as
+well send it to freshmeat at the same time.  The tar is still named
+segy-py, but hopefully I will get around to fixing that soon.
+<br /><br />
+<a href="http://freshmeat.net/projects/seismic-py">http://freshmeat.net/projects/seismic-py</a>
+<br /><br />
+Freshmeat does not seem to have a place to put the link to the svn
+repository, so it is here: <a
+href="https://cowfish.unh.edu/projects/seismic-py/">https://cowfish.unh.edu/projects/seismic-py/</a>.
+Be warned that the svn trunk is currently very messy.  I am trying to
+restructure the project to really look like a python module and I am
+nowhere near done.
+<br /><br />
+<img src="http://download.freshmeat.net/screenshots/60454.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-23T07_56_53.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-23T22_00_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-22T06_53_50.txt" name="e2006-06-22T06_53_50.txt"></a>
+<h2 class="date">06.22.2006 06:53</h2>
+<div class="blogbody">
+<h3 class="title">Fink home page</h3>
+<div class="item-description">
+I just found out that fink has a non-sourceforge home page:
+<br /><br />
+<a href="http://finkproject.org/">http://finkproject.org/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-22T06_53_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-23T07_56_53.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-22T06_48_12.txt" name="e2006-06-22T06_48_12.txt"></a>
+<h2 class="date">06.22.2006 06:48</h2>
+<div class="blogbody">
+<h3 class="title">VMware coming to Mac OSX</h3>
+<div class="item-description">
+There are many stories around of VMware being on the way for Mac OSX.
+Gimme!  I am feed up with virtual PC.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-22T06_48_12.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-22T06_53_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-19T22_03_49.txt" name="e2006-06-19T22_03_49.txt"></a>
+<h2 class="date">06.19.2006 22:03</h2>
+<div class="blogbody">
+<h3 class="title">vrml for python</h3>
+<div class="item-description">
+<a href="http://blog.vrplumber.com/1524">http://blog.vrplumber.com/1524</a>... more stuff for me to look at.  The backlog just keeps growing.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-19T22_03_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-22T06_48_12.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-19T20_53_26.txt" name="e2006-06-19T20_53_26.txt"></a>
+<h2 class="date">06.19.2006 20:53</h2>
+<div class="blogbody">
+<h3 class="title">Big troubles with Mac Applications - SSL</h3>
+<div class="item-description">
+I am currently having big issues with Apples Mail.app and iCal.  I am
+just about at the point where I will be ditching them for Thunderbird
+and Sunbird.  Well, maybe Mail.app can stay.  Here is the solution for
+Mail.app from Apple's web sight:
+<ol>
+<li> Click "Show certificate" when Mail asks if you want to accept the certificate.</li>
+<li> Press the Option key while dragging the certificate to the desktop. The certificate's icon appears on the desktop.</li>
+<li> Add the certificate to your keychain by dragging its icon on top of Keychain Access. Tip: Keychain Access is located in the Utilities folder (/Applications/Utilities).</li>
+<li> When Keychain Access opens, you may be prompted to select which
+keychain to import to. If this happens, choose a keychain and also
+select X509 Anchors.</li>
+</ol>
+Now why can't iCal cope with SSL?  <a
+href="http://discussions.apple.com/thread.jspa?messageID=1952284&#1952284">Apple
+discussion thread</a> from MacLemmon... now how do I find the bug?
+<pre>
+  The problem is that iCal does not allow you to subscribe to a
+  calendar over https since it tells you that iCal doesn't recognize
+  the URL scheme starting with https.
+<br /><br />
+  This definitely is a BUG in iCal. I have filed this bug to Apple
+  Radar on November 7th 2005 (4332054). Yes, almost half a year ago
+  and it has been declared duplicate. It just hasn't been fixed by
+  now.
+<br /><br />
+  Apple, this should really be a simple fix. More than 5 months to
+  correct this just is not acceptable.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-19T20_53_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-19T22_03_49.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-18T22_19_54.txt" name="e2006-06-18T22_19_54.txt"></a>
+<h2 class="date">06.18.2006 22:19</h2>
+<div class="blogbody">
+<h3 class="title">scripts notifying the screen</h3>
+<div class="item-description">
+<a href="http://www.debian-administration.org/articles/407">http://www.debian-administration.org/articles/407</a>:
+Debian Administration - Creating desktop notifications
+<br /><br />
+I had never heard of xosd before, but it is in fink.  I have to give
+osd_cat a try sometime.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-18T22_19_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-19T20_53_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-15T17_20_01.txt" name="e2006-06-15T17_20_01.txt"></a>
+<h2 class="date">06.15.2006 17:20</h2>
+<div class="blogbody">
+<h3 class="title">AFS Ru1ez</h3>
+<div class="item-description">
+<a href="http://ezine.daemonnews.org/200605/afs.html">AFS: network
+filesystem beyond NFS weaknesses</a>...  okay, so I loved using AFS
+both at Stanford and CMU.  Do you know what zephyr++ means?  The only
+thing that I was not in to was kerberos tickets running out after 24
+hours.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-15T17_20_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-18T22_19_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-15T06_56_45.txt" name="e2006-06-15T06_56_45.txt"></a>
+<h2 class="date">06.15.2006 06:56</h2>
+<div class="blogbody">
+<h3 class="title">Movies on web development</h3>
+<div class="item-description">
+Sean Kelly has now produced two videos.  I didn't know about the 2nd
+until Myche pointed me to it.  My real question is how did produce it?
+<ul>
+<li><a href="http://oodt.jpl.nasa.gov/better-web-app.mov">http://oodt.jpl.nasa.gov/better-web-app.mov</a></li>
+<li><a href="http://www.archive.org/details/SeanKellyGettingYourFeetWetwithPlone">http://www.archive.org/details/SeanKellyGettingYourFeetWetwithPlone</a></li>
+</ul>
+Why can't I do all that in under an hour?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-15T06_56_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-15T17_20_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-14T21_20_26.txt" name="e2006-06-14T21_20_26.txt"></a>
+<h2 class="date">06.14.2006 21:20</h2>
+<div class="blogbody">
+<h3 class="title">Global Shoreline Data</h3>
+<div class="item-description">
+I am always looking for better shoreline data...
+<br /><br />
+<a href="http://evs-islands.blogspot.com/2006/06/data-improved-wvs-rival-evs-whats.html"> Data: Improved WVS? Rival EVS? What's Going On?</a>
+<br /><br />
+<a href="http://www.nga.mil/portal/site/nga01/index.jsp?epi-content=GENERIC&itemID=9328fbd8dcc4a010VgnVCMServer3c02010aRCRD&beanID=1629630080&viewID=Article">Prototype Global Shoreline Data (Satellite Derived High Water Line Data)</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-14T21_20_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-15T06_56_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-14T19_49_51.txt" name="e2006-06-14T19_49_51.txt"></a>
+<h2 class="date">06.14.2006 19:49</h2>
+<div class="blogbody">
+<h3 class="title">CMU 3D from 2D pictures</h3>
+<div class="item-description">
+This just made slashdot...
+<br /><br />
+<a href="http://www.cmu.edu/PR/releases06/060613_3d.html">Carnegie Mellon Researchers Teach Computers To Perceive Three Dimensions in 2-D Images</a> - Program Automatically Generates 3-D Models From a Single Photograph 
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-14T19_49_51.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-14T21_20_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-13T21_24_14.txt" name="e2006-06-13T21_24_14.txt"></a>
+<h2 class="date">06.13.2006 21:24</h2>
+<div class="blogbody">
+<h3 class="title">a class that works like a stream</h3>
+<div class="item-description">
+Today I had some fun with C++.  Roland and I want a class behaves sort
+of like the C++ ostream concept.  At first that seemed pretty easy.  I
+figured I'd go look at the gcc ostream header and I'd be ready to go.
+I did alright creating operator<< functions, but hit the wall when I
+tried to make an endl manipulator.  So back to ostream I went...
+<pre>
+  <strong>template</strong><font color="4444FF">&lt;</font><strong>typename</strong> <font color="#2040a0">_CharT</font>, <strong>typename</strong> <font color="#2040a0">_Traits</font><font color="4444FF">&gt;</font>
+    <font color="#2040a0">basic_ostream</font><font color="4444FF">&lt;</font><font color="#2040a0">_CharT</font>, <font color="#2040a0">_Traits</font><font color="4444FF">&gt;</font><font color="4444FF">&amp;</font> 
+    <font color="#2040a0">endl</font><font color="4444FF">(</font><font color="#2040a0">basic_ostream</font><font color="4444FF">&lt;</font><font color="#2040a0">_CharT</font>, <font color="#2040a0">_Traits</font><font color="4444FF">&gt;</font><font color="4444FF">&amp;</font> <font color="#2040a0">__os</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font> <strong>return</strong> <font color="#2040a0">flush</font><font color="4444FF">(</font><font color="#2040a0">__os</font>.<font color="#2040a0">put</font><font color="4444FF">(</font><font color="#2040a0">__os</font>.<font color="#2040a0">widen</font><font color="4444FF">(</font><font color="#008000">'<font color="#77dd77">\n</font>'</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="4444FF"><strong>}</strong></font>
+</pre>
+Got that?  Yeah, that is what I thought.  A whole lot of template
+magic.  I finally bit the bullet and posted to comp.lang.c++.  My
+usual experience with posting there is not that productive.  But then
+again, who is really reading net news these days?  I pretty much
+switched to just a couple mailing lists back in 1995.  Well, turns out
+the folks in comp.lang.c++ were <b>awesome</b>.  In an hour and a half
+with 9 messages I had a working solution.  They all wanted ostream,
+but here is my ostream-less solution.
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;iostream&gt;</font></strong></font>
+<strong>using</strong> <strong>namespace</strong> <font color="#2040a0">std</font><font color="4444FF">;</font>
+<strong>class</strong> <font color="#2040a0">slog</font> <font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+<br /><br />
+<font color="#2040a0">slog</font><font color="4444FF">&amp;</font> <strong>operator</strong><font color="4444FF">&lt;</font><font color="4444FF">&lt;</font><font color="4444FF">(</font><font color="#2040a0">slog</font><font color="4444FF">&amp;</font><font color="#2040a0">s</font>, <font color="#2040a0">slog</font><font color="4444FF">&amp;</font><font color="4444FF">(</font><font color="4444FF">*</font><font color="#2040a0">manip</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">slog</font><font color="4444FF">&amp;</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="#2040a0">slog</font><font color="4444FF">&amp;</font> <strong>operator</strong><font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="4444FF">(</font><font color="#2040a0">slog</font> <font color="4444FF">&amp;</font><font color="#2040a0">s</font>, <strong>const</strong> <strong>int</strong> <font color="4444FF">&amp;</font><font color="#2040a0">r</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<br /><br />
+<font color="#2040a0">slog</font><font color="4444FF">&amp;</font> <font color="#2040a0">endl</font><font color="4444FF">(</font><font color="#2040a0">slog</font><font color="4444FF">&amp;</font> <font color="#2040a0">s</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cerr</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;endl called&quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">endl</font><font color="4444FF">;</font>
+  <strong>return</strong> <font color="#2040a0">s</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<br /><br />
+<font color="#2040a0">slog</font><font color="4444FF">&amp;</font> <strong>operator</strong><font color="4444FF">&lt;</font><font color="4444FF">&lt;</font><font color="4444FF">(</font><font color="#2040a0">slog</font><font color="4444FF">&amp;</font><font color="#2040a0">s</font>, <font color="#2040a0">slog</font><font color="4444FF">&amp;</font><font color="4444FF">(</font><font color="4444FF">*</font><font color="#2040a0">manip</font><font color="4444FF">)</font><font color="4444FF">(</font><font color="#2040a0">slog</font><font color="4444FF">&amp;</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cerr</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font><font color="#008000">&quot;manip op<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">;</font>
+  <strong>return</strong> <font color="#2040a0">manip</font><font color="4444FF">(</font><font color="#2040a0">s</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<br /><br />
+<font color="#2040a0">slog</font><font color="4444FF">&amp;</font> <strong>operator</strong><font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="4444FF">(</font><font color="#2040a0">slog</font> <font color="4444FF">&amp;</font><font color="#2040a0">s</font>, <strong>const</strong> <strong>int</strong> <font color="4444FF">&amp;</font><font color="#2040a0">r</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">cerr</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;Hello: &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">r</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">endl</font><font color="4444FF">;</font>
+  <strong>return</strong> <font color="#2040a0">s</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<br /><br />
+<strong>int</strong> <font color="#2040a0">main</font><font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">argc</font>, <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">slog</font> <font color="#2040a0">log</font><font color="4444FF">;</font>
+  <font color="#2040a0">log</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#FF0000">1</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#FF0000">2</font><font color="4444FF">;</font>
+  <font color="#2040a0">log</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#FF0000">3</font><font color="4444FF">;</font>
+  <font color="#2040a0">log</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">endl</font><font color="4444FF">;</font>
+  <strong>return</strong> <font color="4444FF">(</font><font color="#2040a0">EXIT_SUCCESS</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Here is what it does when it runs.
+<pre>
+make && ./slogcxx-test
+g++ -o slogcxx-test slogcxx.cpp -Wall -g
+Hello: 1
+Hello: 2
+Hello: 3
+manip op
+endl called
+</pre>
+Doesn't actually do what I was aiming for, but does a nice job of
+proving that I can have things like stream manipulators.  Definitely a
+learning experiences.  It is always wild to see what is going on
+inside the compiler headers.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-13T21_24_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-14T19_49_51.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-13T21_03_21.txt" name="e2006-06-13T21_03_21.txt"></a>
+<h2 class="date">06.13.2006 21:03</h2>
+<div class="blogbody">
+<h3 class="title">Robots on Linux PPC</h3>
+<div class="item-description">
+<a
+href="http://www-128.ibm.com/developerworks/library/pa-migrate/?ca=dgr-lnxw09X86ToPower">Migrating from x86 to PowerPC, Part 1: Robots and networked appliances
+on a shoestring Low-cost real-time development with Linux on PowerPC</a> [ibm developer works]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-13T21_03_21.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-13T21_24_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-12T19_43_58.txt" name="e2006-06-12T19_43_58.txt"></a>
+<h2 class="date">06.12.2006 19:43</h2>
+<div class="blogbody">
+<h3 class="title">Google Sketchup for Mac!</h3>
+<div class="item-description">
+Finally... <a href="http://sketchup.google.com/download.html">Google SketchUp for the Mac</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-12T19_43_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-13T21_03_21.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-12T19_31_11.txt" name="e2006-06-12T19_31_11.txt"></a>
+<h2 class="date">06.12.2006 19:31</h2>
+<div class="blogbody">
+<h3 class="title">automated build systems</h3>
+<div class="item-description">
+I gave <a href="http://buildbot.sourceforge.net/">buildbot</a> and <a
+href="http://cruisecontrol.sourceforge.net/">cruisecontrol</a>.  I was
+a bit frustrated with the two of them.  Cruisecontrol didn't build and 
+I'm not an expert at Java build error messages.  Buildbot's
+configation system is pretty confusing.  Maybe if there was a tutorial
+for svn+c++ and svn+python projects all on one host, then I could at
+least give it a go.
+<br /><br />
+I posted to the trac mailing list and quickly got some good feed back:
+<ul>
+  <li>Lots of comments to use <a href="http://bitten.cmlenz.net/">bitten</a></li>
+  <li><a
+  href="http://docs.codehaus.org/display/DAMAGECONTROL/Continuous+Integration+Server+Feature+Matrix">DamageControl's
+  matrix</a> lists a good number of systems.</li>
+</ul>
+I hope bitten does the trick!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-12T19_31_11.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-12T19_43_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-11T06_14_19.txt" name="e2006-06-11T06_14_19.txt"></a>
+<h2 class="date">06.11.2006 06:14</h2>
+<div class="blogbody">
+<h3 class="title">Emacs 22 replace with regular expressions</h3>
+<div class="item-description">
+<a href="http://steve-yegge.blogspot.com/2006/06/shiny-and-new-emacs-22.html">emacs 22 new features</a> is worth a read.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-11T06_14_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-12T19_31_11.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-10T14_56_10.txt" name="e2006-06-10T14_56_10.txt"></a>
+<h2 class="date">06.10.2006 14:56</h2>
+<div class="blogbody">
+<h3 class="title">Abusing Mach on Mac OSX</h3>
+<div class="item-description">
+This is on me "to read" list...
+<br /><br />
+<a href="http://uninformed.org/index.cgi?v=4&a=3">Abusing Mach on Mac OS X by
+nemo@felinemenace.org</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-10T14_56_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-11T06_14_19.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-10T11_19_55.txt" name="e2006-06-10T11_19_55.txt"></a>
+<h2 class="date">06.10.2006 11:19</h2>
+<div class="blogbody">
+<h3 class="title">Red Tide in the local news</h3>
+<div class="item-description">
+<a href="http://www.seacoastonline.com/news/06102006/news/107185.htm">'Red tide' brings shellfishing ban</a>
+<pre>
+Chris Nash, the shellfish program manager for the N.H. Department of
+Environmental Services, said hundreds of thousands of gallons of
+sewage flowed into offshore areas during the recent rainfalls.
+<br /><br />
+Following that event, paralytic shellfish poisoning - commonly
+referred to as "red tide" - was detected, resulting in the May 3
+closing of shellfishing of all species in the New Hampshire tidal
+waters of Little Harbor, Hampton/Seabrook, Great Bay, Little Bay, the
+Bellamy River and near shore areas of the Atlantic Coast.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-10T11_19_55.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-10T14_56_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-10T11_09_59.txt" name="e2006-06-10T11_09_59.txt"></a>
+<h2 class="date">06.10.2006 11:09</h2>
+<div class="blogbody">
+<h3 class="title">Tiny GPS data logger</h3>
+<div class="item-description">
+<a href="http://www.makezine.com/blog/archive/2006/06/diy_gps_logger.html?CMP=OTC-0D6B48984890">DIY GPS logger</a> [make.com]
+<br /><br />
+<a href="http://www.sparkfun.com/commerce/product_info.php?products_id=657">Lassen iQ FAT16 Data Logger</a>
+<br /><br />
+<img src="http://www.sparkfun.com/commerce/images/GPSlog-act_main.jpg">
+<br /><br />
+<pre>
+Take a Lassen iQ, an SD memory card, a LPC2138 ARM processor, mix in
+some FAT16 firmware and you get the new GPS logger from Spark Fun
+Electronics. The Lassen iQ FAT16 Datalogger takes the GPS data from
+the Lassen iQ and records it onto the SD card in pure, beautiful text
+file format. This means you can record up to 440 hours onto a 256
+megabyte SD card. That's two and a half weeks of every-second GPS
+location data!
+<br /><br />
+Pete also got a bit spunky and programmed in a KML mode. This mode
+interfaces nearly directly with Google Earth. Pull the SD card, insert
+it into a card reader, cut and paste the specially formatted data into
+a KML file, and wammo - you can see what Casey did over lunch with a
+satellite image overlay. Take a look at the example screen shot. You
+can see what lane Casey was in! When he stopped at the light, his data
+points piled up. Fancy. Real fancy. Speed is also datalogged - it's
+like Big Brother in the palm of your hand...  </pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-10T11_09_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-10T11_19_55.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-09T23_10_39.txt" name="e2006-06-09T23_10_39.txt"></a>
+<h2 class="date">06.09.2006 23:10</h2>
+<div class="blogbody">
+<h3 class="title">georeferenced panoramas in charting applications</h3>
+<div class="item-description">
+<a href="http://www.panbo.com/yae/archives/001310.html">http://www.panbo.com/yae/archives/001310.html</a>
+<pre>
+I'm pretty sure that Maptech was the first to add panoramic photos to
+its electronic charts, but now they're everywhere. Nobletec Passport
+Deluxe, Navionics Platinum, C-Map MAX, and Garmin BlueChart G2 all
+have their own (or licensed) panoramas. But Maptech has upped the
+ante, at least on the SRN/i3, figuring out how to georeference the
+whole photos, not just where they were taken, so your boat can be
+overlaid on them. It is not critical for navigation, but it is cool.
+</pre>
+GeoZui3D did this quite a while ago, but is not use that heavily
+outside of NOAA and UNH.  And hey, Viz and VEVI did this type of thing
+back in 1995-2000.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-09T23_10_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-10T11_09_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-09T23_01_28.txt" name="e2006-06-09T23_01_28.txt"></a>
+<h2 class="date">06.09.2006 23:01</h2>
+<div class="blogbody">
+<h3 class="title">3D web browsers</h3>
+<div class="item-description">
+<a href="http://www.extremetech.com/article2/0,1697,1974390,00.asp">http://www.extremetech.com/article2/0,1697,1974390,00.asp</a>
+<pre>
+What ever happened to the virtual reality, 3D world of the web? Back
+in the late 90s, all the hype was about VRML-Virtual Reality Markup
+Language-which would turn the web into an immersive environment that
+you'd maneuver around to get to the information you wanted. We're here
+to tell you that the reports of the 3D web's death are greatly
+exaggerated. As evidence, we present three 3D browsers that will use
+that graphics card for something other than gaming: 3B, Browse3D, and
+SphereXPlorer.
+<br /><br />
+As further proof that the 3D web isn't dead, an XML format called
+3D-a free run-time architecture that can "represent and communicate
+3D scenes and objects using XML"- is starting to take hold. You can
+find more info about it from The Web3D Consortium which is very active
+in its efforts to add one more dimension to the web as we know
+it. There's even a mobile browser for X3D, so that you could, for
+example, navigate around a city you're visiting on your handheld PC.
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-09T23_01_28.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-09T23_10_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-09T06_22_00.txt" name="e2006-06-09T06_22_00.txt"></a>
+<h2 class="date">06.09.2006 06:22</h2>
+<div class="blogbody">
+<h3 class="title">historic maps of the NorthEast</h3>
+<div class="item-description">
+See what New Hampshire looked like in 1893...
+<a href="http://historical.maptech.com/">http://historical.maptech.com/</a>
+<pre>
+As a special service to the mapping community, Maptech is proud to
+host this collection of historic USGS topographic maps. This ongoing
+project is headed by historian Christopher Marshall and compiled
+through the efforts of many individuals. We are honored to be the
+stewards of this fine collection, making it available to all via the
+World Wide Web.
+<br /><br />
+For a discussion on the evolution of USGS maps, please check out the
+section on "Historic Topographic Maps". Select "About the Collection"
+for information on how you can help expand this library. Maps are
+scanned and processed by volunteers who share an interest in historic
+maps. Maptech sponsors their efforts by providing free web space for
+this collection.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-09T06_22_00.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-09T23_01_28.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-08T21_01_15.txt" name="e2006-06-08T21_01_15.txt"></a>
+<h2 class="date">06.08.2006 21:01</h2>
+<div class="blogbody">
+<h3 class="title">Instructables</h3>
+<div class="item-description">
+<a href="http://www.instructables.com/">Instructables: step-by-step collaboration</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-08T21_01_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-09T06_22_00.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-08T20_59_16.txt" name="e2006-06-08T20_59_16.txt"></a>
+<h2 class="date">06.08.2006 20:59</h2>
+<div class="blogbody">
+<h3 class="title">The Ultimate Boot CD</h3>
+<div class="item-description">
+Stephen just lent Roland and I a copy of this cd.  Damn!  How cool is
+this.  memtest and much more.
+<br /><br />
+<a href="http://www.ultimatebootcd.com/">http://www.ultimatebootcd.com/</a>
+<br /><br />
+Seems like it has virus checkers and more.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-08T20_59_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-08T21_01_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-08T07_48_31.txt" name="e2006-06-08T07_48_31.txt"></a>
+<h2 class="date">06.08.2006 07:48</h2>
+<div class="blogbody">
+<h3 class="title">Ships in dry dock</h3>
+<div class="item-description">
+<a href="http://bldgblog.blogspot.com/2006/06/student-projects-5-shipbldg.html"> Student projects 5: ship.bldg</a>
+<br /><br />
+<img src="http://photos1.blogger.com/blogger/7184/598/400/1661_11.jpg">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-08T07_48_31.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-08T20_59_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-08T07_38_08.txt" name="e2006-06-08T07_38_08.txt"></a>
+<h2 class="date">06.08.2006 07:38</h2>
+<div class="blogbody">
+<h3 class="title">Ubuntu 6.06</h3>
+<div class="item-description">
+I just went through a batch of attempted Linux installs.  I haven't
+done this in about 2 years.  I used to be a Mandrake fan, but have
+become frustrated with the RPM packaging system.  I want a system for
+at work that would be along the lines of what the IT guys prefer.  I
+dropped and talked to them.  I got the suggestion of trying CentOS.
+After downloading the latest 4 CD distribution, I gave it a go.  It
+feels like a RedHat/Fedora system.  It installed alright on one older
+laptop, but did not quite get the video right.  The other older HP
+laptop, it completely failed.  On the machine where it installed, it
+was a bit behind on the compilers of where I would want to be and I
+was not sure how upgrade it or was I at the latest?  I figured I'd
+give Fedora Core 5 a go on both laptops.  I had basically the same
+results as CentOS, but the installer was a bit slicker.  Also, I was
+able to figure out what I had done wrong with the video (the old Dell
+laptop is only happy in 1600x1200 mode).  With that installed and an
+update done, the laptop was deployed to the field where it will be a
+data logger.  I like older laptops mostly because they have actual
+serial RS232 serial ports.  USB-to-RS232 adapters are not that fun.
+<br /><br />
+I then had the HP laptop left.  I tried Knoppix to see if I could get
+a Linux system fully working.  After popping in knoppix and waiting a
+few minutes, I did indeed have a happily working Linux system.  I then
+used it on a cranky server down the hall that would not boot off of
+it's current configuration.  Knoppix rocks! 
+<br /><br />
+Finally I have been wondering about Ubuntu, which has been getting a
+lot of hype lately.  I was lent a 5.05 DVD.  After hours of grinding,
+I decided the old laptop's DVD reader might just be a little too old.
+Looking at the <a href="http://www.ubuntu.com/">ubuntu</a> web site, I
+found the 1 CD Live/Install disk (6.06 Dapper Drake).  After the
+download and burn, I dropped the CD in and had a working system just
+like knoppix with the addition of an install icon on the desktop.  I
+clicked that and the install was a snap.
+<br /><br />
+The install software icon was somewhat helpful, but I had to dig into
+the system menu to find a package manager (System - Admin -
+Synaptic).  Then I was able to find the python serial module.  Now the
+machine is happily logging serial data.
+<br /><br />
+<a href="http://monkeyblog.org/ubuntu/installing/">How to install ANYTHING in Ubuntu</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-08T07_38_08.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-08T07_48_31.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-08T07_19_21.txt" name="e2006-06-08T07_19_21.txt"></a>
+<h2 class="date">06.08.2006 07:19</h2>
+<div class="blogbody">
+<h3 class="title">aqua emacs</h3>
+<div class="item-description">
+I tried an aqua emacs a couple years ago and was very disappointed.
+Perhaps now is a good time to try again.
+<br /><br />
+<a href="http://aquamacs.org/">http://aquamacs.org/</a>
+<br /><br />
+I ran back into this via this article: <a
+href="http://www.macdevcenter.com/pub/a/mac/2006/06/07/aging-powerbook-upgrade.html?page=1">aging
+powerbook upgrade</a>.  
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-08T07_19_21.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-08T07_38_08.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-06-05T15_46_56.txt" name="e2006-06-05T15_46_56.txt"></a>
+<h2 class="date">06.05.2006 15:46</h2>
+<div class="blogbody">
+<h3 class="title">python shed skin</h3>
+<div class="item-description">
+I always like it when people respond to posts I make about things and
+I especially appreciate it when it is the author or creator!  I got
+this one today (which Apple's mail.app called SPAM... boo hiss) from
+the author of Shed Skin.  I stand corrected.  All my main machines are
+ppc, so I will have to sometime log into a remote x86 box and give it
+a try.
+<pre>
+	From: 	  mark.dufour 
+	Subject: 	shed skin
+	Date: 	June 5, 2006 12:05:29 PM EDT
+	To: 	  kdschwehr@ucsd.edu
+<br /><br />
+Hello Kurt,
+<br /><br />
+Looking for my own compiler, I came across a link from your blog (thanks! :D):
+<br /><br />
+<a href="../archives/2005-09.html">../archives/2005-09.html</a>
+<br /><br />
+| <em>"Sounds like what what was done eith JIT with Java."</em>
+<br /><br />
+However, this is not true: SS is a completely _static_ compiler,
+comparable to C++ compilers. A JIT compiler performs optimizations
+during run-time. Psyco is more of a a JIT (and specializing) compiler
+for Python.
+<br /><br />
+Btw, if you look at my thesis at mark.dufour.googlepages.com, you can
+see that code runs on average 12 times faster using SS than when using
+Psyco. But this is mostly due to the fact that Psyco does not optimize
+the x86 code it directly emits.
+<br /><br />
+Thanks again, and please refer to <a href="mark.dufour.googlepages.com">mark.dufour.googlepages.com</a> if you
+mention SS again, as its the new homepage since a few weeks.
+<br /><br />
+Thanks,
+Mark.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-06.html#e2006-06-05T15_46_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-06-08T07_19_21.html#comments">Comments</a> -->
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="links">
+
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary="Calendar with links to days with entries">
+<caption class="calendarhead">June 2006</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td> <td align="center"></td> <td align="center"></td> <td align="center"></td>      
+<td align="center"><span class="calendar">1</span></td>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar">3</span></td>
+</tr>
+<tr>
+            
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-05T15_46_56.txt">5</a></span></td>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-08T21_01_15.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-09T23_10_39.txt">9</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-10T14_56_10.txt">10</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-11T06_14_19.txt">11</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-12T19_43_58.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-13T21_24_14.txt">13</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-14T21_20_26.txt">14</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-15T17_20_01.txt">15</a></span></td>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar">17</span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-18T22_19_54.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-19T22_03_49.txt">19</a></span></td>
+<td align="center"><span class="calendar">20</span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-22T06_53_50.txt">22</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-23T22_03_01.txt">23</a></span></td>
+<td align="center"><span class="calendar">24</span></td>
+</tr>
+<tr>
+     
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-25T20_11_22.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href="2006-06.html#e2006-06-26T07_21_06.txt">26</a></span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar">28</span></td>
+<td align="center"><span class="calendar">29</span></td>
+<td align="center"><span class="calendar">30</span></td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<br clear="all" />
+
+</body>
+</html>

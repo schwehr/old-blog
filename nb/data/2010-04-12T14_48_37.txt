@@ -1,0 +1,56 @@
+TITLE: Processing large amounts of AIS information
+AUTHOR: Kurt
+DATE: 04.12.2010 14:48
+DESC: suggestions
+-----
+BODY:
+I just got a request Bill Holton for thoughts about how to go about
+tackling large amounts of AIS vessel position information using
+noaadata.  This fits in well with a paper that I am working on right now.
+<pre>...
+I have downloaded the noaadata-py tools you have graciously put together
+and have the code working to import the data into Postgres\Postgis.
+However, I do have a question regarding the most efficient way to
+import the data and was hoping you might be able to lead me in the
+right direction.  I need to import the coordinates and ship type from
+all stations to produce ship counts per grid cell.  However, it is
+taking over 24 hours to import a single day into the database using
+the ais-process-day.bash script.  I have also tried generating a csv
+file of just the information I need from the rawdata, but it was
+taking longer than 24 hours to convert a single day of rawdata.  This
+would not be an issue if I was only working with a few days of data,
+but the project requires analysis on a year's worth of data.  Do you
+have any suggestions for importing the data more effectively?</pre>
+Here are some thoughts on how to get through the data more efficiently
+and some of the processing issues that come up:
+
+Consider using something other than noaadata.  My software is research
+code and I have some very fast computers that optimize my time rather
+than the compute power required.  Alternatives include (but are not
+limited to) <a href="http://gpsd.berlios.de/">GPSD</a>,
+devtools/ais.py in GPSD if you want to stick with pure python, <a
+href="http://www.freeais.org/">FreeAIS</a>, etc.  You can purchase a C
+library to parse AIS.  Or better yet, write your own if you are coder.
+
+If you are sticking with noaadata, first remove all messages that do
+not matter.  You can use <b>egrep 'AIVDM,1,1,,[AB],[1-3]'</b> to
+extract only the position messages.  Then consider running
+ais_nmea_remove_dups.py with a lookback of something like 5-10K lines
+(-l 10000).  Finally, consider using ais_build_sqlite rather than
+ais_build_postgis if you don't need PostGIS.  sqlite is definitely
+faster for just crunching raw numbers of lines.  Also, make sure that
+you replace BitVector.py in the ais directory with the latest version
+as Avi has released 1.5 that is much faster.
+
+If you want to stay with noaadata and are willing to write a little
+bit of python, you might consider looking in ais_msg_1.py and just
+converting the minimum number of NMEA characters and just decoding the
+fields you need.
+
+Remember to be very careful about using raw points from AIS.  There
+are all sorts of aliasing issues that come from transmission rates as
+ships move differently, aspect oriented transmission errors
+(e.g. smoke stacks clocking VHF), propagation changes, timestamp
+errors (or lack of timestamping), ships with bad GPSs, ships with
+bogus MMSI's, receiving the same message from multiple stations, and so on.
+-----

@@ -1,0 +1,38 @@
+TITLE: Tracking disk space usage over time on the Mac
+AUTHOR: Kurt
+DATE: 04.13.2010 15:12
+DESC: what is going on under the hood?
+-----
+BODY:
+We just had a Mac where the disk was suddenly full.  I never really
+figured out what was chewing up all the disk space, but I learned some
+really useful Mac specific tricks in the process after spending a
+while with du, df, lsof, find, and ls -a, and xargs.  With some help
+from the fink community (thanks Jack!), I tried out <a
+href="http://www.derlien.com/">Disk Inventory X</a>.  It takes a while
+to plow through your disk, but then is super easy to see what's going on
+space wise right now.
+
+<img title="Disk Inventory X" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/diskinventoryx.png"/>
+
+Then, I had the thought to use <a href="http://en.wikipedia.org/wiki/Time_Machine_%28Apple_software%29">Time Machine</a> to watch the differences
+between the backups.  That should definitely record what just started
+eating up disk space (assuming it wasn't in part of a disk that was
+marked to not be backed up).  TimeTracker (at <a href="http://charlessoft.com/">charlessoft.com</a> does a great job of giving a quick view into what has changed.
+
+<img title="TimeTracker to look into Time Machine backups" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/timetracker.png"/>
+
+I usually prefer command line ways to work.  While <a
+href="http://www.fernlightning.com/doku.php?id=software:misc:tms">tms</a>
+(described <a
+href="http://www.macgurulounge.com/see-which-files-time-machine-backed-up/">here</a>)
+looks like an awesome command line utility, the software is closed and
+appears to be dead.  However, in the future, it looks like <a
+href="http://code.google.com/p/timedog/">timedog</a> might be really
+useful.  And timedog is open source perl, so it won't just up and
+disappear.
+
+See also: <a href="http://www.macosxhints.com/article.php?story=20071109024812437">10.5: Compare Time Machine backups to original drive System 10.5</a> [macosxhints] and <a href="http://forums.macosxhints.com/showthread.php?p=579121">my question on the forums</a>
+-----

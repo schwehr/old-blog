@@ -1,0 +1,101 @@
+TITLE: A little help on decoding AIS messages
+AUTHOR: Kurt
+DATE: 02.18.2007 14:32
+DESC: the joy of codecs
+-----
+BODY:
+Here are some quick notes to help people decode AIS messages.  Thanks
+to Lam Lap for prompting me to write this quick message.  We
+definitely need libraries for a range of languages.  First we need an
+AIS message to use as a test case.
+<pre>!AIVDM,1,1,,A,34QiN:1001GWS7LBd1lt3GD20000,0*58,rb03660465,1171825441</pre>
+Now use my noaadata/ais scripts to decode the message.
+<pre>cd noaadata/ais/
+./ais_msg_3.py -d '!AIVDM,1,1,,A,34QiN:1001GWS7LBd1lt3GD20000,0*58,rb03660465,1171825441'
+position:
+        MessageID:           3
+        RepeatIndicator:     0
+        UserID:              303849000
+        NavigationStatus:    1
+        ROT:                 0
+        SOG:                 0.1
+        PositionAccuracy:    0
+        Position_longitude:  -117.1895766666666666666666667
+        Position_latitude:   32.65955166666666666666666667
+        COG:                 308.5
+        TrueHeading:         234
+        TimeStamp:           1
+        RegionalReserved:    0
+        Spare:               0
+        RAIM:                False
+        syncstate:           0
+        slottimeout:         0
+        slotoffset:          0
+</pre>
+In the ais directory, let's do a little from the ipython shell
+<pre>
+In [1]: msg='34QiN:1001GWS7LBd1lt3GD20000'
+In [2]: import binary
+</pre>
+The first character is the AIS message number.  Here it is 3 (which is
+a position message.
+<pre>
+In [3]: bv = binary.ais6tobitvec('3')
+In [4]: print bv
+000011
+In [5]: print int(bv)
+3
+</pre>
+One positive feature of the AIS NMEA encoding scheme is that the first
+character completely describes the message number and messages 1-9 are
+completely human readable.  From 10 on, the coding is not as easy to 
+remember.
+<pre> 
+In [6]: bv = binary.ais6tobitvec('D')
+In [7]: print bv
+010100
+In [8]: print int(bv)
+20
+</pre>
+I use a python dictionary (aka hash table) to lookup the associated values.
+<pre>
+In [10]: for key in binary.decode.keys():
+   ....:     print key, int(binary.decode[key])
+
+1 1
+0 0
+3 3
+2 2
+5 5
+4 4
+7 7
+6 6
+9 9
+8 8
+; 11
+: 10
+= 13
+< 12
+? 15
+> 14
+A 17
+@ 16
+C 19
+B 18
+E 21
+D 20
+</pre>
+And back to the original message, here are the bits
+<pre>
+In [11]: bv = binary.ais6tobitvec(msg)
+In [12]: print bv
+000011000100100001110001011110001010000001000000000000000001010111100111100011000111011100010010101100000001110100111100000011010111010100000010000000000000000000000000
+</pre>
+From which, we can slice off the first 6 bits to get the message number.
+<pre>
+In [13]: print bv[0:6]
+000011
+In [14]: print int(bv[0:6])
+3
+</pre>
+-----

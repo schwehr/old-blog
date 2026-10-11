@@ -1,0 +1,54 @@
+TITLE: isdraft
+AUTHOR: Kurt
+DATE: 07.12.2005 17:38
+DESC: template for draft
+-----
+BODY:
+Saw this post today.  I was thinking about the same kind of thing and
+was getting tempted to do some preprocessor magic.
+<pre>
+From: brotherelf -- at -- gmx.net (Ulrich M. Schwarz)
+
+"Jim Jim" <jpo**twentyfour**@cam.ac.uk> writes:
+
+> Where \isdraft is a command I've made up for the example (that I'd like to
+> have).
+
+Quick and dirty version:
+%% isdraft.sty starts here
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{isdraft}[2005/07/12 v0.2 isdraft.sty (ums)]
+\DeclareOption{draft}{\drafttrue}%
+\@ifundefined{ifdraft}{%
+ % it's all great, we don't know ifdraft
+ \newif\ifdraft
+ \draftfalse
+ \ProcessOptions\relax
+}{%
+ %oh my, isdraft is already defined as a command or boolean!
+ \PackageWarningNoLine{isdraft}{%
+   There already is a command ifdraft.\MessageBreak
+   I'm not touching it}
+}
+%% isdraft.sty ends here
+
+\documentclass[final]{report}
+\usepackage{isdraft}
+
+\ifdraft
+ \typeout{draft}
+\else
+ \typeout{final}
+\fi
+
+\begin{document}
+ Hello
+\end{document}
+
+As usual, the global option can be overridden by a package-option
+[final] or [draft].
+
+HTH
+ Ulrich
+</pre>
+-----

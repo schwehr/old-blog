@@ -1,0 +1,101 @@
+TITLE: EarthNC on the Mac
+AUTHOR: Kurt
+DATE: 05.08.2007 07:37
+DESC: quality control
+-----
+BODY:
+Yesterday, I finally got part of what I wanted from EarthNC.  I was trying to be
+able to see the Norfolk, VA area.  EarthNC works hard to obscure which
+chart is in which file.  This is fine if you are on Windows XP and
+willing to live with the standard EarthNC interface.  I need the ability to combined
+specific layers from each chart.  Here is roughly what I did.
+
+First I had to find where it put the files.  I forget exactly where
+that was, but I think it was under Program Files somewhere and then
+the path included "EarthNC/EarthNC Plus/charts".  Then you are faced
+with this mess:
+<pre>
+IJ3371LH39.kml          RC3848MX56.kml          ZS7417FS82.kmz
+IJ7715HG42.kml          RD1595IG14.kml          ZS7536HI55.kmz
+IK7757BI66.kml          RD2178ZX31.kml          ZS7608ST59.kml
+IL2229AB74.kml          RD2195FB33.kml          ZT1872MH86.kml
+IL3086JG33.kmz          RD5351LS55.kmz          ZT3836VE52.kml
+</pre>
+To find the Virgina charts, I did a grep on the KML files.  The KML
+files are all small wrappers that call into a KMZ that contains the
+chart data.
+<pre>
+grep US5VA * > list.txt
+</pre>
+After a little work in emacs, I ended up with this list:
+<pre>
+US5VA10M - Chesapeake Bay Wolf Trap To Pungoteague Creek MD1138SA94.kml
+US5VA11M - Approaches To Chesapeake Bay TH3562ZU56.kml    
+US5VA13M - Chesapeake Bay, Cape Charles To Norfolk Harbor VH8718FL19.kml  
+US5VA14M - Chesapeake Bay  Cape Charles To Wolf Trap AX8426VE64.kml    
+US5VA15M - Hampton Roads SL0300VN05.kml  
+US5VA16M - Chesapeake Bay YH5047EC02.kml 
+US5VA17M - Norfolk Harbor And Elizabeth River VK1266JV12.kml
+US5VA18M - Naval Amphibious Base Little Creek HW9495ZS03.kml
+US5VA19M - Chesapeake Bay, Cape Henry To Thimble Shoal Light FG8373ZD02.kml
+US5VA21M - Tangier Sound - Norhtern Part FI0171KL48.kml   
+US5VA22M - Potomac Piver  Chesapeake Bay To Piney Point AI2440WN57.kml
+US5VA24M - Chesapeake Bay, Mobjack Bay And York River Entrance AQ7582YA38.kml
+US5VA25M - James River TE5997SG68.kml  
+US5VA26M - Chesapeake Bay, Mobjack Bay And York River Entrance IZ7673GI75.kml
+US5VA27M - Potomac Piver  Chesapeake Bay To Piney Point CR2272FX93.kml
+US5VA32M - James River, Jordan Point To Richmond ZW4627HO25.kml 
+US5VA41M - Rappahannock River Entrance CW1176OH84.kml 
+US5VA51M - James River, Jamestown Island To Jordan Point CZ7696FC57.kml 
+US5VA60M - York River Yorktown And Vicinity XD1583YL35.kml    
+</pre>
+From there I had to find in the kml which kmz files I need.
+<pre>
+grep -h kmz *.kml | sort -u
+    <href>AO1430WW20.kmz</href>
+    <href>AZ2174QY22.kmz</href>
+    <href>BG7106YP13.kmz</href>
+...
+    <href>ZA1625ZT63.kmz</href>
+    <href>ZC4894SQ14.kmz</href>
+    <href>ZR5073PO97.kmz</href>
+</pre>
+After a bit of work, I finally figured out that I needed these files:
+<pre>
+CT0317TK46.kmz - Approaches to Chesapeake
+DO2607QT06.kmz - Chesapeake Bay, Cape Charles To Norfolk Harbor
+                   (north side of the mouth of the bay)
+KY2663NC06.kmz - Chesapeake Bay, Cape Henry (coming into the bay)
+SN1393YY09.kmz - James (useful to the west)
+YH6959XQ14.kmz - Norfolk Harbor and Elizabeth River
+ZC4894SQ14.kmz - Hampton Roads
+</pre>
+I then loaded these up and nuked a lot of layers, especially the
+soundings which can really clutter up the view.  Here are my results:
+
+<img src="http://schwehr.org/blog/attachments/2007-05/earthnc-struggles.png">
+
+A few of us spent a bit of time yesterday looking at the EarthNC
+charts and evaluating what they might be useful for.  The analysis
+applies to what should be on an ECDIS and how an ECDIS should be
+used/controlled.  The main issue was clutter.  The electronic charts
+frequently suffer from clutter issues.  There are so many layers that
+it is hard to find and enable/display the layers that are relevant.
+
+One interesting use of these types of visualizations is for quality
+control (QC) of the charts.  The requirement then becomes that the
+user must be able to know the provenience/history of both the ENC data
+and the reference imagery.  For example, here is a pier that does not
+match between the ENC and imagery.  Not displayed are the acquisition
+time of either.  Was this pier extended after the imagery was collected
+or has the pier been shorted?  There is no good mechanism in Google
+Earth for recording the position and possible issue to export back to
+systems like Pydro.  Perhaps the user could create a folder of
+thumbtacks and export KML that could be parsed by Pydro.  Not elegant,
+but it would work.
+
+<img src="http://schwehr.org/blog/attachments/2007-05/earthnc-qc.png">
+
+It is exciting to see products such as EarthNC come out.  What you
+using EarthNC for and how are you using it?
+-----

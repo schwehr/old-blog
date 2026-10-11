@@ -1,0 +1,153 @@
+TITLE: More pltsegy
+AUTHOR: Kurt
+DATE: 06.21.2005 15:46
+DESC: more picking and postscript
+-----
+BODY:
+I have been working a little more with pltsegy.  Now is when I really
+could use a G5 machine.  My lab book makes a nice prop for the laptop
+to help it cool.  I also turned the window fan on me and the laptop.
+Ouch it gets hot!
+
+Becca says that I need to say a bit more about picking the water
+bottom/sediment interface... When you run pltsegy with "device=16", it
+displays the seismic line on the screen (in an X11 window).  You can
+click with the mouse on the sed/water interface (or any layer that you
+are trying to map) and a small 'x' will appear.  Do this across the
+whole surface.  When you have finished this, press the "dump" button
+on the left and look in the window.  There will be some numbers that
+are also in the "pick.xtp" file.  The 1st column is the shotpoint and
+the 4th column is the time of the pick (time 0 is the chirp fish in
+the water).  Then you can use the awk script to make this a wbt input
+for sioseis.  I just altered the sioseis script to allow you to
+specify the wbt as an input file.  This will make things a little more
+scriptable with less emacs time.  I still need to make the shot range
+be selectable from the command line.  The new script gets run like this:
+<pre>
+./sioseis-wbt.bash bpsio04L04.sgy bpsio04L04-wbt02.sgy bpsio04L04-02.h2o
+</pre>
+Here is the script.  I have marked the `cat $WBTFILE` line in black,
+which is the key change (in addition to the command line arg
+checking/handling).
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+
+<font color="#444444"># First try at wbt
+</font>
+declare -ri <font color="#2040a0">EXIT_FAILURE</font>=1
+
+if [ <font color="#2040a0">$#</font> != 3 ] ; then
+  echo
+  echo <font color="#008000">&quot;  ERROR: Must specify 3 arguments.  Found <font color="#2040a0">$#</font>&quot;</font>
+  echo
+  echo <font color="#008000">&quot;  usage:  <font color="#2040a0">$0</font> [segy in file] [segy out file] [wbt-pick-file] &quot;</font> 
+  echo
+  echo <font color="#008000">&quot;  Example:&quot;</font>
+  echo <font color="#008000">&quot;    <font color="#2040a0">$0</font> basic.sgy basic-wbt.sgy basic-picks.h2o&quot;</font>
+  exit <font color="#2040a0">$EXIT_FAILURE</font>
+fi
+
+declare -r <font color="#2040a0">FNO</font>=<font color="#008000">&quot;80000&quot;</font>
+declare -r <font color="#2040a0">LNO</font>=<font color="#008000">&quot;89800&quot;</font>
+declare -r <font color="#2040a0">INFILE</font>=<font color="#2040a0">$1</font>
+declare -r <font color="#2040a0">OUTFILE</font>=<font color="#2040a0">$2</font>
+declare -r <font color="#2040a0">WBTFILE</font>=<font color="#2040a0">$3</font>
+
+<font color="#444444"># FIX: allow user to specify FNO and LNO
+</font>
+<font color="#444444">#procs diskin wbt gains header prout diskoa end</font>
+
+<font color="#444444">#cat &lt;&lt; eof1 </font>
+sioseis &lt;&lt; EOF
+<font color="#FF8800">
+procs diskin wbt gains header prout diskoa end
+diskin
+  ipath <font color="#2040a0">$INFILE</font> end
+end
+
+header 
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font>
+ l6 = l3 end
+end
+
+wbt
+<font color ="#000000">`cat $WBTFILE`</font>
+end
+
+wbt2
+ solrat 1.5 ses 0.049 0.05 sel 0.017 0.025 track 0.0005 end
+end
+
+
+wbt3
+ thres 0.000000005 track 0.005 end
+end
+
+filter
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftype 99  pass 150 6500 end
+end
+
+mix
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> type 1 weight 0.25 0.50 0.25 end
+end
+
+agc
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> winlen .005 pctagc 90 end
+end
+
+gains
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> addwb yes type 9 TGP
+    0.0000    01.0000
+    0.0001    05.0000
+    0.0100    10.0000
+    0.0200    40.0000
+    0.0300    50.0000
+    0.0350    60.0000
+    0.0400    55.0000
+    0.0500    40.0000 end
+end
+
+prout
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftr 0 ltr 1 noinc 100 end
+end
+
+diskoa
+ opath <font color="#2040a0">$OUTFILE</font> fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftr 0 ltr 1 end
+end
+
+end
+EOF</font>
+</pre>
+The next task to try out is writing to postscript with pltsegy.
+Postscript output will look a lot better than what you can do with
+just the screen.  The trick is to change the device in the pltsegy
+device from 16 to 15.  Remember that '{' is the comment character!
+<pre>
+       {device = 16; { X11 screen
+       device = 15; { postscript
+</pre>
+Run pltsegy and wait a while until it finishes.
+<pre>
+&gt; ls -l *.ps
+-rw-r--r--    1 schwehr  staff    101188928 Jun 21 15:27 bpsio04L04-wbt02.ps
+</pre>
+Now use ghostscript to create a tif file from the postscript file.
+This will take a long time.  Make sure your computer has proper cooling!
+<pre>
+  &gt; gs -sDEVICE=tiff24nc -r300 -sOutputFile=bpsio04L04-wbt02.tif bpsio04L04-wbt02.ps
+  convert bpsio04L04-wbt02.tif bpsio04L04-wbt02.png
+</pre>
+I am now trying to play with the shad argument.
+<ul>
+<li> -1 gives all black</li>
+<li>  0 gives all black</li>
+<li>  1 gives all black</li>
+<li>  2 gives all white</li>
+<li>  3 gives nothing</li>
+<li>  5 gives the usual reasonable plot</li>
+</ul>
+Is this because of how sioseis converts xstar to sioseis?  I made a
+plot with segydump.py, which I don't totally trust with float data
+yet.  That plot showed that all of the samples had positive values.
+Also, the level field in the pltsegy file only has positive values.
+-----

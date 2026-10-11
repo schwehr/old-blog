@@ -1,0 +1,187 @@
+TITLE: MBSystem 5.0.6 released
+AUTHOR: Kurt
+DATE: 02.21.2005 07:26
+DESC: opengl mbgrdviz
+-----
+BODY:
+Just found an email in my inbox from Dave Caress talking about the new
+features in the just released MB-System 5.0.6.  I am about to set
+forth on the task of getting it into fink.  In the meantime here is
+the email from Dave:
+
+<pre>
+  One new feature that is not strongly highlighted in the release
+  notice is the inclusion of MBgrdviz, an OpenGL based tool that
+  provides some simple visualization capabilities for GMT grid
+  files. Since MBgrdviz is not yet well documented, this note is
+  to provide some extra hints on building and using this new
+  program. MBgrdviz is essentially a demo and test program for a
+  visualization library called MBview that will be central to
+  several new MB-System tools now under development. These new
+  tools will include interactive project management, improved
+  bathymetry editing, and patch test tools in the relatively near
+  term.
+  
+  Since the visualization API depends on OpenGL as well as X11
+  and Motif, the install_makefiles script now includes an
+  OPENGLLIBS parameter. If you do not define (or comment out)
+  OPENGLLIBS, then install_makefiles will construct the Makefiles
+  structure so that MBview and MBgrdviz are not built. In this
+  case, the rest of the MB-System tools will build and install as
+  before. Thus, to build MBgrdviz, you must define the OPENGLLIBS
+  parameter properly for your system. The comments in the
+  install_makefiles script include appropriate settings for
+  MacOSX and IRIX.
+  
+  Since there is no real documentation yet, early users of
+  MBgrdviz will be determining if the interface is sufficiently
+  obvious to be used without documentation. Feedback on
+  ease-of-use will be appreciated.
+  
+  Here are some hints for using MBgrdviz:
+  
+  1. MBgrdviz can display up to ten instances, each potentially
+  displaying different grids. The program will work with grids
+  that are in geographic (longitude latitude) coordinates or in
+  projected coordinates systems (e.g. UTM eastings and
+  northings). However, the program will only recognize projected
+  coordinate system grids that have been made by mbgrid, as
+  mbgrid embeds the projection used in the grid file comments.
+  
+  2. Each grid is displayed in an MBview window with its own view
+  control widgets.
+  
+  3. The basic controls for display type are in the View
+  menu. Options include 2D or 3D display, setting the primary
+  data displayed in color (e.g. the topography in the primary
+  grid, the topographic slope, or an overly grid), shading style
+  (none, shading by illumination, shading by slope, shading using
+  an overlay grid such as backscatter), and turning topography
+  contours on or off.
+  
+  4. Interaction with the data is controlled by a number of mouse
+  modes; the mouse mode is set through the options in the Mouse
+  menu. Options include Pan & Zoom, Rotate Model, Rotate View,
+  Shading, Pick Area, Edit Sites, Edit Routes, and Pick Nav. If
+  the MBview window is resized large enough, a set of buttons
+  appears on the lower left that duplicates the Mouse menu
+  options, making it easier to switch modes. The top status
+  display box on the left always displays the mouse button
+  behaviour for the current mouse mode. So, in Pan & Zoom mode,
+  this box shows that the left button does pick operations, the
+  middle button does pan operations, and the right button does
+  zoom operations.
+  
+  5. The Rotate Model and Rotate View mouse modes are only
+  available when the data is displayed in 3D.
+  
+  6. The basic pick operation will pick a single point on the
+  topography, display a red X at that location, and show
+  information about the pick in the middle status box on the
+  left. If the user drags the cursor while the right button is
+  down, two points will be picked (the point where the button was
+  pressed and the point where the button was released), and the
+  two points will be displayed as red X's connected by a line
+  segment between the points. In 3D views this line will be
+  draped along the topography. The status window will show the
+  positions of both picks and the distance between them.
+  
+  7. The Pick Area mode allows regions and areas to be picked
+  interactively. In MBview, a region is rectangular with sides
+  that are oriented N-S and E-W in the grid coordinates, is
+  picked with the left button in Pick Area mode, and is displayed
+  as a yellow box. An area is an arbitrarily oriented rectangle
+  defined by dragging the middle button in Pick Area mode, and is
+  also displayed in yellow. The aspect ratio, and therefore the
+  width, of an active area can be altered by dragging the right
+  button up or down in Pick Area mode. In 3D views both region
+  and area bounds are draped on the topography.
+  
+  8. MBgrdviz also supports display of Sites, Routes, and
+  Navigation.  Sites and Routes may be created and altered
+  interactively in MBgrdviz, and can also be exported to files
+  and imported from files. Site and Route files created by
+  MBgrdviz include comments documenting the format. The
+  file-naming convention for Site files uses an *.ste suffix, and
+  an *.rte suffix for route files. Navigation is imported by
+  reading datalists of swath files supported by MB-System.
+  
+  9. The Edit Site mouse mode allows the user to select and move
+  sites with the left button, create new sites using the middle
+  button, and delete already selected sites using the right
+  button.
+  
+  10. The Edit Route mouse mode allows the user to select and
+  move route waypoints using the left button, create new route
+  waypoints using the middle button, and delete selected route
+  waypoints using the right button.
+  
+  11. Navigation may imported in two fashions from the Action
+  menu. The Open Navigation menu item allows a datalist to be
+  selected and opened; the program then reads the navigation in
+  each swath file referenced by the datalist and displays it as a
+  simple black navigation line. The Open Swath menu item also
+  reads navigation data from a datalist, but it causes the
+  program to also read and store the acrosstrack bounds of the
+  swath bathymetry associated with each navigation point, with
+  implications covered in point (12). In 3D views, the navigation
+  can be displayed using it's real vertical position (the
+  navigation tracks will usually display somewhere above the
+  topography), or it can displayed draped along the topography,
+  or both.
+  
+  12. The Pick Nav mouse mode allows the user to pick individual
+  nav points and to select and deselect arbitrary sections of the
+  navigation.  If the navigation has been imported using the Open
+  Navigation menu item, then the selected navigation will simply
+  be displayed in red, and information about the selected
+  navigation will appear in the middle status window on the
+  left. If the navigation has been imported using the Open Swath
+  menu item, then the selected navigation will also have the
+  bounds of the associated swath bathymetry displayed in
+  yellow. In 3D views, the swath bathymetry bounds will be draped
+  on the topography.
+  
+  13. MBgrdviz displays the topography in three
+  resolutions. Whenever an operation modifies the display, the
+  data will first be redrawn in low resolution, and then in a
+  high resolution. During operations involving mouse dragging
+  (e.g. panning, rotating, zooming, or two-point picking), the
+  display will be refreshed rapidly in low resolution, with the
+  high resolution display appearing once the operation is ended
+  by releasing the mouse. For large grids, the high resolution
+  display may not be at the full resolution of the grid. A full
+  resolution display can be obtained by clicking the Full button
+  below the middle status box on the left. The lower status
+  window on the left shows the current status of drawing the
+  display - typically users only see a "Done" status except
+  during full resolution drawing.
+  
+  14. The Reset button below the middle status box on the left
+  resets the display to the original scale and orientation.
+  
+  15. The Clear button below the middle status box on the left
+  clears any picks and selections.
+  
+  There are some known bugs in this first release version of
+  MBgrdviz:
+  
+  1. The Rotate View function simply doesn't work right. I don't
+  have the order of the OpenGL rotations set properly so that
+  Rotate View operations actually rotate the 3D display around
+  the user's viewpoint.
+  
+  2. There is a memory leak that produces error messages when
+  MBview instances are dismissed.
+  
+  3. In 3D displays the program tries to figure out what part of
+  the grid is actually in the display window so that it can skip
+  drawing areas that cannot be seen. MBgrdviz also then adjusts
+  the resolution used during low and high resolution drawing
+  accordingly. This allows the effective resolution to increase
+  as one zooms in on a particular area.  However, the current
+  algorithm frequently underestimates the viewable area, with the
+  result that visible parts of the grid are left undrawn.
+</pre>
+  
+-----

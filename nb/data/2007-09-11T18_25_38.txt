@@ -1,0 +1,56 @@
+TITLE: more evdo
+AUTHOR: Kurt
+DATE: 09.11.2007 18:25
+DESC: what more can I figure out?
+-----
+BODY:
+So the EVDO works fine in downtown Dover with 3 bars.  With the 2nd
+USB port in use, I have not gotten any more of the error 913/USB
+detach failures.
+<pre>
+<b>ifconfig ppp0</b>
+ppp0: flags=8051&lt;UP,POINTOPOINT,RUNNING,MULTICAST&gt; mtu 1500
+        inet 75.194.208.185 --&gt; 66.174.20.4 netmask 0xff000000 
+</pre>
+ping works...
+<pre>
+<b>sudo tcpdump -i ppp0 host vislab-ccom.unh.edu</b>
+18:04:58.254455 IP vislab-ccom.unh.edu &gt; 185.sub-75-194-208.myvzw.com: icmp 64: echo request seq 2
+18:04:58.254521 IP 185.sub-75-194-208.myvzw.com &gt; vislab-ccom.unh.edu: icmp 64: echo reply seq 2
+</pre>
+ping stats:
+<pre>
+14 packets transmitted, 14 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 59.036/78.931/84.076/5.875 ms
+</pre>
+But ssh does not... visualize empty space:
+<pre>
+</pre>
+The System Preferences "Network" pane sees it as a "Novatel Wireless
+CDMA," but the packaging says "Qualcomm 3G CDMA".  Then it says
+<pre>
+NationalAccess - BroadbandAccess is connected to #777. You are
+connected to the internet via Nationalaccess - BroadbandAccess.
+</pre>
+What does that mean?
+
+The interface that verizon provides is easy to use, but how do I set
+it up to automatically just go for the network?  Would be nice to have
+an optional menu bar widget to control this ranther than a big-ol-app.
+
+This interface controls to which network I am attached.  If 802.11 networks
+are around, they show up here too.
+
+<img src="http://schwehr.org/blog/attachments/2007-09/evdo-networks.png">
+
+It does give me a sense of how much network traffic I am generating so
+that I can see how close to 5 GB I am getting.
+
+<img src="http://schwehr.org/blog/attachments/2007-09/evdo-usage.png">
+
+the statistics page tells me a bit about my current connection.
+
+<img src="http://schwehr.org/blog/attachments/2007-09/evdo-stats.png">
+
+The router and IP seem to change all the time.  That is all I have for now.
+-----

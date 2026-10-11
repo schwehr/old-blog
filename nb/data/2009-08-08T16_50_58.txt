@@ -1,0 +1,71 @@
+TITLE: iPhone note files on the Mac
+AUTHOR: Kurt
+DATE: 08.08.2009 16:50
+DESC: parsing in python
+-----
+BODY:
+I've been attempting to take some notes on the iPhone to see what I think
+of the platform.  I synced the iPhone to my mac and tried looking for some
+place that might be hiding the notes.  Turns out it is in the Mail app:
+<pre>% <b>ls ~/Library/Mail/Mailboxes/Notes.mbox/Messages</b>
+29343.emlx  29345.emlx  29347.emlx  29349.emlx  29351.emlx  29353.emlx
+29344.emlx  29346.emlx  29348.emlx  29350.emlx  29352.emlx  29416.emlx</pre>
+Time to take a look at what is in a note:
+<pre><tt>616
+X-Uniform-Type-Identifier: com.apple.mail-note
+Message-Id: &lt;693D209C-19BF-4687-BD99-DAC020E4ECDD@gateway.2wire.net&gt;
+From: =?MACINTOSH?Q?Kurt=D5s_iPhone?=
+Content-Type: text/html;
+	charset=US-ASCII
+X-Universally-Unique-Identifier: 86207fd8-541f-434f-a374-84a9e6f735d9
+Content-Transfer-Encoding: 7bit
+X-Mail-Generated-Subject: YES
+X-Mail-Created-Date: 2009-07-19 15:47:26 -0700
+Mime-Version: 1.0 (Apple Message framework v935.3)
+Subject: =?MACINTOSH?Q?=CAerrands?=
+Date: 2009-07-24 15:51:48 -0700
+<!-- -->
+mongolian beef<b><font color="#0000FF">&lt;div&gt;</font></b>muffins<b><font color="#000080">&amp;nbsp;</font></b><b><font color="#0000FF">&lt;/div&gt;&lt;div&gt;</font></b>waffles<b><font color="#0000FF">&lt;/div&gt;&lt;div&gt;</font></b>milk<b><font color="#0000FF">&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;</font></b>
+<b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#000080">&lt;!DOCTYPE</font></b> <font color="#009900">plist</font> <font color="#009900">PUBLIC</font> <font color="#FF0000">"-//Apple//DTD PLIST 1.0//EN"</font> <font color="#FF0000">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</font><b><font color="#000080">&gt;</font></b>
+<b><font color="#0000FF">&lt;plist</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;dict&gt;</font></b>
+	<b><font color="#0000FF">&lt;key&gt;</font></b>date-sent<b><font color="#0000FF">&lt;/key&gt;</font></b>
+	<b><font color="#0000FF">&lt;real&gt;</font></b>1248475908<b><font color="#0000FF">&lt;/real&gt;</font></b>
+	<b><font color="#0000FF">&lt;key&gt;</font></b>flags<b><font color="#0000FF">&lt;/key&gt;</font></b>
+	<b><font color="#0000FF">&lt;integer&gt;</font></b>33751169<b><font color="#0000FF">&lt;/integer&gt;</font></b>
+	<b><font color="#0000FF">&lt;key&gt;</font></b>sender<b><font color="#0000FF">&lt;/key&gt;</font></b>
+	<b><font color="#0000FF">&lt;string&gt;</font></b>Kurt's iPhone<b><font color="#0000FF">&lt;/string&gt;</font></b>
+	<b><font color="#0000FF">&lt;key&gt;</font></b>subject<b><font color="#0000FF">&lt;/key&gt;</font></b>
+	<b><font color="#0000FF">&lt;string&gt;</font></b>errands<b><font color="#0000FF">&lt;/string&gt;</font></b>
+	<b><font color="#0000FF">&lt;key&gt;</font></b>to<b><font color="#0000FF">&lt;/key&gt;</font></b>
+	<b><font color="#0000FF">&lt;string&gt;&lt;/string&gt;</font></b>
+<b><font color="#0000FF">&lt;/dict&gt;</font></b>
+<b><font color="#0000FF">&lt;/plist&gt;</font></b></tt></pre>
+This is almost an RFC822 message.  I just need to remove that first line that is the message size(right?).
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> email
+<b><font color="#000080">import</font></b> sys
+<!-- -->
+em_file <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font>sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">])</font>
+em_file<font color="#990000">.</font><b><font color="#000000">readline</font></b><font color="#990000">()</font>
+em <font color="#990000">=</font> email<font color="#990000">.</font><b><font color="#000000">message_from_file</font></b><font color="#990000">(</font>em_file<font color="#990000">)</font>
+<!-- -->
+content <font color="#990000">=</font> <font color="#990000">[]</font>
+<b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> em<font color="#990000">.</font><b><font color="#000000">get_payload</font></b><font color="#990000">().</font><b><font color="#000000">splitlines</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">if</font></b> <font color="#FF0000">'&lt;?xml version="1.0" encoding="UTF-8"?&gt;'</font> <font color="#990000">==</font> line<font color="#990000">.</font><b><font color="#000000">strip</font></b><font color="#990000">():</font>
+        <b><font color="#0000FF">break</font></b>
+    content<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>line<font color="#990000">)</font>
+<!-- -->
+results <font color="#990000">=</font> <font color="#FF0000">''</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>content<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> results</tt></pre>
+After doing <i>fink install html2text</i>, I can parse my message:
+<pre>% <b>./notes.py 29344.emlx | html2text</b>
+mongolian beef
+muffins 
+waffles
+milk</pre>
+All this because I use Thunderbird and don't want to open mail or to email
+notes to myself.
+-----

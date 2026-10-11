@@ -1,0 +1,46 @@
+TITLE: Finding a vessel's MMSI
+AUTHOR: Kurt
+DATE: 10.21.2008 10:33
+DESC: it is a bit of work, but can be done
+-----
+BODY:
+When you don't have the right MMSI for a vessel, you have to go through
+the shipdata AIS messages to try to find the vessel's name.  Here is how
+I did it for one vessel.  First get the all the 2 part AIS messages from the
+stations that you know are in the area.  The station is after the normal AIS
+message in a USCG formatted AIS message log.
+<pre>for file in ais-logs-*.bz2; do
+    echo $file
+    base=${file%%.bz2}
+    bzcat $file | egrep 'station1|station2|station3' | egrep 'AIVDM,2,[12],[0-9]?,[AB],' &gt;&gt; 2parts
+done</pre>
+Now you need to normalize the AIS messages such that they are one line each.
+<pre>cat 2parts | ais_normalize.py -t -w 10 > 2parts.norm</pre>
+You only want the msg 5/shipdata messages.
+<pre>egrep '!AIVDM,1,1,[0-9]?,[AB],5'  2parts.norm > 2parts.norm.5</pre>
+Then create a sqlite3 database of these shipdata messages.
+<pre>ais_build_sqlite.py  -C 2parts.norm.5 -d shipdata.db3</pre>
+Now look for your vessel by a partial name.
+<pre>% <b>sqlite3 shipdata.db3 'select userid,name,callsign from shipdata where name like "%ODYSSEA%" LIMIT 5;'</b>
+338208000|ODYSSEA GIANT       |WCZ7319
+338208000|ODYSSEA GIANT       |WCZ7319
+338208000|ODYSSEA GIANT       |WCZ7319
+338208000|ODYSSEA GIANT       |WCZ7319
+338208000|ODYSSEA GIANT       |WCZ7319
+</pre>
+Now I have the MMSI (aka UserID) for the Odyssea Giant.  Better yet, I can
+find out the basic stats of the vessel and if they have changed over the time period:
+<pre>% <b>sqlite3 shipdata.db3 'select userid, imonumber, callsign, name, \
+   shipandcargo, dimA+dimB, dimC+dimD, destination, draught \
+   from shipdata where name like "%ODYSSEA%" ;' | sort -u</b>
+338208000|7408055|WCZ7319|ODYSSEA GIANT       |31|15|35|BOSTON MASS.        |13.5
+338208000|7408055|WCZ7319|ODYSSEA GIANT       |31|15|35|BOSTON MASS.        |3.5
+338208000|7408055|WCZ7319|ODYSSEA GIANT       |32|0|0|BOSTON MASS.        |3.9
+338208000|7408055|WCZ7319|ODYSSEA GIANT       |32|15|35|BOSTON MASS.        |3.5
+338208000|7408055|WCZ7319|ODYSSEA GIANT       |32|15|35|BOSTON MASS.        |3.9
+338208000|7408055|WCZ7319|ODYSSEA GIANT       |32|15|35|TUXPAN.MEX.         |3.9
+</pre>
+shipandcargo of 31 and 32 are as expected for this ship:
+<pre>31: towing
+32: towing length exceeds 200m or breadth exceeds 25m</pre>
+-----

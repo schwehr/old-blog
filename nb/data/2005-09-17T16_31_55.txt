@@ -1,0 +1,66 @@
+TITLE: A more automated approach
+AUTHOR: Kurt
+DATE: 09.17.2005 16:31
+DESC: a lot nicer
+-----
+BODY:
+I now have a script that works for all sgy files in a directory.  It
+also creates the sqlite databases if they don't exists.  Note the name
+change from Shotpoint to EnsembleNo now that the databases are based
+off of the sioseis converted sgy files.  Now I just need to generate a
+sioseis file for finding the water bottom and some default gains.
+
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+declare -ri <font color="#2040a0">VERBOSITY</font>=2<font color="#FF8800"> # TRACE</font>
+
+<font color="#2040a0">project</font>=<font color="#008000">&quot;Eel_River_Basin&quot;</font>
+
+for file in *.sgy; do
+    echo
+    echo ========    <font color="#2040a0">$file</font>    ========
+    <font color="#2040a0">name</font>=${file%%.sgy}
+
+    <font color="#2040a0">db</font>=<font color="#008000">&quot;${file}.db&quot;</font>
+
+    if [ ! -f <font color="#2040a0">$db</font> ]; then
+	echo <font color="#008000">&quot;WARNING: missing database (<font color="#2040a0">$db</font>)... generating assuming SEGY REV 1&quot;</font>
+	segysql.py -f <font color="#2040a0">$db</font> <font color="#2040a0">$file</font> --<font color="#2040a0">verbosity</font>=<font color="#2040a0">$VERBOSITY</font> --warn-only
+    fi
+
+    <font color="#2040a0">ShotpointName</font>=EnsembleNo
+    <font color="#2040a0">minShot</font>=`sqlite <font color="#2040a0">$db</font> <font color="#008000">&quot;select min(<font color="#2040a0">$ShotpointName</font>) from segyTrace&quot;</font>`
+    <font color="#2040a0">maxShot</font>=`sqlite <font color="#2040a0">$db</font> <font color="#008000">&quot;select max(<font color="#2040a0">$ShotpointName</font>) from segyTrace&quot;</font>`
+    echo <font color="#008000">&quot;Shot range:      <font color="#2040a0">$minShot</font> ... <font color="#2040a0">$maxShot</font>&quot;</font>
+
+    <font color="#2040a0">minDelay</font>=`sqlite <font color="#2040a0">$db</font> 'SELECT min(Delay) FROM segyTrace'`
+    <font color="#2040a0">maxDelay</font>=`sqlite <font color="#2040a0">$db</font> 'SELECT max(Delay) FROM segyTrace'`
+    echo <font color="#008000">&quot;delay range:     <font color="#2040a0">$minDelay</font> ... <font color="#2040a0">$maxDelay</font>&quot;</font>
+
+    <font color="#2040a0">TraceSamples</font>=`sqlite <font color="#2040a0">$db</font> 'SELECT min(TraceSamples) FROM segyTrace'`
+    <font color="#2040a0">SampleInterval</font>=`sqlite  <font color="#2040a0">$db</font> 'select max(sampleinterval) from segyTrace'`
+    <font color="#2040a0">SampleInterval</font>=`python -c <font color="#008000">&quot;print \&quot;%.7f\&quot; %(<font color="#2040a0">$SampleInterval</font> / 1000000.)&quot;</font>`
+    echo <font color="#008000">&quot;Sample Interval: <font color="#2040a0">$SampleInterval</font>&quot;</font>
+   <font color="#FF8800"> #SampleInterval=0.000083 # Force if reading SampleInterval from xstar file.</font>
+
+    <font color="#2040a0">timeStart</font>=`python -c <font color="#008000">&quot;print \&quot;%0.2f\&quot; % (<font color="#2040a0">$minDelay</font>/1000.)&quot;</font>`
+    <font color="#2040a0">timeEnd</font>=`python -c <font color="#008000">&quot;print (<font color="#2040a0">$maxDelay</font>/1000. + <font color="#2040a0">$SampleInterval</font> * <font color="#2040a0">$TraceSamples</font>)&quot;</font>`
+    echo <font color="#008000">&quot;Time range:      <font color="#2040a0">$timeStart</font> ... <font color="#2040a0">$timeEnd</font>&quot;</font>
+
+    <font color="#2040a0">pltWidth</font>=350<font color="#FF8800"> # The default</font>
+   <font color="#FF8800"> # Screen width / number of shots we want to see</font>
+    <font color="#2040a0">spa</font>=`python -c <font color="#008000">&quot;print \&quot;%.2f\&quot; % (<font color="#2040a0">$pltWidth</font>/float(<font color="#2040a0">$maxShot</font>-<font color="#2040a0">$minShot</font>))&quot;</font>`
+    echo <font color="#008000">&quot;Spacing:         <font color="#2040a0">$spa</font>&quot;</font>
+
+   <font color="#FF8800"> # SPA of 0.5 showed some
+    # FIX: how to calculate a good timescale?
+    #      time scale. The scale for the time axis in mm./second.</font>
+    echo
+    makepltsegy.py --<font color="#2040a0">verbosity</font>=<font color="#2040a0">$VERBOSITY</font> -o <font color="#2040a0">$name</font>.pltsegy -i <font color="#2040a0">$name</font>.sgy \
+	-s <font color="#2040a0">$minShot</font> -S <font color="#2040a0">$maxShot</font> \
+	--<font color="#2040a0">spa</font>=<font color="#2040a0">$spa</font> --<font color="#2040a0">timescale</font>=400 \
+	--<font color="#2040a0">tbi</font>=<font color="#2040a0">$timeStart</font> --<font color="#2040a0">tfi</font>=<font color="#2040a0">$timeEnd</font> \
+	--<font color="#2040a0">title</font>=<font color="#008000">&quot;<font color="#2040a0">$project</font> <font color="#2040a0">$name</font> <font color="#2040a0">$minShot</font> ... <font color="#2040a0">$maxShot</font>&quot;</font>
+done
+</pre>
+-----

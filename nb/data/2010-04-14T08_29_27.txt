@@ -1,0 +1,49 @@
+TITLE: Healy's science sensors back in the feed
+AUTHOR: Kurt
+DATE: 04.14.2010 08:29
+DESC: more data from sea
+-----
+BODY:
+If anyone is interested in a fun dataset to make visualizations from,
+I've put a copy of <a
+href="http://vislab-ccom.unh.edu/~schwehr/healy/20100417-healy-sqlite.db3.bz2">20100417-healy-sqlite.db3.bz2</a>.
+There are 2756 summary reports in the database from 2009-04-28 through to today (with a big hole for the time in dry dock).  I would be really excited if someone would create code to produce a visualization using <a href="http://www.simile-widgets.org/timeplot/">SIMILE Timeplot</a>.
+Hopefully, I will get a chance to convert my code to using spatialite
+now that BABA has packaged it for fink!
+<pre><tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> healy_summary <font color="#990000">(</font>
+  heading REAL<font color="#990000">,</font> <i><font color="#9A1900">-- ashtech PAT heading in degrees</font></i>
+  lon REAL<font color="#990000">,</font> <i><font color="#9A1900">-- GGA position</font></i>
+  lat REAL<font color="#990000">,</font> <i><font color="#9A1900">-- GGA position</font></i>
+  ts <font color="#009900">TIMESTAMP</font><font color="#990000">,</font> <i><font color="#9A1900">-- ZDA</font></i>
+  depth REAL<font color="#990000">,</font> <i><font color="#9A1900">-- CTR depth_m in meters</font></i>
+  air_temp REAL<font color="#990000">,</font> <i><font color="#9A1900">-- ME[ABC] Deg C</font></i>
+  humidity REAL<font color="#990000">,</font> <i><font color="#9A1900">-- ME[ABC]</font></i>
+  pressure REAL<font color="#990000">,</font> <i><font color="#9A1900">-- ME[ABC] barometric pressure_mb (milli bar)</font></i>
+  precip REAL<font color="#990000">,</font> <i><font color="#9A1900">-- ME[ABC] milimeters</font></i>
+  sea_temp REAL<font color="#990000">,</font> <i><font color="#9A1900">-- STA Deg C</font></i>
+  speed REAL <i><font color="#9A1900">-- VTG speed knots</font></i>
+<font color="#990000">);</font></tt></pre>
+The science feed now has speed over ground (SOG), sea &amp; air temps, humidity and pressure coming back : <a href="http://vislab-ccom.unh.edu/~schwehr/healy/healy-science-google.rss">healy-science-google.rss</a> e.g.:
+
+<a href="http://maps.google.com/maps?q=http://vislab-ccom.unh.edu/%7Eschwehr/healy/healy-science-google.rss&amp;ll=48.1889208333,-122.994923333&amp;t=h&amp;z=6">Google Map View</a>
+
+<table border="1">
+<tr bgcolor="red"><th>Field</th> <th>Value</th> <th>Units</th> </tr>
+<tr><th align="left">UTC time</th> <th align="right">2010-04-14 00:30:01</th> <th>UTC</th> </tr>
+<tr><th align="left">Longitude</th> <th align="right">-122.9949</th> <th>&deg;</th> </tr>
+<tr><th align="left">Latitude</th> <th align="right">48.1889</th> <th>&deg;</th> </tr>
+<tr><th align="left">Heading</th> <th align="right">None</th> <th>&deg; True</th> </tr>
+<tr><th align="left">Speed over ground</th> <th align="right">9.6</th> <th>knots</th> </tr>
+<tr><th align="left">Water Depth</th> <th align="right">None</th> <th>m</th></tr>
+<tr><th align="left">Sea temp</th> <th align="right">12.59</th> <th>&deg; C</th></tr>
+<tr><th align="left">Air Temp</th> <th align="right">12.11</th> <th>&deg; C</th></tr>
+<tr><th align="left">Humidity</th> <th align="right">70.46</th> <th>%</th> </tr>
+<tr><th align="left">Presure</th> <th align="right">1011.38</th> <th>millibar</th> </tr>
+<tr><th align="left">Precipitation</th> <th align="right">None</th> <th>mm</th> </tr>
+</table>
+
+I actually prefer the Google Maps view...
+
+<img title="Healy Met data in Google Maps" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/healy-met-data-googlemaps.png"/>
+-----

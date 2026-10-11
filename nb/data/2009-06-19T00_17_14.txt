@@ -1,0 +1,39 @@
+TITLE: Beginning Python Visualization
+AUTHOR: Kurt
+DATE: 06.19.2009 00:17
+DESC: what gives?
+-----
+BODY:
+I just got a copy of <a
+href="http://books.slashdot.org/article.pl?sid=09/05/27/1327255">Beginning
+Python Visualization</a>.  I really like the book and am learning a
+lot.  However, I'm either missing something or there needs to be more
+errata.  For example in chapter 4, there is some weird array syntax.  I
+tried downloading the source, but it is the same text.  
+<pre><tt>yearday <font color="#990000">=</font> <b><font color="#000000">zeros</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>values<font color="#990000">[:,</font> <font color="#993399">0</font><font color="#990000">]))</font></tt></pre>
+When I try to run the example, there is no data file in the data directory:
+<pre>% <b>python2.5 stock_charts.py</b>
+Traceback (most recent call last):
+  File "stock_charts.py", line 11, in &lt;module%gt;
+    for row in csv.reader(open(filepath), delimiter='\t'):
+IOError: [Errno 2] No such file or directory: '../data/charts.xls'</pre>
+I typed in the data and the code ran just fine.  And the indexing that
+was confusing was from the world of numpy and arrays - specifically
+multi-dimensional arrays.
+<pre>% <b>python</b>
+&gt;&gt;&gt; <b>import numpy
+&gt;&gt;&gt; <b>numpy.arange(36).reshape(6,6)</b>
+array([[ 0,  1,  2,  3,  4,  5],
+       [ 6,  7,  8,  9, 10, 11],
+       [12, 13, 14, 15, 16, 17],
+       [18, 19, 20, 21, 22, 23],
+       [24, 25, 26, 27, 28, 29],
+       [30, 31, 32, 33, 34, 35]])
+&gt;&gt;&gt; <b>a = numpy.arange(36).reshape(6,6)</b>
+&gt;&gt;&gt; <b>a[:,2]</b> # Slice out a column
+array([ 2,  8, 14, 20, 26, 32])</pre>
+The book could have used a bit more of an introduction to arrays earlier
+or at least refer forward to the section.  N-Dimensional Arrays comes
+at page 236 and I hit this on page 110.  Now that I know what I'm looking
+at, it makes good sense.
+-----

@@ -1,0 +1,40 @@
+TITLE: Timestamping and UTC
+AUTHOR: Kurt
+DATE: 06.15.2008 18:22
+DESC: ntp knows better than I do
+-----
+BODY:
+When properly using timestamps in python, you can indeed get UTC time.
+No fancy conversions needed.  All that is need is for NTP to actually
+be working (doh!)
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">#</font>
+<strong>import</strong> <font color="#2040a0">time</font>
+<strong>import</strong> <font color="#2040a0">datetime</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="#008000">'     date now: '</font>,
+<font color="#2040a0">sys</font>.<font color="#2040a0">stdout</font>.<font color="#2040a0">flush</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">os</font>.<font color="#2040a0">system</font> <font color="4444FF">(</font><font color="#008000">'date'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="#008000">'utc date now: '</font>,
+<font color="#2040a0">sys</font>.<font color="#2040a0">stdout</font>.<font color="#2040a0">flush</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">os</font>.<font color="#2040a0">system</font> <font color="4444FF">(</font><font color="#008000">'date -u'</font><font color="4444FF">)</font>
+<font color="#2040a0">sys</font>.<font color="#2040a0">stdout</font>.<font color="#2040a0">flush</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">now</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>print</strong>
+<strong>print</strong> <font color="#008000">'timestamp:'</font>, <font color="#2040a0">now</font>
+<strong>print</strong>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="#008000">'    date from timestamp:'</font>,<font color="#2040a0">datetime</font>.<font color="#2040a0">datetime</font>.<font color="#2040a0">fromtimestamp</font><font color="4444FF">(</font><font color="#2040a0">now</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'UTC date from timestamp:'</font>,<font color="#2040a0">datetime</font>.<font color="#2040a0">datetime</font>.<font color="#2040a0">utcfromtimestamp</font><font color="4444FF">(</font><font color="#2040a0">now</font><font color="4444FF">)</font>
+</pre>
+Here is a run of the script plus the screen capture from a flight tool
+that shows UTC.  It took me and the computer just over a second to get
+from running the command to doing the screen grab.
+<img src="http://schwehr.org/blog/attachments/2008-06/timestamping.png"/>
+-----

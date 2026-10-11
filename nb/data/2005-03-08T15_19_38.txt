@@ -1,0 +1,42 @@
+TITLE: Super simple gnuplot-py example
+AUTHOR: Kurt
+DATE: 03.08.2005 15:19
+DESC: gnuplot-py is nice
+-----
+BODY:
+My first ever gnuplot-py program:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">Gnuplot</font>
+
+<font color="#2040a0">g</font> <font color="4444FF">=</font> <font color="#2040a0">Gnuplot</font>.<font color="#2040a0">Gnuplot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">g</font>.<font color="#2040a0">title</font><font color="4444FF">(</font><font color="#008000">'Plot 1'</font><font color="4444FF">)</font>
+<font color="#2040a0">g</font><font color="4444FF">(</font><font color="#008000">&quot;set xlabel 'yo x label'&quot;</font><font color="4444FF">)</font>
+
+<font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#FF0000">1</font>,<font color="#FF0000">2</font>,<font color="#FF0000">3</font>,<font color="#FF0000">4</font>,<font color="#FF0000">5</font><font color="4444FF">]</font>
+<font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="#FF0000">1</font>,<font color="#FF0000">2</font>,<font color="#FF0000">2</font>,<font color="#FF0000">3</font>,<font color="#FF0000">2.5</font><font color="4444FF">]</font>
+<font color="#2040a0">gData</font> <font color="4444FF">=</font> <font color="#2040a0">Gnuplot</font>.<font color="#2040a0">Data</font><font color="4444FF">(</font><font color="#2040a0">x</font>,<font color="#2040a0">y</font>,<font color="#2040a0">with</font><font color="4444FF">=</font><font color="#008000">'lp'</font><font color="4444FF">)</font>
+<font color="#2040a0">g</font>.<font color="#2040a0">plot</font><font color="4444FF">(</font><font color="#2040a0">gData</font><font color="4444FF">)</font>
+</pre>
+Okay, so this is nothing special and I have been using gnuplot
+extensively while working on my thesis.  Why this is exciting to me is
+that I was swimming in a pool of little space delimited ascii data
+files.  There are 10's of little routines running around my thesis cvs
+tree that just read some sort of database and turn around to write
+little text files.  There there are maybe 50 gnuplot files that try to
+plot all this.  I constant do "make clean" do nuke all of them and I
+have come up with lots of silly extensions for them...
+<pre>
+   .ddi     ---  depth dec inc
+   .di	    ---  dec inc
+   .dt      ---  depth and a text string
+   t123     ---  for AMS Tau 1,2, and 3
+   f12-f23  ---  F test
+   susc     ---  Bulk susceptibility
+   etc.
+</pre>
+This is getty pretty darn messy.  I would rather just have the dumped
+pdf plots.  Gnuplot-py will now make these plots without every leaving
+any of these droppings on my filesystem.  I am starting to think about
+xcore-py which would make generating inventor models a snap.
+-----

@@ -1,0 +1,82 @@
+TITLE: segy python sqlite simple example
+AUTHOR: Kurt
+DATE: 05.26.2005 10:02
+DESC: sqlite db works nicely
+-----
+BODY:
+This is an example of how to quickly create an sqlite database using
+segy python and the sqlite module.  This is nothing fancy and it is
+missing 99.9% of all the information available, but it is small and
+thus easier to understand (I hope).  First the code.  This is the
+previous example, but with a little extra sqlite code.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">segy</font> <strong>import</strong> <font color="#2040a0">Segy</font>
+<strong>import</strong> <font color="#2040a0">sqlite</font>
+
+<font color="#2040a0">dbFilename</font> <font color="4444FF">=</font> <font color="#008000">'bpsegy.db'</font>
+<font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#2040a0">dbFilename</font><font color="4444FF">)</font>
+<font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+<font color="#444444"># traceCount is the trace offset in a file</font>
+<font color="#2040a0">createStr</font>  <font color="4444FF">=</font> <font color="#008000">&quot;CREATE TABLE traces&quot;</font>
+<font color="#2040a0">createStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; ( traceCount INTEGER, lat REAL, long REAL );&quot;</font>
+<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">createStr</font><font color="4444FF">)</font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+<font color="#2040a0">xstar</font> <font color="4444FF">=</font> <font color="#2040a0">Segy</font><font color="4444FF">(</font><font color="#008000">'bpsio01L00.xstar'</font><font color="4444FF">)</font>
+
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">xstar</font>.<font color="#2040a0">getNumberOfTraces</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">traceHdr</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'X'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">traceHdr</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Y'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+
+    <font color="#2040a0">insertStr</font>  <font color="4444FF">=</font> <font color="#008000">&quot;INSERT INTO traces&quot;</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; (traceCount, lat,long)&quot;</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; VALUES&quot;</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; (&quot;</font> <font color="4444FF">+</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; ,&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">)</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; ,&quot;</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">y</font><font color="4444FF">)</font>
+    <font color="#2040a0">insertStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">&quot; );&quot;</font>
+    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">insertStr</font><font color="4444FF">)</font>
+
+<font color="#444444"># Flush this to the db... </font>
+<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Once this is run, you will now have a little sqlite database in the
+same directory.  Here is a simple query to look at a range of traces.
+<pre>
+  sqlite bpsegy.db "select * from traces where traceCount&gt;40 and \
+  traceCount&lt;50;" | tr '|' ' '
+
+  41 -120.101111111 34.4061111111
+  42 -120.101111111 34.4061111111
+  43 -120.101111111 34.4061111111
+  44 -120.101111111 34.4061111111
+  45 -120.101111111 34.4061111111
+  46 -120.101111111 34.4061111111
+  47 -120.101388889 34.4061111111
+  48 -120.101388889 34.4061111111
+  49 -120.101388889 34.4061111111
+</pre>
+That is it for now.
+
+Constantin Cranganu from Brooklyn College had an interesting over
+pressure poster this morning.
+
+The <a href="http://mbmgquake.mtech.edu/seismic_glossary.html">Seismic
+Glosary</a> is helping me get through the Sumatra talks.
+
+<a href="http://www.cia.gov/cia/publications/factbook/">CIA
+Factbook</a> - Just a reminder that it is still with us.
+
+<a
+href="http://os.newsforge.com/os/05/05/19/1946219.shtml?tid=6&tid=132">OSS
+on OSX</a> - this article covers fink too.
+
+<a
+href="http://www.networkworld.com/columnists/2005/052305schwartau.html">Windows
+guys gives up on MS Windows</a> - An amusing read about someone who
+has had it with Windows.
+-----

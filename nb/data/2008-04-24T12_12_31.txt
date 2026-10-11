@@ -1,0 +1,62 @@
+TITLE: noaadata for AIS analysis, quick and dirty
+AUTHOR: Kurt
+DATE: 04.24.2008 12:12
+DESC: where it is at right now
+-----
+BODY:
+Here is a quick check point on where I am for low level reporting of
+ships.  This is the easiest method.  My other method runs through
+PostGIS.
+
+First grab some data.  Use grep to only pull AIS VDM messages.  We
+don't need the control/status NMEA messages coming through the system.
+<pre>% <b>tail -50 uscg-logs-2008-04-24  | grep AIVDM > log.ais</b></pre>
+Now we need to convert the data such that each line contains exactly
+one message.  The input NMEA string has multiline messages
+(e.g. shipdata) that are just not good for parsing.  This violates the
+NMEA maximum line length, but that doesn't matter.
+<pre>% <b>ais_normalize.py log.ais > log.ais.norm</b></pre>
+Now dump the data into sqlite3.  We don't really care about the database
+other than as an intermediate format.
+<pre>% <b>ais_build_sqlite.py --with-create log.ais.norm</b>
+processing file: log.ais.norm
+{1: 32, 2: 0, 3: 1, 4: 0, 5: 4}</pre>
+That give use 33 position messages (1, 2, and 3) and 4 shipdata messags (5)
+Note that at the moment the is a bug with the timestamps.  I know, but
+haven't had a chance to fix it.  Also take a look at sqlite3 that uses
+the sqlite3 driver built into python(>2.5).
+
+The data is now easily accessable, but not human readable.  Time to
+dump the database tables formatted somewhat nicely.  This will be tab
+delimited.  You can check out the full list of fields with <b>sqlite3
+ais.db3 .schema</b>.
+<pre>% <b>sqlite3 ais.db3 'SELECT UserID, longitude, latitude, SOG, COG FROM position LIMIT 5;' | tr '|' '\t'</b>
+316003289       -123.407461667  48.6886766667   0       191.5
+366779440       -122.35025      47.58955        0.1     169
+367326360       -122.382335     47.65756        0       213.3
+367152240       -122.403566667  37.8074216667   2.4     195.5
+693559  -70.624605      41.7375816667   0       15.6
+</pre>
+And the shipdata:
+<pre>s% <b>qlite3 ais.db3 'SELECT UserID, IMOnumber, callsign, name, shipandcargo, dimA,dimB,dimC,dimD, draught FROM shipdata;' | tr '|' '\t'  | tr '@' ' ' | sort -un</b>
+338046000       8978473 WDA8289 NRC CAPE FLATTERY       54      0       0       0       0       0
+367006060       1       WAV8350 ROYAL PRINCESS          60      7       30      4       5       2
+368609000       0       WBE4853 ADVENTURE               0       1       2       3       4       15
+636011280       9185047 ELYB2   UNITED SPIRIT           70      52      123     18      12      8.1
+</pre>The above command is a bit tricky.  The second <b>tr</b> (translate)
+changes the annoying '@' characters to spaces, making strings easier
+to read.  I also did a numberic and unique sort of the vessel UserID (aka MMSI)
+so that there is only one report per UserID.
+
+Now to make comma separated files (csv) for import to MS Excel, Numbers, gnumeric, oleo, or OpenOffice.
+<pre>% <b>echo "UserID, longitude, latitude, SOG, COG" > positions.csv</b>
+% <b>sqlite3 ais.db3 'SELECT UserID, longitude, latitude, SOG, COG FROM position;' | tr '|' ',' &gt;&gt; positions.csv</b>
+</pre>
+And for the ship name, size, and cargo message:
+<pre>
+% <b>echo "UserID, IMOnumber, callsign, name, shipandcargo, dimA,dimB,dimC,dimD, draught" &gt; shipdata.csv</b>
+% <b>sqlite3 ais.db3 'SELECT UserID, IMOnumber, callsign, name, shipandcargo, dimA,dimB,dimC,dimD, draught FROM shipdata;' | tr '|' ','  | tr '@' ' ' | sort -un &gt;&gt; shipdata.csv</b>
+</pre>
+Remember, this leaves out the Class B reports, not that we get many in the US yet.  See <a href="http://www.panbo.com/archives/2008/04/ais_this_n_that_7.html">AIS, this 'n' that #7</a> [Panbo] for commentary on the FCC not yet approving AIS Class B.
+
+ -----

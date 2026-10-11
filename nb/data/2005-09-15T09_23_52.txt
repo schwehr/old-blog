@@ -1,0 +1,56 @@
+TITLE: Trouble with Eel xstar data
+AUTHOR: Kurt
+DATE: 09.15.2005 09:23
+DESC: what is this error?
+-----
+BODY:
+I am still struggling with what is wrong the Eel data.  Here is the error message that I get.  Note the "impossible" just before the end.
+<pre>
+./xstar2segy.bash yr1999day217-2244z.xstar 
+converting yr1999day217-2244z.xstar to yr1999day217-2244z.sgy
+./sioseis.Darwin
+  SIOSEIS ver 2005.4 (20 May. 2005)(C) Regents of U.C.
+  
+ procs diskin xstar header diskoa end 
+  
+ diskin 
+     format edgetech 
+     ipath yr1999day217-2244z.xstar end 
+ end 
+  
+ xstar 
+    type 2 dummies 2 end 
+ end 
+  
+ header 
+      fno 0 lno 999999 ftr 0 ltr 999999 
+      l3 = l1 l6 = l3 end 
+ end 
+  
+ diskoa 
+   opath yr1999day217-2244z.sgy end 
+ end 
+  
+ end 
+ ****    0 ERRORS IN THIS JOB   ****
+  Dropping trace 2 due to different sample intervals.
+  <font color="red">impossible - icount =0 and its the same ping no</font>
+Done.
+</pre>
+I am going to try to write a segy slicer this morning to nuke traces.
+
+Here is the lsd of the data:
+<pre>
+lsd yr1999day217-2244z.xstar  | head
+      SHOT   TR       RP    TR ID  RANGE DELAY NSAMPS    SI   YR DAY HR MIN SEC
+         0     0       0     0  1      0    90   3976    40 1999 217 22  51  38
+         0     1       0     0  1      0    90   3976    40 1999 217 22  51  38
+         0     1       0     0  1      0    90   3976    41 1999 217 22  51  38
+         0     0       0     0  1      0    90   3976    41 1999 217 22  51  38
+         0     0       0     0  1      0    90   3976    41 1999 217 22  51  38
+         0     1       0     0  1      0    90   3976    41 1999 217 22  51  39
+         0     1       0     0  1      0    90   3976    41 1999 217 22  51  39
+         0     0       0     0  1      0    90   3976    41 1999 217 22  51  39
+         0     1       0     0  1      0    90   3976    41 1999 217 22  51  39
+</pre>
+-----

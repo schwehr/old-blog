@@ -1,0 +1,80 @@
+TITLE: Django security update
+AUTHOR: Kurt
+DATE: 12.22.2010 13:27
+DESC: asdf
+-----
+BODY:
+<b>Update 2010-Dec-23</b>:  I was behind a version.  <a href="http://pypi.python.org/pypi/Django/1.2.3">1.2.3</a> was from September.  <a href="http://pypi.python.org/pypi/Django/1.2.4">1.2.4</a> is the security update.  Sorry for the confusion.
+
+I just commited <a href="http://www.djangoproject.com/">Django</a>
+1.2.4 to fink unstable to fix the following two security issues with
+Django.  Please update your django installs in fink or elsewhere!
+<pre>Information leakage in Django administrative interface
+======================================================
+<!-- -->
+The Django administrative interface, django.contrib.admin, supports
+filtering of displayed lists of objects by fields on the corresponding
+models, including across database-level relationships. This is
+implemented by passing lookup arguments in the querystring portion of
+the URL, and options on the ModelAdmin class allow developers to
+specify particular fields or relationships which will generate
+automatic links for filtering.
+<!-- -->
+One historically-undocumented and -unofficially-supported feature has
+been the ability for a user with sufficient knowledge of a model's
+structure and the format of these lookup arguments to invent useful
+new filters on the fly by manipulating the querystring.
+<!-- -->
+As reported to us by Adam Baldwin, however, this can be abused to gain
+access to information outside of an admin user's permissions; for
+example, an attacker with access to the admin and sufficient knowledge
+of model structure and relations could construct querystrings which --
+with repeated use of regular-expression lookups supported by the
+Django database API -- expose sensitive information such as users'
+password hashes.
+<!-- -->
+To remedy this, django.contrib.admin will now validate that
+querystring lookup arguments either specify only fields on the model
+being viewed, or cross relations which have been explicitly
+whitelisted by the application developer using the pre-existing
+mechanism mentioned above. This is backwards-incompatible for any
+users relying on the prior ability to insert arbitrary lookups, but as
+this "feature" was never documented or supported, we do not consider
+it to be an issue for our API-stability policy. The release notes for
+Django 1.3 beta 1 -- which will include this change -- will, however,
+note this difference from previous Django releases.
+<!-- -->
+<!-- -->
+Denial-of-service attack in password-reset mechanism
+====================================================
+<!-- -->
+Django's bundled authentication framework, django.contrib.auth, offers
+views which allow users to reset a forgotten password. The reset
+mechanism involves generating a one-time token composed from the
+user's ID, the timestamp of the reset request converted to a base36
+integer, and a hash derived from the user's current password hash
+(which will change once the reset is complete, thus invalidating the
+token).
+<!-- -->
+The code which verifies this token, however, does not validate the
+length of the supplied base36 timestamp before attempting to convert
+it. An attacker with sufficient knowledge of a site's URL
+configuration and the manner in which the reset token is constructed
+can, then, craft a request containing an arbitrarily-large (up to the
+web server's maximum supported URL length) base36 integer, which
+Django will blindly attempt to convert back into a timestamp.
+<!-- -->
+As reported to us by Paul McMillan, the time required to attempt this
+conversion on ever-larger numbers will consume significant server
+resources, and many such simultaneous requests will result in an
+effective denial-of-service attack. Further investigation revealed
+that the password-reset code blindly converts base36 in multiple
+places.
+<!-- -->
+To remedy this, the base36_to_int() function in django.utils.http will
+now validate the length of its input; on input longer than 13 digits
+(sufficient to base36-encode any 64-bit integer), it will now raise
+ValueError. Additionally, the default URL patterns for
+django.contrib.auth will now enforce a maximum length on the relevant
+parameters.</pre>
+-----

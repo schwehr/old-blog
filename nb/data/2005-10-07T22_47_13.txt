@@ -1,0 +1,65 @@
+TITLE: gdal strangeness
+AUTHOR: Kurt
+DATE: 10.07.2005 22:47
+DESC: growl has a python interface?
+-----
+BODY:
+I just found a gdal python install on my machine that maybe I did??!!??
+<pre>
+ls -l /System/Library/Frameworks/Python.framework
+/Versions/2.3/lib/python2.3/site-packages/       
+total 792
+-rw-rw-r--    1 root     admin         119 Sep 13  2003 README
+-rw-r--r--    1 root     admin      357076 Jul 18  2004 _gdalmodule.a
+-rwxr-xr-x    1 root     admin        1026 Jul 18  2004 _gdalmodule.la
+-rwxr-xr-x    1 root     admin      293208 Jul 18  2004 _gdalmodule.so
+-rw-r--r--    1 root     admin       23718 Jul 18  2004 gdal.py
+-rw-r--r--    1 root     admin        3639 Jul 18  2004 gdalconst.py
+-rw-r--r--    1 root     admin        7882 Jul 18  2004 gdalnumeric.py
+-rw-r--r--    1 root     admin       26761 Jul 18  2004 ogr.py
+-rw-r--r--    1 schwehr  admin       53450 Oct  7 21:28 ogr.pyc
+-rw-r--r--    1 root     admin       21359 Jul 18  2004 osr.py
+</pre>
+But when I tried it, it was very unhappy.  The date is from before got
+this machine.  Maybe the initial setup migrated this from the last
+machine?  I am not sure, but it did not work.
+<pre>
+/usr/bin/python
+Python 2.3 (#1, Sep 13 2003, 00:49:11) 
+[GCC 3.3 20030304 (Apple Computer, Inc. build 1495)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; import ogr
+/System/Library/Frameworks/Python.framework/Versions/2.3/lib/python2.3/site-pac
+kages/ogr.py:117: FutureWarning: hex/oct constants &gt; sys.maxint will return pos
+itive values in Python 2.4 and up
+  wkbPoint25D = 0x80000001
+...
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+  File "/System/Library/Frameworks/Python.framework/Versions/2.3/lib/python2.3/
+site-packages/ogr.py", line 99, in ?
+    import _gdal
+ImportError: Failure linking new module: /usr/local/lib/libogdi31.dylib: dyld: 
+/usr/bin/python can't open library: /usr/local/lib/libogdi31.dylib  (No such fi
+le or directory, errno = 2)
+</pre>
+That's one of the troubles with the Mac OSX setup stuff.  I can't do a
+dpkg -S to ask where it came from.  So at least it is possible to
+build gdal with python support on mac osx.
+
+This evening I took a look at matplotlib.  It looks pretty nice.  I am
+thinking of using it for my Eel figures since it looks pretty
+powerful.  With the Santa Barbara / Gaviota Slide paper I pushed
+gnuplot to its very limits and beyond.
+
+Also, I (unitentionally) found stuff that says that growl, which is
+used by Adium and Fish, has a python interface.  It was not clear
+where to get it.  Then I found that fink has a perl growl interface.
+It would be cool to start to understand a little bit more how to
+interface with the mac.  I am totally torn between learning all the
+mac ins and outs, or sticking to stuff that I know can be cross
+platform (perhaps with some pain).
+
+Looks like the python growl code is in the developer tar.  FINK-TODO!  
+<a href=http://growl.info/downloads_developers.php">http://growl.info/downloads_developers.php</a>
+-----

@@ -1,0 +1,39 @@
+TITLE: postgis database manipulation
+AUTHOR: Kurt
+DATE: 07.02.2007 22:14
+DESC: blather
+-----
+BODY:
+I have been working hard to expand my understanding of SQL and more
+specifically PostgreSQL/PostGIS.  From what I have seen, there is a
+long way for me to go.  I feel like back in the day when Ulman was
+trying to teach us how to think in ML (aka metalizard, ocaml, etc) -
+the world of functional programming languages.  The first few weeks
+were strange and more than awkward.  But, by the end of the second
+semester, we could all think naturally in that weird recursion only
+land that not even lisp will take you to.  I wish I were past this
+clumsy stage.  I keep having to revert back to simple select calls
+from python and doing the real grunt work in the more traditional
+imperative styles.  XSLT for some of the XML work we are doing is also
+causing me to back track to these ideas that I have not through about
+in ages.
+
+As we used to say: 
+<pre>Real-time lisp on spacecraft... CDR CDR CDR CDR **Crash**</pre>
+The saying often goes that these kinds of non imperitive tools are
+"not for real work."  Just for academics.  That just is not true.  A
+different approach can completely alter the difficulty of a task.  I
+just need to start thinking in a more SQL-like way for these problems.
+The right tool for the right job.  Most of the Lisp Guys that I know
+switched to C++ for deployed code, yet many kept Lisp for small
+projects and for developing new ideas/algorithms.
+
+For example, "what do I need to index?"  I was trying to generate a
+transits table that breaks up each ship position records.  I
+continually pull groups of records from the position table based on
+the ship "userid" (AKA MMSI or radio ID number).  The run had taken 5
+hours and was less than half done on the 4.5M records that I was
+trying to crunch through.  I added an index on the userid.  After
+waiting just a couple minutes, the index creation was done and the
+second half of the data processing completed in under 10 minutes.
+-----

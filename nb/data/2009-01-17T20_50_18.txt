@@ -1,0 +1,104 @@
+TITLE: Combining JavaScript libraries with Django using fink
+AUTHOR: Kurt
+DATE: 01.17.2009 20:50
+DESC: it works
+-----
+BODY:
+I've started working again on getting JavaScript libraries into fink
+such that they can be used from Django.  The goal is to make it as
+easy as possible.  There is still going to be porting work if you
+switch platforms, but I am hoping to constrain it to editing just the
+project's settings.py.  Here is the lightnighting tour using James
+Bennett's Practical Django Projects book - up to page 26 in Chapter 3.
+James creates a basic flat page system and addes the <a href="http://tinymce.moxiecode.com/">TinyMCE</a>
+javascript library to the Admin editing of flatpages.  Present here
+without explanation...
+
+This is on Mac OSX 10.5.6 with Django 1.0.2.
+<pre>% <b>fink install django-py26</b>
+% <b>fink install tinymce-js</b>
+% <b>cd ~/Desktop</b>
+% <b>django-admin.py startproject django_tinymce_demo</b>
+% <b>mkdir -p templates/flatpages</b>
+% <b>cat &lt;&lt; EOF &gt; templates/flatpages/default.html</b>
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;{{ flatpage.title }}&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;{{flatpage.title}}&lt;/h1&gt;
+    {{ flatpage.content }}
+  &lt;/body&gt;
+&lt;/html&gt;
+EOF
+% <b>mkdir -p templates/admin/flatpages/flatpage</b>
+% <b>cp /sw/lib/python2.6/site-packages/django/contrib/admin/templates/admin/change_form.html \
+       templates/admin/flatpages/flatpage/</b>
+% <b>emacs templates/admin/flatpages/flatpage/change_form.html</b></pre>
+Just after this line:
+<pre>&lt;script type="text/javascript" src="../../../jsi18n/"&gt;&lt;/script&gt;</pre>
+Add these lines to change_form.html.  This tells the admin app to use
+the TineMCE editor with text areas for a flatpage change.
+<pre>&lt;!-- new change --&gt;
+&lt;script type="text/javascript" src="/javascript/tinymce/tiny_mce.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+tinyMCE.init({
+  mode: "textareas",
+  theme: "simple"
+});
+&lt;/script&gt;
+&lt;!-- END new change --&gt;</pre>
+Now edit settings.py.  Add these lines to the top of the file:
+<pre>import os.path
+PROJECT_DIR = os.path.dirname(__file__)
+<!-- -->
+JSPATH = '/sw/lib/javascript'</pre>
+And set these lines:
+<pre>DATABASE_ENGINE = 'sqlite3'
+DATABASE_NAME = 'demo.db3'</pre>
+I'm on the east coast, but you could leave this the way it is:
+<pre>TIME_ZONE = 'America/New_York'</pre>
+Set the template dirs and the installed apps:
+<pre>TEMPLATE_DIRS = (
+    <i>PROJECT_DIR+'/templates',</i>
+)
+<!-- -->
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    <i>'django.contrib.admin',
+    'django.contrib.flatpages',</i>
+)</pre>
+That concludes the changes to settings.py.  Now get everything setup in the urls.py:
+<pre>from django.conf.urls.defaults import *
+from settings import JSPATH # JavaScript location
+from django.contrib import admin
+admin.autodiscover()
+<!-- -->
+urlpatterns = patterns('',
+    (r'^admin/(.*)', admin.site.root),
+    (r'^javascript/(?P&lt;path&gt;.*)$', 'django.views.static.serve',
+     {'document_root': JSPATH}
+     ),
+    (r'',include('django.contrib.flatpages.urls')),
+)</pre>
+Time to get the django webserver going and start working with the admin interface.
+<pre>% <b>python manage.py syncdb</b>
+% <b>python manage.py runserver</b>
+% <b>open http://127.0.0.1:8000/admin/sites/site/1/</b></pre>
+In the Sites admin, change example.com to the settings for the test server:
+<pre>domain name: <i>127.0.0.1:8000</i>
+display name: <i>localhost</i></pre>
+Now create a flatpage:
+<pre>% <b>open http://127.0.0.1:8000/admin/flatpages/flatpage/</b></pre>
+Click <i>Add flat page</i> on the top right.  For the URL, make it <i>/test/</i>.
+Pick your 127.0.0.1:8000 site on the bottome left and 
+click <i>Save and continue editing</i>.  Finally, click <i>View on site</i>.
+
+While you were editing, you should see these icons at the bottom of
+the Content editing area. (<b>B</b> <i>I</i> <u>U</u> <del>ABC</del> ...)
+
+<img title="Django with TinyMCE from Fink" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/fink-django-tinymce.png"/>
+-----

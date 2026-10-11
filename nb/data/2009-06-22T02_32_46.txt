@@ -1,0 +1,113 @@
+TITLE: python generator for xml - gavia navigation
+AUTHOR: Kurt
+DATE: 06.22.2009 02:32
+DESC: what is best?
+-----
+BODY:
+I've been playing a bit more with the gavia navigation.  It comes as
+XML in a list of entries.  Here is what one entry looks like:
+<pre><tt><b><font color="#0000FF">&lt;entry</font></b> <font color="#009900">timestamp</font><font color="#990000">=</font><font color="#FF0000">"1186499188.996763000"</font> <font color="#009900">time</font><font color="#990000">=</font><font color="#FF0000">"2007 08  7 15:06:28.996"</font><b><font color="#0000FF">&gt;</font></b>
+  <b><font color="#0000FF">&lt;magnetic-deviation&gt;</font></b>18.5089<b><font color="#0000FF">&lt;/magnetic-deviation&gt;</font></b>
+  <b><font color="#0000FF">&lt;orientation&gt;</font></b>
+    <b><font color="#0000FF">&lt;heading&gt;</font></b>188.401<b><font color="#0000FF">&lt;/heading&gt;</font></b>
+    <b><font color="#0000FF">&lt;pitch&gt;</font></b>-0.933838<b><font color="#0000FF">&lt;/pitch&gt;</font></b>
+    <b><font color="#0000FF">&lt;roll&gt;</font></b>24.7852<b><font color="#0000FF">&lt;/roll&gt;</font></b>
+  <b><font color="#0000FF">&lt;/orientation&gt;</font></b>
+  <b><font color="#0000FF">&lt;position&gt;</font></b>
+    <b><font color="#0000FF">&lt;depth&gt;</font></b>0.0035894<b><font color="#0000FF">&lt;/depth&gt;</font></b>
+    <b><font color="#0000FF">&lt;lat&gt;</font></b>5052.2666N<b><font color="#0000FF">&lt;/lat&gt;</font></b>
+    <b><font color="#0000FF">&lt;lon&gt;</font></b>12144.4970W<b><font color="#0000FF">&lt;/lon&gt;</font></b>
+  <b><font color="#0000FF">&lt;/position&gt;</font></b>
+  <b><font color="#0000FF">&lt;sound-velocity&gt;</font></b>1490<b><font color="#0000FF">&lt;/sound-velocity&gt;</font></b>
+  <b><font color="#0000FF">&lt;valid&gt;</font></b>36415<b><font color="#0000FF">&lt;/valid&gt;</font></b>
+  <b><font color="#0000FF">&lt;variance&gt;</font></b>
+    <b><font color="#0000FF">&lt;var_lat&gt;</font></b>81.6767<b><font color="#0000FF">&lt;/var_lat&gt;</font></b>
+    <b><font color="#0000FF">&lt;var_lat_lon&gt;</font></b>0<b><font color="#0000FF">&lt;/var_lat_lon&gt;</font></b>
+    <b><font color="#0000FF">&lt;var_lon&gt;</font></b>81.6767<b><font color="#0000FF">&lt;/var_lon&gt;</font></b>
+  <b><font color="#0000FF">&lt;/variance&gt;</font></b>
+  <b><font color="#0000FF">&lt;velocity&gt;</font></b>
+    <b><font color="#0000FF">&lt;heave&gt;</font></b>0<b><font color="#0000FF">&lt;/heave&gt;</font></b>
+    <b><font color="#0000FF">&lt;surge&gt;</font></b>-0<b><font color="#0000FF">&lt;/surge&gt;</font></b>
+    <b><font color="#0000FF">&lt;sway&gt;</font></b>-0<b><font color="#0000FF">&lt;/sway&gt;</font></b>
+  <b><font color="#0000FF">&lt;/velocity&gt;</font></b>
+  <b><font color="#0000FF">&lt;zero-altitude&gt;</font></b>0<b><font color="#0000FF">&lt;/zero-altitude&gt;</font></b>
+<b><font color="#0000FF">&lt;/entry&gt;</font></b></tt></pre>
+I wrote some code that loops through
+looking for the beginning and ending entry tags and then passes
+the block to lxml.
+<pre><tt><b><font color="#0000FF">def</font></b> <b><font color="#000000">parse_entry</font></b><font color="#990000">(</font>entry_xml_text<font color="#990000">):</font>
+    et <font color="#990000">=</font> etree<font color="#990000">.</font><b><font color="#000000">XML</font></b><font color="#990000">(</font>entry_xml_text<font color="#990000">)</font>
+    entry<font color="#990000">={}</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>  <i><font color="#9A1900"># Crit entries... must have</font></i>
+        entry<font color="#990000">[</font><font color="#FF0000">'timestamp'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>et<font color="#990000">.</font>attrib<font color="#990000">[</font><font color="#FF0000">'timestamp'</font><font color="#990000">])</font>
+        entry<font color="#990000">[</font><font color="#FF0000">'datetime'</font><font color="#990000">]</font> <font color="#990000">=</font> datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">utcfromtimestamp</font></b><font color="#990000">(</font><b><font color="#000000">int</font></b><font color="#990000">(</font>entry<font color="#990000">[</font><font color="#FF0000">'timestamp'</font><font color="#990000">]))</font>
+        entry<font color="#990000">[</font><font color="#FF0000">'depth'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>et<font color="#990000">.</font><b><font color="#000000">xpath</font></b><font color="#990000">(</font><font color="#FF0000">'//*/depth'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">].</font>text<font color="#990000">)</font>
+        entry<font color="#990000">[</font><font color="#FF0000">'lon'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">parse_lon</font></b><font color="#990000">(</font>et<font color="#990000">.</font><b><font color="#000000">xpath</font></b><font color="#990000">(</font><font color="#FF0000">'//*/lon'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">].</font>text<font color="#990000">)</font>
+        entry<font color="#990000">[</font><font color="#FF0000">'lat'</font><font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">parse_lat</font></b><font color="#990000">(</font>et<font color="#990000">.</font><b><font color="#000000">xpath</font></b><font color="#990000">(</font><font color="#FF0000">'//*/lat'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">].</font>text<font color="#990000">)</font>
+    <b><font color="#0000FF">except</font></b> Exception<font color="#990000">,</font> e<font color="#990000">:</font>
+        <b><font color="#0000FF">return</font></b> None
+<!-- -->
+    <b><font color="#0000FF">for</font></b> field <b><font color="#0000FF">in</font></b> <font color="#990000">(</font><font color="#FF0000">'heading'</font><font color="#990000">,</font> <font color="#FF0000">'pitch'</font><font color="#990000">,</font> <font color="#FF0000">'roll'</font><font color="#990000">,</font> <font color="#FF0000">'sound-velocity'</font><font color="#990000">,</font>
+                  <font color="#FF0000">'var_lat'</font><font color="#990000">,</font><font color="#FF0000">'var_lon'</font><font color="#990000">,</font><font color="#FF0000">'valid'</font><font color="#990000">,</font> <font color="#FF0000">'magnetic-deviation'</font><font color="#990000">,</font> 
+                  <font color="#FF0000">'heave'</font><font color="#990000">,</font><font color="#FF0000">'sway'</font><font color="#990000">,</font><font color="#FF0000">'zero-altitude'</font><font color="#990000">):</font>
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            entry<font color="#990000">[</font>field<font color="#990000">]</font> <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>et<font color="#990000">.</font><b><font color="#000000">xpath</font></b><font color="#990000">(</font><font color="#FF0000">'//*/%s'</font> <font color="#990000">%</font> <font color="#990000">(</font>field<font color="#990000">,))[</font><font color="#993399">0</font><font color="#990000">].</font>text<font color="#990000">)</font>
+        <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">pass</font></b> <i><font color="#9A1900"># optional - try to grab these fields if available</font></i>
+<!-- -->
+    <b><font color="#0000FF">return</font></b> entry
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">nav_iter</font></b><font color="#990000">(</font>filename<font color="#990000">):</font>
+<i><font color="#9A1900">    '''generator for gavia navigation entries'''</font></i>
+    cache <font color="#990000">=</font> <font color="#990000">[]</font>
+    entries <font color="#990000">=</font> <font color="#990000">[]</font>
+    <b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">file</font></b><font color="#990000">(</font>filename<font color="#990000">):</font>
+        <b><font color="#0000FF">if</font></b> <font color="#FF0000">'&lt;entry'</font> <b><font color="#0000FF">in</font></b> line<font color="#990000">:</font>
+            cache <font color="#990000">=</font> <font color="#990000">[]</font>
+            cache<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>line<font color="#990000">)</font>
+            <b><font color="#0000FF">continue</font></b>
+    
+        cache<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>line<font color="#990000">)</font>
+        <b><font color="#0000FF">if</font></b> <font color="#FF0000">'&lt;/entry&gt;'</font> <b><font color="#0000FF">in</font></b> line<font color="#990000">:</font>
+            entry_xml <font color="#990000">=</font> <font color="#FF0000">''</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>cache<font color="#990000">)</font>
+            entry <font color="#990000">=</font> <b><font color="#000000">parse_entry</font></b><font color="#990000">(</font>entry_xml<font color="#990000">)</font>
+            <b><font color="#0000FF">if</font></b> entry <b><font color="#0000FF">is</font></b> <b><font color="#0000FF">not</font></b> None<font color="#990000">:</font>
+                yield entry  <i><font color="#9A1900"># Make this a generator so that we can iterate across entries</font></i>
+            cache <font color="#990000">=</font> <font color="#990000">[]</font>
+            <b><font color="#0000FF">continue</font></b>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+    <i><font color="#9A1900"># setup goes here</font></i>
+    <b><font color="#0000FF">for</font></b> entry <b><font color="#0000FF">in</font></b> <b><font color="#000000">nav_iter</font></b><font color="#990000">(</font>filename<font color="#990000">):</font> 
+        <b><font color="#0000FF">if</font></b> entry <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font>
+            <b><font color="#0000FF">continue</font></b>
+        <i><font color="#9A1900"># Do something with the entry dict here</font></i></tt></pre>
+This works pretty well, but I wanted to give a go at using the lxml event
+method of access, since it is likely to be more robust.
+<pre><tt><b><font color="#0000FF">def</font></b> <b><font color="#000000">nav_iter</font></b><font color="#990000">(</font>filename<font color="#990000">):</font>
+<i><font color="#9A1900">    '''generator for gavia navigation entries'''</font></i>
+    <b><font color="#0000FF">for</font></b> i<font color="#990000">,</font> <font color="#990000">(</font>event<font color="#990000">,</font> element<font color="#990000">)</font> <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>etree<font color="#990000">.</font><b><font color="#000000">iterparse</font></b><font color="#990000">(</font>filename<font color="#990000">,</font>events<font color="#990000">=(</font><font color="#FF0000">'end'</font><font color="#990000">,))):</font>
+        <b><font color="#0000FF">if</font></b> element<font color="#990000">.</font>tag <font color="#990000">!=</font> <font color="#FF0000">'entry'</font><font color="#990000">:</font>
+            <b><font color="#0000FF">continue</font></b>
+        entry <font color="#990000">=</font> <b><font color="#000000">parse_entry</font></b><font color="#990000">(</font>element<font color="#990000">)</font>
+        element<font color="#990000">.</font><b><font color="#000000">clear</font></b><font color="#990000">()</font> <i><font color="#9A1900"># Free up memory</font></i>
+        <b><font color="#0000FF">if</font></b> entry <b><font color="#0000FF">is</font></b> <b><font color="#0000FF">not</font></b> None<font color="#990000">:</font>
+            yield entry  <i><font color="#9A1900"># Make this a generator so that we can iterate across entries</font></i></tt></pre>
+However, I noticed that it was running really really slow once it got
+past about 10000 entries.  I figured out that I could tell it to only
+generate "end" events and that left out all the starts.  Then I also
+added a clear to the element after I processed it.  That was a huge
+speed up, but it still seemed slow.  A quick time test (using the unix time command)
+<pre><b>manual search:</b>
+  real    0m1.464s
+  user    0m1.306s
+  sys     0m0.057s
+<b>lxml event search</b>
+real    0m4.310s
+user    0m4.172s
+sys     0m0.079s</pre>
+Clearly, I need to switch to SAX like parsing if I want to stick with lxml
+to find the events and be fast.
+
+<img title="Gavia navigation entries in Google Earth" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/gavia-navigation-ge.png"/>
+-----

@@ -1,0 +1,78 @@
+TITLE: Using Google Cloud Storage - Part 1
+AUTHOR: Kurt
+DATE: 04.30.2012 13:54
+DESC: non-auth portion
+-----
+BODY:
+This is my first attempt at a tutorial for Google Cloud Storage.
+
+Using <a href="https://developers.google.com/storage/">Google Cloud Storage</a> to store data objects (a blob of data of what ever type you want).  Right now, 
+you get 5GB of storage for free and you can transfer 20 GB per month.
+Beyond that, you'll have to check the <a href="https://developers.google.com/storage/docs/pricingandterms">pricing</a>.
+
+This is pretty much what is on
+<a href="https://developers.google.com/storage/docs/getting-started">https://developers.google.com/storage/docs/getting-started</a> and 
+<a href="https://developers.google.com/storage/docs/hellogooglestorage">https://developers.google.com/storage/docs/hellogooglestorage</a>
+I've tweaked it a bit to fit my style.  I'm doing this on a mac with fink
+and splitting between two acounts.  I want to end up with a way to
+transfer files from one group to another.  I started off by watching 
+this 2011 Google IO video:
+
+<a href="https://developers.google.com/storage/docs/pricingandterms">Google I/O 2011: Storing Your Application's Data in the Google Cloud</a>
+
+First setting up a virtual env in python to isolate us from messing up
+any existing python installs.
+<pre>cd ~/Desktop
+mkdir try-gs
+<span style="color: lightsteelblue; font-weight: bold;">cd</span> try-gs
+fink install virtualenv-py27
+virtualenv ve
+<span style="color: lightsteelblue; font-weight: bold;">source</span> ve/bin/activate
+wget http://commondatastorage.googleapis.com/pub/gsutil.tar.gz
+tar xf gsutil.tar.gz
+<span style="color: lightsteelblue; font-weight: bold;">pushd</span> gsutil
+<!-- -->
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gsutil does not have a proper setup.py that will work with virtualenv</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">so force it to play along</span>
+perl -pi -e "s|/usr|`pwd`/../ve|g" setup.py
+<!-- -->
+python setup.py install
+popd</pre>
+You should now have a working virtualenv with gsutil installed in it.
+Your normal python will not be effective.  You will have to rerun the
+&lt;b&gt;activate&lt;/b&gt; from any other shell that you want to have access to
+gsutil.  The virtualenv named "ve" will change your prompt:
+<pre>$ pwd
+/Users/schwehr/Desktop/try-gs
+(ve)
+$</pre>
+Let's test out setup.
+<pre>type python
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">python is hashed (/Users/schwehr/Desktop/try-gs/ve/bin/python)</span>
+<span style="color: lightsteelblue; font-weight: bold;">type</span> gsutil
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gsutil is /Users/schwehr/Desktop/try-gs/ve/bin/gsutil</span>
+gsutil --help 
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">lots of help scrolls by</span>
+<!-- -->
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">Try a world readable test data set</span>
+gsutil ls gs://uspto-pair/applications/0800401*
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gs://uspto-pair/applications/08004010.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gs://uspto-pair/applications/08004011.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gs://uspto-pair/applications/08004012.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gs://uspto-pair/applications/08004013.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gs://uspto-pair/applications/08004016.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gs://uspto-pair/applications/08004017.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">gs://uspto-pair/applications/08004019.zip</span>
+gsutil ls -l gs://uspto-pair/applications/08004010.zip 
+<span style="color: red; font-style: italic;">#       </span><span style="color: red; font-style: italic;">3410  2010-09-29T20:14:15  gs://uspto-pair/applications/08004010.zip</span>
+<span style="color: red; font-style: italic;"># </span><span style="color: red; font-style: italic;">TOTAL: 1 objects, 3410 bytes (3.33 KB)</span>
+gsutil cp gs://uspto-pair/applications/08004010.zip .
+md5sum 08004010.zip</pre>
+I have yet to write up using the oauth2 authentication.  Hopefully, I'll get that done soon.
+
+<b>See Also:</b>
+<ul>
+<li><a href="http://code.google.com/p/gsutil/">http://code.google.com/p/gsutil/</a></li>
+<li><a href="http://code.google.com/p/gsutil/issues/detail?id=92">Issue 92 covers</a> using pypi / pip / distribute / setuptools</li>
+</ul>
+-----

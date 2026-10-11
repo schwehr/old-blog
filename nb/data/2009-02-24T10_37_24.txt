@@ -1,0 +1,42 @@
+TITLE: sqlite mini tutorial revisited
+AUTHOR: Kurt
+DATE: 02.24.2009 10:37
+DESC: kickstart
+-----
+BODY:
+As a reminder to myself... some SQL basics.  Start by opening a database in the sqlite program:
+<pre>% <b>sqlite3 2008-11.db3</b></pre>
+Now run some commands
+<pre><tt><i><font color="#9A1900">-- Dumps the database table definitions</font></i>
+<font color="#0000FF">.schema</font>
+<!-- -->
+<i><font color="#9A1900">-- Number of points</font></i>
+<b><font color="#0000FF">SELECT</font></b> COUNT<font color="#990000">(</font><b><font color="#0000FF">key</font></b><font color="#990000">)</font> <b><font color="#0000FF">FROM</font></b> position<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Create indexes for speed</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">INDEX</font></b> position_indx_userid <b><font color="#0000FF">ON</font></b> position <font color="#990000">(</font>userid<font color="#990000">);</font>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">INDEX</font></b> position_indx_cg_timestamp <b><font color="#0000FF">ON</font></b> position <font color="#990000">(</font>cg_timestamp<font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Number of MMSI (UserID in the tables)</font></i>
+<b><font color="#0000FF">SELECT</font></b> COUNT<font color="#990000">(</font><b><font color="#0000FF">DISTINCT</font></b><font color="#990000">(</font>userid<font color="#990000">))</font> <b><font color="#0000FF">FROM</font></b> position<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Looking at the lowest 20 MMSI</font></i>
+<b><font color="#0000FF">SELECT</font></b> <b><font color="#0000FF">DISTINCT</font></b><font color="#990000">(</font>userid<font color="#990000">)</font> <b><font color="#0000FF">FROM</font></b> position <b><font color="#0000FF">ORDER</font></b> <b><font color="#0000FF">BY</font></b> userid <b><font color="#0000FF">LIMIT</font></b> <font color="#993399">20</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Grab 5 position reports</font></i>
+<b><font color="#0000FF">SELECT</font></b> userid<font color="#990000">,</font>latitude<font color="#990000">,</font>longitude<font color="#990000">,</font>rot<font color="#990000">,</font>sog<font color="#990000">,</font>cog<font color="#990000">,</font>trueheading<font color="#990000">,</font>cg_timestamp <b><font color="#0000FF">FROM</font></b> position <b><font color="#0000FF">LIMIT</font></b> <font color="#993399">5</font><font color="#990000">;</font>
+<i><font color="#9A1900">-- 368700000|36.9631666667|-76.4201666667|-128|0.1|338|511|2008-10-31 23:59:15</font></i>
+<i><font color="#9A1900">-- 366880750|36.927575|-76.0675033333|-128|22.4|65.4|511|2008-10-31 23:59:15</font></i>
+<i><font color="#9A1900">-- 366994950|36.9258533333|-76.3386883333|-128|18.1|357.8|511|2008-10-31 23:59:18</font></i>
+<i><font color="#9A1900">-- 111111|36.81385|-76.2782483333|-128|0|0|511|2008-11-01 00:00:00</font></i>
+<i><font color="#9A1900">-- 366999608|36.912945|-76.176525|-128|0|230.5|511|2008-11-01 00:00:01</font></i>
+</tt></pre>
+Or to make a CSV:
+<pre>% <b>sqlite3 2008-11.db3 'SELECT userid,latitude,longitude,rot,sog,cog,trueheading,cg_timestamp FROM position LIMIT 5;' | tr '|' ','</b></pre>
+This gives:
+<pre>368700000,36.9631666667,-76.4201666667,-128,0.1,338,511,2008-10-31 23:59:15
+366880750,36.927575,-76.0675033333,-128,22.4,65.4,511,2008-10-31 23:59:15
+366994950,36.9258533333,-76.3386883333,-128,18.1,357.8,511,2008-10-31 23:59:18
+111111,36.81385,-76.2782483333,-128,0,0,511,2008-11-01 00:00:00
+366999608,36.912945,-76.176525,-128,0,230.5,511,2008-11-01 00:00:01</pre>
+-----

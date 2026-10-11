@@ -1,0 +1,1427 @@
+<html>
+<title>AIS Binary Message Registry - HTML version</title>
+<body>
+
+This is a prototype of what the web front end to the AIS Binary
+Message registry might look like in html web form.  The registry would
+be represented as an XML file containing all known binary messages
+from the IMO and all local authories with DAC codes.  Countries can
+then reuse messages from other countries' regional authorities,
+thereby limiting the total number of binary messages needed for the
+whole world.<p/>
+
+This contains just a few example messages from IMO, the European River
+Information System (ris) project, and the North American Saint
+Lawrence Seaway (sls).<p/>
+
+
+-Kurt Schwehr, Feb 2008
+
+<h1>AIS Binary Message Definitions</h1>
+<ul>
+
+<li>
+<a href="#imo_met_hydro">imo_met_hydro</a>
+	      (001:11): 
+	      IMO meteorological and hydroglogical data.  Specified
+      in SN/Circ.236 Annex 2.
+    </li>
+
+
+<li>
+<a href="#imo_fairway_closed">imo_fairway_closed</a>
+	      (001:13): 
+	      IMO fairway closed.  Specified
+      in SN/Circ.236 Annex 2, page 4, Application 3
+    </li>
+
+<li>
+<a href="#imo_tidal_window">imo_tidal_window</a>
+	      (001:13): 
+	      IMO tidal window.  Specified
+      in SN/Circ.236 Annex 2, page 5, Application 3
+    </li>
+
+
+<li>
+<a href="#ris_waterlevel">ris_waterlevel</a>
+	      (???:24): River Information System water level report
+</li>
+
+<li>
+<a href="#sls_waterlevel">sls_waterlevel</a>
+	      (366 316:1:3): 
+	      St Lawrance Seaway water level message</li>
+
+
+<li>
+<a href="#sls_weatherreport">sls_weatherreport</a>
+	      (366 316:1:2): 
+	      St Lawrance Seaway wind information</li>
+
+
+
+</ul>
+
+
+
+
+<hr/>
+
+
+
+
+
+
+<a name="imo_met_hydro"><h2>AIS Message: imo_met_hydro
+	    (001:11)
+	  </h2></a><h3>Description:</h3>
+<p>IMO meteorological and hydroglogical data.  Specified
+      in SN/Circ.236 Annex 2.  Also defined in IALA Guidelines on AIS,
+      Vol 1, Part 1, Ed. 1.3. Guildeline No 1028.
+    </p>
+<p><b>Note:</b>All unavailable values are defined to be the highest
+    possible number in the next following</p>
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>AIS message number.  Must be 8</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Indicated how many times a message has been repeated<br><b>0</b>: default<br><b>3</b>: do not repeat any more</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>MMSI number of transmitter broadcasting the message</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved for definition by a regional authority.</td>
+</tr>
+<tr>
+<td>dac</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Designated Area Code - part 1 of the IAI</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Functional Identifier - part 2 of the IAI</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>24</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of the vessel.  North South location</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>25</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of the vessel.  East West location</td>
+</tr>
+<tr>
+<td>day</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>days</td>
+<td>Day 0..31</td>
+</tr>
+<tr>
+<td>hour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>hours</td>
+<td>Hour 0..23</td>
+</tr>
+<tr>
+<td>min</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>Min</td>
+</tr>
+<tr>
+<td>avewind</td>
+<td>7</td>
+<td></td>
+<td>uint</td>
+<td>knots</td>
+<td>Average wind speed values for the last 10 minutes.</td>
+</tr>
+<tr>
+<td>windgust</td>
+<td>7</td>
+<td></td>
+<td>uint</td>
+<td>knots</td>
+<td>Wind gust is the max wind speed value reading
+ during the last 10 minutes.</td>
+</tr>
+<tr>
+<td>winddir</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Wind direction</td>
+</tr>
+<tr>
+<td>windgustdir</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Wind direction for the gust.</td>
+</tr>
+<tr>
+<td>airtemp</td>
+<td>11</td>
+<td></td>
+<td>decimal</td>
+<td>degrees Celsius</td>
+<td>Dry bulb temperature</td>
+</tr>
+<tr>
+<td>relhumid</td>
+<td>7</td>
+<td></td>
+<td>uint</td>
+<td>percent</td>
+<td>Relative humidity</td>
+</tr>
+<tr>
+<td>dewpoint</td>
+<td>10</td>
+<td></td>
+<td>decimal</td>
+<td>degrees Celsius</td>
+<td>Dew Point</td>
+</tr>
+<tr>
+<td>airpressure</td>
+<td>9</td>
+<td></td>
+<td>udecimal</td>
+<td>hPa</td>
+<td>Air pressure</td>
+</tr>
+<tr>
+<td>airpressuretrend</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Air pressure trend<br><b>0</b>: steady<br><b>1</b>: decreasing<br><b>2</b>: increasing<br><b>3</b>: unavailable</td>
+</tr>
+<tr>
+<td>horizvis</td>
+<td>8</td>
+<td></td>
+<td>udecimal</td>
+<td>nm</td>
+<td>Horizontal visibility</td>
+</tr>
+<tr>
+<td>waterlevel</td>
+<td>9</td>
+<td></td>
+<td>decimal</td>
+<td>m</td>
+<td>Water level (incl. tide)</td>
+</tr>
+<tr>
+<td>waterleveltrend</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Water level trend<br><b>0</b>: steady<br><b>1</b>: decreasing<br><b>2</b>: increasing<br><b>3</b>: unavailable</td>
+</tr>
+<tr>
+<td>surfcurspeed</td>
+<td>8</td>
+<td></td>
+<td>udecimal</td>
+<td>knots</td>
+<td>Surface current speed</td>
+</tr>
+<tr>
+<td>surfcurdir</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Surface current direction</td>
+</tr>
+<tr>
+<td>curspeed2</td>
+<td>8</td>
+<td></td>
+<td>udecimal</td>
+<td>knots</td>
+<td>Level 2 current speed</td>
+</tr>
+<tr>
+<td>curdir2</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Level 2 current direction</td>
+</tr>
+<tr>
+<td>curlevel2</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>m</td>
+<td>Measuring level below sea surface for level 2</td>
+</tr>
+<tr>
+<td>curspeed3</td>
+<td>8</td>
+<td></td>
+<td>udecimal</td>
+<td>knots</td>
+<td>Level 3 current speed</td>
+</tr>
+<tr>
+<td>curdir3</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Level 3 current direction</td>
+</tr>
+<tr>
+<td>curlevel3</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>m</td>
+<td>Measuring level below sea surface for level 3</td>
+</tr>
+<tr>
+<td>sigwaveheight</td>
+<td>8</td>
+<td></td>
+<td>udecimal</td>
+<td>m</td>
+<td>Significant wave height</td>
+</tr>
+<tr>
+<td>waveperiod</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>sec</td>
+<td>Wave period</td>
+</tr>
+<tr>
+<td>wavedir</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Wave direction</td>
+</tr>
+<tr>
+<td>swellheight</td>
+<td>8</td>
+<td></td>
+<td>udecimal</td>
+<td>m</td>
+<td>Swell height</td>
+</tr>
+<tr>
+<td>swellperiod</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>sec</td>
+<td>Swell period</td>
+</tr>
+<tr>
+<td>swelldir</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Swell direction</td>
+</tr>
+<tr>
+<td>seastate</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td>Beaufort scale</td>
+<td>Sea state according to the Beaufort scale<br><b>0</b>: Calm<br><b>1</b>: Light air<br><b>2</b>: Light breeze<br><b>3</b>: Gentle breeze<br><b>4</b>: Moderate breeze<br><b>5</b>: Fresh breeze<br><b>6</b>: Strong breeze<br><b>7</b>: Near gale<br><b>8</b>: Gale<br><b>9</b>: Strong gale<br><b>10</b>: Storm<br><b>11</b>: Violent storm<br><b>12</b>: Hurricane<br><b>15</b>: unavailable</td>
+</tr>
+<tr>
+<td>watertemp</td>
+<td>10</td>
+<td></td>
+<td>udecimal</td>
+<td>degrees Celsius</td>
+<td>Water temperature</td>
+</tr>
+<tr>
+<td>preciptype</td>
+<td>3</td>
+<td></td>
+<td>uint</td>
+<td>WMO scale index</td>
+<td>According to WMO<br><b>0</b>: FIX: find the WMO list of types<br><b>7</b>: unavailable</td>
+</tr>
+<tr>
+<td>salinity</td>
+<td>9</td>
+<td></td>
+<td>decimal</td>
+<td>0/00</td>
+<td>Salinity</td>
+</tr>
+<tr>
+<td>ice</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Yes or no for the presence of ice<br><b>0</b>: Not sure.  Maybe no ice?<br><b>1</b>: Not sure.  Maybe yes ice?<br><b>2</b>: Not sure.  Maybe not allowed?<br><b>3</b>: Unknown?</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Must be zero</td>
+</tr>
+</table>
+</body>
+
+<hr/>
+
+
+
+<a name="imo_fairway_closed"><h2>AIS Message: imo_fairway_closed
+	    (001:13:)
+	  </h2></a><h3>Description:</h3>
+<p>IMO fairway closed.  Specified
+      in SN/Circ.236 Annex 2, page 4, Application 3.  Also defined in IALA Guidelines on AIS,
+      Vol 1, Part 1, Ed. 1.3. Guildeline No 1028.
+
+      This message should be used to inform ships, in particular to give
+      guidance to large vessels about temporary closed fairways or sections
+      in ports. Attributes: broadcast, shore station transmitting, no
+      acknowledgement.
+    </p>
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>AIS message number.  Must be 8</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Indicated how many times a message has been repeated<br><b>0</b>: default<br><b>3</b>: do not repeat any more</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>MMSI number of transmitter broadcasting the message</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved for definition by a regional authority.</td>
+</tr>
+<tr>
+<td>dac</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Designated Area Code - part 1 of the IAI</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Functional Identifier - part 2 of the IAI</td>
+</tr>
+<tr>
+<td>reason</td>
+<td>6</td>
+<td>20</td>
+<td>aisstr6</td>
+<td></td>
+<td>Reason for closing</td>
+</tr>
+<tr>
+<td>from</td>
+<td>6</td>
+<td>20</td>
+<td>aisstr6</td>
+<td></td>
+<td>Location of closing from</td>
+</tr>
+<tr>
+<td>to</td>
+<td>6</td>
+<td>20</td>
+<td>aisstr6</td>
+<td></td>
+<td>Location of closing To</td>
+</tr>
+<tr>
+<td>radius</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td>See unit field</td>
+<td>Extention of closed area</td>
+</tr>
+<tr>
+<td>unit</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Unit of extension value for range field<br><b>0</b>: m<br><b>1</b>: km<br><b>2</b>: nm<br><b>3</b>: cbl</td>
+</tr>
+<tr>
+<td>closingday</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Closing from day</td>
+</tr>
+<tr>
+<td>closingmonth</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Closing from month</td>
+</tr>
+<tr>
+<td>fromhour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>From LT hour (appr)</td>
+</tr>
+<tr>
+<td>frommin</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>From LT minute (appr)</td>
+</tr>
+<tr>
+<td>today</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>To day</td>
+</tr>
+<tr>
+<td>tomonth</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>To month</td>
+</tr>
+<tr>
+<td>tohour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>To LT hour (appr)</td>
+</tr>
+<tr>
+<td>tomin</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>To LT minute (appr)</td>
+</tr>
+<tr>
+<td>spare2</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Padding out the slot</td>
+</tr>
+</table>
+
+
+
+<hr/>
+
+
+
+
+
+<a name="imo_tidal_window"><h2>AIS Message: imo_tidal_window
+	    (001:13:)
+	  </h2></a><h3>Description:</h3>
+<p>IMO tidal window.  Specified
+      in SN/Circ.236 Annex 2, page 5, Application 3.  Also defined in IALA Guidelines on AIS,
+      Vol 1, Part 1, Ed. 1.3. Guildeline No 1028.
+
+      This message should be used to inform vessels about tidal
+      windows which allow a vessel the safe passage of a fairway.  The
+      message includes predictions of current speed and current
+      direction. In this example, three points of tidal information
+      are given. Attributes of message: addressed, shore station
+      transmitting, acknowledgement required.
+    </p>
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>AIS message number.  Must be 6</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Indicated how many times a message has been repeated<br><b>0</b>: default<br><b>3</b>: do not repeat any more</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>MMSI number of transmitter broadcasting the message</td>
+</tr>
+<tr>
+<td>SeqNum</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Sequence number as described in 5.3.1.  Assigned to each station</td>
+</tr>
+<tr>
+<td>DestinationID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Unique ship identification number (MMSI)</td>
+</tr>
+<tr>
+<td>RetransmitFlag</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td></td>
+<td>Should be set upon retransmission<br><b>0</b>: no retransmission<br><b>1</b>: restransmitted</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>1</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Must be 0</td>
+</tr>
+<tr>
+<td>dac</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Designated Area Code - part 1 of the IAI</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Functional Identifier - part 2 of the IAI</td>
+</tr>
+<tr>
+<td>month</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>UTC month</td>
+</tr>
+<tr>
+<td>day</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>UTC day</td>
+</tr>
+<tr>
+<td>window1_longitude</td>
+<td>28</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Not sure what this position is for?  Center?  East West location</td>
+</tr>
+<tr>
+<td>window1_latitude</td>
+<td>27</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Not sure what this position is for?  Center?  North South location</td>
+</tr>
+<tr>
+<td>fromhour1</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>hours</td>
+<td>From UTC hour</td>
+</tr>
+<tr>
+<td>frommin1</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>From UTC minute</td>
+</tr>
+<tr>
+<td>tohour1</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>hours</td>
+<td>To UTC hour</td>
+</tr>
+<tr>
+<td>tomin1</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>To UTC minute</td>
+</tr>
+<tr>
+<td>curdir1</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Current direction</td>
+</tr>
+<tr>
+<td>curspeed1</td>
+<td>7</td>
+<td></td>
+<td>udecimal</td>
+<td>knots</td>
+<td>Current speed</td>
+</tr>
+<tr>
+<td>window2_longitude</td>
+<td>28</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Not sure what this position is for?  Center?  East West location</td>
+</tr>
+<tr>
+<td>window2_latitude</td>
+<td>27</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Not sure what this position is for?  Center?  North South location</td>
+</tr>
+<tr>
+<td>fromhour2</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>hours</td>
+<td>From UTC hour</td>
+</tr>
+<tr>
+<td>frommin2</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>From UTC minute</td>
+</tr>
+<tr>
+<td>tohour2</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>hours</td>
+<td>To UTC hour</td>
+</tr>
+<tr>
+<td>tomin2</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>To UTC minute</td>
+</tr>
+<tr>
+<td>curdir2</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Current direction</td>
+</tr>
+<tr>
+<td>curspeed2</td>
+<td>7</td>
+<td></td>
+<td>udecimal</td>
+<td>knots</td>
+<td>Current speed</td>
+</tr>
+<tr>
+<td>window3_longitude</td>
+<td>28</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Not sure what this position is for?  Center?  East West location</td>
+</tr>
+<tr>
+<td>window3_latitude</td>
+<td>27</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Not sure what this position is for?  Center?  North South location</td>
+</tr>
+<tr>
+<td>fromhour3</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>hours</td>
+<td>From UTC hour</td>
+</tr>
+<tr>
+<td>frommin3</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>From UTC minute</td>
+</tr>
+<tr>
+<td>tohour3</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td>hours</td>
+<td>To UTC hour</td>
+</tr>
+<tr>
+<td>tomin3</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td>minutes</td>
+<td>To UTC minute</td>
+</tr>
+<tr>
+<td>curdir3</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Current direction</td>
+</tr>
+<tr>
+<td>curspeed3</td>
+<td>7</td>
+<td></td>
+<td>udecimal</td>
+<td>knots</td>
+<td>Current speed</td>
+</tr>
+</table>
+
+
+
+
+
+<hr/>
+
+
+
+
+
+
+
+<a name="ris_waterlevel"><h2>AIS Message: ris_waterlevel
+	    (000:24:)
+	  </h2></a><h3>Description:</h3>
+<p>RIS ECE/TRANS/SC.3/2006/10 Table 2.15: Water level report</p>
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>AIS message number.  Must be 8</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Indicated how many times a message has been repeated<br><b>0</b>: default<br><b>3</b>: do not repeat any more</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Unique ship identification number (MMSI)</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved for definition by a regional authority.</td>
+</tr>
+<tr>
+<td>dac</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Designated Area Code</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Functional Identifier</td>
+</tr>
+<tr>
+<td>country</td>
+<td>6</td>
+<td>2</td>
+<td>aisstr6</td>
+<td></td>
+<td>UN country code using 2*6-Bit ASCII characters according to ERI specification</td>
+</tr>
+<tr>
+<td>id1_id</td>
+<td>11</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  Station ID defined by ERI for each country</td>
+</tr>
+<tr>
+<td>id1_sign</td>
+<td>1</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  sign of the number in the waterlevel<br><b>0</b>: -1<br><b>1</b>: 1</td>
+</tr>
+<tr>
+<td>id1_waterlevel</td>
+<td>11</td>
+<td></td>
+<td>decimal</td>
+<td>m</td>
+<td>One tide gauge measurement.  Water level at the sensor</td>
+</tr>
+<tr>
+<td>id1_i_have_no_idea</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  What are these bits for?  They do not seem to be specified</td>
+</tr>
+<tr>
+<td>id2_id</td>
+<td>11</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  Station ID defined by ERI for each country</td>
+</tr>
+<tr>
+<td>id2_sign</td>
+<td>1</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  sign of the number in the waterlevel<br><b>0</b>: -1<br><b>1</b>: 1</td>
+</tr>
+<tr>
+<td>id2_waterlevel</td>
+<td>11</td>
+<td></td>
+<td>decimal</td>
+<td>m</td>
+<td>One tide gauge measurement.  Water level at the sensor</td>
+</tr>
+<tr>
+<td>id2_i_have_no_idea</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  What are these bits for?  They do not seem to be specified</td>
+</tr>
+<tr>
+<td>id3_id</td>
+<td>11</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  Station ID defined by ERI for each country</td>
+</tr>
+<tr>
+<td>id3_sign</td>
+<td>1</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  sign of the number in the waterlevel<br><b>0</b>: -1<br><b>1</b>: 1</td>
+</tr>
+<tr>
+<td>id3_waterlevel</td>
+<td>11</td>
+<td></td>
+<td>decimal</td>
+<td>m</td>
+<td>One tide gauge measurement.  Water level at the sensor</td>
+</tr>
+<tr>
+<td>id3_i_have_no_idea</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  What are these bits for?  They do not seem to be specified</td>
+</tr>
+<tr>
+<td>id4_id</td>
+<td>11</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  Station ID defined by ERI for each country</td>
+</tr>
+<tr>
+<td>id4_sign</td>
+<td>1</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  sign of the number in the waterlevel<br><b>0</b>: -1<br><b>1</b>: 1</td>
+</tr>
+<tr>
+<td>id4_waterlevel</td>
+<td>11</td>
+<td></td>
+<td>decimal</td>
+<td>m</td>
+<td>One tide gauge measurement.  Water level at the sensor</td>
+</tr>
+<tr>
+<td>id4_i_have_no_idea</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>One tide gauge measurement.  What are these bits for?  They do not seem to be specified</td>
+</tr>
+</table>
+
+
+<hr>
+
+
+
+
+<a name="sls_waterlevel"><h2>AIS Message: sls_waterlevel
+	    (366 316:1:3)
+	  </h2></a><h3>Description:</h3>
+<p>St Lawrance Seaway water level message</p>
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>time_month</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	month 1..12</td>
+</tr>
+<tr>
+<td>time_day</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	day of the month 1..31</td>
+</tr>
+<tr>
+<td>time_hour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	UTC hours 0..23</td>
+</tr>
+<tr>
+<td>time_min</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	minutes</td>
+</tr>
+<tr>
+<td>stationid</td>
+<td>6</td>
+<td>7</td>
+<td>aisstr6</td>
+<td></td>
+<td>Character identifier of the station.  Usually a number.</td>
+</tr>
+<tr>
+<td>pos_longitude</td>
+<td>25</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of measurement
+	East West location</td>
+</tr>
+<tr>
+<td>pos_latitude</td>
+<td>24</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of measurement
+	North South location</td>
+</tr>
+<tr>
+<td>type</td>
+<td>1</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>How to interpret the water level<br><b>0</b>: Relative to datum<br><b>1</b>: Water depth</td>
+</tr>
+<tr>
+<td>waterlevel</td>
+<td>16</td>
+<td></td>
+<td>int</td>
+<td>cm</td>
+<td>Water level in centimeters</td>
+</tr>
+<tr>
+<td>datum</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>What reference datum applies to the value<br><b>0</b>: MLLW<br><b>1</b>: IGLD-85<br><b>2</b>: Reserved<br><b>3</b>: Reserved</td>
+</tr>
+<tr>
+<td>reserved</td>
+<td>14</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved bits for future use</td>
+</tr>
+</table>
+
+
+
+
+
+
+
+<a name="sls_weatherreport"><h2>AIS Message: sls_weatherreport
+	    (366 316:1:2)
+	  </h2></a><h3>Description:</h3>
+<p>St Lawrance Seaway wind information</p>
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>time_month</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	month 1..12</td>
+</tr>
+<tr>
+<td>time_day</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	day of the month 1..31</td>
+</tr>
+<tr>
+<td>time_hour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	UTC hours 0..23</td>
+</tr>
+<tr>
+<td>time_min</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Time tag of measurement
+	minutes</td>
+</tr>
+<tr>
+<td>stationid</td>
+<td>6</td>
+<td>7</td>
+<td>aisstr6</td>
+<td></td>
+<td>Character identifier of the station</td>
+</tr>
+<tr>
+<td>pos_longitude</td>
+<td>25</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of measurement
+	East West location</td>
+</tr>
+<tr>
+<td>pos_latitude</td>
+<td>24</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Location of measurement
+	North South location</td>
+</tr>
+<tr>
+<td>speed</td>
+<td>10</td>
+<td></td>
+<td>udecimal</td>
+<td>kts</td>
+<td>Average wind speed<br><b>102.2</b>: 102.2 kts or greater</td>
+</tr>
+<tr>
+<td>gust</td>
+<td>10</td>
+<td></td>
+<td>udecimal</td>
+<td>kts</td>
+<td>Wind gust<br><b>102.2</b>: 102.2 kts or greater</td>
+</tr>
+<tr>
+<td>direction</td>
+<td>9</td>
+<td></td>
+<td>uint</td>
+<td>degrees</td>
+<td>Wind direction</td>
+</tr>
+<tr>
+<td>atmpressure</td>
+<td>14</td>
+<td></td>
+<td>udecimal</td>
+<td>millibars</td>
+<td>Atmospheric pressure</td>
+</tr>
+<tr>
+<td>airtemp</td>
+<td>10</td>
+<td></td>
+<td>decimal</td>
+<td>Celsius</td>
+<td>Air temperature<br><b>-51.1</b>: -51.1 degrees C or lower<br><b>51.1</b>: 51.1 degrees C or greater</td>
+</tr>
+<tr>
+<td>dewpoint</td>
+<td>10</td>
+<td></td>
+<td>decimal</td>
+<td>Celsius</td>
+<td>Dew Point<br><b>-51.1</b>: -51.1 degrees C or lower<br><b>51.1</b>: 51.1 degrees C or greater</td>
+</tr>
+<tr>
+<td>visibility</td>
+<td>8</td>
+<td></td>
+<td>udecimal</td>
+<td>km</td>
+<td>Visibility<br><b>25.4</b>: 25.4 km or greater</td>
+</tr>
+<tr>
+<td>watertemp</td>
+<td>10</td>
+<td></td>
+<td>decimal</td>
+<td>Celsius</td>
+<td>Water Temperature<br><b>-51.1</b>: -51.1 degrees C or lower<br><b>51.1</b>: 51.1 degrees C or greater</td>
+</tr>
+<tr>
+<td>reserved</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved bits for future use</td>
+</tr>
+</table>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+TITLE: python ctypes and geodjango
+AUTHOR: Kurt
+DATE: 09.30.2008 09:40
+DESC: help
+-----
+BODY:
+I have a new draft package for geodjango on fink.  There are a number
+of rough spots.  First, I wish that the fink python would know about
+the default location of fink libs, so that it would find libgeos3.
+<pre>% ipython
+&gt;&gt;&gt; <b>ls /sw/lib/libgeos_c.1.4.1.dylib</b>
+/sw/lib/libgeos_c.1.4.1.dylib
+&gt;&gt;&gt; <b>from ctypes.util import find_library</b>
+find_library('libgeos_c')
+# Nothing
+&gt;&gt;&gt; <b>find_library('libgeos_c.1.4.1')</b>
+# Nothing
+&gt;&gt;&gt; <b>find_library('libgeos_c.1.4.1.dylib')</b>
+# Nothing
+&gt;&gt;&gt; <b>find_library('/sw/lib/libgeos_c.1.4.1.dylib')</b>
+# Nothing
+&gt;&gt;&gt; <b>find_library('/sw/lib/libgeos_c.1.4.1')</b>
+'/sw/lib/libgeos_c.1.4.1.dylib'
+</pre>
+Then the libgeos2 package is trouble.  Postgis links against
+libgeos2's libeos_c.1.dylib.  
+<pre>
+psycopg2.OperationalError: could not load library
+"/sw/lib/postgresql-8.3/liblwgeom.so":
+dlopen(/sw/lib/postgresql-8.3/liblwgeom.so, 10): Library not loaded:
+/sw/lib/libgeos_c.1.dylib
+
+Ben (RangerRick) suggested to put all the libs into %p/lib/libgeos3 for
+libgeos3 so that they do not conflict with libgeos2.  That makes sense.
+libgeos3 really should have a different major version number.
+-----

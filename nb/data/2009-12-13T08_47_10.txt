@@ -1,0 +1,35 @@
+TITLE: BAGs in Google Earth, a bit more progress
+AUTHOR: Kurt
+DATE: 12.13.2009 08:47
+DESC: closer
+-----
+BODY:
+I am getting a lot closer to having the final product for AGU... I
+have a popup, a nice icon by Colleen, a bounding box, and a gdal tiled
+image.
+
+<img title="Info for a BAG" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/bag-googleearth-demo.png"/>
+
+I still have a number of issues to resolve.  I gave a bit of work on
+troubles with transparency, but I have shelved the issue and will just
+live with the large gray semitransparent areas for now.
+
+A bigger problem is that gdaldem hillshade crashes on large images:
+<pre> composite -blend 50 H11335_0_80m-hillshade.tif H11335_0_80m-color-relief.tif H11335_0_80m-blend.tif
+composite(3284) malloc: *** mmap(size=2557730816) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug
+composite(3284) malloc: *** mmap(size=2557730816) failed (error code=12)
+*** error: can't allocate region
+*** set a breakpoint in malloc_error_break to debug</pre>
+That geotiff is 18981x8422.  Here is the color relief of the bag in question:
+
+<img title="Overview of the bag that was causing trouble" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/gdal-color-relief-bag-overview.png"/>
+
+And a close up:
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/gdal-color-relief-bag-closeup.png"/>
+
+This is by no means the largest bag.  These bags have large empty
+border areas, but even if those are removed, these grids are large.
+-----

@@ -1,0 +1,54 @@
+TITLE: Last research tools class - RT 26 - Copyright and KML/SQLite export
+AUTHOR: Kurt
+DATE: 12.02.2011 04:12
+DESC: the end
+-----
+BODY:
+Yesterday, I dashed out the audio editing and screenshot to
+Keynote/PDF for Research Tools 26:
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/26-python-binary-files-part-5.html">html</a>, <a href="http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/audio/26-python-binary-files-part-5.mp3">mp3</a>, <a href="http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/present/26-python-binary-files-part-5.pdf">pdf</a> and <a href="https://bitbucket.org/schwehr/researchtools/src/tip/class/26-python-binary-files-part-5.org">26-python-binary-files-part-5.org</a>.  Any comments you might want to make can go here: <a href="http://schwehr.blogspot.com/2011/12/rt-26-part-6-parsing-binary-sbet-files.html">Kurt's Backup blog: RT 26</a>
+
+I wish that BitBucket would let people to add comments to a particular
+version of the file, not just the commit.  I love the way that <a
+href="http://djangobook.com">DjangoBook.com</a> allows comments.  At
+least you can comment on a commit: <a
+href="https://bitbucket.org/schwehr/researchtools/changeset/db25c6a65fe2">comment
+on changeset db25c6a65fe2</a>.  But why not allow comments to be
+associated with a particular line?
+
+<img width="600" height="428" title="Research Tools 26 - Final presentation title slide" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-12/rt-26.png"/>
+
+<img width="600" height="409" title="Django Book comment system" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-12/djangobook-comments.png"/>
+
+And a little imagemagick + bash.  It doesn't work as I want if the
+image is taller than wide, but typically my image captures are
+landscape style.
+<pre>convert -resize 600 {~/Desktop/,}rt-26.png</pre>
+And an aside... I liked this post for the shell script rewrite with
+explanation (I'm not going to start using TextExpander).  
+
+<a href="http://www.leancrew.com/all-this/2011/12/erm/">Erm</a> by Dr. Drang.  
+
+He went from this:
+<pre><tt><i><font color="#9A1900">#!/bin/tcsh</font></i>
+echo -n `pbpaste` <font color="#990000">|</font> perl -e <font color="#FF0000">'while (&lt;&gt;) { s/-//g; print $_; }'</font></tt></pre>
+to this (I changed bash to sh and added --noprofile for speed).
+<pre><tt><i><font color="#9A1900">#!/bin/sh --noprofile</font></i>
+pbpaste <font color="#990000">|</font> tr -dc <font color="#FF0000">'[:digit:]'</font></tt></pre>
+I would also say to @macgenie's tweets: <a
+href="https://twitter.com/#!/macgenie/status/142327964539949057">first</a>
+and <a
+href="https://twitter.com/#!/macgenie/status/142347515755364354">second</a>... if
+you are going to use tcsh for scripts, you should at least switch to
+/bin/csh -f rather than tcsh for everything.  Not a big deal in a one
+off, but if later you morph into a frequently called script, that will
+reduce overhead.  But why would anyone want to use csh/tcsh?  This
+coming from me who was a die hard {t,}csh user from 1990 to 1999 until
+I was forced to really start using bash during Mars Polar Lander.
+
+Trackbacks:
+
+<a
+href="http://slashgeo.org/2011/12/05/Open-Source-Geonews-StatCan-Opening-its-Data-OSM-500000-Users-QGIS-News-and-much-more">Slashgeo 2011/12/05</a>
+-----

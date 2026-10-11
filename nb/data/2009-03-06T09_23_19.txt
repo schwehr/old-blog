@@ -1,0 +1,134 @@
+TITLE: implementing GMT's grdinfo in python
+AUTHOR: Kurt
+DATE: 03.06.2009 09:23
+DESC: getting to the data
+-----
+BODY:
+I've wanted to try this for a long time and today I had a reason to
+give it a go.  There are several Python interfaces to GMT.  <a
+href="http://freshmeat.net/projects/gmtpy/">gmtpy</a> works like the
+command line programs of GMT.  <a
+href="http://www.geos.ed.ac.uk/homes/mhagdorn/PyGMT">PyGMT</a> (get
+0.6 from <a href="http://forge.nesc.ac.uk/projects/pygmt/">here</a>)
+is a cPython interface to GMT's library to read and write grid files.
+I was thinking of using ctypes to interface to the GMT shared
+libraries, but then I thought that I would give a go at reading them
+using a netcdf package in python.  First, I updated ScientificPython
+in fink to support python 2.6 and updated to the latest stable version
+(2.8).
+<pre>% <b>fink install scientificpython-py26</b>
+% <b>fink install netcdf-bin</b></pre>
+Then I tooks a look at GMT's file specification: <a
+href="http://gmt.soest.hawaii.edu/gmt/doc/gmt/html/GMT_Docs/node171.html">B.2.1
+NetCDF files</a> and ran ncdump to take look at what is in this file.
+<pre>% <b>ncdump g3.grd</b>
+netcdf g3 {
+dimensions:
+        side = 2 ;
+        xysize = 8742 ;
+variables:
+        double x_range(side) ;
+                x_range:units = "user_x_unit" ;
+        double y_range(side) ;
+                y_range:units = "user_y_unit" ;
+        double z_range(side) ;
+                z_range:units = "user_z_unit" ;
+        double spacing(side) ;
+        int dimension(side) ;
+        float z(xysize) ;
+                z:scale_factor = 1. ;
+                z:add_offset = 0. ;
+                z:node_offset = 0 ;
+<!-- -->
+// global attributes:
+                :title = "" ;
+                :source = "grdcut santabarbF_bath.grd -Gg3.grd -R-120.150001013862/-120.139997147338/34.3899087775448/34
+.4000213817476 -V" ;
+data:
+<!-- -->
+ x_range = -120.150001013862, -120.139997147338 ;
+<!-- -->
+ y_range = 34.3899087775448, 34.4000213817476 ;
+<!-- -->
+ z_range = -260.718994140625, -206.770004272461 ;
+<!-- -->
+ spacing = 0.0001087376796, 0.0001087376796 ;
+<!-- -->
+ dimension = 93, 94 ;
+<!-- -->
+ z = -211.416, -211.161, -210.336, -211.239, -210.711, -211.104, -211.05, 
+    -210.492, -210.516, -211.127, -210.416, -209.976, -209.958, -210.465, 
+    -210.604, -210.624, -209.789, -210.333, -210.214, -210.465, -210.118, 
+...
+}</pre>
+I then compared this to what I get from the GMT grdinfo command:
+<pre>% <b>grdinfo g3.grd</b>
+g3.grd: Title: 
+g3.grd: Command: grdcut santabarbF_bath.grd -Gg3.grd -R-120.150001013862/-120.139997147338/34.3899087775448/34.4000213817476 -V
+g3.grd: Remark: 
+g3.grd: Gridline node registration used
+g3.grd: Grid file format: cf (# 10)
+g3.grd: x_min: -120.15 x_max: -120.14 x_inc: 0.000108738 name: user_x_unit nx: 93
+g3.grd: y_min: 34.3899 y_max: 34.4 y_inc: 0.000108738 name: user_y_unit ny: 94
+g3.grd: z_min: -260.719 z_max: -206.77 name: user_z_unit
+g3.grd: scale_factor: 1 add_offset: 0</pre>
+I then worked through all the variables and picked them out of the
+netcdf.  I don't think this code is very stable.  GMT allows you to
+specify specific layers of data with a <b>?</b>.  I also don't handle
+the case of actual_range verses valid_range.  I need to look at the source
+of GMT to figure out how that look up the grid file format identifiers: seen here as <i>cf (# 10)</i>.  See <a href="http://gmt.soest.hawaii.edu/gmt/doc/gmt/html/GMT_Docs/node66.html#sec:grdformats">4.17 Grid file format specifications</a> for the different file types.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sys
+<b><font color="#000080">from</font></b> Scientific<font color="#990000">.</font>IO <b><font color="#000080">import</font></b> NetCDF
+<!-- -->
+node_offset_str<font color="#990000">={</font><font color="#993399">0</font><font color="#990000">:</font> <font color="#FF0000">'gridline node registration'</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">:</font> <font color="#FF0000">'pixel registration'</font><font color="#990000">}</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> Grd<font color="#990000">:</font>
+    <b><font color="#0000FF">def</font></b> <b><font color="#000000">__init__</font></b><font color="#990000">(</font>self<font color="#990000">,</font>filename<font color="#990000">):</font>
+        self<font color="#990000">.</font>filename <font color="#990000">=</font> filename
+        self<font color="#990000">.</font>grd <font color="#990000">=</font> NetCDF<font color="#990000">.</font><b><font color="#000000">NetCDFFile</font></b><font color="#990000">(</font>filename<font color="#990000">)</font>
+        grd <font color="#990000">=</font> self<font color="#990000">.</font>grd
+<!-- -->
+        self<font color="#990000">.</font>x_range <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'x_range'</font><font color="#990000">].</font><b><font color="#000000">getValue</font></b><font color="#990000">()</font> 
+        self<font color="#990000">.</font>x_units <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'x_range'</font><font color="#990000">].</font>units
+        self<font color="#990000">.</font>y_range <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'y_range'</font><font color="#990000">].</font><b><font color="#000000">getValue</font></b><font color="#990000">()</font> 
+        self<font color="#990000">.</font>y_units <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'y_range'</font><font color="#990000">].</font>units
+        self<font color="#990000">.</font>z_range <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'z_range'</font><font color="#990000">].</font><b><font color="#000000">getValue</font></b><font color="#990000">()</font> 
+        self<font color="#990000">.</font>z_units <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'z_range'</font><font color="#990000">].</font>units
+<!-- -->
+        self<font color="#990000">.</font>dx<font color="#990000">,</font>self<font color="#990000">.</font>dy <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'spacing'</font><font color="#990000">].</font><b><font color="#000000">getValue</font></b><font color="#990000">()</font> 
+        self<font color="#990000">.</font>z <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'z'</font><font color="#990000">].</font><b><font color="#000000">getValue</font></b><font color="#990000">()</font> <i><font color="#9A1900"># This is the data... probably not efficient</font></i>
+        self<font color="#990000">.</font>scale_factor <font color="#990000">=</font> self<font color="#990000">.</font>grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'z'</font><font color="#990000">].</font>scale_factor<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font>
+        self<font color="#990000">.</font>add_offset <font color="#990000">=</font> self<font color="#990000">.</font>grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'z'</font><font color="#990000">].</font>add_offset<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font>
+        self<font color="#990000">.</font>node_offset <font color="#990000">=</font> self<font color="#990000">.</font>grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'z'</font><font color="#990000">].</font>node_offset<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font>
+<!-- -->
+        self<font color="#990000">.</font>width<font color="#990000">,</font> self<font color="#990000">.</font>height <font color="#990000">=</font> grd<font color="#990000">.</font>variables<font color="#990000">[</font><font color="#FF0000">'dimension'</font><font color="#990000">].</font><b><font color="#000000">getValue</font></b><font color="#990000">()</font> 
+        self<font color="#990000">.</font>dimensions <font color="#990000">=</font> grd<font color="#990000">.</font>dimensions
+<!-- -->
+        self<font color="#990000">.</font>title <font color="#990000">=</font> grd<font color="#990000">.</font>title
+        self<font color="#990000">.</font>source <font color="#990000">=</font> grd<font color="#990000">.</font>source
+<!-- -->
+    <b><font color="#0000FF">def</font></b> <b><font color="#000000">info</font></b><font color="#990000">(</font>self<font color="#990000">,</font>out<font color="#990000">=</font>sys<font color="#990000">.</font>stdout<font color="#990000">):</font>
+        f <font color="#990000">=</font> self<font color="#990000">.</font>filename
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s: Title: %s\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>f<font color="#990000">,</font>self<font color="#990000">.</font>title<font color="#990000">))</font>
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s: Command: %s\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>f<font color="#990000">,</font>self<font color="#990000">.</font>source<font color="#990000">))</font>
+        <i><font color="#9A1900">#out.write('%s: Remark: \n',(f,)) # Where did this come from? </font></i>
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s: %s\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>f<font color="#990000">,</font>node_offset_str<font color="#990000">[</font>self<font color="#990000">.</font>node_offset<font color="#990000">]))</font> <i><font color="#9A1900"># registration</font></i>
+        <i><font color="#9A1900">#out.write('%s: : \n' % ()) # format</font></i>
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s: xmin: %f x_max: %f x_inc: %f name: %s nx: %d \n'</font> <font color="#990000">%</font> <font color="#990000">(</font>f<font color="#990000">,</font>self<font color="#990000">.</font>x_range<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>self<font color="#990000">.</font>x_range<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font>self<font color="#990000">.</font>dx<font color="#990000">,</font>self<font color="#990000">.</font>x_units<font color="#990000">,</font>self<font color="#990000">.</font>width<font color="#990000">))</font>
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s: ymin: %f y_may: %f y_inc: %f name: %s ny: %d \n'</font> <font color="#990000">%</font> <font color="#990000">(</font>f<font color="#990000">,</font>self<font color="#990000">.</font>y_range<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>self<font color="#990000">.</font>y_range<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font>self<font color="#990000">.</font>dy<font color="#990000">,</font>self<font color="#990000">.</font>y_units<font color="#990000">,</font>self<font color="#990000">.</font>height<font color="#990000">))</font>
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s: z_min: %f x_max: %f name: %s \n'</font> <font color="#990000">%</font> <font color="#990000">(</font>f<font color="#990000">,</font>self<font color="#990000">.</font>z_range<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>self<font color="#990000">.</font>z_range<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font>self<font color="#990000">.</font>z_units<font color="#990000">))</font>
+        out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'%s: scale_factor: %f add_offset: %f\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>f<font color="#990000">,</font>self<font color="#990000">.</font>scale_factor<font color="#990000">,</font>self<font color="#990000">.</font>add_offset<font color="#990000">))</font>
+<!-- -->
+grd <font color="#990000">=</font> <b><font color="#000000">Grd</font></b><font color="#990000">(</font><font color="#FF0000">'g3.grd'</font><font color="#990000">)</font>
+grd<font color="#990000">.</font><b><font color="#000000">info</font></b><font color="#990000">()</font></tt></pre>
+Here are the results from this python code.  These match pretty well to the grdinfo.
+<pre>% <b>./gmt.py</b>
+g3.grd: Title: 
+g3.grd: Command: grdcut santabarbF_bath.grd -Gg3.grd -R-120.150001013862/-120.139997147338/34.3899087775448/34.4000213817476 -V
+g3.grd: gridline node registration
+g3.grd: xmin: -120.150001 x_max: -120.139997 x_inc: 0.000109 name: user_x_unit nx: 93 
+g3.grd: ymin: 34.389909 y_may: 34.400021 y_inc: 0.000109 name: user_y_unit ny: 94 
+g3.grd: z_min: -260.718994 x_max: -206.770004 name: user_z_unit 
+g3.grd: scale_factor: 1.000000 add_offset: 0.000000</pre>
+-----

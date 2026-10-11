@@ -1,0 +1,78 @@
+TITLE: Processing Multibeam with MB-System (Notes from the Revelle)
+AUTHOR: Kurt
+DATE: 11.13.2006 15:34
+DESC: Initial howto
+-----
+BODY:
+This is the beginning of a couple entries on processing multi-beam
+sonar on the R/V Revelle (and also my first blog post while at sea.)
+
+NOTE: This is not the complete way to process the data.  I am missing
+several steps and we are also working on getting Caris installed on
+the ship.
+
+The first task is to find the sonar and XBT (eXpendable Bathy
+Thermograph) data on the ships computers.  Our cruise is CA0606RR, so
+the EM120 multibeam system has its data stored in
+/SCG.PROC/CRUISE.DATA/EM120/raw/CA0606RR.  I used scp to bring the
+data to my laptop.  The -r is for recursive and the -p preserves timestamps.
+<pre>
+  scp -p -r revelle:/SCG.PROC/CRUISE.DATA/EM120/raw/CA0606RR ~/Desktop/em120raw
+</pre>
+I had to figure out which multibeam format to us in mbsystem.  The
+file naming convention on the Revelle does say what number the format
+is.  A quick look at "man mbio" shows this:
+<pre>
+           MBIO Data Format ID:  56
+           Format name:          MBF_EM300RAW
+           Informal Description: Simrad current multibeam
+                                 vendor format
+           Attributes:           Simrad EM120, EM300, EM1002,
+                                 EM3000, bathymetry, amplitude,
+                                 and sidescan, up to 254 beams,
+                                 variable pixels, ascii + binary,
+                                 Simrad.
+
+           MBIO Data Format ID:  57
+           Format name:          MBF_EM300MBA
+           Informal Description: Simrad multibeam processing format
+           Attributes:           Old and new Simrad multibeams,
+                        EM12S, EM12D, EM121, EM120,
+                                 EM300, EM100, EM1000, EM950,
+                                 EM1002, EM3000, bathymetry,
+                                 amplitude, and sidescan,
+                                 up to 254 beams, variable pixels,
+                                 ascii + binary, MBARI.
+</pre>
+Based on that, I think the data is in format 56.  Inside that new
+directory is where I will work.  The first task is to create the list
+of files that will be processed into one grid.
+<pre>
+	ls *_raw.all | awk '{print $1, 56}' > datalist
+</pre>
+Then datalist will look something like this:
+<pre>
+0001_20061111_164959_raw.all 56
+0001_20061111_180424_raw.all 56
+0001_20061112_172712_raw.all 56
+0001_20061113_082736_raw.all 56
+0002_20061111_165145_raw.all 56
+0002_20061111_234540_raw.all 56
+</pre>
+
+I started out wanting to see how the data looked at 30m (which is what
+the MBARI em300 survey used).  I then tried 15m to see how small the
+grid cell size can be.  I tried producing a grid file, but dmagic
+(from the Fledermaus package) was unable to read them.  Instead I used
+an Arc/ASCII format (which is specified by -G4).  Here is my command that
+I used.
+<pre>mbgrid -Idatalist -R-120.5/-119.5/34/34.5 -Oall_to_20061113 -A2 -N -E30/30/meters -G4
+cp all_to_20061113.asc ~/Desktop/
+</pre>
+Now open dmagic and import a gridded surface.  After creating a sd
+file for the area, I did a quick transect/profile line across the
+crack.
+
+<!-- <img src="http://schwehr.org -->
+<img src="http://schwehr.org/blog/attachments/2006-11/GaviotaCrack-pass1.png">
+-----

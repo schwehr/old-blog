@@ -1,0 +1,46 @@
+TITLE: extracting data from application plists
+AUTHOR: Kurt
+DATE: 02.04.2009 14:25
+DESC: not too hard
+-----
+BODY:
+I wanted to pull the RSS feeds from an older NetNewsWireLite
+application and migrate it to NetNewsWire 3.0 with NewsGater.
+However, I'm not quite up to remote desktoping in to the other server
+to run NetNewsWire Lite and export an OPML.  Also, I'd like to only
+import a subset of old feeds.  This gave me a chance to play with Mac
+OSX plists from python.
+
+The first thing to know is that the current plist format doesn't work
+directly with the python plistlib.  You have to first convert it to a
+XML format and then it is readable with plistlib.
+
+First grab a copy of the subscriptions plist file:
+<pre>% <b>cp ~/schwehr/Library/Application\ Support/NetNewsWire/Subscriptions.plist</b></pre>
+Here is the code to convert the plist and then grab the RSS urls: 
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> plistlib<font color="#990000">,</font> os
+<!-- -->
+os<font color="#990000">.</font><b><font color="#000000">system</font></b><font color="#990000">(</font><font color="#FF0000">'plutil -convert xml1 -o Subscriptions.xml Subscriptions.plist'</font><font color="#990000">)</font>
+<!-- -->
+pl <font color="#990000">=</font> plistlib<font color="#990000">.</font><b><font color="#000000">readPlist</font></b><font color="#990000">(</font><font color="#FF0000">'Subscriptions.xml'</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b><font color="#FF0000"> '''&lt;html&gt;&lt;body&gt;&lt;ul&gt;'''</font>
+<b><font color="#0000FF">for</font></b> item <b><font color="#0000FF">in</font></b> pl<font color="#990000">:</font>
+    <b><font color="#0000FF">if</font></b> <font color="#FF0000">'rss'</font> <b><font color="#0000FF">in</font></b> item<font color="#990000">.</font><b><font color="#000000">keys</font></b><font color="#990000">():</font> 
+        url <font color="#990000">=</font> item<font color="#990000">[</font><font color="#FF0000">'rss'</font><font color="#990000">]</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;li&gt;&lt;a href="%s"&gt;%s&lt;/a&gt;&lt;/li&gt;'</font> <font color="#990000">%</font> <font color="#990000">(</font>url<font color="#990000">,</font>url<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b><font color="#FF0000"> '''&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;'''</font>
+</tt></pre>
+Run it like this:
+<pre>% <b>dumprss_from_plist.py &gt; feeds.html</b></pre>
+Then open it and start using the urls to add the feeds to your news reader.
+<pre>% <b>open feeds.html</b></pre>
+<ul>
+<li><a href="http://www.schwehr.org/blog/rss.xml">http://www.schwehr.org/blog/rss.xml</a></li>
+<li><a href="http://the-moni-blog.blogspot.com/feeds/posts/default?alt=rss">http://the-moni-blog.blogspot.com/feeds/posts/default?alt=rss</a></li>
+<li><a href="http://www.aliceandval.com/valswork/blog/atom.xml">http://www.aliceandval.com/valswork/blog/atom.xml</a></li>
+<li><a href="http://ccom.unh.edu/rss/ccom_rss.xml">http://ccom.unh.edu/rss/ccom_rss.xml</a></li>
+...
+</ul>
+-----

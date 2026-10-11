@@ -1,0 +1,63 @@
+TITLE: apache2 and libapache2-mod-python-py25 in fink
+AUTHOR: Kurt
+DATE: 08.27.2007 16:28
+DESC: whew... it works
+-----
+BODY:
+I was having problems with mod-python in fink.  After rebuilding
+apache2, the bus errors disappeared.  I think this comes from me
+building apache2 a while back and then compiled mod python.  I did a
+fink rebuild of apache2 and now all is well.  When it was failing,
+life was not fun.  After doing an <b>apache2ctl restart</b>, it went
+into an infinite loop trying to start apache2.  BTW, Mac OSX sticks
+crash dumps in /Library/Logs/CrashReporter/apache2.crash.log
+
+The proceedure:
+<pre>
+fink install apache2
+fink install libapache2-mod-python-py25 
+sudo a2enmod python2.5
+sudo emacs /sw/etc/apache2/apache2.conf
+</pre>
+Now in the apache2.conf file, add this to the end just for testing:
+<pre>
+&lt;Location /mpinfo&gt;
+    SetHandler mod_python
+    PythonInterpreter main_interpreter
+    PythonHandler mod_python.testhandler
+&lt;/Location&gt;
+</pre>
+Now restart apache and give a look at the mod python info:
+<pre>
+sudo apache2ctl restart
+open http://localhost/mpinfo
+</pre>
+<h3>General information</h3>
+<table border="1">
+<tr><td><code>Apache version</code></td><td><code>Apache/2.0.59 (Unix) mod_python/3.3.1 Python/2.5.1</code></td></tr>
+<tr><td><code>Apache threaded MPM</code></td><td><code>Yes, maximum 25 threads / process</code></td></tr>
+<tr><td><code>Apache forked MPM</code></td><td><code>Yes, maximum 6 processes</code></td></tr>
+<tr><td><code>Apache server root</code></td><td><code>/sw/etc/apache2</code></td></tr>
+
+<tr><td><code>Apache document root</code></td><td><code>/sw/var/www</code></td></tr>
+<tr><td><code>Apache error log</code></td><td><code>/sw/var/log/apache2/error.log</code> (<a href="?view_log=1" target="_new">view last 100 lines</a>)</td></tr>
+<tr><td><code>Python sys.version</code></td><td><code>2.5.1 (r251:54863, May 11 2007, 07:21:53) 
+[GCC 4.0.1 (Apple Computer, Inc. build 5341)]</code></td></tr>
+<tr><td><code>Python sys.path</code></td><td><pre>/sw/lib/python25.zip
+/sw/lib/python2.5
+/sw/lib/python2.5/plat-darwin
+/sw/lib/python2.5/plat-mac
+/sw/lib/python2.5/plat-mac/lib-scriptpackages
+/sw/lib/python2.5/lib-tk
+/sw/lib/python2.5/lib-dynload
+/sw/lib/python2.5/site-packages
+/sw/lib/python2.5/site-packages/Numeric
+/sw/lib/python2.5/site-packages/PIL
+/sw/lib/python2.5/site-packages/ellipt2d
+/sw/lib/python2.5/site-packages/gtk-2.0</pre></td></tr>
+<tr><td><code>Python interpreter name</code></td><td><code>main_interpreter</code></td></tr>
+
+<tr><td><code>mod_python.publisher available</code></td><td><code>Yes</code></td></tr>
+<tr><td><code>mod_python.psp available</code></td><td><code>Yes</code></td></tr>
+</table>
+-----

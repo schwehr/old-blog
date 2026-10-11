@@ -1,0 +1,82 @@
+TITLE: Working towards a serial logging daemon for linux
+AUTHOR: Kurt
+DATE: 07.04.2007 17:52
+DESC: never enough
+-----
+BODY:
+I am close to having serial_logger.py working as a daemon on remoting
+linux boxes (ubuntu).  It needs to be able to start itself on reboot
+and respond to stop/restart requests.  Here is my initial ugly script that
+is now in /etc/init.d.  I need to fix serial_logger.py to have an option
+to act like a daemon (fork to the background) and to catch a shutdown
+signal so that it writes the shutdown into the log file.  Always more work
+to do!
+
+The <b>start-stop-daemon</b> program is a nice addition to linux that
+I have not used before.  If only my program behaved better so that it
+played nicely with this handler.  I have not put in the links into
+/etc/rc?.d for the start script, but when I have the serial logger
+setup correctly in daemon mode, I will do that.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash -e</strong></font>
+<font color="#444444">#</font>
+<font color="#444444"># aislog		This init.d script is used to start serial data logging on tide1 for ais.</font>
+<font color="#444444">#			It basically just calls the python serial logger
+ENV=&quot;env -i LANG=C PATH=/usr/local/bin:/usr/bin:/bin:/home/schwehr/projects/noaadata/scripts&quot;
+set -e</font>
+. /lib/lsb/init-functions
+test -f /etc/default/rcS &amp;&amp; . /etc/default/rcS
+#
+<font color="#2040a0">SERIAL_LOGGER</font>=/home/schwehr/projects/noaadata/scripts/serial_logger.py
+<font color="#2040a0">DAEMON</font>=<font color="#2040a0">$SERIAL_LOGGER</font>
+<font color="#2040a0">NAME</font>=`basename <font color="#2040a0">$0</font>`
+<font color="#2040a0">PIDFILE</font>=${PIDFILE:-/var/run/<font color="#2040a0">$NAME</font>.pid}
+<font color="#2040a0">ARGS</font>=`echo <font color="#2040a0">$ARGS</font> --<font color="#2040a0">port</font>=/dev/ttyS2 --log-<font color="#2040a0">prefix</font>=ais- --uscg-format --station-id nhjel --<font color="#2040a0">timeout</font>=300 --mark-timeouts`
+
+case <font color="#008000">&quot;<font color="#2040a0">$1</font>&quot;</font> in
+	start)
+		echo -n <font color="#008000">&quot;Starting <font color="#2040a0">$DESC</font>: &quot;</font>
+		start-stop-daemon --background --start --quiet --pidfile <font color="#2040a0">$PIDFILE</font> \
+		    --chuid schwehr \
+		    --chdir /home/schwehr/projects/data/tide1/ais \
+		    --exec <font color="#2040a0">$DAEMON</font> -- <font color="#2040a0">$ARGS</font> 2&gt;&amp;1
+<font color="#444444"># FIX: make serial_logger act like a daemon if asked
+#		sleep 1</font>
+<font color="#444444">#		if [ -f &quot;$PIDFILE&quot; ] &amp;&amp; ps h `cat &quot;$PIDFILE&quot;` &gt;/dev/null; then</font>
+<font color="#444444">#			echo &quot;$NAME.&quot;</font>
+<font color="#444444">#		else</font>
+<font color="#444444">#			echo &quot;$NAME failed to start; check syslog for diagnostics.&quot;</font>
+<font color="#444444">#			exit 1
+#		fi
+		echo &quot;$NAME.&quot;
+		;;</font>
+	stop)
+		echo -n <font color="#008000">&quot;Stopping <font color="#2040a0">$DESC</font>: <font color="#2040a0">$NAME</font>&quot;</font>
+<font color="#444444">#		start-stop-daemon --oknodo --stop --quiet --pidfile $PIDFILE 
+#		start-stop-daemon --oknodo --stop --quiet \</font>
+<font color="#444444">#			--exec $DAEMON -- $ARGS 2&gt;&amp;1
+		echo &quot;.&quot;</font>
+		echo <font color="#008000">&quot;FIX: stop broken&quot;</font>
+		;;
+	reload)
+		# Do nothing since ELOG daemon responds to 
+		# the changes in conffile directly.
+		;;
+	restart|force-reload)
+		<font color="#2040a0">$0</font> stop
+		sleep 1
+		<font color="#2040a0">$0</font> start
+		if [ <font color="#008000">&quot;$?&quot;</font> != <font color="#008000">&quot;0&quot;</font> ]; then
+			exit 1
+		fi
+		;;
+	*)
+		<font color="#2040a0">N</font>=/etc/init.d/<font color="#2040a0">$NAME</font>
+		echo <font color="#008000">&quot;Usage: <font color="#2040a0">$N</font> {start|stop|restart|reload|force-reload}&quot;</font> &gt;&amp;2
+		exit 1
+		;;
+esac
+<font color="#444444">#</font>
+exit 0
+</pre>
+-----

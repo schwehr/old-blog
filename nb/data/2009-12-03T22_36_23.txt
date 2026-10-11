@@ -1,0 +1,89 @@
+TITLE: BAG to Google Earth using GDAL
+AUTHOR: Kurt
+DATE: 12.03.2009 22:36
+DESC: beginnings of an automated workflow
+-----
+BODY:
+With help from FrankW and EvenR on the GDAL IRC channel, I now have
+the beginnings of my workflow to convert a large number of BAGs (<a
+href="http://www.opennavsurf.org/">Bathymetry Attributed Grids</a>) to
+a Google Earth Visualization.  Frank's BAG reader definitely gets the job
+done.  Here is how I've been going so far.  This is based on gdal 1.6.4svn.
+I checked out the source from svn on my mac and setup fink:
+<pre>svn checkout https://svn.osgeo.org/gdal/trunk/gdal gdal
+fink remove --recursive gdal gdal-dev
+fink install gmt hdf5</pre>
+I then configured it like this:
+<pre>./configure --with-hdf5=/sw --with-libz=/sw --without-perl \
+--without-python --prefix=/Users/schwehr/local LDFLAGS=-L/sw/lib \
+CC=/sw/bin/gcc-4 CXX=/sw/bin/g++-4 -target=i386-apple-darwin10.2.0 \
+--with-proj4=/sw --with-static-proj4=/sw  --without-ogr
+make -j 2
+make install</pre>
+The first step is to warp the BAG from UTM to Geographic.  The default
+is to convert to a geotiff.  That works, but we need to bump up the Z
+values to floats to capture the precision of the depth soundings.
+Note that gdalwarp can not go directly to many formats: <a href="http://trac.osgeo.org/gdal/wiki/FAQRaster#Whywontgdalwarporgdal_mergewritetomostformats">Why won't gdalwarp or gdal_merge write to most formats?</a>.  That's why I warp and then translate to get to a GMT grid.
+<pre><b>~/local/bin/gdalwarp -ot Float32 -t_srs EPSG:4326  H11657_1of5_1m_Final_Depth.bag H11657_1of5_1m_Final_Depth.tif</b>
+Creating output file that is 2292P x 5212L.
+Processing input file H11657_1of5_1m_Final_Depth.bag.
+Using internal nodata values (eg. 1e+06) for image H11657_1of5_1m_Final_Depth.bag.
+0...10...20...30...40...50...60...70...80...90...100 - done.</pre>
+Using gdal info shows us that this geotif makes sense:
+<pre><b>~/local/bin/gdalinfo H11657_1of5_1m_Final_Depth.tif</b>
+Driver: GTiff/GeoTIFF
+Files: H11657_1of5_1m_Final_Depth.tif
+Size is 2292, 5212
+Coordinate System is:
+GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0],
+    UNIT["degree",0.0174532925199433],
+    AUTHORITY["EPSG","4326"]]
+Origin = (-76.052723696313151,37.621900224152917)
+Pixel Size = (0.000009296811983,-0.000009296811983)
+Metadata:
+  AREA_OR_POINT=Area
+Image Structure Metadata:
+  INTERLEAVE=PIXEL
+Corner Coordinates:
+Upper Left  ( -76.0527237,  37.6219002) ( 76d 3'9.81"W, 37d37'18.84"N)
+Lower Left  ( -76.0527237,  37.5734452) ( 76d 3'9.81"W, 37d34'24.40"N)
+Upper Right ( -76.0314154,  37.6219002) ( 76d 1'53.10"W, 37d37'18.84"N)
+Lower Right ( -76.0314154,  37.5734452) ( 76d 1'53.10"W, 37d34'24.40"N)
+Center      ( -76.0420695,  37.5976727) ( 76d 2'31.45"W, 37d35'51.62"N)
+Band 1 Block=2292x1 Type=Float32, ColorInterp=Gray
+Band 2 Block=2292x1 Type=Float32, ColorInterp=Undefined</pre>
+Now get the GeoTiff to a GMT GRD:
+<pre>~/local/bin/gdal_translate -b 1 -of GMT H11657_1of5_1m_Final_Depth.tif H11657_1of5_1m_Final_Depth.grd</pre>
+GDAL writes old style grid files, which still works just fine.
+<pre><b>grdinfo H11657_1of5_1m_Final_Depth.grd</b>
+H11657_1of5_1m_Final_Depth.grd: Title: 
+H11657_1of5_1m_Final_Depth.grd: Command: 
+H11657_1of5_1m_Final_Depth.grd: Remark: 
+H11657_1of5_1m_Final_Depth.grd: Pixel node registration used
+H11657_1of5_1m_Final_Depth.grd: Grid file format: cf (# 10) GMT netCDF format (float) (deprecated)                  
+H11657_1of5_1m_Final_Depth.grd: x_min: -76.0527236963 x_max: -76.0314154032 x_inc: 9.29681198274e-06 name: meters nx: 2292
+H11657_1of5_1m_Final_Depth.grd: y_min: 37.5734452401 y_max: 37.6219002242 y_inc: 9.29681198274e-06 name: meters ny: 5212
+H11657_1of5_1m_Final_Depth.grd: z_min: -18.7246704102 z_max: 0 name: meters
+H11657_1of5_1m_Final_Depth.grd: scale_factor: 1 add_offset: 0</pre>
+To make sure things were doing what I expected, I loaded the data into DMagic.
+
+<img title="Using Fledermaus and DMagic to proof GMT grid" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/gmt-grd-2-kml-in-fm-dmagic.png"/>
+
+I then created and SD, and loaded it up in Fledermaus.  I made a
+GeoTiff MapSheet (under Tools).  In DMagic, I loaded it back in and
+right clicked the GeoTiff and make a Google Earth file... success!
+Fledermaus / DMagic can directly read BAG's and do the right thing, but
+the point is to develop a preview mode in Google Earth that I can put up
+on the web so that people can more easily get at the BAGs.  I want to
+automate the process of creating the Google Earth preview and a popup that
+lets you download the BAG so that you can use it in Fledermaus.
+
+<img title="First BAG in KML as an image" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/bag-in-google-earth.png"/>
+
+<a href="http://schwehr.org/blog/attachments/2009-12/H11657_1of5_1m_Final_Depth_sd.kmz">H11657_1of5_1m_Final_Depth_sd.kmz</a>
+-----

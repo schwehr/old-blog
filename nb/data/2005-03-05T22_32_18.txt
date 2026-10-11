@@ -1,0 +1,40 @@
+TITLE: quick ssh command tutorial
+AUTHOR: Kurt
+DATE: 03.05.2005 22:32
+DESC: a little something for Jason S.
+-----
+BODY:
+If you want to ssh to another command and run something on the remote
+machine (which is useful for e.g. a backup script) here are some
+examples to get you going:
+<pre>
+   # The simplest example... localhost is the same as your current machine
+   ssh localhost ls
+
+   # now make it a remote machine
+   ssh pixie ls
+
+   # if you are having name resolution troubles where it says
+   # "who the heck is pixie"
+   ssh pixie.ucsd.edu ls
+
+   # You need quotes if the command had any spaces
+   ssh pixie "ls -l"
+
+   # What if you need to switch users?
+   ssh smith@pixie "ls -la"
+
+   # What if you are not sure that you are getting to the right host?
+   ssh pixie hostname
+   ssh pixie "uname -a"
+   ssh pixie pwd
+
+   # So you want to backup the etc directory on a remote machine to a
+   # tar file and copy it to your current computer?
+   ssh smith@pixie "tar cf etc.tar /etc"
+   ssh smith@pixie "bzip2 -9 etc.tar"
+   scp smith@pixie:etc.tar.bz2 .
+   tar tfjv etc.tar.bz2
+</pre>
+Party on Wayne.  Party on Garth.
+-----

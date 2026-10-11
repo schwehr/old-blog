@@ -1,0 +1,51 @@
+TITLE: SqlSoup in SqlAlchemy
+AUTHOR: Kurt
+DATE: 03.13.2009 09:35
+DESC: a better way to play with data?
+-----
+BODY:
+Yesterday, Brian C. showed me how easy it is to access SQLite data
+from inside of Matlab.  Looking at my code to access the same database
+in Python with sqlite3, made me look for an easier way.  I looked at
+SqlAlchemy and was starting to wonder why it was such a pain to
+specify all these object relationships.  Then I saw <a
+href="http://www.sqlalchemy.org/trac/wiki/SqlSoup">SqlSoup</a>.  As
+usual, I'm working with AIS data from msgs 1-3 and 5.
+<pre>% <b>sqlite ais.db3 .schema</b>
+<tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> position <font color="#990000">(</font> 
+  <b><font color="#0000FF">key</font></b> INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font> MessageID INTEGER<font color="#990000">,</font> RepeatIndicator INTEGER<font color="#990000">,</font> 
+  UserID INTEGER<font color="#990000">,</font> NavigationStatus INTEGER<font color="#990000">,</font> ROT INTEGER<font color="#990000">,</font> SOG <font color="#009900">DECIMAL</font><font color="#990000">(</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">),</font> 
+  PositionAccuracy INTEGER<font color="#990000">,</font> longitude <font color="#009900">DECIMAL</font><font color="#990000">(</font><font color="#993399">8</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">),</font> latitude <font color="#009900">DECIMAL</font><font color="#990000">(</font><font color="#993399">8</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">),</font> 
+  COG <font color="#009900">DECIMAL</font><font color="#990000">(</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">),</font> TrueHeading INTEGER<font color="#990000">,</font> <font color="#009900">TimeStamp</font> INTEGER<font color="#990000">,</font> 
+  RegionalReserved INTEGER<font color="#990000">,</font> Spare INTEGER<font color="#990000">,</font> RAIM <font color="#009900">BOOL</font><font color="#990000">,</font> 
+  state_syncstate INTEGER<font color="#990000">,</font> state_slottimeout INTEGER<font color="#990000">,</font> 
+  state_slotoffset INTEGER<font color="#990000">,</font> cg_r <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">15</font><font color="#990000">),</font> cg_sec INTEGER<font color="#990000">,</font> 
+  cg_timestamp <font color="#009900">TIMESTAMP</font> 
+<font color="#990000">);</font>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> shipdata <font color="#990000">(</font> 
+  <b><font color="#0000FF">key</font></b> INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font> MessageID INTEGER<font color="#990000">,</font> RepeatIndicator INTEGER<font color="#990000">,</font> 
+  UserID INTEGER<font color="#990000">,</font> AISversion INTEGER<font color="#990000">,</font> IMOnumber INTEGER<font color="#990000">,</font> callsign <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">7</font><font color="#990000">),</font> 
+  name <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> shipandcargo INTEGER<font color="#990000">,</font> dimA INTEGER<font color="#990000">,</font> dimB INTEGER<font color="#990000">,</font> 
+  dimC INTEGER<font color="#990000">,</font> dimD INTEGER<font color="#990000">,</font> fixtype INTEGER<font color="#990000">,</font> ETAminute INTEGER<font color="#990000">,</font> 
+  ETAhour INTEGER<font color="#990000">,</font> ETAday INTEGER<font color="#990000">,</font> ETAmonth INTEGER<font color="#990000">,</font> draught <font color="#009900">DECIMAL</font><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">),</font> 
+  destination <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> dte INTEGER<font color="#990000">,</font> Spare INTEGER<font color="#990000">,</font> cg_r <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">15</font><font color="#990000">),</font> 
+  cg_sec INTEGER<font color="#990000">,</font> cg_timestamp <font color="#009900">TIMESTAMP</font>
+<font color="#990000">);</font></tt></pre>
+Here is a quick example of looking at the data with SqlSoup:
+<pre>% <b>ipython</b>
+from sqlalchemy.ext.sqlsoup import SqlSoup
+db = SqlSoup('sqlite:///ais.db3')
+db.position.get(10)
+<font color="#009900">Out: MappedPosition(key=10,MessageID=1,RepeatIndicator=0,UserID=366994950,
+     NavigationStatus=7,ROT=-128,SOG=Decimal('0.1'),PositionAccuracy=0,
+     longitude=Decimal('-76.0895316667'),latitude=Decimal('36.90689'),
+     COG=Decimal('87.8'),TrueHeading=511,TimeStamp=7,RegionalReserved=0,
+     Spare=0,RAIM=False,state_syncstate=0,state_slottimeout=3,
+     state_slotoffset=31,cg_r=None,cg_sec=1222819204,
+     cg_timestamp=datetime.datetime(2008, 10, 1, 0, 0, 4))</font>
+p = db.position.get(10)
+p.longitude,p.latitude,p.UserID,p.cg_sec
+<font color="#009900">Out[8]: (Decimal('-76.0895316667'), Decimal('36.90689'), 366994950, 1222819204)</font></pre>
+I still have more to figure out with SqlSoup and it would be great to
+make this work seamlessly with matplotlib.  Also, <a href="http://elixir.ematia.de/trac/wiki">Elixir</a> looks very much like the Django ORM.
+-----

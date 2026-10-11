@@ -1,0 +1,74 @@
+TITLE: Testing and collaboration
+AUTHOR: Kurt
+DATE: 07.17.2011 13:45
+DESC: scary bugs
+-----
+BODY:
+And this is why working by yourself totally sucks.  Since last year,
+I've noticed ships in ERMA with shipandcargo/type_and_cargo greater
+than 100.  Trouble is that I was given a draft USCG AIS setup sheet
+to review and it had type_and_cargo values over 100 on it.  So I assumed
+that I was seeing these in use.  WRONG!
+
+I'm working on some data analysis for tomorrow and git one of these
+again, but this time I was setup to dump the NMEA and compare.  libais 
+was giving 241.  Here is the message decoded in noaadata:
+<pre>./ais_msg_5.py -d '!AIVDM,1,1,3,A,53f&lt;sj0281hWTP7;335`tM84HT62222222222216BpN:D0Ud0K0S0@jp4i@H88888888880,2*05,1296517901'
+shipdata:
+        MessageID:        5
+        RepeatIndicator:  0
+        UserID:           249773000
+        AISversion:       0
+        IMOnumber:        8914697
+        callsign:         9HA2001
+        name:             ZOGRAFIA            
+        shipandcargo:     <b>70</b>
+        dimA:             151
+        dimB:             30
+        dimC:             10
+        dimD:             20</pre>
+Looking at ais5.cpp, here is the code that I had:
+<pre>    name = ais_str(bs, 112, 120);
+    type_and_cargo = ubits(bs, 120, 8);
+    dim_a = ubits(bs, 240, 9);</pre>
+That was seriously wrong!  name starts at bit 112 and is 120 bits long.  I
+was tired when I wrote that code and did not have a test harness ready.
+type_and_cargo should have started at 112+120!  I now have this line:
+<pre>    type_and_cargo = ubits(bs, 232, 8);</pre>
+And life is better.  This bug has been in there since 2010-May-03.
+Having a team mate that understands what you are doing and looks over
+what you do and writing test cases is priceless.  I'm sure there are
+lots of other issues like this lurking in libais.  :(
+
+This bug has been in a user facing interface for more than a year and 
+used as the COP for Deepwater Horizon.  Nobody ever said anything.
+Shame on me for the lack of testing and shame on the responders for
+mindlessly using the tool.
+
+libais lives in github, so there is now a place to submit issues:
+<a href="https://github.com/schwehr/libais/issues">https://github.com/schwehr/libais/issues</a>
+
+See also: <a href="https://github.com/schwehr/libais/commit/eb4644ee34e7656e901fe43fb24e8f85ca636eae">commit eb4644ee34e7656e901fe43fb24e8f85ca636eae</a>
+
+And there still are vessels with their shipandcargo>100:
+<pre>./ais_msg_5.py -d '!AIVDM,1,1,3,B,544aRB023Op=D8hGT00hTp@Lthl0000000000;Rd30f2840000000000000000000000000,2*32,1296510715'
+shipdata:
+        MessageID:        5
+        RepeatIndicator:  0
+        UserID:           273310280
+        AISversion:       0
+        IMOnumber:        8617859
+        callsign:         UBLE9@@
+        name:             LINDGOLM@@@@@@@@@@B8
+        shipandcargo:     172
+        dimA:             24
+        dimB:             46
+        dimC:             2
+        dimD:             8
+        fixtype:          1
+        ETAmonth:         0
+        ETAday:           0
+        ETAhour:          0
+        ETAminute:        0
+        draught:          0</pre>
+-----

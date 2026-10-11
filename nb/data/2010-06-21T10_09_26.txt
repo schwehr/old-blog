@@ -1,0 +1,99 @@
+TITLE: Using hdf5 built in commands to examine a BAG
+AUTHOR: Kurt
+DATE: 06.21.2010 10:09
+DESC: Alternative ways to explore BAGs
+-----
+BODY:
+BAGs are still a fairly new concept to me and in general to the
+community, so I am in the mode where I am trying to figure out how to 
+understand the files.  I haven't used HDF5 much before and am exploring
+to understand and decode as many aspects of a BAG as possible.  HDF5 comes
+with a bunch of command line tools that can show you what is inside of a BAG.
+The first tool is h5ls
+<pre><b>h5ls some_bathy.bag</b>
+BAG_root                 Group</pre>
+But it's better do list a BAG out recursively ('-r') to see the entire
+structure:
+<pre><b>h5ls --recursive some_bathy.bag</b>
+/                        Group
+/BAG_root                Group
+/BAG_root/elevation      Dataset {6077, 5692}
+/BAG_root/metadata       Dataset {12484/Inf}
+/BAG_root/tracking_list  Dataset {0/Inf}
+/BAG_root/uncertainty    Dataset {6077, 5692}</pre>
+I've tried to figure out a way to nicely print out the metadata, but so
+far, I have not found a clean way to do it.  This command gets you part
+of the way, but then you will have to reverse the encoding of the XML:
+<pre><b>h5ls --string --simple -d some_bathy.bag/BAG_root/metadata | cut -f2 -d\" | tr -d '\n' &gt; yuck.xml</b>
+<b>cat yuck.xml</b>
+metadata                 Dataset {12484/Inf}    Data:<b><font color="#000080">&lt;?xml</font></b><font color="#009900">%20version</font><font color="#990000">=</font><font color="#FF0000">1.0%20encoding</font>=<font color="#009900">UTF</font>-<font color="#009900">8</font><b><font color="#000080">?&gt;</font></b>%0a<i><font color="#9A1900">&lt;!--%20BAG%20Metadata%20-%20Created%20with:%20-vSABER_</font></i>...
+</pre>
+Then it is time to try h5dump to see the structure of the data.
+<pre><b>h5dump -H some_bathy.bag</b>
+HDF5 <font color="#FF0000">"some_bathy.bag"</font> <font color="#FF0000">{</font>
+GROUP <font color="#FF0000">"/"</font> <font color="#FF0000">{</font>
+   GROUP <font color="#FF0000">"BAG_root"</font> <font color="#FF0000">{</font>
+      ATTRIBUTE <font color="#FF0000">"Bag Version"</font> <font color="#FF0000">{</font>
+         <font color="#008080">DATATYPE</font>  H5T_STRING <font color="#FF0000">{</font>
+               STRSIZE <font color="#993399">32</font><font color="#990000">;</font>
+               <font color="#008080">STRPAD</font> H5T_STR_NULLTERM<font color="#990000">;</font>
+               <font color="#008080">CSET</font> H5T_CSET_ASCII<font color="#990000">;</font>
+               <font color="#008080">CTYPE</font> H5T_C_S1<font color="#990000">;</font>
+            <font color="#FF0000">}</font>
+         DATASPACE  SCALAR
+      <font color="#FF0000">}</font>
+      DATASET <font color="#FF0000">"elevation"</font> <font color="#FF0000">{</font>
+         <font color="#008080">DATATYPE</font>  H5T_IEEE_F32LE
+         <font color="#008080">DATASPACE</font>  SIMPLE <font color="#FF0000">{</font> <font color="#990000">(</font> <font color="#993399">6077</font><font color="#990000">,</font> <font color="#993399">5692</font> <font color="#990000">)</font> <font color="#990000">/</font> <font color="#990000">(</font> <font color="#993399">6077</font><font color="#990000">,</font> <font color="#993399">5692</font> <font color="#990000">)</font> <font color="#FF0000">}</font>
+         ATTRIBUTE <font color="#FF0000">"Maximum Elevation Value"</font> <font color="#FF0000">{</font>
+            <font color="#008080">DATATYPE</font>  H5T_IEEE_F32LE
+            DATASPACE  SCALAR
+         <font color="#FF0000">}</font>
+         ATTRIBUTE <font color="#FF0000">"Minimum Elevation Value"</font> <font color="#FF0000">{</font>
+            <font color="#008080">DATATYPE</font>  H5T_IEEE_F32LE
+            DATASPACE  SCALAR
+         <font color="#FF0000">}</font>
+      <font color="#FF0000">}</font>
+      DATASET <font color="#FF0000">"metadata"</font> <font color="#FF0000">{</font>
+         <font color="#008080">DATATYPE</font>  H5T_STRING <font color="#FF0000">{</font>
+               STRSIZE <font color="#993399">1</font><font color="#990000">;</font>
+               <font color="#008080">STRPAD</font> H5T_STR_NULLTERM<font color="#990000">;</font>
+               <font color="#008080">CSET</font> H5T_CSET_ASCII<font color="#990000">;</font>
+               <font color="#008080">CTYPE</font> H5T_C_S1<font color="#990000">;</font>
+            <font color="#FF0000">}</font>
+         <font color="#008080">DATASPACE</font>  SIMPLE <font color="#FF0000">{</font> <font color="#990000">(</font> <font color="#993399">12484</font> <font color="#990000">)</font> <font color="#990000">/</font> <font color="#990000">(</font> H5S_UNLIMITED <font color="#990000">)</font> <font color="#FF0000">}</font>
+      <font color="#FF0000">}</font>
+      DATASET <font color="#FF0000">"tracking_list"</font> <font color="#FF0000">{</font>
+         <font color="#008080">DATATYPE</font>  H5T_COMPOUND <font color="#FF0000">{</font>
+            H5T_STD_U32LE <font color="#FF0000">"row"</font><font color="#990000">;</font>
+            H5T_STD_U32LE <font color="#FF0000">"col"</font><font color="#990000">;</font>
+            H5T_IEEE_F32LE <font color="#FF0000">"depth"</font><font color="#990000">;</font>
+            H5T_IEEE_F32LE <font color="#FF0000">"uncertainty"</font><font color="#990000">;</font>
+            H5T_STD_U8LE <font color="#FF0000">"track_code"</font><font color="#990000">;</font>
+            H5T_STD_I16LE <font color="#FF0000">"list_series"</font><font color="#990000">;</font>
+         <font color="#FF0000">}</font>
+         <font color="#008080">DATASPACE</font>  SIMPLE <font color="#FF0000">{</font> <font color="#990000">(</font> <font color="#993399">0</font> <font color="#990000">)</font> <font color="#990000">/</font> <font color="#990000">(</font> H5S_UNLIMITED <font color="#990000">)</font> <font color="#FF0000">}</font>
+         ATTRIBUTE <font color="#FF0000">"Tracking List Length"</font> <font color="#FF0000">{</font>
+            <font color="#008080">DATATYPE</font>  H5T_STD_U32LE
+            DATASPACE  SCALAR
+         <font color="#FF0000">}</font>
+      <font color="#FF0000">}</font>
+      DATASET <font color="#FF0000">"uncertainty"</font> <font color="#FF0000">{</font>
+         <font color="#008080">DATATYPE</font>  H5T_IEEE_F32LE
+         <font color="#008080">DATASPACE</font>  SIMPLE <font color="#FF0000">{</font> <font color="#990000">(</font> <font color="#993399">6077</font><font color="#990000">,</font> <font color="#993399">5692</font> <font color="#990000">)</font> <font color="#990000">/</font> <font color="#990000">(</font> <font color="#993399">6077</font><font color="#990000">,</font> <font color="#993399">5692</font> <font color="#990000">)</font> <font color="#FF0000">}</font>
+         ATTRIBUTE <font color="#FF0000">"Maximum Uncertainty Value"</font> <font color="#FF0000">{</font>
+            <font color="#008080">DATATYPE</font>  H5T_IEEE_F32LE
+            DATASPACE  SCALAR
+         <font color="#FF0000">}</font>
+         ATTRIBUTE <font color="#FF0000">"Minimum Uncertainty Value"</font> <font color="#FF0000">{</font>
+            <font color="#008080">DATATYPE</font>  H5T_IEEE_F32LE
+            DATASPACE  SCALAR
+         <font color="#FF0000">}</font>
+      <font color="#FF0000">}</font>
+   <font color="#FF0000">}</font>
+<font color="#FF0000">}</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
+-----
+

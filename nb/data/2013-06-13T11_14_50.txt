@@ -1,0 +1,71 @@
+TITLE: How much of the world is deeper than X
+AUTHOR: Kurt
+DATE: 06.13.2013 11:14
+DESC: snarky answer
+-----
+BODY:
+I was asked for fraction of the ocean deeper than 20 fathoms.  That
+gets tricky.  What would the differnce be if this were at MLLW vrs
+MHW?  I welcome input from anyone specializing in geodesy, vertical
+datums and tides.
+
+I prefer to work in units of chains.  So how much is deeper than 1.8
+chains (aka -36.576m)... 97.1% of the WORLD (oceans + other things that might be
+deeper but not in the ocean).  And this is relative to whatever
+vertical datum topo30 uses.
+
+Here is using the topo30 2012 edition from David Sandwell and JJ
+Becker.  First a warning.  There is a non-commercial license on the
+topo30 data.  This is more restrictive than the GPL license that many
+are familiar with.
+<pre>Permission to copy, modify and distribute any part of this gridded
+bathymetry at 30 second resolution for educational, research and
+non-profit purposes, without fee, and without a written agreement is
+hereby granted ...
+<!-- -->
+... use for commercial purposes should contact the Technology Transfer
+& Intellectual Property Services, University of California, San Diego ...</pre>
+<pre><b>wget ftp://topex.ucsd.edu/pub/srtm30_plus/topo30/topo30.grd</b>
+<b>gdal_translate topo30.grd topo30.tif</b>
+<b>grdinfo topo30.grd</b>
+<!-- -->
+topo30.grd: Title: topo30.grd
+topo30.grd: Command: xyz2grd -V -Rg -I30c topo30 -Gtopo30.grd=ns -ZTLhw -F
+topo30.grd: Remark: 
+topo30.grd: Pixel node registration used
+topo30.grd: Grid file format: ns (# 16) GMT netCDF format (short)  (COARDS-compliant)           
+topo30.grd: x_min: 0 x_max: 360 x_inc: 0.00833333333333 name: longitude [degrees_east] nx: 43200
+topo30.grd: y_min: -90 y_max: 90 y_inc: 0.00833333333333 name: latitude [degrees_north] ny: 21600
+topo30.grd: z_min: -11609 z_max: 8685 name: z
+topo30.grd: scale_factor: 1 add_offset: 0
+<!-- --> 
+# z above is altitude in meters relative to ?
+<!-- --> 
+# install ipython, gdal-py and numpy
+<b>ipython</b>
+<!-- -->
+import gdal
+<!-- -->
+src = gdal.Open('topo30.tif')
+topo30 = src.GetRasterBand(1).ReadAsArray()
+num_deep = (topo30 < -36.576).sum()  
+'%.1f %% of the globe' % (num_deep / float(topo30.size) * 100)
+<!-- -->
+67.7 % of the globe
+<!-- -->
+num_ocean = (topo30 < 0).sum()
+'%.1f %% of the ocean is deeper than 36.576m' % ( 100. * num_deep / float(num_ocean) )</pre>
+<pre>'97.1 % of the ocean is deeper than 36.576m'</pre>
+Minus issues with resolution, vertical datums, tides and other stuff,
+97.1% of the world is deeper than 20 fathoms and 91.4% is deeper than
+100 fathoms.
+
+<a
+href="https://gist.github.com/schwehr/5789528">https://gist.github.com/schwehr/5789528</a>
+- 
+<a href="http://nbviewer.ipython.org/5789528">http://nbviewer.ipython.org/5789528</a>
+
+<img width="383" height="260" title="Topo30 histogram" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-06/topo30-hist.png"/>
+
+<img width="383" height="260" title="Topo 30 cdf" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-06/topo30-cdf.png"/>
+-----

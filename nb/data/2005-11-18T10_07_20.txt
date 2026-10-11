@@ -1,0 +1,50 @@
+TITLE: subqueries for Banerjee plot
+AUTHOR: Kurt
+DATE: 11.18.2005 10:07
+DESC: combining rows from the same table
+-----
+BODY:
+Myche just helped me work though building an SQL query to generate the
+data for a Banerjee plot.  In plotting ARM100mT and IRM10kGauss, I
+have to pull the pairs out of different rows in the same table.  Turns
+out this can be done with either temporary tables or subqueries.  I
+started down the subquery path here, so that is what I will show.
+
+First the schema for the table.
+<pre>
+CREATE TABLE mag ( samplename VARCHAR(40), treatment REAL, csd REAL,
+  intensity REAL, dec REAL, inc REAL, timeMeasured TIMESTAMP, type
+  VARCHAR(10), operator VARCHAR(20), depth REAL, cruise VARCHAR(20),
+  corenum INTEGER, coretype VARCHAR(1), corehalf VARCHAR(1) , section
+  INTEGER, sectionoffset REAL);
+</pre>
+The <em>type</em> field is either "arm" or "irm" for each measurement
+made on Flo the magnetometer.  So I have a two rows, both with the
+same sample name that need to be joined together, but the intensity
+value for each must be renamed.
+<pre>
+samplename         type  intensity
+==========         ====  =========
+ttn136b-2pw-s6-100 irm   0.0026260000
+ttn136b-2pw-s6-100 arm   0.0000352900
+<pre>
+To solve this I made a subquery for each for irm and arm samples,
+renamed the fields and joined them by matching names.  This does leave
+out the problem of separating cores from each other, but that is
+pretty easy to add and will just make this example more confusing.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+#
+<font color="#2040a0">q1</font>=<font color="#008000">&quot;SELECT samplename AS armsample, intensity AS arm FROM mag WHERE type='arm'&quot;</font>
+<font color="#2040a0">q2</font>=<font color="#008000">&quot;SELECT samplename AS irmsample, intensity AS irm FROM mag WHERE type='irm'&quot;</font>
+#
+sqlite ttn136b.db <font color="#008000">&quot;SELECT irm,arm FROM (<font color="#2040a0">$q1</font>),(<font color="#2040a0">$q2</font>) WHERE armsample=irmsample;&quot;</font>
+</pre>
+This results in this query getting sent to sqlite:
+<pre>
+  SELECT arm,irm FROM \
+    (SELECT samplename AS armsample, intensity AS arm FROM mag WHERE type='arm') \
+   ,(SELECT samplename AS irmsample, intensity AS irm FROM mag WHERE type='irm') \
+    WHERE armsample=irmsample;
+</pre>
+-----

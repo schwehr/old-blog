@@ -1,0 +1,25 @@
+TITLE: GNUplot from sqlite3 using plot special-filename
+AUTHOR: Kurt
+DATE: 05.19.2009 11:03
+DESC: Better, but not perfect
+-----
+BODY:
+I while back, I requested a new gnuplot feature: <a
+href="http://sourceforge.net/tracker/?func=detail&atid=352055&aid=2753994&group_id=2055">sql
+queries (e.g. sqlite)</a> or some sort of more direct way to access
+sqlite without dropping temporary files on the disk.  Juergen was kind
+enough to point me to "help plot special-filename" in gnuplot.  It isn't
+totally what I was thinking, but it is definitely much better than what
+I had before.  One drawback is that this is awefully hard to debug what
+is going wrong... turned out that I've got NULLs in my depth values when
+there is not CTR NMEA report from the Healy.
+<pre>% <b>gnuplot</b>
+gnuplot&gt; <b>set term x11</b> # Aquaterm doesn't allow rotation with splots
+gnuplot&gt; <b>plot '&lt; sqlite3 healy.db3 "SELECT lat,-depth FROM healy_summary WHERE depth IS NOT NULL;" | tr "|" "  "' t 'depth'</b> </pre>
+<img title="2D gnuplot from sqlite" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/healy-gnuplot-depth-lat.png"/>
+<pre>gnuplot&gt; <b>splot '&lt; sqlite3 healy.db3 "SELECT lon,lat,-depth FROM healy_summary WHERE depth IS NOT NULL;" | tr "|" "  "' t 'depth'</b></pre>
+<img title="3D splot with gnuplot" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/healy-gnuplot-splot-depth.png"/>
+
+I was really hoping to just transition to matplotlib, but I keep coming
+back to gnuplot.
+-----

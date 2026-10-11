@@ -1,0 +1,93 @@
+TITLE: VDatum GTX files in QGIS and GDAL
+AUTHOR: Kurt
+DATE: 03.29.2012 13:01
+DESC: progress
+-----
+BODY:
+I should have guess that Frank had already taken a look at all this before.
+He showed me how to take a look at the conversion grids in GDAL and since
+QGIS is built on top of GDAL, you can see the grids right in QGIS.  First,
+checking out a grid with gdal:
+<pre><b>gdalinfo TXlaggal01_8301/mhw.gtx</b>
+Driver: GTX/NOAA Vertical Datum .GTX
+Files: TXlaggal01_8301/mhw.gtx
+Size is 2446, 1742
+Coordinate System is:
+GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        TOWGS84[0,0,0,0,0,0,0],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.0174532925199433,
+        AUTHORITY["EPSG","9108"]],
+    AUTHORITY["EPSG","4326"]]
+Origin = (263.124500000000012,29.890499999999999)
+Pixel Size = (0.001000000000000,-0.001000000000000)
+Corner Coordinates:
+Upper Left  (     263.125,      29.890) (263d 7'28.20"E, 29d53'25.80"N)
+Lower Left  (     263.125,      28.148) (263d 7'28.20"E, 28d 8'54.60"N)
+Upper Right (     265.571,      29.890) (265d34'13.80"E, 29d53'25.80"N)
+Lower Right (     265.571,      28.148) (265d34'13.80"E, 28d 8'54.60"N)
+Center      (     264.348,      29.020) (264d20'51.00"E, 29d 1'10.20"N)
+Band 1 Block=2446x1 Type=Float32, ColorInterp=Undefined
+27.60056127.600561</pre>
+The GTX format is documented in the gdal code:
+<pre>float64  latitude_of_origin
+float64  longitude_of_origin (0-360)
+float64  cell size (x?y?)
+float64  cell size (x?y?)
+int32    length in pixels
+int32    width in pixels
+<!-- -->
+Data
+====
+float32  * width in pixels * length in pixels </pre>
+I did a quick check on the data using python to make sure the files made sense.
+This is not the kind of code that I would write for production!
+<pre><tt><b>ipython -pylab</b>
+<!-- -->
+gtx <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'mllw.gtx'</font><font color="#990000">).</font><b><font color="#000000">read</font></b><font color="#990000">()</font>
+lat<font color="#990000">,</font>lon<font color="#990000">,</font>x_size<font color="#990000">,</font> y_size <font color="#990000">=</font> struct<font color="#990000">.</font><b><font color="#000000">unpack_from</font></b><font color="#990000">(</font><font color="#FF0000">'&gt;4d'</font><font color="#990000">,</font>gtx<font color="#990000">)</font>
+wide<font color="#990000">,</font> high <font color="#990000">=</font> struct<font color="#990000">.</font><b><font color="#000000">unpack_from</font></b><font color="#990000">(</font><font color="#FF0000">'&gt;2i'</font><font color="#990000">,</font>gtx<font color="#990000">,</font><font color="#993399">4</font><font color="#990000">*</font><font color="#993399">8</font><font color="#990000">)</font>
+grid <font color="#990000">=</font> struct<font color="#990000">.</font><b><font color="#000000">unpack_from</font></b><font color="#990000">(</font><font color="#FF0000">'&gt;'</font><font color="#990000">+</font><b><font color="#000000">str</font></b><font color="#990000">(</font>wide<font color="#990000">*</font>high<font color="#990000">)+</font><font color="#FF0000">'f'</font><font color="#990000">,</font> gtx<font color="#990000">,</font> <font color="#993399">4</font><font color="#990000">*</font><font color="#993399">8</font> <font color="#990000">+</font> <font color="#993399">2</font><font color="#990000">*</font><font color="#993399">4</font><font color="#990000">)</font>
+<!-- -->
+real_data <font color="#990000">=</font> <font color="#990000">[]</font>
+<b><font color="#0000FF">for</font></b> i <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>grid<font color="#990000">)):</font>
+  <i><font color="#9A1900"># No data appears to be -88.8888</font></i>
+  <b><font color="#0000FF">if</font></b> grid<font color="#990000">[</font>i<font color="#990000">]</font> <font color="#990000">&gt;</font> <font color="#990000">-</font><font color="#993399">88</font><font color="#990000">:</font>
+    real_data<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>grid<font color="#990000">[</font>i<font color="#990000">])</font>
+<!-- -->
+<b><font color="#000000">hist</font></b><font color="#990000">(</font>real_data<font color="#990000">,</font>bins<font color="#990000">=</font><font color="#993399">100</font><font color="#990000">)</font>
+<b><font color="#000000">title</font></b><font color="#990000">(</font><font color="#FF0000">'Histogram of vdatum offsets'</font><font color="#990000">)</font>
+<b><font color="#000000">xlabel</font></b><font color="#990000">(</font><font color="#FF0000">'vertical offset (m)'</font><font color="#990000">)</font>
+<b><font color="#000000">ylabel</font></b><font color="#990000">(</font><font color="#FF0000">'num cells'</font><font color="#990000">)</font>
+</tt></pre>
+<img width="600" height="452" title="Histogram of GTX offsets" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-03/gtx-histogram.png"/>
+
+I then loaded two adjacent gtx files and compared the values along the
+edges.  They are the same within 1mm.  Note that I gave the two gtx grids
+slightly different color ramps to make it easier to tell them apart.
+
+<img width="600" height="519" title="VDatum GTX files in QGIS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-03/qgis-vdatum-gtx.png"/>
+
+Note: It's a bummer that the VDatum team didn't put in a "magic" file
+identifier at the beginning of the GTX file to allow the unix file
+command to identify these files.  We have to count on the file
+structure and ".gtx" extension.  We must look at the directory
+name to get the version number for the grid.  I highly recommend to
+anyone listening that when you design a file format, make sure you
+also put that infomation inside the file.
+<pre><b>file *</b>
+dtl.gtx:             data
+mhhw.gtx:            data
+mhw.gtx:             data
+mllw.gtx:            data
+mlw.gtx:             data
+mtl.gtx:             data
+tss.gtx:             data
+TXlaggal01_8301.bnd: ASCII text
+TXlaggal01_8301.met: ASCII text, with CRLF line terminators</pre>
+-----

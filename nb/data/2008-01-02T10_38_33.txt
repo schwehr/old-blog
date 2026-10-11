@@ -1,0 +1,71 @@
+TITLE: Embedded linux system design using syscalltrack
+AUTHOR: Kurt
+DATE: 01.02.2008 10:38
+DESC: contract work
+-----
+BODY:
+A while back (2002/2003), I worked on a contract project for an
+embedded Linux system that was meant to run on a solid state disk with
+not much space that allowed users to plug a flash drive into the unit
+and have automatic updates.  The problem was that the system only had
+256MB of storage space and had to fit the Linux kernel, busy box,
+Mozilla, and java.  One of the really cool tricks that I used to
+develop this Linux distribution was to use <a
+href="http://syscalltrack.sourceforge.net/">syscalltrack</a>.  This is
+a Linux kernel module that lets you hijack system calls.  I used it to
+generate a complete list of files that a running system would use
+during a test run.  I then used a script to remove all unused files
+from the system accept for a few in a known list of unused files that
+I wanted to keep.  I haven't tried doing this kind of thing with Linux
+2.6 kernels, but it worked greate with 2.4.
+
+Here is what a syscalltrack log likes like for Mozilla starting up...
+<pre>
+...
+syscall: 71["mozilla"]: 5_open("/lib/mmx/libtermcap.so.2", 0, 0) (rule 1)
+syscall: 71["mozilla"]: 5_open("/lib/libtermcap.so.2", 0, 0) (rule 1)
+syscall: 71["mozilla"]: 5_open("/lib/libdl.so.2", 0, 512) (rule 1)
+syscall: 71["mozilla"]: 5_open("/lib/libc.so.6", 0, 12288) (rule 1)
+syscall: 71["mozilla"]: 5_open("/dev/tty", 34818, 0) (rule 1)
+syscall: 71["mozilla"]: 5_open("/usr/share/locale/locale.alias", 0, 438) (rule 1)
+</pre>
+And then a java processing kicking off:
+<pre>
+...
+syscall: 81["java"]: 5_open("/lib/libc.so.6", 0, 1024) (rule 1)
+syscall: 81["java"]: 5_open("/usr/local/j2re1.4.1_02/lib/i386/jvm.cfg", 0, 438) 
+(rule 1)
+syscall: 81["java"]: 5_open("/etc/ld.so.preload", 0, 8) (rule 1&#41;
+syscall: 81["java"]: 5_open("/usr/local/j2re1.4.1_02/lib/i386/client/i686/mmx/li
+bpthread.so.0", 0, 0) (rule 1&#41;
+syscall: 81["java"]: 5_open("/usr/local/j2re1.4.1_02/lib/i386/client/i686/libpth
+read.so.0", 0, 0) (rule 1)
+...
+</pre>
+strace has to be done on a process by process basis, thereby becoming
+very difficult to track everything that is happing on a complete
+system run.  I also had to make a little script to excercise other
+programs on the system that I wanted to remain (e.g. grep, sed, etc)
+I then ended up with a list of files that I want to keep:
+<pre>
+...
+/bin/rm
+/bin/sed
+/bin/sh
+/bin/stat
+/bin/touch
+/bin/umount
+/bin/uname
+/dev
+/dev/apm_bios
+/dev/console
+/dev/cpu/
+/dev/cpu/mtrr
+/dev//dev/sct_log0
+/dev/mem
+/dev/null
+...
+</pre>
+I glued it all together with a lot of egrep, cut, awk, xargs,
+etc. scripting.  This was definitely a fun project.
+-----

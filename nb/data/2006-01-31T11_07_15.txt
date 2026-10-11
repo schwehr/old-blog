@@ -1,0 +1,61 @@
+TITLE: ucsd latex thesis
+AUTHOR: Kurt
+DATE: 01.31.2006 11:07
+DESC: citations/references
+-----
+BODY:
+I just worked out how to control the citations in my thesis.  I first
+read <a
+href="http://www.andy-roberts.net/misc/latex/latextutorial3.html">Getting
+to Grips with Latex - Bibliography Management</a> by Andy Roberts.
+Then here is what I did.  The beginning of my thesis document looks
+like this:
+<pre>
+  \documentclass[12pt]{report}
+  \usepackage{natbib}
+  \bibpunct{(}{)}{;}{a}{,}{,}
+  \usepackage{ucsd-thesis}
+  \usepackage{graphicx}
+  \begin{document}
+</pre>
+I just added the natbib and bibpunct commands.  Then I modified the
+end of the document to look like this:
+<pre>
+  a \nocite{schwehr2003}
+  b \cite{schwehr2003}
+  c \citet{schwehr2003}
+  d \citep{schwehr2003}
+  e \citet*{schwehr2003}
+  f \citep*{schwehr2003}
+  %\bibliographystyle{plain}  % this was numbered, which I do not want.
+  \bibliographystyle{plainnat}
+  \bibliography{schwehr}
+  \end{document}
+</pre>
+The results come out something like this:
+<pre>
+  a
+  b Schwehr and Tauxe (2003)
+  c Schwehr and Tauxe (2003)
+  d (Schwehr and Tauxe, 2003)
+  e Schwehr and Tauxe (2003)
+  f (Schwehr and Tauxe, 2003)
+
+  Bibliography
+    K.D. Schwehr and L. Tauxe. Characterization of soft sediment deformation:
+    dectection of crypto-slumps using magnetic methods. Geology, 31(3):203-206,
+    2003.
+</pre>
+BTW, the bibtex entry for schwehr2003 is:
+<pre>
+@article{
+schwehr2003,
+   Author = {Schwehr, K.D. and Tauxe, L.},
+   Title = {Characterization of soft sediment deformation: dectection of crypto-slumps using magnetic methods},
+   Journal = {Geology},
+   Volume = {31},
+   Number = {3},
+   Pages = {203-206},
+   Year = {2003} }
+</pre>
+-----

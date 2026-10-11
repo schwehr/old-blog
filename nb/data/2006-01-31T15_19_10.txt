@@ -1,0 +1,63 @@
+TITLE: xstar nav file decimators
+AUTHOR: Kurt
+DATE: 01.31.2006 15:19
+DESC: for becca
+-----
+BODY:
+Here are two little python scripts to help out those who have to deal
+with decimating navigation data from the SIO XStar system.  This will
+not work close to the prime meridian because of a bug in the
+processing software or chirp... that would be the lines that looks for
++/- .1 degrees.
+
+To use these commands, just pass a list of files in like "./filter.py
+foo.txt bar.txt sos.tex justshootmenow.txt"
+
+The first script sends the results to stdout (a.ka. the screen or console).
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>for</strong> <font color="#2040a0">file</font> <strong>in</strong> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">file</font>
+    <font color="#2040a0">linenum</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">file</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>.<font color="#2040a0">readlines</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">fields</font><font color="4444FF">=</font><font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>if</strong> <font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'lat'</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#2040a0">line</font>, <font color="#444444"># keep the header</font>
+            <strong>continue</strong>    <font color="#444444"># but do NOT count it</font>
+        <strong>if</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font> .<font color="#FF0000">1</font> <strong>and</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&gt;</font> <font color="4444FF">-</font>.<font color="#FF0000">1</font><font color="4444FF">:</font>
+            <strong>continue</strong> <font color="#444444"># skip nasty bad nav points from the xstar</font>
+        <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">linenum</font><font color="4444FF">%</font><font color="#FF0000">500</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#2040a0">line</font>,
+        <font color="#2040a0">linenum</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+</pre>
+The next one gets a little be more tricky.  It dumps the decimated
+data to a new file with ".500" appended to the original file name.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>for</strong> <font color="#2040a0">file</font> <strong>in</strong> <font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">file</font>
+    <font color="#2040a0">linenum</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+    <font color="#2040a0">out</font><font color="4444FF">=</font><font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">+</font><font color="#008000">'.500'</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+    
+    <strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#2040a0">file</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>.<font color="#2040a0">readlines</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <font color="#2040a0">fields</font><font color="4444FF">=</font><font color="#2040a0">line</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+        <strong>if</strong> <font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'lat'</font><font color="4444FF">:</font>
+            <strong>if</strong> <font color="#2040a0">linenum</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font> <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font> <font color="#444444"># keep the header</font>
+            <strong>continue</strong>    <font color="#444444"># but do NOT count it</font>
+
+        <strong>if</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font> .<font color="#FF0000">1</font> <strong>and</strong> <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">&gt;</font> <font color="4444FF">-</font>.<font color="#FF0000">1</font><font color="4444FF">:</font>
+            <strong>continue</strong> <font color="#444444"># skip nasty bad nav points from the xstar</font>
+
+        <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">linenum</font><font color="4444FF">%</font><font color="#FF0000">500</font><font color="4444FF">:</font>
+            <font color="#2040a0">out</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+
+        <font color="#2040a0">linenum</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+</pre>
+The second script also drops any following header info about which
+field is which when generated by the lsd command.
+
+Enjoy!
+-----

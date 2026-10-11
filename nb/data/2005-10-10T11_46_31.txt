@@ -1,0 +1,106 @@
+TITLE: matplotlib stereonets
+AUTHOR: Kurt
+DATE: 10.10.2005 11:46
+DESC: foo
+-----
+BODY:
+
+Yet again, I go for google and end up back at my blog with no
+information gained.  I am trying to figure out how to do
+stereonets/polar plots.  
+
+<a href="http://matplotlib.sourceforge.net/matplotlib.pylab.html#-polar">http://matplotlib.sourceforge.net/matplotlib.pylab.html#-polar</a>
+<pre>
+polar(*args, **kwargs)
+    POLAR(theta, r)
+     
+    Make a polar plot.  Multiple theta, r arguments are supported,
+    with format strings, as in plot.
+</pre>
+There are two polar examples in the zip...  first polar_scatter.py:
+<pre>
+<font color="#FF8800">#!/usr/bin/env python</font>
+<font color="#FF8800"># a polar scatter plot; size increases radially in this example and</font>
+<font color="#FF8800"># color increases with angle (just to verify the symbols are being</font>
+<font color="#FF8800"># scattered correctlu).  In a real example, this would be wasting</font>
+<font color="#FF8800"># dimensionlaity of the plot</font>
+<strong>from</strong> <font color="#2040a0">pylab</font> <strong>import</strong> <font color="4444FF">*</font>
+
+<font color="#2040a0">N</font> <font color="4444FF">=</font> <font color="#FF0000">150</font>
+<font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">rand</font><font color="4444FF">(</font><font color="#2040a0">N</font><font color="4444FF">)</font>
+<font color="#2040a0">theta</font> <font color="4444FF">=</font> <font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">rand</font><font color="4444FF">(</font><font color="#2040a0">N</font><font color="4444FF">)</font> 
+<font color="#2040a0">area</font> <font color="4444FF">=</font> <font color="#FF0000">200</font><font color="4444FF">*</font><font color="#2040a0">r</font><font color="4444FF">*</font><font color="4444FF">*</font><font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">rand</font><font color="4444FF">(</font><font color="#2040a0">N</font><font color="4444FF">)</font>
+<font color="#2040a0">colors</font> <font color="4444FF">=</font> <font color="#2040a0">theta</font>
+<font color="#2040a0">ax</font> <font color="4444FF">=</font> <font color="#2040a0">subplot</font><font color="4444FF">(</font><font color="#FF0000">111</font>, <font color="#2040a0">polar</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+<font color="#2040a0">c</font> <font color="4444FF">=</font> <font color="#2040a0">scatter</font><font color="4444FF">(</font><font color="#2040a0">theta</font>, <font color="#2040a0">r</font>, <font color="#2040a0">c</font><font color="4444FF">=</font><font color="#2040a0">colors</font>, <font color="#2040a0">s</font><font color="4444FF">=</font><font color="#2040a0">area</font><font color="4444FF">)</font>
+<font color="#2040a0">c</font>.<font color="#2040a0">set_alpha</font><font color="4444FF">(</font><font color="#FF0000">0.75</font><font color="4444FF">)</font>
+
+<font color="#FF8800">#savefig('polar_test2')</font>
+<font color="#2040a0">show</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Which makes this:<br>
+<img src="http://schwehr.org/blog/attachments/2005-10/polar_test2.png">
+
+There is also polar_demo.py which makes a spiral
+<pre>
+<font color="#FF8800">#!/usr/bin/env python</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># matplotlib now has a PolarAxes class and a polar function in the</font>
+<font color="#FF8800"># matplotlib interface.  This is considered alpha and the interface</font>
+<font color="#FF8800"># may change as we work out how polar axes should best be integrated</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># The only function that has been tested on polar axes is &quot;plot&quot; (the</font>
+<font color="#FF8800"># pylab interface function &quot;polar&quot; calls ax.plot where ax is a</font>
+<font color="#FF8800"># PolarAxes) -- other axes plotting functions may work on PolarAxes</font>
+<font color="#FF8800"># but haven't been tested and may need tweaking.</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># you can get get a PolarSubplot instance by doing, for example</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800">#   subplot(211, polar=True)</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># or a PolarAxes instance by doing</font>
+<font color="#FF8800">#   axes([left, bottom, width, height], polar=True)</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># The view limits (eg xlim and ylim) apply to the lower left and upper</font>
+<font color="#FF8800"># right of the rectangular box that surrounds to polar axes.  Eg if</font>
+<font color="#FF8800"># you have</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800">#  r = arange(0,1,0.01)</font>
+<font color="#FF8800">#  theta = 2*pi*r</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># the lower left corner is 5/4pi, sqrt(2) and the</font>
+<font color="#FF8800"># upper right corner is 1/4pi, sqrt(2)</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># you could change the radial bounding box (zoom out) by setting the</font>
+<font color="#FF8800"># ylim (radial coordinate is the second argument to the plot command,</font>
+<font color="#FF8800"># as in matlab(TM), though this is not advised currently because it is not</font>
+<font color="#FF8800"># clear to me how the axes should behave in the change of view limits.</font>
+<font color="#FF8800"># Please advise me if you have opinions.  Likewise, the pan/zoom</font>
+<font color="#FF8800"># controls probably do not do what you think they do and are better</font>
+<font color="#FF8800"># left alone on polar axes.  Perhaps I will disable them for polar</font>
+<font color="#FF8800"># axes unless we come up with a meaningful, useful and functional</font>
+<font color="#FF8800"># implementation for them.</font>
+<font color="#FF8800">#</font>
+<font color="#FF8800"># See the pylab rgrids and thetagrids functions for</font>
+<font color="#FF8800"># information on how to customize the grid locations and labels</font>
+
+<strong>from</strong> <font color="#2040a0">pylab</font> <strong>import</strong> <font color="4444FF">*</font>
+
+<font color="#FF8800"># radar green, solid grid lines</font>
+<font color="#2040a0">rc</font><font color="4444FF">(</font><font color="#008000">'grid'</font>, <font color="#2040a0">color</font><font color="4444FF">=</font><font color="#008000">'#316931'</font>, <font color="#2040a0">linewidth</font><font color="4444FF">=</font><font color="#FF0000">1</font>, <font color="#2040a0">linestyle</font><font color="4444FF">=</font><font color="#008000">'-'</font><font color="4444FF">)</font>
+<font color="#2040a0">rc</font><font color="4444FF">(</font><font color="#008000">'tick'</font>, <font color="#2040a0">labelsize</font><font color="4444FF">=</font><font color="#FF0000">15</font><font color="4444FF">)</font>
+<font color="#FF8800"># force square figure and square axes looks better for polar, IMO</font>
+<font color="#2040a0">figure</font><font color="4444FF">(</font><font color="#2040a0">figsize</font><font color="4444FF">=</font><font color="4444FF">(</font><font color="#FF0000">8</font>,<font color="#FF0000">8</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#2040a0">ax</font> <font color="4444FF">=</font> <font color="#2040a0">axes</font><font color="4444FF">(</font><font color="4444FF">[</font><font color="#FF0000">0.1</font>, <font color="#FF0000">0.1</font>, <font color="#FF0000">0.8</font>, <font color="#FF0000">0.8</font><font color="4444FF">]</font>, <font color="#2040a0">polar</font><font color="4444FF">=</font><font color="#2040a0">True</font>, <font color="#2040a0">axisbg</font><font color="4444FF">=</font><font color="#008000">'#d5de9c'</font><font color="4444FF">)</font>
+
+<font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#2040a0">arange</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#FF0000">1</font>,<font color="#FF0000">0.001</font><font color="4444FF">)</font>
+<font color="#2040a0">theta</font> <font color="4444FF">=</font> <font color="#FF0000">2</font><font color="4444FF">*</font><font color="#FF0000">2</font><font color="4444FF">*</font><font color="#2040a0">pi</font><font color="4444FF">*</font><font color="#2040a0">r</font>
+<font color="#2040a0">polar</font><font color="4444FF">(</font><font color="#2040a0">theta</font>, <font color="#2040a0">r</font>, <font color="#2040a0">color</font><font color="4444FF">=</font><font color="#008000">'#ee8d18'</font>, <font color="#2040a0">lw</font><font color="4444FF">=</font><font color="#FF0000">3</font><font color="4444FF">)</font>
+
+<font color="#2040a0">title</font><font color="4444FF">(</font><font color="#008000">&quot;And there was much rejoicing!&quot;</font>, <font color="#2040a0">fontsize</font><font color="4444FF">=</font><font color="#FF0000">20</font><font color="4444FF">)</font>
+<font color="#2040a0">savefig</font><font color="4444FF">(</font><font color="#008000">'polar_demo'</font><font color="4444FF">)</font>
+<font color="#2040a0">show</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+
+
+-----

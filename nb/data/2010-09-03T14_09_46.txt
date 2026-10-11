@@ -1,0 +1,77 @@
+TITLE: AIS ATON and not Google Fusion Tables
+AUTHOR: Kurt
+DATE: 09.03.2010 14:09
+DESC: visualizing data
+-----
+BODY:
+<a href="http://tables.googlelabs.com/Home">Google Fusion Tables</a> -
+I wish I were playing with this.
+
+But instead, I'm working on the AIS ATON replacement for the USCG and
+NOAA that will go out at Cape Cod to replace the CNS6000 Class A
+transponder with the Blue Force (BF) firmware.
+
+<img title="AIS AtoN bench setup" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/l3-ais-aton-desktop-setup.jpg"/>
+
+The one big drawback of the L3 unit is that it does not come with the
+connector to let you get at the serial ports.  It turns out that this
+is an additional $330 to get at the 3 RS232 serial ports and it is
+really fragile.  You can see here that Andy M has worked hard to
+protect the cables so that I don't break them.  He added a flexable
+wrap and taped the 3 serial ports together.  Why couldn't there just be 3
+9 pin D-Shell connectors?  They are cheap and they work great.
+
+<img title="The connector that held us up" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-09/l3-ais-aton-expensive-connector.jpg"/>
+
+A quick snippet of what I get back from the unit... First on P3, I get
+the normal NMEA response.  Then the unit powers on, I get something
+like this before it has got a GPS lock:
+<pre>!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538265.16
+$ANALR,000000.00,007,A,V,AIS: UTC Lost*75,rccom-office-l3-3,1283538265.49
+$ANADS,L3 AIS ID,,A,4,I,N*02,rccom-office-l3-3,1283538265.5
+!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538268.17
+!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538271.17
+!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538274.16
+!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538277.16
+!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538280.16
+!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538283.16
+!ANVDO,1,1,,X,E00VT:QVIgPb7W00000000000006NAc0J2@`000000wP40,4*19,rccom-office-l3-3,1283538286.16
+!ANVDO,1,1,,X,E00VT:QVIgPb7W0000000000000=M`MQ&lt;Em9H00000bh40,4*5F,rccom-office-l3-3,1283538289.16
+!ANVDO,1,1,,X,E00VT:QVIgPb7W0000000000000=M`MP&lt;Em9P00000d@40,4*68,rccom-office-l3-3,1283538292.17
+!ANVDO,1,1,,X,E00VT:QVIgPb7W0000000000000=M`MP&lt;Em9p00000eh40,4*61,rccom-office-l3-3,1283538295.17
+$ANALR,000000.00,007,A,V,AIS: UTC Lost*75,rccom-office-l3-3,1283538295.66
+$ANADS,L3 AIS ID,,A,4,I,N*02,rccom-office-l3-3,1283538295.67
+$ANALR,182515.00,007,V,V,AIS: UTC Lost*68,rccom-office-l3-3,1283538297.67
+!ANVDO,1,1,,X,E00VT:QVIgPb7W0000000000000=M`MN&lt;Em:h00000g@00,4*4A,rccom-office-l3-3,1283538298.17</pre>
+The last two lines are the unit getting a GPS fix.  Here is the message decoded:
+<pre><b>./ais_msg_21_handcoded.py</b> -d '!ANVDO,1,1,,X,E00VT:QVIgPb7W0000000000000=M`MN&lt;Em:h00000g@00,4*4A'
+AidsToNavReport:
+	MessageID:           21
+	RepeatIndicator:     0
+	UserID:              631850
+	type:                3
+	name:                L3-ATON@@@@@@@@@@@@@
+	PositionAccuracy:    0
+	longitude:           -70.9395767
+	latitude:            43.1352900
+	dimA:                0
+	dimB:                0
+	dimC:                0
+	dimD:                0
+	FixType:             1
+	timestamp:           30
+	OffPosition:         True
+	status:              0
+	RAIM:                False
+	virtual_aton_flag:   False
+	assigned_mode_flag:  False
+	spare:               0
+	spare2:              0</pre>
+The unit then goes to sleep and only turns on for transmitting:
+<pre>!ANVDO,1,1,,X,E00VT:QVIgPb7W0000000000000MM`MC&lt;Em;`00000Sh60,4*24,rccom-office-l3-3,1283538589.75
+$ANALR,183007.01,007,V,V,AIS: UTC Lost*6E,rccom-office-l3-3,1283538590.93
+$ANZDA,183010.00,03,09,2010,00,00*7C,rccom-office-l3-3,1283538592.21
+!ANVDO,1,1,,Y,E00VT:QVIgPb7W0000000000000MM`MG&lt;Em&lt;000000U@20,4*5C,rccom-office-l3-3,1283538592.75
+$ANZDA,183012.00,03,09,2010,00,00*7E,rccom-office-l3-3,1283538594.21
+!ANVDO,1,1,,A,E00VT:QVIgPb7W0000000000000MM`ML&lt;Em&lt;P00000Vh20,4*04,rccom-office-l3-3,1283538595.53</pre>
+-----

@@ -1,0 +1,34 @@
+TITLE: noaadata 0.38 release
+AUTHOR: Kurt
+DATE: 05.23.2008 15:13
+DESC: go!
+-----
+BODY:
+I've had some pretty serious bugs in my noaadata releases up till now.
+I think I've nocked out a few of them.  The worst was that the nmea
+module was not being installed.  Now I need to refactor my package
+such that I am less likely to have a module name collision with other
+packages.  <b>nmea</b> is too likely to come from other packages.
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.38.tar.bz2">http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.38.tar.bz2</a>
+
+<a href="http://pypi.python.org/pypi/noaadata-py/0.38">pypi noaadata</a>
+
+This time I tested just the setup.py installed code on a server and
+ais_normalize.py finally runs.
+
+Setting up a pile of new macs with OSX 10.5 is a good way to test out
+procedures.  My tests show that my procedures really need some
+improvement/streamlining!  I had to update my geodjango info file too.
+Ouch, I forgot how slow a single G4 CPU is compared to a quad core
+Intel 3GHz xeon mac.  But, the G4 makes a fine web and file server.
+It's got a BlackMagic video card in it, but that is not likely to stay
+in that machine.
+<pre>% cd /sw/fink/10.5/local/main/finkinfo
+% mkdir sci web
+% cd web
+% wget http://vislab-ccom.unh.edu/~schwehr/software/fink/geodjango/geodjango-py.info
+% cd ../sci
+% wget http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py.info
+% fink install noaadata-py25-bin geodjango</pre>
+-----

@@ -1,0 +1,15 @@
+TITLE: AIS of a construction vessel
+AUTHOR: Kurt
+DATE: 10.07.2008 08:15
+DESC: doing donuts
+-----
+BODY:
+I'm looking at the vessel traffic for the construction of a deep water
+LNG terminal.  This pattern is very different than everything I've
+looked at to date.
+<pre>% <b>egrep 'AIVDM,1,1,[0-9]?,[AB],[1-3]' log.ais > log.ais.123</b>
+% <b>ais_build_sqlite.py  --with-create -d position.db3</b>
+% <b>sqlite3 positions.db3 'SELECT longitude,latitude,userid,cg_sec FROM position WHERE userid=246481000;' | tr '|' ' ' &gt; 246481000.xymt</b>
+% <b>xymt2kml 246481000.xymt &gt; 246481000.kml</b></pre>
+<img title="Path of the Jumbo Javelin for part of 2007" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/ais-construction-jumbo-javelin.png"/>
+-----

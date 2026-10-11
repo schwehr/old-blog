@@ -1,0 +1,120 @@
+TITLE: Friday
+AUTHOR: Kurt
+DATE: 01.21.2005 08:18
+DESC: More thesis and industrial control
+-----
+BODY:
+Welcome to Friday morning.
+
+Yesterday a few interesting things came up.  First, Catherine showed
+me a teaching tool that seems to have huge promise for larger
+classes.  Each student gets a remote that is keyed to their student
+ID.  Then in class there are receivers.  You can ask questions in
+class and get immediate responses in terms of a bar graph.  This is
+like the Pittsburgh Science Center for Nomad, but you get to know who
+answers what.  At the PSC, each chair could vote on of three ways to
+control the Nomad rover as it went through the Atacama desert.  You
+could use this kind of tool to get students to collaborate.  Answer
+first on your own, then discuss, and see if as a group you can improve
+your answer.  This is a device with a lot of potential.  What exactly
+was this thing called?  Google would not tell me.
+
+Yesterday, I took a look at sugarbush, our Linux seismic server, that
+runs Mandrake 8.1.  Now I can not remember for sure when 8.1 was the
+current version, but it must have been 2001.  So this machine needs an
+update no matter what, but at the moment it would boot under its own
+power.  It comes up into the boot process and makes it two past the
+interactive selection and hangs as it says it is starting DevFS.  I
+tried to do fsck.xfs, since it uses SGI's XFS for the root
+partitions.  However, I later discovered from the man page that
+fsck.xfs does nothing and returns success (EXIT_SUCCESS in C).
+Thanks.  Then I looked up the xfs_repair man page and here is what I
+had to do while booted in knoppix:
+<pre>
+  sudo -s
+  umount /mnt/sdb1
+  mount -w /mnt/sdb1
+  umount /mnt/sdb1
+  xfs_repair -v /mnt/sdb1
+</pre>
+Guess what... Still did not work.  I tried removing devfs from the
+lilo boot line, but got nervous about this since knoppix does all
+sorts of renaming of what is sda and sdb, so maybe I would push the
+system over the edge.  It was really strange looking at the logs.
+syslog stops in November and the messages log ends on Jan 10th.  Time
+for a total wipe of the / and /usr partitions and an install of the
+latest Mandrake version.
+
+I am currently debating putting my AMS K15 and s[7] matrix data into
+sqlite for working on the rest of my thesis.  There is a nice python
+module for working with sqlite.  This might make it much easier to
+select portions of the data for doing things like a windowed bootstrap
+that I want to try out.  The idea is that I would set a window of N
+samples, where N > 6.  I would move this window along the core and
+bootstrap a group.  Then slide the window my one sample and bootstrap
+again.  The idea is to bootstrap the smallest region of the core so
+that samples are as genetically related as possible.  For the samples
+in BPSIO Core 1 Sec 2, there is a sample every 3 cm.  That would give
+me a minimum window of 18cm.  This method would suffer the same
+problems as U-channeling does, but I might be able to find coherent
+deformation.
+
+For the todo list:  look up and explain what exactly a statistical
+null hypothesis is.
+
+Here are some interesting links on industrial control and instrument
+data acquisition from <a href="http://lwn.net/Articles/118054/">Linux
+Weekly News</a>.  ProcessViewBrowser looks like it has had much more
+development.  Exciting projects!  Qt is still on my list of things to
+learn more about, but which will not happen until some time way in the
+future.  By the way, SCADA stands for Supervisory Control And Data
+Acquisition.
+<ul>
+<li><a href="http://www.qt4lab.org/">Qt4Lab</a></li>
+<li><a href="http://www.pvbrowser.org/pvbrowser/">ProcessViewBrowser</a></li>
+<li><a href="http://qwt.sourceforge.net/">qwt</a> Qt Widgets for
+Technical Applications</li>
+</ul>
+
+A geologic article on yahoo: <a
+href="http://story.news.yahoo.com/news?tmpl=story&cid=624&ncid=753&e=1&u=/ap/20050121/ap_on_sc/great_dying">Volcanic
+Warming Eyed in 'Great Dying'</a>.  They talk about massive volcanic
+flows in Siberia.  The technical term would be <em>Large Igneous
+Province</em> (LIP), right?  Like the Ontong Java plateau or the Decan
+Traps in India.
+
+I have a little story from doing my research yesterday.  I was working
+away measuring paleomag cubes on the Kappabridge when I realized that
+a contract lens was bugging me.  After about an hour of this, I was
+getting kind of annoyed.  It is about time to go for a new pair, so I
+figured I would just throw out that one and work some more.  It would
+only be a couple hours before I would get home.  I was mostly okay,
+but it was a not the most fun looking at the computer screen.  I
+finally had to just go home.  That was when the trouble started.  I
+decided to read a computer vision magazine I had with me while I was
+on the bus.  I wanted to bury myself away from the wet cough lady
+behind me who was insisting on clinging to the back of my seat for
+dear life.  Bus drivers on the 34 route are not all alike.  Some are
+good drivers, but other treat the breaks like a binary switch so
+everyone is banging back and forth for the whole ride.  Yesterday was
+a binary switch kind of guy.  Between the driver, the reading with one
+contact, and the nasty bus area, I was pretty nauseous by the time I
+got off that bus.
+
+I added MulleSite and gcam to my <a href="http://schwehr.org/software/Darwin/macosx-install-10.3.html">MacOSX 10.3 install
+notes</a> doc yesterday.  I still have not got around to working on
+turning my two talks into a movie.
+
+<a
+href="http://news.bbc.co.uk/2/hi/science/nature/4193043.stm">Methane
+rain on Titan</a> [bbc.com]
+
+From the "Tao of Mac" is a list of <a
+href="http://the.taoofmac.com/space/Mac%20OS%20X">essential osx software</a>
+
+<a href="http://www.cvstrac.org/">cvstraq</a> uses sqlite.
+
+<a
+href="http://www.technotecture.com/software/SimplyBibTeX/">SimplybibTeX</a>
+- PHP BibTeX web program with RSS and more.  Any good?
+-----

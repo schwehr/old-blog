@@ -1,0 +1,111 @@
+TITLE: ObjC - a first NSFastEnumeration example
+AUTHOR: Kurt
+DATE: 08.11.2010 10:35
+DESC: slow going
+-----
+BODY:
+I have been extremely turned around by the ObjC Cocoa/Foundation way
+to create iterators.  I'm trying to do something that was really
+simple for me in C++ and Python: create an iterator over a file that
+is a factory returning objects decoded from the binary multibeam file
+(in this case a Simrad/Kongsberg <a
+href="http://www.km.kongsberg.com/ks/web/nokbg0240.nsf/AllWeb/E875530A90163597C1256CF00052435D?OpenDocument">EM
+3002</a>).  I've been trying to read documentation on NSEnumerator and
+NSFastEnumerator, but there are very few complete examples (e.g. I can
+compile, run and step through them with the debugger).  I have been
+looking at Matt Gallagher's post, <a
+href="http://cocoawithlove.com/2008/05/implementing-countbyenumeratingwithstat.html">Implementing
+countByEnumeratingWithState:objects:count:</a> and finally have
+something that actually runs.  What a pain.  Here is the really
+stupid, but complete example: (note that source-highlight does not
+understand ObjC)
+<pre><tt><b><font color="#000080">#import</font></b> <font color="#990000">&lt;</font>Foundation<font color="#990000">/</font>Foundation<font color="#990000">.</font>h<font color="#990000">&gt;</font>
+<!-- -->
+<b><font color="#000080">#define</font></b> ARRAY_LENGTH <font color="#993399">10</font>
+<!-- -->
+@<font color="#008080">interface</font> SimpleStringArray <font color="#990000">:</font> NSObject <font color="#990000">&lt;</font>NSFastEnumeration<font color="#990000">&gt;</font>
+<font color="#FF0000">{</font>
+    <font color="#008080">NSString</font> <font color="#990000">*</font>stringArray<font color="#990000">[</font>ARRAY_LENGTH<font color="#990000">];</font>
+<font color="#FF0000">}</font>
+@end
+<!-- -->
+@implementation SimpleStringArray
+<!-- -->
+<font color="#990000">-(</font>id<font color="#990000">)</font>init <font color="#FF0000">{</font>
+	<b><font color="#0000FF">if</font></b> <font color="#990000">(</font>self <font color="#990000">=</font> <font color="#990000">[</font><font color="#008080">super</font> init<font color="#990000">])</font> <font color="#FF0000">{</font>
+		stringArray<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"zero"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"one"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"two"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"three"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">4</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"four"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"five"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">6</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"six"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">7</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"seven"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">8</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"eight"</font><font color="#990000">;</font>
+		stringArray<font color="#990000">[</font><font color="#993399">9</font><font color="#990000">]</font> <font color="#990000">=</font> @<font color="#FF0000">"nine (last)"</font><font color="#990000">;</font>
+	<font color="#FF0000">}</font>
+	<b><font color="#0000FF">return</font></b> self<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+<!-- -->
+<font color="#990000">-</font> <font color="#990000">(</font>NSUInteger<font color="#990000">)</font>countByEnumeratingWithState<font color="#990000">:(</font>NSFastEnumerationState <font color="#990000">*)</font><font color="#008080">state</font> objects<font color="#990000">:(</font>id <font color="#990000">*)</font><font color="#008080">stackbuf</font> count<font color="#990000">:(</font>NSUInteger<font color="#990000">)</font>len
+<font color="#FF0000">{</font>
+	<b><font color="#000000">NSLog</font></b><font color="#990000">(</font>@<font color="#FF0000">"In countByEnumeratingWithState: stackbuf: %@, count: %d"</font><font color="#990000">,*</font>stackbuf<font color="#990000">,</font> len<font color="#990000">);</font>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>state<font color="#990000">-&gt;</font>state <font color="#990000">&gt;=</font> ARRAY_LENGTH<font color="#990000">)</font>
+        <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+    state<font color="#990000">-&gt;</font>itemsPtr <font color="#990000">=</font> stringArray<font color="#990000">;</font>
+    state<font color="#990000">-&gt;</font>state <font color="#990000">=</font> ARRAY_LENGTH<font color="#990000">;</font>
+    state<font color="#990000">-&gt;</font>mutationsPtr <font color="#990000">=</font> <font color="#990000">(</font><font color="#009900">unsigned</font> <font color="#009900">long</font> <font color="#990000">*)</font>self<font color="#990000">;</font>
+    
+    <b><font color="#0000FF">return</font></b> ARRAY_LENGTH<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+<!-- -->
+@end
+<!-- -->
+<font color="#009900">int</font> <b><font color="#000000">main</font></b> <font color="#990000">(</font><font color="#009900">int</font> argc<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font> argv<font color="#990000">[])</font> <font color="#FF0000">{</font>
+	NSAutoreleasePool <font color="#990000">*</font> pool <font color="#990000">=</font> <font color="#990000">[[</font><font color="#008080">NSAutoreleasePool</font> alloc<font color="#990000">]</font> init<font color="#990000">];</font>
+<!-- -->
+	<font color="#008080">SimpleStringArray</font> <font color="#990000">*</font>ssa <font color="#990000">=</font> <font color="#990000">[[</font><font color="#008080">SimpleStringArray</font> alloc<font color="#990000">]</font> init<font color="#990000">];</font>
+	<b><font color="#0000FF">for</font></b> <font color="#990000">(</font>NSString <font color="#990000">*</font>obj <font color="#008080">in</font> ssa<font color="#990000">)</font> <font color="#FF0000">{</font>
+		<b><font color="#000000">NSLog</font></b><font color="#990000">(</font>@<font color="#FF0000">"obj in ssa: %@"</font><font color="#990000">,</font> obj<font color="#990000">);</font>
+	<font color="#FF0000">}</font>
+	
+	<font color="#990000">[</font><font color="#008080">pool</font> drain<font color="#990000">];</font>
+	<b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<font color="#FF0000">}</font></tt></pre>
+Here is the header of what the above code has to handle:
+<pre><tt><i><font color="#9A1900">/*	NSEnumerator.h	Copyright (c) 1995-2009, Apple Inc. All rights reserved. */</font></i>
+<b><font color="#000080">#import</font></b> <font color="#990000">&lt;</font>Foundation<font color="#990000">/</font>NSObject<font color="#990000">.</font>h<font color="#990000">&gt;</font>
+<!-- -->
+@<b><font color="#0000FF">class</font></b> <font color="#008080">NSArray</font><font color="#990000">;</font>
+<b><font color="#0000FF">typedef</font></b> <b><font color="#0000FF">struct</font></b> <font color="#FF0000">{</font>
+    <font color="#009900">unsigned</font> <font color="#009900">long</font> state<font color="#990000">;</font>
+    <font color="#008080">id</font> <font color="#990000">*</font>itemsPtr<font color="#990000">;</font>
+    <font color="#009900">unsigned</font> <font color="#009900">long</font> <font color="#990000">*</font>mutationsPtr<font color="#990000">;</font>
+    <font color="#009900">unsigned</font> <font color="#009900">long</font> extra<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">];</font>
+<font color="#FF0000">}</font> NSFastEnumerationState<font color="#990000">;</font>
+<!-- -->
+@protocol NSFastEnumeration
+<font color="#990000">-</font> <font color="#990000">(</font>NSUInteger<font color="#990000">)</font>countByEnumeratingWithState<font color="#990000">:(</font>NSFastEnumerationState <font color="#990000">*)</font><font color="#008080">state</font> objects<font color="#990000">:(</font>id <font color="#990000">*)</font><font color="#008080">stackbuf</font> count<font color="#990000">:(</font>NSUInteger<font color="#990000">)</font>len<font color="#990000">;</font>
+@end
+<!-- -->
+@<font color="#008080">interface</font> NSEnumerator <font color="#990000">:</font> NSObject <font color="#990000">&lt;</font>NSFastEnumeration<font color="#990000">&gt;</font>
+<font color="#990000">-</font> <font color="#990000">(</font>id<font color="#990000">)</font>nextObject<font color="#990000">;</font>
+@end
+<!-- -->
+@<font color="#008080">interface</font> <b><font color="#000000">NSEnumerator</font></b> <font color="#990000">(</font>NSExtendedEnumerator<font color="#990000">)</font>
+<font color="#990000">-</font> <font color="#990000">(</font>NSArray <font color="#990000">*)</font>allObjects<font color="#990000">;</font>
+@end</tt></pre>
+It's a start.  Here is the output when it is run:
+<pre>2010-08-11 10:33:05.318 loop2[606:a0f] In countByEnumeratingWithState: stackbuf: (null), count: 16
+2010-08-11 10:33:05.320 loop2[606:a0f] obj in ssa: zero
+2010-08-11 10:33:05.320 loop2[606:a0f] obj in ssa: one
+2010-08-11 10:33:05.321 loop2[606:a0f] obj in ssa: two
+2010-08-11 10:33:05.321 loop2[606:a0f] obj in ssa: three
+2010-08-11 10:33:05.321 loop2[606:a0f] obj in ssa: four
+2010-08-11 10:33:05.321 loop2[606:a0f] obj in ssa: five
+2010-08-11 10:33:05.321 loop2[606:a0f] obj in ssa: six
+2010-08-11 10:33:05.322 loop2[606:a0f] obj in ssa: seven
+2010-08-11 10:33:05.322 loop2[606:a0f] obj in ssa: eight
+2010-08-11 10:33:05.322 loop2[606:a0f] obj in ssa: nine (last)
+2010-08-11 10:33:05.322 loop2[606:a0f] In countByEnumeratingWithState: stackbuf: (null), count: 16</pre>
+-----

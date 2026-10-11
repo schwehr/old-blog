@@ -1,0 +1,57 @@
+TITLE: boost.python hello world on Mac OSX 10.5 with fink
+AUTHOR: Kurt
+DATE: 08.02.2008 12:39
+DESC: finally it works
+-----
+BODY:
+I've been attempting to give a look at the boost.python tool for
+adding a python interface to a C++ class.  I'm trying a restart on
+creating a cBitVector class.  I don't know how to use bjam, so
+I'm not sure if there is an easier way to do this.  But I finally
+got at least something to work.  I had trouble with a missing init
+when the module name and shared object file name did not match.
+
+What I have installed from fink for this:
+<pre>
+% <b>fink list -i boost</b>
+Information about 7010 packages read in 0 seconds.
+ i   boost-jam                3.1.16-1           Extension of Perforce Jam make replacement
+ i   boost1.33-shlibs         1.33.1-1009        Boost C++ Shared Library Files
+ i   boost1.34.python25       1.34.1-1004        Boost C++ Libraries: static and source libs
+ i   boost1.34.python25-shli  1.34.1-1004        Boost C++ Libraries (shared libs)
+</pre>
+There is the source file hello.cpp.  I'm not a fan of .cpp for C++
+code, but that was the tutorial's style.
+<pre>
+<strong>char</strong> <strong>const</strong><font color="4444FF">*</font> <font color="#2040a0">greet</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>return</strong> <font color="#008000">&quot;hello&quot;</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;boost/python.hpp&gt;</font></strong></font>
+<font color="#2040a0">BOOST_PYTHON_MODULE</font><font color="4444FF">(</font><font color="#2040a0">hello</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+    <strong>using</strong> <strong>namespace</strong> <font color="#2040a0">boost</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">python</font><font color="4444FF">;</font>
+    <font color="#2040a0">def</font><font color="4444FF">(</font><font color="#008000">&quot;greet&quot;</font>,<font color="#2040a0">greet</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Build it the module.  Here is the Makefile:
+<pre>
+<font color="8b2252"><strong>default</strong>:</font>
+	g++ -fno-strict-aliasing -Wno-long-double <strong>\</strong>
+	    -g -fwrapv -g -Wall <strong>\</strong>
+	   -I/sw/include/python2.5 -I/sw/include <strong>\</strong>
+	   -c hello.cpp -o hello.o
+	gcc -L/sw/lib -bundle -undefined dynamic_lookup \
+	    hello.o -o hello.so -lboost_python
+</pre>
+Now try it out...
+<pre>
+In [1]: <b>import hello</b>
+In [2]: <b>hello. # Press tab here</b>
+hello.__class__     hello.__file__          hello.__name__      hello.__repr__    hello.greet
+hello.__delattr__   hello.__getattribute__  hello.__new__       hello.__setattr__ hello.html
+hello.__dict__      hello.__hash__          hello.__reduce__    hello.__str__     hello.o
+hello.__doc__       hello.__init__          hello.__reduce_ex__ hello.cpp         hello.so
+In [2]: <b>hello.greet()</b>
+Out[2]: 'hello'
+</pre>
+-----

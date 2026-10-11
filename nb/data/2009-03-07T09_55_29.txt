@@ -1,0 +1,76 @@
+TITLE: Cleaning up your disk
+AUTHOR: Kurt
+DATE: 03.07.2009 09:55
+DESC: unix find command
+-----
+BODY:
+WARNING: be vary careful with the find and rm
+
+Unix systems can end up with a lot of stale temporary files.  The GNU
+find command command can help with cleanup.
+<pre>% <b>fink install findutils</b>
+% <b>cd /var/tmp</b></pre>
+Now, using find, I can list the files that are older than 90 days.
+<pre>% <b>find . -mtime +90  | xargs ls -ltrd | head -10</b>
+drwx------  4 root    wheel       136 Dec 31  1969 ./orbit-root
+-r--r--r--  1 root    wheel      6120 Sep 30  2004 ./.BlankFile
+-rwxr-xr-x  1 root    wheel       173 Sep 11  2007 ./tmp.3.RzCQoQ
+-rwxr-xr-x  1 root    wheel       168 Sep 11  2007 ./tmp.2.b3GTEM
+-rwxr-xr-x  1 root    wheel       119 Sep 11  2007 ./tmp.1.BAkCol
+-rwxr-xr-x  1 root    wheel       112 Sep 11  2007 ./tmp.0.6gW3RC
+-rw-rw-rw-  1 root    wheel        48 Sep 11  2007 ./com.apple.speech.synthesis.globals
+-rwxr-xr-x  1 root    wheel      1145 Sep 19  2007 ./tmp.5.yI0YLo
+-rw-------  1 schwehr wheel     74782 Oct  1  2007 ./47013d873a962
+-rw-------  1 schwehr wheel     75155 Oct  2  2007 ./470274484c972</pre>
+Now to remove the files.  Be careful here!  A typo could do damage to your
+computer.  You have a backup, right?
+<pre>% <b>find . -mtime +90  | xargs rm</b>
+find: ./gconfd-root: Permission denied
+find: ./launchd: Permission denied
+find: ./orbit-root: Permission denied
+rm: cannot remove `./.BlankFile': Permission denied
+rm: cannot remove `./folders.501': Is a directory
+rm: cannot remove `./gconfd-root': Is a directory
+rm: cannot remove `./mds/system/mds.install.lock': Permission denied
+rm: cannot remove `./orbit-root': Is a directory
+rm: cannot remove `./sortWosd7B': Permission denied
+rm: cannot remove `./sortwUyfwU': Permission denied
+rm: cannot remove `./sortXEvhhV': Permission denied
+...</pre>
+Without having root, many of the files will not be deleted.  You can
+make this into a script to allow it to be run via sudo.  Also, I'm making
+the rm command recursive.
+<pre>cat &lt;&lt; EOF &gt; cleanup.bash
+#!/usr/bin/env bash
+find . -mtime +90  | xargs rm -rf
+EOF
+% <b>chmod +x cleanup.bash</b></pre>
+If you want to learn more about find, take a look at the manual:
+<a href="http://www.gnu.org/software/findutils/manual/find.html">GNU Find Manual</a>
+The <a
+href="http://www.gnu.org/software/findutils/manual/html_mono/find.html#Actions">actions</a>
+section shows how you can create a command without xargs.
+<pre>% <b>find . -exec ls -ld '{}' ';' | head -5</b>
+drwxrwxrwt 8 root wheel 272 Mar  7 09:37 .
+-rwxr-xr-x 1 schwehr wheel 54 Mar  7 09:29 ./cleanup.bash
+-rw------- 1 root wheel 6 Mar  5 08:58 ./krb5kdc_rcache
+drwx------ 3 root wheel 102 Mar  5 08:57 ./launchd
+find: ./launchd: Permission denied
+drwxrwxrwt 5 root wheel 170 Mar  5 08:58 ./mds</pre>
+Another area of clean is for backup files from your editor.  I use emacs and have edited
+my .emacs file to put all the backup files in one place such that I don't
+have "~" files strewn across my disk.  I can <i>cd ~/.emacs-backup</i> and
+run the same commands to cleanup my backup files.
+<pre>;;; FILE:     .emacs -*- lisp -*-
+;;; ABSTRACT: Startup file for GNU Emacs
+<!-- -->
+;;; Put backup files not in my directories
+(setq backup-directory-alist `(("." . ,(expand-file-name "~/.emacs-backup"))))
+<!-- -->
+;...
+</pre>
+Note: It looks like source-highlight doesn't have Lisp as one of it's supported
+languages.
+
+Overall, this saved me about 0.5 GB of disk space on my laptop.
+-----

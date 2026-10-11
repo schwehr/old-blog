@@ -1,0 +1,142 @@
+TITLE: emacs and elisp for pulling data over a TCP connection
+AUTHOR: Kurt
+DATE: 06.01.2011 17:23
+DESC: progress on elisp and pulling positions
+-----
+BODY:
+I have been slowly (and I mean the snails are passing me by) working
+towards my goal of creating a spatial addition of org-mode.  For part
+of that, I would like to be able to pull data from a TCP socket from
+GPSD.  I envision being able to select a priority list of position
+sources that the program will try to gracefully degrade over.  I have been
+reading about emacs lisp (elisp) off and on for the last year and a half.
+It's different enough from what I normally do (and I haven't really done 
+any lisp since about 1991), that it's challenging.  On top of that, I usually
+have only small chunks of time.
+
+I've blogged a bit about elisp in the past, but since it has been so long, I had to go back to the basics.  Start with hello world....hello.el:
+<pre><tt>#!/usr/bin/emacs --script
+<!-- -->
+<font color="#FF0000">(</font>message <font color="#FF0000">"hello world"</font><font color="#FF0000">)</font></tt></pre>
+and running this code as a command line script, the <i>message</i> function will
+write to standard out.  If you try this inside of emacs with a
+"lisp-interaction-mode" buffer, the output goes to the mini buffer.
+<pre><b>./hello.el</b>
+hello world</pre>
+Then I tried to figure out how to work with the command line.  It's possible to use traditional GNU style arguments, but here, I just want to take the <i>host</i> and <i>port</i> that I want to receive text from.  
+<pre><tt>#!/usr/bin/emacs --script
+<!-- -->
+<font color="#FF0000">(</font>message <font color="#FF0000">"command line info"</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font>message <font color="#FF0000">"command-line-args: %s "</font> command-line-args<font color="#FF0000">)</font>
+<font color="#FF0000">(</font>message <font color="#FF0000">"num_args: %d"</font> <font color="#FF0000">(</font>length command-line-args-left<font color="#FF0000">))</font>
+<font color="#FF0000">(</font>message <font color="#FF0000">"command-line-args-left: %s "</font> command-line-args-left<font color="#FF0000">)</font>
+<font color="#FF0000">(</font>message <font color="#FF0000">"cdr command-line-args-left: %s "</font> <font color="#FF0000">(</font><b><font color="#0000FF">cdr</font></b> command-line-args-left<font color="#FF0000">))</font>
+<font color="#FF0000">(</font>message <font color="#FF0000">"1st-arg: '%s'"</font> <font color="#FF0000">(</font>nth <font color="#993399">0</font> command-line-args-left<font color="#FF0000">))</font>
+<font color="#FF0000">(</font>message <font color="#FF0000">"2nd-arg: '%s'"</font> <font color="#FF0000">(</font>nth <font color="#993399">1</font> command-line-args-left<font color="#FF0000">))</font></tt></pre>
+Running this demonstrates a couple elisp features.  First,
+command-line-args contains the entire raw command line.  This is more
+than you might expect.  It's weird that the script name is not there
+at the beginning.  The "shebang" replacement is included.
+
+Then I use <i>command-line-args-left</i>, which has the unhandled
+portion of the command line in it.  I just learned the <i>nth</i>
+function, which is like array access in C-style languages.
+<pre><b>./01-command-line.el myhost.schwehr.org 9999 extra args</b>
+command line info
+command-line-args: (/usr/bin/emacs --no-splash -scriptload ./01-command-line.el myhost.schwehr.org 9999 extra args) 
+num_args: 4
+command-line-args-left: (myhost.schwehr.org 9999 extra args) 
+cdr command-line-args-left: (9999 extra args) 
+1st-arg: 'myhost.schwehr.org'
+2nd-arg: '9999'</pre>
+I then wanted to create a really simple TCP client that just prints
+what it receives.  I tried asking on stack overflow: <a
+href="http://stackoverflow.com/questions/6162967/simple-tcp-client-examples-in-emacs-elisp">Simple
+tcp client examples in emacs elisp?</a> I ended up answering my own
+question with a cut down version of <a
+href="http://www.emacswiki.org/emacs/TcpClient">TcpClient</a>.  I'll
+let you take a look at my answer over on Stack Overflow.
+
+Once I had a super simple network client, I put it together with the
+command line handling and created this simple program.  I am impressed
+with how fast emacs starts up and it is quite capable of keeping up with
+my NAIS feed.  Here is the whole code:
+<pre><tt>#!/usr/bin/emacs --script
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">if</font></b> <font color="#FF0000">(</font>= <font color="#993399">2</font> <font color="#FF0000">(</font>length command-line-args-left<font color="#FF0000">))</font>
+    <font color="#FF0000">(</font>message <font color="#FF0000">"args okay"</font><font color="#FF0000">)</font> <i><font color="#9A1900">; okay!  don't exit</font></i>
+    <font color="#FF0000">(</font><b><font color="#0000FF">progn</font></b>
+      <font color="#FF0000">(</font>message <font color="#FF0000">"ERROR: wrong number of args!"</font><font color="#FF0000">)</font>
+      <font color="#FF0000">(</font>message <font color="#FF0000">"Must specify host and port"</font><font color="#FF0000">)</font>
+      <font color="#FF0000">(</font>kill-emacs <font color="#993399">1</font><font color="#FF0000">)</font>
+      <font color="#FF0000">)</font>
+<font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defvar</font></b> listen-host <font color="#FF0000">(</font>nth <font color="#993399">0</font> command-line-args-left<font color="#FF0000">)</font>
+    <font color="#FF0000">"host to connect to"</font><font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defvar</font></b> listen-port <font color="#FF0000">(</font>nth <font color="#993399">1</font> command-line-args-left<font color="#FF0000">)</font>
+    <font color="#FF0000">"port of the service that we want to listen to"</font><font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font>message <font color="#FF0000">(</font>format <font color="#FF0000">"Connecting to host:port... %s:%s"</font> listen-host listen-port<font color="#FF0000">))</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> listen-start nil
+    <font color="#FF0000">"starts an emacs echo server"</font>
+    <font color="#FF0000">(</font>make-network-process <b><font color="#000080">:name</font></b> <font color="#FF0000">"listen"</font> <b><font color="#000080">:buffer</font></b> <font color="#FF0000">"*listen*"</font> <b><font color="#000080">:family</font></b> <font color="#009900">'ipv4</font> <b><font color="#000080">:host</font></b> listen-host 
+                 <b><font color="#000080">:service</font></b> listen-port <b><font color="#000080">:sentinel</font></b> <font color="#009900">'listen-sentinel</font> <b><font color="#000080">:filter</font></b> <font color="#009900">'listen-filter</font> <font color="#FF0000">)</font> 
+    <font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> listen-stop nil
+  <font color="#FF0000">"stop an emacs echo server"</font>
+  <font color="#FF0000">(</font>delete-process <font color="#FF0000">"listen"</font><font color="#FF0000">)</font>
+  <font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> listen-filter <font color="#FF0000">(</font>proc string<font color="#FF0000">)</font>   
+  <i><font color="#9A1900">;(message proc)</font></i>
+  <font color="#FF0000">(</font>message string<font color="#FF0000">)</font>
+  <font color="#FF0000">)</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> listen-sentinel <font color="#FF0000">(</font>proc msg<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font><b><font color="#0000FF">when</font></b> <font color="#FF0000">(</font>string= msg <font color="#FF0000">"connection broken by remote peer</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#FF0000">)</font>
+    <font color="#FF0000">(</font>message <font color="#FF0000">(</font>format <font color="#FF0000">"client %s has quit"</font> proc<font color="#FF0000">))))</font>
+<!-- -->
+<font color="#FF0000">(</font><b><font color="#0000FF">listen-start</font></b><font color="#FF0000">)</font>
+<font color="#FF0000">(</font>sleep-for <font color="#993399">300</font><font color="#FF0000">)</font>
+<font color="#FF0000">(</font><b><font color="#0000FF">listen-stop</font></b><font color="#FF0000">)</font></tt></pre>
+When I run this, it will happily sit then listening on the network for 300 seconds or quit early with Ctrl-C.
+<pre><b>./04-listen.el 127.0.0.1 9999</b>
+args okay
+Connecting to host:port... 127.0.0.1:9999
+$AITXT,01,01,01,WELCOME.  TESTING ONLY*47
+<!-- -->
+$AITXT,01,01,01,WHALE NOTICES DATETIME 20110601T221339 UTC*55
+!AIVDM,1,1,,A,81mg=5@0EP:0&lt;6i@02PN04da=3V&lt;&gt;N000,0*58,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP90&lt;6i@02PMwvgi=&lt;;T&gt;N000,0*5C,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP80&lt;6i@02PMwpWa=Drl&gt;N000,0*6A,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP70&lt;6i@02PMwi99=MG&lt;&gt;N000,0*26,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP60&lt;6i@02PMwW1i=NFt&gt;N000,0*0B,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP50&lt;6i@02PMwIp9=OAl&gt;N000,0*19,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP40&lt;6i@02PMw&lt;h1=P5D&gt;N000,0*3E,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP30&lt;6i@02PMvw`Q=PsD&gt;N000,0*5D,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP20&lt;6i@02PMvjP1=Qi&lt;&gt;N000,0*72,rTEST_RCVR,1306966201
+!AIVDM,1,1,,A,81mg=5@0EP10&lt;6i@02PMvUJ1=RTd&gt;N000,0*32,rTEST_RCVR,1306966201</pre>
+Here is a quick walk through of the program flow.  First, I check to
+make sure there are exactly two arguments left after emacs sets itself
+up.  I then pull the first arg (number 0) and store it in
+<i>listen-host</i> and I save the port number in the same way.
+
+I then define helper functions that start and stop the listener
+"process".  Emacs uses the same infrastructure for child processes and
+networking.  I use a "filter" called <i>listen-filter</i> to print to
+standard out.  The filter is called every time there is input ready
+and is handed the data that has come in.  You will notice that the
+filter just calls the <i>message</i> function to print the string.
+
+I then start the listener "process" (again, not a real processes) and
+sleep for 300 seconds.  The emacs network infrastructure is already
+setup to do event handling, so I don't have to worry about creating
+some sort of main loop with a <i>select</i> or <i>poll</i> mechanism.
+
+This code isn't what I want in the long run, but it is about the right
+complexity for me to start to understand how to get started.
+-----

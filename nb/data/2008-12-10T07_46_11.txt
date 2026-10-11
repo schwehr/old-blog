@@ -1,0 +1,68 @@
+TITLE: VOS Vessel Tracks in Google Earth
+AUTHOR: Kurt
+DATE: 12.10.2008 07:46
+DESC: Leveraging Ben's hard work
+-----
+BODY:
+<a href="http://www.maperl.com/">Ben Smith</a> has been working on the <a
+href="http://www.maperl.com/cgi-local/journal/VSTP">VSTP</a>/<a
+href="http://www.vos.noaa.gov/">VOS</a>/<a
+href="http://www.amver.com/">AMVER</a> vessel traffic.  Ben did all the
+heavy lifting and this morning, I put together a first draft of a Google
+Earth visualization.
+
+<img title="VSTP vessel plots" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-12/vos-vessel-tracks-in-ge.png"/>
+
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sqlite3 <i><font color="#9A1900"># Use python 2.5 or newer</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+    cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'200810-bensmith-vosdata.db'</font><font color="#990000">)</font>
+    cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+<!-- -->
+    callsigns <font color="#990000">=</font> <font color="#990000">[</font> x<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <b><font color="#0000FF">for</font></b> x <b><font color="#0000FF">in</font></b> cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT DISTINCT(callsign) FROM vosdata;'</font><font color="#990000">).</font><b><font color="#000000">fetchall</font></b><font color="#990000">()</font> <font color="#990000">]</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Num ships:'</font><font color="#990000">,</font><b><font color="#000000">len</font></b><font color="#990000">(</font>callsigns<font color="#990000">)</font>
+<!-- -->
+    o <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'out.kml'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+    o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'''&lt;?xml version="1.0" encoding="UTF-8"?&gt;</font>
+<font color="#FF0000">&lt;!-- voxdb2kml by Ben Smith and Kurt Schwehr py --&gt;</font>
+<font color="#FF0000">&lt;kml xmlns="http://earth.google.com/kml/2.1"&gt;</font>
+<font color="#FF0000">  &lt;Document&gt;</font>
+<font color="#FF0000">    &lt;Folder&gt;</font>
+<font color="#FF0000">'''</font><font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">for</font></b> callsign <b><font color="#0000FF">in</font></b> callsigns<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> callsign
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'      &lt;Placemark&gt;\n'</font><font color="#990000">)</font>
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'        &lt;name&gt;%s&lt;/name&gt;\n'</font> <font color="#990000">%</font> callsign<font color="#990000">)</font>
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'        &lt;LineString&gt;&lt;coordinates&gt;\n'</font><font color="#990000">)</font>
+        <b><font color="#0000FF">for</font></b> position <b><font color="#0000FF">in</font></b> cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT longitude, latitude FROM vosdata WHERE callsign=?;'</font><font color="#990000">,(</font>callsign<font color="#990000">,)):</font>
+            o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'          %.5f,%.5f\n'</font> <font color="#990000">%</font> position<font color="#990000">)</font>
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'        &lt;/coordinates&gt;&lt;/LineString&gt;\n'</font><font color="#990000">)</font>
+        o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'      &lt;/Placemark&gt;\n'</font><font color="#990000">)</font>
+<!-- -->
+    o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'''    &lt;/Folder&gt;</font>
+<font color="#FF0000">  &lt;/Document&gt;</font>
+<font color="#FF0000">&lt;/kml&gt;</font>
+<font color="#FF0000">'''</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__<font color="#990000">==</font><font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    <b><font color="#000000">main</font></b><font color="#990000">()</font></tt></pre>
+Here is what the table schema currently looks like. 
+<pre>% <b>sqlite3 200810-bensmith-vosdata.db .schema</b>
+CREATE TABLE VOSdata (id TEXT PRIMARY KEY, sqltime TEXT, latitude REAL, longitude REAL, wkt_geographic TEXT, callSign TEXT);</pre>
+And some sample data:
+<pre>% <b>sqlite3 'SELECT * FROM vosdata LIMIT 5;'</b>
+VTXK986076000|2001-03-31 00:00:00|13.9|42.9|1390.00000 4290.00000|VTXK
+VTXK986097600|2001-04-01 00:00:00|14.9|42.0|1490.00000 4200.00000|VTXK
+ATQO986097600|2001-04-01 00:00:00|22.7|66.5|2270.00000 6650.00000|ATQO
+VVGG986140800|2001-04-01 00:00:00|47.5|-6.1|4750.00000 -610.00000|VVGG
+VTXK986162400|2001-04-01 00:00:00|18.4|39.8|1840.00000 3980.00000|VTXK</pre>
+And just how much data is in this test run:
+<pre>% <b>sqlite3 200810-bensmith-vosdata.db 'SELECT count(*) FROM VOSdata;'</b>
+164234</pre>
+Don't forget to create an index on the callsign so that queries go really fast!
+<pre>% <b>sqlite3 200810-bensmith-vosdata.db 'CREATE INDEX callsign_idx ON vosdata(callsign);'</b></pre>
+Future enhancements might include using a TIMESTAMP type for the time field
+and creating timespans for the vessel traffic.
+-----

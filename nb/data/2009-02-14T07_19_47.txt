@@ -1,0 +1,84 @@
+TITLE: Using unix file command to detect multibeam sonar and segy seismic data
+AUTHOR: Kurt
+DATE: 02.14.2009 07:19
+DESC: marching forward towards progress
+-----
+BODY:
+This has been on my wish list for a while.  The unix <b>file</b>
+command is a fast way to get at what the contents of a file are.  It
+knows a great many formats, but has not known about many scientific
+data formats.  I've looked at it before and got turned around.  But,
+yesterday, it clicked.  I don't know why I was having trouble before
+with the format. It really isn't too difficult.  I started by reading
+the "magic" format description that describes how to identify file types.
+<pre>% <b>man magic</b></pre>
+From that, it looks like some file formats may be nearly impossible to
+get right, but I should at least be able to do some.  One thing to remember
+is that this does not count on any file naming conventions.  As we
+seem time after time, people and computers can generate really strange
+names that have nothing to do with the contents.
+
+Here is my first batch of codes:
+<pre><tt><i><font color="#9A1900">#Magic</font></i>
+<font color="#993399">0</font>	byte	<font color="#993399">67</font>	SEGY seismic<font color="#990000">,</font> ASCII
+<font color="#990000">&gt;</font><font color="#993399">3500</font>	beshort	<font color="#993399">0x0</font>	revision <font color="#993399">0</font>
+<font color="#990000">&gt;</font><font color="#993399">3500</font>	beshort	<font color="#993399">0x1</font>	revision <font color="#993399">1</font>
+<!-- -->
+<font color="#993399">0</font>	byte	<font color="#993399">195</font>	SEGY seismic<font color="#990000">,</font> EBCDIC
+<font color="#990000">&gt;</font><font color="#993399">3500</font>	beshort   <font color="#993399">0x0000</font>       revision <font color="#993399">0</font>
+<font color="#990000">&gt;</font><font color="#993399">3500</font>	beshort   <font color="#993399">0x0001</font>       revision <font color="#993399">1</font>
+<!-- -->
+<i><font color="#9A1900"># Atlas Hydrosweep starts with any of these packets</font></i>
+<i><font color="#9A1900"># MB-System code of mb21</font></i>
+<font color="#993399">0</font>	string	ERGNPARA	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	ERGNMESS	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	ERGNSLZT	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	ERGNAMPL	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	ERGNEICH	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	ERGNHYDI	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	MEABCOMM	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	MEABHYDI	Hydrosweep multibeam sonar
+<font color="#993399">0</font>	string	MEABPDAT	Hydrosweep multibeam sonar
+<!-- -->
+<i><font color="#9A1900"># Seabeam 2100 </font></i>
+<i><font color="#9A1900"># mbsystem code mb41</font></i>
+<font color="#993399">0</font>	string SB2100DR	SeaBeam <font color="#993399">2100</font> DR multibeam sonar
+<font color="#993399">0</font>	string SB2100PR SeaBeam <font color="#993399">2100</font> PR
+<!-- -->
+<i><font color="#9A1900"># EM3002</font></i>
+<i><font color="#9A1900"># mb58</font></i>
+<i><font color="#9A1900"># 0479 .all</font></i>
+<font color="#993399">0</font>	belong	<font color="#993399">0xdc020000</font>	EM <font color="#993399">3002</font> multibeam sonar
+<!-- -->
+<i><font color="#9A1900"># EM120</font></i>
+<i><font color="#9A1900"># mb51</font></i>
+<font color="#993399">0</font>	belong	<font color="#993399">0x000001aa</font>	EM <font color="#993399">120</font> multibeam sonar
+<!-- -->
+<i><font color="#9A1900"># MGD77 - http://www.ngdc.noaa.gov/mgg/dat/geodas/docs/mgd77.htm</font></i>
+<i><font color="#9A1900"># mb161</font></i>
+<font color="#993399">9</font>	string MGD77	MGD77 Header<font color="#990000">,</font> Marine Geophysical Data Exchange Format
+<font color="#993399">0</font>       regex	<font color="#993399">5</font><font color="#990000">[</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">][</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">\</font> <font color="#990000">][</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">\</font> <font color="#990000">][</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">\</font> <font color="#990000">][</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">\</font> <font color="#990000">][</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">\</font> <font color="#990000">][</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">\</font> <font color="#990000">][</font>A-Z<font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">\</font> <font color="#990000">][+</font>-<font color="#990000">][</font><font color="#993399">0</font>-<font color="#993399">9</font><font color="#990000">]</font>	MGD77 Data<font color="#990000">,</font> Marine Geophysical Data Exchange Format</tt></pre>
+I am pretty sure that my EM 3002 and EM 120 are only partly right.  I just
+opened two files and looked at the first 4 bytes.  It would be better
+to read the spec and find something stable, but it gets the idea across.
+Also, several of these specifications are weak and likely to tag files
+that are not of that type.  It's a start.
+<pre>% <b>file -m ../magic *</b>
+0479_20080620_175447_RVCS.all: EM 3002 multibeam sonar
+Atlantic_line_172_raw.mb51:    EM 120 multibeam sonar
+GOA_line_5.sgy:                SEGY seismic, EBCDIC revision 0
+Marianas_Line_013.sgy:         SEGY seismic, EBCDIC revision 0
+TN136HS.306:                   Hydrosweep multibeam sonar
+ba66005.a77:                   MGD77 Data, Marine Geophysical Data Exchange Format
+ba66005.h77:                   MGD77 Header, Marine Geophysical Data Exchange Format
+hs.d214.mb21:                  Hydrosweep multibeam sonar
+lj101.sgy:                     SEGY seismic, ASCII revision 0
+sb199704060133.mb41:           SeaBeam 2100 DR multibeam sonar
+sb199708160538.rec:            SeaBeam 2100 PR</pre>
+Hopefully we can build this up as a community and eventually get at
+least some of it into the file distribution.
+
+One of the big issues here is finding stable targets in files.  With
+many of these formats, they are a stream of packets.  We have to be
+able to check for all of the different packet types coming first.
+-----

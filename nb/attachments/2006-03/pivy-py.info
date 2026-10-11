@@ -1,0 +1,35 @@
+Info2: <<
+
+GCC: 3.3
+
+Package: pivy-py%type_pkg[python]
+Version: 0.3.0
+Revision: 1
+Description: Python interface to Coin/OpenInventor
+DescDetail: <<
+Woo hoo
+
+<<
+Source: http://pivy.tammura.at/download/pivy/releases/%v/Pivy-%v.tar.bz2
+Source-MD5: 4f6095396c58a16f12e2ded3dc7c16fe
+
+PatchScript: <<
+  perl -pi.bak -e 's/\"swig\"/\"swig1325\"/g' setup.py
+<<
+
+Type: python (2.4)
+Depends: python%type_pkg[python], coin45-shlibs, soqt21-shlibs
+BuildDepends: swig1325, coin45-dev, soqt21-dev
+CompileScript: <<
+ CC=gcc-3.3 %p/bin/python%type_raw[python] setup.py build
+<<
+InstallScript: <<
+ %p/bin/python%type_raw[python] setup.py install --root %d
+<<
+DocFiles: README
+License: BSD
+Homepage: http://pivy.tammura.at/
+Maintainer: Kurt Schwehr <goatbar@users.sourceforge.net>
+
+# Info2
+<<

@@ -1,0 +1,42 @@
+TITLE: Setting up webalizer
+AUTHOR: Kurt
+DATE: 02.19.2005 09:31
+DESC: sorcerer is now hooked up
+-----
+BODY:
+This is take two on setting up webalizer and I did it this time where
+it is not a problem to give all the details of what I did.  So here is
+what I did!  This is using the Apple supplied Apache web server (not
+the fink Apache - that would use different paths to all the files).
+<pre>
+  fink install webalizer
+  cd /Library/WebServer/Documents
+  mkdir webalizer
+  export EDITOR=emacs
+  crontab -e
+</pre>
+Now when crontab pops up emacs to edit your crontab file, enter this,
+but put everything starting with "30" and ending with /dev/null all on
+one line:
+<pre>
+MAILTO=''
+30 2 * * * /sw/bin/webalizer -p -N 2 -D \
+/Library/WebServer/Documents/webalizer/dnscache -n sorcerer.ucsd.edu \
+-o /Library/WebServer/Documents/webalizer \
+/private/var/log/httpd/access_log > /dev/null
+</pre>
+You can change -n sorcerer.ucsd.edu to your websever.  You can kick
+things off right away by running webalizer with those options.
+Otherwise you will have to wait until after 2:30 AM for this cron job
+to get run.  To see the results, take a look at:
+<pre>
+<a href="http://sorcerer.ucsd.edu/webalizer/">http://sorcerer.ucsd.edu/webalizer/</a>
+</pre>
+I also added a <a
+href="http://sorcerer.ucsd.edu/robots.txt">robots.txt</a> to the
+webserver to tell microsoft to bugger off.
+<pre>
+User-agent: msnbot
+Disallow: /
+</pre>
+-----

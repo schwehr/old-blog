@@ -1,0 +1,21 @@
+TITLE: Preventing updatedb from scanning attached drives
+AUTHOR: Kurt
+DATE: 11.09.2009 10:40
+DESC: what is the right solution
+-----
+BODY:
+On my Mac, I don't want updatedb searching my Time Machine backup drive (or any
+other attached media), so I just tried tweaking the
+/sw/etc/updatedb.conf file to exclude some areas.  I can't seem to
+do more than just one.  If I add /private/tmp, I get this complaint:
+<pre><b>sudo /sw32/etc/cron.daily/findutils</b>
+/sw32/etc/updatedb.conf: line 11: /private/tmp: is a directory</pre>
+But this config seems to mostly work okay...
+<pre>DAYS=1
+STATUS=on
+PRUNEFS=/Volumes</pre>
+However, find seems to have some trouble with directories:
+<pre>/sw32/bin/find: /usr/share/man/man3: Cannot allocate memory</pre>
+I find myself using both mdfind (macosx spotlight) and locate depending
+on what I am trying to track down.
+-----

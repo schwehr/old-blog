@@ -1,0 +1,24 @@
+TITLE: Looking at large diffs
+AUTHOR: Kurt
+DATE: 06.17.2014 10:35
+DESC: more better (or shorter)
+-----
+BODY:
+Here is a little Unix command line trick.  I've been looking at the
+differences between version releases in software like GDAL, HDF4,
+HDF5, etc.  There is often a lot of noise (aka non-functional changes)
+that get in the way of my trying to understand what is different.  The
+diff tool is pretty useful and I often look at diffs in emacs and
+appreciate the highlighting of Diff mode.  However, I'd rather not 
+have this noise.  In the case of GDAL, that is a lot of copyright and
+svn Id changes.  Those don't change the bevior of the code.  Here is
+how to get them out using the diff ----ignore-matching-lines (-I) flag.
+Just repeat the flag for each thing you want to not get used for diffs.
+e.g.
+<pre>diff -ruN gdal-1.1[01].0/port -I 'Copyright' -I '$Id:' > port.diff</pre>
+That says to recursively produce "unified" format diffs with the contents
+of new files shown, but leave out lines with "Copyright" and "$Id:'.
+The two -I flags drop the diff file from 7500 lines to 6200 lines for the changes
+between GDAL 1.10.0 and 1.11.0 in the port directory.  Every little bit of
+help makes things easier.
+-----

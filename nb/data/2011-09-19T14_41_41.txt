@@ -1,0 +1,68 @@
+TITLE: NOAA VDatum
+AUTHOR: Kurt
+DATE: 09.19.2011 14:41
+DESC: almost super cool
+-----
+BODY:
+It is exciting that NOAA has finished the first pass at VDatum, but it
+is a bummer that the source code is not available.  I saw a news
+article implying that the source code was available, but couldn't find
+anything on the NOAA site.  I grabbed the latest zip from <a
+href="http://vdatum.noaa.gov/download/software/">http://vdatum.noaa.gov/download/software/</a>
+and gave a look to see if I was just missing something.
+<pre>wget http://vdatum.noaa.gov/download/software/VDatum30b1.zip
+unzip VDatum30b1.zip
+unzip NGSDatumUtil.jar
+du -h gov
+ 20K	gov/noaa/vdatum/plugin
+ 28K	gov/noaa/vdatum/prefs
+ 16K	gov/noaa/vdatum/referencing/igld85
+ 60K	gov/noaa/vdatum/referencing/stateplane
+176K	gov/noaa/vdatum/referencing
+ 20K	gov/noaa/vdatum/resources
+ 64K	gov/noaa/vdatum/tidalarea
+160K	gov/noaa/vdatum/transgrid/utils
+212K	gov/noaa/vdatum/transgrid
+772K	gov/noaa/vdatum
+772K	gov/noaa
+772K	gov
+s -l gov/noaa/vdatum/
+total 504
+-rw-r--r--   1 schwehr  staff   4453 Apr  1 17:13 Console$ASCIITransform.class
+-rw-r--r--   1 schwehr  staff  18331 Apr  1 17:13 Console.class
+-rw-r--r--   1 schwehr  staff   3896 Apr  1 17:13 DatumRegistry.class
+-rw-r--r--   1 schwehr  staff   3649 Apr  1 17:13 Disclaimers.class
+-rw-r--r--   1 schwehr  staff   2708 Apr  1 17:13 NewClass.class
+-rw-r--r--   1 schwehr  staff    802 Apr  1 17:13 ProgressBar$1.class
+-rw-r--r--   1 schwehr  staff    801 Apr  1 17:13 ProgressBar$2.class
+-rw-r--r--   1 schwehr  staff   7108 Apr  1 17:13 ProgressBar.class
+-rw-r--r--   1 schwehr  staff    201 Apr  1 17:13 VDatum$1.class
+-rw-r--r--   1 schwehr  staff   1922 Apr  1 17:13 VDatum$WorkFolderGetter.class
+-rw-r--r--   1 schwehr  staff  10055 Apr  1 17:13 VDatum.class
+-rw-r--r--   1 schwehr  staff   2767 Apr  1 17:13 VDatum_CMD.class
+-rw-r--r--   1 schwehr  staff    794 Apr  1 17:13 VDatum_GUI$1.class
+-rw-r--r--   1 schwehr  staff    796 Apr  1 17:13 VDatum_GUI$10.class
+...
+find . -name \*.class | grep -v '\$' | tail
+./gov/noaa/vdatum/transgrid/TransgridGTS.class
+./gov/noaa/vdatum/transgrid/TransgridGTX.class
+./gov/noaa/vdatum/transgrid/TransgridUtils.class
+./gov/noaa/vdatum/transgrid/utils/TransgridFilter.class
+./gov/noaa/vdatum/transgrid/utils/TransgridImX.class
+./gov/noaa/vdatum/transgrid/utils/TransgridImXport.class
+./gov/noaa/vdatum/transgrid/utils/TransgridInfo.class
+./gov/noaa/vdatum/VDatum.class
+./gov/noaa/vdatum/VDatum_CMD.class
+./gov/noaa/vdatum/VDatum_GUI.class</pre>
+That gave me some file names to search on.   e.g. <a
+href="http://www.google.com/search?q=%22TransgridGTX.java%22">http://www.google.com/search?q="TransgridGTX.java"
+</a>, but nothing.
+
+Without the source being public, I'm not going to bother packaging the
+software (or doing anything else with it).  A very big bummer. :(
+
+I was talking to Frank Warmerdam a while ago and he said that he's
+actually done some worth with vdatam (not meaning the NOAA Java Source
+Code).  I finally looked it up:
+<a href="http://trac.osgeo.org/proj/wiki/VerticalDatums">http://trac.osgeo.org/proj/wiki/VerticalDatums</a>
+-----

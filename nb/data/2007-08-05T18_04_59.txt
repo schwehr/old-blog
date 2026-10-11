@@ -1,0 +1,43 @@
+TITLE: gnuplot gridding
+AUTHOR: Kurt
+DATE: 08.05.2007 18:04
+DESC: gridding is good
+-----
+BODY:
+This is my first time using gnuplot to generate grids.  This is great stuff!
+First, my test data set (4.dat):
+<pre>
+0.500000 0.500000 2.000000
+0.500000 1.500000 1.000000
+0.500000 2.500000 1.000000
+0.500000 3.500000 1.000000
+1.500000 0.500000 1.000000
+1.500000 1.500000 0.000000
+1.500000 2.500000 0.000000
+1.500000 3.500000 1.000000
+2.500000 0.500000 1.000000
+2.500000 1.500000 0.000000
+2.500000 2.500000 0.000000
+2.500000 3.500000 1.000000
+3.500000 0.500000 1.000000
+3.500000 1.500000 1.000000
+3.500000 2.500000 1.000000
+3.500000 3.500000 1.000000
+</pre>
+Then the gnuplot commands:
+<pre>
+  set term x11
+  set dgrid3d 5,5,1
+  splot '4-grid.dat' with l, '4.dat'
+  set ticslevel 0.5
+  set view 60,30
+  set autoscale
+  set parametric
+  set style data points
+  splot '4.dat'
+  set style data lines
+  splot '4.dat'
+</pre>
+
+<img src="http://schwehr.org/blog/attachments/2007-08/gnuplot-grid.png">
+-----

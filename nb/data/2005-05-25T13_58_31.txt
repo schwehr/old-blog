@@ -1,0 +1,80 @@
+TITLE: Segy python works.  Woohoo
+AUTHOR: Kurt
+DATE: 05.25.2005 13:58
+DESC: lat/long reading in python
+-----
+BODY:
+
+UPDATE 17:00 - Turns out that the <b>API below is already out of date</b>,
+but I just made my first plot of a trace dumped to a sample
+number/value pair.  Looks very much like I expected!
+
+Talking to quite a number of people about seismic data yesterday got
+me motivated to really go for it with my python segy library.  The
+task really has been mostly an exercise in making lots of lookup
+tables with dictionaries.  Just a few minutes ago, I got my first
+correct lat/long pair out of a trace from an Edgetech Xstar segy file.
+This is extra exciting since the xstar format does not follow the SEGY
+standards.  In fact, seismic unix (aka su or cwp-su) is unable to read
+xstar files.  Right now, we first run them through sioseis to write
+out a better segy file.  My hope is to have code that can easily be
+adapted to each vender's interpretation of the SEGY standards.
+Clearly people treat the SEGY documentation as <em>suggestions</em>.
+Being that I intend this to be an open source utility, here is the
+source.  Note that this is just my test code.  It is FUGLY.
+<pre>
+  <a href="http://schwehr.org/software/scripts/segy-1.7.py.html">segy-1.7.py.html</a>
+</pre>
+Here is a little bit of pseudo code that shows how I can read from the
+first file/trace of the Santa Barbara data.  I open up the file by
+creating a Segy class object and from there, I create a SegyTrace
+object.  One problem right now is that it is possible to close the
+mmap from the Segy class while SegyTrace objects are still using the
+mmap.  I do not know what would happen if that happens.  Pseudo code:
+<pre>
+<b>
+	import Segy
+	xstar = Segy("bpsio01L00.xstar")
+        trace1 = SegyTrace(xstar.data,3600)
+        trace1.printHeader()
+</b>
+SweepFreqStart  =  1000
+RecvGrpElev  =  0
+SweepLen  =  50
+OverTravel  =  392
+GapSize  =  235
+SrcEDirTenths  =  0
+LowCutFreq  =  0
+...
+<b>
+        # look!  If we divide by 3600, we get degrees!
+        x = trace1.getHeader('X'); print x, '--&gt;  ',x/3600.
+        y = trace1.getHeader('Y'); print y, '--&gt;  ',y/3600.
+</b>
+-432364 --&gt;  -120.101111111
+ 123862 --&gt;    34.4061111111
+</pre>
+Those lat/lon numbers actually look like they are in the right area.
+Party time!  Actually, now I need to be able to seek through the
+traces.  I have not done that yet, hence the hard coded 3600 for the
+trace start.  Then after that, I need to build and sqlite database of
+the file and trace parameters.
+
+<pre>
+  fugal
+       adj : of or relating to or in the style of a musical fugue
+
+  fugue
+       n 1: dissociative disorder in which a person forgets who who they
+            are and leaves home to creates a new life; during the
+            fugue there is no memory of the former life; after
+            recovering there is no memory for events during the
+            dissociative state [syn: {psychogenic fugue}]
+       2: a dreamlike state of altered consciousness that may last for
+          hours or days
+       3: a musical form consisting of a theme repeated a fifth above
+          or a fourth below its first statement
+</pre>
+
+<a href="http://www.w3schools.com/xml/">XML tutorials</a>
+-----

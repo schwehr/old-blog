@@ -1,0 +1,28 @@
+TITLE: gmtplus lives
+AUTHOR: Kurt
+DATE: 01.11.2005 15:39
+DESC: I hope it works.  Be careful!
+-----
+BODY:
+Just ported to mac osx the gmtplus that JJ, Ed and Dru have hacked on
+for the last couple of years.  And I made a fink info file.  I am
+calling this version gmtplus-3.4.0.  It <b>should</b> work with gmt
+3.4.x, but I did not try it.  Hah!  I actually built things with gmt
+4.0 and had to add some #if macros to get around the API changing for 
+ps_plotinit and GMT_2D_to_3D for gmtplustrack and pluswiggle
+respectively.  Any program that uses the decode_record calls is
+suspect with bad pointer mojo.  BEWARE!  Backup your brown book files
+and such before using this.  This comes without data files.  You will
+have to someone like Cande or Sandwell for data.
+<pre>
+  <a href="http://schwehr.org/software/gmtplus/">gmtplus</a>
+
+  sudo -s
+  mkdir -p /sw/fink/10.3/local/main/finkinfo/sci
+  cd /sw/fink/10.3/local/main/finkinfo/sci
+  sudo apt-get install wget
+  wget  http://schwehr.org/software/gmtplus/gmtplus.info
+  less gmtplus.info
+  fink install gmtplus
+</pre>
+-----

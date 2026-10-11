@@ -1,0 +1,79 @@
+TITLE: blender brain dump
+AUTHOR: Kurt
+DATE: 02.06.2005 18:36
+DESC: WaveFront obj format
+-----
+BODY:
+Last year, I did some brief work on terrain generation code to convert
+various input grids to different output formats.  Basically, I wanted
+to be able to take gmt netcdf grids and output them into a formats that
+could be read by LightWave, Maya, Blender, and Povray.  The first
+three all read WaveFront obj files which are pretty simple compared to
+things like the lightwave file format.  LWO2, is um, ouch.  Here is a
+sample OBJ file:
+<pre>
+o sample1o
+g sample1
+mtllib sample1.mtl
+usemtl sample1mtl
+v 0 0 -1.88
+v 1 0 -1
+v 2 0 0
+v 0 1 -1
+v 1 1 0
+v 2 1 -0.2
+v 0 2 -0.35
+v 1 2 -0.323
+v 2 2 -0.301
+vn 0.551207 0.551207 -0.626372
+vn 0.568636 0.568636 -0.593691
+vn 0.19245 0.19245 -0.7698
+vn 0.59035 0.515392 -0.615405
+vn 0.240578 0.128444 -0.774256
+vn -0.119176 -0.198286 -0.963921
+vn 0.334089 0.0551787 -0.796885
+vn -0.0464649 -0.236557 -0.960263
+vn 0.0218834 -0.100465 -0.9947
+vt 0 1
+vt 0.333333 1
+vt 0.666667 1
+vt 0 0.666667
+vt 0.333333 0.666667
+vt 0.666667 0.666667
+vt 0 0.333333
+vt 0.333333 0.333333
+vt 0.666667 0.333333
+f 1/1/1 4/4/4 2/2/2
+f 4/4/4 5/5/5 2/2/2
+f 2/2/2 5/5/5 3/3/3
+f 5/5/5 6/6/6 3/3/3
+f 4/4/4 7/7/7 5/5/5
+f 7/7/7 8/8/8 5/5/5
+f 5/5/5 8/8/8 6/6/6
+f 8/8/8 9/9/9 6/6/6
+</pre>
+If you want this thing to display textures, you need an mtl file to go
+with it.  Here is the one that goes with this.  Hack it to load the
+image you want.  sample1.mtl:
+<pre>
+newmtl sample1mtl
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+illum 2
+Ns 25.6
+map_Kd sample1.jpg
+</pre>
+You will have to dig up the specs on the format to get into the nitty
+gritties.  You can make things simpler if you just want geometry and
+can ignore the normals (vt) and the uv texture map (vt).
+
+I tried blender 236 this evening for about two minutes.  Major
+improvements over when I last used it.  Do a File->Import->Wavefront
+and select this file.  You will see 8 triangles folded over.  Then do
+Render->Current Frame to see a rendered scene.  Also, you may need to
+delete the default box from the scene with Object->Delete (at the
+bottom of the geometry window).  Use the middle mouse and scroll wheel
+to zoom around the scene.  That is all I can dredge out of my head in
+just a couple minutes.
+-----

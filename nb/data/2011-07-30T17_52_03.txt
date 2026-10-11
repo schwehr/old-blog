@@ -1,0 +1,88 @@
+TITLE: socat rocks
+AUTHOR: Kurt
+DATE: 07.30.2011 17:52
+DESC: bending data to my will
+-----
+BODY:
+I had the problem that I needed to get a subset of a very high rate
+AIS feed out to a program that I'm working on.  I could use ssh, but
+that is hard to use on it's own.  I wanted to put a grep between the
+server getting the feed and the outgoing data to the house I'm at that
+has a smaller pipe (and a data cap that I'm putting a big dent
+in... I'd love to put a cap in the new data cap trend!).
+
+<a href="http://www.dest-unreach.org/socat/">socat</a> is netcat but
+just better.  How?  I think you have to be a bigger user of the two
+than I am, but socat just rocks.  <a
+href="http://en.wikipedia.org/wiki/Netcat">netcat</a> saved our bacon
+on the <a
+href="http://en.wikipedia.org/wiki/Mars_Polar_Lander#Communications_loss">Mars
+Polar Lander project until the spacecraft went splat</a>.
+
+My task is to connect to a TCP port, pass that data to egrep, then
+pass that data back out to a socket.  I then connect to the port from
+another machine and consume the data.  First, the consumption from the
+AIS server.
+<pre>socat -u TCP:localhost:31414 -</pre>
+That command has a "-u" for unidirectional data... we only want to
+listen to the torrenct from port 31414.  The "TCP:localhost:31414"
+says to use the reliable TCP protocol (rather than UDP datagrams,
+named pipes, etc) and talk to the localhost (aka 127.0.0.1) using port
+31414.  Then the final "-" sends the data to standard out (aka "stdout").
+
+From that first command, we can use a unix pipe ("|") to pass the data
+from socat to an extended grep command.  If you don't know how to use
+regular expressions with grep, you really should.  Here is my grep
+command that I am using to filter down to only type 8 area notice
+whale messages coming from Cape Cod.
+<pre>egrep --line-buffered <font color="#FF0000">'^!AIVDM,1,1,,[AB],803Ovrh0E.*r003669945'</font></pre>
+This goes from roughly 700 messages/sec down to 10 messages every few
+minutes.  Therefor, I put a "--line-buffered" option in for grep to
+cause it to immediately pass on each line that it matches.  Normally,
+that option is a bad idea because of the extra work put on the system
+by disabling buffering.  Next, I have the regular expression.  The "^"
+has it match the beginning of the line.  To keep the load low, I'm
+trying to cause the regular expression to fail as fast as possible, so
+I don't want grep to work hard looking for a match later on in a line.
+Then I want to look for a single NMEA line (1,1) AIS message in either
+channel A or B that starts with the data payload of "803Ovrh0E".  That
+string from 8 to E covers the message type, MMSI and DAC/FI for the
+message.  After that, the ".*" says any characters up to the station
+name.  There are several stations receiving that message and I only
+want to receive that particular one.
+
+Now that I've got the subset of the data that I want and am getting it
+as soon as each line is ready, I have to pass it back to a socat to
+publish it.  
+<pre>socat -d -d -v -u - TCP4-LISTEN<font color="#990000">:</font><font color="#993399">35000</font></pre>
+I've added 3 options just after the socat.  The "-d -d" double tells
+socat to tell me more about what is going on.  I want to see when a
+client connects.  The "-v" lets me see the data going to whoever
+connected.  I then specified standard in (stdin) with a "-" followed
+by an output port of TCP4-LISTEN.  That says to listen on interface
+0.0.0.0 with port 35000.  0.0.0.0 means to listen on all interfaces
+both inside and on the network.
+The full command:
+<pre>socat -u TCP<font color="#990000">:</font>localhost<font color="#990000">:</font><font color="#993399">31414</font> - <font color="#990000">|</font> egrep --line-buffered <font color="#FF0000">'^!AIVDM,1,1,,[AB],803Ovrh0E.*r003669945'</font> <font color="#990000">|</font> socat -d -d -v -u - TCP4-LISTEN<font color="#990000">:</font><font color="#993399">35000</font></pre>
+I can now connect in my host to fetch the data!  Here is what I see
+(with altered IP addresses):
+<pre><tt>2011/07/30 20:07:18 socat[3773] N using stdin for reading
+2011/07/30 20:07:18 socat[3773] N listening on AF=2 0.0.0.0:35000
+2011/07/30 20:23:17 socat[3773] N accepting connection from AF=2 192.168.123.147:49731 on AF=2 192.168.122.190:35000
+2011/07/30 20:23:17 socat[3773] N starting data transfer loop with FDs [0,0] and [4,4]
+&gt; 2011/07/30 20:23:17.748626  length=8022 from=0 to=8021
+!AIVDM,1,1,,A,803Ovrh0EP:0?t1002PN04da=3V&lt;&gt;N0000,4*56,d-085,S0400,t000810.00,T10.67040091,r003669945,1312070890\r
+!AIVDM,1,1,,A,803Ovrh0EP70?t1002PMwi89=MGt&gt;N0000,4*61,d-085,S0412,t000810.00,T10.99039963,r003669945,1312070891\r
+!AIVDM,1,1,,B,803Ovrh0EP90?t1002PMwvgi=&lt;;T&gt;N0000,4*51,d-085,S0419,t000811.00,T11.17708257,r003669945,1312070891\r
+!AIVDM,1,1,,B,803Ovrh0EP60gt100ApMwW1i=NFt&gt;N0000,4*0D,d-085,S0428,t000811.00,T11.41706859,r003669945,1312070891\r
+!AIVDM,1,1,,B,803Ovrh0EP40?t1002PMw&lt;h1=P5D&gt;N0000,4*33,d-085,S0463,t000812.00,T12.35041521,r003669945,1312070892\r
+!AIVDM,1,1,,A,803Ovrh0EP50?t1002PMwIpq=OA&lt;&gt;N0000,4*0F,d-085,S0487,t000812.00,T12.99038661,r003669945,1312070893\r
+!AIVDM,1,1,,A,803Ovrh0EP30?t1002PMvw`Q=PsD&gt;N0000,4*53,d-085,S0492,t000813.00,T13.12374945,r003669945,1312070893\r
+!AIVDM,1,1,,A,803Ovrh0EP10?t1002PMvUJ1=RTd&gt;N0000,4*3C,d-085,S0518,t000813.00,T13.81705397,r003669945,1312070893\r
+!AIVDM,1,1,,B,803Ovrh0EP:0?t1@02PN04da=3V&lt;&gt;N0000,4*25,d-085,S0388,t001010.00,T10.35038917,r003669945,1312071010\r</tt></pre>
+There is lots more I can do.  I need to probably try out fork so that the setup doesn't quit when I end a connection
+from a client.
+
+socat FTW!  And if you don't know FTW, please run
+<pre>wtf FTW</pre>
+-----

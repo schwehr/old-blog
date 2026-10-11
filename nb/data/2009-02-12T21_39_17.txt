@@ -1,0 +1,62 @@
+TITLE: More segy issues
+AUTHOR: Kurt
+DATE: 02.12.2009 21:39
+DESC: what?
+-----
+BODY:
+There always seems to be yet another wrinkle in SEGY data.  For some
+reason a Knudsen decided not to write the year or day fields.  It has a 
+time factor of 0.  Thanks.  From the segy rev 1 doc:
+<pre>Time basis code:
+1 = Local
+2 = GMT (Greenwich Mean Time)
+3 = Other, should be explained in a user defined stanza in the Extended
+    textual File Header
+4 = UTC (Coordinated Universal Time)</pre>
+Nope, 0 is just not in there.  Also, what is the difference between GMT and
+UTC.  Isn't it under a second?
+
+I think Sonarweb took user input to get
+the date figured out.  Neither lsd nor my code understand the dates.
+<pre>% <b>lsd Marianas_Line_013.sgy | head -4</b>
+      SHOT   TR       RP    TR ID  RANGE DELAY NSAMPS    SI   YR DAY HR MIN SEC
+     46045     1       0     0  1      0     0   1600   415    0   0  5  47  54
+     46046     1       0     0  1      0     0   1600   415    0   0  5  47  57
+     46047     1       0     0  1      0     0   1600   415    0   0  5  47  59
+     46048     1       0     0  1      0     0   1600   415    0   0  5  48   1</pre>
+And my code (cut down for space...)
+<pre>% <b>segy-info Marianas_Line_013.sgy -v -t -b -a -F year -F day -F hour -F min -F sec -F time_basis -F x -F y</b>
+[text header]
+C 1 CLIENT                        COMPANY                       CREW NO         
+C 2 LINE            AREA                        MAP ID                          
+C 3 REEL NO           DAY-START OF REEL     YEAR      OBSERVER                  
+C 4 INSTRUMENT: MFG KEL        MODEL POSTSURVEY SERIAL NO                       
+C 5 DATA TRACES/RECORD        AUXILIARY TRACES/RECORD         CDP FOLD          
+C 6 SAMPLE INTERVAL         SAMPLES/TRACE 1600  BITS/IN      BYTES/SAMPLE 2     
+C 7 RECORDING FORMAT        FORMAT THIS REEL        MEASUREMENT SYSTEM          
+...
+C39                                                                             
+C40 END EBCDIC                                                                  
+<!-- -->
+[bin header]
+seg_y_rev = 0
+line_no = 1
+sweep_len = 0
+...
+orig_samples_per_trace = 0
+sample_format = 3
+samples_per_trace = 1600
+aux_traces_per_ensemble = 0
+...
+<!-- -->
+[traces]
+# trace: year, day, hour, min, sec, time_basis,        x,            y
+    0:      0,   0,    5,  47,  54,     0,      142.439746389, 20.4817763889
+    1:      0,   0,    5,  47,  57,     0,      142.439781389, 20.4818613889
+    2:      0,   0,    5,  47,  59,     0,      142.439824722, 20.4819780556
+...
+  292:      0,   0,    5,  59,  35,     0,      142.453339722, 20.5070116667
+  293:      0,   0,    5,  59,  37,     0,      142.453371389, 20.5070630556
+  294:      0,   0,    5,  59,  37,     0,      142.453371389, 20.5070630556</pre>
+Do I really want to give an option that forces the year and day?
+-----

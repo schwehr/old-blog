@@ -1,0 +1,61 @@
+TITLE: cwp-su troubles
+AUTHOR: Kurt
+DATE: 03.25.2005 20:27
+DESC: someday cwp-su will be solid
+-----
+BODY:
+It seems there are still problems with CWPROOT for seismic unix.  I
+really need a test suite that I can just run to prove that everything
+works!
+<pre>
+Whenever I try to feed suxmovie with some data, it fails with
+
+sh: line 1: /sw/lib/cwp-su/bin/bin/xmovie: No such file or directory
+
+I think that there's an extra "bin" in the path used to execute stuff. 
+It appears as if CWPROOT is set incorrectly.
+
+        Stephen Hocking
+</pre>
+Thanks to Charles for detailing the troubles.
+<pre>
+Charles Williams willic3 at rpi.edu
+Date: Fri, 25 Mar 2005 
+Subject: [Fink-users] Caution about cctools-528.5
+
+Hi Everyone,
+
+I had some recent build problems that were due to the fact I had  
+installed a newer version of the cctools package.  I have since  
+reverted back to the original version provided with Xcode and was able  
+to build things after that.  Since then, however, I have discovered  
+some other problems with libraries that were built with cctools-528.5.   
+I first noticed problems when linking with mpich2 libraries I had built  
+myself, so I rebuilt those.  This morning, I discovered a problem with  
+the python2.4 library:
+
+ld: /sw/lib/python2.4/config/libpython2.4.a(_sre.o) r_type field of  
+relocation entry 1622 in section (__TEXT,__text) invalid
+ld: /sw/lib/python2.4/config/libpython2.4.a(_sre.o) stray relocation  
+PPC_RELOC_PAIR entry (1623) in section (__TEXT,__text)
+ld: /sw/lib/python2.4/config/libpython2.4.a(_sre.o) r_type field of  
+relocation entry 1624 in section (__TEXT,__text) invalid
+ld: /sw/lib/python2.4/config/libpython2.4.a(_sre.o) stray relocation  
+PPC_RELOC_PAIR entry (1625) in section (__TEXT,__text)
+make[2]: ***  
+[/Users/willic3/geoframe/build/bin/Darwin-7.x_ppc-shared,debug,mpi/ 
+mpipython.exe] Error 1
+
+It appears that libraries built with the newer version of cctools are  
+not compatible with the version I have now.  I'm afraid this means I'm  
+going to be rebuilding a lot of fink-installed packages (I'm rebuilding  
+python2.4 right now).  The moral of the story is:  Don't be impatient  
+(as I was) and grab third-party developer tools that become the  
+defaults.  Fink's method of dealing with this is much better.  The  
+newer versions of the tools are only used when they are specifically  
+requested.  If you did install the newer cctools, you will probably run  
+into some of the same problems I am having.
+
+Charles
+</pre>
+-----

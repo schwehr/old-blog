@@ -1,0 +1,308 @@
+TITLE: fink x11 troubles
+AUTHOR: Kurt
+DATE: 02.18.2005 07:21
+DESC: It works for me
+-----
+BODY:
+I have been looking at how to pass text via stdin to programs called
+from python.  os.system can not do this.  Looks like <a
+href="http://docs.python.org/lib/module-popen2.html">os.popen,
+os.popen2, or os.popen3.</a>  I have yet to find a nice working
+example on the web.  Maybe one of these modules would do the trick:
+pipes or commands.  Hey wait, I found something that works!
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">popen2</font>,<font color="#2040a0">string</font>
+<font color="#2040a0">fin</font>,<font color="#2040a0">fout</font><font color="4444FF">=</font><font color="#2040a0">popen2</font>.<font color="#2040a0">popen2</font><font color="4444FF">(</font><font color="#008000">&quot;sort&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">fout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;foo<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">fout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;bar<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">fout</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">fin</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">fin</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">fin</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+
+Oceans on Mars: <a
+href="http://www.lpi.usra.edu/meetings/lpsc2005/pdf/1741.pdf">LPI
+1741</a>
+
+More random notes for fink problems.  Lisa has the forever
+disappearing Apple X11.  Perhaps this command will help debug the
+problem.
+<pre>
+  fink list system-xfree86
+  fink-virtual-pkgs --debug
+</pre>
+Here is what "fink-virtual-pkgs --debug 2&>1 foo" gives on a happy
+machine:
+<pre>
+Package: broken-gcc
+Status: purge ok not-installed
+Version: 3.3-1
+builddependsonly: true
+description: [virtual package representing a broken gcc compiler]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: cctools
+Status: install ok installed
+Version: 498-1
+builddependsonly: true
+description: [virtual package representing the developer tools]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: cctools-single-module
+Status: install ok installed
+Version: 1.0-1
+builddependsonly: true
+description: [virtual package, your dev tools support -single_module]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: darwin
+Status: install ok installed
+Version: 7.8.0-1
+description: [virtual package representing the kernel]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: gcc3.1
+Status: install ok installed
+Version: 3.1-1
+builddependsonly: true
+description: [virtual package representing the gcc 3.1 compiler]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: gcc3.3
+Status: install ok installed
+Version: 3.3-1
+builddependsonly: true
+description: [virtual package representing the gcc 3.3 compiler]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: gimp-print-shlibs
+Status: install ok installed
+Version: 4.2.5-1
+description: [virtual package representing Apple's install of Gimp Print]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: macosx
+Status: install ok installed
+Version: 10.3.8-1
+description: [virtual package representing the system]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-java
+Status: install ok installed
+Version: 1.4.2-1
+description: [virtual package representing Java 1.4.2]
+
+Package: system-java-dev
+Status: install ok installed
+Version: 1.4.2-1
+description: [virtual package representing Java SDK 1.4.2]
+
+Package: system-java12
+Status: purge ok not-installed
+Version: 1.2-1
+provides: system-java
+description: [virtual package representing Java 1.2]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-java13
+Status: install ok installed
+Version: 1.3.1-1
+provides: system-java
+description: [virtual package representing Java 1.3.1]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-java13-dev
+Status: install ok installed
+Version: 1.3.1-1
+description: [virtual package representing Java 1.3.1 development headers]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-java14
+Status: install ok installed
+Version: 1.4.2-1
+provides: system-java, jdbc, jdbc2, jdbc3, jdbc-optional
+description: [virtual package representing Java 1.4.2]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-java14-dev
+Status: install ok installed
+Version: 1.4.2-1
+description: [virtual package representing Java 1.4.2 development headers]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-java15
+Status: purge ok not-installed
+Version: 1.5-1
+provides: system-java, jdbc, jdbc2, jdbc3, jdbc-optional
+description: [virtual package representing Java 1.5]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-java3d
+Status: purge ok not-installed
+Version: 0-0
+description: [virtual package representing Java3D]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-javaai
+Status: purge ok not-installed
+Version: 0-0
+description: [virtual package representing Java Advanced Imaging]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-perl
+Status: install ok installed
+Version: 5.8.1-1
+provides: perl581-core, system-perl581, attribute-handlers-pm581,
+  cgi-pm581, digest-md5-pm581, file-spec-pm581, file-temp-pm581,
+  filter-simple-pm581, filter-util-pm581, getopt-long-pm581,
+  i18n-langtags-pm581, libnet-pm581, locale-maketext-pm581,
+  memoize-pm581, mime-base64-pm581, scalar-list-utils-pm581,
+  test-harness-pm581, test-simple-pm581, time-hires-pm581
+description: [virtual package representing perl]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-xfree86
+Status: install ok installed
+Version: 2:4.3-2
+provides: xserver, x11, libgl, xft2, fontconfig1, rman, xfree86-base-threaded
+description: [placeholder for user installed x11]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-xfree86-dev
+Status: install ok installed
+Version: 2:4.3-2
+builddependsonly: true
+provides: x11-dev, libgl-dev, xft2-dev, fontconfig1-dev
+description: [placeholder for user installed x11 development tools]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-xfree86-shlibs
+Status: install ok installed
+Version: 2:4.3-2
+provides: x11-shlibs, libgl-shlibs, xft1-shlibs, xft2-shlibs,
+  fontconfig1-shlibs, xfree86-base-threaded-shlibs
+description: [placeholder for user installed x11 shared libraries]
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+</pre>
+Here is the cranky machine:
+<pre>
+fink list system-xfree86
+
+ i   system-xfree86   2:4.3-2      [placeholder for user installed x11]
+ i   system-xfree...  2:4.3-2      [placeholder for user installed x11 devel...
+ i   system-xfree...  2:4.3-2      [placeholder for user installed x11 share...
+
+fink-virtual-pkgs --debug
+
+...
+
+- found gimp-print-shlibs 4.2.5-1
+- checking for library libX11.6.dylib... found in /usr/X11R6/lib
+- checking for X servers... Xquartz
+  - system-xfree86-shlibs provides x11-shlibs
+  - found an X server, system-xfree86 provides xserver and x11
+- checking for header X11/Xlib.h... missing
+- checking for library libGL.1.dylib... found in /usr/X11R6/lib
+  - system-xfree86-shlibs provides libgl-shlibs
+  - system-xfree86 provides libgl
+- checking for header GL/gl.h... missing
+- checking for library libXft.1.dylib... found in /usr/X11R6/lib
+  - system-xfree86-shlibs provides xft1-shlibs
+- checking for library libXft.2.dylib... found in /usr/X11R6/lib
+  - system-xfree86-shlibs provides xft2-shlibs
+- checking for library libXft.dylib... found in /usr/X11R6/lib
+  - libXft points to Xft2
+    - system-xfree86-dev provides xft2-dev
+    - system-xfree86 provides xft2
+- checking for library libfontconfig.1.dylib... found in /usr/X11R6/lib
+  - system-xfree86-shlibs provides fontconfig1-shlibs
+- checking for library libfontconfig.dylib... found in /usr/X11R6/lib
+- checking for header fontconfig/fontconfig.h... missing
+- checking for rman... found, system-xfree86 provides rman
+- checking for threaded libXt... threaded
+  - system-xfree86-shlibs provides xfree86-base-threaded-shlibs
+  - system-xfree86 provides xfree86-base-threaded
+
+...
+
+Package: system-xfree86
+Status: install ok installed
+Version: 2:4.3-2
+description: [placeholder for user installed x11]
+provides: xserver, x11, libgl, xft2, rman, xfree86-base-threaded
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+
+Package: system-xfree86-dev
+Status: install ok installed
+Version: 2:4.3-2
+description: [placeholder for user installed x11 development tools]
+provides: xft2-dev
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+builddependsonly: true
+
+Package: system-xfree86-shlibs
+Status: install ok installed
+Version: 2:4.3-2
+description: [placeholder for user installed x11 shared libraries]
+provides: x11-shlibs, libgl-shlibs, xft1-shlibs, xft2-shlibs,
+  fontconfig1-shlibs , xfree86-base-threaded-shlibs
+homepage: http://fink.sourceforge.net/faq/usage-general.php#virtpackage
+</pre>
+So what the heck is wrong???  This looks okay to me.  Now I try installing something from X11 and get:
+<pre>
+fink install g3data
+
+fink needs help picking an alternative to satisfy a virtual
+dependency. The candidates:
+
+(1)      xfree86: Free X11 implementation for Darwin and Mac OS X
+(2)      xorg: Free X11 implementation for Darwin and Mac OS X
+</pre>
+Trying a fink selfupdate (which is rsync).  Got a new version of fink.
+Damn!  The 2.5GHz G5 with 4GB of ram is errr.... FAST!!!   Then did a
+scanpackages.  Still no go!  Grr.  fink index.  Here is the build
+depend list for g3data...
+
+BuildDepends: pkgconfig, gtk+2 (>= 2.2-1), gtk+2-dev (>= 2.2-1),
+imlib, atk1, pango1-dev, glib2, glib2-dev, x11-dev
+
+
+<pre>
+
+fink list xfree86 xorg x11-
+Information about 4669 packages read in 1 seconds.
+ i   system-xfree86             2:4.3-2   placeholder for user installed x11]
+ i   system-xfree86-dev         2:4.3-2   [placeholder for user installed x11 development tools]
+ i   system-xfree86-shlibs      2:4.3-2   [placeholder for user installed x11 shared libraries]
+     x11-app                    1.0-2     Apple's X11.app X server
+     x11-dev                              [virtual package]
+     x11-shlibs                           [virtual package]
+     x11-ssh-askpass            1.2.4.1-1 X11-based SSH passphrase dialog
+     xfree86                    4.4.0-14  Free X11 implementation for Darwin and Mac OS X
+     xfree86-base-threaded                [virtual package]
+     xfree86-base-threaded-...            [virtual package]
+     xfree86-shlibs             4.4.0-14  Free X11 implementation for Darwin and Mac OS X
+     xorg                       6.8.1-12  Free X11 implementation for Darwin and Mac OS X
+     xorg-shlibs                6.8.1-12  Free X11 implementation for Darwin and Mac OS X
+</pre>
+Finally, here is where fink is at on this machine:
+<pre>
+  fink --version
+  Package manager version: 0.23.6
+  Distribution version: 0.7.1.rsync
+</pre>
+Roi's problem with the developer tool kit I have no idea on.
+
+Jason has a G3 laptop in the lab that has gcc crashing in ncurses...
+<pre>
+Please submit a full bug report,
+with preprocessed source if appropriate.
+See <URL:http://developer.apple.com/bugreporter> for instructions.
+make[1]: *** [../objects/read_entry.o] Error 1
+make: *** [all] Error 2
+### execution of /var/tmp/tmp.2.jS01rl failed, exit code 2
+Failed: compiling ncurses-5.4-20041023-4 failed
+</pre>
+-----

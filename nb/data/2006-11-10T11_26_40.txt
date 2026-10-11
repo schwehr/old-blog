@@ -1,0 +1,28 @@
+TITLE: Fink svn 1.2 to 1.4 upgrade troubles
+AUTHOR: Kurt
+DATE: 11.10.2006 11:26
+DESC: some frustration gone
+-----
+BODY:
+Time to write a blog entry while I wait for 6 gigs of svn stuff to
+come across the internet from the East Coast to West coast.  1 MB/s
+seems slow when you have 6 GB to go.
+
+I finally got svn to upgrade from 1.2.3 to 1.4.2.  I kept getting
+strange conflicts.  The trick was to complete remove all svn 1.2.3 and
+any svn doc packages.  Then I installed things one by one with the
+svn-client-ssl last.  Now I have svn in my path with ssl and it works.
+<pre>
+fink list svn | egrep -v "admin|swig|cpp|web|mirror|java|cvs|kde|apache|rapid|simple"
+ i      svn     1.4.2-10        Subversion - svnserve, tools
+ i      svn-client      1.4.2-10        Subversion - Client
+        svn-client-ssl  1.4.2-10        Dummy upgrade package for svn-client
+ i      svn-dev 1.4.2-10        Subversion - Development headers and libs
+        svn-doc 1.4.2-10        Subversion - Documentation
+ i      svn-shlibs      1.4.2-10        Subversion - Shared libraries
+ i      svn-ssl 1.4.2-10        Dummy upgrade package for svn
+ i      svn-ssl-dev     1.4.2-10        Dummy upgrade package for svn-dev
+        svn-ssl-doc     1.4.2-10        Dummy upgrade package for svn-doc
+ i      svn-ssl-shlibs  1.4.2-10        Dummy upgrade package for svn-shlibs
+</pre>
+-----

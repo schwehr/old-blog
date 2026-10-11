@@ -1,0 +1,44 @@
+TITLE: unittest++ 1.3 sort of working
+AUTHOR: Kurt
+DATE: 04.28.2007 20:06
+DESC: vtable troubles
+-----
+BODY:
+I just tried out my <a href="http://vislab-ccom.unh.edu/~schwehr/software/fink/unittest++.info">unittest++-1.3 info file</a>.  My old example works but I wanted to give reporters a try.  No luck.
+
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;fstream&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&quot;UnitTest++.h&quot;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&quot;XmlTestReporter.h&quot;</font></strong></font>
+<strong>int</strong> <font color="#2040a0">main</font><font color="4444FF">(</font><strong>int</strong>, <strong>char</strong> <strong>const</strong> <font color="4444FF">*</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">std</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">ofstream</font> <font color="#2040a0">f</font><font color="4444FF">(</font><font color="#008000">&quot;tests.xml&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">UnitTest</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">XmlTestReporter</font> <font color="#2040a0">reporter</font><font color="4444FF">(</font><font color="#2040a0">f</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <strong>return</strong> <font color="#2040a0">UnitTest</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">RunAllTests</font><font color="4444FF">(</font><font color="#2040a0">reporter</font>,
+                                 <font color="#2040a0">UnitTest</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">Test</font><font color="4444FF">:</font><font color="4444FF">:</font><font color="#2040a0">GetTestList</font><font color="4444FF">(</font><font color="4444FF">)</font>,
+                                 <font color="#2040a0">NULL</font>,
+                                 <font color="#FF0000">0</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+When I try to compile it, no go.  Maybe I missed another library?
+<pre>
+make try3
+g++ -I/sw/include/UnitTest++ -Wall -Wimplicit -pedantic -W -Wredundant-decls -g3 -O0  -L/sw/lib -lUnitTest++  try3.C   -o try3
+/usr/bin/ld: Undefined symbols:
+UnitTest::RunAllTests(UnitTest::TestReporter&, UnitTest::TestList const&, char const*, int)
+UnitTest::TestReporter::~TestReporter()
+UnitTest::XmlTestReporter::XmlTestReporter(std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&)
+UnitTest::Test::GetTestList()
+vtable for UnitTest::XmlTestReporter
+vtable for UnitTest::DeferredTestReporter
+collect2: ld returned 1 exit status
+</pre>
+It seems like I've run into vtable issues before, but I can't remember
+what was up!
+<pre>
+nm /sw/lib/libUnitTest++ | grep RunAllTests
+...
+echo '__ZN8UnitTest11RunAllTestsERNS_12TestReporterERKNS_8TestListEPKci' | c++filt 
+UnitTest::RunAllTests(UnitTest::TestReporter&, UnitTest::TestList const&, char const*, int)
+</pre>
+-----

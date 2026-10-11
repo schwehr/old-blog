@@ -1,0 +1,198 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>DOCUMENT TITLE</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2011-03-26"><meta name="m-file" content="testpub"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>DOCUMENT TITLE</h1><!--introduction--><p>INTRODUCTORY TEXT</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">SECTION TITLE</a></li><li><a href="#10">Trying stuff on my own</a></li><li><a href="#11">display for output</a></li><li><a href="#12"><a href="http://www.mathworks.com/help/techdoc/ref/sprintf.html">sprintf</a> can help</a></li><li><a href="#13">References</a></li></ul></div><h2>SECTION TITLE<a name="2"></a></h2><p>DESCRIPTIVE TEXT</p><pre class="codeinput"><span class="comment">% create a report like this:</span>
+<span class="comment">% publish('myscript.m', 'html')</span>
+</pre><p><b>BOLD TEXT</b></p><pre>PREFORMATTED
+TEXT</pre><p>That was with two spaces after the percent (%)</p><p>An image:</p><p><img vspace="5" hspace="5" src="FILENAME.PNG" alt=""> </p><div><ul><li>ITEM1</li><li>ITEM2</li></ul></div><div><ol><li>ITEM1</li></ol></div><p>
+<table border=1><tr><td>one</td><td>two</td></tr></table>
+</p><div><ol><li>ITEM2</li></ol></div><p>Latex table</p><p></p><p>End of latex table</p><p><img src="testpub_eq05913.png" alt="$$e^{\pi i} + 1 = 0$$"></p><pre class="codeinput"><span class="comment">% snapnow;</span>
+</pre><h2>Trying stuff on my own<a name="10"></a></h2><p><b>In star</b> and <i>under bars</i> and <tt>vertical bars</tt></p><h2>display for output<a name="11"></a></h2><p>Perhaps what I really want is a notebook that lets me include output from matlab commands.  But notebook is only available on windows</p><pre class="codeinput"><span class="comment">% If you put a blank line, it goes back to doing regular matlab comments</span>
+
+<span class="comment">% If I want to put text into the output stream, display works, but the</span>
+<span class="comment">% display is in the resulting code</span>
+
+display(<span class="string">'hello world'</span>)
+display(<span class="string">'hello world with ;'</span>);
+</pre><pre class="codeoutput">hello world
+hello world with ;
+</pre><h2><a href="http://www.mathworks.com/help/techdoc/ref/sprintf.html">sprintf</a> can help<a name="12"></a></h2><pre class="codeinput">val1 = 0.123456789; <span class="comment">% ; suppresses putting the result value into the publish output</span>
+val2 = 3.14 <span class="comment">% This will be in the publish</span>
+
+display(sprintf(<span class="string">'Values: %0.3f %d %d'</span>,val1,val2, 3))
+
+sprintf(<span class="string">'Values: %0.3f %d %d'</span>,val1,val2, 3)
+</pre><pre class="codeoutput">
+val2 =
+
+    3.1400
+
+Values: 0.123 3.140000e+00 3
+
+ans =
+
+Values: 0.123 3.140000e+00 3
+
+</pre><h2>References<a name="13"></a></h2><p>This has a table of markups at the very bottom of the page.  Put links in angle brackets <a href="http://www.mathworks.com/help/techdoc/matlab_env/f6-30186.html">Marking Up MATLAB Comments for Publishing</a></p><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% DOCUMENT TITLE
+% INTRODUCTORY TEXT
+%%
+
+%% SECTION TITLE
+% DESCRIPTIVE TEXT
+
+% create a report like this:
+% publish('myscript.m', 'html')
+
+%%
+% *BOLD TEXT* 
+
+%%
+% 
+%  PREFORMATTED
+%  TEXT
+% 
+% That was with two spaces after the percent (%)
+
+%%
+% 
+% An image:
+%
+% <<FILENAME.PNG>>
+% 
+
+%%
+% 
+% * ITEM1
+% * ITEM2
+% 
+
+%%
+% 
+% # ITEM1
+% 
+% <html>
+% <table border=1><tr><td>one</td><td>two</td></tr></table>
+% </html>
+% 
+% # ITEM2
+% 
+
+%%
+% 
+% Latex table
+%
+% <latex>
+% \begin{tabular}{|c|c|} \hline
+% $n$ & $n!$ \\ \hline
+% 1 & 1 \\
+% 2 & 2 \\
+% 3 & 6 \\ \hline
+% \end{tabular}
+% </latex>
+% 
+% End of latex table
+
+
+%%
+% 
+% $$e^{\pi i} + 1 = 0$$
+% 
+
+% snapnow;
+
+%% Trying stuff on my own
+% *In star* and _under bars_ and |vertical bars|
+
+%% display for output
+% 
+% Perhaps what I really want is a notebook that lets me include output from
+% matlab commands.  But notebook is only available on windows
+
+% If you put a blank line, it goes back to doing regular matlab comments
+
+% If I want to put text into the output stream, display works, but the
+% display is in the resulting code
+
+display('hello world')
+display('hello world with ;');
+
+%% <http://www.mathworks.com/help/techdoc/ref/sprintf.html sprintf> can help
+
+val1 = 0.123456789; % ; suppresses putting the result value into the publish output
+val2 = 3.14 % This will be in the publish
+
+display(sprintf('Values: %0.3f %d %d',val1,val2, 3))
+
+sprintf('Values: %0.3f %d %d',val1,val2, 3)
+
+%% References
+%
+% This has a table of markups at the very bottom of the page.  Put links in angle brackets
+% <http://www.mathworks.com/help/techdoc/matlab_env/f6-30186.html Marking Up MATLAB Comments for Publishing>
+
+##### SOURCE END #####
+--></body></html>

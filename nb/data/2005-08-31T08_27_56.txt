@@ -1,0 +1,36 @@
+TITLE: AGU review format
+AUTHOR: Kurt
+DATE: 08.31.2005 08:27
+DESC: how to do it
+-----
+BODY:
+I just submitted a paper to <a
+href="http://www.agu.org/journals/gc/">G-cubed</a>.  Here is how I
+converted from a nice looking paper to the double spaced format for
+review (which is definitely ugly).  Before:
+<pre>
+\documentclass[agupp]{aguplus}
+\usepackage{graphicx}
+</pre>
+Now for review:
+<pre>
+\documentclass[agums]{aguplus} % For review - double spaced
+\usepackage{graphicx}
+</pre>
+
+Also, landscape figures get converted back to portrait, so I had to
+shrink some figures.  I left in the landscape tags, but had to add the
+width modifier to the includegraphics tag.
+<pre>
+\begin{landscape}
+\begin{figure}
+\includegraphics<b>[width=6in]</b>{FiguresCores/Core4-AMS-water-v5} % FIX: only for draft
+%\includegraphics{FiguresCores/Core4-AMS-water-v5}
+\caption{Core 4 is blah blah blah}
+\label{fig:core4}
+\end{figure}
+\end{landscape}
+</pre>
+
+The files are available here: <a href="ftp://ftp.agu.org/journals/latex/">ftp://ftp.agu.org/journals/latex/</a>... get agums.sty
+-----

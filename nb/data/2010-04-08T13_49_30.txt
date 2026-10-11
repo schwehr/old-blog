@@ -1,0 +1,57 @@
+TITLE: Downtime estimate with minimum gap time
+AUTHOR: Kurt
+DATE: 04.08.2010 13:49
+DESC: a reasonable conclusion
+-----
+BODY:
+Looking at the estimate of downtime, it is primarily controlled by the
+amount of time with no messages that I consider as being offline.  I am
+looking at a threshold somewhere under 10 minutes of no receives.  There
+should pretty much always be a vessel or basestation up and broadcasting
+in the Boston area.  I figured the best way to make sure that my 5
+minute first guess made sense was to see how the minimum gap time
+changed the downtime estimate.  As the minimum gap starts increasing,
+there are some really huge shifts in the estimated downtime.  Here are
+the first few values:
+<pre> 2 19862872
+ 3 11486556
+ 4 6576780
+ 5 3933032
+ 6 2729717
+ 7 2206115
+ 8 1974632
+ 9 1843744
+10 1766929</pre>
+Going from 2 to 8 seconds drops the estimated downtime from 19M
+seconds down an order of magnitude to 2M seconds.  Here is a log plot
+showing that there are inflection points at 12 seconds and 26-30
+seconds.  I am not sure what that says about the system, but here are
+number from times that I think might make sense in terms of timings:
+<pre> 
+ min   sec  downtime  uptime  reason 
+  1.5   90   1440037   95.4%  Maximum negative time jump seen
+  3    180   1301964   95.9%  Class A/B retransmit when at anchor
+  5    300   1211944   96.2%  Kerberos max time spread for W32Time
+  6    360   1169338   96.3%  Kerb 5 minutes + 1 minute for AISSource time offset
+  8    480   1117793   96.5%  Timing issue seen with Hawkeye basestations
+  9    540   1082542   96.6%  Hawkeye timing issue + 1 minute for AISSource time offset</pre>
+That gives me a sense that this station was operational somewhere in
+the range of 95.4% to 96.6% of the year.  With three partially overlapping
+stations, the hope would be that for the area of the SBNMS, the uptime
+would be even greater.  Accept for major storm events, at least one of
+the stations would will be up with both Cape Ann and Cape Cod being
+more prone to go down.  However, without good time correlation between
+the stations, I am not going to bother attempting the analysis of
+overall uptime.  I will just stick to by station statistics.
+
+I am going with <b>6 minutes</b> as my threshold for being offline for
+these NAIS stations.  For a receiver in a busy port with proper time
+control, that a threshold in the range of 21 to 60 seconds.  If there
+is a basestation in the area, ITU 1371-3 says that it should be
+broadcasting every 10 seconds (Table 2, page 4).  If you can
+consistantly hear that basestation, then 21 seconds should be good to
+allow for occasionally missing single msg 4 basestation reports.
+
+<img title="Downtime with minumum gap size" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/r003669945-downtime-with-min-gap.png"/>
+-----

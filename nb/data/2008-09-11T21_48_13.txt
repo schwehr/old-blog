@@ -1,0 +1,36 @@
+TITLE: First non-localhost django site
+AUTHOR: Kurt
+DATE: 09.11.2008 21:48
+DESC: it works
+-----
+BODY:
+I finally have my first Django site up on the internet beyond using
+the built in debug server.  I'm using apache2 with mod-python.  I'd
+write up the SSL config with apache2, but I did that quite a while
+ago on my dev server.
+
+I haven't converted my application from 0.96 to 1.0.  It is mostly
+just using the admin interface that I've customized.  Also, I did a
+tweak by installing Django in my home directory rather than from a
+Ubuntu deb.  My project is called "dt", for Django test: /home/schwehr/dt
+
+I used the <a
+href="http://www.djangoproject.com/documentation/0.96/modpython/">Django
+modpython 0.96</a> page and a bunch of googling to figure out the
+Alias and 2nd location tag that turns off the mod python on the media subtree.
+
+Here is what I added to /etc/apache2/sites-available/ssl:
+<pre><tt><b><font color="#0000FF">&lt;Location</font></b> <font color="#FF0000">"/"</font><b><font color="#0000FF">&gt;</font></b>
+    PythonPath "['/home/schwehr/python-2.5/lib/python2.5/site-packages','/home/schwehr/'] + sys.path"
+    SetHandler python-program
+    PythonHandler django.core.handlers.modpython
+    SetEnv DJANGO_SETTINGS_MODULE dt.settings
+    PythonDebug On
+<b><font color="#0000FF">&lt;/Location&gt;</font></b>
+#
+Alias /media "/home/schwehr/python-2.5/lib/python2.5/site-packages/django/contrib/admin/media"
+<b><font color="#0000FF">&lt;Location</font></b> <font color="#FF0000">"/media"</font><b><font color="#0000FF">&gt;</font></b>
+    SetHandler None  # Don't use mod-python on this directory
+<b><font color="#0000FF">&lt;/Location&gt;</font></b>
+</tt></pre>
+-----

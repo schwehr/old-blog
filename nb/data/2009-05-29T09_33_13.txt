@@ -1,0 +1,65 @@
+TITLE: Python regular expressions (regex) for NMEA strings
+AUTHOR: Kurt
+DATE: 05.29.2009 09:33
+DESC: Seems to work well
+-----
+BODY:
+I've pretty much finished up my python code to parse the over 100 NMEA
+strings that the Healy sends me every hour.  I've put the code online:
+<a
+href="http://vislab-ccom.unh.edu/~schwehr/software/healy-py/healy-py-0.2.tar.bz2">healy-py-0.2.tar.bz2</a>.
+
+The whole parsing thing is just a bunch of python regular expressions.  Here are the GGA position and ZDA timestamp messages:
+<pre>gga_nmea_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''[$](?P&lt;talker&gt;[A-Z][A-Z])(?P&lt;sentence&gt;GGA),</font>
+<font color="#FF0000">(?P&lt;time_utc&gt;(?P&lt;hour&gt;\d\d)(?P&lt;minute&gt;\d\d)(?P&lt;second&gt;\d\d\.\d*))?,</font>
+<font color="#FF0000">(?P&lt;lat&gt;(?P&lt;lat_deg&gt;\d\d)(?P&lt;lat_min&gt;\d\d\.\d*))?,</font>
+<font color="#FF0000">(?P&lt;lat_hemi&gt;[NS])?,</font>
+<font color="#FF0000">(?P&lt;lon&gt;(?P&lt;lon_deg&gt;\d{3})(?P&lt;lon_min&gt;\d\d\.\d*))?,</font>
+<font color="#FF0000">(?P&lt;lon_hemi&gt;[EW])?,</font>
+<font color="#FF0000">(?P&lt;gps_quality&gt;\d+)?,</font>
+<font color="#FF0000">(?P&lt;satellites&gt;\d+)?,</font>
+<font color="#FF0000">(?P&lt;hdop&gt;\d+\.\d+)?,</font>
+<font color="#FF0000">(?P&lt;antenna_height&gt;[+-]?\d+\.\d+)?,</font>
+<font color="#FF0000">(?P&lt;antenna_height_units&gt;M)?,</font>
+<font color="#FF0000">(?P&lt;geoidal_height&gt;[+-]?\d+\.\d+)?,</font>
+<font color="#FF0000">(?P&lt;geoidal_height_units&gt;M)?,</font>
+<font color="#FF0000">(?P&lt;differential_ref_station&gt;[A-Z0-9.]*),</font>
+<font color="#FF0000">(?P&lt;differential_age_sec&gt;\d+)?</font>
+<font color="#FF0000">\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])'''</font>
+<!-- -->
+zda_nmea_regex_str <font color="#990000">=</font> r<font color="#FF0000">'''[$!](?P&lt;talker&gt;[A-Z][A-Z])(?P&lt;sentence&gt;ZDA),</font>
+<font color="#FF0000">(?P&lt;time_utc&gt;(?P&lt;hours&gt;\d\d)(?P&lt;minutes&gt;\d\d)(?P&lt;seconds&gt;\d\d\.\d\d*))?,</font>
+<font color="#FF0000">(?P&lt;day&gt;\d\d)?,</font>
+<font color="#FF0000">(?P&lt;month&gt;\d\d)?,</font>
+<font color="#FF0000">(?P&lt;year&gt;\d{4})?,</font>
+<font color="#FF0000">(?P&lt;zone_hrs&gt;[+-]?(\d\d))?,</font>
+<font color="#FF0000">(?P&lt;zone_min&gt;(\d\d))?,?</font>
+<font color="#FF0000">\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])'''</font></pre>
+I then build a dictionary of the compiled regular expressions.
+<pre>regex_dict <font color="#990000">=</font> <font color="#990000">{}</font>
+regex_dict<font color="#990000">[</font><font color="#FF0000">'gga'</font><font color="#990000">]</font> <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>gga_nmea_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">)</font>
+regex_dict<font color="#990000">[</font><font color="#FF0000">'zda'</font><font color="#990000">]</font> <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>zda_nmea_regex_str<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">)</font></pre>
+For each line, I walk the dictionary trying each regular expression until one works or I run out of messages to try.
+<pre>matches <font color="#990000">=</font> <font color="#993399">0</font>
+misses <font color="#990000">=</font> <font color="#993399">0</font>
+<b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> test_str<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'\n'</font><font color="#990000">):</font>
+    <b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> regex_dict<font color="#990000">:</font>
+        match <font color="#990000">=</font> regex_dict<font color="#990000">[</font>key<font color="#990000">].</font><b><font color="#000000">search</font></b><font color="#990000">(</font>line<font color="#990000">)</font>
+        <b><font color="#0000FF">if</font></b> match <b><font color="#0000FF">is</font></b> <b><font color="#0000FF">not</font></b> None<font color="#990000">:</font>
+            <b><font color="#0000FF">break</font></b>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> match <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'No_match_for_line: "%s"'</font> <font color="#990000">%</font> <font color="#990000">(</font>line<font color="#990000">.</font><b><font color="#000000">strip</font></b><font color="#990000">(),)</font>
+        misses <font color="#990000">+=</font> <font color="#993399">1</font>
+        <b><font color="#0000FF">continue</font></b>
+<!-- -->
+    match <font color="#990000">=</font> match<font color="#990000">.</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font>
+    matches <font color="#990000">+=</font> <font color="#993399">1</font></pre>
+Having named fields in a regular expression feels like mixing Lex/Flex
+and YACC/Bison, but without having to do as much work.  Using Kodos to build 
+and test the regular expressions makes this pretty easy to construct.
+
+Note that in my regular expressions, I have a lot of "?" characters
+for all of the fields that might be blank.  The one thing that is missing
+right now is to validate the NMEA checksum.
+-----

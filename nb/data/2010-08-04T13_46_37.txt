@@ -1,0 +1,39 @@
+TITLE: ObjC NSMutableArray of counters?
+AUTHOR: Kurt
+DATE: 08.04.2010 13:46
+DESC: better please!
+-----
+BODY:
+There has to be a better way!  I know I could use a C++ vector or a C
+array, but I'm trying to write the best Cocoa ObjC possible as a
+learning experience.  I am using the MB Nuts and Bolts course as my
+test case for learning ObjC and Mac/iPhone programming environment.  I
+can write the C++ pretty quickly and python is amazingly easy for me
+to create binary file readers.  ObjC... I have a long ways to go.
+Example code is here on the web (no cheating if you are taking this
+as a course!):  <a href="http://vislab-ccom.unh.edu/~schwehr/Classes/2010/mbnutsandbolts/">MB Nuts &amp; Bolts</a>
+
+Comments can go here: <a href="http://schwehr.blogspot.com/2010/08/how-do-i-make-this-clean.html">A cleaner way to have an NSMutableArray of counters?</a>
+<pre><tt><font color="#008080">NSMutableArray</font> <font color="#990000">*</font>count_id <font color="#990000">=</font> <font color="#990000">[</font><font color="#008080">NSMutableArray</font> <b><font color="#0000FF">new</font></b><font color="#990000">];</font>
+<i><font color="#9A1900">// Can this be done better for an initialization?</font></i>
+<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#009900">int</font> i<font color="#990000">;</font> i <font color="#990000">&lt;</font> <font color="#993399">256</font><font color="#990000">;</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font>
+	<font color="#990000">[</font><font color="#008080">count_id</font> addObject<font color="#990000">:[</font><font color="#008080">NSNumber</font> numberWithInt<font color="#990000">:</font><font color="#993399">0</font><font color="#990000">]];</font>
+<font color="#FF0000">}</font>
+<!-- -->
+<font color="#008080">NSData</font> <font color="#990000">*</font>data <font color="#990000">=</font> <font color="#990000">[</font><font color="#008080">NSData</font> dataWithContentsOfFile<font color="#990000">:</font>fileName<font color="#990000">];</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> <font color="#990000">(</font><font color="#008080">size_t</font> dgStart <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font> dgStart <font color="#990000">&lt;</font> data<font color="#990000">.</font>length<font color="#990000">;</font> <font color="#990000">)</font> <font color="#FF0000">{</font>
+	<font color="#009900">unsigned</font> <font color="#009900">char</font> id<font color="#990000">;</font>
+	<font color="#009900">unsigned</font> <font color="#009900">int</font> size<font color="#990000">;</font>
+	<font color="#990000">[</font><font color="#008080">data</font> getBytes<font color="#990000">:&amp;</font><font color="#008080">size</font> range<font color="#990000">:</font><b><font color="#000000">NSMakeRange</font></b><font color="#990000">(</font>dgStart<font color="#990000">,</font> <font color="#993399">4</font><font color="#990000">)];</font>
+	<font color="#990000">[</font><font color="#008080">data</font> getBytes<font color="#990000">:&amp;</font><font color="#008080">id</font> range<font color="#990000">:</font><b><font color="#000000">NSMakeRange</font></b><font color="#990000">(</font>dgStart<font color="#990000">+</font><font color="#993399">5</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">)];</font>
+<!-- -->
+	<i><font color="#9A1900">//</font></i>
+	<i><font color="#9A1900">// Yuck!  I just want to increment the number by 1.  How do I improve this?</font></i>
+	<i><font color="#9A1900">//</font></i>
+	<font color="#990000">[</font><font color="#008080">count_id</font> replaceObjectAtIndex<font color="#990000">:</font><font color="#008080">id</font> withObject<font color="#990000">:</font> <font color="#990000">[</font><font color="#008080">NSNumber</font> numberWithInt<font color="#990000">:[[</font><font color="#008080">count_id</font> objectAtIndex<font color="#990000">:</font>id<font color="#990000">]</font> integerValue<font color="#990000">]+</font><font color="#993399">1</font> <font color="#990000">]</font> <font color="#990000">];</font>
+<!-- -->
+	<i><font color="#9A1900">// Jump to the next packet</font></i>
+	dgStart <font color="#990000">+=</font> size<font color="#990000">+</font><font color="#993399">4</font><font color="#990000">;</font>
+<font color="#FF0000">}</font></tt></pre>
+-----

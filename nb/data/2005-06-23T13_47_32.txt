@@ -1,0 +1,52 @@
+TITLE: sioseis and pltsegy continued
+AUTHOR: Kurt
+DATE: 06.23.2005 13:47
+DESC: mix and filter
+-----
+BODY:
+My seismic lines that I have been working on is starting to look much
+better.  The biggest improvements have come with doing a better job of
+picking the water bottom.  The first trick is to really expand
+sections of the line and pick those.  The screen resolution is a real
+limiting factor.
+<pre>
+        shb = 81800; { beginning shot
+        shf = 82800; { ending shot
+        timscal= 300; { suggest 1000 to 200 for chirp
+        tmark = 0.09; { get the horizontal lines out of the way.
+        spa = 0.2;    { horzontal spacing
+</pre>
+First, only plot a thousand shots at a time.  Then jack up the timscal
+to increase the vertical size.  The spa up to take up more of the
+screen horizontally.
+
+With Becca's help, I have turned on filtering and trace mixing within
+sioseis.  My procs line now looks like this:
+<pre>
+  procs diskin header filter wbt mix gains prout diskoa en
+</pre>
+with the addition of the <a
+href="http://sioseis.ucsd.edu/filter.html">filter</a> and <a
+href="http://sioseis.ucsd.edu/mix.html">mix</a> sections.  I did not
+totally understand the mix web page, so it was great to have an
+example to copy.
+<pre>
+filter
+ fno $FNO lno $LNO ftype 99  pass 150 6500 end
+end
+
+mix
+ fno $FNO lno $LNO type 1 weight 0.25 0.50 0.25 end
+end
+</pre>
+The final trick really is to write out postscript which is then
+converted to tif by ghostscript (gs).
+
+Almost forgot.  Here is the current command line for the sioseis script.
+<pre>
+  ./sioseis-wbt.bash bpsio04L04.sgy bpsio04L04-wbt04.sgy \
+  		     bpsio04L04-04.h2o bpsio04L04-02.gains
+</pre>
+Now all I need is layback to figure out where the cores really should
+be.
+-----

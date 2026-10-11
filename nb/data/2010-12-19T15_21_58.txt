@@ -1,0 +1,314 @@
+TITLE: AIS misconceptions - a walk through of position and static data
+AUTHOR: Kurt
+DATE: 12.19.2010 15:21
+DESC: hope this helps
+-----
+BODY:
+<p>
+<a href="http://bit.ly/b6yWjf">John Konrad</a> of <a href="http://gcaptain.com">gCaptian</a> sent me a thread, <a href="http://www.cruisersforum.com/forums/f121/ais-need-to-take-it-with-a-grain-of-salt-51664.html#post580926">AIS - Need to Take it with a Grain of Salt</a>, from <a href="http://cruisersforum.com">CruisersForum.com</a> that it a great starting point for
+discussion on the maze that is AIS.  There really needs to be an
+overview document for AIS and I'm trying keep working on it.  The
+specification for AIS, ITU-R.M.1371-3, is hidden beyond a paywall
+(&gt;$300), and it is written by and for electrical engineers - not
+mariners or software engineers.
+</p>
+<p>
+This initial quote from markpierce, set things off.  I will make this
+overly long winded, but the summary is that there are
+misinterpretations by the posters that I would like to correct.  The
+102.3 knots actually means that "speed is not available".  My low
+level software does not always tell you things like this, but it
+should.  Vendor software should NEVER display 102.3 knots.
+</p>
+<pre>markpierce: Current AIS data shows the U.S. Coast Guard Cutter<br/>
+Aspen, of the Juniper Sea Going Buoy Tender class, is moored at Yerba<br/>
+Buena Island (in San Francisco Bay), making 102.3 knots</pre>
+<p>First, I want to pull the ship from ERMA's backend database to see
+what it is getting.  I over simplify things in the database to keep it
+fast, but it will let me see what is up with the ASPEN.
+</p>
+<p>
+Referring to ships by name is not helpful to someone like me looking
+at AIS traffic from the entire United States and sometimes the globe.
+AIS names are often ambiguous or misspelled.  Additionally,
+<b>everything</b> in AIS is keyed off of the <a href="http://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity">MMSI</a> (a ship radio ID
+number).  Unfortunately, MMSI numbers are often wrong, which makes
+understanding AIS data very difficult.
+</p>
+<p>
+Here is the SQL that I used to find the ASPEN.  Note that AIS names
+are always all CAPITAL LETTERS.  There is no option for lower case.
+</p>
+<pre class="src src-sql"><span style="color: #00ffff;">SELECT</span> * <span style="color: #00ffff;">FROM</span> vessel_name <span style="color: #00ffff;">WHERE</span> <span style="color: #00ffff;">name</span> <span style="color: #00ffff;">LIKE</span> <span style="color: #ffa07a;">'%ASPEN%'</span>;
+</pre>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="right" /><col class="left" /><col class="right" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="right">mmsi</th><th scope="col" class="left">name</th><th scope="col" class="right">type_and_cargo</th><th scope="col" class="left">response_class</th></tr>
+</thead>
+<tbody>
+<tr><td class="right">303865000</td><td class="left">CG ASPEN</td><td class="right">120</td><td class="left"></td></tr>
+<tr><td class="right">371397000</td><td class="left">ASPEN</td><td class="right">52</td><td class="left"></td></tr>
+</tbody>
+</table>
+<p>
+I found two ships that could be the USCG Aspen.  It helps that MMSI
+303865000 has the letters "CG " in front.  Not all Coast Guard vessels
+do that.  There is currently no published standard operating
+procedure for naming your ship in AIS (but I have seen a USCG draft).
+</p>
+<p>
+Now I need to pull the vessel position information as I track the
+course, speed, timestamp (of roughly when I last heard the ship) and
+position in that table.
+</p>
+<pre class="src src-sql"><span style="color: #00ffff;">SELECT</span> cog,sog,time_stamp,astext(pos) <span style="color: #00ffff;">FROM</span> vessel_pos <span style="color: #00ffff;">WHERE</span> MMSI=303865000;
+</pre>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">cog</th><th scope="col" class="left">sog</th><th scope="col" class="left">time_stamp</th><th scope="col" class="left">astext</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">360</td><td class="left">102.3</td><td class="left">2010-12-19 15:08:05-05</td><td class="left">POINT(-122.360931396484 37.8085403442383)</td></tr>
+</tbody>
+</table>
+<p>
+Now I know that people were likely receiving the number 1023 in the
+speed field of the AIS position message from the CG ASPEN.  From the
+ITU document (and other public documents like <a href="http://gpsd.berlios.de/AIVDM.html">AIVDM.html</a> by Eric
+Raymond), there is a note that certain speed numbers have special meanings.
+</p>
+<pre class="example">1 023 = not available, 1 022 = 102.2 knots or higher
+</pre>
+<p>
+So 102.3 knots means that AIS unit on the vessel is not able to
+calculate speed.  That probably means the AIS unit does not have
+enough GPS satellites locked or the GPS antenna is detached from the
+unit (as often happens during ship maintenance).
+</p>
+<p>
+Now for the gory details.  I am going to pull a raw logged position
+message and break it apart for you.  The hard part for me is finding a
+message from the ship.  I need to pull a small chunk of AIS data from
+yesterday's logs that contains a small enough piece subset of messages
+that I can search it.  I know that base station b003669710 is located 
+in North Richmond, CA.  (Yes, basestations announce their GPS
+position over AIS, so it's location is public knowledge).  The station
+is appended by the USCG software to each line, so I can use the GNU
+grep command to get just that basestation from the 4.2GB log file (54 million
+NMEA lines) from yesterday.
+</p>
+<p>
+If I just wanted the position message, I wouldn't have to go through
+the "normalize" process, but I want to show you the vessel name info
+too.  That spans two lines and normalization turns multiline nmea into
+1 long line per message.  I can then easily filter by MMSI.
+</p>
+<pre class="src src-sh">grep b003669710 uscg-nais-dl1-2010-12-18 &gt; b003669710-20101218.ais
+ais_normalize.py  b003669710-20101218.ais &gt; b003669710-20101218.ais.norm
+ais_filter_by_mmsi b003669710-20101218.ais.norm 303865000 &gt; b003669710-20101218.ais.norm.303865000
+tail -2 b003669710-20101218.ais.norm.303865000
+</pre>
+<p>
+That left me with 904 AIS messages.  The last command shows me the
+last two lines of the subset file.  The first message is a 5 (name /
+"static data") and the second shorter message is a 3 (Class A position).
+</p>
+<pre class="example">!AIVDM,1,1,5,A,54QjLb0000000000000&lt;N05=0Dr222222222220S58L;8400004hC`1TPCPjDhkp0hH8880,2*42,b003669710,1292716710
+!AIVDM,1,1,,A,34QjLb5P?wo?p4RE`Ui&gt;4?vH0DgJ,0*14,b003669710,1292716727
+</pre>
+<p>
+Since the question was about the speed initially, here is the decoded
+position 
+message with Speed Over Ground (SOG) using my noaadata python software:
+</p>
+<pre class="example">ais_msg_3_handcoded.py -d '!AIVDM,1,1,,A,34QjLb5P?wo?p4RE`Ui&gt;4?vH0DgJ,0*14,b003669710,1292716727' 
+position:
+        MessageID:          3             # Class A position
+        RepeatIndicator:    0             # This message not repeated
+        UserID:             303865000     # MMSI
+        NavigationStatus:   5             # 5 == moored
+        ROT:                -128          # Rate of turn.  Raw value of -128 indicates no turn information available
+        SOG:                102.3         # Speed over ground.  The raw value was 1023, which indicates speed not available
+        PositionAccuracy:   1             # Position is accurate to less than 10 meters
+        longitude:          -122.36093167
+        latitude:           37.80854
+        COG:                360           # The raw value of 3600 indicates no course available
+        TrueHeading:        511           # No ship's heading available.  This requires a compass input
+        TimeStamp:          12            # Second of the minute that the report was generated
+        RegionalReserved:   0             # I don't have code for the "special manoeuvre"
+        Spare:              0
+        RAIM:               False         # Receiver accuracy integrity monitoring (RAIM) *not* in use
+        sync_state:                   0    # Time is directly UTC from a GPS
+        slot_increment:               5309 # Next slot this transmitter will use
+        slots_to_allocate:            5    # Surprisingly 5 means "1 slot" and 1 means "2 slots"
+        keep_flag:                    0    # The 0 means the transmitter is giving up the slot it just used
+</pre>
+<p>
+I have added some annotations after the '#' character on most lines.
+Hopefully that will help you understand the lines.  The position
+accuracy of 1 (high) is contradictory to the SOG being unknown.
+Here is my attempt to write out the English paragraph from the ship:
+&lt;pre&gt;This ship with MMSI 303865000 is moored at this location and its position
+is accurate to less than 10 meters.  The ship does not know if it is
+moving and if so, it does not know in what direction it is moving.
+This ship does not providing heading to AIS.&lt;/pre&gt;
+Now on to the static data message number 5.  This is mostly stuff
+entered by people and frequently wrong.  
+</p>
+<p>
+For reference here is the Aspen's home page at the USCG: <a href="http://www.uscg.mil/d11/cgcAspen/">USCGC ASPEN (WLB 208)</a>
+</p>
+<pre class="example"> ~/projects/src/noaadata/ais/ais_msg_5.py -d '!AIVDM,1,1,5,A,54QjLb0000000000000&lt;N05=0Dr222222222220S58L;8400004hC`1TPCPjDhkp0hH8880,2*42,b003669710,1292716710'
+shipdata:
+        MessageID:        5         # Class A static data
+        RepeatIndicator:  0         # Not repeated
+        UserID:           303865000 # MMSI
+        AISversion:       0         # Using the first AIS version: ITU-R M.1371-1.  Not ITU-R M.1371-3.
+        IMOnumber:        0         # No IMO number available for this ship
+        callsign:         @@@@@@@   # This ship has *NO CALL SIGN*.  '@' characters mark the end of strings.
+        name:             CG ASPEN          
+        shipandcargo:     35        # Engaged in military operations
+        dimA:             41        # Distance in meters to the bow from the GPS
+        dimB:             28        # Distance in meters to the stern from the GPS
+        dimC:             11        # Max distance to the port side from the GPS
+        dimD:             8         # Max distance to the starboard side from the GPS
+        fixtype:          1         # Uses GPS for positioning
+        ETAmonth:         0         # No destination time set
+        ETAday:           0
+        ETAhour:          0
+        ETAminute:        0
+        draught:          0         # Magically floats on the water
+        destination:      SAN FRANCISCO CA # Heading to San Francisco
+        dte:              0         # Data terminal available.  Has minimum keyboard display
+        Spare:            0
+</pre>
+<p>
+The above information says a lot about the vessel.  First, the device
+is using the first version of the ITU AIS specification.  With
+versions -1 and -3, there are no huge changes, so we can mostly ignore
+this.  Then there is a a zero for the IMO number implying that there is
+no IMO number for the vessel.  I don't believe that US Government
+vessels must have an IMO number, but it would be great if someone who
+knows can set me straight.  Then the callsign is a big mess up.  I'm
+sure that USCG vessels have call signs.  Next come the ships type.  35
+for military operations sort of makes sense, but there is no way to
+set multiple types right now (warning&hellip; the USCG is likely to do
+something in the near future that is not an international standard).
+The Aspen is a "Juniper Class Sea Going Buoy Tender," so I might want
+to pick something more like 53: port tender or 55: law enforcement,
+but nothing really fits.  
+</p>
+<p>
+The size is covered in 4 numbers that locate the gps with respect to
+the maximum extent of the ship in the 4 main ship directions. The
+length is dimA + dimB or 69 meters long. The width is 11+8 meters or
+19 meters wide. Often ship's crew will mess up and enter feet, so
+never try to use these sizes for cutting things close! Mark 1 eyeball
+time!
+</p>
+<p>
+Next is fix type that says the AIS unit is
+using a GPS for position.  The ETA is all zeros meaning that it is not
+set.
+</p>
+<p>
+The draught (aka draft) is really frustrating for me. It is supposed
+to be the "Maximum present static draught". Means you don't know. If
+you don't know your draft, you should quit right now. Set it and set
+it right! Change it when it changes. Don't know what this means and
+what it should be set to? ITU-1371-3 says "in accordance with IMO
+Resolution A.851".  In typical style, the specification does not link
+to the document, but I found it published by Australia.  However, the
+document doesn't explain what static draft is.
+</p>
+<p>
+<a href="http://www.amsa.gov.au/forms/IMO\_Assembly\_Resolution\_A.851(20).pdf">http://www.amsa.gov.au/forms/IMO_Assembly_Resolution_A.851(20).pdf</a>
+</p>
+<p>
+According to the USCG, the answer is this as published in
+<a href="#www.uscg.mil/Acquisition/nais/documents/The-Guardian-Issue-2.pdf">The Guardian Issue 2</a> (the USCG NAIS new letter).
+</p><pre>
+The depth of water required for the vessel to float with its present
+loading condition.</pre>
+<p>
+The destination is set to San Francisco.  If they sitting at a pier or
+working on a buoy, they really should change this to "NONE" or
+something like that.  The "dte" flag just lets other AIS units in the
+area know that the device on the ship has a minimum keyboard display.
+Often this display is hidden in the back of a very large bridge, so
+don't count on this display for the mariner to notice anything.
+</p>
+<p>
+I have seen the draft recommendation page for setting your AIS, but I
+won't show it until I know it has been released.  I forwarded a pretty
+large list of suggestions for improvements.  So hopefully that will be
+out in the near future.
+</p>
+<p>
+<b>Military rules</b>
+</p>
+<p>
+There were comments as to what the military is allowed to do.  There
+does not seem to be a clear SOP as to when to do what.  But here is
+what they can and have been doing with their "Blue Force" AIS units.
+Note: The USCG made me buy one of these units, so I've actually tried
+these modes.
+</p>
+<ul>
+<li>
+Normal mode - just like a regular class A
+</li>
+<li>
+Secure mode - Encrypts the position message and sends it out as a
+message 8.
+</li>
+<li>
+Silent mode - just like an AIS receive-only device
+</li>
+</ul>
+<p>You can force a silent mode device to transmit by sending it a BBM
+NMEA string, so it really isn't totally silent.
+</p>
+<p>
+Really, as far as I can tell, there are no rules for US Government
+vessels to set their AIS any particular way and to fill in the static
+data fields in any consistent manner.  That said, with a friendly
+word off the record, I have had a number of government vessels set
+their AIS properly.  Additionally, I was told that I was getting Blue
+Force decrypts during the September-ish time frame in my ERMA feed.  I
+looked and didn't see any extra government vessels in the Gulf
+Mexico.  I didn't look to see if there were message 8's coming in to
+my other non-blue force feed at the time (it's a lot to sift through).
+</p>
+<p>
+Here is a sample of what the encrypted traffic looks like at my
+receiver in Newcastle, NH.  There are typically 1 or 2 USCG cutters
+docked and several navy ships and subs in dry dock.  In the NMEA,
+messages that start "!AIVDM,2," are two line messages.
+</p>
+<pre class="example">!AIVDM,1,1,,B,85PH4CQKf2T1wV&lt;TgPB5Hu8iFkKMeOOBbmHAcS26524VcFkaqKFo,0*6E,rnhcml,1292597404.81
+!AIVDM,1,1,,A,85PH4CQKf1glv0GC&gt;w0lqrEIWdIE`WI&lt;KLaRqq6jmuUfvII3Wr`4,0*50,rnhcml,1292597405.29
+!AIVDM,2,1,9,A,85PH4CQKf@N5aigSp:Nv5aN3@6NsFw&gt;;=T@1wT9u5`dtqPKPhcH3KMAG,0*59,rnhcml,1292597407.99
+!AIVDM,2,2,9,A,MJvGa;hse4A:IrTdFC1:c55afHudReHr000DMip,2*55,rnhcml,1292597408.0
+!AIVDM,2,1,0,B,85PH4CQKf@N5aigSp:Nv5aN3@6NsFw&gt;;=T@1wT9u5`dtqPKPhcH3KMAG,0*53,rnhcml,1292597408.17
+!AIVDM,2,2,0,B,MJvGa;hse4A:IrTdFC1:c55afHudReHr000DMip,2*5F,rnhcml,1292597408.19
+</pre>
+<p>
+I have a small program that tells me the DAC (country code), the FI
+(which message type for that DAC), the MMSI, and the station for
+message 8s.  rnhcml is the Coastal Marine Lab in Newcastle, NH.
+</p>
+<pre class="example">ais_bin_msgs.py 8.ais | sort -u
+366 56 369493068 rnhcml
+366 56 369493069 rnhcml
+366 56 369493070 rnhcml
+366 57 369493069 rnhcml
+366 57 369493070 rnhcml
+</pre>
+-----

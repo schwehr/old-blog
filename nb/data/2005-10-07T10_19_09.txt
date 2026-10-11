@@ -1,0 +1,45 @@
+TITLE: Magnus adds more to PyGMT
+AUTHOR: Kurt
+DATE: 10.07.2005 10:19
+DESC: nice!
+-----
+BODY:
+For PyGMT, Magnus did a merge of my libgmt reading code with his
+original code and we now have the best of both worlds!  I need to add
+the libgmt writing code soon that the whole thing is wrapped up.
+Collaboration rocks!  Also, looking at his setup.py, I learned how to
+check python's version.  I use sets in some of my python code, which is only in python &gt;= 2.4.
+<pre>
+<strong>void</strong> <font color="#2040a0">example</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">PyFile_Check</font><font color="4444FF">(</font><font color="#2040a0">GMT_file</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font><font color="#FF8800">/* checking if GMT_file is a file object */</font>
+    <font color="#2040a0">input</font> <font color="4444FF">=</font> <font color="#2040a0">PyFile_AsFile</font><font color="4444FF">(</font><font color="#2040a0">GMT_file</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font><font color="4444FF">(</font><font color="#2040a0">fread</font><font color="4444FF">(</font><font color="4444FF">&amp;</font><font color="#2040a0">gmtheader</font>,<strong>sizeof</strong><font color="4444FF">(</font><strong>struct</strong> <font color="#2040a0">GRD_HEADER</font><font color="4444FF">)</font>,<font color="#FF0000">1</font>,<font color="#2040a0">input</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+      <font color="#2040a0">PyErr_SetString</font><font color="4444FF">(</font><font color="#2040a0">PyExc_IOError</font>, <font color="#008000">&quot;Error, reading GMT header from file&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+      <strong>return</strong> <font color="#2040a0">NULL</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+  <font color="4444FF"><strong>}</strong></font> <strong>else</strong> <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">PyString_Check</font><font color="4444FF">(</font><font color="#2040a0">GMT_file</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font> <font color="#FF8800">/* check if GMT_file is a string */</font>
+    <strong>int</strong> <font color="#2040a0">argc</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">;</font>
+    <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF"><strong>{</strong></font><font color="#008000">&quot;gmtiomodule&quot;</font>,<font color="#FF0000">0</font><font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+    <strong>const</strong> <strong>int</strong> <strong>false</strong><font color="4444FF">=</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+    <font color="#2040a0">filename</font> <font color="4444FF">=</font> <font color="#2040a0">strdup</font><font color="4444FF">(</font><font color="#2040a0">PyString_AsString</font><font color="4444FF">(</font><font color="#2040a0">GMT_file</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#FF8800">// DO NOT FREE or modify PyString_AsString, so copy it right away</font>
+    <font color="#2040a0">argc</font><font color="4444FF">=</font><font color="#2040a0">GMT_begin</font><font color="4444FF">(</font><font color="#2040a0">argc</font>,<font color="#2040a0">argv</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#FF8800">// Sets GMT globals</font>
+    <font color="#2040a0">GMT_grd_init</font> <font color="4444FF">(</font><font color="4444FF">&amp;</font><font color="#2040a0">gmtheader</font>, <font color="#2040a0">argc</font>, <font color="#2040a0">argv</font>, <strong>false</strong><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#FF8800">// Initialize grd header structure </font>
+    <font color="#2040a0">GMT_read_grd_info</font> <font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="4444FF">&amp;</font><font color="#2040a0">gmtheader</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font> <strong>else</strong>  <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">PyErr_SetString</font><font color="4444FF">(</font><font color="#2040a0">PyExc_TypeError</font>, <font color="#008000">&quot;Error, need a File object or a file name (string)&quot;</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <strong>return</strong> <font color="#2040a0">NULL</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Here is my build/install line for Mac OSX with fink (netcdf and gmt-dev 4.x installed):
+<pre>
+NETCDF_PREFIX=/sw GMT_PREFIX=/sw python setup.py install \
+   --root=/Users/schwehr/Desktop/pygmt-cvs
+</pre>
+
+<a
+href="http://www.extremetech.com/article2/0,1697,1866597,00.asp">extremetech
+on military remote sensor stations</a>.  These could make great sensor
+nodes for science (especially if they cost a lot less).
+-----

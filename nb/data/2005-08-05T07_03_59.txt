@@ -1,0 +1,44 @@
+TITLE: CVS Entries parsing with python
+AUTHOR: Kurt
+DATE: 08.05.2005 07:03
+DESC: Using split
+-----
+BODY:
+I just finished up a very basic python script that parses the
+CVS/Entries file and lets me get version number for any file.  Why
+would I want to do that?  I want to be able to make snapshots of my
+paper that are named based on the santabarbara.tex version number and
+the date.  Here is my makefile rule which I call snap:
+<pre>
+SBB_VERSION := ${shell ./parsecvsdir.py -r -e CVS/Entries -n ${NAME}.tex}
+DATE        := ${shell date +'%b%d'}
+SNAP        := ${DATE}-${SBB_VERSION}
+snap:
+	@echo "Making directory for revision ${SBB_VERSION} on ${DATE}"
+	rm -rf ${SNAP}
+	mkdir ${SNAP}
+	cp ${NAME}.tex ${SNAP}/${NAME}-${SBB_VERSION}.tex
+	echo skipping cp ${NAME}.pdf ${SNAP}/sb-${SBB_VERSION}.pdf
+	cp ${NAME}-nofig.pdf ${SNAP}/sb-${SBB_VERSION}-nofig.pdf
+	cp ${NAME}.bib ${SNAP}/sb-${SBB_VERSION}.bib
+	cp Makefile ${SNAP}/Makefile-${SBB_VERSION}
+</pre>
+The SBB_VERSION line uses parscvsdir.py to go into the CVS Entries and
+read the status of santabarbara.tex.  The Entries file looks like
+basically like this:
+<pre>
+D/iv////
+/agums.sty/1.1/Thu Jun 30 16:29:23 2005//
+/agupp.sty/1.1/Thu Jun 30 16:29:23 2005//
+/aguplus.cls/1.1/Thu Jun 30 16:29:23 2005//
+/.cvsignore/1.6/Thu Jun 30 16:27:07 2005//
+/papers.html/1.8/Tue Jul 19 17:59:48 2005//
+/santabarbara.bib/1.11/Thu Jul 28 05:35:11 2005//
+/coreloctab.tex/1.10/Sat Jul 30 01:28:01 2005//
+/santabarbara.tex/1.60/Sun Jul 31 15:51:59 2005//
+</pre>
+The python code really is just a wrapper around line.split('/')[2].
+
+The code is available here: <a
+href="http://schwehr.org/blog/attachments/2005-08/parsecvsdir.py">parsecvsdir.py</a>
+-----

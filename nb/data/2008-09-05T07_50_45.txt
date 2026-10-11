@@ -1,0 +1,124 @@
+TITLE: trac with django
+AUTHOR: Kurt
+DATE: 09.05.2008 07:50
+DESC: sort of helpful
+-----
+BODY:
+<b>UPDATE:</b> <a href="http://www.djangosnippets.org/snippets/1047/">Template filter implementing the Trac wiki markup language</a> [djangosnippets]
+
+I've been trying to come up with creative ways to approach learning
+django.  Having django 1.0 released is very exciting, but as a
+beginner, the differences between the two books I have and what
+actually works is fairly large.  My next django app is appearing to be
+somewhat complicated.  I have yet to figure out what the database
+models should look like.  I figured that I would look at an
+application that I think is fairly impressive and see what the
+corresponding model.py might look like.  For my first try, I picked <a
+href="http://trac.edgewall.org/">trac</a> - an integrated SCM and
+project management tool.
+<pre>% <b>fink install trac-py25</b>
+% <b>mkdir -p ~/Desktop/trac-django/trac</b>
+% <b>cd ~/Desktop/trac-django/trac</b>
+% <b>trac-admin `pwd` initenv</b>
+% <b>htdigest -c .htdigest localhost $USER</b>
+enter the password you want
+% <b>tracd -p 9000 --auth="*",`pwd`/.htdigest,localhost `pwd`</b>
+% <b>open http://localhost:9000/</b>
+</pre>
+Now log in with your username and make some changes to the wiki pages
+and add a ticket or two with some updates.  Now kill that tracd
+webserver.  It's time to work with django.
+<pre>% <b>cd ~/Desktop/trac-django</b>
+% <b>django-admin.py startproject monitor_trac</b>
+% <b>cd monitor_trac</b>
+Edit settings.py to have a database of sqlite3 and a database of trac.db
+% <b>ln -s ../trac/db/trac.db</b>
+% <b>python manage.py inspectdb > models_autogen.py</b>
+</pre>
+That last inspectdb call will go into the trac database and try to
+build the python code to represent the tables in the trac database.
+Time to see what we have.
+<pre> % <b>sqlite3 trac.db .tables</b>
+sqlite3 trac.db .tables
+attachment         node_change        session_attribute  version          
+auth_cookie        permission         system             wiki             
+component          report             ticket           
+enum               revision           ticket_change    
+milestone          session            ticket_custom    
+% <b>sqlite3 trac.db ".schema wiki"</b>
+CREATE TABLE wiki (
+    name text,
+    version integer,
+    time integer,
+    author text,
+    ipnr text,
+    text text,
+    comment text,
+    readonly integer,
+    UNIQUE (name,version)
+);
+CREATE INDEX wiki_time_idx ON wiki (time);
+</pre>
+Here is what django thought about that table:
+<pre>
+<strong>class</strong> <font color="#2040a0">Wiki</font><font color="4444FF">(</font><font color="#2040a0">models</font>.<font color="#2040a0">Model</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">version</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="#2040a0">null</font><font color="4444FF">=</font><font color="#2040a0">True</font>, <font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">time</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="#2040a0">null</font><font color="4444FF">=</font><font color="#2040a0">True</font>, <font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">author</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">ipnr</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">text</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">comment</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">readonly</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="#2040a0">null</font><font color="4444FF">=</font><font color="#2040a0">True</font>, <font color="#2040a0">blank</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <strong>class</strong> <font color="#2040a0">Meta</font><font color="4444FF">:</font>
+        <font color="#2040a0">db_table</font> <font color="4444FF">=</font> <font color="#2040a0">u</font><font color="#008000">'wiki'</font>
+</pre>
+It doesn't look like this will work right.  Let's check.
+<pre>% <b>python manage.py startapp trac</b>
+Error: 'trac' conflicts with the name of an existing Python module and cannot be used as an app name. Please try another name.
+% <b>python manage.py startapp dt</b>
+% <b>rm trac.db</b> # Get rid of the symbolic link to keep the original database intact
+</pre>
+Now put the above wiki model into dt/models.py.  Then edit the INSTALLED_APPS 
+in settings.py to look like this:
+<pre>INSTALLED_APPS = (
+    'monitor_trac.dt',
+)</pre>
+Time to create and view the database table that does with this model.
+<pre>
+% <b>python manage.py sqlall dt</b>
+BEGIN;
+CREATE TABLE "wiki" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "name" text NOT NULL,
+    "version" integer NULL,
+    "time" integer NULL,
+    "author" text NOT NULL,
+    "ipnr" text NOT NULL,
+    "text" text NOT NULL,
+    "comment" text NOT NULL,
+    "readonly" integer NULL
+)
+;
+COMMIT;</pre>
+Looks like there is an extra "id" field as the primary key.  Django
+does not currently understand the <b>UNIQUE(name,version)</b>
+constraint on the database, but I think that it wouldn't be too much
+work to dump the trac database and rebuild it with the above table
+plus the UNIQUE.
+
+Looking through the rest of the tables, I don't see any other than
+UNIQUE that might trip up django.  It looks like it might not be that
+hard to completely rewrite trac as a django application.  If only I
+had the time!  I'm thinking the hardest part would be the integration
+with svn or other revision control systems.  But maybe if the project
+used the python based <a
+href="http://www.selenic.com/mercurial">Mercurial</a> (hg), it might
+be doable in a short period of time.
+
+This excercise did not quite give me the insite I was hoping for on my
+application.  I think next, I'll look into on of the flight operations
+tools called IPRW (Image Product Release Website).  That database
+(using mysql, jQuery, php, and gallery2) has a lot of interesting
+components that I'd like to emulate in django.
+-----

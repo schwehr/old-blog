@@ -1,0 +1,47 @@
+TITLE: Guest post - Trey on GIS architectures
+AUTHOR: Trey Smith
+DATE: 11.17.2010 13:01
+DESC: first guest post
+-----
+BODY:
+I'd like to introduce Trey Smith.  He and I worked together at CMU
+Pittsburgh for a year on Bulwinkle, an ATRV rover and Mars Autonomy
+software.  I did a guest post for Trey back in the summer of 2009: <a
+href="http://disastercam.blogspot.com/2009/08/sonoma-air-attack-20090807.html">Sonamo
+Air Attack</a>.  Trey offered up this guest post based on his
+experiences with developing emergency response systems while working
+at NASA Ames (e.g. GeoCam).  
+
+On to Trey's thoughts:
+
+Here's a different take on a GIS architecture diagram, something we use when presenting GeoCam.
+
+It obviously doesn't address all the issues you're trying to get at
+with your diagram, but the thing I like about it is it emphasizes that
+there are lots of data sources and lots of visualization tools, so
+that no one software tool can do everything, any particular software
+tool you write is just a tiny part of the overall system, and open
+standards are super important.
+
+Another way I think about this stuff is to separate GIS modules into three categories:
+<li>Feeds</li><ul><li>Sensors</li><li>Manual data entry interfaces</li></ul><li>Aggregators</li><ul>  <li>Curate data sources</li>  <li>Collect history</li>  <li>Run analysis (e.g. plume dispersion)</li>  <li>Detect events (e.g. near collisions)</li>  <li>Produce derived feeds</li></ul><li>Visualizers</li><ul>  <li>Human interfaces to view data</li></ul></ul>
+As a developer, I like this view because it shows you how you can
+contribute in any of the three areas without solving all the problems
+of the other areas.
+
+Like: If you have a new sensor, make it produce KML and it can be
+picked up by an aggregator/visualizer like ERMA almost for free.  And
+ERMA offers great value but doesn't have to solve all the issues of
+where to get the data in-house -- if you have a platform that's
+getting used, people will figure out how to contribute data on their
+own.
+
+A very cool example of this is Francis Enomoto's Collaborative
+Decision Environment.  It's almost a pure aggregator, basically just a
+KML index file that points to a bunch of other KML data sources that
+are often relevant to firefighters.  Very helpful, but Francis doesn't
+have to do too much to maintain it because of the community he's
+piggybacking on.
+
+<img title="Trey's architectural view" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-11/gis-workflow-trey.png"/>
+-----

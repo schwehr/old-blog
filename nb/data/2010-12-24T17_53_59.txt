@@ -1,0 +1,76 @@
+TITLE: The best possible python file reading example
+AUTHOR: Kurt
+DATE: 12.24.2010 17:53
+DESC: Need assistance
+-----
+BODY:
+I need help from the community.  I've been working on a chapter that
+walks through the process of creating a python driver for reading a
+fairly simple binary format: Smoothed Best Estimate of Trajectory
+(SBET).  SBETs are great in that they are a simple example binary 
+data files and they have a spatial component.
+
+<a
+href="http://vislab-ccom.unh.edu/~schwehr/Classes/2011/esci895-researchtools/python-binary-files.html">Python
+- parsing binary data files</a>
+
+My main constraint is that I am requiring Python 2.7.x.  I should really
+make the read work with Python 3.x, but I'm not sure how to do that.
+
+But... I am now at a point where I want to create the complete and
+final version.  I can then back fill the second half of the chapter.
+The question is what do you all think should be in the end code and
+how does what I have so far stack up?  I've just taken a stab at a <a
+href="http://trac.gispython.org/lab/wiki/PythonGeoInterface">__geo_interface__</a>
+and I've used <a
+href="http://trac.gispython.org/lab/wiki/Shapely">Shapely</a>.  It can
+now do <a
+href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON</a>
+I want to provide simple SQLite, CSV, and KML writing.
+
+If you are into python and up for giving the chapter and code a look,
+I could really use some feedback!
+
+Things on the todo list... should do or not do any of these and if I
+should implement them, are there any strong opinions on how or best
+examples?
+<ul>
+<li>How to produce a good python package with a nice setup.py using distribute.</li>
+<li>Submitting the package to <a href="http://pypi.python.org/pypi">pypi</a> along with creating eggs, tars, sdist, rpm, and deps.  That probably also means I should talk about <a href="http://pypi.python.org/pypi/stdeb">stdeb</a> for making Debian packages</li>
+<li>documentation - <a href="http://blog.doughellmann.com/2009/08/pymotw-pydoc-online-help-for-python.html">pydoc</a> and/or <a href="http://sphinx.pocoo.org/">sphinx</a> (it seems that <a href="http://epydoc.sourceforge.net/">epydoc</a> is out of favor)</li>
+<li><a href="http://docs.python.org/library/unittest.html">unit</a> and <a href="http://docs.python.org/library/doctest.html">doc testing</a>.  I like separate doctest files.  And what about <a href="http://code.google.com/p/python-nose/">nose</a> and other test systems?</li>
+<li>optparse command line interface</li>
+<li>using sqlite3 to make a simple database</li>
+<li>allowing the iterator to handle every nth sample or have a minimum distance between returned datagrams</li>
+<li>kml output that has some flexibility</li>
+<li>Possibly examples using <a href="http://pypi.python.org/pypi/SQLAlchemy">sqlalchemy</a> and/or <a href="http://pypi.python.org/pypi/SQLObject/">sqlobject</a> ORMs to access a database.  <a href="http://stackoverflow.com/questions/53428/what-are-some-good-python-orm-solutions">What are some good Python ORM solutions?</a> on Stack Overflow</li>
+<li>Using <a href="http://www.logilab.org/projects/pylint">pylint</a> and/or <a href="http://pychecker.sourceforge.net/">pychecker</a> to improve the code</li>
+<li>Should this driver know anything about plotting or <a href="http://numpy.scipy.org/">numpy</a>?</li>
+<li>Using a small C library to speed up reading in a batch of data from the file.</li>
+<li>Performance tuning</li>
+</ul>
+Should I include a templated ISO XML metadata creation?  If yes, which
+templating engine would be best?  I can use Python 2.7's .format or
+one of the many other templating engines, but which one?  <a href="http://pypi.python.org/pypi/Mako/">Mako</a>, <a href="http://pypi.python.org/pypi/Cheetah/">Cheetah</a>, <a href="http://jinja.pocoo.org/">Jinja2</a>, <a href="http://pypi.python.org/pypi/Genshi/">Genshi</a>, etc.
+
+For databases, should I also include writing to <a
+href="http://www.gaia-gis.it/spatialite/">SpatialLite</a> and <a
+href="http://postgis.refractions.net/">PostGIS</a>?  Or is just
+exposing WKB and WKT enough?  I don't think ORM tools other than in
+GeoDjango support spatial database columns.
+
+And what about optimization?  Things like being able to return numpy
+arrays probably do not want to use the iterator.  They should likely
+run in a really tight loop and only decode with struct the bare
+minimum.
+
+This chapter is going to be super heavy, but I'm not too worried about
+that.  So what else am I missing?
+
+Yeah, so that is a ton of questions and most of them do not have a single correct answer.
+
+The code so far is on my secondary blog along with a place to comment:
+
+<a href="http://schwehr.blogspot.com/2010/12/best-possible-python-file-reading.html">The best possible python file reading example</a>
+
+-----

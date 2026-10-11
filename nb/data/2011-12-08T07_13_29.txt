@@ -1,0 +1,112 @@
+TITLE: BitTorrent for ships - revisited
+AUTHOR: Kurt
+DATE: 12.08.2011 07:13
+DESC: RVTEC
+-----
+BODY:
+Val asked me to explain my thoughts on why the <a href="http://en.wikipedia.org/wiki/BitTorrent_%28protocol%29">BitTorrent protocol</a> might be good for 
+research ships.  I'd love to hear other thoughts about how to most effectively
+use the limited sat bandwidth without destroying the other critical uses of
+that link and allowing for bursts of data over other routes when possible.
+
+I thought quite a bit about this back in 1996 / 1997 when I wrote the
+first version of a protocol to blast image data back over a double hop
+geosync satellite link from the <a href="http://en.wikipedia.org/wiki/Nomad_rover">Nomad Rover</a> in the Atacama desert of
+Chile back to 2-3 ground control centers at NASA Ames (California),
+Carnegie Mellon (Pittsburgh, PA), and I forget the other locations.  I 
+very much regret not having written a journal paper back then about
+what Dan Christian and I got working.
+
+My original design was using multicast UDP with <a href="http://rti.com/">RTI</a>'s Network Data Delivery Service (NDDS; now <a href="http://en.wikipedia.org/wiki/Data_distribution_service">DDS</a>).
+The robot was running my code on VxWorks and there were 5-10+ Sun
+Solaris and SGI Irix 5.x workstations consuming the multicast stream.
+I had a good sized ring buffer of image blocks.  As images were
+captured, they were dropped into the ring buffer.  Another thread sent
+out packets at a good clip, but we made sure to never 100% saturate
+our dedicated satellite links to reserve space for command and control
+data.  End nodes could then send very small retransmit request packets
+and the robot would resend data if it was still in the ring buffer.
+This meant that when the network degraded, we would get some images
+with unknown (aka black) blocks, but the system was always moving
+forward.  When the data loss rate was low, we spent almost no time on
+the resend process.
+
+With bigger machines and huge disks on ships, we can now expect things
+like BitTorrent to get 100% of the data correctly to the end points.
+But with satellite links, there is a lot of very specific knowledge
+that can help you tune packet size and transmission rate.  Is each
+link section going over a reliable tunnel (e.g. between a ground
+station and the satellite)?  Can we balance packet overhead with the
+BER (bit-error-rate) on the link to pick the optimal packet size?  Is
+there packet fragmentation happening at any point that means we might
+as well send smaller packets?
+
+Lots of interesting things going on and trade offs to weigh!
+
+What I wrote:
+
+I look forward to the day when data is never again shipped more than a
+couple hundred feet by DVD/flashdrive/USB Drive/Tape (or maybe a helicopter
+flight from a ship in the ice to McMurdo).  Our data is not a
+Washington Mutual data center armored truck sized data center
+migration (a story I very much enjoyed hearing).
+
+My thoughts so far...
+
+Benefits of a BitTorrent style setup:
+<ul>
+<li>designed with networks that frequently go up and down.  rsync over ssh will work, but not great.</li>
+<li>It's okay with transferring bits and pieces.</li>
+<li>If you hit a high bandwidth spot like wifi or wired in a harbor, it will happily ramp up the bandwidth.</li>
+<li>Think Barrow, AK... it could do a fast dump to a local dump to a shore client when a ship came in range and now you have two seeds getting data back through the system to the national archives.</li>
+<li>This can be hands off... the ship just sends the file definition / seed info over the sat link and then the archive sites can monitor the progress and the ship slowly and sporadically sends the files in no particular order.</li>
+<li>If two ships passed using SWAP, it is possible to pass data to a vessel that will hit higher bandwidth internet sooner.</li>
+<li>Again with SWAP, if you have one ship with a much bigger sat pipe, BitTorrent could totally handle the UUCP like job of bouncing the data to shore.</li>
+</ul>
+Downsides:
+<ul>
+<li>What you don't want (that is in the current spec) is to have more than 1 or 2 clients pulling that data.  Having clients "swarm" the ships network needs to be prevented.</li>
+<li>Most IT groups will so "no way" to anything peer-to-peer without ever looking beyond the first time they see a word proposing such.</li>
+</ul>
+What needs to happen?  IT teams need to be willing to consider a
+peer-to-peer system without a knee jerk no.  I do understand that
+plain old BitTorrent has a well deserved bad rap for 95% of its
+traffic.  Stock BitTorrent setup would definitely work and be able to
+be setup to stay away for the normal BitTorrent world.  But it would
+be better to have a modified BitTorrent setup that:
+<ul>
+<li>Used UDP to send and I'm not sure if it should be TCP or UDP to "ack" blocks</li>
+<li>Have a configurable or dynamic UDP packet size to best work with the specific satellite configuration and bit error rate</li>
+<li>Can listen to the ship's systems for hints about how much sat bandwidth to try to use</li>
+<li>Being able to know now many clients to send data to based on the route to that client (e.g. over sat verses land/sea based WAN)</li>
+<li>Evaluate if multicast could reduce the number of retransmits needed by increasing the chance that someone would get the packet and ack it</li>
+<li>Automate the seek info handling and distribution</li>
+<li>Can we use this channel to more effectively update ship board software systems?  e.g. data delivery to ships</li>
+<li>A priority system to make sure that the most important data files or data types get to shore first (and I would imagine that will always be changing based on the vessel science goals)</li>
+</ul>
+The other thought I should bring up... I strongly suggest
+pre-compressing all data files before doing BitTorrent / rsync /
+whatever.  Most of the formats compress very well, but that adds time
+to the transmit process (more blocks for BitTorrent to track or more
+data for rsync to checksum during each time rsync runs).  Adding a
+"nohup bzip2 -9 monster-mb-data-file.all" to your processing chain.
+
+I'd be interested to hear what others thought about this
+(good/bad/otherwise :).  I don't have available engineering time to
+work on such a system, but it would be great to flush out the idea and
+then we can have it out there with the chance that an enterprising
+Computer Science grad student in networking might take it on as a
+thesis project.
+
+<b>Update 2011-12-08</b>: <a
+href="https://plus.google.com/u/0/102101513984015207006/posts/a6wfowqARZB">Dan
+Christian followed up</a> (g+ post) with a number of suggestions
+including <a href="http://en.wikipedia.org/wiki/UDP_tracker">UDP
+tracker protocol</a> - "a high-performance low-overhead BitTorrent
+tracker protocol">.  And <a
+href="http://en.wikipedia.org/wiki/Datagram_Congestion_Control_Protocol">DCCP</a>,
+or <a
+href="http://en.wikipedia.org/wiki/Explicit_Congestion_Notification">ECN</a>.
+Dan has something cool up his sleeve for just about any topic I bring up.
+<a href="http://news.bbc.co.uk/2/hi/technology/6506193.stm">Wi-fi buses drive rural web use</a> (bbc news)
+-----

@@ -1,0 +1,50 @@
+TITLE: Why not to have the same message in multiple DAC/FI locations
+AUTHOR: Kurt
+DATE: 01.19.2009 23:43
+DESC: trying to explain why not to reuse DAC/FI combinations
+-----
+BODY:
+Last week at the IALA AIS working group, one of the vendors pointed
+out that messages are appearing with multiple DAC/FI combinations.
+For example, if a competent authority tells a developer to use 366/54,
+then the message is used in a different location, the developer will
+use for example, 303/54 to transmit the same message content.  This
+causes two problems that I can think of:
+
+<b>First</b>, if a Electronic Chart System (ECS) is setup to work with the
+first 366/54 and the vendor is not aware of 303/54 being the same
+message content, then the vessel will not recognize the message when
+it transits to Alaska.  This is adding extra complexity to every
+ECS/ECDIS system that might end up in multiple locations on the Earth.
+
+<b>Second</b>, this reuse <i>drastically</i> collapses the space of
+available messages from over 17 thousand to something like 120 to 250.
+That is implying that for a particular area, there is only a DAC of 1
+for international IMO messages, a local DAC, and possibly a 3rd or 4th
+regional DAC that can be used in a particular area.
+
+There is no reason not to reuse the same DAC/FI else where in the
+world.  If you are a competent authority, I <b>strongly</b> urge you
+to reuse other binary application messages from other DACs and keep
+the original DAC/FI.  If the message, was originally 366/54, use
+366/54 no matter where you are in the world.  You can authorize the
+use of transmitting that DAC/FI pair in your part of the world.
+
+If you see that someone else has a great message, by all means use it,
+but please don't change the DAC/FI.  To quote the ITU R1371-3
+specification for AIS (P. 58, Annex 5, 1.2):
+<pre>It is recommended that the administrator of application specific
+messages base the DAC selection on the maritime identification digit
+(MID) of the administrator's country or region. It is the intention
+that any application specific message can be utilized worldwide. <b>The
+choice of the DAC does not limit the area where the message can be
+used.</b></pre>
+[emaphasis added]
+
+So if you are creating a new type of message, put it in your DAC.  If
+you are using an existing message, do not put it in another DAC.
+
+Putting a DAC in a message should not specify where in the world the
+transmitter is located.  Location can be determined based on other AIS
+messages and/or the MMSI of a known station.
+-----

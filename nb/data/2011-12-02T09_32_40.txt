@@ -1,0 +1,16 @@
+TITLE: Memory usage in python
+AUTHOR: Kurt
+DATE: 12.02.2011 09:32
+DESC: effeciency matters
+-----
+BODY:
+Perhaps I need to think about how this particular python script is
+written.  I expected it to be slow, but this slow?
+<pre>PID   COMMAND      %CPU  TIME     #TH  #WQ  #POR #MREGS RPRVT  RSHRD  RSIZE  VPRVT  VSIZE  PGRP PPID STATE    UID  FAULTS
+4742  python2.7    23.6  02:52.91 2    0    24   36939  2744M- 520K   2555M- 14G    <b>16G</b>    4742 1001 sleeping 502  3710024+</pre>
+But I'm loading a ton of data all at one time and then writing it to a
+numpy array so that I can work with it much faster.  16G of virtual memory 
+is a fair bit :)  It would have been much faster to handle a record at a time
+and use struct rather than making 5.5M dicts that each has about 15 python objects
+in it.
+-----

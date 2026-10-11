@@ -1,0 +1,217 @@
+TITLE: Thinking about multicast reliable type protocols for AIS
+AUTHOR: Kurt
+DATE: 12.29.2007 16:03
+DESC: What to suggest?
+-----
+BODY:
+
+<b>Warning</b>: This is me thinking through a problem where I haven't
+heard all the requirements and assumptions.
+
+Way back in 1997, I wrote a multicast semi-reliable transmission
+protocol for the CMU rover to send back images from the Atacama desert
+to multiple locations around the United States.  Back then, the data
+rate for these images for realtime telepresent driving was close to
+the limits of our satellite communications links and trying to drive
+multiple TCP/IP connections would have been a disaster.  I started
+working on a paper about the algorithm back then, but got distracted
+by moving to CMU.  So I was lame and never wrote the paper.  I am now
+wishing I had taken the time to write the paper.  
+
+Why am I talking about this now, 10 years after the fact?  Comments
+going within the RTCM SC121 working group on AIS Binary Messaging have
+brought up similar issues to that original work.  We are talking
+about zone/area management messages that let the user know that
+something is up with a region of a water way.  Reading through the
+message, I realized that part of the group wants this message to be an
+address binary message that requires the addressed vessel to respond
+with an acknowledgement.  That could be serious trouble when a new
+message or updated message needs to go out and be acknowledged.  If
+there are hundreds of vessels in the waterway, that will use a
+substantial chunk of bandwidth.  That's two messages for each vessel
+and this is likely a 2 or more slot message for the outgoing.
+
+Here is a quick back of the envelop calculation without checking my
+facts.  Assume 200 ships and a 2 slot message with a one slot
+acknowledgement.  Then assume that some operation within the port
+requires 3 separate zones (e.g. concentric increasing
+security/caution: heightened awareness, exclude some vessels, and
+exclude all vessels.  That means a minimum of (200*2 + 100)*3 or 1500
+slots of traffic.  At the available data rates that is 1/3 of a second
+assuming no packet loss.  Meanwhile, vessels will be trying to fit in
+the normal AIS traffic load.  If there are more than one zone in each
+message, things get a little better, but this is still a big network
+traffic swarm.  Then think of a moving zone that has to be updated
+every N (e.g. N=30) seconds as a LNG tanker moves through the harbor.
+
+That kind of network traffic on 802.11 or other higher speed data
+links is not really a big deal, but for the AIS VDL rates of
+2*9600bps, it is a serious issue.  If AIS class B takes off, there
+will be many more AIS contacts.
+
+I am only beginning to think through the problem requirements and
+issues at this point.  This really needs some use cases to figure out
+what is really needed.  Here are some starting points as I try to drop
+back into the world of managing network traffic.  
+
+<ul>
+<li><a href="http://www.faqs.org/rfcs/rfc3170.html">http://www.faqs.org/rfcs/rfc3170.html</a>
+Request for Comments: 3170, 
+IP Multicast Applications: Challenges and Solutions,
+See section 5.4 Reliable Data Delivery
+</li>
+<li><a href="http://inrg.cse.ucsc.edu/katia/publications.html">http://inrg.cse.ucsc.edu/katia/publications.html</a>
+[Obraczka]  K. Obraczka "Multicast Transport Mechanisms: A Survey and
+            Taxonomy", IEEE Communications Magazine, Vol. 36 No. 1,
+            January 1998.
+</li>
+<li><a href="http://tools.ietf.org/html/rfc3208">http://tools.ietf.org/html/rfc3208</a>,
+Request for Comments: 3208,
+PGM Reliable Transport Protocol Specification
+</li>
+<li><a href="http://www.ietf.org/internet-drafts/draft-ietf-rmt-pi-norm-revised-05.txt">http://www.ietf.org/internet-drafts/draft-ietf-rmt-pi-norm-revised-05.txt</a>,
+NACK-Oriented Reliable Multicast (NORM) Protocol
+</li>
+</ul>
+What are the options for AIS based networking to address this kind of problem?
+
+I was thinking about a timed circular notice message (<a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/timed_circular_notice.html">timed_circular_notice.html</a>),
+but it is not addressed.  I was thinking that if there is a detection
+of non-compliance from a vessel, that USCG software running with the
+basestation would then create an addressed safety text message
+informing the vessel and possibly alerting the local USCG watch
+standers that they need to contact the vessel via VHF voice radio.
+
+Here is what my concept of the message looks like:
+<table border="1">
+<tr bgcolor="#9acd32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Units</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>MessageID</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>AIS message number.  Must be 8</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Indicated how many times a message has been repeated<br/><b>0</b>: default<br/><b>3</b>: do not repeat any more</td>
+</tr>
+<tr>
+<td>UserID</td>
+<td>30</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Unique ship identification number (MMSI)</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>2</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Reserved for definition by a regional authority.</td>
+</tr>
+<tr>
+<td>dac</td>
+<td>10</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Designated Area Code - 366 for the United States</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Functional IDentifier - 63</td>
+</tr>
+<tr>
+<td>month</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Start time of most recent notice  UTC month</td>
+</tr>
+<tr>
+<td>day</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Start time of most recent notice  UTC day of the month 1..31</td>
+</tr>
+<tr>
+<td>hour</td>
+<td>5</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Start time of most recent notice  UTC hours 0..23</td>
+</tr>
+<tr>
+<td>min</td>
+<td>6</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>Start time of most recent notice  UTC minutes</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>28</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Center of the area/zone  East West location</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>27</td>
+<td></td>
+<td>decimal</td>
+<td>degrees</td>
+<td>Center of the area/zone  North South location</td>
+</tr>
+<tr>
+<td>timetoexpire</td>
+<td>15</td>
+<td></td>
+<td>uint</td>
+<td>Minutes</td>
+<td>Minutes from the start time until the notice expires.  Max is aprox 23 days<br/><b>0</b>: No detection or notice not active in region<br/><b>32767</b>: Will not expire until another message has been received to replace the message for that location</td>
+</tr>
+<tr>
+<td>radius</td>
+<td>15</td>
+<td></td>
+<td>uint</td>
+<td>m</td>
+<td>Distance from center of detection zone (lat/lon above)</td>
+</tr>
+<tr>
+<td>areatype</td>
+<td>7</td>
+<td></td>
+<td>uint</td>
+<td></td>
+<td>What does this circular area represent<br/><b>0</b>: Right whale acoustic detection<br/><b>1</b>: Restricted Area<br/><b>2</b>: Prohibited Area (no unauthorized entry)<br/><b>4</b>: Diving operations<br/><b>5</b>: Underwater obstruction<br/><b>6</b>: Fishing nets<br/><b>7</b>: Oil in water<br/><b>9</b>: Towing prohibited<br/><b>10</b>: Anchorage area (large vessels)<br/><b>11</b>: Anchorage area (small vessels)<br/><b>12</b>: Anchorage area (general)<br/><b>13</b>: Anchorage area (deep water)<br/><b>14</b>: Anchorage area (tanker)<br/><b>15</b>: Anchorage area (24h max)<br/><b>16</b>: Anchorage area (explosives)<br/><b>17</b>: Sea-plane landing area<br/><b>18</b>: Anchorage area (sea planes)<br/><b>20</b>: Anchoring prohibited<br/><b>21</b>: Fishing prohibitedx<br/><b>23</b>: Actively dumping explosives<br/><b>24</b>: Actively dumping<br/><b>30</b>: Firing danger area<br/><b>31</b>: Military area, entry prohibited<br/><b>32</b>: Mine-laying practice area<br/><b>33</b>: Submarine transit and excercise area<br/><b>34</b>: Mine field<br/><b>61</b>: Fast ice<br/><b>62</b>: Sea ice<br/><b>63</b>: Logs<br/><b>65</b>: Dreding area<br/><b>66</b>: Cargo transhipment area<br/><b>67</b>: Incineration area<br/><b>70</b>: SAR - Region of search (what SAR keys should there be?)<br/><b>71</b>: SAR - Man Overboard<br/><b>111</b>: LNG security zone</td>
+</tr>
+</table>
+-----

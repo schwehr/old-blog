@@ -1,0 +1,383 @@
+TITLE: Gallery2 and django
+AUTHOR: Kurt
+DATE: 11.03.2008 16:20
+DESC: Using database introspection
+-----
+BODY:
+I'd like to see something like <a
+href="http://gallery.menalto.com/">Gallery2</a> in Django. I've been
+using a moderate sized PHP at NASA that is built around Gallery2 and
+have been impressed.  I figured the best thing to do is evaluate
+Gallery2 on my laptop and see if I could get Django to pick up the
+database model via introspection.  First to install Gallery2.  I got the
+"full" English only version.  This is on a mac with fink libapache2-mod-php5.
+<pre>% <b>createdb gallery2 -E UNICODE</b>  # Setup Postgresql database
+% <b>createuser -l -P gallery2</b>     # Make a database user for Gallery2
+% <b>wget http://downloads.sourceforge.net/gallery/gallery-2.3-full-en.tar.gz</b>
+% <b>cd /sw/var/www</b>
+% <b>tar xf ~/Desktop/allery-2.3-full-en.tar.gz</b>
+% <b>open http://localhost/gallery2/install</b>
+</pre>
+Then I started walking through the install.  The only thing a bit
+custom is that I put the data directory in /sw/var/g2data so that it
+is not accessable for viewing as web pages.  I selected Postgres:
+
+<img title="Selecting Postgresql in the Gallery2 setup process" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-11/gallery2-install-db.png"/>
+
+I stopped when I got the Step 9 that wants to install all the modules.
+At this point, the "Core" module is installed and I want to check out
+the database.
+<pre>% <b>mkdir ~/Desktop/djangotest</b>
+% <b>cd ~/Desktop/djangotest</b>
+% <b>django-admin.py startproject g2</b>
+% <b>cd g2</b>
+% <b>python2.5 python2.5 manage.py inspectdb &gt; model_tmp.py</b>
+</pre>
+The last command will dump the database model that Django things goes
+with the database tables created by Gallery2:
+<pre><tt><b><font color="#000080">from</font></b> django<font color="#990000">.</font>db <b><font color="#000080">import</font></b> models
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Schema</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_name <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">,</font> primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_major <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_minor <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_createsql <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    g_pluginid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_type <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_info <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_schema'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Eventlogmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_userid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_type <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_summary <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_details <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    g_location <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_client <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_timestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_referer <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_eventlogmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Externalidmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_externalid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_entitytype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_entityid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_externalidmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Failedloginsmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_username <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">,</font> primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_count <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_lastattempt <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_failedloginsmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Accessmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_accesslistid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_userorgroupid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_permission <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font> <i><font color="#9A1900"># This field type is a guess.</font></i>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_accessmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Accesssubscribermap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_itemid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_accesslistid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_accesssubscribermap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Albumitem</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_theme <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_orderby <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_orderdirection <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_albumitem'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Animationitem</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_width <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_height <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_animationitem'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Cachemap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_key <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_value <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    g_userid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_itemid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_type <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_timestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_isempty <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_cachemap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Childentity</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_parentid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_childentity'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Dataitem</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_mimetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_size <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_dataitem'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Derivative</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_derivativesourceid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_derivativeoperations <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_derivativeorder <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_derivativesize <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_derivativetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_mimetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_postfilteroperations <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_isbroken <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_derivative'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Derivativeimage</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_width <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_height <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_derivativeimage'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Derivativeprefsmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_itemid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_order <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_derivativetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_derivativeoperations <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_derivativeprefsmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Descendentcountsmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_userid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_itemid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_descendentcount <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_descendentcountsmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Entity</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_creationtimestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_islinkable <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    g_linkid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_modificationtimestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_serialnumber <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_entitytype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_onloadhandlers <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_entity'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Factorymap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_classtype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_classname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_implid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_implpath <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_implmoduleid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_hints <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_orderweight <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_factorymap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Filesystementity</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_pathcomponent <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_filesystementity'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Group</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_grouptype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_groupname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>unique<font color="#990000">=</font>True<font color="#990000">,</font> max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_group'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Item</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_cancontainchildren <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    g_description <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    g_keywords <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_ownerid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_renderer <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_summary <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_title <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_viewedsincetimestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_originationtimestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_item'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Itemattributesmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_itemid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_viewcount <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_orderweight <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_parentsequence <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_itemattributesmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Maintenancemap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_runid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_taskid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_timestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_success <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    g_details <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_maintenancemap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Mimetypemap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_extension <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">,</font> primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_mimetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_viewable <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_mimetypemap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Movieitem</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_width <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_height <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_duration <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_movieitem'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Permissionsetmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_module <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_permission <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>unique<font color="#990000">=</font>True<font color="#990000">,</font> max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_description <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_bits <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font> <i><font color="#9A1900"># This field type is a guess.</font></i>
+    g_flags <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_permissionsetmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Photoitem</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_width <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_height <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_photoitem'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Pluginmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_plugintype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_pluginid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_active <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_pluginmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Pluginpackagemap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_plugintype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_pluginid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_packagename <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_packageversion <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_packagebuild <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_locked <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_pluginpackagemap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Pluginparametermap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_plugintype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_pluginid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_itemid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_parametername <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_parametervalue <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_pluginparametermap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Recoverpasswordmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_username <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">,</font> primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_authstring <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_requestexpires <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_recoverpasswordmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Sessionmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">,</font> primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_userid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_remoteidentifier <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_creationtimestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_modificationtimestamp <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_data <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">TextField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_sessionmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Tkoperatnmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_name <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">,</font> primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_parameterscrc <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_outputmimetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_description <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_tkoperatnmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Tkoperatnmimetypemap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_operationname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_toolkitid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_mimetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_priority <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_tkoperatnmimetypemap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Tkoperatnparametermap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_operationname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_position <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_type <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_description <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_tkoperatnparametermap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Tkpropertymap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_name <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_type <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_description <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_tkpropertymap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Tkpropertymimetypemap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_propertyname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_toolkitid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_mimetype <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_tkpropertymimetypemap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Unknownitem</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_unknownitem'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2User</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_id <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">(</font>primary_key<font color="#990000">=</font>True<font color="#990000">)</font>
+    g_username <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>unique<font color="#990000">=</font>True<font color="#990000">,</font> max_length<font color="#990000">=</font><font color="#993399">32</font><font color="#990000">)</font>
+    g_fullname <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_hashedpassword <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_email <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">255</font><font color="#990000">)</font>
+    g_language <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">CharField</font></b><font color="#990000">(</font>max_length<font color="#990000">=</font><font color="#993399">128</font><font color="#990000">)</font>
+    g_locked <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">SmallIntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_user'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Usergroupmap</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_userid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_groupid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_usergroupmap'</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">G2Lock</font></b><font color="#990000">(</font>models<font color="#990000">.</font>Model<font color="#990000">):</font>
+    g_lockid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_readentityid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_writeentityid <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_freshuntil <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    g_request <font color="#990000">=</font> models<font color="#990000">.</font><b><font color="#000000">IntegerField</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">class</font></b> Meta<font color="#990000">:</font>
+        db_table <font color="#990000">=</font> u<font color="#FF0000">'g2_lock'</font>
+<!-- -->
+</tt></pre>
+That's a lot and I won't get to dig into the tables just yet.
+
+As an aside, you can also just directly look at the database tables.  For Postgresql:
+<pre>% <b>psql gallery2</b>
+gallery2=# <b>\d</b></pre>
+or in MySQL:
+<pre>% <b>mysqldump --no-data --tables -u gallery2 -p******** gallery2</b></pre>
+-----

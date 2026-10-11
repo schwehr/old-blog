@@ -1,0 +1,67 @@
+TITLE: gnuplot multiplot strikes back
+AUTHOR: Kurt
+DATE: 11.09.2005 17:32
+DESC: many tall skinnies
+-----
+BODY:
+I am feeling a little frustrated with plotting from within python
+today, so I went back to straight gnuplot.  Somehow, it is just
+simpler.  I found a web page that I really like so far for help with
+gnuplot.  <a
+href="http://t16web.lanl.gov/Kawano/gnuplot/index-e.html">GNUPLOT -
+not so frequently asked questions</a>.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+<font color="#FF8800">#</font>
+!echo <font color="#008000">&quot;#depth bulbsusc tau1 tau2 tau3 dec1 inc3&quot;</font> &gt; 2p.dat
+!sqlite ttn136b.db 'SELECT depth, bulksusc, tau1, tau2, tau3, \
+  dec1, inc3 FROM ams WHERE <font color="#2040a0">corenum</font>=2 AND <font color="#2040a0">coretype</font>=<font color="#008000">&quot;p&quot;</font> \
+  ORDER BY depth' | tr '|' '\t' &gt;&gt; 2p.dat
+<font color="#FF8800">#</font>
+unset key
+set yrange [] reverse
+set multiplot
+<font color="#FF8800">########################################
+# Bulk suscecptabilty SI</font>
+set title 'Bulk Chi (SI)'
+set xtics .0001,.0002
+set origin 0,0
+set size .3,1
+plot '2p.dat' using 2:1 with lp
+<font color="#FF8800">########################################
+# tau 1, 2, 3 - eigen values</font>
+set title 'tau 1,2,3'
+set noytic
+set xrange [.32:.35]
+set xtic .33, .01, .34
+set origin .25,0
+plot '2p.dat' using 3:1 with lp \
+     ,'2p.dat' using 4:1 with lp \
+     ,'2p.dat' using 5:1 with lp
+<font color="#FF8800">########################################
+# dec1 eigenvector (with minimum eigenvalue)</font>
+set title 'dec 1'
+set xrange [0:360]
+set xtic 90,90,270
+set origin .5,0
+plot '2p.dat' using 6:1 with lp 
+<font color="#FF8800">########################################
+# inc3 eigenvector component (with minimum eigenvalue)</font>
+set title 'v 3'
+set xrange [0:90]
+set xtic 30,30,60
+set origin .7,0
+plot '2p.dat' using 7:1 with lp 
+<font color="#FF8800">#</font>
+unset multiplot
+pause -1 'hit return dummy'
+</pre>
+This yields a very imperfect plot, but it is heading in the right
+direction.  This is my first time really tweaking xtic to not clobber
+neighboring plot labels across the bottom.
+
+<img src="http://schwehr.org/blog/attachments/2005-11/multiplot-core2.gif">
+
+
+
+-----

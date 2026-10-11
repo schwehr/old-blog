@@ -1,0 +1,50 @@
+TITLE: A simple Django command line program (django "admin" command)
+AUTHOR: Kurt
+DATE: 02.08.2010 06:47
+DESC: the right way
+-----
+BODY:
+I want to be able to run some Django code from a cron job to update a
+database.  I looked at <a
+href="http://code.google.com/p/django-cron/">Django Cron</a>, but then
+thought about the admin commands and realized that was a better route
+to my goal.  Here is the basic route that I tool:
+<pre>django-admin.py startproject projname
+cd projname
+python manage.py startapp myapp
+# Edit settings.py to add myapp to the INSTALLED_APPS
+cd myapp
+mkdir -p management/commands
+touch management/__init__.py
+touch management/commands/__init__.py
+cd management/commands/
+</pre>
+Now create your command:
+<pre><tt><b><font color="#000080">import</font></b> django<font color="#990000">.</font>core<font color="#990000">.</font>management<font color="#990000">.</font>base as base
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">Command</font></b><font color="#990000">(</font>base<font color="#990000">.</font>NoArgsCommand<font color="#990000">):</font>
+  help <font color="#990000">=</font> <font color="#FF0000">'Describe the Command Here'</font>
+  <b><font color="#0000FF">def</font></b> <b><font color="#000000">handle_noargs</font></b><font color="#990000">(</font>self<font color="#990000">,</font> <font color="#990000">**</font>options<font color="#990000">):</font>
+      <b><font color="#0000FF">print</font></b> <font color="#FF0000">'hello world'</font>
+      <b><font color="#0000FF">print</font></b> options</tt></pre>
+Now give it a try:
+<pre>cd ../../.. # back to the project directory
+python manage.py help
+<!-- -->
+Type 'manage.py help <subcommand>' for help on a specific subcommand.
+<!-- -->
+Available subcommands:
+  cleanup
+  compilemessages
+  ...
+  flush
+  <i>hello_world</i>
+  inspectdb
+  loaddata
+  ...
+python manage.py hello_world
+  hello world
+  {'pythonpath': None, 'verbosity': '1', 'traceback': None, 'settings': None}</pre>
+That's it.  Now I have a command (that doesn't really do anything yet)
+that I can put in my crontab.
+-----

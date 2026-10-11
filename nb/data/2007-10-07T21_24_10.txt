@@ -1,0 +1,150 @@
+TITLE: First bit of openldap progress
+AUTHOR: Kurt
+DATE: 10.07.2007 21:24
+DESC: getting somewhere I hope
+-----
+BODY:
+I finally was able to get some LDIF files to import into openldap.
+First off, I am using openldap23 from fink:
+<pre>
+fink list -i openldap
+Information about 6680 packages read in 0 seconds.
+ i   openldap-ssl-shlibs       2.1.29-1025         Shared libraries for LDAP
+ i   openldap23                2.3.27-10           LDAP directory services implementation
+ i   openldap23-dev            2.3.27-10           Libraries and headers for LDAP development
+ i   openldap23-shlibs         2.3.27-10           Shared libraries for LDAP
+</pre>
+I ran into a number of stumbling blocks that were not covered in the docs that I have been reading.
+
+First, I had to edit /sw/etc/openldap/slapd.conf.  I edited the includes at the top have add cosine and inetorgperson schemas:
+<pre>
+include		/sw/etc/openldap/schema/core.schema
+include			/sw/etc/openldap/schema/cosine.schema
+include				/sw/etc/openldap/schema/inetorgperson.schema
+</pre>
+Then in the database at the bottom of the slapd.conf, I setup a dummy schwehr.org domain.
+<pre>
+database	bdb
+suffix			"dc=schwehr,dc=org"
+rootdn				"cn=Manager,dc=schwehr,dc=org"
+# Cleartext passwords, especially for the rootdn, should
+# be avoid.  See slappasswd(8) and slapd.conf(5) for details.
+# Use of strong authentication encouraged.
+#rootpw	 	secret
+rootpw			{SSHA}somelargehash
+
+# The database directory MUST exist prior to running slapd AND 
+# should only be accessible by the slapd and slap tools.
+# Mode 700 recommended.
+directory  /sw/var/openldap-data
+# Indices to maintain
+index	  objectClass	eq
+</pre>
+Replace somelargehash above with the results of "sudo slappasswd".  I
+then had to cleanup from previous slapd instances.  First do a ps -aux
+| grep slapd and kill slapd if it is running.  If things are well, you
+can do:
+<pre>
+kill `cat /sw/var/run/slapd.pid`
+</pre>
+Remove all previous database info.  <b>WARNING: If you have a real database, this will destroy all your data!!!!</b>
+<pre>
+cd /sw/var/openldap-data
+sudo rm -f log.0000000001 alock __db.00* *.bdb
+</pre>
+Make sure that you have a DB_CONFIG file.
+<pre>
+cp DB_CONFIG.example DB_CONFIG
+</pre>
+Now check your config file.
+<pre>
+slaptest -f /sw/etc/openldap/slapd.conf
+</pre>
+I first tried adding both the root and the people at the same time.  This did not work.  The combined file:
+<pre>
+cat &gt;&gt; EOF > ~/people.ldif
+## Build the root node.
+dn: dc=schwehr,dc=org
+dc: schwehr
+objectClass: dcObject
+objectClass: organizationalUnit
+ou: Schwehr Dot Org
+      
+## Build the people ou.
+dn: ou=people,dc=schwehr,dc=org
+ou: people
+objectClass: organizationalUnit
+EOF
+</pre>
+But that gave me an error.  Why?  I don't know.
+<pre>
+slapadd -v -l ~/people.ldif 
+bdb_db_open: Warning - No DB_CONFIG file found in directory /sw/var/openldap-data: (2)
+Expect poor performance for suffix dc=schwehr,dc=org.
+str2entry: entry -1 has multiple DNs "dc=schwehr,dc=org" and "ou=people,dc=schwehr,dc=org"
+slapadd: could not parse entry (line=12)
+</pre>
+Then I tried each piece separately and it worked!
+<pre>
+% cat &gt;&gt; EOF > ~/people1.ldif
+## Build the root node.
+dn: dc=schwehr,dc=org
+dc: schwehr
+objectClass: dcObject
+objectClass: organizationalUnit
+ou: Schwehr Dot Org
+</pre>
+When added gives:
+<pre>
+% slapadd -v -l ~/people1.ldif 
+added: "dc=schwehr,dc=org" (00000001)
+</pre>
+And the second part with the people entry:
+<pre>
+% cat &gt;&gt; EOF > ~/people2.ldif
+## Build the people ou.
+dn: ou=people,dc=schwehr,dc=org
+ou: people
+objectClass: organizationalUnit
+</pre>
+That results in:
+<pre>
+% slapadd -v -l ~/people2.ldif 
+added: "ou=people,dc=schwehr,dc=org" (00000002)
+</pre>
+Start the ldap server:
+<pre>
+% slapd -f /sw/etc/openldap/slapd.conf
+</pre>
+I used gq to browse the database:
+<pre>gq &amp;</pre>
+
+<img src="http://schwehr.org/blog/attachments/2007-10/openldap-gq.png"/>
+
+And finally a slapcat to look at the contents of the database:
+<pre>slapcat
+dn: dc=schwehr,dc=org
+dc: schwehr
+objectClass: dcObject
+objectClass: organizationalUnit
+ou:: U2Nod2VociBEb3QgT3JnICAgICA=
+structuralObjectClass: organizationalUnit
+entryUUID: ed352594-0984-102c-9c76-7977ca58b6da
+creatorsName: cn=Manager,dc=schwehr,dc=org
+modifiersName: cn=Manager,dc=schwehr,dc=org
+createTimestamp: 20071008005537Z
+modifyTimestamp: 20071008005537Z
+entryCSN: 20071008005537Z#000000#00#000000
+
+dn: ou=people,dc=schwehr,dc=org
+ou: people
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: 0a9635a6-0985-102c-89af-21c7102a7e23
+creatorsName: cn=Manager,dc=schwehr,dc=org
+modifiersName: cn=Manager,dc=schwehr,dc=org
+createTimestamp: 20071008005626Z
+modifyTimestamp: 20071008005626Z
+entryCSN: 20071008005626Z#000000#00#000000
+</pre>
+-----

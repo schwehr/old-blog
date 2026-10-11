@@ -1,0 +1,43 @@
+TITLE: AMQP messaging in fink
+AUTHOR: Kurt
+DATE: 02.22.2010 08:51
+DESC: better?
+-----
+BODY:
+I need a solid messaging framework for one of my projects.  I've used
+NDDS (now DDS), RTC (an CMU thing), <a
+href="http://pyro.sourceforge.net/">Pyro</a>, and a few others in the
+past.  I want something simple, but that buys me more than just
+managing TCP or UDP myself.  I looked at Jabber/XMPP a bit, but then 
+started reading about AMQP, which sounds attractive, especially with
+the option to allow for keeping messages through a system crash.  
+
+I spent some time with various implementations of AMQP with not much
+success.  I avoided RabbitMQ because it is based on Erlang which is
+not something I am used to.  I tried these two, but got frustrated
+with the code bases.  I don't have time to get them to build
+reasonably on the Mac with fink.
+<ul>
+<li><a href="http://qpid.apache.org/">qpid</a></li>
+<li><a href="http://www.openamq.org/">OpenMQ</a></li>
+</ul>
+I ended up packaging these into fink:
+<ul>
+<li><a href="http://www.rabbitmq.com/">RabbitMQ</a> - Once I realized
+that I don't need to know Erlang to use it</li>
+<li><a href="http://pypi.python.org/pypi/amqplib/">amqplib</a> - basic
+python library</li>
+<li><a href="http://pypi.python.org/pypi/carrot/">carrot</a></li>
+<li><a href="http://pypi.python.org/pypi/celery/">celery</a></li>
+</ul>
+I did some simple tests and have the basics working.  I now need to
+figure out how to use carrot and celery.
+
+For general background, I read <a
+href="http://blogs.digitar.com/jjww/2009/01/rabbits-and-warrens/">Rabbits
+and Warrens</a> and watched this video, but is not the best for seeing
+the figures, but it does give a kickstart.  The slides get better
+about 20 minutes in.
+
+<object width="640" height="505"><param name="movie" value="http://www.youtube.com/v/ZQogoEVXBSA&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/ZQogoEVXBSA&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="505"></embed></object>
+-----

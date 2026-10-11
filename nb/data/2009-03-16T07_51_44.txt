@@ -1,0 +1,44 @@
+TITLE: GPSD and AIS
+AUTHOR: Kurt
+DATE: 03.16.2009 07:51
+DESC: thanks go to ESR for doing this
+-----
+BODY:
+<a href="http://www.catb.org/~esr/">Eric S. Raymond (ESR)</a> has been
+working adding AIS message decoding to GPSD.  This is a huge
+contribution to the AIS community.  My noaadata code is a research
+type development as I explored what an AIS message definition XML
+dialect might look like.  Thanks Eric!
+
+He just sent this email out to the gpsd-dev and gpsd-user mailing
+lists:
+<pre>The rtcmdecode utility, formerly a filter that turned RTCM2 and RTCM3 
+packets into readable text dumps, has been renammed "gpsdecode" and 
+now has tha ability to un-armor and text-dump common AIVDM sentences 
+as well.
+<!-- -->
+Specifically, it can crack types 1, 2, 3, 4, 5, 9, and 18.  I'd love
+to support others as well but I don't have regression tests for them.
+Tip of the hat to Kurt Schwehr of New Hampshire University for
+supplying test data and text dumps for these.
+<!-- -->
+The GPSD references page now includes a <a href="http://gpsd.berlios.de/AIVDM.html">detailed description of how to
+interpret AIDVM</a>, This is significant because public documentation on
+this has previously been quite poor.  Many of the relevant standards
+are locked up behaind paywalls. Even if they were not, it turns out
+that assembling a complete picture of how both layers of the protocol
+work (not to mentional regional variants like St. Lawrence Seaway's
+AIS extensions like the Coast Guards's PAWSS) is a significant effort.
+<!-- -->
+The gpsd daemon itself does not yet do anything with AIVDM packets,
+though the analysis code in its driver is fully working and it could
+do anything we want with the data.  I could reduce AIS message types
+1, 3, 4, 9, and 18 (everything but 5) to O reports, but I'm far from
+sure this would actually be useful.
+<!-- -->
+I think it would make more sense to extend the GPSD protocol so it can
+report tagged locations (and associated data) from different sensors
+in the vicinity, including both GPSes and AIS receivers.  I'll have
+more to say about this in an upcoming request for discussion on the
+protocol redesign.</pre>
+-----

@@ -1,0 +1,65 @@
+TITLE: simplesegy 0.7 released
+AUTHOR: Kurt
+DATE: 02.13.2009 17:18
+DESC: sigh
+-----
+BODY:
+I just released simplesegy version 0.7.  segy-metadata can now set the
+year and day for segy files that didn't record such information.  It
+should get upset on files that cross over days, but I haven't tried
+that yet.  WARNING: I picked a random year and Julian day for the testing
+here.
+<pre>% <b>segy-metadata -v --year=2004 --julian=134 -t /sw/share/doc/simplesegy-py26/docs/blank.metadata.tmpl Marianas_Line_013.sgy</b>
+file: Marianas_Line_013.sgy -> Marianas_Line_013.sgy.metadata.txt
+<font color="orange">Computing forced time range assuming hour, min, sec are valid</font>
+    datetime_min: 2004-05-13 05:47:54
+    datetime_max: 2004-05-13 05:59:37
+           x_min: 142.439746389
+           x_max: 142.453371389
+           y_min: 20.4817763889
+           y_max: 20.5070630556</pre>
+Excerpts from the FGDC metadata template:
+<pre>Identification_Information:
+  Citation:
+    Citation_Information:
+      Originator: 
+      Publication_Date: 
+      Title: Line Marianas_Line_013.sgy
+Time_Period_of_Content:
+    Time_Period_Information:
+      Range_of_Dates/Times:
+        Beginning_Date: 2004-05-13 
+        Beginning_Time: 05:47    
+        Ending_Date:    2004-05-13   
+        Ending_Time:    05:59      
+...
+  Spatial_Domain:
+    Bounding_Coordinates:
+      West_Bounding_Coordinate:  142.439746389
+      East_Bounding_Coordinate:  142.453371389
+      South_Bounding_Coordinate: 20.4817763889
+      North_Bounding_Coordinate: 20.5070630556
+...
+  Standard_Order_Process:
+    Digital_Form:
+      Digital_Transfer_Information:
+        Format_Name: binary
+        Format_Information_Content: 
+        Transfer_Size: 1.0184 MB</pre>
+Now if someone could generate a good template for the XML metadata
+schema that would work for SEG-Y seismic data, we would be all set.
+
+I really have no way of validating the FGDC metadata format here.  The
+USGS validator seems to make assumptions that aren't true for
+multibeam data.
+
+<a href="http://www.fgdc.gov/metadata/geospatial-metadata-tools">FGDC Metadata Tools</a>
+
+I do see a XML schema here: <a href="http://www.fgdc.gov/metadata/fgdc-std-001-1998.xsd/view">fgdc-std-001-1998.xsd/view</a>
+
+If you are in the know, how abot contributing to wikipedia?  <a
+href="http://en.wikipedia.org/wiki/Geospatial_metadata">Wikipedia on
+Geospatial metadata</a>... I wish these standards like <a
+href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=26020">ISO
+19115:2003</a> were available for free like the basic internet standards.
+-----

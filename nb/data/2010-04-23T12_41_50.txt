@@ -1,0 +1,27 @@
+TITLE: Another example of what a GPS receiver can do
+AUTHOR: Kurt
+DATE: 04.23.2010 12:41
+DESC: more better
+-----
+BODY:
+I haven't looked at the details of this vessel, but when parked at the
+doc under the Tobin bridge, the GPS feeding its class A AIS position
+reports had some really bad position estimates.  Outside of that, it
+looks to have done a great job.  The AIS unit should have broadcast that it did not have a GPS lock in these cases.
+
+<img title="MMSI 366998520 - Odd GPS positions" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/ais-bad-gps.png"/>
+
+I now have ais_decimate_traffic working.  It defaults to 200 meters
+between reports or 10 minutes, which ever comes sooner.  
+<pre><b>ais_decimate_traffic.py -f 2009-filtered.db3 -x -71.155 -X -69.36 -y 41.69 -Y 42.795</b>
+keep_cnt:  275997
+toss_cnt:  897231
+outside_cnt:  51287</pre>
+The above image is not filtered, but you can see below that filtering
+keeps the general sense of when and when the ship was but with about
+and order of magnitude fewer points.
+
+<img title="MMSI 366998520 - filtered" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/ais-pos-filtered.png"/>
+-----

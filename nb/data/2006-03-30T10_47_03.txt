@@ -1,0 +1,69 @@
+TITLE: SQLAlchemy - weird python code
+AUTHOR: Kurt
+DATE: 03.30.2006 10:47
+DESC: what the heck?
+-----
+BODY:
+
+I have just started to play with SQLAlchemy now that I have working
+fink packages for setuptools and SQLAlchemy.  I promise will check
+them in when the sf.net CVS server comes back online.  In the process,
+I am working on creating a db of AIS data.  In ipython I wanted some
+more info on various time functionality and I got quite a surpise.
+<pre>
+In [23]: sqlalchemy.Time?
+Type:           type
+Base Class:     &lt;type 'type'&gt;
+String Form:    &lt;class 'sqlalchemy.types.Time'&gt;
+Namespace:      Interactive
+File:           /sw/lib/python2.4/site-packages/sqlalchemy/types.py
+Docstring:
+    &lt;no docstring&gt;
+
+In [24]: help(sqlalchemy.Time)
+
+Help on class Time in module sqlalchemy.types:
+
+class Time(TypeEngine)
+ |  Method resolution order:
+ |      Time
+ |      TypeEngine
+ |      __builtin__.object
+ |  
+ |  Methods inherited from TypeEngine:
+ |  
+ |  __init__(self, *args, **kwargs)
+ |  
+ |  adapt_args(self)
+...
+</pre>
+No doc string?  I figured I could go look at the source and see what
+is goind on.  Maybe the doc string was getting nuked somehow?  Nope!
+I found this in /sw/lib/python2.4/site-packages/sqlalchemy/types.py:
+<pre>
+...
+class DateTime(TypeEngine):
+    pass
+
+class Date(TypeEngine):
+    pass
+
+class Time(TypeEngine):
+    pass
+
+class Binary(TypeEngine):
+    def __init__(self, length=None):
+        self.length = length
+    def convert_bind_param(self, value, engine):
+        return engine.dbapi().Binary(value)
+    def convert_result_value(self, value, engine):
+        return value
+    def get_constructor_args(self):
+        return {'length':self.length}
+...
+</pre>
+<b>Say what?</b>  First off, there is not inline documentation or
+comments.  Secondly, a class with just pass?  So this will inherit
+the parents functionality, but appear as a different object.  Is
+that the point?
+-----

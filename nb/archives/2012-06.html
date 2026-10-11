@@ -1,0 +1,756 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: June 2012 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2012-06-27T11_18_46.txt" name=
+"e2012-06-27T11_18_46.txt"></a>
+<h2 class="date">06.27.2012 11:18</h2>
+<div class="blogbody">
+<h3 class="title">Python packaging</h3>
+<div class="item-description">I try hard to keep up with python
+packaging. There is a lot I don't understand. Armin Ronacher's
+recent post is well worth reading if you are a python programmer of
+any level.<br />
+<br />
+<a href=
+"http://lucumr.pocoo.org/2012/6/22/hate-hate-hate-everywhere/">Python
+Packaging: Hate, hate, hate everywhere</a><br />
+<br />
+This article covers pth files (which I never understood nor looked
+in), the setuptools egg directory structure, eggs (the zip
+format/jar work alike), binary eggs, pip, and lots of other bits
+and pieces.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-27T11_18_46.txt">Permalink</a> 
+<!-- <br /><a href="archives/#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-26T14_38_43.txt" name=
+"e2012-06-26T14_38_43.txt"></a>
+<h2 class="date">06.26.2012 14:38</h2>
+<div class="blogbody">
+<h3 class="title">gdal to geographic bounding box</h3>
+<div class="item-description">This use case comes up a lot, so here
+is a post to keep me from re-inventing the wheel. I have a spatial
+file in some projection. I want get its bounding box in geographic.
+There are lots of ways to do it, but I want to stay within
+gdal/ogr/osr.
+<pre>
+<tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> osgeo <b><font color=
+"#000080">import</font></b> gdal<font color="#990000">,</font> osr
+<!-- -->
+bag <font color="#990000">=</font> gdal<font color=
+"#990000">.</font><b><font color=
+"#000000">Open</font></b><font color="#990000">(</font><font color=
+"#FF0000">'F00574_MB_2m_MLLW_2of3.bag'</font><font color=
+"#990000">)</font>
+bag_gtrn <font color="#990000">=</font> bag<font color=
+"#990000">.</font><b><font color=
+"#000000">GetGeoTransform</font></b><font color="#990000">()</font>
+bag_proj <font color="#990000">=</font> bag<font color=
+"#990000">.</font><b><font color=
+"#000000">GetProjectionRef</font></b><font color=
+"#990000">()</font>
+bag_srs <font color="#990000">=</font> osr<font color=
+"#990000">.</font><b><font color=
+"#000000">SpatialReference</font></b><font color=
+"#990000">(</font>bag_proj<font color="#990000">)</font>
+geo_srs <font color="#990000">=</font>bag_srs<font color=
+"#990000">.</font><b><font color=
+"#000000">CloneGeogCS</font></b><font color="#990000">()</font>
+transform <font color="#990000">=</font> osr<font color=
+"#990000">.</font><b><font color=
+"#000000">CoordinateTransformation</font></b><font color=
+"#990000">(</font> bag_srs<font color=
+"#990000">,</font> geo_srs<font color="#990000">)</font>
+<!-- -->
+bag_bbox_cells <font color="#990000">=</font> <font color=
+"#990000">(</font>
+    <font color="#990000">(</font><font color=
+"#993399">0</font><font color="#990000">.,</font> <font color=
+"#993399">0</font><font color="#990000">.),</font>
+    <font color="#990000">(</font><font color=
+"#993399">0</font><font color="#990000">,</font> bag<font color=
+"#990000">.</font>RasterYSize<font color="#990000">),</font>
+    <font color="#990000">(</font>bag<font color=
+"#990000">.</font>RasterXSize<font color=
+"#990000">,</font> bag<font color=
+"#990000">.</font>RasterYSize<font color="#990000">),</font>
+    <font color="#990000">(</font>bag<font color=
+"#990000">.</font>RasterXSize<font color=
+"#990000">,</font> <font color="#993399">0</font><font color=
+"#990000">),</font>
+  <font color="#990000">)</font>
+<!-- -->
+geo_pts <font color="#990000">=</font> <font color=
+"#990000">[]</font>
+<b><font color="#0000FF">for</font></b> x<font color=
+"#990000">,</font> y <b><font color=
+"#0000FF">in</font></b> bag_bbox_cells<font color=
+"#990000">:</font>
+    x2 <font color="#990000">=</font> bag_gtrn<font color=
+"#990000">[</font><font color="#993399">0</font><font color=
+"#990000">]</font> <font color=
+"#990000">+</font> bag_gtrn<font color=
+"#990000">[</font><font color="#993399">1</font><font color=
+"#990000">]</font> <font color="#990000">*</font> x <font color=
+"#990000">+</font> bag_gtrn<font color=
+"#990000">[</font><font color="#993399">2</font><font color=
+"#990000">]</font> <font color="#990000">*</font> y
+    y2 <font color="#990000">=</font> bag_gtrn<font color=
+"#990000">[</font><font color="#993399">3</font><font color=
+"#990000">]</font> <font color=
+"#990000">+</font> bag_gtrn<font color=
+"#990000">[</font><font color="#993399">4</font><font color=
+"#990000">]</font> <font color="#990000">*</font> x <font color=
+"#990000">+</font> bag_gtrn<font color=
+"#990000">[</font><font color="#993399">5</font><font color=
+"#990000">]</font> <font color="#990000">*</font> y
+    geo_pt <font color="#990000">=</font> transform<font color=
+"#990000">.</font><b><font color=
+"#000000">TransformPoint</font></b><font color=
+"#990000">(</font>x2<font color="#990000">,</font> y2<font color=
+"#990000">)[:</font><font color="#993399">2</font><font color=
+"#990000">]</font>
+    geo_pts<font color="#990000">.</font><b><font color=
+"#000000">append</font></b><font color=
+"#990000">(</font>geo_pt<font color="#990000">)</font>
+    <b><font color="#0000FF">print</font></b> x<font color=
+"#990000">, </font>y<font color="#990000">, </font><font color=
+"#FF0000">'-&gt;'</font><font color=
+"#990000">, </font>x2<font color="#990000">, </font>y2<font color=
+"#990000">, </font><font color="#FF0000">'-&gt;'</font><font color=
+"#990000">, </font>geo_pt</tt>
+</pre>
+The results of this code are:
+<pre>
+0.0 0.0 -&gt; 369179.0 4775259.0 -&gt; (-70.608087740520943, 43.118768822635147)                                
+0.0 1083 -&gt; 369179.0 4773093.0 -&gt; (-70.607577288471774, 43.099271863165256)                               
+1841 1083 -&gt; 372861.0 4773093.0 -&gt; (-70.56234820699548, 43.099898472783011)                               
+1841 0.0 -&gt; 372861.0 4775259.0 -&gt; (-70.562844311963829, 43.119395856927362)
+</pre>
+I was looking at <a href=
+"http://svn.osgeo.org/gdal/trunk/gdal/swig/python/samples/gdalinfo.py">
+gdalinfo.py</a> in the gdal source tree, but got hung up on the
+very different coding style. Thanks to EvenR, I now know that the
+b, psz, adf, h, etc prefixes on variable names are <a href=
+"http://en.wikipedia.org/wiki/Hungarian_notation">Hungarian
+notation</a>. While I've heard of Hungarian notation, I've never
+really had to deal with it before. I have an easier time reading
+the above example. I hope this helps a few people.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-26T14_38_43.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-27T11_18_46.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-26T12_06_13.txt" name=
+"e2012-06-26T12_06_13.txt"></a>
+<h2 class="date">06.26.2012 12:06</h2>
+<div class="blogbody">
+<h3 class="title">Detecting who done it when dumping oil</h3>
+<div class="item-description">Back in 2007, Phil McGillivary and I
+wrote an IEEE/MTS paper, <a href=
+"http://vislab-ccom.unh.edu/~schwehr/papers/SchwehrMcGillivaryOceansMTS2007.pdf">
+Marine Ship Automatic Identification System (AIS) for Enhanced
+Coastal Security Capabilities: An Oil Spill Tracking
+Application</a>. Shortly after, I <a href=
+"../archives/2007-11.html#e2007-11-27T14_39_11.txt">
+linked</a> to a <a href=
+"http://www.marinelink.com/news/article/coast-guard-to-test-oil-from-seven-ships-in/325434.aspx">
+USCG note in MarineLink</a> saying that the USCG had used NAIS to
+figure out who spilled oil. Since then, there have been papers
+talking about combining AIS and satellite imaging to catch
+dumpers.<br />
+<br />
+Last week, SkyTruth and SpaceQuest published a nice demonstration
+of doing exactly that:<br />
+<br />
+<a href=
+"http://blog.skytruth.org/2012/06/bilge-dumping-busted-using-satellite.html">
+Bilge Dumping? Busted Using Satellite Images and AIS Data</a>
+[SkyTruth]<br />
+<a href="http://gcaptain.com/bilge-dump-csi-skytruth-ids">Bilge
+Dump CSI: AIS Helps ID Vessel Responsible for Oil Slick Off
+Angola</a> [gCaptain]<br />
+<br />
+It's nice to see a concept get one step closer to common
+practice.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-26T12_06_13.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-26T14_38_43.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-14T19_39_01.txt" name=
+"e2012-06-14T19_39_01.txt"></a>
+<h2 class="date">06.14.2012 19:39</h2>
+<div class="blogbody">
+<h3 class="title">Half day kickstart on AIS</h3>
+<div class="item-description">I was just talking to a person who
+works for federal agency who was looking for information on AIS.
+Here is the list of material that I think gives a kickstart into
+AIS. This is a very intense half day of material, but leaves out
+actually processing any AIS data. I have yet to create an AIS in
+practice video.<br />
+<br />
+First 3 videos. Each is close to an hour.<br />
+<br />
+My AIS Deepwater Horizon video: <a href=
+"http://youtu.be/t5xfs7z2VJY">http://youtu.be/t5xfs7z2VJY</a><br />
+My AIS for Environmental Protection video: <a href=
+"http://youtu.be/MQBj9tlcqU0">http://youtu.be/MQBj9tlcqU0</a><br />
+Michael Jones of Google talking about AIS and several other
+technologies in industry: <a href=
+"http://www.youtube.com/watch?v=Dk3IIOimGwE">http://youtu.be/Dk3IIOimGwE</a><br />
+
+<br />
+After that, here are two pretty big documents:<br />
+<br />
+My AIS for Deepwater Horizon paper: <a href=
+"%20http://vislab-ccom.unh.edu/~schwehr/papers/2011-schwehr-ushydro-dwh.pdf">
+2011-schwehr-ushydro-dwh.pdf</a><br />
+NOAA CSC BOEM AIS Data Handler presenation (cites me): <a href=
+"http://www.marinecadastre.gov/AIS/AIS%20Documents/AISDataHandlerTutorial_DRAFT.pdf">
+http://www.marinecadastre.gov/AIS/AIS%20Documents/AISDataHandlerTutorial_DRAFT.pdf</a><br />
+
+<br />
+I haven't posted this even though it has been online for just about
+a month, but here it is. Michael Jones of Google talking about what
+industry as a whole can and does do. Keep your eyes out as he shows
+a photo of the SpaceQuest crew with two of their AIS
+satellites.<br />
+<br />
+<iframe width="640" height="360" src=
+"http://www.youtube.com/embed/Dk3IIOimGwE" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-14T19_39_01.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-26T12_06_13.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-13T12_01_20.txt" name=
+"e2012-06-13T12_01_20.txt"></a>
+<h2 class="date">06.13.2012 12:01</h2>
+<div class="blogbody">
+<h3 class="title">RT Lecture 20 - From BAG to summary KML in Earth
+and QGIS</h3>
+<div class="item-description">In this lecture, I'm really proud
+that we went from a HDF5 BAG data file from a hydrographic survey
+to a bounding box KML summary with Google Earth and in QGIS with
+GSHHS shorelines for context.<br />
+<br />
+<iframe width="640" height="480" src=
+"http://www.youtube.com/embed/SePadYITcFs" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-13T12_01_20.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-14T19_39_01.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-12T06_09_41.txt" name=
+"e2012-06-12T06_09_41.txt"></a>
+<h2 class="date">06.12.2012 06:09</h2>
+<div class="blogbody">
+<h3 class="title">Research Tools Lecture 19 - plotting BAGs and
+parsing metadata</h3>
+<div class="item-description">In this video, I plot the bathymetry,
+a histogram of elevations, the uncertainty and a histogram of
+uncertainty for a Bathymetry Attributed Grid (BAG) file. I also
+show how to use h5py and lxml with xpath to beging to extract parts
+of the ISO XML metadata.<br />
+<br />
+<iframe width="640" height="480" src=
+"http://www.youtube.com/embed/Ud-CWRjSjSo" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-12T06_09_41.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-13T12_01_20.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-06T04_56_42.txt" name=
+"e2012-06-06T04_56_42.txt"></a>
+<h2 class="date">06.06.2012 04:56</h2>
+<div class="blogbody">
+<h3 class="title">A little more puppet</h3>
+<div class="item-description">I wanted to show how to install
+something on Ubuntu in my first post on puppet, but it ended up
+being just too much for one go. Here is installing one package on a
+Ubuntu 10.04 LTS machine. I picked the cheetah python module at
+random.
+<pre>
+<b>apt-cache search cheetah</b>
+python-cheetah - text-based template engine and Python code generator
+moap - Swiss army knife for project maintainers and developers
+python-mako - fast and lightweight templating for the Python platform
+<!-- -->
+<b>dpkg -l python-cheetah</b>
+No packages found matching python-cheetah.
+<!-- -->
+# trying to install it
+<b>puppet apply cheetah.pp</b>
+err: /Stage[main]//Package[python-cheetah]/ensure: change from purged to present failed: Execution of '/usr/bin/apt-get -q -y -o DPkg::Options::=--force-confold install python-cheetah' returned 100: E: Could not open lock file /var/lib/dpkg/lock - open (13: Permission denied)
+E: Unable to lock the administration directory (/var/lib/dpkg/), are you root?
+<!-- -->
+notice: Finished catalog run in 0.23 seconds
+<!-- -->
+# It needs to be root to have permission to install
+<b>sudo puppet apply cheetah.pp</b>
+notice: /Stage[main]//Package[python-cheetah]/ensure: ensure changed 'purged' to 'present'
+notice: Finished catalog run in 6.78 seconds
+<!-- -->
+<b>dpkg -l python-cheetah</b>
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Cfg-files/Unpacked/Failed-cfg/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                         Version                      Description
++++-============================-============================-=======================================
+ii  python-cheetah               2.0.1-2ubuntu7               text-based template engine and Python code generator
+</pre>
+Here is what the cheetah.pp file looks like:
+<pre>
+package <font color="#FF0000">{</font> <font color=
+"#FF0000">"python-cheetah"</font><font color="#990000">:</font>
+    <b><font color="#0000FF">ensure</font></b> <font color=
+"#990000">=&gt;</font> present<font color="#990000">,</font>
+<font color="#FF0000">}</font>
+</pre>
+Last time, I showed using an erb template. Here is running the ruby
+erb command to see what it does to a template:
+<pre>
+cat mytemplate.erb 
+os: &lt;%= operatingsystem %&gt;
+<b>erb -x mytemplate.erb </b>
+_erbout = ''; _erbout.concat "os: "; _erbout.concat(( operatingsystem ).to_s); _erbout.concat "\n"
+; _erbout
+</pre>
+I don't speak ruby, but this looks like it might be a ruby
+script.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-06T04_56_42.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-12T06_09_41.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-05T14_34_55.txt" name=
+"e2012-06-05T14_34_55.txt"></a>
+<h2 class="date">06.05.2012 14:34</h2>
+<div class="blogbody">
+<h3 class="title">Multibeam advisory committee</h3>
+<div class="item-description">I've been telling a lot of people
+about this, but now it is public:
+<pre>
+The Multibeam Advisory Committee (MAC) is a community-based effort with
+the goal of ensuring consistent high-quality multibeam data are
+collected across the U.S. Academic Research Fleet. Our strategy is to
+create a community of stakeholders to build a common body of knowledge
+and technical expertise to optimize multibeam data acquisition.
+<!-- -->
+Please visit <a href=
+"http://mac.unols.org">http://mac.unols.org</a> for:
+- Information about the MAC help-desk
+- Sound Velocity Profile (SVP) Editor Tools
+- Beta Sound Velocity Profile (SVP) Mission Planning Tools
+- Technical Reports
+- Software Cookbooks
+<!-- -->
+Following up from our presentation at the RVTEC meeting last November,
+we are currently gathering information and documentation, and invite you
+to contribute stories of technical successes, technical issues, and/or
+any documentation or protocols you may be willing to share.  We look
+forward to working with you.
+<!-- -->
+Best wishes,
+Vicki Ferrini, Jonathan Beaudoin, and Paul Johnson
+</pre>
+<img width="600" height="291" title="MAC Tech Resources"
+withgrayborder="True" src=
+"../attachments/2012-06/mac-tech-resources.png" /><br />
+
+<br />
+<img width="578" height="265" title="tech reports" withgrayborder=
+"True" src=
+"../attachments/2012-06/mac-tech-reports.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-05T14_34_55.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-06T04_56_42.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-05T07_47_14.txt" name=
+"e2012-06-05T07_47_14.txt"></a>
+<h2 class="date">06.05.2012 07:47</h2>
+<div class="blogbody">
+<h3 class="title">Iceland</h3>
+<div class="item-description">I saw Greenland for the first time
+out the window of the plane...<br />
+<br />
+<img width="600" height="450" title="Greenland from the plane"
+withgrayborder="True" src=
+"../attachments/2012-06/greenland.jpg" /><br />
+
+<br />
+Then I got to see the moon rise as we got close to Iceland:<br />
+<br />
+<img width="600" height="241" title=
+"Moon over the Atlantic near Iceland" withgrayborder="True" src=
+"../attachments/2012-06/moon-over-the-atlantic.jpg" />
+<br />
+<br />
+Then I got an awesome midnight bus ride from the KEF airport to
+Reykjavik. This morning, I took a walk out to the area around
+Valhusahaeo.<br />
+<br />
+<img width="600" height="208" title="Valhusahaeo Park"
+withgrayborder="True" src=
+"../attachments/2012-06/valhusahaeo-reykjavik-iceland.jpg" />
+<br />
+<br />
+<img width="600" height="242" title="the ocean" withgrayborder=
+"True" src=
+"../attachments/2012-06/iceland-ocean.jpg" /><br />
+
+<br />
+Photosynths:<br />
+<br />
+<iframe frameborder="0" src=
+"http://photosynth.net/embed.aspx?cid=29b0c5d4-d1a1-463f-8b38-70196ed17aa0&amp;delayLoad=true&amp;slideShowPlaying=false"
+width="500" height="300"></iframe><br />
+<br />
+<iframe frameborder="0" src=
+"http://photosynth.net/embed.aspx?cid=46a507dd-ed9a-4f7b-b16f-a0cbe164545e&amp;delayLoad=true&amp;slideShowPlaying=false"
+width="500" height="300"></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-05T07_47_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-05T14_34_55.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-06-02T11_10_01.txt" name=
+"e2012-06-02T11_10_01.txt"></a>
+<h2 class="date">06.02.2012 11:10</h2>
+<div class="blogbody">
+<h3 class="title">puppet hello world</h3>
+<div class="item-description">I'm getting tired trying to maintain
+too many machines across the globe. I'd like to have a way to make
+sure that virtual and non-virtual machines meet the requirements
+for what I'm going to do with them.<br />
+<br />
+There are a number of use cases that I have in my mind:<br />
+<br />
+This first is with my remake of my research tools Ubuntu 11.04
+VMWare Fusion 3 vm that I used with the 2011 Research Tools course.
+While it did work okay for the class. It was hard to be sure that
+each students instance was the same as mine. I couldn't push
+changes to the students. They had to run 'sudo apt-get
+some-package' to install software that we needed, which is great
+for learning, but hard to keep momentum. If they had been able to
+use hg, git or svn to pull and updated puppet config and ask puppet
+to do the updating, I think it would have gone a lot faster.<br />
+<br />
+My next use case is for my own use of many machines. My computing
+life spans 10's of mac and linux machines that I directly log into
+and many more that I count on. If I could make some basic modules
+of things, then I could say... "give me my programming environment"
+(e.g. emacs, yasnippets, python, and my favorite python modules).
+Or "this machine is a data logger" (seriously coders... I don't
+know the answer for this one. Tell me what this is). Or "I need to
+do GIS data processing" (give me qgis, gdal, shapely, pyproj). You
+get the idea.<br />
+<br />
+Then there is the collaboration aspect. When a buddy needs to work
+with me, I can say "grab this puppet config" and it will get you
+there. Every system has it's own way to get going... e.g. yum/rpm
+vrs apt/deb vrs fink/deb vrs macports/? vrs homebrew/just don't
+look. And we have ruby gems, php pear, python
+distribute/pip/pypi/virtualenv, perl cpan, emacs 24+?, etc.<br />
+<br />
+So, how to get myself started? I bought a book. It wasn't very
+good. Instead, I'm trying to do some simple hello world type stuff
+and bootstrap myself by doing.<br />
+<br />
+First, I'm going to assume that you have puppet installed somehow
+(I'm not worrying about the puppet master today). I leave this to
+the reader to pick their way. On ubuntu "apt-get install
+puppet".<br />
+<br />
+Make sure puppet is installed:
+<pre>
+<b>puppet --version</b>
+2.7.12
+<b>facter --puppet | egrep 'architecture|os_version|operatingsystem'</b>
+architecture =&gt; x86_64
+operatingsystem =&gt; Darwin
+operatingsystemrelease =&gt; 11.4.0
+sp_os_version =&gt; Mac OS X 10.7.4 (11E53)
+<b>puppet help</b>
+...
+</pre>
+Now that I know that puppet at least runs, time to write a hello
+world. I'm using emacs and telling it to treat the code as if it is
+ruby. Older versions were okay without the apply in the shebang
+line (#!).
+<pre>
+<i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+<!-- -->
+notice<font color="#990000">(</font><font color=
+"#FF0000">"hello world!"</font><font color="#990000">)</font>
+</pre>
+Now run it:
+<pre>
+# apply runs a .pp file
+<b>puppet apply helloworld.pp</b>
+notice: Scope(Class[main]): hello world!
+notice: Finished catalog run in 0.03 seconds
+<!-- -->
+<b>chmod +x helloworld.pp
+./helloworld.pp</b>
+notice: Scope(Class[main]): hello world!
+notice: Finished catalog run in 0.02 seconds
+</pre>
+Yup, we can do hello world.<br />
+<br />
+Can we do the equivalent of "touch" a file... this will create an
+empty file.
+<pre>
+<i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+<!-- -->
+file <font color="#FF0000">{</font> <font color=
+"#FF0000">"a file"</font><font color="#990000">:</font>
+    path <font color="#990000">=&gt;</font> <font color=
+"#FF0000">"/tmp/aliastest"</font><font color="#990000">,</font>
+    <b><font color="#0000FF">ensure</font></b> <font color=
+"#990000">=&gt;</font> file
+<font color="#FF0000">}</font>
+</pre>
+<pre>
+<b>ls -l /tmp/aliastest</b>
+ls: /tmp/aliastest: No such file or directory
+<!-- -->
+<b>./file.pp</b>
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: /Stage[main]//File[a file]/ensure: created
+notice: Finished catalog run in 0.02 seconds
+<!-- -->
+<b>ls -l /tmp/aliastest</b>
+-rw-r--r--  1 schwehr  wheel  0 Jun  2 17:59 /tmp/aliastest
+./file.pp 
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: Finished catalog run in 0.02 seconds
+<!-- -->
+<b>ls -l /tmp/aliastest</b>
+-rw-r--r--  1 schwehr  wheel  0 Jun  2 17:59 /tmp/aliastest
+</pre>
+So that worked for creating a zero length file the first time and
+if the file already exists, it does not mess with an existing
+file.<br />
+<br />
+The next thing to try to do is put content into a file. We here add
+a mode to control the file permission bits and a content entry that
+will be exactly what is in the file.
+<pre>
+<i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+<!-- -->
+file <font color="#FF0000">{</font> <font color=
+"#FF0000">'helloworld.txt'</font><font color="#990000">:</font>
+  path <font color="#990000">=&gt;</font> <font color=
+"#FF0000">'/tmp/helloworld.txt'</font><font color=
+"#990000">,</font>
+  mode <font color="#990000">=&gt;</font> <font color=
+"#993399">644</font><font color="#990000">,</font>
+  content <font color=
+"#990000">=&gt;</font> 'Hello world to a file<font color=
+"#990000">.</font>
+'<font color="#990000">,</font>
+<font color="#FF0000">}</font>
+</pre>
+Run it:
+<pre>
+<b>chmod +x helloworld-file.pp
+./helloworld-file.pp</b>
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: /Stage[main]//File[helloworld.txt]/ensure: defined content as '{md5}bb341d5ec467509b253683246617c8b3'
+notice: Finished catalog run in 0.03 seconds
+<!-- -->
+<b>ls -l /tmp/helloworld.txt</b>
+-rw-r--r--  1 schwehr  wheel  23 Jun  2 18:13 /tmp/helloworld.txt
+<!-- -->
+cat /tmp/helloworld.txt 
+Hello world to a file.
+</pre>
+Slow and steady wins the race, right? This is a long ways from
+giving us super powers over our systems.<br />
+<br />
+What if we want to have the content change depending on system
+variables like the hostname? We can use the puppet templating
+system to fill in variables. Let's create a file with some variable
+filled in. Here is the "mytemplate.erb" file that I have in the
+same directory:
+<pre>
+os: <%= operatingsystem %>
+</pre>
+Now we need to create a puppet script that will use that template:
+<pre>
+<i><font color="#9A1900">#!/usr/bin/env puppet apply</font></i>
+<i><font color="#9A1900"># -*- ruby -*-</font></i>
+file <font color="#FF0000">{</font> <font color=
+"#FF0000">'helloworld-template.txt'</font><font color=
+"#990000">:</font>
+  path <font color="#990000">=&gt;</font> <font color=
+"#FF0000">'/tmp/helloworld-template.txt'</font><font color=
+"#990000">,</font>
+  mode <font color="#990000">=&gt;</font> <font color=
+"#993399">644</font><font color="#990000">,</font>
+  content <font color="#990000">=&gt;</font> template<font color=
+"#990000">(</font><font color=
+"#FF0000">"mytemplate.erb"</font><font color="#990000">),</font>
+<font color="#FF0000">}</font>
+</pre>
+Try it:
+<pre>
+<b>chmod +x helloworld-template.pp 
+./helloworld-template.pp a</b>
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+Could not find template 'mytemplate.erb' at /Users/schwehr/Desktop/puppet/helloworld-template.pp:6 on node schwehr-macbookair.local
+</pre>
+Rats! puppet is looking somewhere else. It took me a while to find
+out how to have puppet look in the current directory for the
+template:
+<pre>
+<b>puppet apply --templatedir=`pwd` helloworld-template.pp</b>
+Timed out seeking value for ipaddress
+warning: Could not retrieve fact ipaddress
+notice: /Stage[main]//File[helloworld-template.txt]/ensure: defined content as '{md5}2d97ba272f96c4d53d505981330e3338'
+notice: Finished catalog run in 0.03 seconds
+<b>cat /tmp/helloworld-template.txt</b>
+os: Darwin
+</pre>
+So there we have my not overly useful introduction to playing with
+puppet.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-06.html#e2012-06-02T11_10_01.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-06-05T07_47_14.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">June 2012</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar">1</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-02T11_10_01.txt">2</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-05T14_34_55.txt">5</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-06T04_56_42.txt">6</a></span></td>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar">8</span></td>
+<td align="center"><span class="calendar">9</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-12T06_09_41.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-13T12_01_20.txt">13</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-14T19_39_01.txt">14</a></span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar">16</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">17</span></td>
+<td align="center"><span class="calendar">18</span></td>
+<td align="center"><span class="calendar">19</span></td>
+<td align="center"><span class="calendar">20</span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar">23</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-26T14_38_43.txt">26</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-06.html#e2012-06-27T11_18_46.txt">27</a></span></td>
+<td align="center"><span class="calendar">28</span></td>
+<td align="center"><span class="calendar">29</span></td>
+<td align="center"><span class="calendar">30</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

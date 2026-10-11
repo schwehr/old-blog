@@ -1,0 +1,46 @@
+TITLE: water bottom getting close to matching gmt grid
+AUTHOR: Kurt
+DATE: 10.03.2005 08:36
+DESC: sooooo close
+-----
+BODY:
+It's not there yet, but I am getting closer to comparing the water
+bottom picks to the bathymetery.  I may have a rounding or casting
+error.  Or it could be something totally different.  Oh, but I am so
+close!  Here is what I did at this point.  The command lines are
+getting crazy long. 
+<pre>
+segywaterbottom.py -d xstar -f EEL5kL03.xstar -t 5000  -D  -p -n \
+  --database=foo.db  --verbosity=30 --offset=143 \
+  --trace-key=Shotpoint --trace-min=88500 --trace-max=90000
+
+segysqlshiptrack.py  -g Eureka.grd -d foo.db -i --wbt=wbt --verbosity=10 
+
+gnuplot
+
+splot 'track.xyz' with l, 'track.xyz' using 1:2:4 with l
+
+set xrange [8000:13000]
+plot 'track.xyz' using 3 with l title 'EM1000 gmt grid', \
+   'track.xyz' using 4 with lp title 'wbt pick'
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-10/wbt-not-good-yet.gif">
+
+<b>Update:</b> Looks like the original water bottom picks are great!
+There is one miss and a couple high picks (telephone poles), but check
+out that sea floor!  Clearly I have a bug somewhere with putting the
+water bottom picks into the wbt database field or getting it back
+out.  Once I find that bug, I need a little program that lets me slide
+the water bottom data backward in time (to the left) and up and down.
+Looks like the fish depth estimate from Friday or 143-148 meters is
+pretty close.  It is also cool to see the fish drop on turns... it
+pulls away from the gmt grid file and then comes back up.
+<pre>
+gnuplot
+
+plot 'wbt.dat' using 1:4 with l title 'wbt original', \
+  'track.xyz' using 3 with l title 'EM1000 gmt grid', \
+  'track.xyz' using 4 with lp title 'wbt pick'
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-10/wbt-better.gif">
+-----

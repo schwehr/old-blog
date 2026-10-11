@@ -1,0 +1,72 @@
+TITLE: CMake continued - trying to make a setup for libais
+AUTHOR: Kurt
+DATE: 07.07.2010 17:15
+DESC: seems to be going well
+-----
+BODY:
+My next step in working with CMake is to try to use it for a smaller
+project for a while.  GNU autotools made my head hurt.  CMake seems to
+make much more sense to me (at least so far).  I'm using libais as my
+test case.  It had a hand done makefile that was pretty brittle, but
+got me going in a way that I like.  Here is the initial CMakeLists.txt
+that I have created.  I know it needs work to be ready for prime time,
+but it does seem to compile both static and shared libraries and a
+test application.
+<pre><tt><font color="#000000">01:</font> <i><font color="#9A1900"># -*- shell-script -*- make up a mode for emacs</font></i>
+<font color="#000000">02:</font> cmake_minimum_required <font color="#990000">(</font>VERSION <font color="#993399">2.8</font><font color="#990000">)</font>
+<font color="#000000">03:</font> project <font color="#990000">(</font>libais<font color="#990000">)</font>
+<font color="#000000">04:</font> 
+<font color="#000000">05:</font> <b><font color="#0000FF">set</font></b> <font color="#990000">(</font>LIBAIS_VERSION_MAJOR <font color="#993399">0</font><font color="#990000">)</font>
+<font color="#000000">06:</font> <b><font color="#0000FF">set</font></b> <font color="#990000">(</font>LIBAIS_VERSION_MINOR <font color="#993399">6</font><font color="#990000">)</font>
+<font color="#000000">07:</font> 
+<font color="#000000">08:</font> configure_file <font color="#990000">(</font>
+<font color="#000000">09:</font>   <font color="#FF0000">"${PROJECT_SOURCE_DIR}/ais.h.in"</font>
+<font color="#000000">10:</font>   <font color="#FF0000">"${PROJECT_BINARY_DIR}/ais.h"</font>
+<font color="#000000">11:</font>   <font color="#990000">)</font>
+<font color="#000000">12:</font> 
+<font color="#000000">13:</font> include_directories<font color="#990000">(</font><font color="#FF0000">"${PROJECT_BINARY_DIR}"</font><font color="#990000">)</font>
+<font color="#000000">14:</font> 
+<font color="#000000">15:</font> add_library<font color="#990000">(</font>ais SHARED STATIC ais ais1_2_3 ais4_11 ais5 ais7_13 ais8 ais9 ais10 ais12 ais14 ais15 ais18 ais19 ais21 ais24<font color="#990000">)</font>
+<font color="#000000">16:</font> 
+<font color="#000000">17:</font> add_executable<font color="#990000">(</font>test_libais test_libais<font color="#990000">)</font>
+<font color="#000000">18:</font> target_link_libraries <font color="#990000">(</font>test_libais ais<font color="#990000">)</font>
+<font color="#000000">19:</font> 
+<font color="#000000">20:</font> <i><font color="#9A1900"># There must be a new line after each command?</font></i>
+<font color="#000000">21:</font> </tt></pre>
+Right now, I have everything in the same directory.  I will likely
+want to make sudbirs down the road.  It's very interesting that you
+can either give the file extension or not give it when specifying source
+files.  I am happy to report that (most of the time), the above creates a test 
+program and it runs.  However, I often have CMake screw up the dependencies such
+that it doesn't try to link in test_libais.cpp.  The failure looks like this:
+<pre><b>make VERBOSE=1</b>
+Linking CXX executable test_libais
+/sw32/bin/cmake -E cmake_link_script CMakeFiles/test_libais.dir/link.txt --verbose=1
+/usr/bin/c++    -Wl,-search_paths_first -headerpad_max_install_names    -o test_libais  libais.a 
+Undefined symbols:
+  "_main", referenced from:
+      start in crt1.10.6.o
+ld: symbol(s) not found
+collect2: ld returned 1 exit status
+make[2]: *** [test_libais] Error 1
+make[1]: *** [CMakeFiles/test_libais.dir/all] Error 2
+make: *** [all] Error 2</pre>
+Any modification to the CMakeLists.txt file and things get redone correctly.  This strange
+behavior led me to take a look at dependency graphicing.  This is pretty neat, but I
+can't figure out how to have the source files show up in the dependency graph.
+<pre><b>fink install graphviz
+cmake --graphviz=libais.dot .
+dot -Tpng libais.dot &gt; libais.png</b></pre>
+The dot file is pretty simple:
+<pre>digraph GG {
+node [
+  fontsize = "12"
+];
+    "node0" [ label="ais" shape="diamond"];
+    "node1" [ label="test_libais" shape="house"];
+    "node1" -> "node0"
+}</pre>
+The resulting graph is not very interesting for such a small project:
+
+<img title="cmake dependecy graph" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-07/libais.png"/>
+-----

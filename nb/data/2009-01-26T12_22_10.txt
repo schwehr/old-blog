@@ -1,0 +1,94 @@
+TITLE: simplesegy python library for reading SEG-Y seismic data
+AUTHOR: Kurt
+DATE: 01.26.2009 12:22
+DESC: out in the wild
+-----
+BODY:
+I've just made the first public release of <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/simplesegy/">simplesegy</a>:
+<a href="http://pypi.python.org/pypi/simplesegy/0.2">simplesegy 0.2 on
+pypi</a>.  Unlike my segy-py / seismic-py, this package is much, well,
+simpler.  It does have lookup tables for the binary file header and
+the trace header, so that you can inherit and override the lookups if 
+you know what a vender is doing, but it doesn't really try to encourage 
+people to do that the way I did before.  
+
+Being much simpler, I'm comfortable adding simplesegy to fink.  I was never
+up for that much exposure with seismic-py.
+
+Here is a quick usage tutorial:
+<pre>% <b>fink selfupdate</b>
+% <b>fink install simplesegy-py26</b></pre>
+Now here is a test.py file:
+<pre><tt><font color="#000000">01:</font> <i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<font color="#000000">02:</font> 
+<font color="#000000">03:</font> <b><font color="#000080">from</font></b> simplesegy <b><font color="#000080">import</font></b> segy
+<font color="#000000">04:</font> 
+<font color="#000000">05:</font> sgy <font color="#990000">=</font> segy<font color="#990000">.</font><b><font color="#000000">Segy</font></b><font color="#990000">(</font><font color="#FF0000">'foo.sgy'</font><font color="#990000">)</font>
+<font color="#000000">06:</font> 
+<font color="#000000">07:</font> sgy<font color="#990000">.</font><b><font color="#000000">trace_metadata</font></b><font color="#990000">()</font>
+<font color="#000000">08:</font> <b><font color="#0000FF">print</font></b> sgy<font color="#990000">.</font>hdr_text
+<font color="#000000">09:</font> 
+<font color="#000000">10:</font> <b><font color="#0000FF">for</font></b> i<font color="#990000">,</font>trace <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>sgy<font color="#990000">):</font>
+<font color="#000000">11:</font> 
+<font color="#000000">12:</font>     <b><font color="#0000FF">print</font></b> trace<font color="#990000">.</font><b><font color="#000000">position_geographic</font></b><font color="#990000">(),</font> trace<font color="#990000">.</font><b><font color="#000000">datetime</font></b><font color="#990000">(),</font> trace<font color="#990000">.</font>min<font color="#990000">,</font> trace<font color="#990000">.</font>sec
+<font color="#000000">13:</font> 
+<font color="#000000">14:</font>     o <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'shot-%05d'</font><font color="#990000">%</font>i<font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+<font color="#000000">15:</font>     <b><font color="#0000FF">for</font></b> sample <b><font color="#0000FF">in</font></b> trace<font color="#990000">.</font>samples<font color="#990000">:</font>
+<font color="#000000">16:</font>         o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><b><font color="#000000">str</font></b><font color="#990000">(</font>sample<font color="#990000">)+</font><font color="#FF0000">'\n'</font><font color="#990000">)</font>
+<font color="#000000">17:</font>     <b><font color="#0000FF">if</font></b> i<font color="#990000">&gt;</font><font color="#993399">10</font><font color="#990000">:</font>
+<font color="#000000">18:</font>         <b><font color="#0000FF">break</font></b></tt></pre>
+After opening a file on line 5, you can ask for some simple metadata as on line 07.  This is the bounding box and time range:
+<pre>(
+ (142.52074472222222, 14.634158055555556), 
+ (142.67233305555555, 15.039263055555555), 
+ (datetime.datetime(2007, 11, 29, 13, 24, 20), 
+  datetime.datetime(2007, 11, 29, 15, 18, 33))
+)</pre>
+Line 8 shows printing the text header.  You can also print the binary
+header values by just doing <i>print sgy.sweep_start,
+sgy.sweep_end</i> and so on.  Just look at
+simplesegy.segy.segy_bin_header_lut for the list of known header
+fields.
+
+Right now, the only way to access traces is to iterate over them as shown
+on line 10.  It should be pretty fast as everything works as delayed/lazy
+decodes.  Proper trace indexing is somewhere in the distant future.
+
+So far, the package only comes with one program: segy-metadata.  This
+is a program to do cheetah templating to create metadata files.  The 
+source comes with a blank template.
+<pre>% <b>segy-metadata -v -t /sw/share/doc/simplesegy-py26/docs/blank.metadata.tmpl *.sgy</b>
+<!-- -->
+            file: foo.sgy -> foo.sgy.metadata.txt
+    datetime_min: 2007-11-29 13:24:20
+    datetime_max: 2007-11-29 15:18:33
+           x_min: 142.520744722
+           x_max: 142.672333056
+           y_min: 14.6341580556
+           y_max: 15.0392630556</pre>
+This script will fill in the above values at the appropriate places.  It is up
+to you to fill in the template before you run this accross all the files
+for a cruise.
+
+This is my first attempt at using <a
+href="http://peak.telecommunity.com/DevCenter/setuptools">setuptools</a>
+rather than the straight python distutils.  I haven't been excited for
+setuptools until now.  The main reason is the <i>entry points</i> 
+functionality in setup.py. 
+<pre>      entry_points = '''
+      [console_scripts]
+      segy-metadata = simplesegy.metadata:main
+      ''',</pre>
+This tells the install to create a script (or ??? for windows) and in that
+script, call the main function in the metadata module.  This gets rid of
+the nastiness of trying to put something in bin for each script and then
+worry about wether to .py or not .py for testing and such.  This keeps
+all my code in the modules.
+
+Now I desperately need to add some unittesting to this code.  But that
+is going to have to wait for another day.  Setuptools has a
+placeholder for tests that I should use: <a
+href="http://peak.telecommunity.com/DevCenter/setuptools#test-build-package-and-run-a-unittest-suite">python
+setup.py test</a>.
+-----

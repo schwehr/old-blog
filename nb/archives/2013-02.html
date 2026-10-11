@@ -1,0 +1,848 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: February 2013 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2013-02-24T09_32_45.txt" name=
+"e2013-02-24T09_32_45.txt"></a>
+<h2 class="date">02.24.2013 09:32</h2>
+<div class="blogbody">
+<h3 class="title">What python packages are installed?</h3>
+<div class="item-description">Work at Google on a team that works
+primarily in python has pushed me to get tons better at python.
+It's one thing to know and working a language. It's a whole nother
+thing to get to that expert level. I have been trying to figure out
+how to get others the hard won knowledge that makes for amazing
+python. The is always the danger of getting overly clever and
+writing code that is difficult to understand. Writing and managing
+python packages is an area that I have felt like was too difficult.
+I finally feel like I am starting to break through some of the
+confusion. This might not be the right thing in the long run with
+python 3 working on a new distribution package, but with the advent
+of the <a href=
+"https://pypi.python.org/pypi/distribute">distribute</a> package (a
+fork of <a href=
+"https://pypi.python.org/pypi/setuptools">setuptools</a>), I'm
+feeling more comfortable.<br />
+<br />
+I few years ago, I discovered the python module <a href=
+"https://pypi.python.org/pypi/yolk">yolk</a> (<a href=
+"https://github.com/cakebread/yolk">https://github.com/cakebread/yolk</a>).
+This is a nice module that makes it easy to ask questions about
+your python install from the command line.
+<pre>
+<b>virtualenv test-ve
+source test-ve/bin/activate
+pip install yolk
+yolk --list</b>
+Python          - 2.7.3        - active development (/sw/lib/python2.7/lib-dynload)
+pip             - 1.2.1        - active 
+setuptools      - 0.6c11       - active 
+wsgiref         - 0.1.2        - active development (/sw/lib/python2.7)
+yolk            - 0.4.3        - active
+<!-- -->
+# "<b>yolk -U</b>" or
+<b>yolk --show-updates</b>
+No newer packages found at The Cheese Shop
+</pre>
+Going back to my normal python environment, you can see a list of
+packages that are out of date:
+<pre>
+<b>yolk -U | head</b>
+ Cython 0.16 (0.18)
+ Pygments 1.5 (1.6)
+ SQLAlchemy 0.7.9 (0.7.10)
+ Shapely 1.2.16 (1.2.17)
+ distribute 0.6.34 (0.6.35)
+ docutils 0.8 (0.10)
+ logilab-common 0.58.3 (0.59.0)
+ Mercurial 2.4.2 (2.5.1)
+ mock 0.7.0b3 (1.0.1)
+ numexpr 1.4.2 (2.0.1)
+</pre>
+That's nice, but I've blogged about yolk before and it would be
+better to know how to do this kind of thing from within python.
+What if I want to list which packages I have installed from within
+an IPython notebook to document the state of the world that I used?
+I'd like the names of all python modules as found in pypi and the
+versions of a few critical packages.
+<pre>
+<b>deactivate</b> # drop out of test-ve
+<b>virtualenv --system-site-packages test2-ve
+source test2-ve/bin/activate
+pip install bigquery</b> # This is Google's <a href=
+"https://developers.google.com/bigquery/">BigQuery</a> python interface.
+<b>ipython notebook --pylab=inline</b>
+</pre>
+And now, how do I ask about packages in the notebook?
+<pre>
+<tt><b><font color="#000080">import</font></b> pkg_resources
+<!-- --> 
+pkgs <font color="#990000">=</font> <font color=
+"#990000">[</font>pkg <b><font color=
+"#0000FF">for</font></b> pkg <b><font color=
+"#0000FF">in</font></b> pkg_resources<font color=
+"#990000">.</font><b><font color=
+"#000000">Environment</font></b><font color="#990000">()]</font>
+<b><font color="#000000">len</font></b><font color=
+"#990000">(</font>pkgs<font color="#990000">)</font>
+<!-- -->
+pkgs<font color="#990000">[:</font><font color=
+"#993399">10</font><font color="#990000">]</font>
+<font color="#990000">[</font><font color=
+"#FF0000">'configobj'</font><font color="#990000">,</font>
+ <font color="#FF0000">'logilab-astng'</font><font color=
+"#990000">,</font>
+ <font color="#FF0000">'shapely'</font><font color=
+"#990000">,</font>
+ <font color="#FF0000">'pyproj'</font><font color=
+"#990000">,</font>
+ <font color="#FF0000">'distribute'</font><font color=
+"#990000">,</font>
+ <font color="#FF0000">'yolk'</font><font color="#990000">,</font>
+ <font color="#FF0000">'python-dateutil'</font><font color=
+"#990000">,</font>
+ <font color="#FF0000">'pygments'</font><font color=
+"#990000">,</font>
+ <font color="#FF0000">'mysql-python'</font><font color=
+"#990000">,</font>
+ <font color="#FF0000">'numexpr'</font><font color=
+"#990000">]</font>
+<!-- -->
+bq_version <font color="#990000">=</font> pkg_resources<font color=
+"#990000">.</font><b><font color=
+"#000000">get_distribution</font></b><font color=
+"#990000">(</font><font color=
+"#FF0000">'bigquery'</font><font color="#990000">).</font>version
+bq_version
+<!-- -->
+<i><font color="#9A1900">'2.0.12'</font></i>
+<!-- -->
+pkg_resources<font color="#990000">.</font><b><font color=
+"#000000">parse_version</font></b><font color=
+"#990000">(</font>version<font color="#990000">)</font>
+<font color="#990000">(</font><font color=
+"#FF0000">'00000002'</font><font color=
+"#990000">,</font> <font color=
+"#FF0000">'00000000'</font><font color=
+"#990000">,</font> <font color=
+"#FF0000">'00000012'</font><font color=
+"#990000">,</font> <font color=
+"#FF0000">'*final'</font><font color="#990000">)</font>
+</tt>
+</pre>
+So, I'm using version 2.0.12 of the <a href=
+"https://pypi.python.org/pypi/bigquery">BigQuery python
+module</a>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-02.html#e2013-02-24T09_32_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-02-20T22_17_16.txt" name=
+"e2013-02-20T22_17_16.txt"></a>
+<h2 class="date">02.20.2013 22:17</h2>
+<div class="blogbody">
+<h3 class="title">Django updated to 1.4.5 in fink for a security
+issue</h3>
+<div class="item-description"><a href=
+"https://www.djangoproject.com/weblog/2013/feb/20/updated-releases-issued/">
+Updated releases issued</a>
+<pre>
+Today the Django team is issuing two releases -- Django 1.3.7 and
+1.4.5 -- to correct a packaging problem with yesterday's 1.3.6 and
+1.4.4 releases.
+<!-- -->
+Both the 1.3.6 and 1.4.4 releases of Django contained stray .pyc files
+that caused "bad magic number" errors when running with some versions
+of Python. The 1.3.7 and 1.4.5 releases correct this, and also fix a
+bad documentation link in the project template settings.py file
+generated by manage.py startproject.
+</pre>
+and <a href=
+"https://www.djangoproject.com/weblog/2013/feb/19/security/">Security
+releases issued</a>
+<pre>
+These security releases fix four issues: one potential phishing
+vector, one denial-of-service vector, an information leakage issue,
+and a range of XML vulnerabilities.
+<!-- -->
+Here's a brief summary of each issue and its resolution:
+<!-- -->
+Issue: Host header poisoning: an attacker could cause Django to
+generate and display URLs that link to arbitrary domains. This could
+be used as part of a phishing attack. These releases fix this problem
+by introducing a new setting, ALLOWED_HOSTS, which specifies a
+whitelist of domains your site is known to respond to.
+<!-- -->
+Important: by default Django 1.3.6 and 1.4.4 set ALLOWED_HOSTS to
+allow all hosts. This means that to actually fix the security
+vulnerability you should define this setting yourself immediately
+after upgrading.
+<!-- -->
+Issue: Formset denial-of-service: an attacker can abuse Django's
+tracking of the number of forms in a formset to cause a
+denial-of-service attack. This has been fixed by adding a default
+maximum number of forms of 1,000. You can still manually specify a
+bigger max_num, if you wish, but 1,000 should be enough for anyone.
+<!-- -->
+Issue: XML attacks: Django's serialization framework was vulnerable to
+attacks via XML entity expansion and external references; this is now
+fixed. However, if you're parsing arbitrary XML in other parts of your
+application, we recommend you look into the defusedxml Python packages
+which remedy this anywhere you parse XML, not just via Django's
+serialization framework.
+<!-- -->
+Issue: Data leakage via admin history log: Django's admin interface
+could expose supposedly-hidden information via its history log. This
+has been fixed.
+</pre>
+So it was long past time to update django in fink.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-02.html#e2013-02-20T22_17_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-02-24T09_32_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-02-18T16_17_55.txt" name=
+"e2013-02-18T16_17_55.txt"></a>
+<h2 class="date">02.18.2013 16:17</h2>
+<div class="blogbody">
+<h3 class="title">Tracking vessels at or under the sea</h3>
+<div class="item-description">First off, I have never held a secret
+or above clearance. I am not revealing anything from restricted
+documents. Any similarities are purely coincidental. I just rewatch
+the movie "<a href=
+"http://en.wikipedia.org/wiki/The_Hunt_for_Red_October_(film)">The
+Hunt for Red October</a>". Much of what I discuss here is in that
+movie. If you have thought at all about stealth technologies, then
+you have likely already thought of most of this.<br />
+<br />
+US government documents talk about using "national technical means"
+to avoid saying exactly how they are accomplishing their ship
+tracking. One of my favorite stories is of a friend describing
+being out on a US vessel doing patrol duty at night. They noticed a
+vessel on radar acting strangely. They tried raising the vessel on
+the VHF marine radio, but got nothing. As they worked their way
+towards the vessel, they saw no lights and still no response on the
+radio. They used the standard procedure of calling the vessel by
+the location again and again. When they got close, the flipped on
+their large spotlight. What did they find? A US patrol boat from
+the same agency out trying to catch illegal fisherman and who had
+just had their cover blown for the night. Oops. Reading between the
+lines on that story should give you some key details.<br />
+<br />
+Back in 2005, I started on the faculty at CCOM as the lead of the
+Chart of the Future project with the goal of making maritime travel
+safer, more efficient and easier on mariners and the natural
+environment. And yes, I consider mariners like endangered species -
+it's bad news to be rough on either class of entities. I talked to
+a lot of mariners, maritime managers, government employees and
+researchers. I ended up with a pile of (highly entertaining) sea
+stories, but no way to make concrete assertions about maritime
+operations. I desperately wanted tangible metrics that I could use
+to identify how ships operations progress over time. How do ships
+move and react under a wide range of circumstances? As a result, I
+have thought about the many ways to understand what ships do. I
+consider the unified whole of ship and crew to be very complicated
+organism. From my blog and <a href=
+"http://vislab-ccom.unh.edu/~schwehr/papers/">publications</a>, you
+can see that I've tried a number of approaches that include AIS and
+the USCG MISLE incident database. When it comes to safety and
+efficiency on the water, it comes down to all parties knowing where
+they are, where everyone else current is, has been and is likely to
+be in the future, and combining that knowledge with how can perform
+and are likely to behave.<br />
+<br />
+I sat down with two USCG Academy students last summer and we talked
+through how ships (and really any vehicle) might be tracked. I just
+ran into those notes and thought I would share my thoughts.<br />
+<br />
+I see several general/top level categories. The first is sensing
+the world and that comes in passive flavors where we look for
+changes in the existing environment and active where we somehow
+change the world and look at the signal at various locations to see
+entities in the world that we are interested in. The second
+category are methods where the vehicle is actively or
+unintentionally saying (transmitting) where the vessel is located.
+That can either be a public broadcast like AIS or a private
+broadcast that we may or may not be on the addressee list for. The
+final category comes down to human intelligence where someone tells
+us where the vehicle is or we observe some administrative
+information (e.g. fuel purchase). There are a huge number of side
+channels that come out of the operations of ships that give a clue
+as to the travel history or plans of a ship.
+<ol>
+<li>Sensing the environment
+<ul>
+<li>Active</li>
+<li>Passive</li>
+</ul>
+</li>
+<li>Announcing your location</li>
+<li>Side channels and human intelligence (HUMINT)</li>
+</ol>
+With each method, there are several factors to consider depending
+on if you are the tracker, want to be tracked or trying to avoid
+being tracked. These primarily boil down to cost, reliability and
+accuracy functions. What is the cost of being detected versus the
+cost of not being detected and by who. This function is likely time
+varying (a submarine about to leave on patrol cares more about
+being hidden that at the end of the patrol) and spatially varying
+(is the vehicle in pirate infested waters or trying to accomplish
+delicate maneuvers in a crowded waterway). There is also the
+critical aspects of timing (knowing position of X now, yesterday,
+or tomorrow), accuracy (cost of a false positive or negative) and
+precision of the location (does it exist on the earth down to
+microscopic). Or are you a brand new secret submarine and you don't
+want even your existence to be know?<br />
+<br />
+While I am doing my best to be complete, I don't intend this post
+to be comprehensive or referenced. It's not an academic paper and
+has had no review. I make no statement as to who may or may not use
+or have used any of these.<br />
+<br />
+<b>Passive sensing</b><br />
+<br />
+I think it is best to start off by approaching the passive
+mechanisms that we use to find vehicles. All three of the
+categories are full of a wide variety of techniques. But with
+passive, we can start by talking about the basic world environment
+and the senses that humans have built in or can create in the
+world. Start with the fundamental forces in our environment. We
+have gravitation, electromagnetism, and the nuclear forces. Then
+think through the ways that a ship can emit or alter any of these
+forces as they exist in the world. Add to that what ships
+physically emit or absorb. From that we should be able to derive
+all of the passive mechanisms. Start first by thinking about how
+the presents of the vehicle in the world. Then think about what the
+vehicle might emit in the course of its operation (or even just
+existance).<br />
+<br />
+The most obvious of the techniques is the electromagnetism
+(E&amp;M) aspect. We have to think about the entire energy spectrum
+from ultra low frequency (ULF) all the way up to gamma rays. Yes,
+this actually includes the most fundamental human maritime sense of
+all time: sight. Think about the sources in the environment (even
+man made) that are in the environment. At the low frequencies where
+the wavelength is much larger than the object, it is likely going
+to be tough to measure a difference in the signal with or without
+that vessel. We then also have to think about what are the sensors
+that can pick up the energy and is it possible to interpret the
+results.<br />
+<br />
+Down in the HF radio bands, we start having the potential for the
+material of the vehicle to absorb or deflect EM entergy.<br />
+<br />
+At this point, I realize that I am not up for writing a
+dissertation on the topic, so I'm just going to dump the rest of my
+list. My apologies for duplicated entries.
+<ul>
+<li>General radio direction finding. e.g. Rescue 21 Can be off of
+any RF source&hellip; radar, AIS, encrypted blue force AIS, voice,
+cell data. From HF to microwave.</li>
+<li>AIS
+<ul>
+<li>Space</li>
+<li>Ground (w/ and without large towers)</li>
+<li>Airborne platforms</li>
+<li>From other ships / vehicles</li>
+<li>Buoys</li>
+</ul>
+</li>
+<li>LRIT</li>
+<li>Radar
+<ul>
+<li>Passive (listen for other radars painting the world)</li>
+<li>Active
+<ul>
+<li>Sat looking down (probably more imaging type radars</li>
+<li>Shore and ship based horizontal systems</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>VMS - Vessel Monitoring Service for fishing</li>
+<li>Imaging
+<ul>
+<li>Categories: visible, thermal, low light, multispectral</li>
+<li>Wake detection vrs direct detection</li>
+<li>Satellites</li>
+<li>aircraft/balloons/helicopters/UAVs</li>
+<li>shore/ground based cameras (e.g. entrance to SF harbor)</li>
+</ul>
+</li>
+<li>Acoustic - passive listening
+<ul>
+<li>Sounds in air (from balloons, UAVs, etc) While sound in water
+is much more efficient, you can get around faster in air.</li>
+<li>Bottom mounted (e.g. SOSUS, Neptune/Orion)</li>
+<li>gliders, AUVs, subs</li>
+<li>buoys</li>
+<li>dippers (e.g. gliders and the old P3 Orion dropping disposable
+sonobuoys)</li>
+</ul>
+</li>
+<li>Active acoustics:
+<ul>
+<li>Upward looking sonars and ADCP. e.g. already there for
+currents</li>
+<li>Fixed structure active sonars. e.g. on a bridge pier</li>
+<li>Ships and other mobile active sonars</li>
+</ul>
+</li>
+<li>Inmarsat phone calls (and possibly iridium) headers have
+position of the mobile unit(s) in the call</li>
+<li>Tracking the Internet IP address (can be end up often just
+getting the downlink)</li>
+<li>Human Intelligence
+<ul>
+<li>Other boaters</li>
+<li>Crew</li>
+<li>Shore based observers</li>
+<li>Purchases of supplies, replacement parts and consumables.</li>
+<li>Work orders and other construction related staff.</li>
+</ul>
+</li>
+<li>Notices of Arrival submitted to the USCG</li>
+<li>Self broadcast position reports
+<ul>
+<li>AMVER - Mariners helping mariners in distress</li>
+<li>VOS - Ships giving weather reports</li>
+<li>Google Latitude, Facebook, 4square, G+ checkins, Good Inc.,
+GeoLoqi</li>
+<li>Posting geotagged images</li>
+</ul>
+</li>
+<li>Cell phones talking to towers (and additional fake towers)
+<ul>
+<li>This is a big one for government staff with blackberries</li>
+</ul>
+</li>
+<li>Satellite position recorders
+<ul>
+<li>Spot personal locators</li>
+</ul>
+</li>
+<li>Intentionally deploying reflective targets possibly with a
+unique signature on a ship. e.g. QR code on the roof or police cars
+w/ a number on the roof.</li>
+<li>Wonky ones like detecting tracers
+<ul>
+<li>Trash</li>
+<li>oil signature</li>
+<li>radioactive signatures for those that have them</li>
+</ul>
+</li>
+<li>Lights at night.</li>
+<li>Reflectors and distinctive paint that aids identification.</li>
+<li>Has anyone done longer range RF ID chips?</li>
+<li>Magnetometers
+<ul>
+<li>Airborne (e.g. P3 Orions and general magnetic surveys)</li>
+<li>Magnetic observatories</li>
+<li>Towed</li>
+</ul>
+</li>
+<li>Air gap sensors on bridges e.g. NOAA PORTS. Generate a
+profile</li>
+<li>An activated EPIRB (I had discounted this, but now I realize
+how important this is)</li>
+<li>VTS reports</li>
+<li>Peoples activities leading up to being on the ship e.g.
+<a href="http://location/">http://location/</a> at google with Door
+badges. TWIC badging, car tracking, car tolls, plane tickets, cargo
+manifests, fish sales, fuel/supply purchases, boat maintenance</li>
+<li>LIDAR
+<ul>
+<li>side looking (e.g. across the entrance to a harbor)</li>
+<li>airborne (small spot size). Any different potential with topo
+or bathymetry lidar? Perhaps see the bubbles in a wake with
+bathy?</li>
+<li>Space based. e.g. Ice SAT being used by people studying trees
+in Brazil</li>
+</ul>
+</li>
+<li>Things the ship leaves behind&hellip; trash, oil, other
+chemicals, heat, etc</li>
+<li>Detecting a related party Support vessels, launches</li>
+<li>custom proprietary tracking devices</li>
+<li>Damage to environment
+<ul>
+<li>Touching the sea floor or turbulence causing scour</li>
+<li>Marine animals hurt by sound, chemicals, heat, cold (LNG
+regasification), or physical damage (e.g. ship strike or prop
+injuries)</li>
+</ul>
+</li>
+<li>Waves absorbed/reflected/generated, wake, or turbulence</li>
+<li>Support vessels presence or absence</li>
+<li>Government declared security zones (e.g. for submarines or LNG
+ships)</li>
+<li>Absence or presence of vessels that know of the vessel</li>
+<li>Bioluminescence of disturbed surroundings.</li>
+<li>Notices of arrival, departure and cruise plans</li>
+<li>Movement of cargo and/or fuel in anticipation or result up
+arrival or departure</li>
+<li>Changes in prices of supplies, commodities, hotel rates
+relating to the ship.</li>
+<li>General change in behavior of dock workers or the overall
+harbor infrastructure.</li>
+<li>Travel of known crew (or family members) to or from an end
+point. Banking activity and other related personal activities.</li>
+<li>Financial transactions anywhere in the chain of people and
+businesses related to the vessel.</li>
+<li>Geotagged and/or time tagged images sent by people on the ship
+or images of the ship by others</li>
+<li>Past established history and patterns. People are creatures of
+habit.</li>
+<li>Vessel kinematic constraints. e.g. draft is too deep for
+certain areas or unable to handle seas greater than some size.</li>
+<li>Known endurance constraints</li>
+<li>IP addresses, traceroutes and round-trip times of Internet
+network traffic. May only give you downlink station, but that might
+be enough for many purposes and especially interesting is knowing
+when these change.</li>
+<li>Analysis of bilge water to see where the ship has been. e.g.
+isotope analysis like Sr/Rb, what is living in the water or
+sediment at the bottom of the tanks.</li>
+<li>Chemical or isotope analysis of consumables. bunker oil,
+lubricants etc.</li>
+</ul>
+<p>I grew up under the flight path of the P3 Orions from Moffett
+Field that patrolled the pacific with dropped sono-bouys and their
+tail mounted magnetometers, so this topic has been in my mind for
+almost 4 decades. The times have changed (e.g. the end of the cold
+war) but many of the strategies for hiding and finding are no
+different. Ships may hide out of site or in plane sight (e.g. drug
+dealer using a cover of legitimate business). Ships are complicated
+devices and even with the greatest of care, they leak information
+like crazy. The importance of that information flow varies with
+time and need. For example, a notice of arrival is unlikely to help
+much in a high seas potential collision situation.<br />
+<br />
+I haven't talked much in this about knowing which vessel an
+observation relates to. aka how ambiguous is an observation. Nor
+have I talked about proof of identity. Just because an AIS
+transmitter broadcasts a particular MMSI and static data with name
+and IMO, that does not mean that those are correct. If there is an
+actor in the environment that is trying to alter the results,
+things get very confusing quick.<br />
+<br />
+Tracking is already happening for many reasons. Most of it is
+behind closed doors. I got to see what Iceland is doing and am
+excited by applications theirs where when a ship stops transmitting
+AIS, there is a rescue helocopter on the way after 30 minutes. That
+will absolutely save lives. What are the most effective efforts we
+can make as a global community to best use this information to
+improve our environment, economies, working conditions and entire
+world?<br />
+<br />
+I hope you enjoyed this discussion. As a computer scientist and a
+robotics engineer, I am always looking at the systems I work with
+and build to see how they can communicate to me what they are
+doing. This is often refered to as "debugging". Can the robot blink
+a light when some event happens? What if the robot is on Mars? Even
+things like looking at jitter in packets can tell you all sorts of
+interesting things. If you really like this stuff, it's easy to
+play with. Grab nmap and wireshark and point them at your own
+computer. (I take no responsibility if you use them unwisely.) Then
+check out traceroute and you will start into a very interesting
+world.</p>
+<pre>
+sudo nmap localhost -sV
+<!-- -->
+Starting Nmap 6.00 ( http://nmap.org ) at 2013-02-18 16:26 EST
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.00038s latency).
+Not shown: 496 filtered ports, 494 closed ports
+PORT     STATE SERVICE              VERSION
+22/tcp   open  ssh                  OpenSSH 5.2 (protocol 2.0)
+25/tcp   open  smtp                 Postfix smtpd
+80/tcp   open  http                 Apache httpd 2.2.14 ((Unix))
+88/tcp   open  kerberos-sec         Mac OS X kerberos-sec
+548/tcp  open  afp                  Apple AFP (name: snipe; protocol 3.3; Mac OS X 10.5 - 10.6; MacPro)
+631/tcp  open  ipp                  CUPS 1.4
+5432/tcp open  postgresql           PostgreSQL DB 8.4.1 - 8.4.9
+5900/tcp open  vnc                  Apple remote desktop vnc
+7937/tcp open  nsrexec (nsrexec V1) 1 (rpc #390113)
+7938/tcp open  rpcbind (rpcbind V2) 2 (rpc #100000)
+Service Info: Hosts:  snipe.ccom.nh, snipe.ccom.nh; OS: Mac OS X; CPE: cpe:/o:apple:mac_os_x
+<!-- -->
+Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 29.71 seconds
+</pre>
+Then give a look at these two books:
+<ul>
+<li>TCP/IP Illustrated, Volume 1: The Protocols (2nd Edition), by
+Kevin Fall and W. Richard Stevens</li>
+<li>The ARRL Handbook for Radio Communications YYYY</li>
+</ul>
+There is a new version of the ARRL Handbook for each year. The copy
+I currently have is from 2008.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-02.html#e2013-02-18T16_17_55.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-02-20T22_17_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-02-10T13_45_10.txt" name=
+"e2013-02-10T13_45_10.txt"></a>
+<h2 class="date">02.10.2013 13:45</h2>
+<div class="blogbody">
+<h3 class="title">The USCG and autonomous vehicles</h3>
+<div class="item-description">Back in 2006 / 2007, I proposed that
+we put AIS transcievers on Autonomous {Underwater,Surface} vehicles
+(AUV/ASV). This would aid in recovery operations and allow a
+vehicle to advertise it's current location and maybe even it's area
+of operation with an extra area notice message (8:001:22). I even
+got a vender to write up what it would take to design a unit that
+would work well for an autonomous vehicle because Class A and B
+units just don't make sense and the ATON spec is a world of
+stupid.<br />
+<br />
+When I talked to the USCG about that, I was told in some rather
+overly clear language that I would not do that in US waters. No
+way, no how.<br />
+<br />
+Now this... (yeah, I am a little behind)
+<pre>
+November 19, 2012
+Docket Management Facility (M-30)
+U.S. Department of Transportation
+West Building Ground Floor, Room W12-140
+1200 New Jersey Avenue SE. Washington, DC 20590-0001
+Reference: Department of Homeland Security, Docket USCG-2012-0212
+Subject: UUV Manufacturers' Concerns Regarding NAVSAC Task 08-07,
+Resolution 11-02 Proposed Changes to Inland and COLREGS to Address
+Unmanned Underwater and Unmanned Surface Vehicles
+<!-- -->
+To Whom It May Concern,
+<!-- -->
+The Association for Unmanned Vehicle Systems International (AUVSI) is
+aware that the Navigation Safety Advisory Council (NAVSAC), an
+industry advisory body to the U.S. Coast Guard, has proposed revisions
+to the existing Navigation Rules that will affect unmanned maritime
+vehicles.
+<!-- -->
+AUVSI believes the proposed regulations would be highly impractical
+for most widely-used Unmanned Underwater Vehicles (UUVs), but
+especially for UUVs under 8m in length and 1m in diameter. The
+proposed new rules would have a significant impact on the industry and
+the U.S. Navy, on the performance and cost of the vehicles, and would
+provide very little benefit in terms of maritime safety. Since UUVs
+are not remotely piloted because of the inability to maintain constant
+communication with them, they should not be subject to rules for
+manned vessels. UUV Manufacturers could generally acknowledge that the
+new regulations may be relevant for large diameter UUVs which might
+create a potential hazard for navigation
+...
+</pre>
+I never got around to finishing this post. It seems that the
+current view out there from the US Navy / USCG (DHS) is that they
+are now going to mandate some sort of "watch standing" for
+autonomous vehicles and there are suggestions that AIS transmit of
+position may become required in the near future. I haven't
+researched all this enough to really know what is going on and I am
+seriously out of the loop.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-02.html#e2013-02-10T13_45_10.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-02-18T16_17_55.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-02-10T02_24_34.txt" name=
+"e2013-02-10T02_24_34.txt"></a>
+<h2 class="date">02.10.2013 02:24</h2>
+<div class="blogbody">
+<h3 class="title">scikit-learn and an ipython notebook</h3>
+<div class="item-description">I took a look at scikit-learn today
+by watching Jake's video from PyData 2012.<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/cHZONQ2-x7I" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+I made an ipython notebook while following along. I was on ubuntu
+12.04, and there are newer versions out of the main libraries, so
+here is what I did to get set up (and to try out putting code in my
+blog via a github gist):<br />
+<br />
+<script src="https://gist.github.com/schwehr/4748768.js" type=
+"text/javascript">
+</script><br />
+<br />
+When I went to make a nbviewer of the notebook in a gist, I ran
+into trouble. When I make a gist, I get a URL like this that has my
+account in the URL:<br />
+<br />
+<a href=
+"https://gist.github.com/schwehr/4748729">https://gist.github.com/schwehr/4748729</a><br />
+
+<br />
+But what I had to do was remove the account from the URL before I
+pasted it into <a href=
+"http://nbviewer.ipython.org/">http://nbviewer.ipython.org/</a>:<br />
+
+<br />
+<a href=
+"https://gist.github.com/4748729">https://gist.github.com/4748729</a><br />
+
+<br />
+<a href=
+"http://nbviewer.ipython.org/4748729/">http://nbviewer.ipython.org/4748729/</a><br />
+
+<br />
+And finally, here is just the python in the form of a gist without
+the ipython notebook wrapping it:<br />
+<br />
+<script src="https://gist.github.com/schwehr/4748800.js" type=
+"text/javascript">
+</script></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-02.html#e2013-02-10T02_24_34.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-02-10T13_45_10.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-02-02T14_31_15.txt" name=
+"e2013-02-02T14_31_15.txt"></a>
+<h2 class="date">02.02.2013 14:31</h2>
+<div class="blogbody">
+<h3 class="title">mbsystem and the mbcookbook as an IPython
+Notebook</h3>
+<div class="item-description">I just fell in love with a fancy new
+hammer called IPython Notebook and the world looks like a bunch of
+nails that need pounding. Even if using mbsystem to process
+multibeam sonar data does not need python, it sure makes a nice
+subject for a notebook.<br />
+<br />
+It's a little clunky in that I have to put a ! in front of each
+command to bash and the images are super small, but it was fun
+to<br />
+<br />
+<a href=
+"https://gist.github.com/4698869">https://gist.github.com/4698869</a><br />
+
+<br />
+The notebook can be viewed here:<br />
+<br />
+<a href=
+"http://nbviewer.ipython.org/4698869/">http://nbviewer.ipython.org/4698869/</a><br />
+
+<br />
+Setup (because there are definitely a few things that ended up
+being system specific):
+<ul>
+<li>bash</li>
+<li>mac osx 10.8</li>
+<li>fink install mbsystem # version 5.3.2012</li>
+<li>fink install graphicsmagick-imagemagic</li>
+<li>fink install ipython-py27 # version 0.13.1</li>
+<li>fink install matplotlib-py27 # version 1.2.0</li>
+</ul>
+<img width="600" height="424" title=
+"MB Cookbook for MB System in an IPython Notebook" withgrayborder=
+"True" src=
+"../attachments/2013-02/ipython-notebook-mbsystem-mbcookbook.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-02.html#e2013-02-02T14_31_15.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-02-10T02_24_34.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">February 2013</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar">1</span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-02.html#e2013-02-02T14_31_15.txt">2</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar">5</span></td>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar">8</span></td>
+<td align="center"><span class="calendar">9</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2013-02.html#e2013-02-10T13_45_10.txt">10</a></span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar">12</span></td>
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar">16</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">17</span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-02.html#e2013-02-18T16_17_55.txt">18</a></span></td>
+<td align="center"><span class="calendar">19</span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-02.html#e2013-02-20T22_17_16.txt">20</a></span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar">23</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2013-02.html#e2013-02-24T09_32_45.txt">24</a></span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar">28</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

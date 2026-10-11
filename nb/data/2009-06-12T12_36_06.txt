@@ -1,0 +1,113 @@
+TITLE: Filtering AIS messages before decoding
+AUTHOR: Kurt
+DATE: 06.12.2009 12:36
+DESC: getting crazy with grep and AIS
+-----
+BODY:
+I've been meaning to explore the idea of filtering AIS messages before
+decoding and finally gave it a closer look.  I've been using egrep for
+quite a while.  Here are some examples of what I've been doing:
+<pre>% <b>egrep -h -v 'AIVDM,1,1,[0-9]?,[AB],' log*.ais | ais_normalize.py > log.norm</b> # pull all the multi line ais messages
+<b>egrep -h -v 'AIVDM,1,1,[0-9]?,[AB],' log*.ais | ais_normalize.py > egrep -h 'AIVDM,1,1,[0-9]?,[AB],5 > log.5.norm </b> # Class A shipdata
+<b>egrep -h 'AIVDM,1,1,[0-9]?,[AB],[123]' log*.ais  > log.123</b> # Class A position messages
+<b>egrep -h 'AIVDM,1,1,[0-9]?,[AB],4' log*.ais  > log.4</b> # bsreports</pre>
+Not that with grep '-v' says reject all messages that match and '-h'
+says don't include file names
+
+I would like to a grep for a vessel name.  The MMSI is 30 bits, which
+is a multiple of 6.  AIS NMEA uses 6 bit letters.  Unfortunetely, the
+standard has the repeat idicator right after the message ID and before the 
+MMSI.  If only the standard writers had reverset this flag.  All of my
+AIS decoders look like this:
+<pre>        r['MessageID']=int(bv[:6])
+        r['RepeatIndicator']=int(bv[6:8])
+        r['UserID']=int(bv[8:38]) # MMSI</pre>
+The question then becomes, what is after the MMSI and is it stable?  For
+Class A position reports, this is Navigation Station.  This is likely to
+change, so we can't use the last 4 bits of the MMSI.  We can come close when
+filter with egrep by discarding the last 4 bits.  It will let other vessels
+through, but still get close to filtering.  We hopefully know that there
+is no repeater operation in the area (there are none in the Portsmouth, NH area).
+I'm looking for the TERM MARY, which has an MMSI of 220112000:
+<pre>% <b>ipython</b>
+from BitVector import BitVector
+import ais.binary as binary
+binary.bitvectoais6(binary.setBitVectorSize(BitVector(intVal=0),2)+binary.setBitVectorSize(BitVector(intVal=220112000),30))[0][:-1]
+Out[14]: '3ArTP'</pre>
+Now that I know that '3ArTP' is the TERM MARY and maybe a few other vessels, I can grep for it in my log files:
+<pre>% <b>egrep -h '[!]AIVDM,1,1,[0-9]?,[AB],[123]3ArT' *</b>
+!AIVDM,1,1,,B,13ArTP000jJt8ADHaW2:q`kN0`MA,0*57,rnhcml,1244594390.72
+!AIVDM,1,1,,A,13ArTP000iJt8:LHaW7:q`kj0t05,0*18,rnhcml,1244594399.36
+!AIVDM,2,1,9,A,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4k,0*69,rnhcml,1244594405.89
+!AIVDM,1,1,,B,13ArTP000iJt83pHaW&lt;:q`lB0`5U,0*7B,rnhcml,1244594410.42
+!AIVDM,1,1,,A,13ArTP000hJt7wPHaWA:q`lR0l05,0*16,rnhcml,1244594419.93
+!AIVDM,1,1,,B,13ArTP000hJt7ptHaWF:q`lr0d05,0*19,rnhcml,1244594430.48</pre>
+Multipart messages cause trouble because we can only find the first sentence this way.  Normalizing first
+would solve this problem.  Double check by decoding a position message:
+<pre>% <b>~/projects/src/noaadata/ais/ais_msg_3.py -d '!AIVDM,1,1,,B,13ArTP000hJt7ptHaWF:q`lr0d05,0*19,rnhcml,1244594430.48'</b>
+position:
+        MessageID:          3
+        RepeatIndicator:    0
+        UserID:             220112000
+        NavigationStatus:   0
+        ROT:                0
+        SOG:                4.8
+        PositionAccuracy:   0
+        longitude:          -70.75195
+        latitude:           43.0794
+        COG:                279
+        TrueHeading:        282
+        TimeStamp:          29
+        RegionalReserved:   0
+        Spare:              0
+        RAIM:               False
+        state_syncstate:    1
+        state_slottimeout:  3
+        state_slotoffset:   5</pre>
+The situation first appears a little bit better for the Ship data
+message (5).  Right after the UsreID is the AIS Version field.  However,
+that field is only 2 bits that are followed by the IMOnumber.  We have
+to know the IMO number of the ship to make a unique grepable string.
+Here I know that the TORM MARY's IMO is 9246798.  And I assume the 
+vessel thinks it is using AIS Version 0.
+<pre>binary.bitvectoais6(binary.setBitVectorSize(BitVector(intVal=0),2) # Repeat indicator
+                       + binary.setBitVectorSize(BitVector(intVal=220112000),30) # MMSI
+                       + binary.setBitVectorSize(BitVector(intVal=0),2) # AIS Version 0
+                       + binary.setBitVectorSize(BitVector(intVal=9246798),30) # IMO number
+                       )[0]
+Out[16]: '3ArTP02=64p'</pre>
+I can then shrink this down to the first 5 characters for the shipdata message: '3ArTP0'.  If we normalize,
+we can then grep for the shipdata messages.
+<pre>% <b>egrep -h -v 'AIVDM,1,1,[0-9]?,[AB],' * | grep AIVDM | ais_normalize.py | egrep -h 'AIVDM,1,1,[0-9]?,[AB],53ArTP0'</b>
+!AIVDM,1,1,8,B,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244592602.65
+!AIVDM,1,1,8,B,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244592602.65
+!AIVDM,1,1,1,A,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244592962.88
+!AIVDM,1,1,4,B,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244593323.9
+!AIVDM,1,1,6,A,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244593684.62
+!AIVDM,1,1,8,B,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244594044.97
+!AIVDM,1,1,9,A,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244594405.9</pre>
+Check that by decoding one of the messages:
+<pre>% <b>~/projects/src/noaadata/ais/ais_msg_5.py -d '!AIVDM,1,1,9,A,53ArTP02=64puDQG:21@u8n0l59V22222222221IB`R@@5Tl0FT3lU4kCmE283R88888880,2*7D,rnhcml,1244594405.9'</b>
+shipdata:
+        MessageID:        5
+        RepeatIndicator:  0
+        UserID:           220112000
+        AISversion:       0
+        IMOnumber:        9246798
+        callsign:         OUHU2  
+        name:             TORM MARY           
+        shipandcargo:     89
+        dimA:             149
+        dimB:             34
+        dimC:             16
+        dimD:             16
+        fixtype:          1
+        ETAmonth:         6
+        ETAday:           9
+        ETAhour:          20
+        ETAminute:        0
+        draught:          9
+        destination:      PORTSMOUTH NH       
+        dte:              0
+        Spare:            0</pre>
+-----

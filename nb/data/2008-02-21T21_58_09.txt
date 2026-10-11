@@ -1,0 +1,51 @@
+TITLE: creating movies from images files on mac osx 10.5 from a script
+AUTHOR: Kurt
+DATE: 02.21.2008 21:58
+DESC: encode away
+-----
+BODY:
+I you want to convert image files into an animation/movie file and be
+able to script the process, here are some options.  The simple not
+command line way to do this is to buy quicktime pro and assemble a
+movie from files.  I will assume for the following, that there a bunch of
+frames in the current directory named foo-NNN.png where NNN is a numbered 
+sequence padded with zeros (e.g. foo-001.png, foo-002.png, etc)
+
+The tool is imagemagick.  It can produce a couple of types of files.  The
+simplest is an animated gif.
+<pre>
+% fink install imagemagick
+% convert -delay 50 foo-???.png foo.gif
+% open -a /Applications/Safari.app foo.gif
+</pre>
+The delay will cause the movie to render slower.  What about a true
+movie file?
+<pre>
+convert foo-???.png foo.mpeg
+sh: mpeg2encode: command not found
+convert: Delegate failed `"mpeg2encode" "%i" "%o"'.
+</pre>
+Oops!  We need to install a codec:
+<pre>
+% fink install mpeg2vidcodec
+</pre>
+Now make a movie:
+<pre>
+% convert -delay 50 foo-???.png foo.mpg
+% open foo.mpg
+</pre>
+A second program is ffmpeg:
+<pre>
+% fink install ffmpeg
+% ffmpeg -i foo-%d.png foo2.mpg
+% open foo2.mpg
+</pre>
+Yup, there are more ways.  mpeg_encode was just too complicated for
+this post.  You can start searching with fink:
+<pre>
+% fink apropos movie
+% fink apropos mpeg
+% fink apropos mpg
+% fink apropos video
+</pre>
+-----

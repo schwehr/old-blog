@@ -1,0 +1,23 @@
+TITLE: new density release
+AUTHOR: Kurt
+DATE: 03.02.2006 20:04
+DESC: FALLBACK
+-----
+BODY:
+I just put together a new release of density.  Thanks to Chris and
+Kyrah for helping me figure out how to get it to work on 10.4.  My
+issue with JPEG from before is because of case insensitivity in the
+linker.  I really prefer case sensitive machines!!  The trick is to
+use the new  DYLD_LIBRARY_PATH variable and make sure that
+DYLD_LIBRARY_PATH is unset.
+<pre>
+unset DYLD_LIBRARY_PATH
+if [ -z "$DYLD_FALLBACK_LIBRARY_PATH" ]; then
+    export DYLD_FALLBACK_LIBRARY_PATH=@FINK@/lib
+else
+    export DYLD_FALLBACK_LIBRARY_PATH=@FINK@/lib:$DYLD_LIBRARY_PATH
+fi
+</pre>
+You can find it at <a
+href="http://schwehr.org/software/density/">density</a>.
+-----

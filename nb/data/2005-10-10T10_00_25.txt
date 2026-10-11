@@ -1,0 +1,24 @@
+TITLE: sqlite UNIQUE and DISTINCT
+AUTHOR: Kurt
+DATE: 10.10.2005 10:00
+DESC: Use DISTINCT
+-----
+BODY:
+I wanted to get a list of samples for a paricular core so I can do a
+PCA to give the best direction.  Here is what I ended up doing:
+<pre>SELECT DISTINCT(samplename) FROM ams WHERE corenum=1;</pre>
+These did NOT work:
+<pre>
+sqlite&gt; SELECT UNIQUE(samplename) FROM ams WHERE corenumber=1;
+sqlite&gt; SELECT samplename FROM ams WHERE UNIQUE (SELECT samplename FROM ams);
+</pre>
+I am not totally sure that I am using UNIQUE correctly.  It is also
+possible that UNIQUE is not something that sqlite2 understands.  I saw
+this from oracle that makes me think that UNIQUE just is not there.
+<pre>
+If I say:
+  SELECT UNIQUE(COLUMN) FROM TABLE
+I get the same results as saying
+  SELECT DISTINCT(COLUMN) FROM TABLE
+</pre>
+-----

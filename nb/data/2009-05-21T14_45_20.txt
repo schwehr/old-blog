@@ -1,0 +1,72 @@
+TITLE: A first RPM spec file
+AUTHOR: Kurt
+DATE: 05.21.2009 14:45
+DESC: getting the job done
+-----
+BODY:
+Now that I've got a CentOS 5.3 box that I'm trying to configure, it's
+time for me to finally learn how to create RPM packages for Linux.
+This has been on my "to do" list since 1999.  I haven't mastered the
+topic, but at least I can place a file on the disk and have it be
+under control of the package manager.  The RPM spec file is similar
+yet very different than fink info files.  I used these references for
+figuring it out: The Fedora Project's <a
+href="http://docs.fedoraproject.org/drafts/rpm-guide-en/ch-creating-rpms.html">Chapter
+8. Creating RPMs: An Overview</a> and <a
+href="http://www.gurulabs.com/GURULABS-RPM-LAB/GURULABS-RPM-GUIDE-v1.0.PDF">GURULABS-RPM-LAB/GURULABS-RPM-GUIDE-v1.0.PDF</a>
+(which sadly is a secured pdf).
+
+For this project, I have a tar that consists just of
+"example/example.jar".  This is a java archive as such can run on any
+platform, so you will see "noarch" below.
+
+First I setup my build environment:
+<pre>% <b>echo "%_topdir /home/schwehr/rpmbuild" > .rpmmacros</b>
+% <b>mkdir -p ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}</b></pre>
+I then put my tar in ~/rpmbuild/SOURCES and created ~/rpmbuild/SPECS
+to look like this:
+<pre><tt><b><font color="#0000FF">Summary:</font></b> Example rpm spec file
+<b><font color="#0000FF">Name:</font></b> example
+<b><font color="#0000FF">Version:</font></b> <font color="#993399">1.3</font>.<font color="#993399">0</font>
+<b><font color="#0000FF">Release:</font></b> <font color="#993399">1</font>
+<b><font color="#0000FF">License:</font></b> Proprietary
+<b><font color="#0000FF">Group:</font></b> Applications/Network
+<b><font color="#0000FF">Source:</font></b> <b><font color="#000080">%{name}</font></b>-<b><font color="#000080">%{version}</font></b>.tar.bz2
+<!-- -->
+<b><font color="#0000FF">URL:</font></b> <u><font color="#0000FF">http://example.org</font></u>
+<b><font color="#0000FF">Buildroot:</font></b> <b><font color="#000080">%{_tmppath}</font></b>/<b><font color="#000080">%{name}</font></b>-root
+<!-- -->
+<b><font color="#000080">%description</font></b>
+Put a detailed description of the package here.
+<!-- -->
+<b><font color="#000080">%prep</font></b>
+<b><font color="#000080">%setup</font></b> -q
+<!-- -->
+<b><font color="#000080">%build</font></b>
+echo "Nothing to build"
+<!-- -->
+<b><font color="#000080">%install</font></b>
+rm -rf <font color="#009900">$RPM_BUILD_ROOT</font>
+mkdir -p <font color="#009900">$RPM_BUILD_ROOT</font>/usr/share/java
+install -c -m <font color="#993399">755</font> example.jar <font color="#009900">$RPM_BUILD_ROOT</font>/usr/share/java/
+<!-- -->
+<b><font color="#000080">%clean</font></b>
+rm -rf <font color="#009900">$RPM_BUILD_ROOT</font>
+<!-- -->
+<b><font color="#000080">%files</font></b>
+<b><font color="#000080">%defattr</font></b>(-,root,root)
+/usr/share/java
+<!-- -->
+<b><font color="#000080">%changelog</font></b>
+* Thu May <font color="#993399">21</font> <font color="#993399">2009</font> Kurt Schwehr
+Initial attempt at creating a rpm</tt></pre>
+Then I built and installed my rpm:
+<pre>% <b>rpmbuild -ba  --target noarch SPECS/example.spec</b>
+% <b>sudo rpm -i RPMS/noarch/example-1.3.0-1.noarch.rpm</b>
+% <b>ls /usr/share/java/example.jar 
+/usr/share/java/example.jar</b></pre>
+There is a lot more that I need to figure out.  I'd like to install
+documentation files and setup a config file.  I'd like to do this kind
+of thing for a number of data logging processes and have init scripts
+that kick off the appropriate daemons.
+-----

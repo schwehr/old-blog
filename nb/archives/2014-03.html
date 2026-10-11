@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: March 2014 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2014-03-19T19_08_35.txt" name=
+"e2014-03-19T19_08_35.txt"></a>
+<h2 class="date">03.19.2014 19:08</h2>
+<div class="blogbody">
+<h3 class="title">Rebecca Moore at the White House - Google Earth
+Engine</h3>
+<div class="item-description"><iframe width="560" height="315" src=
+"http://www.youtube.com/embed/KhNBNWTQso8" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2014-03.html#e2014-03-19T19_08_35.txt">Permalink</a> 
+</div>
+</div>
+<div class="item"><a id="e2014-03-17T10_45_51.txt" name=
+"e2014-03-17T10_45_51.txt"></a>
+<h2 class="date">03.17.2014 10:45</h2>
+<div class="blogbody">
+<h3 class="title">AIS talkers for NMEA VDM/VDO messages</h3>
+<div class="item-description">I got an email with this question:
+<pre>
+In my data feed m getting some sentences with packet types I do not
+recognize.  Could you tell me what they mean?
+<!-- -->
+!BSVDM
+!ABVDM
+<!-- -->
+I'm also getting multi-sentences with different packet types. Is that
+allowed? First part can be ABVDM and second part AIVDM.
+</pre>
+I was just asked in email to explain the first field in the CSV
+that is the AIS NMEA armored messages. Sadly, the NMEA
+specification is paywalled by the annoying folks at NMEA so I can't
+share with you where talkers are defined. The same goes for the IEC
+standards that define AIS device messages and testing procedures.
+And I only have draft versions of a few of those that people on the
+commitees have given me over the years. For example, I have
+"Maritime navigation and radiocommunication equipment and systems -
+Digital interfaces - Part 100: Single talker and multiple listeners
+- Extra requirements to IEC 61162-1 for the UAIS".<br />
+<br />
+Back before <a href=
+"http://www.itu.int/rec/R-REC-M.1371-4-201004-I/en">ITU 1371</a>
+was opened up, I helped Eric Raymond (ESR) a bit with his writing
+of <a href="http://gpsd.berlios.de/AIVDM.html">AIVDM/AIVDO protocol
+decoding</a>. I still think that his document is drastically better
+written than the crap that is in the ITU documents. ESR also has
+<a href="http://gpsd.berlios.de/NMEA.html#_talker_ids">NMEA
+Revealed with a list of talker ID</a>.<br />
+<br />
+Let's start with a sample message:
+<pre>
+!AIVDO,1,1,,B,403OvpQuUwgBMJRe6VE5Aai005q8,0*6F,b003669730,1249053583
+</pre>
+The first two letters after the bang ("!") are the "talker." In
+NMEA speak, this is the device that generated the text in your
+local environment. It has nothing to do with any remote AIS devices
+and what they sent over the VHF radio. Above, we have "AI". This is
+the classic "AIS" device talker. It is what you get with most AIS
+receivers and transceivers (they are NOT transponders).<br />
+<br />
+Following the talker are 3 letters that define the "sentence type."
+In the world of NMEA, this is the type of message that you are
+about to parse. VDO is a type that not many people know about. It
+says that the message that follows is an AIS message that is about
+"own ship." This really means that the device is talking about
+itself. The more commonly observed VDM means "AIS message that the
+device received over a VHF radio channel." The VDO in the above
+sample message makes sense as this is an AIS basestation telling us
+the message 4 (basestation report) for itself. The message has two
+extra fields on the right: ",b003669730,1249053583". This is the
+older USCG logging format and has a receiver identifier and UNIX
+UTC timestamp. The b at the beginning of the receiver name says
+that the message was logged from a basestation. If we decode that
+message, we should find that the MMSI of the basestation report
+should match the receiver name.<br />
+<br />
+This next sample message has "BSVDM". The talker is "BS". This
+means that we are hearing from a basestation. The logger has added
+",r003669717" with an "r" for receiver, but it might just be
+missconfigured. This message is from my 2006 notes and I was just
+figuring out AIS and what the USCG was doing back then. I did have
+a basestation on my desk for a while.
+<pre>
+!BSVDM,1,1,,A,85MwpwQKf7sgdeioePgqI0@Q;F=0q3va1sdLFPCS4wB7PtDMD:62,0*34,r003669717,1165850344
+</pre>
+And a final sample that has "ANVDM". This was an AIS ATON
+(aid-to-navigation) device that uses "AN" as the talker:
+<pre>
+!ANVDM,1,1,,B,35MnbiPP@PJutdlH2M1sIq:80000,0*10,r003669947,1294012804
+</pre>
+As for "AB", I was unsure. I did receive some sample data with an
+AB talker, but I do not know what kind of device was doing the
+logging. AB might stand for Ais Basestation in someones mind.
+Looking at NMEA's closed documentation (yes, I paid rediculous
+amount for version 4.0 of the spec), I found:
+<pre>
+AB Independent AIS Base Station
+AD Dependent AIS Base Station 
+AI Mobile Class A or B AIS Station
+AN AIS Aids to Navigation Station
+AR AIS Receiving Station
+AS Limited Base Station
+AT AIS Transmitting Station
+AX AIS Simplex Repeater Station
+SA Physical Shore AIS Station
+</pre>
+There was no "BS" talker in there. Don't ask me to explain the
+differences between all those codes.<br />
+<br />
+Please, please, please: If you have the opportunity to talk to
+people at NMEA, IMO, IALA, IHO, ITU, or IEC, tell them that closed
+/ paywalled specifications are the work of the devil (and
+contradictory to the mission of SOLAS). It's bad enough that people
+aren't willing to put the discussion leading up to these specs
+online with their names attached. Can we please at least get ALL
+specs for these public data standards (because they are mandated by
+law in many cases) out there for free distribution
+licenses?!?!?</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2014-03.html#e2014-03-17T10_45_51.txt">Permalink</a> 
+<!-- <br /><a href="archives/2014-03-19T19_08_35.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2014-03-06T21_43_59.txt" name=
+"e2014-03-06T21_43_59.txt"></a>
+<h2 class="date">03.06.2014 21:43</h2>
+<div class="blogbody">
+<h3 class="title">Software Defined Radios</h3>
+<div class="item-description">Last time I went looking for Software
+Defined Radios (SDR) to play with, the price was in the $300-$500
+and up. That is quite different than some of the options we have
+today. I just ordered at <a href=
+"http://www.nooelec.com/store/software-defined-radio/sdr-receivers/tv28tv2-sdr-dvb-t-usb-stick-set.html">
+NooElec NESDR Mini SDR &amp; DVB-T USB Stick (R820T) w/ Antenna and
+Remote Control</a>. It's a R820T tuner IC made by Rafael Micro with
+a frequency range of ~ 25MHz to 1750MHz. It apparently can output
+<a href="http://sdr.osmocom.org/trac/wiki/rtl-sdr">2.5M S/s
+(million samples per second)</a>.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2014-03.html#e2014-03-06T21_43_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2014-03-17T10_45_51.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">March 2014</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar">1</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar">5</span></td>
+<td align="center"><span class="calendar"><a href=
+"2014-03.html#e2014-03-06T21_43_59.txt">6</a></span></td>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar">8</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">9</span></td>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar">12</span></td>
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar"><a href=
+"2014-03.html#e2014-03-17T10_45_51.txt">17</a></span></td>
+<td align="center"><span class="calendar">18</span></td>
+<td align="center"><span class="calendar"><a href=
+"2014-03.html#e2014-03-19T19_08_35.txt">19</a></span></td>
+<td align="center"><span class="calendar">20</span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar">28</span></td>
+<td align="center"><span class="calendar">29</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">30</span></td>
+<td align="center"><span class="calendar">31</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

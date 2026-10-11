@@ -1,0 +1,90 @@
+TITLE: Simulations of oil spills and follow along with missions
+AUTHOR: Kurt
+DATE: 01.13.2011 13:02
+DESC: potential
+-----
+BODY:
+I been thinking about simulation environments and following actual
+events in virtual environments since the late 1980's and especially
+after visiting Scott Fischer's Virtual Reality lab at NASA Ames in
+1990.  Those were days of big visions, but light on really usable
+systems.  Since then, I've used tools like SecondLife, Viz, GeoZui,
+Fledermaus, <a href="http://www.flightgear.org/">FlightGear</a>
+(Roland simulating ships in SF Bay), and many other similar platforms.
+They have all been really great, but each is missing some aspect of
+what I'm looking for.  It needs to be easy to control the environment
+from inside or from external programs.  It has to handle arbitrary
+objects and control styles (sorry Fledermaus).  And for me to count on
+it for the long term, it has to be Open Source.  It also must have a
+community of developers so that the burden can be distributed.  I have
+the source for GeoZui and Viz, but they aren't really open and the
+teams are too small... even if the software is fast and really
+powerful.  The idea of using a SecondLife type environment to mirror
+the world has been enticing, but SecondLife really turned me off
+during the two weeks that I gave it a try.  I don't want the
+commercially controlled public craziness that is SecondLife.
+
+I was listening to <a href="http://twit.tv/floss123">FLOSS Weekly 123:
+Open Wonderland</a> and thought that <a
+href="http://openwonderland.org">Open Wonderland</a> might be the
+ticket.  It <a
+href="http://code.google.com/p/openwonderland/source/list">looks
+like</a> there are 4 people making lots of changes to the code.  I
+gave it a spin on my old Mac laptop to see if I could get it running
+and it came right up (took about 90 seconds).
+<pre><b>wget http://download.openwonderland.org/releases/preview4/Wonderland.jar
+java -jar Wonderland.jar
+open http://192.168.0.6:8080</b></pre>
+I pressed Launch to use Java Web Start to get the interface running and Server Admin to view how the server was configured.
+
+<img title="Open Wonderland default view" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-01/openwonderland.png"/>
+
+<img title="Open Wonderland server view" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-01/openwonderland-server-admin.png"/>
+
+So... I now have two tasks to make this useful.  First, I need to be
+able to load in the shoreline of the North America.  Second, how to I
+talk to the server from a non-Java client?  I've got python code that
+can decode ship positions.  Looking at the open ports, it's a little overwhelming with 33 open:
+<pre><b>lsof -i -nP | grep java<b/b>
+java      81564 schwehr   61u  IPv6 0x12e38350      0t0  TCP *:8080 (LISTEN)
+java      81564 schwehr   63u  IPv6 0x0954de20      0t0  TCP [::1]:62326->[::1]:62325 (TIME_WAIT)
+java      81564 schwehr   74u  IPv6 0x09b14940      0t0  TCP [::192.168.0.6]:62439->[::192.168.0.6]:1139 (ESTABLISHED)
+java      81564 schwehr  114u  IPv6 0x09b70bb0      0t0  TCP [::192.168.0.6]:62428->[::192.168.0.6]:1139 (ESTABLISHED)
+java      81564 schwehr  130u  IPv6 0x09c325c0      0t0  TCP [::192.168.0.6]:62447->[::192.168.0.6]:1139 (ESTABLISHED)
+java      81564 schwehr  138u  IPv6 0x094f9aa0      0t0  TCP [::192.168.0.6]:62448->[::192.168.0.6]:1139 (ESTABLISHED)
+java      81580 schwehr   51u  IPv6 0x0947c940      0t0  TCP [::192.168.0.6]:5060 (LISTEN)
+java      81580 schwehr   52u  IPv6 0x094f90e0      0t0  TCP [::1]:62392->[::1]:62391 (TIME_WAIT)
+java      81580 schwehr   53u  IPv6 0x0bd37f78      0t0  UDP [::192.168.0.6]:5060
+java      81580 schwehr   54u  IPv6 0x085aa130      0t0  UDP *:3478
+...
+java      81583 schwehr   86u  IPv6 0x094f9830      0t0  TCP *:43012 (LISTEN)
+java      81583 schwehr   92u  IPv6 0x094f95c0      0t0  TCP *:62393 (LISTEN)
+java      81583 schwehr   93u  IPv6 0x094f9d10      0t0  TCP *:44533 (LISTEN)
+java      81583 schwehr   94u  IPv6 0x09b13350      0t0  TCP [::127.0.0.1]:6668->[::127.0.0.1]:63264 (CLOSED)
+java      81583 schwehr  100u  IPv6 0x09b141f0      0t0  TCP *:44535 (LISTEN)
+java      81583 schwehr  101u  IPv6 0x09b6fd10      0t0  TCP [::192.168.0.6]:1139->[::192.168.0.6]:62439 (ESTABLISHED)</pre>
+Their <a href="http://openwonderland.org/resources/developers">developer page</a> has some info on the architecture:
+
+<img title="Open Wonderland server view" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-01/wonderland-apis.png"/>
+
+It looks like when Oracle bought Sun, they killed <a
+href="http://projectdarkstar.com/">Project Darkstar</a>, but it lives
+on as <a href="http://www.reddwarfserver.org/">RedDwarf Server</a>.
+And there is <a
+href="http://sourceforge.net/projects/pyreddwarf/">PyRedDwarf</a>, so
+it may be possible to use python to talk to Open Wonderland.
+
+If that all works, we then need software to simulate an oil spill and
+provide simple simulators for driving ships around virtually by humans
+and agents.  Perhaps we can mix in real ship motions from a couple
+real ships engaged in the drill.  One of the big things with the SONS
+drill I saw was a lack of reality to the drill.  When I asked a USCG
+person which ships were moving around for the drill, they had no idea.
+The logistics of moving ships, plans, people and supplies around is a huge 
+part of dealing with a spill.  If we don't simulate that aspect, then we
+are going to have trouble when it comes to the real thing.  Another trouble
+spot with OpenWonderland is that we will have a harder time simulating
+the realworld communications difficulties.
+
+See also: <a href="http://en.wikipedia.org/wiki/OpenSimulator">OpenSimulator</a> that is compatible with SecondLife.
+-----

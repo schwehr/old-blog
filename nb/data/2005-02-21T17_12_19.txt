@@ -1,0 +1,29 @@
+TITLE: Full python database creation
+AUTHOR: Kurt
+DATE: 02.21.2005 17:12
+DESC: build-db.py is much faster!
+-----
+BODY:
+Just finished up the full database creation python scripts.  The bash
+script was getting to be 5-10 minutes long and I have a long ways to
+go before I am done.  Right now I am at 7-8 seconds with the python
+script.  There were just so many calls to awk, cut, and sqlite.  Now
+with the python code, the script is much simpler and tons faster.  It
+uses the string split method extensively and I have some classes that
+handle converting k15 data into hext and s formats.  Check out the two
+scripts:
+<pre>
+<a href="http://schwehr.org/blog/attachments/2005-02/ams.py.html">ams.py</a>
+<a href="http://schwehr.org/blog/attachments/2005-02/build-db.py.html">build_db.py</a>
+</pre>
+<b>ams.py</b> is my module of helper functions that includes the classes
+Hext, S_Matrix, DepthLookup and SampleName.  I really like
+SampleName.  I give it a string from one of my sample names and it
+pulls apart all the fields.  It also has a __str__ method so that if I
+turn it into a string, it goes back to the original.
+
+<b>build_db.py</b> is a little more complicated.  It reads each of the
+text data files off of disk, creates the table, and inserts all the
+values.  Having really string processing in python makes the core
+location and core section tables so much simpler and easy to read.
+-----

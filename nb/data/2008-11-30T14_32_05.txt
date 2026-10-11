@@ -1,0 +1,60 @@
+TITLE: opennms
+AUTHOR: Kurt
+DATE: 11.30.2008 14:32
+DESC: admin tools
+-----
+BODY:
+I was going to look at nagios for fink and look into adding checks for
+my tide stations, but I figured that since <a
+href="http://www.opennms.org">OpenNMS</a> is already in fink and <a href="http://www.ohloh.net/projects/4501/contributors/19331647804578">one
+of the fink maintainers also works on OpenNMS</a>, it might be worth
+giving it a try on my Mac laptop.
+<pre> % <b>fink describe opennms</b>
+% <b>less /sw/share/doc/opennms/README.Darwin</b>
+% <b>fink install opennms</b>
+% <b>fink install tomcat5</b> # Did a really need this one?
+% <b>sudo emacs /sw/var/postgresql-8.3/data/pg_hba.conf</b>
+# Realize that the file looks to be already configured
+% <b>sudo emacs /sw/var/postgresql-8.3/data/postgresql.conf</b>
+listen_addresses = 'localhost'		# what IP address(es) to listen on;
+max_connections = 192			# (change requires restart)
+% <b>sudo daemonic enable postgresql83</b></pre>
+This is the Mac OS X 10.5:
+<pre>% <b>sudo emacs /etc/sysctl.conf</b>
+kern.sysv.shmmax=16777216
+kern.sysv.shmmin=1
+kern.sysv.shmmni=64
+kern.sysv.shmseg=8
+kern.sysv.shmall=32768
+</pre>
+Once the above parameters are set, you need to reboot the mac.
+<pre>% #<b>cd /sw/bin && sudo pgsql.sh-8.3 restart</b>  # Not needed with reboot
+   # There is something weird with my postgresql setup... 
+   # Lots of complaints on restart
+% <b>sudo -u postgres createdb -U postgres -E UNICODE opennms</b>
+% <b>install_iplike_83.sh</b> 
+% <b>sudo /sw/var/opennms/bin/install -dis</b>
+% <b>sudo /sw/bin/tomcat5 start</b>
+% <b>sudo opennms start</b>
+% <b>open http://localhost:8980/opennms/</b>
+U: admin, P: admin</pre>
+Then, when you are ready to have an OpenNMS service always running, do this:
+<pre>% <b>sudo daemonic enable opennms</b></pre>
+<img title="OpenNMS in Firefox on the Mac" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-11/opennms-fink.png"/>
+
+
+Above, you can see my comment about the postgresql restart.  
+What's up with this?
+<pre>% <b>sudo pgsql.sh-8.3 restart</b>
+<!-- -->
+pg_ctl-8.3: PID file "/sw/var/postgresql-8.3/data/postmaster.pid" does not exist
+Is server running?
+starting server anyway
+shell-init: error retrieving current directory: getcwd: cannot access parent directories: Permission denied
+server starting
+<!-- -->
+LOG:  00000: could not identify current directory: Permission denied
+LOCATION:  find_my_exec, exec.c:196
+FATAL:  XX000: /sw/bin/postgres-8.3: could not locate my own executable path
+LOCATION:  PostmasterMain, postmaster.c:470</pre>
+-----

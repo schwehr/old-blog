@@ -1,0 +1,32 @@
+TITLE: configuring php5 via apache2.0.x from fink
+AUTHOR: Kurt
+DATE: 11.09.2005 06:27
+DESC: it works!
+-----
+BODY:
+Because of my last post about subversion (svn) I remembered that a
+while back I was unable to get php5 working on my laptop to try out
+some simple php again.  I got totally frustrated back then.
+Configuring apache is worse than using the command line configure for
+a linux kernel.  But sometimes you just stumble into the right thing
+at a later date.  Here is what I had before that DID NOT work.
+<pre>
+AddHandler php-script php
+AddType text/html       php
+AddType application/x-httpd-php-source phps
+</pre>
+Then I ran into this very verbose (which is a good thing) description
+of installing apache2 on fink: <a
+href="http://people.engr.ncsu.edu/jayoung/site/pages/installing-apache2-with-fink">Jay's
+how to install apache2 on fink</a>.  Based on his web page, I changed
+my /sw/etc/apache2/httpd.conf to have these lines.
+<pre>
+DirectoryIndex index.html index.php
+
+AddType application/x-httpd-php .php .php3 .php4 .php5 .phtml
+AddType application/x-httpd-php-source .phps
+</pre>
+Now php5 is working.  Woo hoo!  Now I just need time to play with php
+some.  I also probably need to read up on php security, but my
+laptop's webserver never sees the internet, so I can put that off.
+-----

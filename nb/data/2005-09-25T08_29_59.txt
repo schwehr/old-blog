@@ -1,0 +1,72 @@
+TITLE: pyblosxom
+AUTHOR: Kurt
+DATE: 09.25.2005 08:29
+DESC: worked, but not super exciting
+-----
+BODY:
+I finally got a chance to check out <a
+href="http://pyblosxom.sourceforge.net/">pyblosxom</a> while on the
+plane last night.  One thing I liked about nanoblogger that I did not
+experience with pyblosxom, is instant success.  With nanoblogger, I
+had a demo page that looked nice and had a few posts in under a half
+an hour without any hard work.  The reality is that there are
+thousands of tools that I should checkout and learn, but there is
+never enough time.  So unless there is a clear reason for me to dive
+into a tool that requires substantial learning before I can see some
+good progress, I won't even try it.  That happened to me with all the
+seismic tools.  It was only when truly forced to that I finally
+figured out the basics to sioseis and pltsegy.  The other tools have
+only received a few minutes of my attention.  
+
+Back to pyblosxom.  I had this package high on my list of interesting
+projects due to being built on python.  Most blogging tools are
+written in PHP.  I have worked a bit with PHP, but I really like
+python - it is easy to work with and very expressive.  I don't really
+want to have to figure out all the details of yet another programming
+language.  Nanoblogger (my current tool) is great, but working with
+bash is challenging.  Bash as a language is a million times better
+than csh, but it is just not up to building manageable API's for us
+mortals.  Yes, it can be done, but I'd rather have python where I get
+a slew of API's that I can use to extend the blogging engine.
+
+pyblosxom is a python cgi program and that was my first rough spot.
+Apache's http.conf is not someplace that I like to go into.  I've
+setup virtual hosting and done a few things like that, but it is such
+a large beast that I end up with a lot of trial and error (mostly error).
+I used apache2 from fink with all the extras enabled (which I don't
+know how to use), so I started by editing /sw/etc/apache2/httpd.conf.
+I finally nuked the whole &lt;Directory /Users/*/Sites&gt; section and
+put it this:
+<pre>
+AddHandler cgi-script .cgi .pl
+&lt;Directory /Users/schwehr/Sites/*&gt;
+    Options +ExecCGI
+&lt;/Directory&gt;
+</pre>
+I did not want to use a ScriptAlias.  After about 50 <b>apachectl
+restart</b>s I had a test cgi working.  I never did figure out how to
+get php5 to work :(
+
+I then tweaked ~/Sites/cgi-bin/config.py with the path to data and log
+dirs.  Then I put a dummy file in data and fired up firefox with a
+<b>open http://localhost/~schwehr/cgi-bin/pyblosxom.cgi</b>. That
+worked, but what I got was ugly.  My data file (post1.txt):
+<pre>
+yada <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">b</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>yada<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/b</font><font color="4444FF"><strong>&gt;</strong></font></strong></font> yada <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">font</font> <font color="#2040a0">color=</font><font color="#008000">&quot;red&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>red<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/font</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+The results...
+<hr>
+Another pyblosxom blog
+<h1>Another pyblosxom blog</h1><p>  </p>
+<h2>Sat, 24 Sep 2005</h2>
+<h3><a name="post">yada <b>yada</b> yada <font color="red">red</font></a></h3><div class="blosxomStory">
+<p>posted at: 18:59 | path: <a href="http://localhost/~schwehr/cgi-bin/pyblosxom.cgi/" title="path">/</a> | <a href="http://localhost/~schwehr/cgi-bin/pyblosxom.cgi/post.html">permanent link to this entry</a></p></div>
+<p><a href="http://pyblosxom.sourceforge.net/"><img src="http://pyblosxom.sourceforge.net/images/pb_pyblosxom.gif" alt="Made with PyBlosxom" border="0" /></a></p></body></html>
+<hr>
+Not so pretty.  And it takes the date/time from the file.  That is not
+going to work out so well for me.  I see some serious potential with
+all the different available flavors/skins and the ability to use and
+make lots of pythonic plugins, but I am not going to be doing any
+switching right now.  Perhaps this could be the basis for a nice
+research tool.
+-----

@@ -1,0 +1,40 @@
+TITLE: messing with gsf
+AUTHOR: Kurt
+DATE: 01.31.2006 09:27
+DESC: arch defines
+-----
+BODY:
+I took a quick look at the Generic Sensor Format (gsf) this morning
+and got it to compile.  Here is what I changed in gsf.h:
+<pre>
+<font color="0000ff"><strong>#ifndef __APPLE__</strong></font>
+<font color="0000ff"><strong>#if (!defined (_STRUCT_TIMESPEC_) &amp;&amp; !defined (_TIMESPEC_T) &amp;&amp; !defined (_STRUCT_TIMESPEC) &amp;&amp; !defined (_SYS_TIMESPEC_H) &amp;&amp; !defined (__timespec_defined))</strong></font>
+<font color="0000ff"><strong>#define _STRUCT_TIMESPEC_</strong></font>
+<font color="0000ff"><strong>#define _TIMESPEC_T</strong></font>
+<font color="0000ff"><strong>#define _STRUCT_TIMESPEC</strong></font>
+<font color="0000ff"><strong>#define _SYS_TIMESPEC_H</strong></font>
+<font color="0000ff"><strong>#define __timespec_defined</strong></font>
+    <strong>struct</strong> <font color="#2040a0">timespec</font>
+    <font color="4444FF"><strong>{</strong></font>
+        <font color="#2040a0">time_t</font>          <font color="#2040a0">tv_sec</font><font color="4444FF">;</font>
+        <strong>long</strong>            <font color="#2040a0">tv_nsec</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font><font color="4444FF">;</font>
+<font color="0000ff"><strong>#endif</strong></font>
+<font color="0000ff"><strong>#endif # __APPLE__ </strong></font>
+</pre>
+Val brought up that there is a command to see everything that the c
+preprocessor (cpp) defines:
+<pre>
+cpp -dM gsf.h | egrep -i 'APPLE|DARWIN'
+
+ #define __APPLE_API_STANDARD 
+ #define __SYS_APPLEAPIOPTS_H__ 
+ #define __APPLE_API_OBSOLETE 
+ #define __APPLE__ 1
+ #define __APPLE_API_STABLE 
+ #define __APPLE_API_EVOLVING 
+ #define __APPLE_API_UNSTABLE 
+ #define __APPLE_API_PRIVATE 
+ #define __VERSION__ "3.3 20030304 (Apple Computer, Inc. build 1495)"
+</pre>
+-----

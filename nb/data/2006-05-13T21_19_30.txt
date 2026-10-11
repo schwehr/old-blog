@@ -1,0 +1,42 @@
+TITLE: answer - tail after the child
+AUTHOR: Kurt
+DATE: 05.13.2006 21:19
+DESC: lxml
+-----
+BODY:
+In my previous post, I wondered how to get the text within a tag that
+comes after a child tag.  Looking through the lxml test suite, I found
+test_tail in test_elementtree.py that answered my question.
+<pre>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> test_tail</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">ElementTree</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">etree</font>.<font color="#2040a0">ElementTree</font>
+        <font color="#2040a0">f</font> <font color="4444FF">=</font> <font color="#2040a0">StringIO</font><font color="4444FF">(</font><font color="#008000">'&lt;doc&gt;This is &lt;i&gt;mixed&lt;/i&gt; content.&lt;/doc&gt;'</font><font color="4444FF">)</font>
+        <font color="#2040a0">doc</font> <font color="4444FF">=</font> <font color="#2040a0">ElementTree</font><font color="4444FF">(</font><font color="#2040a0">file</font><font color="4444FF">=</font><font color="#2040a0">f</font><font color="4444FF">)</font>
+        <font color="#2040a0">root</font> <font color="4444FF">=</font> <font color="#2040a0">doc</font>.<font color="#2040a0">getroot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">assertEquals</font><font color="4444FF">(</font><font color="#FF0000">1</font>, <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">root</font><font color="4444FF">)</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">assertEquals</font><font color="4444FF">(</font><font color="#008000">'This is '</font>, <font color="#2040a0">root</font>.<font color="#2040a0">text</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">assertEquals</font><font color="4444FF">(</font><font color="#2040a0">None</font>, <font color="#2040a0">root</font>.<font color="#2040a0">tail</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">assertEquals</font><font color="4444FF">(</font><font color="#008000">'mixed'</font>, <font color="#2040a0">root</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">text</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">assertEquals</font><font color="4444FF">(</font><font color="#008000">' content.'</font>, <font color="#2040a0">root</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>.<font color="#2040a0">tail</font><font color="4444FF">)</font>
+</pre>
+Or here is what I did in ipython:
+<pre>
+ipython
+In [1]: from StringIO import StringIO
+In [2]: f = StringIO('&lt;doc&gt;This is &lt;i&gt;mixed&lt;/i&gt; content.&lt;/doc&gt;')
+In [3]: from lxml.etree import ElementTree
+In [4]: root = ElementTree(file=f).getroot()
+In [6]: print root.text
+This is 
+In [7]: print len(root)      
+1
+In [8]: print root[0]  
+&lt;Element i at 1178378&gt;
+In [9]: print root[0].text
+mixed
+In [10]: print root[0].tail
+ content.
+</pre>
+The key is that the text is the "tail of the child."  Not exactly what
+I expected, but it works.
+-----

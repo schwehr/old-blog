@@ -1,0 +1,119 @@
+TITLE: sql query builder
+AUTHOR: Kurt
+DATE: 10.08.2005 14:48
+DESC: how to make queries without as much trouble
+-----
+BODY:
+I just cooked up a little bit of python to make SELECT sql calls much
+easier.  I am sure that SQLObject and things like that have support
+for this kind of idea, but it is more trouble to deal with more large
+packages right now.  The idea is to add fields, where conditions,
+froms, etc and have the <b>sqlselect</b> class take care of stringing
+together the fields with commas and AND's as appropriate.  I have been
+writing too much of this again and again sporadically in my code as it
+is needed.  I think I may thow this into segy-py.  
+
+I know, I know... I should really check out SQLObject by Ian B.  For
+now, this is what I am going to use.
+
+<pre>
+<font color="#FF8800">#!/usr/bin/env python</font>
+
+<strong>class</strong> <font color="#2040a0">sqlselect</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    Construct an sql select query
+
+    Sometimes it just gets ugly having all that comma and WHERE AND
+    logic in there.  This code takes care of that
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">fields</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="4444FF">]</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">where</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="4444FF">]</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">limit</font> <font color="4444FF">=</font> <font color="#2040a0">None</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">from_tables</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="4444FF">]</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">orderby</font> <font color="4444FF">=</font> <font color="#2040a0">None</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">desc</font> <font color="4444FF">=</font> <font color="#2040a0">False</font> <font color="#FF8800"># descending sort if true</font>
+        <strong>return</strong>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> setorderby</font><font color="2040a0">(self,field,desc=False)</font>:
+</strong>        <font color="#008000">&quot;Make the returned rows come in some order&quot;</font>
+        <strong>if</strong> <font color="#2040a0">str</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">field</font><font color="4444FF">)</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">&quot;ERROR: fix throw type exception&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">orderby</font> <font color="4444FF">=</font> <font color="#2040a0">field</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">desc</font> <font color="4444FF">=</font> <font color="#2040a0">desc</font>
+        <strong>return</strong>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> addfield</font><font color="2040a0">(self,fieldname)</font>:
+</strong>        <font color="#008000">&quot;Add a field name to return&quot;</font>
+        <strong>if</strong> <font color="#2040a0">str</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">fieldname</font><font color="4444FF">)</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">&quot;ERROR: fix throw type exception&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">fields</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#2040a0">fieldname</font><font color="4444FF">)</font>
+        <strong>return</strong>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> addwhere</font><font color="2040a0">(self,boolTest)</font>:
+</strong>        <font color="#008000">&quot; Add expressions to chain together with ANDs&quot;</font>
+        <strong>if</strong> <font color="#2040a0">str</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">boolTest</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#008000">&quot;ERROR: fix throw type exception&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">where</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#2040a0">boolTest</font><font color="4444FF">)</font>
+        <strong>return</strong>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> addfrom</font><font color="2040a0">(self,tableName)</font>:
+</strong>        <font color="#008000">&quot;Which tables the query will pull from&quot;</font>
+        <strong>if</strong> <font color="#2040a0">str</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">tableName</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#008000">&quot;ERROR: fix throw type exception&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">from_tables</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#2040a0">tableName</font><font color="4444FF">)</font>
+        <strong>return</strong>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> setlimit</font><font color="2040a0">(self,numOfItems)</font>:
+</strong>        <font color="#008000">&quot;Set the maximum number of items to return&quot;</font>
+        <strong>if</strong> <font color="#2040a0">int</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">type</font><font color="4444FF">(</font><font color="#2040a0">numOfItems</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#008000">&quot;ERROR: fix throw type exception&quot;</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">limit</font> <font color="4444FF">=</font> <font color="#2040a0">numOfItems</font>
+        <strong>return</strong>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __str__</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#008000">&quot;Return the query as a string&quot;</font>
+        <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">fields</font><font color="4444FF">)</font> <font color="4444FF">&lt;</font> <font color="#FF0000">1</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">&quot;ERROR: fix throw some exception?&quot;</font>
+        <font color="#2040a0">s</font> <font color="4444FF">=</font> <font color="#008000">'SELECT '</font>
+        <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font> <font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">fields</font><font color="4444FF">)</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">fields</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">','</font>
+        <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">fields</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#008000">' '</font>
+
+        <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">from_tables</font><font color="4444FF">)</font><font color="4444FF">&lt;</font><font color="#FF0000">1</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">&quot;ERROR: fix throw some exception&quot;</font>
+        <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">'FROM '</font>
+        <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font> <font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">from_tables</font><font color="4444FF">)</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">from_tables</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">','</font>
+        <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">from_tables</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+
+        <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">where</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' WHERE '</font>
+        <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font> <font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">where</font><font color="4444FF">)</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">where</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">' AND '</font>
+        <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">where</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">where</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+
+        <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">orderby</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' ORDER BY '</font> <font color="4444FF">+</font> <font color="#2040a0">self</font>.<font color="#2040a0">orderby</font>
+            <strong>if</strong> <font color="#2040a0">self</font>.<font color="#2040a0">desc</font><font color="4444FF">:</font> <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' DESC'</font>
+
+        <strong>if</strong> <font color="4444FF">(</font><font color="#2040a0">None</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">limit</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' LIMIT '</font> <font color="4444FF">+</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">limit</font><font color="4444FF">)</font>
+
+        <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">';'</font>
+        <strong>return</strong> <font color="#2040a0">s</font>
+
+<font color="#2040a0">q</font> <font color="4444FF">=</font> <font color="#2040a0">sqlselect</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">addfield</font><font color="4444FF">(</font><font color="#008000">'tau1'</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">addfield</font><font color="4444FF">(</font><font color="#008000">'tau2'</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">addfield</font><font color="4444FF">(</font><font color="#008000">'depth'</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">addfrom</font><font color="4444FF">(</font><font color="#008000">'ams'</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">addwhere</font><font color="4444FF">(</font><font color="#008000">'corenum=1'</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">addwhere</font><font color="4444FF">(</font><font color="#008000">'depth&lt;50'</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">setlimit</font><font color="4444FF">(</font><font color="#FF0000">15</font><font color="4444FF">)</font>
+<font color="#2040a0">q</font>.<font color="#2040a0">setorderby</font><font color="4444FF">(</font><font color="#008000">'depth'</font>, <font color="#2040a0">desc</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<strong>print</strong> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">q</font><font color="4444FF">)</font>
+</pre>
+The example at the end returns this SQL string:
+<pre>
+SELECT tau1,tau2,depth FROM ams WHERE corenum=1 AND depth<50 \
+  ORDER BY depth DESC LIMIT 15;
+</pre>
+Not as cool as the built in C# query mechanisms, but it works for me.
+-----

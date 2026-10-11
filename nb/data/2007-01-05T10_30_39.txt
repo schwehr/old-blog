@@ -1,0 +1,184 @@
+TITLE: noaadata python package provides AIS decoding
+AUTHOR: Kurt
+DATE: 01.05.2007 10:30
+DESC: Nice html table
+-----
+BODY:
+My new noaadata package includes ais message handling.  Here is a
+quick demo of what it can do as of version 0.8.  You can download it
+here: <a
+href="http://vislab-ccom.unh.edu/~schwehr/ais/waterlevel/downloads/">http://vislab-ccom.unh.edu/~schwehr/ais/waterlevel/downloads/</a>
+(Note: this location may change in the future).
+
+First, here is an N-AIS ship position message in its native NMEA-AIS format.
+I grabbed this one at random from the stream.  I don't know what ship this is
+or where it is located.
+<pre>!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A,r003679900,1168010561</pre>
+Now, I can ask ais_msg_1.py for help.
+<pre>./ais_msg_1.py -h
+Usage: ais_msg_1.py [options]
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  --doc-test            run the documentation tests
+  --unit-test           run the unit tests
+  -v, --verbose         Make the test output verbose
+  -t IOTYPE, --type=IOTYPE
+                        What kind of string to expect (binary, nmeapayload,
+                        nmea) [default: nmeapayload]
+  -T OUTPUTTYPE, --output-type=OUTPUTTYPE
+                        What kind of string to output (std, html, xml)
+                        [default: std]
+  -o OUTPUTFILENAME, --output=OUTPUTFILENAME
+                        Name of the python file to write [default: stdout]
+  -d, --decode          decode a "position" AIS message
+  -e, --encode          encode a "position" AIS message
+  --RepeatIndicator-field=uint
+                        Field parameter value [default: 0]
+  --UserID-field=uint   Field parameter value [default: none]
+...</pre>
+I want to decode the message to see what is in there:
+<pre>
+./ais_msg_1.py -d -t nmea \
+'!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A,r003679900,1168010561'
+
+position:
+        MessageID:           1
+        RepeatIndicator:     0
+        UserID:              371798000
+        NavigationStatus:    0
+        ROT:                 -127
+        SOG:                 12.3
+        PositionAccuracy:    1
+        Position_longitude:  -123.395383333
+        Position_latitude:   48.38163333333
+        COG:                 224
+        TrueHeading:         215
+        TimeStamp:           33
+        RegionalReserved:    0
+        Spare:               0
+        RAIM:                False
+        syncstate:           0
+        slotoffset:          4252
+</pre>
+Note that slotoffset is not right.  The library can't currently decode
+conditionals.  Also, the rate of turn is not right either.  The
+library does not support decodings other than linear.  ROT requires a sqrt.
+
+What if I want to see a pretty html for that has the entries decoded
+by lookup tables if possible?  That is now trival to do!
+<pre>
+./ais_msg_1.py -d -t nmea -T html '!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A,r003679900,1168010561' > msg.html
+open msg.html
+</pre>
+Here is what msg.html contains.  I did a a couple quick edits to make it
+look nicer in the blog.  First, I removed all extra white space in the html.  Second, I shorted the decimal values.  Third, I changed a header 3 tag to a bold tag.
+
+<b>position</b>
+<table border="1">
+<tr bgcolor="orange">
+<th align="left">Field Name</th>
+<th align="left">Type</th>
+<th align="left">Value</th>
+<th align="left">Value in Lookup Table</th>
+<tr>
+<td>MessageID</td>
+<td>uint</td>
+        <td>1</td>
+        <td>1</td>
+</tr>
+<tr>
+<td>RepeatIndicator</td>
+<td>uint</td>
+        <td>0</td>
+<td>default</td></tr>
+<tr>
+<td>UserID</td>
+<td>uint</td>
+        <td>371798000</td>
+        <td>371798000</td>
+</tr>
+<tr>
+<td>NavigationStatus</td>
+<td>uint</td>
+        <td>0</td>
+<td>under way using engine</td></tr>
+<tr>
+<td>ROT</td>
+<td>int</td>
+        <td>-127</td>
+        <td>-127</td>
+</tr>
+<tr>
+<td>SOG</td>
+<td>udecimal</td>
+        <td>12.3</td>
+<td><i>Missing LUT entry</i></td></tr>
+<tr>
+<td>PositionAccuracy</td>
+<td>uint</td>
+        <td>1</td>
+<td>high (greater than 10 m)</td></tr>
+<tr>
+<td>Position_longitude</td>
+<td>decimal</td>
+        <td>-123.3953833</td>
+        <td>-123.3953833</td>
+</tr>
+<tr>
+<td>Position_latitude</td>
+<td>decimal</td>
+        <td>48.38163333</td>
+        <td>48.38163333</td>
+</tr>
+<tr>
+<td>COG</td>
+<td>udecimal</td>
+        <td>224</td>
+        <td>224</td>
+</tr>
+<tr>
+<td>TrueHeading</td>
+<td>uint</td>
+        <td>215</td>
+        <td>215</td>
+</tr>
+<tr>
+<td>TimeStamp</td>
+<td>uint</td>
+        <td>33</td>
+<td><i>Missing LUT entry</i></td></tr>
+<tr>
+<td>RegionalReserved</td>
+<td>uint</td>
+        <td>0</td>
+        <td>0</td>
+</tr>
+<tr>
+<td>Spare</td>
+<td>uint</td>
+        <td>0</td>
+        <td>0</td>
+</tr>
+<tr>
+<td>RAIM</td>
+<td>bool</td>
+        <td>False</td>
+<td>not in use</td></tr>
+<tr>
+<td>syncstate</td>
+<td>uint</td>
+        <td>0</td>
+<td>UTC direct</td></tr>
+<tr>
+<td>slotoffset</td>
+<td>uint</td>
+        <td>4252</td>
+        <td>4252</td>
+</tr>
+</table>
+
+And finally, we should have Google Earth show us where that was.
+
+<img src="http://schwehr.org/blog/attachments/2007-01/noaadata-try1.png">
+-----

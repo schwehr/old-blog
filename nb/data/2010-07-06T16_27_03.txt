@@ -1,0 +1,115 @@
+TITLE: Trying to follow a CMake tutorial
+AUTHOR: Kurt
+DATE: 07.06.2010 16:27
+DESC: struggling
+-----
+BODY:
+I can already say that getting started with CMake is easier than with
+AutoConf, but it definitely has rough edges.  It's always tough to
+compare with learning GNU Make.  I got slowly introduced to makefiles
+in my 2nd year of undergrad CS courses.  It was a lot easier to pick
+up that way when I was in a cluster full of 100 workstations where
+most everyone else was also learning how to create Makefiles.  And I
+had the time to sit down and read the entire GNU Make book.
+
+I started on CMake with what I thought was the best tutorial.
+Definetely not the way to go.  Here is my working through the initial
+example and what I had to do differently.  I'm working on this using
+Mac OSX 10.6, Aquaemacs 23, and cmake 2.8.2 from fink.
+
+The problems started right off the mark.  This isn't to say that I
+don't think that CMake is a great idea.  It's just a bit rough on a
+beginner (but a million times easier than with the GNU autotools).
+Step one has you create a CMakeLists file.  That's not right.  It
+should be <b>CMakeLists.txt</b>.    Based on the tutorial, I created a
+CMakeLists:
+<pre>cmake_minimum_required (2.6)
+project (Tutorial)
+add_executable(Tutorial tutorial.cxx)</pre>
+And I always like to get something working as fast as possible.  There
+is no mention of the command line to use.  Turns out that I need to
+run this:
+<pre><b>cmake -G "Unix Makefiles" .</b>
+CMake Error: The source directory "/Users/schwehr/Desktop/cmake-tut" does not appear to contain CMakeLists.txt.
+<b>mv CMakeLists{,.txt}</b> # renames CMakeLists to CMakeLists.txt if you are not used to the {before,after} syntax in bash
+<b>cmake -G "Unix Makefiles" . </b>
+CMake Error at CMakeLists.txt:1 (cmake_minimum_required):
+  <i>cmake_minimum_required called with unknown argument "2.6".</i>
+<!-- -->
+-- The C compiler identification is GNU
+-- The CXX compiler identification is GNU
+-- Checking whether C compiler has -isysroot
+-- Checking whether C compiler has -isysroot - yes
+-- Checking whether C compiler supports OSX deployment target flag
+-- Checking whether C compiler supports OSX deployment target flag - yes
+-- Check for working C compiler: /usr/bin/gcc
+-- Check for working C compiler: /usr/bin/gcc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Checking whether CXX compiler has -isysroot
+-- Checking whether CXX compiler has -isysroot - yes
+-- Checking whether CXX compiler supports OSX deployment target flag
+-- Checking whether CXX compiler supports OSX deployment target flag - yes
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Configuring incomplete, errors occurred!
+</pre>
+Say what?  So something is wrong with the first line of the file is
+wrong.  A little Googling and I have this:
+<pre>cmake_minimum_required (VERSION 2.8)
+project (Tutorial)
+add_executable(Tutorial tutorial.cxx)</pre>
+It now runs like this:
+<pre><b>cmake -G "Unix Makefiles" .</b>
+-- Configuring done
+CMake Error in CMakeLists.txt:
+  Cannot find source file "tutorial.cxx".  Tried extensions .c .C .c++ .cc
+  .cpp .cxx .m .M .mm .h .hh .h++ .hm .hpp .hxx .in .txx
+<!-- -->
+-- Build files have been written to: /Users/schwehr/Desktop/cmake-tut</pre>
+That's better - it is just missing the tutorial.cxx  Now I can go on to the C++ code that they have for an
+example, but I found two problems right away.  It's not good to use
+poor coding examples and the headers are not right.  I have submitted
+<a href="http://public.kitware.com/Bug/view.php?id=10949">a bug
+report</a> to the CMake Mantis tracker.
+<pre><tt><i><font color="#9A1900">// A simple program that computes the square root of a number</font></i>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;math.h&gt;</font>
+<font color="#009900">int</font> <b><font color="#000000">main</font></b> <font color="#990000">(</font><font color="#009900">int</font> argc<font color="#990000">,</font> <font color="#009900">char</font> <font color="#990000">*</font>argv<font color="#990000">[])</font>
+<font color="#FF0000">{</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>argc <font color="#990000">&lt;</font> <font color="#993399">2</font><font color="#990000">)</font>
+    <font color="#FF0000">{</font>
+    <b><font color="#000000">fprintf</font></b><font color="#990000">(</font>stdout<font color="#990000">,</font><font color="#FF0000">"Usage: %s number</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font>argv<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]);</font>
+    <b><font color="#0000FF">return</font></b> <font color="#993399">1</font><font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+  <font color="#009900">double</font> inputValue <font color="#990000">=</font> <b><font color="#000000">atof</font></b><font color="#990000">(</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]);</font>
+  <font color="#009900">double</font> outputValue <font color="#990000">=</font> <b><font color="#000000">sqrt</font></b><font color="#990000">(</font>inputValue<font color="#990000">);</font>
+  <b><font color="#000000">fprintf</font></b><font color="#990000">(</font>stdout<font color="#990000">,</font><font color="#FF0000">"The square root of %g is %g</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font>
+          inputValue<font color="#990000">,</font> outputValue<font color="#990000">);</font>
+  <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<font color="#FF0000">}</font></tt></pre>
+Now that I have a C++ file, I can run cmake successfully and attempt
+to build the program.  But it still is not working:
+<pre>make
+[100%] Building CXX object CMakeFiles/Tutorial.dir/tutorial.cxx.o
+/Users/schwehr/Desktop/cmake-tut/tutorial.cxx: In function int main(int, char**):
+/Users/schwehr/Desktop/cmake-tut/tutorial.cxx:11: error: atof was not declared in this scope
+make[2]: *** [CMakeFiles/Tutorial.dir/tutorial.cxx.o] Error 1
+make[1]: *** [CMakeFiles/Tutorial.dir/all] Error 2
+make: *** [all] Error 2</pre>
+I get the same error on a Ubuntu 10.04 box.  Adding cstdlib fixes this
+(and I converted the other 2 from C style includes to C++ style):
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;cstdlib&gt;</font> <i><font color="#9A1900">// Added this header for atof</font></i>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;cstdio&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;cmath&gt;</font></tt></pre>
+Then building it and running it works!
+<pre><b>make</b>
+[100%] Building CXX object CMakeFiles/Tutorial.dir/tutorial.cxx.o
+Linking CXX executable Tutorial
+[100%] Built target Tutorial
+<!-- -->
+<b>./Tutorial 1.2</b>
+The square root of 1.2 is 1.09545</pre>
+-----

@@ -1,0 +1,37 @@
+TITLE: local headers before or after the stdlib headers?
+AUTHOR: Kurt
+DATE: 08.25.2006 20:28
+DESC: local headers first?
+-----
+BODY:
+When writing C++ headers, I have always had the style of headers in this order:
+<ol>
+<li>C stdlib headers (e.g. #include &lt;cassert&gt;)</li>
+<li>C++ stdlib headers (e.g. #include &lt;iostream&gt;)</li>
+<li>External C libs (e.g. tiff)</li>
+<li>External C++ libs (e.g. boost or Inventor)</li>
+<li>Local headers (e.g. #include "myheader.h")</li>
+</ol>
+But after talking to Brian Locke, I am not questioning that policy.
+The goals of header order are 
+<ol>
+<li>Make sure that header dependencies are correct (don't hide things
+that are left out - aka use the compiler)</li>
+<li>Be consistant so it is easy to find headers</li>
+</ol>
+That makes me think that the local headers are first so that if that
+header uses, for example, the C++ string lib, then the header has
+&lt;string&gt;.  Also, classes that are referenced but not really used
+should be defined with just a "class foo;" forward which should
+definitely increase program performance.  After that, what should the
+order be?  I don't know.  How about his:
+<ol>
+<li>Local headers</li>
+<li>C stdlib headers</li>
+<li>C++ stdlib headers</li>
+<li>External C libs</li>
+<li>External C++ libs</li>
+</ol>
+I don't have Brian's code in front of me to see what he thought so
+look at a future blog post for what we finally settle on.
+-----

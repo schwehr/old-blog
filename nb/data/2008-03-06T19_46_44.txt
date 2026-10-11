@@ -1,0 +1,84 @@
+TITLE: Adding unix groups to mac osx 10.5 (Leopard)
+AUTHOR: Kurt
+DATE: 03.06.2008 19:46
+DESC: yuck
+-----
+BODY:
+This one was a bit hard to figure out.  It is definitely time to start
+working on a replacement for userutils on Mac OSX 10.5.  The niutils world
+from 10.4 and older (and the land of NeXT) is gone in Leopard.  Here is
+creating a group and removing it.  If you skip '-v' it won't spew quite 
+so much.
+
+Create a group:
+<pre>
+% <b>dseditgroup -v -o create newgroup</b>
+dseditgroup verbose mode
+Options selected by user:
+Create option selected
+Username determined to be <root>
+Groupname provided as <newgroup>
+.
+dsFindDirNodes using local node
+dsGetRecordList found no record
+dsDoAttributeValueSearch found no record
+Next free gid value determined and added
+GUID value created and added
+Group Record <newgroup> Created
+.
+Recordname <newgroup>
+5 attribute(s) found
+Attribute[1] is <dsAttrTypeStandard:PrimaryGroupID>
+        Value[1] is <500>
+Attribute[2] is <dsAttrTypeStandard:GeneratedUID>
+        Value[1] is <383A517F-3E6F-492E-A194-0983CF78C2E1>
+Attribute[3] is <dsAttrTypeStandard:RecordType>
+        Value[1] is <dsRecTypeStandard:Groups>
+Attribute[4] is <dsAttrTypeStandard:RecordName>
+        Value[1] is <newgroup>
+Attribute[5] is <dsAttrTypeStandard:AppleMetaNodeLocation>
+        Value[1] is </Local/Default>
+</pre>
+That is some verbose mode!  Now use the group:
+<pre>
+% <b>touch foo</b>
+% <b>chgrp newgroup foo</b>
+% <b>ls -l foo</b>
+-rw-r--r-- 1 root newgroup 0 Mar  6 19:27 foo
+</pre>
+That worked.  Time to get rid of this newgroup.
+<pre>
+% <b>dseditgroup -v -q -o delete newgroup</b>
+dseditgroup verbose mode
+Options selected by user:
+Delete option selected
+User verification is disabled
+Username determined to be <root>
+Groupname provided as <newgroup>
+.
+dsFindDirNodes using local node
+Group Record <newgroup> to be Deleted
+.
+Recordname <newgroup>
+5 attribute(s) found
+Attribute[1] is <dsAttrTypeStandard:RecordType>
+        Value[1] is <dsRecTypeStandard:Groups>
+Attribute[2] is <dsAttrTypeStandard:RecordName>
+        Value[1] is <newgroup>
+Attribute[3] is <dsAttrTypeStandard:GeneratedUID>
+        Value[1] is <383A517F-3E6F-492E-A194-0983CF78C2E1>
+Attribute[4] is <dsAttrTypeStandard:PrimaryGroupID>
+        Value[1] is <500>
+Attribute[5] is <dsAttrTypeStandard:AppleMetaNodeLocation>
+        Value[1] is </Local/Default>
+Record has been deleted
+.
+</pre>
+Double check that it really is gone:
+<pre> 
+% <b>ls -l foo</b>
+-rw-r--r-- 1 root 500 0 Mar  6 19:27 foo
+</pre>
+See Also: <a href="http://en.wikipedia.org/wiki/NetInfo_Manager">NetInfo Manager</a> in wikipedia.
+Despite the title, it has a lot on Leopard
+-----

@@ -1,0 +1,116 @@
+TITLE: django inspectdb
+AUTHOR: Kurt
+DATE: 02.07.2008 09:05
+DESC: first try that worked
+-----
+BODY:
+I just gave django's database inspection a try.  I spent a while
+chasing a strange error about trying to import settings.  But I 
+started over and this worked...
+<pre>
+% django-admin.py startproject mysite
+% cd mysite
+% python manage.py runserver
+</pre>
+Yup... it runs.  Now edit the setings.py:
+<pre>
+% grep DATA settings.py
+DATABASE_ENGINE = 'postgresql_psycopg2'
+DATABASE_NAME = 'ais'
+DATABASE_USER = ''
+DATABASE_PASSWORD = ''
+DATABASE_HOST = ''
+DATABASE_PORT = ''
+</pre>
+Now I am ready to do the inspection/code-generation:
+<pre>
+% python manage.py inspectdb > foo.py
+</pre>
+The resulting code looks like this:
+<pre>
+<strong>from</strong> <font color="#2040a0">django</font>.<font color="#2040a0">db</font> <strong>import</strong> <font color="#2040a0">models</font>
+<font color="orange">#</font>
+<strong>class</strong> <font color="#2040a0">Position</font><font color="4444FF">(</font><font color="#2040a0">models</font>.<font color="#2040a0">Model</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">key</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="#2040a0">primary_key</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">messageid</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">repeatindicator</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">userid</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">navigationstatus</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">rot</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">sog</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">FloatField</font><font color="4444FF">(</font><font color="#2040a0">max_digits</font><font color="4444FF">=</font><font color="#FF0000">4</font>, <font color="#2040a0">decimal_places</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+    <font color="#2040a0">positionaccuracy</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">cog</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">FloatField</font><font color="4444FF">(</font><font color="#2040a0">max_digits</font><font color="4444FF">=</font><font color="#FF0000">4</font>, <font color="#2040a0">decimal_places</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+    <font color="#2040a0">trueheading</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">timestamp</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">regionalreserved</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">spare</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">raim</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">BooleanField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">state_syncstate</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">state_slottimeout</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">state_slotoffset</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">cg_r</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">15</font><font color="4444FF">)</font>
+    <font color="#2040a0">cg_sec</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">cg_timestamp</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">DateTimeField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">position</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="orange"># This field type is a guess.</font>
+    <strong>class</strong> <font color="#2040a0">Meta</font><font color="4444FF">:</font>
+        <font color="#2040a0">db_table</font> <font color="4444FF">=</font> <font color="#008000">'position'</font>
+<font color="orange">#</font>
+<strong>class</strong> <font color="#2040a0">LastPosition</font><font color="4444FF">(</font><font color="#2040a0">models</font>.<font color="#2040a0">Model</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">key</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="#2040a0">primary_key</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+    <font color="#2040a0">userid</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">20</font><font color="4444FF">)</font>
+    <font color="#2040a0">cog</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">IntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">sog</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="orange"># This field type is a guess.</font>
+    <font color="#2040a0">cg_timestamp</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">DateTimeField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">position</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="orange"># This field type is a guess.</font>
+    <strong>class</strong> <font color="#2040a0">Meta</font><font color="4444FF">:</font>
+        <font color="#2040a0">db_table</font> <font color="4444FF">=</font> <font color="#008000">'last_position'</font>
+</pre>
+A couple thoughts on the output.  First, I would have expected to see
+the Decimal class being used for the SQL decimal types.  Maybe that is
+what lives behind the "models.FloatField". I am not surprised that it
+didn't get geometry columns.  I would only expect GeoDjango to get
+that.  I am a little surprised that it didn't figure out sog (speed
+over ground) in last_position:
+<pre>
+% psql ais
+ais=# \d last_position
+                                       Table "public.last_position"
+    Column    |            Type             |                          Modifiers                          
+============--+===========================--+============================================================
+ key          | integer                     | not null default nextval('last_position_key_seq'::regclass)
+ userid       | integer                     | 
+ name         | character varying(20)       | 
+ cog          | integer                     | 
+ <b>sog</b>          | <b>real</b>                        | 
+ cg_timestamp | timestamp without time zone | 
+ position     | geometry                    | 
+Indexes:
+    "last_position_pkey" PRIMARY KEY, btree ("key")
+Check constraints:
+    "enforce_dims_position" CHECK (ndims("position") = 2)
+    "enforce_geotype_position" CHECK (geometrytype("position") = 'POINT'::text OR "position" IS NULL)
+    "enforce_srid_position" CHECK (srid("position") = 4326)
+</pre>
+<b>NOTE:</b> If you name your django project the same as another other python
+module that is on your path, you will get a strange error like this as django
+tries to find the settings.py file from that other module.
+<pre>
+Traceback (most recent call last):
+  File "manage.py", line 11, in &lt;module&gt;
+    execute_manager(settings)
+  File "/sw/lib/python2.5/site-packages/django/core/management.py", line 1672, in execute_manager
+    execute_from_command_line(action_mapping, argv)
+  File "/sw/lib/python2.5/site-packages/django/core/management.py", line 1563, in execute_from_command_line
+    from django.utils import translation
+  File "/sw/lib/python2.5/site-packages/django/utils/translation/__init__.py", line 3, in <module>
+    if settings.USE_I18N:
+  File "/sw/lib/python2.5/site-packages/django/conf/__init__.py", line 28, in __getattr__
+    self._import_settings()
+  File "/sw/lib/python2.5/site-packages/django/conf/__init__.py", line 55, in _import_settings
+    self._target = Settings(settings_module)
+  File "/sw/lib/python2.5/site-packages/django/conf/__init__.py", line 83, in __init__
+    raise EnvironmentError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
+EnvironmentError: Could not import settings 'ais.settings' (Is it on sys.path? Does it have syntax errors?): No module named settings
+</pre>
+-----

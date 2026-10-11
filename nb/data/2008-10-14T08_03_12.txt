@@ -1,0 +1,93 @@
+TITLE: Parsing RMC NMEA position message with a regular expression (regex)
+AUTHOR: Kurt
+DATE: 10.14.2008 08:03
+DESC: someday I'll use this code
+-----
+BODY:
+<b>Update 2008-11-21:</b> you can also use the groupdict() method on
+a match to get back a dictionary of the groups.
+
+Yesterday, I ended up doing a bunch of work that ended up not being
+necessary.  Time to toss this code in the rainy day fund.  The SR162g
+AIS receiver spits out GPS RMC position messages.  Here is my python
+regex code that I created to parse it.  It's easy enough to use split
+and string slicing to get all the parse, but I'd guess that the regex
+will be faster and is definitely more compact.  Plus writing
+complicated regex'es is not too bad with the help of <a
+href="http://kodos.sourceforge.net/">kodos</a>.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<i><font color="#9A1900">#</font></i>
+<b><font color="#000080">import</font></b> re
+<i><font color="#9A1900">#</font></i>
+rawstr <font color="#990000">=</font> r<font color="#FF0000">'''^[$!](?P&lt;prefix&gt;[A-Z][A-Z])(?P&lt;msg_type&gt;RMC)</font>
+<font color="#FF0000">,(?P&lt;hour&gt;\d\d)(?P&lt;minute&gt;\d\d)(?P&lt;second&gt;\d\d\.\d\d)</font>
+<font color="#FF0000">,(?P&lt;status&gt;[A-Z])</font>
+<font color="#FF0000">,(?P&lt;latitude&gt;(?P&lt;lat_deg&gt;\d\d)(?P&lt;lat_min&gt;\d\d*.\d*))</font>
+<font color="#FF0000">,(?P&lt;north_south&gt;[NS])</font>
+<font color="#FF0000">,(?P&lt;longitude&gt;(?P&lt;lon_deg&gt;\d\d\d)(?P&lt;lon_min&gt;\d\d.\d*))</font>
+<font color="#FF0000">,(?P&lt;east_west&gt;[EW])</font>
+<font color="#FF0000">,(?P&lt;speed_knots&gt;\d*.\d*)</font>
+<font color="#FF0000">,(?P&lt;course_degrees&gt;\d*.\d*)</font>
+<font color="#FF0000">,(?P&lt;day&gt;\d\d)(?P&lt;month&gt;\d\d)(?P&lt;year&gt;\d\d)</font>
+<font color="#FF0000">,(?P&lt;magnetic_variation_degrees&gt;\d*.\d*)</font>
+<font color="#FF0000">,(?P&lt;mag_var_east_west&gt;[EW])</font>
+<font color="#FF0000">(,(?P&lt;mode&gt;[ADE]))?</font>
+<font color="#FF0000">(?P&lt;checksum&gt;[*][0-9A-F][0-9A-F])'''</font>
+<i><font color="#9A1900">#</font></i>
+matchstr <font color="#990000">=</font> <font color="#FF0000">'$GPRMC,121437.60,A,4212.0258,N,07040.9543,W,18.08,94.6,011008,15.1,W,A*34,rrvauk-sr162g,1222863277.98'</font>
+<i><font color="#9A1900">#</font></i>
+compile_obj <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>rawstr<font color="#990000">,</font>  re<font color="#990000">.</font>VERBOSE<font color="#990000">)</font>
+match_obj <font color="#990000">=</font> compile_obj<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>matchstr<font color="#990000">)</font>
+<i><font color="#9A1900">#</font></i>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'prefix     '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'prefix'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'msg_type   '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'msg_type'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'hour       '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'hour'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'minute     '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'minute'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'second     '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'second'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'status     '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'status'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'latitude   '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'latitude'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'lat_deg    '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'lat_deg'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'lat_min    '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'lat_min'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'north_south'</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'north_south'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'longitude  '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'longitude'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'lon_deg    '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'lon_deg'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'lon_min    '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'lon_min'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'east_west  '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'east_west'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'speed_knots'</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'speed_knots'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'course_degrees'</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'course_degrees'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'day        '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'day'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'month      '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'month'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'year       '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'year'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'magnetic_variation_degrees'</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'magnetic_variation_degrees'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'mag_var_east_west'</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'mag_var_east_west'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'mode       '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'mode'</font><font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'checksum   '</font><font color="#990000">,</font> match_obj<font color="#990000">.</font><b><font color="#000000">group</font></b><font color="#990000">(</font><font color="#FF0000">'checksum'</font><font color="#990000">)</font>
+</tt></pre>
+When run, it does this:
+<pre>./gps_re.py 
+prefix      GP
+msg_type    RMC
+hour        12
+minute      14
+second      37.60
+status      A
+latitude    4212.0258
+lat_deg     42
+lat_min     12.0258
+north_south N
+longitude   07040.9543
+lon_deg     070
+lon_min     40.9543
+east_west   W
+speed_knots 18.08
+course_degrees 94.6
+day         01
+month       10
+year        08
+magnetic_variation_degrees 15.1
+mag_var_east_west W
+mode        A
+checksum    *34</pre>
+If I had a bit more time, I'd pull out an IGRF program an verify the 15.1
+degrees of magnetic field declination offset.
+-----

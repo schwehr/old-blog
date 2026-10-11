@@ -1,0 +1,30 @@
+TITLE: Making a typo in the mac /etc/rc startup file
+AUTHOR: Kurt
+DATE: 07.25.2007 15:24
+DESC: whew!
+-----
+BODY:
+I just had the pleasure of finding out what happens when you make a
+typo while editing /etc/rc on the mac.  I increase the shared memory
+buffer on a mac workstation at JPL before running postgreSQL and on
+reboot I got a black screen with a "root%" prompt.  Oops!  However vi
+and emacs both still worked.  I found that I had accidentally
+capitalized the "if" following the sysctl.  I found the bug by typing
+". /etc/rc".
+
+With help from dmacks, I now know where to find the descriptions for
+what these shared memory parameters mean:
+<pre>
+grep SHM /usr/include/sys/sysctl.h 
+#define KSYSV_SHMMAX   1    /* int: max shared memory segment size (bytes) */
+#define KSYSV_SHMMIN   2    /* int: min shared memory segment size (bytes) */
+#define KSYSV_SHMMNI   3    /* int: max number of shared memory identifiers */
+#define KSYSV_SHMSEG   4    /* int: max shared memory segments per process */
+#define KSYSV_SHMALL   5    /* int: max amount of shared memory (pages) */
+</pre>
+The correct method is to edit the sysctl.conf file, but I have not looked up
+the syntax yet.
+
+Now it is back to work duplicating a database on a local machine for
+testing qgis and ossim planet.
+-----

@@ -1,0 +1,31 @@
+TITLE: Color in LaTeX
+AUTHOR: Kurt
+DATE: 08.08.2005 08:24
+DESC: works
+-----
+BODY:
+I saw a posting on the TeX news group this morning about color and
+came up with a working example of colorizing text using the color
+package.  Only colors defined in the color.sty will work.  Use 
+<pre>grep definecolor /sw/share/texmf-dist/tex/latex/graphics/color.sty</pre>
+to get the list of supported colors.  Just do "pdflatex color.tex;
+open color.pdf" to see the example:
+<pre>\documentclass[9pt,letterpaper ]{article} 
+\usepackage[usenames]{color} 
+\begin{document} 
+
+ grep definecolor /sw/share/texmf-dist/tex/latex/graphics/color.sty
+
+{\color{red}foo}  % ok 
+%{\color{orange}foo}  % breaks 
+  {\color{white}white} (that was white)
+  {\color{black}black}
+  {\color{red}red}
+  {\color{green}green}
+  {\color{blue}blue}
+  {\color{cyan}cyan}
+  {\color{magenta}magenta}
+  {\color{yellow}yellow}
+
+\end{document}</pre>
+-----

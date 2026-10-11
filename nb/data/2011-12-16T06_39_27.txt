@@ -1,0 +1,215 @@
+TITLE: Using Yolk to build fink packages
+AUTHOR: Kurt
+DATE: 12.16.2011 06:39
+DESC: right way?
+-----
+BODY:
+I've had the idea of using pypi as the raw source to create a starter
+fink package info file or to help with the update process.  I finally
+took a couple minutes to give it a go based on the <a
+href="http://pypi.python.org/pypi/yolk">Yolk</a> python package.  I
+got a proof of concept done, but I'm not sure that I am on the right
+track.  I posted a ticket with the Yolk developer, <a
+href="http://blog.cakebread.info/">Rob Cakebread</a> asking for
+examples of how he thinks the yolk API should be used:
+
+<a href="https://github.com/cakebread/yolk/issues/2">https://github.com/cakebread/yolk/issues/2</a>
+
+In looking around, I realized that perhaps yolk isn't the best platform for
+this.  Rob points to <a href="http://code.google.com/p/g-pypi/">g-pypi</a>:
+<pre>g-pypi creates ebuilds for Gentoo Linux using information in PyPI
+(Python Package Index).</pre>
+That is exactly what I am trying to do for fink and it was a 2010 Google
+Summer of Code project.  Looking into g-pypi, I realized that the code is 
+also based on yolk and by Rob, so yolk looks to be the way to go.  The
+one thing that I was bummed to see is that he is using the Cheetah templating
+library rather than python's str ".format" method.
+
+I got a bunch turned around in my initial inspection of yolk, but
+after a bit here is what I came up with for two examples.  First with
+SQLAlchemy:
+<pre><tt><b><font color="#000080">import</font></b> yolk<font color="#990000">.</font>pypi as pypi
+cs <font color="#990000">=</font> pypi<font color="#990000">.</font><b><font color="#000000">CheeseShop</font></b><font color="#990000">()</font>
+<!-- -->
+cs<font color="#990000">.</font><b><font color="#000000">package_releases</font></b><font color="#990000">(</font><font color="#FF0000">'SQLAlchemy'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># ['0.7.4']</font></i>
+cs<font color="#990000">.</font><b><font color="#000000">query_versions_pypi</font></b><font color="#990000">(</font><font color="#FF0000">'SQLAlchemy'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># ('SQLAlchemy', ['0.7.4'])</font></i>
+sa_rd <font color="#990000">=</font> cs<font color="#990000">.</font><b><font color="#000000">release_data</font></b><font color="#990000">(</font><font color="#FF0000">'SQLAlchemy'</font><font color="#990000">,</font><font color="#FF0000">'0.7.4'</font><font color="#990000">)</font>
+<!-- -->
+sa_ru <font color="#990000">=</font> cs<font color="#990000">.</font><b><font color="#000000">release_urls</font></b><font color="#990000">(</font><font color="#FF0000">'SQLAlchemy'</font><font color="#990000">,</font><font color="#FF0000">'0.7.4'</font><font color="#990000">)</font>
+sa_ru<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#FF0000">'md5_digest'</font><font color="#990000">]</font>
+<i><font color="#9A1900"># '731dbd55ec9011437a842d781417eae7'</font></i>
+sa_ru<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#FF0000">'url'</font><font color="#990000">]</font></tt></pre>
+The results of the release_urls call consists of just one entry:
+<pre><tt><font color="#990000">[{</font><font color="#FF0000">'comment_text'</font><font color="#990000">:</font> <font color="#FF0000">''</font><font color="#990000">,</font>
+  <font color="#FF0000">'downloads'</font><font color="#990000">:</font> <font color="#993399">4525</font><font color="#990000">,</font>
+  <font color="#FF0000">'filename'</font><font color="#990000">:</font> <font color="#FF0000">'SQLAlchemy-0.7.4.tar.gz'</font><font color="#990000">,</font>
+  <font color="#FF0000">'has_sig'</font><font color="#990000">:</font> False<font color="#990000">,</font>
+  <font color="#FF0000">'md5_digest'</font><font color="#990000">:</font> <font color="#FF0000">'731dbd55ec9011437a842d781417eae7'</font><font color="#990000">,</font>
+  <font color="#FF0000">'packagetype'</font><font color="#990000">:</font> <font color="#FF0000">'sdist'</font><font color="#990000">,</font>
+  <font color="#FF0000">'python_version'</font><font color="#990000">:</font> <font color="#FF0000">'source'</font><font color="#990000">,</font>
+  <font color="#FF0000">'size'</font><font color="#990000">:</font> <font color="#993399">2514647</font><font color="#990000">,</font>
+  <font color="#FF0000">'upload_time'</font><font color="#990000">:</font> <font color="#990000">&lt;</font>DateTime <font color="#FF0000">'20111209T23:31:43'</font> at 10fb28128<font color="#990000">&gt;,</font>
+  <font color="#FF0000">'url'</font><font color="#990000">:</font> <font color="#FF0000">'http://pypi.python.org/packages/source/S/SQLAlchemy/SQLAlchemy-0.7.4.tar.gz'</font><font color="#990000">}]</font></tt></pre>
+SQLObject gives more complicated responses:
+<pre><tt><b><font color="#000080">import</font></b> yolk<font color="#990000">.</font>pypi as pypi
+cs <font color="#990000">=</font> pypi<font color="#990000">.</font><b><font color="#000000">CheeseShop</font></b><font color="#990000">()</font>
+<!-- -->
+cs<font color="#990000">.</font><b><font color="#000000">package_releases</font></b><font color="#990000">(</font><font color="#FF0000">'SQLObject'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># ['1.2.1', '1.1.4']</font></i>
+cs<font color="#990000">.</font><b><font color="#000000">query_versions_pypi</font></b><font color="#990000">(</font><font color="#FF0000">'SQLObject'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># ('SQLObject', ['1.2.1', '1.1.4'])</font></i>
+<!-- -->
+cs<font color="#990000">.</font><b><font color="#000000">get_download_urls</font></b><font color="#990000">(</font><font color="#FF0000">'SQLObject'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># ['http://pypi.python.org/packages/2.4/S/SQLObject/SQLObject-1.2.1-py2.4.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/2.5/S/SQLObject/SQLObject-1.2.1-py2.5.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/2.6/S/SQLObject/SQLObject-1.2.1-py2.6.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/2.7/S/SQLObject/SQLObject-1.2.1-py2.7.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/source/S/SQLObject/SQLObject-1.2.1.tar.gz',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/2.4/S/SQLObject/SQLObject-1.1.4-py2.4.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/2.5/S/SQLObject/SQLObject-1.1.4-py2.5.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/2.6/S/SQLObject/SQLObject-1.1.4-py2.6.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/2.7/S/SQLObject/SQLObject-1.1.4-py2.7.egg',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/source/S/SQLObject/SQLObject-1.1.4.tar.gz']</font></i>
+<!-- -->
+cs<font color="#990000">.</font><b><font color="#000000">get_download_urls</font></b><font color="#990000">(</font><font color="#FF0000">'SQLObject'</font><font color="#990000">,</font>pkg_type<font color="#990000">=</font><font color="#FF0000">'source'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># ['http://pypi.python.org/packages/source/S/SQLObject/SQLObject-1.2.1.tar.gz',</font></i>
+<i><font color="#9A1900">#  'http://pypi.python.org/packages/source/S/SQLObject/SQLObject-1.1.4.tar.gz']</font></i>
+<!-- -->
+cs<font color="#990000">.</font><b><font color="#000000">get_download_urls</font></b><font color="#990000">(</font><font color="#FF0000">'SQLObject'</font><font color="#990000">,</font>version<font color="#990000">=</font><font color="#FF0000">'1.2.1'</font><font color="#990000">,</font> pkg_type<font color="#990000">=</font><font color="#FF0000">'source'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># ['http://pypi.python.org/packages/source/S/SQLObject/SQLObject-1.2.1.tar.gz']</font></i>
+<!-- -->
+so_rd <font color="#990000">=</font> cs<font color="#990000">.</font><b><font color="#000000">release_data</font></b><font color="#990000">(</font><font color="#FF0000">'SQLObject'</font><font color="#990000">,</font><font color="#FF0000">'1.2.1'</font><font color="#990000">)</font>
+so_rd<font color="#990000">[</font><font color="#FF0000">'download_url'</font><font color="#990000">]</font>
+<i><font color="#9A1900"># 'http://pypi.python.org/pypi/SQLObject/1.2.1'</font></i>
+<!-- -->
+so_ru <font color="#990000">=</font> cs<font color="#990000">.</font><b><font color="#000000">release_urls</font></b><font color="#990000">(</font><font color="#FF0000">'SQLObject'</font><font color="#990000">,</font><font color="#FF0000">'1.2.1'</font><font color="#990000">)</font></tt></pre>
+And the release_urls for just one version contains both source and egg
+file archives.
+<pre><tt><font color="#990000">[{</font><font color="#FF0000">'comment_text'</font><font color="#990000">:</font> <font color="#FF0000">''</font><font color="#990000">,</font>
+  <font color="#FF0000">'downloads'</font><font color="#990000">:</font> <font color="#993399">76</font><font color="#990000">,</font>
+  <font color="#FF0000">'filename'</font><font color="#990000">:</font> <font color="#FF0000">'SQLObject-1.2.1-py2.4.egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'has_sig'</font><font color="#990000">:</font> False<font color="#990000">,</font>
+  <font color="#FF0000">'md5_digest'</font><font color="#990000">:</font> <font color="#FF0000">'42bd3bcfd5406305f58df98af9b7ced8'</font><font color="#990000">,</font>
+  <font color="#FF0000">'packagetype'</font><font color="#990000">:</font> <font color="#FF0000">'bdist_egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'python_version'</font><font color="#990000">:</font> <font color="#FF0000">'2.4'</font><font color="#990000">,</font>
+  <font color="#FF0000">'size'</font><font color="#990000">:</font> <font color="#993399">354432</font><font color="#990000">,</font>
+  <font color="#FF0000">'upload_time'</font><font color="#990000">:</font> <font color="#990000">&lt;</font>DateTime <font color="#FF0000">'20111204T15:33:09'</font> at 10fb85518<font color="#990000">&gt;,</font>
+  <font color="#FF0000">'url'</font><font color="#990000">:</font> <font color="#FF0000">'http://pypi.python.org/packages/2.4/S/SQLObject/SQLObject-1.2.1-py2.4.egg'</font><font color="#990000">},</font>
+ <font color="#990000">{</font><font color="#FF0000">'comment_text'</font><font color="#990000">:</font> <font color="#FF0000">''</font><font color="#990000">,</font>
+  <font color="#FF0000">'downloads'</font><font color="#990000">:</font> <font color="#993399">62</font><font color="#990000">,</font>
+  <font color="#FF0000">'filename'</font><font color="#990000">:</font> <font color="#FF0000">'SQLObject-1.2.1-py2.5.egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'has_sig'</font><font color="#990000">:</font> False<font color="#990000">,</font>
+  <font color="#FF0000">'md5_digest'</font><font color="#990000">:</font> <font color="#FF0000">'0303afd1580b6345a88baad91a3a701d'</font><font color="#990000">,</font>
+  <font color="#FF0000">'packagetype'</font><font color="#990000">:</font> <font color="#FF0000">'bdist_egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'python_version'</font><font color="#990000">:</font> <font color="#FF0000">'2.5'</font><font color="#990000">,</font>
+  <font color="#FF0000">'size'</font><font color="#990000">:</font> <font color="#993399">350388</font><font color="#990000">,</font>
+  <font color="#FF0000">'upload_time'</font><font color="#990000">:</font> <font color="#990000">&lt;</font>DateTime <font color="#FF0000">'20111204T15:33:11'</font> at 10fb85050<font color="#990000">&gt;,</font>
+  <font color="#FF0000">'url'</font><font color="#990000">:</font> <font color="#FF0000">'http://pypi.python.org/packages/2.5/S/SQLObject/SQLObject-1.2.1-py2.5.egg'</font><font color="#990000">},</font>
+ <font color="#990000">{</font><font color="#FF0000">'comment_text'</font><font color="#990000">:</font> <font color="#FF0000">''</font><font color="#990000">,</font>
+  <font color="#FF0000">'downloads'</font><font color="#990000">:</font> <font color="#993399">129</font><font color="#990000">,</font>
+  <font color="#FF0000">'filename'</font><font color="#990000">:</font> <font color="#FF0000">'SQLObject-1.2.1-py2.6.egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'has_sig'</font><font color="#990000">:</font> False<font color="#990000">,</font>
+  <font color="#FF0000">'md5_digest'</font><font color="#990000">:</font> <font color="#FF0000">'df4bfd367a141c6c093766e25dea68f3'</font><font color="#990000">,</font>
+  <font color="#FF0000">'packagetype'</font><font color="#990000">:</font> <font color="#FF0000">'bdist_egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'python_version'</font><font color="#990000">:</font> <font color="#FF0000">'2.6'</font><font color="#990000">,</font>
+  <font color="#FF0000">'size'</font><font color="#990000">:</font> <font color="#993399">349829</font><font color="#990000">,</font>
+  <font color="#FF0000">'upload_time'</font><font color="#990000">:</font> <font color="#990000">&lt;</font>DateTime <font color="#FF0000">'20111204T15:33:13'</font> at 10fb85248<font color="#990000">&gt;,</font>
+  <font color="#FF0000">'url'</font><font color="#990000">:</font> <font color="#FF0000">'http://pypi.python.org/packages/2.6/S/SQLObject/SQLObject-1.2.1-py2.6.egg'</font><font color="#990000">},</font>
+ <font color="#990000">{</font><font color="#FF0000">'comment_text'</font><font color="#990000">:</font> <font color="#FF0000">''</font><font color="#990000">,</font>
+  <font color="#FF0000">'downloads'</font><font color="#990000">:</font> <font color="#993399">174</font><font color="#990000">,</font>
+  <font color="#FF0000">'filename'</font><font color="#990000">:</font> <font color="#FF0000">'SQLObject-1.2.1-py2.7.egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'has_sig'</font><font color="#990000">:</font> False<font color="#990000">,</font>
+  <font color="#FF0000">'md5_digest'</font><font color="#990000">:</font> <font color="#FF0000">'0c3df5991f680a7d7ec0aab2c898a945'</font><font color="#990000">,</font>
+  <font color="#FF0000">'packagetype'</font><font color="#990000">:</font> <font color="#FF0000">'bdist_egg'</font><font color="#990000">,</font>
+  <font color="#FF0000">'python_version'</font><font color="#990000">:</font> <font color="#FF0000">'2.7'</font><font color="#990000">,</font>
+  <font color="#FF0000">'size'</font><font color="#990000">:</font> <font color="#993399">348455</font><font color="#990000">,</font>
+  <font color="#FF0000">'upload_time'</font><font color="#990000">:</font> <font color="#990000">&lt;</font>DateTime <font color="#FF0000">'20111204T15:33:16'</font> at 10fb85908<font color="#990000">&gt;,</font>
+  <font color="#FF0000">'url'</font><font color="#990000">:</font> <font color="#FF0000">'http://pypi.python.org/packages/2.7/S/SQLObject/SQLObject-1.2.1-py2.7.egg'</font><font color="#990000">},</font>
+ <font color="#990000">{</font><font color="#FF0000">'comment_text'</font><font color="#990000">:</font> <font color="#FF0000">''</font><font color="#990000">,</font>
+  <font color="#FF0000">'downloads'</font><font color="#990000">:</font> <font color="#993399">202</font><font color="#990000">,</font>
+  <font color="#FF0000">'filename'</font><font color="#990000">:</font> <font color="#FF0000">'SQLObject-1.2.1.tar.gz'</font><font color="#990000">,</font>
+  <font color="#FF0000">'has_sig'</font><font color="#990000">:</font> False<font color="#990000">,</font>
+  <font color="#FF0000">'md5_digest'</font><font color="#990000">:</font> <font color="#FF0000">'a01cfd19da6f19ecaf79c2eed88c3dc3'</font><font color="#990000">,</font>
+  <font color="#FF0000">'packagetype'</font><font color="#990000">:</font> <font color="#FF0000">'sdist'</font><font color="#990000">,</font>
+  <font color="#FF0000">'python_version'</font><font color="#990000">:</font> <font color="#FF0000">'source'</font><font color="#990000">,</font>
+  <font color="#FF0000">'size'</font><font color="#990000">:</font> <font color="#993399">259127</font><font color="#990000">,</font>
+  <font color="#FF0000">'upload_time'</font><font color="#990000">:</font> <font color="#990000">&lt;</font>DateTime <font color="#FF0000">'20111204T15:33:07'</font> at 10fb85a70<font color="#990000">&gt;,</font>
+  <font color="#FF0000">'url'</font><font color="#990000">:</font> <font color="#FF0000">'http://pypi.python.org/packages/source/S/SQLObject/SQLObject-1.2.1.tar.gz'</font><font color="#990000">}]</font></tt></pre>
+That gave me enough to knock out the proof of concept.  There needs to
+be huge amounts of fine tuning to make this a truly useful tool.  For example,
+I need to be able to detect all the binaries that are installed and create
+the update_alternatives entries.  The initial code:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> yolk<font color="#990000">.</font>pypi <b><font color="#000080">import</font></b> CheeseShop
+<!-- -->
+template <font color="#990000">=</font><font color="#FF0000"> '''Info3: &lt;&lt;</font>
+<font color="#FF0000">Package: {fink_name}%type_pkg[python]</font>
+<font color="#FF0000">Version: {version}</font>
+<font color="#FF0000">Revision: {revision}</font>
+<font color="#FF0000">Source: {url}</font>
+<font color="#FF0000">Source-MD5: {md5}</font>
+<font color="#FF0000">Type: python ({types})</font>
+<font color="#FF0000">Depends: python%type_pkg[python]</font>
+<font color="#FF0000">BuildDepends: distribute-py%type_pkg[python]</font>
+<font color="#FF0000">CompileScript: true</font>
+<font color="#FF0000">InstallScript: %p/bin/python%type_raw[python] setup.py install --root=%d --single-version-externally-managed</font>
+<font color="#FF0000">License: OSI-Approved</font>
+<font color="#FF0000">Homepage: </font>
+<font color="#FF0000">Maintainer: Kurt Schwehr &lt;goatbar@users.sourceforge.net&gt;</font>
+<font color="#FF0000">Description: </font>
+<font color="#FF0000">DescDetail: &lt;&lt;</font>
+<font color="#FF0000">&lt;&lt;</font>
+<font color="#FF0000"># Info3</font>
+<font color="#FF0000">&lt;&lt;</font>
+<font color="#FF0000">'''</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">pypi_to_fink</font></b><font color="#990000">(</font>package_name<font color="#990000">):</font>
+    cs <font color="#990000">=</font> <b><font color="#000000">CheeseShop</font></b><font color="#990000">()</font>
+    release <font color="#990000">=</font> cs<font color="#990000">.</font><b><font color="#000000">package_releases</font></b><font color="#990000">(</font>package_name<font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">]</font> <i><font color="#9A1900"># Hope that highest is first</font></i>
+    <i><font color="#9A1900">#</font></i>
+    <i><font color="#9A1900"># FIX: make a function that pulls the first sdist</font></i>
+    <i><font color="#9A1900"># Possibly prioritize by tar.bz2 -&gt; tar.gz -&gt; zip</font></i>
+    url <font color="#990000">=</font> cs<font color="#990000">.</font><b><font color="#000000">release_urls</font></b><font color="#990000">(</font>package_name<font color="#990000">,</font>release<font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">]</font>
+    fink <font color="#990000">=</font> <font color="#990000">{}</font>
+    fink<font color="#990000">[</font><font color="#FF0000">'name'</font><font color="#990000">]</font> <font color="#990000">=</font> package_name<font color="#990000">.</font><b><font color="#000000">lower</font></b><font color="#990000">()</font>
+    fink<font color="#990000">[</font><font color="#FF0000">'fink_name'</font><font color="#990000">]</font> <font color="#990000">=</font> fink<font color="#990000">[</font><font color="#FF0000">'name'</font><font color="#990000">]+</font><font color="#FF0000">'-py'</font>
+    fink<font color="#990000">[</font><font color="#FF0000">'version'</font><font color="#990000">]</font> <font color="#990000">=</font> release
+    fink<font color="#990000">[</font><font color="#FF0000">'revision'</font><font color="#990000">]</font> <font color="#990000">=</font> <font color="#993399">1</font>
+    <i><font color="#9A1900"># FIX: remove the package name if need be from the URL</font></i>
+    fink<font color="#990000">[</font><font color="#FF0000">'url'</font><font color="#990000">]</font> <font color="#990000">=</font> url<font color="#990000">[</font><font color="#FF0000">'url'</font><font color="#990000">]</font>
+    fink<font color="#990000">[</font><font color="#FF0000">'md5'</font><font color="#990000">]</font> <font color="#990000">=</font> url<font color="#990000">[</font><font color="#FF0000">'md5_digest'</font><font color="#990000">]</font>
+    py_types <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'2.7'</font><font color="#990000">,</font> <font color="#FF0000">'3.2'</font><font color="#990000">]</font> <i><font color="#9A1900"># FIX: figure this out</font></i>
+    fink<font color="#990000">[</font><font color="#FF0000">'types'</font><font color="#990000">]</font> <font color="#990000">=</font> <font color="#FF0000">' '</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>py_types<font color="#990000">)</font>
+    <b><font color="#0000FF">return</font></b> template<font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font>fink<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    <b><font color="#000080">import</font></b> sys
+    <b><font color="#0000FF">print</font></b> <b><font color="#000000">pypi_to_fink</font></b><font color="#990000">(</font>sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">])</font></tt></pre>
+Here is using it for SQLAlchemy:
+<pre><tt><b>./pypi_to_fink.py SQLAlchemy</b>
+Info3: &lt;&lt;
+Package: sqlalchemy-py%type_pkg[python]
+Version: 0.7.4
+Revision: 1
+Source: http://pypi.python.org/packages/source/S/SQLAlchemy/SQLAlchemy-0.7.4.tar.gz
+Source-MD5: 731dbd55ec9011437a842d781417eae7
+Type: python (2.7 3.2)
+Depends: python%type_pkg[python]
+BuildDepends: distribute-py%type_pkg[python]
+CompileScript: true
+InstallScript: %p/bin/python%type_raw[python] setup.py install --root=%d --single-version-externally-managed
+License: OSI-Approved
+Homepage: 
+Maintainer: 
+Description: 
+DescDetail: &lt;&lt;
+&lt;&lt;
+# Info3
+&lt;&lt;</tt></pre>
+That is not the best info package for fink on the planet, but it's a
+great start.  If I want to keep participating with fink, I need to get
+smarter about testing and automation.
+-----

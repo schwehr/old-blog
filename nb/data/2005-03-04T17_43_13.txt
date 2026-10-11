@@ -1,0 +1,54 @@
+TITLE: busy day
+AUTHOR: Kurt
+DATE: 03.04.2005 17:43
+DESC: k15 magic, RAW vrs tiff
+-----
+BODY:
+I saw the PNG cores today as almost the whole crew was up at the core
+locker processing.  Interesting to see how others go about it.  Also,
+was talking to Dingler about digital cameras since Warren showed some
+really awesome digital core photos. Woo hoo!  I am still totally
+confused about why RAW images would be any better than say a 16-bit
+per channel lossless tiff.  It would be easy to store just raw dn
+levels in the tiff plus add tags or sub images for all the camera data
+and even bad pixels / dark frame for correction later on.  Someone
+please set me strait!
+
+Yesterday, I talked to Lisa about MagIC for AMS/K15 kappabridge
+lowfield data.  I am starting to come up with an idea for what I think
+the python API should be.  However, I am starting to question the idea
+of the intermediate magic text files.  It does not hurt to also be
+able to read and write them, but use them?  I can just make an sqlite
+database and we could bridge over to the official magic db when you
+submit.  No worrying about delimiters etc... parsing is pretty much a
+non issue except that many fields are a check of text with many
+subfields separated by ":".  That could be a little interesting.
+Anyways, here are my initial thoughts on APIs:
+
+<pre>
+class K15file:
+    open(filename,"rw")
+    close()
+    eof()  """Are we at the end?"""
+    getNextK15() """Return a K15 class filled in with next value"""
+    appendK15(k15record) """Add an ams measurement to end of the file"""
+    writeMagic(filename) """Write out the k15 file to the magic format"""
+    # for writeMagic, might want 2 file names, one for samples, one
+    # for other params
+    # Do we need a class for all the other fields that go along?
+    # maybe just keep it simple and this writes the samples file?
+
+class K15:
+    setFrom4Lines(str1,str2,str3,str4)
+    setFrom1Line()
+    setFromDatabase(cx,samplename)
+    set(samplename, yadayada, susceptabilities[15])
+    addToDB(cx)
+    getHext() """Return a hext class"""
+    getS() """ Return a list of 7 values """
+    getParamter(paramName) """returns F,L,P', etc"""
+</pre>
+
+I have also been thinking about a wrapper around the database so that
+if I change the backed database, then I am ok.
+-----

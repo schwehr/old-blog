@@ -1,0 +1,65 @@
+TITLE: Plotting both the raw and flattened hysteresis
+AUTHOR: Kurt
+DATE: 10.20.2005 19:11
+DESC: agfm.py improvements
+-----
+BODY:
+I wanted to be able to plot both the raw AGFM and slope corrected
+plots on the same graph.  The slope of the raw AGFM is related to the
+high field susceptibility and the flattened is what people are used to
+seeing.  In a future post, I will hopefully explain how to get the
+normalized high field susceptibility (k(hf) or Chi_hf... need
+MathML!).
+
+agfm.py is becoming a beast/garbage can.  It now has --save-si in
+addition to --save-flattened-si.  The --save-si saves the raw data in
+a gnuplot style ASCII format.  There are some '#' comments at the top
+with AGFM header values and others that give the units.  Then the data
+is space delimited columns.  Hopefully that should be easy for others
+to parse.  Here is how I generated the files to plot:
+<pre>
+  agfm.py -d .2 --save-si --save-flattened-si bp04-1gw-s2-026c.raw 
+</pre>
+Then I use gnuplot to see the results:
+<pre>
+  set xlabel 'mT'
+  set ylabel 'Am^2'
+  plot 'bp04-1gw-s2-026c.raw.flat.si' with l, \
+    'bp04-1gw-s2-026c.raw.si' with l
+</pre>
+Which results in a plot like this:
+<img src="http://schwehr.org/blog/attachments/2005-10/agfm-si-flat-and-notflag.gif">
+Finally, here is a little bash script that does the whole deal.  It
+uses Lisa's hystcrunch that is in her pmag package.  You should verify
+for yourself that the units and results are the same (or at least
+within fit error).  Then it uses agfm.py to produce gnuplot files.
+Finally, I just noticed that <b>gnuplot has svg output</b>.  Woo hoo!
+It is about time.  I tried it and it imports into Adobe Illustrator
+without the problems that come with the pdf terminal.  Yes, I am very
+excited.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+for file in *.raw; do
+    echo
+    echo <font color="#008000">&quot;======== <font color="#2040a0">$file</font> =======&quot;</font>
+    agfm.py --save-flattened --save-si --save-flattened-si --agfm-format -d .2 <font color="#2040a0">$file</font> 
+    ls <font color="#2040a0">$file</font> <font color="#2040a0">$file</font>.flat
+    hystcrunch -mal <font color="#2040a0">$file</font>      &lt; <font color="#2040a0">$file</font>      | plotxy; mv mypost <font color="#2040a0">$file</font>.ps     ; ps2pdf <font color="#2040a0">$file</font>.ps
+    hystcrunch -mal <font color="#2040a0">$file</font>.flat &lt; <font color="#2040a0">$file</font>.flat | plotxy; mv mypost <font color="#2040a0">$file</font>.flat.ps; ps2pdf <font color="#2040a0">$file</font>.flat.ps
+    cat &lt;&lt; EOF | gnuplot <font color="brown">
+set xlabel 'mT'
+set ylabel 'Am^2'
+set terminal gif
+set output <font color="#008000">&quot;<font color="#2040a0">$file</font>.si.gif&quot;</font>
+plot 'bp04-1gw-s2-026c.raw.flat.si' with l, 'bp04-1gw-s2-026c.raw.si' with l
+set terminal pdf
+set output <font color="#008000">&quot;<font color="#2040a0">$file</font>.si.pdf&quot;</font>
+replot
+set terminal svg
+set output <font color="#008000">&quot;<font color="#2040a0">$file</font>.si.svg&quot;</font>
+replot</font>
+EOF
+    echo <font color="#2040a0">$file</font> ... done.
+done
+</pre>
+-----

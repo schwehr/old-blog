@@ -1,0 +1,3204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Kurt's Weblog: January 2009 Archives</title>
+
+<link rel="stylesheet" href="../styles/nb_default.css" type="text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="../atom.xml" />
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span>
+</div>
+
+<div id="content">
+
+<div class="blog">
+<div id="menu">
+	<a href="../index.html">Main</a>
+</div>
+</div>
+
+<div class="blog">
+<div class="item">
+<a id="e2009-01-30T14_53_40.txt" name="e2009-01-30T14_53_40.txt"></a>
+<h2 class="date">01.30.2009 14:53</h2>
+<div class="blogbody">
+<h3 class="title">Arctic incident workshop report released</h3>
+<div class="item-description">
+I participated in this workshop last year: <a
+href="http://www.crrc.unh.edu/workshops/arctic_spill_summit/index.htm">Opening
+the Arctic Seas: Envisioning Disaster & Framing Solutions</a>.  The
+workshop final report was issued yesterday - <a
+href="http://www.crrc.unh.edu/workshops/arctic_spill_summit/arctic_summit_report_final.pdf">arctic_summit_report_final.pdf</a>
+<br /><br />
+I made several blog posts <a
+href="../archives/2008-03.html">during March
+about the St. Lawrence Island subgroup</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-30T14_53_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2013-06-07T21_31_57.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-29T16_36_14.txt" name="e2009-01-29T16_36_14.txt"></a>
+<h2 class="date">01.29.2009 16:36</h2>
+<div class="blogbody">
+<h3 class="title">Streamlining segy sample reading - power of open source</h3>
+<div class="item-description">
+The day after I posted <a href="http://vislab-ccom.unh.edu/~schwehr/software/simplesegy/">simplesegy</a>, I got a patch from Vesa Hautsalo.
+The true power of open source.  Hi patch fix a bug with extended
+headers and suggested a speedup of reading samples with struct:
+<pre><tt><font color="#0000FF">199d198</font>
+<font color="#FF0066">&lt;                 samples = []</font>
+<font color="#0000FF">202,206c201,204</font>
+<font color="#FF0066">&lt;                 for i in range(self.trace_samples):</font>
+<font color="#FF0066">&lt;                     start = base+i*self.sample_size</font>
+<font color="#FF0066">&lt;                     end = start+self.sample_size</font>
+<font color="#FF0066">&lt;                     samples.append( struct.unpack(code,self.data[start:end])[0] )</font>
+<font color="#FF0066">&lt;                 self.samples = samples # Cache it</font>
+---
+<font color="#009900">&gt;                 end = base + self.trace_samples * self.sample_size</font>
+<font color="#009900">&gt;                 fmt = '&gt;%d%s' % (self.trace_samples, code[1:])</font>
+<font color="#009900">&gt;                 samples = list(struct.unpack(fmt, self.data[base:end]))</font>
+<font color="#009900">&gt;                 self.samples = samples</font>
+<font color="#0000FF">348c346</font>
+<font color="#FF0066">&lt;             self.extended_text_hdrs.append = decode_text(data[file_pos:file_pos+3200])</font>
+---
+<font color="#009900">&gt;             self.extended_text_hdrs.append(decode_text(data[file_pos:file_pos+3200]))</font>
+</tt></pre>
+I didn't know that you could pass a number of elements to a struct
+code to read that many elements.  That saves trace reading a lot of string passing.
+In the case of my test file, this replaces 22K loops on the python side with 1.
+<pre>% <b>opendiff simplesegy-0.3/simplesegy/segy.py segy.py</b></pre>
+<img title="Apple FileMerge/opendiff" withgrayborder="True" src="../attachments/2009-01/segy-patch.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-29T16_36_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-30T14_53_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-28T09_57_45.txt" name="e2009-01-28T09_57_45.txt"></a>
+<h2 class="date">01.28.2009 09:57</h2>
+<div class="blogbody">
+<h3 class="title">configure and included external packages</h3>
+<div class="item-description">
+I'm looking at adding libkml to fink, but I don't think it is going
+happen right now.  A general note to all people building software:
+<br /><br />
+<b>Please give me an easy way to not use external packages that you
+wrap into your distribution!</b>
+<br /><br />
+libkml includes a thirdparty diectory that includes boost and
+uriparse.  It then stuffs some extra shared libraries and headers into
+its install.  This will likely cause all kinds of bad things if I were
+to let it go into fink.  Give me some options to specify these libraries and if I don't use them, then you can fall back to your thirdparty libs.
+<br /><br />
+Submitted an issue for this... <a href="http://code.google.com/p/libkml/issues/detail?id=50">Issue 50: configure does not have options use external boost and uriparse</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-28T09_57_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-29T16_36_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-28T07_20_43.txt" name="e2009-01-28T07_20_43.txt"></a>
+<h2 class="date">01.28.2009 07:20</h2>
+<div class="blogbody">
+<h3 class="title">Converting python 2.x to 3</h3>
+<div class="item-description">
+Vesa H. just got me to look at converting my code from python 2 to
+python 3.  I am still unsure what are the things that will impact me
+and fink has yet to get a python30 package.  I am really still trying
+to catch up on my packaging of python 2.6 packages for fink.
+Python 2.6 comes with a program called 2to3.  Here is it running on  
+segy.py from simplesegy 0.3:
+<pre><tt><font color="#FF6600">--- segy.py (original)</font>
+<font color="#009900">+++ segy.py (refactored)</font>
+<font color="#0000FF">@@ -210,7 +210,7 @@</font>
+             val = struct.unpack(struct_code,self.data[self.offset+start:end+self.offset])[0]
+             self.__dict__[name] = val
+             return val
+<font color="#FF6600">-        raise AttributeError, name</font>
+<font color="#009900">+        raise AttributeError(name)</font>
+ <!-- -->
+     def datetime(self):
+         '''
+<font color="#0000FF">@@ -261,7 +261,7 @@</font>
+     def __iter__(self):
+         return self
+ <!-- -->
+<font color="#FF6600">-    def next(self):</font>
+<font color="#009900">+    def __next__(self):</font>
+         if self.cur_pos &gt; self.size-1:
+             raise StopIteration
+         trace = Trace(self.data,self.sample_type,self.cur_pos)</tt></pre>
+This is what open source is all about.  Vesa sent me a patch file to fix some bugs the day
+after I released simplesegy to pypi.  Rock on!
+<br /><br />
+Some readings on converting code from 2 to 3:
+<br /><br />
+<a href="http://lucumr.pocoo.org/2008/12/7/porting-to-python-3:-dos-and-donts">Porting to Python 3: Do's and Don'ts</a> by Armin Ronacher
+<br /><br />
+<a href="http://docs.python.org/dev/3.0/whatsnew/3.0.html">What's new in Python 3.0</a> - 
+<a href="http://docs.python.org/whatsnew/2.6.html">What's new in Python 2.6</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-28T07_20_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-28T09_57_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-27T21_29_33.txt" name="e2009-01-27T21_29_33.txt"></a>
+<h2 class="date">01.27.2009 21:29</h2>
+<div class="blogbody">
+<h3 class="title">Google Code Search</h3>
+<div class="item-description">
+I know this has been around for a while, but I tried it
+again... googling yourslef is what it is, but this time it is
+all source code.
+<br /><br />
+Google Code Search: <a href="http://www.google.com/codesearch/p?hl=en#TFZ6znIk5cA/~schwehr/ais/waterlevel/downloads/noaadata-py-0.23/Makefile&q=%22kurt%20schwehr%22%20lang:makefile&l=2">"Kurt Schwehr" lang:makefile</a>
+<br /><br />
+<img title="Googling myself, but for Makefiles" withgrayborder="True"
+src="../attachments/2009-01/google-code-search.png"/>
+<br /><br />
+An interesting discovery I found was
+Trey Smith reusing some of my oldXDR code:
+<pre> * $Revision: 1.4 $  $Author: trey $  $Date: 2004/04/06 15:06:08 $
+ *
+ * PROJECT:      Distributed Robotic Agents
+ * DESCRIPTION:
+ * COMMENTS:     large parts of this code are taken from a flex spec
+ *               written by Kurt Schwehr at Ames 7/96</re>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-27T21_29_33.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-28T07_20_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-27T16_14_24.txt" name="e2009-01-27T16_14_24.txt"></a>
+<h2 class="date">01.27.2009 16:14</h2>
+<div class="blogbody">
+<h3 class="title">Japan's new Shirase Ice Breaker</h3>
+<div class="item-description">
+<a
+href="../attachments/2009-01/ice-breaker-shirase.png">Full
+sized image</a>
+<br /><br />
+<img title="ABG-Shirase(II)" withgrayborder="True"
+src="../attachments/2009-01/ice-breaker-shirase-sml.png"/>
+<br /><br />
+<a href="http://www.globalsecurity.org/military/world/japan/shirase.htm">AGB-5003 Shirase (II)</a> [GlocalSecurity.org]
+<pre>..
+The second-generation Shirase (17AGB / H17 Forecast) was launched in
+April 2008. A launching ceremony took place Wednesday April 16, 2008
+in Maizuru, Kyoto Prefecture, for the Shirase, Japan's newest
+icebreaker for Antarctic expeditions. ...  The new Shirase (5003) was
+built at the Universal Shipbuilding yard in Maizuru on the Japan Sea
+coast. The New Shirase was scheduled to be ready in May 2009. Due to
+budgetary delays Shirase (5003) will not go on its first voyage until
+November 2009 after interior work on it is completed in May 2009. ...
+<!-- -->
+Taking the name of its predecessor, the Shirase is Japan's fourth
+icebreaker. The new Shirase was built at a cost of 37.6 billion [yen]. The
+12,500-ton ship, which is 138 meters long and 28 meters wide, is
+slightly larger than its predecessor and has top-level ice-breaking
+capabilities. It can move at 3 knots, breaking up ice 1.5 meters
+thick. The new ship uses seawater to clear the snow on the ice,
+allowing it to move smoothly for better fuel-efficiency, and has a
+double-walled fuel tank to prevent leaks.</pre>
+<a href="http://commons.wikimedia.org/wiki/File:---Image---AGB-5003_in_Maizuru_2008_04_06.JPG">Image of AGB-5003</a> from the Wikimedia Commons.
+<br /><br />
+There are also two pictures here: <a href="http://thomasphoto.blog61.fc2.com/blog-entry-2878.html">thomasphoto blog</a> [not in English]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-27T16_14_24.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-27T21_29_33.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-27T13_08_14.txt" name="e2009-01-27T13_08_14.txt"></a>
+<h2 class="date">01.27.2009 13:08</h2>
+<div class="blogbody">
+<h3 class="title">Open Notebook Science</h3>
+<div class="item-description">
+<a href="http://en.wikipedia.org/wiki/Open_notebook_science">Open Notebook Science - Wikipedia</a>
+<pre>Open Notebook Science is the practice of making the entire primary
+record of a research project publicly available online as it is
+recorded. This involves placing the personal, or laboratory, notebook
+of the researcher online along with all raw and processed data, and
+any associated material, as this material is generated. The approach
+may be summed up by the slogan 'no insider information'. It is the
+logical extreme of transparent approaches to research and explicitly
+includes the making available of failed, less significant, and
+otherwise unpublished experiments; so called 'Dark Data'.  The
+practice of Open Notebook Science, although not the norm in the
+academic community, has gained significant recent attention in the
+research, general and peer-reviewed media as part of a general trend
+towards more open approaches in research practice and publishing. Open
+Notebook Science can therefore be described as part of a wider Open
+Science movement that includes the advocacy and adoption of Open
+access publication, Open Data, Crowdsourcing Data, and Citizen
+science. It is inspired in part by the success of Open Source Software
+and draws on many of its ideas.
+...</pre>
+<br /><br />
+This sounds interesting: <a href="http://en.wikipedia.org/wiki/Journal_of_Visualized_Experiments">Journal of Visualized Experiments (JoVE)</a> [wikipedia]: <a href="http://www.jove.com/">http://www.jove.com/</a>
+<br /><br />
+<img title="Journal of Visualized Experiments" withgrayborder="True" src="../attachments/2009-01/jove.png"/>
+<br /><br />
+I have been trying to do the same on youtube: <a href="http://www.youtube.com/user/goatbar">http://www.youtube.com/user/goatbar</a>.  c.f.
+<ul>
+  <li><a href="http://www.youtube.com/watch?v=0FXPUzAiqXI">Kurt showing AMS with the Kappabridge</a></li>
+  <li><a href="http://www.youtube.com/watch?v=BgYZyEXa0cs">Sampling an ocean core - time lapse of lab procedure</a></li>
+</ul>
+<br /><br />
+All this comes from reading: <a href="http://michaelnielsen.org/blog/?p=545">Doing science online</a> by Michael Nielsen.
+<br /><br />
+Dave Monahan and I were talking earlier today about how scientists
+might get career credit for contributing data to the public databases.
+There has been talk of assigning DOI's to data and that might provide
+a "publication" of some sort to academics.  Then would the data be
+available through WorldCat and others?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-27T13_08_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-27T16_14_24.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-26T14_04_49.txt" name="e2009-01-26T14_04_49.txt"></a>
+<h2 class="date">01.26.2009 14:04</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth big announcement Feb 2nd</h3>
+<div class="item-description">
+Everybody seems to be talking about this...
+<a href="http://www.gearthblog.com/blog/archives/2009/01/big_google_earth_announcement_with.html">Big Google Earth Announcement with Al Gore and More</a> [Google Earth Blog]
+<pre>...
+The big clue is Sylvia Earle. As pointed out by everyone, Sylvia Earle
+is a world renowned oceanographer. So, of course, the immediate
+conclusion is that Google Ocean is finally about to be
+introduced. Rumors have been flying about Google Ocean for quite a
+while.
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-26T14_04_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-27T13_08_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-26T12_22_10.txt" name="e2009-01-26T12_22_10.txt"></a>
+<h2 class="date">01.26.2009 12:22</h2>
+<div class="blogbody">
+<h3 class="title">simplesegy python library for reading SEG-Y seismic data</h3>
+<div class="item-description">
+I've just made the first public release of <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/simplesegy/">simplesegy</a>:
+<a href="http://pypi.python.org/pypi/simplesegy/0.2">simplesegy 0.2 on
+pypi</a>.  Unlike my segy-py / seismic-py, this package is much, well,
+simpler.  It does have lookup tables for the binary file header and
+the trace header, so that you can inherit and override the lookups if 
+you know what a vender is doing, but it doesn't really try to encourage 
+people to do that the way I did before.  
+<br /><br />
+Being much simpler, I'm comfortable adding simplesegy to fink.  I was never
+up for that much exposure with seismic-py.
+<br /><br />
+Here is a quick usage tutorial:
+<pre>% <b>fink selfupdate</b>
+% <b>fink install simplesegy-py26</b></pre>
+Now here is a test.py file:
+<pre><tt><font color="#000000">01:</font> <i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<font color="#000000">02:</font> 
+<font color="#000000">03:</font> <b><font color="#000080">from</font></b> simplesegy <b><font color="#000080">import</font></b> segy
+<font color="#000000">04:</font> 
+<font color="#000000">05:</font> sgy <font color="#990000">=</font> segy<font color="#990000">.</font><b><font color="#000000">Segy</font></b><font color="#990000">(</font><font color="#FF0000">'foo.sgy'</font><font color="#990000">)</font>
+<font color="#000000">06:</font> 
+<font color="#000000">07:</font> sgy<font color="#990000">.</font><b><font color="#000000">trace_metadata</font></b><font color="#990000">()</font>
+<font color="#000000">08:</font> <b><font color="#0000FF">print</font></b> sgy<font color="#990000">.</font>hdr_text
+<font color="#000000">09:</font> 
+<font color="#000000">10:</font> <b><font color="#0000FF">for</font></b> i<font color="#990000">,</font>trace <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>sgy<font color="#990000">):</font>
+<font color="#000000">11:</font> 
+<font color="#000000">12:</font>     <b><font color="#0000FF">print</font></b> trace<font color="#990000">.</font><b><font color="#000000">position_geographic</font></b><font color="#990000">(),</font> trace<font color="#990000">.</font><b><font color="#000000">datetime</font></b><font color="#990000">(),</font> trace<font color="#990000">.</font>min<font color="#990000">,</font> trace<font color="#990000">.</font>sec
+<font color="#000000">13:</font> 
+<font color="#000000">14:</font>     o <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'shot-%05d'</font><font color="#990000">%</font>i<font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+<font color="#000000">15:</font>     <b><font color="#0000FF">for</font></b> sample <b><font color="#0000FF">in</font></b> trace<font color="#990000">.</font>samples<font color="#990000">:</font>
+<font color="#000000">16:</font>         o<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><b><font color="#000000">str</font></b><font color="#990000">(</font>sample<font color="#990000">)+</font><font color="#FF0000">'\n'</font><font color="#990000">)</font>
+<font color="#000000">17:</font>     <b><font color="#0000FF">if</font></b> i<font color="#990000">&gt;</font><font color="#993399">10</font><font color="#990000">:</font>
+<font color="#000000">18:</font>         <b><font color="#0000FF">break</font></b></tt></pre>
+After opening a file on line 5, you can ask for some simple metadata as on line 07.  This is the bounding box and time range:
+<pre>(
+ (142.52074472222222, 14.634158055555556), 
+ (142.67233305555555, 15.039263055555555), 
+ (datetime.datetime(2007, 11, 29, 13, 24, 20), 
+  datetime.datetime(2007, 11, 29, 15, 18, 33))
+)</pre>
+Line 8 shows printing the text header.  You can also print the binary
+header values by just doing <i>print sgy.sweep_start,
+sgy.sweep_end</i> and so on.  Just look at
+simplesegy.segy.segy_bin_header_lut for the list of known header
+fields.
+<br /><br />
+Right now, the only way to access traces is to iterate over them as shown
+on line 10.  It should be pretty fast as everything works as delayed/lazy
+decodes.  Proper trace indexing is somewhere in the distant future.
+<br /><br />
+So far, the package only comes with one program: segy-metadata.  This
+is a program to do cheetah templating to create metadata files.  The 
+source comes with a blank template.
+<pre>% <b>segy-metadata -v -t /sw/share/doc/simplesegy-py26/docs/blank.metadata.tmpl *.sgy</b>
+<!-- -->
+            file: foo.sgy -> foo.sgy.metadata.txt
+    datetime_min: 2007-11-29 13:24:20
+    datetime_max: 2007-11-29 15:18:33
+           x_min: 142.520744722
+           x_max: 142.672333056
+           y_min: 14.6341580556
+           y_max: 15.0392630556</pre>
+This script will fill in the above values at the appropriate places.  It is up
+to you to fill in the template before you run this accross all the files
+for a cruise.
+<br /><br />
+This is my first attempt at using <a
+href="http://peak.telecommunity.com/DevCenter/setuptools">setuptools</a>
+rather than the straight python distutils.  I haven't been excited for
+setuptools until now.  The main reason is the <i>entry points</i> 
+functionality in setup.py. 
+<pre>      entry_points = '''
+      [console_scripts]
+      segy-metadata = simplesegy.metadata:main
+      ''',</pre>
+This tells the install to create a script (or ??? for windows) and in that
+script, call the main function in the metadata module.  This gets rid of
+the nastiness of trying to put something in bin for each script and then
+worry about wether to .py or not .py for testing and such.  This keeps
+all my code in the modules.
+<br /><br />
+Now I desperately need to add some unittesting to this code.  But that
+is going to have to wait for another day.  Setuptools has a
+placeholder for tests that I should use: <a
+href="http://peak.telecommunity.com/DevCenter/setuptools#test-build-package-and-run-a-unittest-suite">python
+setup.py test</a>.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-26T12_22_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-26T14_04_49.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-26T08_20_12.txt" name="e2009-01-26T08_20_12.txt"></a>
+<h2 class="date">01.26.2009 08:20</h2>
+<div class="blogbody">
+<h3 class="title">Andres Millan's Sailing Directions videos</h3>
+<div class="item-description">
+Andres Millan was kind enough to give me permission to post his videos to youtube.  The videos are not as good as the original swf, so look at links to the flash swf to be able to read the text and see the full resolution videos.  I've set up a livejournal post to all comments: <a href="http://goatbar.livejournal.com/754.html">Sailing Directions / Coast Pilot</a> [LJ] 
+<br /><br />
+<a href="http://gge.unb.ca./Pubs/TR254InnerApproachToSaintJohn.swf">TR254InnerApproachToSaintJohn.swf</a>
+<br /><br />
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/7JczQgPJXJ0&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/7JczQgPJXJ0&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+<br /><br />
+<a href="http://gge.unb.ca./Pubs/TR254TheChannelIntoTheHarbour.swf">TR254TheChannelIntoTheHarbour.swf</a>
+<br /><br />
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/qc27p8BxFVo&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/qc27p8BxFVo&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-26T08_20_12.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-26T12_22_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-25T13_25_56.txt" name="e2009-01-25T13_25_56.txt"></a>
+<h2 class="date">01.25.2009 13:25</h2>
+<div class="blogbody">
+<h3 class="title">Lazy loading for python</h3>
+<div class="item-description">
+For parsing binary SEGY data, I often only use a few of the attributes
+for each trace.  In order to speed up the code, I'm switching to lazy
+decoding of each trace.  The idea is to only decode that which we need.
+For a Python class, if you add a <i>__getattr__</i> method, python
+will call it if the class instance does not find that attribute.  Here is
+a small example:
+<pre><tt><font color="#000000">01:</font> <i><font color="#9A1900">#!/usr/bin/env python </font></i>
+<font color="#000000">02:</font> 
+<font color="#000000">03:</font> <b><font color="#0000FF">class</font></b> foo<font color="#990000">:</font>
+<font color="#000000">04:</font>     <b><font color="#0000FF">def</font></b> <b><font color="#000000">__init__</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+<font color="#000000">05:</font>         self<font color="#990000">.</font>existing_attr <font color="#990000">=</font> <font color="#FF0000">'Hello there'</font>
+<font color="#000000">06:</font> 
+<font color="#000000">07:</font>     <b><font color="#0000FF">def</font></b> <b><font color="#000000">__getattr__</font></b><font color="#990000">(</font>self<font color="#990000">,</font>name<font color="#990000">):</font>
+<font color="#000000">08:</font>         <b><font color="#0000FF">if</font></b> name<font color="#990000">==</font><font color="#FF0000">'not_there'</font><font color="#990000">:</font>
+<font color="#000000">09:</font>             val <font color="#990000">=</font> <font color="#FF0000">'a dynamic value'</font>
+<font color="#000000">10:</font>             self<font color="#990000">.</font>__dict__<font color="#990000">[</font>name<font color="#990000">]</font> <font color="#990000">=</font> val <i><font color="#9A1900"># Cache for future requests</font></i>
+<font color="#000000">11:</font>             <b><font color="#0000FF">return</font></b> 
+<font color="#000000">12:</font>         <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+<font color="#000000">13:</font>             <b><font color="#0000FF">raise</font></b> AttributeError<font color="#990000">,</font> name
+<font color="#000000">14:</font> 
+<font color="#000000">15:</font> f <font color="#990000">=</font> <b><font color="#000000">foo</font></b><font color="#990000">()</font>
+<font color="#000000">16:</font> <b><font color="#0000FF">print</font></b> <font color="#FF0000">'existing '</font><font color="#990000">,</font>f<font color="#990000">.</font>existing_attr
+<font color="#000000">17:</font> <b><font color="#0000FF">print</font></b> <font color="#FF0000">'missing  '</font><font color="#990000">,</font>f<font color="#990000">.</font>not_there
+<font color="#000000">18:</font> <b><font color="#0000FF">print</font></b> <font color="#FF0000">'exception'</font><font color="#990000">,</font>f<font color="#990000">.</font>causes_exception</tt></pre>
+On line 16, accessing <i>existing_attr</i> grabs that attribute as it
+was set in the __init__.  The second try on line 17, <i>not_there</i>
+triggers the __getattr__ and returns the string 'a dynamic value'.
+Finally on line 18, <i>causes_exception</i> falls through the else and
+triggers a Traceback by raising an exception.  
+<pre>% <b>./attrtest.py</b>
+existing  Hello there
+missing   a dynamic value
+exception
+Traceback (most recent call last):
+  File "./attrtest.py", line 16, in <module>
+    print 'exception',f.causes_exception
+  File "./attrtest.py", line 11, in __getattr__
+    raise AttributeError, name
+AttributeError: causes_exception</pre>
+If the computation is expensive and may be accessed again, the
+__getattr__ function can save the results in <i>self.__dict__[name]</i> (see line 10).
+<br /><br />
+Note: this is the first time I used source-highlight's line number feature.
+Here is the command line:
+<pre>% <b>source-highlight --doc --out-format=html -i attrtest.py -o attrtest.py.html -n</b></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-25T13_25_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-26T08_20_12.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-25T11_29_36.txt" name="e2009-01-25T11_29_36.txt"></a>
+<h2 class="date">01.25.2009 11:29</h2>
+<div class="blogbody">
+<h3 class="title">XBox and the Mac</h3>
+<div class="item-description">
+I've got an XBox 360 with a 60GB drive.  It is mostly being used as a
+NetFlix player, but I'm starting to use it to play music.  Loading
+music from CDs onto the XBox is not an elegant process.  Today, I
+tried to find a solution to share what I have on my Macs.  I started
+with <a href="http://xbmc.org/">XBMC - XBox Music Center</a>.  The
+xbox sees the XBMC, but never sees any of the music or pictures.  I
+didn't see any other solutions in the open source world, so I took a
+look at <a href="http://cynicalpeak.com/rivet/">Rivet</a> and <a
+href="http://www.nullriver.com/products/connect360">Connect360</a>.
+Rivet is a menu item on the top bar and Connect360 is a preference
+pane.  Both worked right off.  Rivet seems a bit better put together,
+also supports the PS3 (not that I have one), and has more control.  I
+don't often buy software for myself, but I went ahead and purchased
+Rivet.  Even if XBMC were to work for sharing music, pictures, and
+video like the other two, it doesn't meet my needs.  I don't want to
+have a huge application running.  XBMC is beautiful and impressive,
+but I just want to share/stream media files.
+<br /><br />
+Too bad the XBox360 and iTunes/iPhoto don't already play together.
+<br /><br />
+<img title="Mac and XBox360" withgrayborder="True" src="../attachments/2009-01/rivet-xbox360-mac.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-25T11_29_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-25T13_25_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-24T16_21_48.txt" name="e2009-01-24T16_21_48.txt"></a>
+<h2 class="date">01.24.2009 16:21</h2>
+<div class="blogbody">
+<h3 class="title">A large icicle</h3>
+<div class="item-description">
+<img title="The neighbor's icicle" withgrayborder="True" src="../attachments/2009-01/icicle.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-24T16_21_48.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-25T11_29_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-24T09_55_12.txt" name="e2009-01-24T09_55_12.txt"></a>
+<h2 class="date">01.24.2009 09:55</h2>
+<div class="blogbody">
+<h3 class="title">The (un)joy of SEG-Y</h3>
+<div class="item-description">
+SEG-Y is a really common format, but it is almost the UN-format.  It
+really seems to only be a hint.  Everybody seems to write it slightly
+differently.  I hit this in the past and even wrote a paper on it:
+<br /><br />
+[<a href="http://vislab-ccom.unh.edu/~schwehr/papers/schwehr2008-pythonpapers-seismic-py.pdf">PDF</a>] Schwehr, seismic-py: Reading seismic data with Python., The Python Papers, 3:2, 8 pages, Sep 4, 2008.
+<br /><br />
+I'm in the process of rewriting segy-py/seismic-py and calling it
+simplesegy.  This new library is only meant to handle the low level
+parsing with minimal logic and preferably no support for things like
+header math.  BTW, I think header math is a bad thing... use a
+separate database to prevent polution of the original segy.
+<br /><br />
+One feature I do want to get right is being able to return the
+location/position of traces/shots.  With the Driscoll <a href="http://www.edgetech.com/">EdgeTech</a> Chirp
+system, I had it right.  Just divide the raw values by 3600.0 and I
+had the position...
+<pre>    def position_geographic(self):
+        return self.hdr['X'] / 3600., self.hdr['Y']/ 3600.</pre>
+This gives:
+<pre>Position Raw: (-422142, 118406)
+Position:     (-117.26166666666667, 32.890555555555558)</pre>
+For this current rewrite, the goal is to be able to do templated 
+metadata generation of UN Law of the Sea <a href="http://www.knudsenengineering.com/">Knudsen</a> chirp data.
+When I try the same thing, I get:
+<pre>Position Raw: (513074681, 52682969)
+Position?     (142520.74472222221, 14634.158055555556)</pre>
+I know that 142&deg;E,14&deg;N is the right neck of the woods, but
+the format does not contain any info about how the position is
+represented.  Neither the EdgeTech or Knudsen has anything that 
+says how I am supposed to interpret the coordinates... neither has
+an <i>Extended Textual Stanza</i> (See Rev 1 Appendix D).  To be
+fair, the Knudsen reports it is SEG-Y Rev 0, but still.
+<br /><br />
+From the <a href="http://www.knudsenengineering.com/files/manuals/320BUserManual.pdf">Knudsen 320BR chirp manual</a>: 
+<pre><b>7.3.4.6 SEG-Y Extended Data Fields</b>
+The original SEG-Y specification does not account for many useful data
+fields. If the user selects the option to include the extended data
+fields, numerous operation controls are recorded in the unassigned
+bytes at the end of the Rev0 Trace header. Some SEG-Y readers do not
+recognize files that contain data in these bytes so it is advisable to
+verify the requirements for the desired reader application before
+selecting this option.</pre>
+There doesn't seem to be any documentation out there, but I've at least
+got other software around that can decode the positions that I can look at - mbystem:
+<pre>% <b>mbsegylist -Ifoo.sgy | head -3</b>
+2007/11/29/13/24/20.002000      0.000    142.520747       14.634158       4806       1       0       0  2.666   0.000060         22222  1.333320
+2007/11/29/13/24/24.002000      4.000    142.520836       14.634398       4807       1       0       0  2.666   0.000060         22222  1.333320
+2007/11/29/13/24/28.002000      4.000    142.520942       14.634687       4808       1       0       0  2.666   0.000060         22222  1.333320</pre>
+Looking at the EdgeTech, mbsegylist can't read it:
+<pre>% <b>mbsegylist -Ilj101.sgy | head -3</b>
+2002/11/13/21/48/05.003000      0.000     -0.000000        0.000000      49573       1       0       0  0.017   0.000040          1988  0.079520
+2002/11/13/21/48/05.003000      0.000     -0.000000        0.000000      49574       1       0       0  0.017   0.000040          1988  0.079520
+2002/11/13/21/48/05.003000      0.000     -0.000000        0.000000      49575       1       0       0  0.017   0.000040          1988  0.079520</pre>
+This causes me to have horrible code like this to detect the two
+cases.  It is pretty safe, but if I end up with a seismic line that
+passes really close to (0,0) I will have a problem.  And I'm likely
+leaving out lots of other ways that people are encoding X and Y.
+<pre><tt>    <b><font color="#0000FF">def</font></b> <b><font color="#000000">position_geographic</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+<i><font color="#9A1900">        '''@bug: this will fail near 0,0'''</font></i>
+        h <font color="#990000">=</font> self<font color="#990000">.</font>hdr
+        x <font color="#990000">=</font> h<font color="#990000">[</font><font color="#FF0000">'X'</font><font color="#990000">]</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+        y <font color="#990000">=</font> h<font color="#990000">[</font><font color="#FF0000">'Y'</font><font color="#990000">]/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+        <b><font color="#0000FF">if</font></b> <b><font color="#000000">abs</font></b><font color="#990000">(</font>x<font color="#990000">)</font> <font color="#990000">&gt;</font> <font color="#993399">180</font> <b><font color="#0000FF">or</font></b> <b><font color="#000000">abs</font></b><font color="#990000">(</font>y<font color="#990000">)&gt;</font><font color="#993399">90</font><font color="#990000">:</font>
+            x <font color="#990000">/=</font> <font color="#993399">1000</font><font color="#990000">.</font>
+            y <font color="#990000">/=</font> <font color="#993399">1000</font><font color="#990000">.</font>
+        <b><font color="#0000FF">return</font></b>  x<font color="#990000">,</font>y</tt></pre>
+My favorite part of all this is the Knudsen SEG-Y Text Header.  This is not helpful!  Yes
+the fields are there, but it would help if they were filled in more than just the 
+instrument type in <i>C 4</i>!
+<pre>C 1 CLIENT                        COMPANY                       CREW NO
+C 2 LINE            AREA                        MAP ID
+C 3 REEL NO           DAY-START OF REEL     YEAR      OBSERVER
+C 4 INSTRUMENT: <b>MFG KEL</b>        MODEL <b>320B/R</b>     SERIAL NO <b>030505</b>
+C 5 DATA TRACES/RECORD        AUXILIARY TRACES/RECORD         CDP FOLD
+C 6 SAMPLE INTERVAL         SAMPLES/TRACE       BITS/IN      BYTES/SAMPLE
+C 7 RECORDING FORMAT        FORMAT THIS REEL        MEASUREMENT SYSTEM
+C 8 SAMPLE CODE: FLOATING PT     FIXED PT X   FIXED PT-GAIN     CORRELATED
+C 9 GAIN  TYPE: FIXED     BINARY     FLOATING POINT     OTHER
+C10 FILTERS: ALIAS     HZ  NOTCH     HZ  BAND     -     HZ  SLOPE    -    DB/OCT
+C11 SOURCE: TYPE            NUMBER/POINT        POINT INTERVAL
+C12     PATTERN:                           LENGTH        WIDTH
+C13 SWEEP: START     HZ  END.    HZ  LENGTH      MS  CHANNEL NO     TYPE
+C14 TAPER: START LENGTH       MS  END LENGTH       MS  TYPE
+C15 SPREAD: OFFSET        MAX DISTANCE        GROUP INTERVAL
+C16 GEOPHONES: PER GROUP     SPACING     FREQUENCY     MFG          MODEL
+C17     PATTERN:                           LENGTH        WIDTH
+C18 TRACES SORTED BY: RECORD     CDP     OTHER
+C19 AMPLITUDE RECOVERY: NONE      SPHERICAL DIV       AGC    OTHER
+C20 MAP PROJECTION                      ZONE ID       COORDINATE UNITS
+C21 PROCESSING:
+C22 PROCESSING:
+...</pre>
+At this point, I'm also able to print out a trace:
+<br /><br />
+<img title="Single trace shown in gnuplot" withgrayborder="True" src="../attachments/2009-01/knudsen-320br-trace.png"/>
+<br /><br />
+I've also got a screenshot from <a href="http://www.chesapeaketech.com/">SonarWeb</a> to help me sort things out:
+<br /><br />
+<img title="SonarWeb image of SEG-Y line" withgrayborder="True" src="../attachments/2009-01/knudsen-320br-line-sonarweb.jpg"/>
+<br /><br />
+Code should be online in a couple days.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-24T09_55_12.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-24T16_21_48.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-23T21_58_29.txt" name="e2009-01-23T21_58_29.txt"></a>
+<h2 class="date">01.23.2009 21:58</h2>
+<div class="blogbody">
+<h3 class="title">4 more youtube videos - Chart of the Future</h3>
+<div class="item-description">
+I've uploaded 4 more videos to youtube from my older Chart of the
+Future (CotF) work.  These are from late 2006 and early 2007.  Being
+youtube, the quality is not the best, but it does give the jist.  All
+were done in Google Earth.
+<br /><br />
+In this first one, the traffic lanes and buoys are from EarthNC.
+<br /><br />
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/fz9A7OGTv3A&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/fz9A7OGTv3A&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+<br /><br />
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/X0hDpu6YyYs&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/X0hDpu6YyYs&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+<br /><br />
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/kXLwbM8HzOQ&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/kXLwbM8HzOQ&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+<br /><br />
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/S6Y9PZPVZgc&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/S6Y9PZPVZgc&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+<br /><br />
+And this one of work that Alex Derbes and Nick Validis did back in the 90's...
+<br /><br />
+<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/CIXHe96Hz8U&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/CIXHe96Hz8U&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-23T21_58_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-24T09_55_12.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-23T19_05_41.txt" name="e2009-01-23T19_05_41.txt"></a>
+<h2 class="date">01.23.2009 19:05</h2>
+<div class="blogbody">
+<h3 class="title">Using OpenStreetMap on other sites</h3>
+<div class="item-description">
+<a href="http://epsg4253.wordpress.com/2009/01/15/openstreetmap-for-your-website/">openstreetmap for your website</a> [epsg4253] points out that OpenStreetMap has an Export tab that helps you build a map for any site.
+<br /><br />
+<img title="Setting up for OpenStreetMap" withgrayborder="True" src="../attachments/2009-01/openstreetmap-embed.png"/>
+<br /><br />
+Copy the html from the output textbox:
+<pre><tt><b><font color="#0000FF">&lt;iframe</font></b> <font color="#009900">width</font><font color="#990000">=</font><font color="#FF0000">"600"</font> <font color="#009900">height</font><font color="#990000">=</font><font color="#FF0000">"350"</font> <font color="#009900">frameborder</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="#009900">scrolling</font><font color="#990000">=</font><font color="#FF0000">"no"</font> 
+        <font color="#009900">marginheight</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="#009900">marginwidth</font><font color="#990000">=</font><font color="#FF0000">"0"</font> 
+        <font color="#009900">src</font><font color="#990000">=</font><font color="#FF0000">"http://www.openstreetmap.org/export/embed.html?bbox=-70.9878,42.9896,-70.788,43.1566&amp;layer=mapnik&amp;marker=43.13660,-70.93868"</font> 
+        <font color="#009900">style</font><font color="#990000">=</font><font color="#FF0000">"border: 1px solid black"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;/iframe&gt;&lt;br</font></b> <b><font color="#0000FF">/&gt;</font></b>
+<b><font color="#0000FF">&lt;small&gt;</font></b>
+  <b><font color="#0000FF">&lt;a</font></b> <font color="#009900">href</font><font color="#990000">=</font><font color="#FF0000">"http://www.openstreetmap.org/?lat=43.0731&amp;lon=-70.8879&amp;zoom=12&amp;layers=B000FTFTT&amp;mlat=43.13660&amp;mlon=-70.93868"</font><b><font color="#0000FF">&gt;</font></b>View Larger Map<b><font color="#0000FF">&lt;/a&gt;</font></b>
+<b><font color="#0000FF">&lt;/small&gt;</font></b></tt></pre>
+The results:
+<br /><br />
+<iframe width="600" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-70.9878,42.9896,-70.788,43.1566&layer=mapnik&marker=43.13660,-70.93868" style="border: 1px solid black"></iframe><br /><small><a href="http://www.openstreetmap.org/?lat=43.0731&lon=-70.8879&zoom=12&layers=B000FTFTT&mlat=43.13660&mlon=-70.93868">View Larger Map</a></small>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-23T19_05_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-23T21_58_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-23T17_36_19.txt" name="e2009-01-23T17_36_19.txt"></a>
+<h2 class="date">01.23.2009 17:36</h2>
+<div class="blogbody">
+<h3 class="title">Gateway LNG</h3>
+<div class="item-description">
+<a href="http://www.lnglawblog.com/BlogEntry.aspx?_entry=dc70d8b1-6525-4563-8052-1d16a28e183a">Platts: Excelerate Cargo Holding Offshore Mass. May be Contributing to Lower Regional Gas Prices</a>
+<pre>A piece in Platts LNG Daily [subscription required] suggests that an
+LNG vessel waiting to unload at Excelerate's Northeast Gateway LNG
+deepwater port off the Massachusetts coast may be contributing to
+relatively low regional natural gas prices during the winter months.</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-23T17_36_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-23T19_05_41.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-23T17_33_55.txt" name="e2009-01-23T17_33_55.txt"></a>
+<h2 class="date">01.23.2009 17:33</h2>
+<div class="blogbody">
+<h3 class="title">AIS SARTs for Oil Spills?</h3>
+<div class="item-description">
+<a href="http://en.wikipedia.org/wiki/AIS-SART">AIS SARTs</a> are devices that will notify a local area of a search and
+rescue targets and on their way to being available for mariners to
+carry.  If you have one of these devices, you turn it on when you are
+in the water so that search and rescue vessels and aircraft can spot
+you when they get near you.
+<br /><br />
+What is the chance that these devices can be cheaply adapted for oil
+spill response?  Can we make them transport close enough to how oil
+moves on the surface?  Economies of scale will likely make these
+devices reasonably inexpensive.  Responders could drop these devices
+into large areas of oil or debris.  Or, for training exercises, they
+could simulate the location of an oil spill.
+<br /><br />
+Also, there were some trials of AIS SARTs going on off of Key West last week.
+Sounds like the results were really good.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-23T17_33_55.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-23T17_36_19.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-23T17_24_24.txt" name="e2009-01-23T17_24_24.txt"></a>
+<h2 class="date">01.23.2009 17:24</h2>
+<div class="blogbody">
+<h3 class="title">2007 Vessel-Quieting Symposium Final Report</h3>
+<div class="item-description">
+Phil just pointed me to the <a
+href="http://www.nmfs.noaa.gov/pr/pdfs/acoustics/vessel_symposium_report.pdf">final
+report (pdf)</a> for the <a
+href="http://www.nmfs.noaa.gov/pr/acoustics/shipnoise.htm">2007
+International Symposium: "Potential Application of Vessel-Quieting
+Technology on Large Commercial Vessels"</a> [NOAA NMFS]
+<br /><br />
+The report mentions AIS on Page 26:
+<pre>Automatic Identification System (AIS) for large vessels was generally
+seen as an important database.  An overarching question is how to
+integrate AIS with other geospatial databases to be the most useful in
+describing and predicting anthropogenic contributions to marine
+ambient noise and potential impacts</pre>
+Leila Hatch was the chair of <i>Session III - Non-Regulatory
+Incentives to Reduce Sound Emission from Large Commercial Vessels</i>.
+Since then, we've published a paper that used AIS in looking at vessel
+noise:
+<br /><br />
+[<a
+href="http://vislab-ccom.unh.edu/~schwehr/papers/hatch2008-vessel-noise.pdf">PDF</a>]
+- <b>Hatch</b>, L., C. Clark, R. Merrick, S. Van Parijs, D. Ponirakis,
+K. <b>Schwehr</b>, M. Thompson, D. Wiley, Characterizing the Relative
+Contributions of Large Vessels to Total Ocean Noise Fields: A Case
+Study Using the Gerry E. Studds Stellwagen Bank National Marine
+Sanctuary, Environmental Management, 42(5), 735-52, Nov 2008.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-23T17_24_24.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-23T17_33_55.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-21T18_04_15.txt" name="e2009-01-21T18_04_15.txt"></a>
+<h2 class="date">01.21.2009 18:04</h2>
+<div class="blogbody">
+<h3 class="title">MS Virtual Earth on Mac with SilverLight</h3>
+<div class="item-description">
+In addition to Netflix Play it now for the Mac, Microsoft's release of
+Silverlight is a big deal for Virtual Earth.  I found this via: <a href="http://virtualearth4gov.spaces.live.com/Blog/cns!369B39F890CE30C1!3121.entry?ppud=4&wa=wsignin1.0&sa=24651343">Tracking Vessels in Microsoft Virtual Earth</a> on the 
+Virtual Earth for the Public Sector blog.
+<br /><br />
+And this is doubly cool because it was brought up because of AIS
+Vessel Tracking.  Too bad there are no vessels currently in the
+system.  Fullscreen mode works but interaction with the map widgets
+started working very slowly.
+<br /><br />
+<a href="http://www.portmetrovancouver.com/">http://www.portmetrovancouver.com/</a>
+<br /><br />
+<img title="" withgrayborder="True" src="../attachments/2009-01/mac-virtual-earth-ais.png"/>
+<br /><br />
+<img title="" withgrayborder="True" src="../attachments/2009-01/ms-virtual-earth-silverlight-vessel-traffic.png"/>
+<br /><br />
+Trackback: <a href="http://industry.slashgeo.org/article.pl?sid=09/01/22/147217">MS Virtual Earth: GIS in VE, Wii, Routing Service, Search for Mobile and More</a> [SlashGeo]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-21T18_04_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-23T17_24_24.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-21T17_15_11.txt" name="e2009-01-21T17_15_11.txt"></a>
+<h2 class="date">01.21.2009 17:15</h2>
+<div class="blogbody">
+<h3 class="title">Dealing with PPT files for an internal mediawiki site</h3>
+<div class="item-description">
+We use an internal mediawiki site at work.  We wanted to be able to
+have a template PPT file available for folks who what to start with a
+framework.  Those who know me, know that I go willy-nilly with my ppt
+formatting, but, even for me, I sometimes want to create a series of
+powerpoints across authors that all feel the same a represent our
+group in a consistent manner.  That's all well and good until
+mediawiki decided that our template ppt had embedded scripts.  I
+couldn't reproduce the problem with a test ppt.  Digging into the
+include/specials/SpecialUpload.php, I got a sense of the problem.
+Mediawiki was taking some bad drugs.  It was trying to apply checks
+that make sense for HTML on a binary ppt.  That means that it is a
+craps shoot to see if you can upload your ppt.  In this case, the ppt
+contained "SrC".  Here is my solution... just let ppt's through.  I'll
+leave it up to local virus scanners to see if the ppt is okay.  This
+should be fine for an internal site, but I have NOT thought this
+through for a wiki with public access.  If that were the case, I would
+not deploy this patch and I might spend the time to chuck any uploads
+through ClamAV or some such.  On to the patch... (remember that I'm
+definitely not a php programmer)
+<pre><tt><b><font color="#0000FF">function</font></b> <b><font color="#000000">detectScript</font></b><font color="#990000">(</font><font color="#009900">$file</font><font color="#990000">,</font> <font color="#009900">$mime</font><font color="#990000">,</font> <font color="#009900">$extension</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+        <b><font color="#0000FF">global</font></b> <font color="#009900">$wgAllowTitlesInSVG</font><font color="#990000">;</font>
+<!-- -->
+        <i><font color="#9A1900">#ugly hack: for text files, always look at the entire file.</font></i>
+        <i><font color="#9A1900">#For binarie field, just check the first K.</font></i>
+<!-- -->
+        <i><font color="#9A1900"># 4 lines added by Kurt Schwehr 21-Jan-2009 </font></i>
+        <i><font color="#9A1900"># Passes powerpoints without any checks</font></i>
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#009900">$extension</font><font color="#990000">==</font><font color="#FF0000">"ppt"</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+           <b><font color="#000000">wfDebugLog</font></b><font color="#990000">(</font><font color="#FF0000">'upload'</font><font color="#990000">,</font> <font color="#FF0000">'No scripts in the ppt extension ... allowing '</font> <font color="#990000">.</font> <b><font color="#000000">print_r</font></b><font color="#990000">(</font><font color="#009900">$extension</font><font color="#990000">,</font>true<font color="#990000">)</font> <font color="#990000">);</font>
+           <b><font color="#0000FF">return</font></b> false<font color="#990000">;</font>
+        <font color="#FF0000">}</font>
+        <i><font color="#9A1900"># End of additional code</font></i>
+<!-- -->
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#000000">strpos</font></b><font color="#990000">(</font><font color="#009900">$mime</font><font color="#990000">,</font><font color="#FF0000">'text/'</font><font color="#990000">)===</font><font color="#993399">0</font><font color="#990000">)</font> <font color="#009900">$chunk</font> <font color="#990000">=</font> <b><font color="#000000">file_get_contents</font></b><font color="#990000">(</font> <font color="#009900">$file</font> <font color="#990000">);</font>
+        <b><font color="#0000FF">else</font></b> <font color="#FF0000">{</font>
+                <font color="#009900">$fp</font> <font color="#990000">=</font> <b><font color="#000000">fopen</font></b><font color="#990000">(</font> <font color="#009900">$file</font><font color="#990000">,</font> <font color="#FF0000">'rb'</font> <font color="#990000">);</font>
+                <font color="#009900">$chunk</font> <font color="#990000">=</font> <b><font color="#000000">fread</font></b><font color="#990000">(</font> <font color="#009900">$fp</font><font color="#990000">,</font> <font color="#993399">1024</font> <font color="#990000">);</font>
+                <b><font color="#000000">fclose</font></b><font color="#990000">(</font> <font color="#009900">$fp</font> <font color="#990000">);</font>
+        <font color="#FF0000">}</font></tt></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-21T17_15_11.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-21T18_04_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-21T12_39_39.txt" name="e2009-01-21T12_39_39.txt"></a>
+<h2 class="date">01.21.2009 12:39</h2>
+<div class="blogbody">
+<h3 class="title">Help with swf and python templating</h3>
+<div class="item-description">
+Dear Web...
+<br /><br />
+Can anyone please help me out with these two things that are tripping me up?
+<br /><br />
+My first problem is that I've been unable convert a SWF video file
+(with audio) to a more traditional movie file (e.g. H.264 / mp4 ).
+Everything I've tried so far has either not worked or really messed up
+the resulting movie.  I have access to Mac and Linux (and if really
+need be to Windows XP).  I'd prefer not to purchase any more software.
+I've got Adobe CS3 (w/ Photoshop, Illustrator, Indesign), the older
+Flash MX 2004 (before Macromedia got bought by Adobe), and Quicktime Pro.
+<br /><br />
+I don't really want to purchase <a
+href="http://mac.eltima.com/swf-player.html">swf-player</a> or others.
+The trillian demo seemed to work, but left a water mark.
+<br /><br />
+I tried mencoder, ffmpeg, swftools, vlc and when I got a result, it
+was not very good.  If you know the command line or options that will
+make one of these work, I would be very grateful!
+<br /><br />
+I just want to convert these two swfs to a more usable format: <a href="http://gge.unb.ca./Pubs/TR254InnerApproachToSaintJohn.swf">TR254InnerApproachToSaintJohn.swf</a> and <a href="http://gge.unb.ca./Pubs/TR254TheChannelIntoTheHarbour.swf">TR254TheChannelIntoTheHarbour.swf</a> from Andres Millian's thesis on this page: <a href="http://gge.unb.ca./Pubs/TechnicalReports.html">UNB Geodesy &amp; Geomatics Engineering Technical Reports</a>
+<br /><br />
+My second question... Does anyone have a simpler explanation /
+tutorial of how to use create a new template for PasteScript's
+<i>paster create -t foo</i>?  I've found a couple demos, but I
+need something a bit simpler to get going.  I tried looking in
+the pylons code and I don't seem to see the __init__ code that the other
+demos talk about.  And the pbp.skel package requires zope.test.
+<ul>
+<li><a href="http://www.themeswiki.org/Creating_template_for_Python_package">http://www.themeswiki.org/Creating_template_for_Python_package</a></li>
+<li><a href="http://wiki.pylonshq.com/display/pylonscookbook/Creating+Templates+For+The+paster+create+Command">http://wiki.pylonshq.com/display/pylonscookbook/Creating+Templates+For+The+paster+create+Command</a></li>
+<li><a href="http://www.stereoplex.com/two-voices/fez-djangoskel-django-projects-and-apps-as-eggs">http://www.stereoplex.com/two-voices/fez-djangoskel-django-projects-and-apps-as-eggs</a></li>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-21T12_39_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-21T17_15_11.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-21T08_46_53.txt" name="e2009-01-21T08_46_53.txt"></a>
+<h2 class="date">01.21.2009 08:46</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth Browser Plugin gadget</h3>
+<div class="item-description">
+This is a super easy way of displaying a kmz!  I saw this on the
+Google Earth Design blog: <a
+href="http://googleearthdesign.blogspot.com/2009/01/gadget-experiment.html">Gadget
+Experiment<a>.  I went to the <a
+href="http://www.gmodules.com/ig/creator?synd=open&url=http://hosting.gmodules.com/ig/gadgets/file/114026893455619160549/embedkmlgadget.xml">Google
+Earth Gadget page</a>.  Then I plugged in the URL to <a href="http://sketchup.google.com/3dwarehouse/details?mid=5b4acc5f6f4083dc7efb52376d7391bd">Christiana's
+Highland Light model</a> converted to a KMZ (not as pretty as her original
+model).  You don't even need a Google Maps API key for this!
+<br /><br />
+Here is what the setup looks like:
+<br /><br />
+<img title="Gadget setup controls" withgrayborder="True" src="../attachments/2009-01/ge-gadget-setup.png"/>
+<br /><br />
+The final result in the blog:
+<br /><br />
+<script src="http://www.gmodules.com/ig/ifr?url=http://hosting.gmodules.com/ig/gadgets/file/114026893455619160549/embedkmlgadget.xml&amp;up_kml_url=http%3A%2F%2Fschwehr.org%2Fblog%2Fattachments%2F2009-01%2Fhighland-light.kmz&amp;up_view_mode=earth&amp;up_earth_2d_fallback=0&amp;up_earth_fly_from_space=1&amp;up_earth_show_buildings=0&amp;synd=open&amp;w=600&amp;h=400&amp;title=Embedded+KML+Viewer&amp;border=%23ffffff%7C0px%2C1px+solid+%23993333%7C0px%2C1px+solid+%23bb5555%7C0px%2C1px+solid+%23DD7777%7C0px%2C2px+solid+%23EE8888&amp;output=js"></script>
+<br /><br />
+Here is the javascript (with some extra newlines to make it readable):
+<pre><tt><font color="#990000">&lt;</font><font color="#008080">script</font> src<font color="#990000">=</font><font color="#FF0000">"http://www.gmodules.com/ig/ifr?</font>
+<font color="#FF0000">url=http://hosting.gmodules.com/ig/gadgets/file/114026893455619160549/embedkmlgadget.xml</font>
+<font color="#FF0000">&amp;amp;up_kml_url=http%3A%2F%2Fschwehr.org%2Fblog%2Fattachments%2F2009-01%2Fhighland-light.kmz</font>
+<font color="#FF0000">&amp;amp;up_view_mode=earth</font>
+<font color="#FF0000">&amp;amp;up_earth_2d_fallback=0</font>
+<font color="#FF0000">&amp;amp;up_earth_fly_from_space=1</font>
+<font color="#FF0000">&amp;amp;up_earth_show_buildings=0</font>
+<font color="#FF0000">&amp;amp;synd=open</font>
+<font color="#FF0000">&amp;amp;w=600</font>
+<font color="#FF0000">&amp;amp;h=400</font>
+<font color="#FF0000">&amp;amp;title=Embedded+KML+Viewer</font>
+<font color="#FF0000">&amp;amp;border=%23ffffff%7C0px%2C1px+solid+%23993333%7C0px%2C1px+solid+%23bb5555%7C0px%2C1px+solid+%23DD7777%7C0px%2C2px+solid+%23EE8888</font>
+<font color="#FF0000">&amp;amp;output=js"</font><font color="#990000">&gt;&lt;/</font>script<font color="#990000">&gt;</font></tt></pre>
+For those of you who are not able (or allowed) to install the plugin,
+here is what it looks like:
+<br /><br />
+<img title="Google Earth Gadget with Highland Light" withgrayborder="True" src="../attachments/2009-01/ge-gadget-highland-light.png"/>
+<br /><br />
+Highland Light in the Google Sketchup 3D Warehouse... seems to act a
+little strange.
+<br /><br />
+<iframe src="http://sketchup.google.com/3dwarehouse/mini?mid=5b4acc5f6f4083dc7efb52376d7391bd" width="400" height="300" scrolling="no" marginheight="0" marginwidth="0" frameborder="0"></iframe>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-21T08_46_53.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-21T12_39_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-20T22_05_40.txt" name="e2009-01-20T22_05_40.txt"></a>
+<h2 class="date">01.20.2009 22:05</h2>
+<div class="blogbody">
+<h3 class="title">David Sandwell on Bathymetry and Google</h3>
+<div class="item-description">
+Update 22-Jan-2009: Now covered by Google Earth Blog - <a href="http://www.gearthblog.com/blog/archives/2009/01/80_milewide_signature_in_ocean_floo.html">80 mile-wide Signature in Ocean Floor in Google Earth</a> and I found a 18-Jan comment from <a href="http://clasticdetritus.com/2009/01/18/sea-floor-sunday-39-improved-bathymetry-data-in-google-earth/">David Sandwell on Sea-Floor Sunday #39: Improved bathymetry data in Google Earth</a> on Clastic Detritus.
+<br /><br />
+Update 24-Jan-2009: For those who would like to see the data, V5 is
+available here: <a
+href="ftp://topex.ucsd.edu/pub/srtm30_plus/">SRTM30_PLUS: DATA FUSION
+OF SRTM LAND TOPOGRAPHY WITH MEASURED AND ESTIMATED SEAFLOOR
+TOPOGRAPHY, SRTM30_PLUS V5.0 September 16, 2008</a> by Joseph J. (JJ)
+Becker David T. Sandwell.
+<br /><br />
+<a href="http://topex.ucsd.edu/sandwell/">David Sandwell</a> sent me a
+note about the current state of global gridded bathymetry:
+<pre>The new bathymetry in Google Earth comes mostly from a recent
+compilation called SRTM30_PLUS.  The global bathymetry map (30 arc
+second resolution) is based on sparse ship soundings and dense
+satellite altimeter measurements of the marine gravity field.  This is
+basically an updated version of the Smith and Sandwell grids but at a
+finer grid spacing and pole-to-pole.  The land data are an exact copy
+of the SRTM30 data.  SRTM30_PLUS means SRTM30 land PLUS the ocean.
+<!-- -->
+Much more information, including access to the global grids,
+is available at:
+<a href="http://topex.ucsd.edu/WWW_html/srtm30_plus.html">http://topex.ucsd.edu/WWW_html/srtm30_plus.html</a>
+<!-- -->
+Google has added some very high resolution data sets in a few coastal
+areas and has done some work matching the bathymetry with the
+coastlines.  Our site includes a place to comment on the data quality;
+negative comments are the most valuable.  These comments will help us
+to improve the bathymetry for the next version.  Actually Google is
+one version behind since they have V4.0 and the latest version
+published in September is V5.0 so a number of things have been fixed.
+To confirm the source of this grid fly to the location N0 E94.75 to
+observe the initials DTS/SIO.  The signature is a way to keep track of
+how the grid is being used.
+<!-- -->
+We have two more years of NSF funding to continue the assembly of raw
+ship soundings and updating the grids so complaints and suggestions
+will be mapped into a to-do list.  Also we accept ship soundings in
+almost any format so send me an e-mail if you have data.  The
+SRTM30_PLUS grid has a matching grid of source identification number
+so we can see which cells are empty and trace data back to the
+original source.  In addition to the grids we will make the (public)
+raw edited sounding data available to everyone.
+<!-- -->
+David T. Sandwell
+Scripps Institution of Oceanography
+dsandwell@ucsd.edu</pre>
+If you are interested in the topic, make sure to read:
+<br /><br />
+<a
+href="http://topex.ucsd.edu/sandwell/publications/124_MG_Becker.pdf">Global
+Bathymetry and Elevation Data at 30 Arc Seconds Resolution:
+SRTM30_PLUS</a> by J. J. Becker, D. T. Sandwell, W. H. F. Smith,
+J. Braud, B. Binder, J. Depner, D.  Fabre, J. Factor, S. Ingalls,
+S-H. Kim, R. Ladner, K. Marks, S. Nelson, A. Pharaoh, G. Sharman,
+R. Trimmer, J. VonRosenburg, G. Wallace, and P. Weatherall.
+<br /><br />
+JJ Becker's thesis: <a href="http://topex.ucsd.edu/sandwell/becker_2008.pdf">Improved Global Bathymetry, Global Sea Floor Roughness, and Deep Ocean Mixing</a>, 2008.
+<br /><br />
+and a number of articles on David Sandwell's <a
+href="http://topex.ucsd.edu/sandwell/publications/publications.html">publications
+page</a>.
+<br /><br />
+The embedded bathymetry info:
+<br /><br />
+<a href="../attachments/2009-01/BathymetryTag-SIO.kmz">BathymetryTag-SIO.kmz</a>
+<br /><br />
+<img title="SIO in Google Earth" withgrayborder="True" src="../attachments/2009-01/sio-revision-in-ge.png"/>
+<br /><br />
+Trackback: <a href="http://www.ogleearth.com/2009/01/links_google_oc.html">Links: Google Ocean soon? Scilly, Cove, bathymetry redux, Digital Karnak...</a> [ogleearth]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-20T22_05_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-21T08_46_53.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-20T18_26_58.txt" name="e2009-01-20T18_26_58.txt"></a>
+<h2 class="date">01.20.2009 18:26</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth Browser Plugin - Hello World</h3>
+<div class="item-description">
+Matt and I gave a first go at looking into working with the Google
+Earth Browser Plugin.  I like what I see so far.  I took Christiana's
+Highland Light and exported a kmz from Google Sketchup Pro.  We
+started working from the <a
+href="http://code.google.com/apis/earth/">Google Earth API</a> page.
+I threw the model kmz on a server and added it to the <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/helloearth/index.html">Hello Earth</a>
+example on the <a href="http://code.google.com/apis/earth/documentation/examples.html">examples page</a>.
+<br /><br />
+<img title="Hello World" withgrayborder="True" src="../attachments/2009-01/ge-browser-plugin-hello-world.png"/>
+<pre><tt><b><font color="#000080">&lt;!DOCTYPE</font></b> <font color="#009900">html</font> <font color="#009900">PUBLIC</font> <font color="#FF0000">"-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</font><b><font color="#000080">&gt;</font></b><b><font color="#0000FF">&lt;html&gt;</font></b>
+  <b><font color="#0000FF">&lt;meta</font></b> <font color="#009900">http-equiv</font><font color="#990000">=</font><font color="#FF0000">"content-type"</font> <font color="#009900">content</font><font color="#990000">=</font><font color="#FF0000">"text/html; charset=utf-8"</font> <b><font color="#0000FF">/&gt;</font></b>
+  <b><font color="#0000FF">&lt;head&gt;</font></b>
+    <b><font color="#0000FF">&lt;title&gt;</font></b>Hello Google Earth!<b><font color="#0000FF">&lt;/title&gt;</font></b>
+    <b><font color="#0000FF">&lt;script</font></b> <font color="#009900">src</font><font color="#990000">=</font><font color="#FF0000">"http://www.google.com/jsapi?key=ABQIAAAAM1F8u7ITEI-8fznypC4hMhRvjyYGNOjAIS98eSpdzWedmD3E9BTd8wbBTwPfUiqpY0mIBlJTwIDOMQ"</font><b><font color="#0000FF">&gt;&lt;/script&gt;</font></b>
+    <b><font color="#0000FF">&lt;script&gt;</font></b>
+google.load("earth", "1");
+<!-- -->
+var ge = null;
+<!-- -->
+function init() {
+  google.earth.createInstance("map3d", initCB, failureCallback);
+}
+<!-- -->
+function initCB(object) {
+  ge = object;
+  ge.getWindow().setVisibility(true);
+<!-- -->
+  var networkLink = ge.createNetworkLink("");
+  networkLink.setFlyToView(true);
+  var link = ge.createLink("");
+<!-- -->
+  link.setHref("http://132.177.103.241/kurt/highland-light.kmz");
+  networkLink.setLink(link);
+  ge.getFeatures().appendChild(networkLink);
+<!-- -->
+  ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+}
+<!-- -->
+function failureCallback(object) {
+}
+    <b><font color="#0000FF">&lt;/script&gt;</font></b>
+<!-- -->
+  <b><font color="#0000FF">&lt;/head&gt;</font></b>
+  <b><font color="#0000FF">&lt;body</font></b> <font color="#009900">onload</font><font color="#990000">=</font><font color="#009900">'init()'</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#009900">'body'</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;center&gt;</font></b>
+      <b><font color="#0000FF">&lt;div&gt;</font></b>
+        Hello, Earth!
+      <b><font color="#0000FF">&lt;/div&gt;</font></b>
+<!-- -->
+      <b><font color="#0000FF">&lt;div</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#009900">'map3d_container'</font>
+           <font color="#009900">style</font><font color="#990000">=</font><font color="#009900">'border:</font> <font color="#009900">1px</font> <font color="#009900">solid</font> <font color="#009900">silver;</font> <font color="#009900">height:</font> <font color="#009900">600px;</font> <font color="#009900">width:</font> <font color="#009900">800px;'</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;div</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#009900">'map3d'</font> <font color="#009900">style</font><font color="#990000">=</font><font color="#009900">'height:</font> <font color="#009900">100%;'</font><b><font color="#0000FF">&gt;&lt;/div&gt;</font></b>
+      <b><font color="#0000FF">&lt;/div&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;/center&gt;</font></b>
+  <b><font color="#0000FF">&lt;/body&gt;</font></b>
+<b><font color="#0000FF">&lt;/html&gt;</font></b>
+</tt></pre>
+Google has created some great demos.  For instance, check out the <a href="http://earth-api-samples.googlecode.com/svn/trunk/demos/drive-simulator/index.html">Drive Simulator</a>:
+<img title="GE Plugin - Drive Simulator" withgrayborder="True" src="../attachments/2009-01/ge-plugin-driving-simulator.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-20T18_26_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-20T22_05_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-20T09_46_34.txt" name="e2009-01-20T09_46_34.txt"></a>
+<h2 class="date">01.20.2009 09:46</h2>
+<div class="blogbody">
+<h3 class="title">Day of the Icicle</h3>
+<div class="item-description">
+There is a lot of snow here in NH.  Yesterday was the day of the icicle.
+<br /><br />
+<img title="Tutle's Red Barn" withgrayborder="True" src="../attachments/2009-01/day-of-the-icicle.jpg"/>
+<br /><br />
+The falls downtown this morning...
+<br /><br />
+<img title="Camera phone image" withgrayborder="True" src="../attachments/2009-01/dover-falls-icy.jpg"/>
+<br /><br />
+Compare that to a morning walk I took last week in Key West (I got a
+grand total of about 3 hours of exploring in):
+<br /><br />
+<img title="7 AM on Route 1" withgrayborder="True" src="../attachments/2009-01/key-west-morning-walk.jpg"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-20T09_46_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-20T18_26_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-19T23_43_02.txt" name="e2009-01-19T23_43_02.txt"></a>
+<h2 class="date">01.19.2009 23:43</h2>
+<div class="blogbody">
+<h3 class="title">Why not to have the same message in multiple DAC/FI locations</h3>
+<div class="item-description">
+Last week at the IALA AIS working group, one of the vendors pointed
+out that messages are appearing with multiple DAC/FI combinations.
+For example, if a competent authority tells a developer to use 366/54,
+then the message is used in a different location, the developer will
+use for example, 303/54 to transmit the same message content.  This
+causes two problems that I can think of:
+<br /><br />
+<b>First</b>, if a Electronic Chart System (ECS) is setup to work with the
+first 366/54 and the vendor is not aware of 303/54 being the same
+message content, then the vessel will not recognize the message when
+it transits to Alaska.  This is adding extra complexity to every
+ECS/ECDIS system that might end up in multiple locations on the Earth.
+<br /><br />
+<b>Second</b>, this reuse <i>drastically</i> collapses the space of
+available messages from over 17 thousand to something like 120 to 250.
+That is implying that for a particular area, there is only a DAC of 1
+for international IMO messages, a local DAC, and possibly a 3rd or 4th
+regional DAC that can be used in a particular area.
+<br /><br />
+There is no reason not to reuse the same DAC/FI else where in the
+world.  If you are a competent authority, I <b>strongly</b> urge you
+to reuse other binary application messages from other DACs and keep
+the original DAC/FI.  If the message, was originally 366/54, use
+366/54 no matter where you are in the world.  You can authorize the
+use of transmitting that DAC/FI pair in your part of the world.
+<br /><br />
+If you see that someone else has a great message, by all means use it,
+but please don't change the DAC/FI.  To quote the ITU R1371-3
+specification for AIS (P. 58, Annex 5, 1.2):
+<pre>It is recommended that the administrator of application specific
+messages base the DAC selection on the maritime identification digit
+(MID) of the administrator's country or region. It is the intention
+that any application specific message can be utilized worldwide. <b>The
+choice of the DAC does not limit the area where the message can be
+used.</b></pre>
+[emaphasis added]
+<br /><br />
+So if you are creating a new type of message, put it in your DAC.  If
+you are using an existing message, do not put it in another DAC.
+<br /><br />
+Putting a DAC in a message should not specify where in the world the
+transmitter is located.  Location can be determined based on other AIS
+messages and/or the MMSI of a known station.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-19T23_43_02.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-20T09_46_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-19T23_10_49.txt" name="e2009-01-19T23_10_49.txt"></a>
+<h2 class="date">01.19.2009 23:10</h2>
+<div class="blogbody">
+<h3 class="title">AIS Binary Application Message Collection</h3>
+<div class="item-description">
+At the IALA AIS working group meeting last week in Key West, FL, Lee
+Alexander and I presented where we were with looking into the
+possibility of an AIS Binary Message Register.  There is yet a lot of
+work for IALA to do, but the group concluded that from here, the first
+step is to create an <a
+href="http://vislab-ccom.unh.edu/~schwehr/ais/collection/">AIS Binary
+Message Collection</a>.  If you have any AIS messages that you have
+created, please email them to me.  Each message should have two files.
+The first is a summary.  Just fill in the <a
+href="http://vislab-ccom.unh.edu/~schwehr/ais/collection/v1/summary-template.doc">summary-template.doc</a>.
+The second document should fully specify how your message works.
+Include the bit layouts and explain the why and how of the message
+working out in the world.  It can be a word document, pdf, or other
+comment format.
+<br /><br />
+The group created a sample to get the process kicked off.  The message
+is in <a
+href="http://vislab-ccom.unh.edu/~schwehr/ais/collection/v1/by-dac/235/">DAC
+235</a> and is an addressed message 6 for AtoN monitoring.
+<br /><br />
+First, here is the summary looks like: <a href="http://vislab-ccom.unh.edu/~schwehr/ais/collection/v1/by-dac/235/235-10-6-sum-aton-monitoring.doc">235-10-6-sum-aton-monitoring.doc</a>
+<br /><br />
+<img title="Summary for an AIS Binary Message Application" withgrayborder="True" src="../attachments/2009-01/235-10-6-sum-aton-monitoring.png"/>
+<br /><br />
+With the summary is also a detailed description: <a
+href="http://vislab-ccom.unh.edu/~schwehr/ais/collection/v1/by-dac/235/235-10-6-aton-monitoring.doc">235-10-6-aton-monitoring.doc</a>.
+In addition to the bits shown here, it is important to give as much
+extra text as possible to explain the AIS message.  e.g.
+<pre>GLA Format for AIS Aids to Navigation Monitoring Message
+<!-- -->
+INTRODUCTION
+<!-- -->
+One of the functions of the AIS AtoN Transponder is to provide Aids to
+Navigation monitoring data via AIS message type 6 for the AtoN
+administration.
+<!-- -->
+This message 6 is an addressed binary message, which is specified by ITU.
+<!-- -->
+MESSAGE INTERVALS
+<!-- -->
+The interval between the transmission of these messages will be
+synchronized with message 21, although not necessarily at the same
+reporting rate. If Message 21 is not used at a particular site, then
+the reporting interval should be selected to minimise the power
+requirement of the transponder, whilst still providing enough data to
+enable meaningful diagnostic analysis.
+...</pre>
+<img title="More detail of the AIS binary message" withgrayborder="True" src="../attachments/2009-01/235-10-6-aton-monitoring.png"/>
+<br /><br />
+Please, only one message per document.  Send item for the collection
+to kurt at ccom.unh.edu.
+<br /><br />
+Also, note that documents in the collection do not in any way control
+the use of DAC's and FI's.  Control of DAC's and FI's are in the hands
+of Regional Competent Authorities.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-19T23_10_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-19T23_43_02.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-19T17_45_26.txt" name="e2009-01-19T17_45_26.txt"></a>
+<h2 class="date">01.19.2009 17:45</h2>
+<div class="blogbody">
+<h3 class="title">segy EBCDIC encoded text blocks</h3>
+<div class="item-description">
+I have some EBCDIC Knudsen data that I need to read.  Time to do a
+better job of using python to detect and use EBCDIC, preferably
+without the user having to do anything.  Python has a <a
+href="http://docs.python.org/library/codecs.html">codec module</a>,
+for which I found a <a
+href="http://effbot.org/librarybook/codecs.htm">simple example</a>.
+The list of codecs on the python codec module page is confusing.
+It was only after working on this post that I discovered that I need
+"<i>cp037 IBM037, IBM039</i>".  Here is how I went about trying to figure 
+out this whole system.  First, I wanted to see what happened when I
+loaded the SEGY text header (which in this case is EBCDIC).
+<pre>% python
+&gt;&gt;&gt; import codecs
+&gt;&gt;&gt; f = codecs.open('foo.sgy', 'r', 'ascii')
+&gt;&gt;&gt; hdr = f.read(3200)
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128)</pre>
+This gave me a strategy to see which codecs would work.  Looking at
+the codecs directory:
+<pre>% <b>grep -i ebcdic /sw/lib/python2.6/encodings/*.py</b>
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_ca'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_nl'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_us'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_wt'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_he'       : 'cp424',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_be'       : 'cp500',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_ch'       : 'cp500',
+/sw/lib/python2.6/encodings/cp037.py:""" Python Character Mapping Codec cp037 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP037.TXT' with gencodec.py.
+/sw/lib/python2.6/encodings/cp1026.py:""" Python Character Mapping Codec cp1026 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP1026.TXT' with gencodec.py.
+/sw/lib/python2.6/encodings/cp500.py:""" Python Character Mapping Codec cp500 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP500.TXT' with gencodec.py.
+/sw/lib/python2.6/encodings/cp875.py:""" Python Character Mapping Codec cp875 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP875.TXT' with gencodec.py.</pre>
+So I expect to get a number of successful decodes by trying every codec. 
+Python already comes with a tool to list the codecs:
+<pre>% <b>python /sw/lib/python2.6/Tools/unicode/listcodecs.py</b>
+all_codecs = [
+    'ascii',
+    'base64_codec',
+    'big5',
+    'big5hkscs',
+    'bz2_codec',
+    'charmap',
+    'cp037',
+    'cp1006',
+    'cp1026',
+    'cp1140',
+    'cp1250',
+...
+    'tis_620',
+    'undefined',
+    'unicode_escape',
+    'unicode_internal',
+    'utf_16',
+    'utf_16_be',
+    'utf_16_le',
+    'utf_32',
+    'utf_32_be',
+    'utf_32_le',
+    'utf_7',
+    'utf_8',
+    'utf_8_sig',
+    'uu_codec',
+    'zlib_codec',
+]</pre>
+Copying the listcodecs.py file to the local directory, I can use it to try each of the codecs.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> codecs
+<b><font color="#000080">import</font></b> listcodecs
+<b><font color="#000080">import</font></b> encodings
+<!-- -->
+<b><font color="#0000FF">for</font></b> codec_name <b><font color="#0000FF">in</font></b> listcodecs<font color="#990000">.</font><b><font color="#000000">listcodecs</font></b><font color="#990000">(</font>encodings<font color="#990000">.</font>__path__<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]):</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        f <font color="#990000">=</font> codecs<font color="#990000">.</font><b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'foo.sgy'</font><font color="#990000">,</font> <font color="#FF0000">'r'</font><font color="#990000">,</font> codec_name<font color="#990000">)</font>
+<!-- -->
+        hdr <font color="#990000">=</font> f<font color="#990000">.</font><b><font color="#000000">read</font></b><font color="#990000">(</font><font color="#993399">3200</font><font color="#990000">)</font>
+        <b><font color="#000000">str</font></b><font color="#990000">(</font>hdr<font color="#990000">)</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'CODEC SUCCESS:'</font><font color="#990000">,</font>codec_name
+        <b><font color="#0000FF">print</font></b> hdr
+<!-- -->
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'FAILED:'</font><font color="#990000">,</font>codec_name</tt></pre>
+The results of the above look something like this:
+<pre>FAILED: ascii
+FAILED: base64_codec
+FAILED: big5
+FAILED: big5hkscs
+FAILED: bz2_codec
+FAILED: charmap
+CODEC SUCCESS: cp037
+C 1 CLIENT                        COMPANY                       CREW NO         
+C 2 LINE            AREA                        MAP ID                
+C 3 REEL NO           DAY-START OF REEL     YEAR      OBSERVER                  
+C 4 INSTRUMENT: MFG KEL        MODEL 320B/R     SERIAL NO 030505                
+C 5 DATA TRACES/RECORD        AUXILIARY TRACES/RECORD         CDP FOLD          
+C 6 SAMPLE INTERVAL         SAMPLES/TRACE       BITS/IN      BYTES/SAMPLE       
+C 7 RECORDING FORMAT        FORMAT THIS REEL        MEASUREMENT SYSTEM          
+C 8 SAMPLE CODE: FLOATING PT     FIXED PT X   FIXED PT-GAIN     CORRELATED      
+C 9 GAIN  TYPE: FIXED     BINARY     FLOATING POINT     OTHER                   
+C10 FILTERS: ALIAS     HZ  NOTCH     HZ  BAND     -     HZ  SLOPE    -    DB/OCT
+C11 SOURCE: TYPE            NUMBER/POINT        POINT INTERVAL
+...</pre>
+Here are the codecs that succeeded:
+<pre>% <b>./codec_test.py | grep SUCCESS</b>
+CODEC SUCCESS: cp037
+CODEC SUCCESS: cp1026
+CODEC SUCCESS: cp1140
+CODEC SUCCESS: cp424
+CODEC SUCCESS: cp500
+CODEC SUCCESS: cp875
+CODEC SUCCESS: quopri_codec
+CODEC SUCCESS: string_escape</pre>
+Looking at what those values in the <a
+href="http://docs.python.org/library/codecs.html#id3">table of
+Standard Encodings</a>, it is clear that we only want cp027, which is
+EBCDIC in English.  We could also use cp437, cp424, cp500, cp875, 
+cp1026, or cp1140 as fallbacks.  However, quopri_codec and 
+string_escape return junk.
+<br /><br />
+To see what cp037 looks like, take a look at this page:
+<a href="http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/EBCDIC/CP037.TXT">http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/EBCDIC/CP037.TXT</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-19T17_45_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-19T23_10_49.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-19T09_50_16.txt" name="e2009-01-19T09_50_16.txt"></a>
+<h2 class="date">01.19.2009 09:50</h2>
+<div class="blogbody">
+<h3 class="title">AGU Virtual Globes poster on Phoenix</h3>
+<div class="item-description">
+John took this image of my setup in the <a
+href="http://conferences.images.alaska.edu/agu/2008/index.htm">Virtual
+Globes</a> poster session at AGU.  My big regret of the meeting is that
+by giving a poster, I didn't have time to talk to more than a couple of
+the other poster presenters.
+<br /><br />
+<img title="Photo by John Bailey" withgrayborder="True" src="../attachments/2009-01/agu-virtual-globes-phoenix.png"/>
+<br /><br />
+<a href="http://picasaweb.google.com/geobrowser/AGU2008">John Bailey's AGU 2008 images</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-19T09_50_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-19T17_45_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-18T22_36_45.txt" name="e2009-01-18T22_36_45.txt"></a>
+<h2 class="date">01.18.2009 22:36</h2>
+<div class="blogbody">
+<h3 class="title">Converting old Arc/Info V7 Coverages</h3>
+<div class="item-description">
+I've got two geologic maps from the Great Basin National Park (GBNP)
+that I worked hard to put into Arc/Info back in 1994-5.  With help
+from <a href="http://pubpages.unh.edu/~mlg52/">Monica</a>, I've at least got some of the data back.  My archived
+data is tar'ed in gbnp-1995.tar.bz2 which can be found in my <a
+href="http://vislab-ccom.unh.edu/~schwehr/data/1995-gbnp/">GBNP
+archive</a> Back in 1995, I did a whole series of 3D visualizations
+using GRASS on an SGI.  The results were really good!  I wish I had
+managed to save the grass project.
+<br /><br />
+<img title="Visualized in GRASS" withgrayborder="True" src="../attachments/2009-01/wheeler-peak-gbnp-grass.png"/>
+<br /><br />
+I could not figure out how ot get gdal to read the Arc/Info V7 project
+with the <a href="http://www.gdal.org/ogr/drv_avcbin.html">avcbin</a>
+driver.  Monica used <a
+href="http://avce00.maptools.org/avce00/index.html">AVCE00</a> to
+convert the files to e00.  I took a converted e00 file and ran it
+though gdal:
+<pre>% <b>ogr2ogr -f KML minerva-canyon.{kml,e00}</b></pre>
+After a little bit of tweaking, here is the view in Google Earth with only a few of the placemarks.
+<br /><br />
+<img title="In Google Earth" withgrayborder="True" src="../attachments/2009-01/minerva-canyon-gbnp-ge.png"/>
+<br /><br />
+How do you parse the INFO database files?  Perhaps this: <a href="http://avce00.maptools.org/docs/v7_bin_cover.html#ARC.DAT">v7_bin_cover.html#ARC.DAT</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-18T22_36_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-19T09_50_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-17T20_50_18.txt" name="e2009-01-17T20_50_18.txt"></a>
+<h2 class="date">01.17.2009 20:50</h2>
+<div class="blogbody">
+<h3 class="title">Combining JavaScript libraries with Django using fink</h3>
+<div class="item-description">
+I've started working again on getting JavaScript libraries into fink
+such that they can be used from Django.  The goal is to make it as
+easy as possible.  There is still going to be porting work if you
+switch platforms, but I am hoping to constrain it to editing just the
+project's settings.py.  Here is the lightnighting tour using James
+Bennett's Practical Django Projects book - up to page 26 in Chapter 3.
+James creates a basic flat page system and addes the <a href="http://tinymce.moxiecode.com/">TinyMCE</a>
+javascript library to the Admin editing of flatpages.  Present here
+without explanation...
+<br /><br />
+This is on Mac OSX 10.5.6 with Django 1.0.2.
+<pre>% <b>fink install django-py26</b>
+% <b>fink install tinymce-js</b>
+% <b>cd ~/Desktop</b>
+% <b>django-admin.py startproject django_tinymce_demo</b>
+% <b>mkdir -p templates/flatpages</b>
+% <b>cat &lt;&lt; EOF &gt; templates/flatpages/default.html</b>
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;{{ flatpage.title }}&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;{{flatpage.title}}&lt;/h1&gt;
+    {{ flatpage.content }}
+  &lt;/body&gt;
+&lt;/html&gt;
+EOF
+% <b>mkdir -p templates/admin/flatpages/flatpage</b>
+% <b>cp /sw/lib/python2.6/site-packages/django/contrib/admin/templates/admin/change_form.html \
+       templates/admin/flatpages/flatpage/</b>
+% <b>emacs templates/admin/flatpages/flatpage/change_form.html</b></pre>
+Just after this line:
+<pre>&lt;script type="text/javascript" src="../../../jsi18n/"&gt;&lt;/script&gt;</pre>
+Add these lines to change_form.html.  This tells the admin app to use
+the TineMCE editor with text areas for a flatpage change.
+<pre>&lt;!-- new change --&gt;
+&lt;script type="text/javascript" src="/javascript/tinymce/tiny_mce.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+tinyMCE.init({
+  mode: "textareas",
+  theme: "simple"
+});
+&lt;/script&gt;
+&lt;!-- END new change --&gt;</pre>
+Now edit settings.py.  Add these lines to the top of the file:
+<pre>import os.path
+PROJECT_DIR = os.path.dirname(__file__)
+<!-- -->
+JSPATH = '/sw/lib/javascript'</pre>
+And set these lines:
+<pre>DATABASE_ENGINE = 'sqlite3'
+DATABASE_NAME = 'demo.db3'</pre>
+I'm on the east coast, but you could leave this the way it is:
+<pre>TIME_ZONE = 'America/New_York'</pre>
+Set the template dirs and the installed apps:
+<pre>TEMPLATE_DIRS = (
+    <i>PROJECT_DIR+'/templates',</i>
+)
+<!-- -->
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    <i>'django.contrib.admin',
+    'django.contrib.flatpages',</i>
+)</pre>
+That concludes the changes to settings.py.  Now get everything setup in the urls.py:
+<pre>from django.conf.urls.defaults import *
+from settings import JSPATH # JavaScript location
+from django.contrib import admin
+admin.autodiscover()
+<!-- -->
+urlpatterns = patterns('',
+    (r'^admin/(.*)', admin.site.root),
+    (r'^javascript/(?P&lt;path&gt;.*)$', 'django.views.static.serve',
+     {'document_root': JSPATH}
+     ),
+    (r'',include('django.contrib.flatpages.urls')),
+)</pre>
+Time to get the django webserver going and start working with the admin interface.
+<pre>% <b>python manage.py syncdb</b>
+% <b>python manage.py runserver</b>
+% <b>open http://127.0.0.1:8000/admin/sites/site/1/</b></pre>
+In the Sites admin, change example.com to the settings for the test server:
+<pre>domain name: <i>127.0.0.1:8000</i>
+display name: <i>localhost</i></pre>
+Now create a flatpage:
+<pre>% <b>open http://127.0.0.1:8000/admin/flatpages/flatpage/</b></pre>
+Click <i>Add flat page</i> on the top right.  For the URL, make it <i>/test/</i>.
+Pick your 127.0.0.1:8000 site on the bottome left and 
+click <i>Save and continue editing</i>.  Finally, click <i>View on site</i>.
+<br /><br />
+While you were editing, you should see these icons at the bottom of
+the Content editing area. (<b>B</b> <i>I</i> <u>U</u> <del>ABC</del> ...)
+<br /><br />
+<img title="Django with TinyMCE from Fink" withgrayborder="True" src="../attachments/2009-01/fink-django-tinymce.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-17T20_50_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-18T22_36_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-17T19_38_58.txt" name="e2009-01-17T19_38_58.txt"></a>
+<h2 class="date">01.17.2009 19:38</h2>
+<div class="blogbody">
+<h3 class="title">Google Earth updated bathymetry</h3>
+<div class="item-description">
+Update: The google Earth Blog noticed too... <a href="http://www.gearthblog.com/blog/archives/2009/01/new_view_of_ocean_floor_in_google_e.html">New View of Ocean Floor in Google Earth</a>
+<br /><br />
+Update 22-Jan-2009: More people are noticing... <a href="http://www.hydro-international.com/news/id2929-Google_Bathymetry_Improved.html">Google Bathymetry Improved</a>
+<br /><br />
+I was just looking at Google Earth and realized that the bathymetry has
+been dramatically improved near shore.  For the US, it looks like they
+imported the Coastal Relief model.  It's definitely better, but you
+can see that the Coastal Relief model is digitized from contours.  The
+contours end up getting rendered has hard stepped shadows.  For marine
+scientists, that is pretty distracting, but the improvement makes
+Google Earth much more useful.
+<br /><br />
+When did this change happen?
+<br /><br />
+<img title="Improved Bathymetry" withgrayborder="True" src="../attachments/2009-01/ge-santa-cruz-updated.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-17T19_38_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-17T20_50_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-16T13_52_03.txt" name="e2009-01-16T13_52_03.txt"></a>
+<h2 class="date">01.16.2009 13:52</h2>
+<div class="blogbody">
+<h3 class="title">Ben Smith's work on visualizing VOS tracks</h3>
+<div class="item-description">
+Ben has been making great progress on visualizing the <a
+href="http://www.vos.noaa.gov/">Voluntary Observing Ship</a> (VOS)
+data. 
+<br /><br />
+<a href="http://vislab-ccom.unh.edu/vos/">http://vislab-ccom.unh.edu/vos/</a>
+<br /><br />
+Check out some of the results:
+<br /><br />
+<img title="North Pacific and Arctic Ocean" withgrayborder="True" src="../attachments/2009-01/bensmith-vos-1.png"/>
+<br /><br />
+<img title="Canandian Vessel visiting Barrow, AK" withgrayborder="True" src="../attachments/2009-01/bensmith-vos-arctic.png"/>
+<br /><br />
+<img title="Canadian Arctic Ocean" withgrayborder="True" src="../attachments/2009-01/bensmith-vos-arctic-canadians.png"/>
+<br /><br />
+This blue route would be nice one to have!
+<br /><br />
+<img title="Hawaii" withgrayborder="True" src="../attachments/2009-01/bensmith-vos-hawaii.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-16T13_52_03.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-17T19_38_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-15T06_02_27.txt" name="e2009-01-15T06_02_27.txt"></a>
+<h2 class="date">01.15.2009 06:02</h2>
+<div class="blogbody">
+<h3 class="title">Traveling south</h3>
+<div class="item-description">
+Lee and I are in a meeting down in Florida for a just over 24 hours.  Here are some images from the trip south.
+<br /><br />
+<img title="Cape Cod" withgrayborder="True" src="../attachments/2009-01/cape-cod-from-a-plane.jpg"/>
+<br /><br />
+<img title="Scituate and the bottom of the Cape" withgrayborder="True" src="../attachments/2009-01/scituate-from-a-plane.jpg"/>
+<br /><br />
+<img title="North Carolina - Cape Hatteras" withgrayborder="True" src="../attachments/2009-01/north-carolina.jpg"/>
+<br /><br />
+<img title="Driving Rt 1 through the Keys" withgrayborder="True" src="../attachments/2009-01/florida-keys.jpg"/>
+<br /><br />
+<img title="Arriving in Key West" withgrayborder="True" src="../attachments/2009-01/key-west-sunset.jpg"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-15T06_02_27.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-16T13_52_03.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-13T09_13_11.txt" name="e2009-01-13T09_13_11.txt"></a>
+<h2 class="date">01.13.2009 09:13</h2>
+<div class="blogbody">
+<h3 class="title">fink and javascript - openlayers test case</h3>
+<div class="item-description">
+In an effort to kickstart fink packaging of JavaScript APIs, I
+packaged OpenLayers last year.  I stuck an openlayers package in
+/sw/share/openlayers.  I realize that layout is not going to scale
+well or be obvious to those wanting to use/find APIs.  Following the
+models of python and ruby in fink, I changed openlayers to live in
+/sw/lib/javascript.  I renamed the package to openlayers-js and I've
+just released an updated package with version 2.7.  I moved the
+<i>tools</i> and <i>art</i> directories into share/doc/openlayers-js/
+and removed the openlayers <i>lib</i> directory completely.  This
+package only provides the single file version of OpenLayers.
+<pre>% <b>fink install openlayers-js</b>
+% <b>ls -l /sw/lib/javascript/</b>
+ls -l /sw/lib/javascript/openlayers/
+total 560
+-rw-r--r--  1 root admin 572604 Oct 27 13:04 OpenLayers.js
+drwxr-xr-x 25 root admin    850 Jan 13 09:03 img
+drwxr-xr-x  3 root admin    102 Jan 13 08:57 theme</pre>
+I'll likely be adding another JavaScript API today for some Django work.
+<br /><br />
+Please let me know if you use this successfully or if it causes trouble.
+<br /><br />
+It is interesting to look through the automated fink build errors: 
+<a href="http://fink.sodan.ecc.u-tokyo.ac.jp/build-10.4-powerpc/">http://fink.sodan.ecc.u-tokyo.ac.jp/build-10.4-powerpc/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-13T09_13_11.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-15T06_02_27.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-12T18_47_02.txt" name="e2009-01-12T18_47_02.txt"></a>
+<h2 class="date">01.12.2009 18:47</h2>
+<div class="blogbody">
+<h3 class="title">AIS Binary Message queuing format</h3>
+<div class="item-description">
+I've been looking into how systems that are sending messages to the
+USCG AIS systems should format the AIS Binary Message content.  First an
+example message to talk about:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;fetcherformatter</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"0.1"</font><b><font color="#0000FF">&gt;</font></b>
+  <b><font color="#0000FF">&lt;binmsg</font></b> <font color="#009900">sitename</font><font color="#990000">=</font><font color="#FF0000">"Tampa"</font> <font color="#009900">msgtype</font><font color="#990000">=</font><font color="#FF0000">"8"</font> <font color="#009900">dac</font><font color="#990000">=</font><font color="#FF0000">"366"</font> <font color="#009900">fi</font><font color="#990000">=</font><font color="#FF0000">"33"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">messagetype</font><font color="#990000">=</font><font color="#FF0000">"3"</font> 
+          <font color="#009900">contenttype</font><font color="#990000">=</font><font color="#FF0000">"partial"</font> <font color="#009900">droptime</font><font color="#990000">=</font><font color="#FF0000">"1215819600"</font> <font color="#009900">priority</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;bounding_region_wkt&gt;</font></b>POLYGON((101.5555 -74.543, 104.214 -74.543, 104.214 -72.102, 101.5555 -72.102, 101.5555 -74.543))<b><font color="#0000FF">&lt;/bounding_region_wkt&gt;</font></b>
+    <b><font color="#0000FF">&lt;marktime&gt;</font></b>1215819000<b><font color="#0000FF">&lt;/marktime&gt;</font></b> <i><font color="#9A1900">&lt;!-- time the data was recorded or generated --&gt;</font></i>
+    <b><font color="#0000FF">&lt;binary&gt;</font></b>111000000110100000000001001101000000010100000000001001010000000000100100000000000000000000000000<b><font color="#0000FF">&lt;/binary&gt;</font></b>
+  <b><font color="#0000FF">&lt;/binmsg&gt;</font></b>
+<b><font color="#0000FF">&lt;/fetcherformatter&gt;</font></b></tt></pre>
+The key is to keep the processing simple and allow the format to grow
+in the future if new requirements come up.  Right now, we are just
+using bounding boxes, but I've used <a
+href="http://en.wikipedia.org/wiki/Well-known_text">WKT</a> to allow
+regions to be arbitrary in the future.  The payload is binary data so
+any routing or queueing mechanisms do not need to understand the
+message.  If the contenttype is "complete," the queueing system can
+just add the binary to the standard message header, dac, and fi.  It
+then can send a BBM (NMEA Binary Broadcast Message) sentence to a
+transponder.
+<br /><br />
+With XML, there is always the question of what to put in as attributes
+and what to include within the body of a <i>binmsg</i> tag.  I put most
+of the information in as attributed rather than child nodes to make XPath
+as simple as possible.  The time the message was generated (marktime), is
+not critical to sorting (only droptime is), so I put it in the body.
+<br /><br />
+Here is a marked up message:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<i><font color="#9A1900">&lt;!-- Kurt Schwehr, 09-Jan-2009 --&gt;</font></i>
+<i><font color="#9A1900">&lt;!-- I tried to make this XPath friendly for use in the future --&gt;</font></i>
+<b><font color="#0000FF">&lt;fetcherformatter</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"0.1"</font><b><font color="#0000FF">&gt;</font></b>
+  <i><font color="#9A1900">&lt;!-- Original FF: BMS, Tampa, 101.5555, -74.543, 104.214, -72.102, 3, 3, 0, </font></i>
+<i><font color="#9A1900">       1215819000,0101101110100001,</font></i>
+<i><font color="#9A1900">       0011010111001101111000000110100000000001001101000000010100000000001001010000000000100100000000000000000000000000 --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: sitename: is required by PAWS, but I see no need </font></i>
+<i><font color="#9A1900">       to specify a site for areas that do not have PAWS.  Something downstream </font></i>
+<i><font color="#9A1900">       can always do a geographic serach for a sitename from a bounding box.  </font></i>
+<i><font color="#9A1900">       The message might span several sites.  --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: id: station or zone this applied to / comes from --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: messagetype: the environmental message subtype or</font></i>
+<i><font color="#9A1900">       zone type --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Content type: </font></i>
+<i><font color="#9A1900">       'partial': the message needs to be place within a message and may be </font></i>
+<i><font color="#9A1900">                  joined with others.  </font></i>
+<i><font color="#9A1900">       'complete': contains the complete content of a binary message</font></i>
+<i><font color="#9A1900">    --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: droptime is the time after which this message </font></i>
+<i><font color="#9A1900">       should just be dropped.  UNIX UTC timestamp --&gt;</font></i>
+  <i><font color="#9A1900">&lt;!-- Optional attribute: priority: 10 for highest, 1 for lowest.  Leave off if </font></i>
+<i><font color="#9A1900">       no particular priority --&gt;</font></i>
+  <b><font color="#0000FF">&lt;binmsg</font></b> <font color="#009900">sitename</font><font color="#990000">=</font><font color="#FF0000">"Tampa"</font> <font color="#009900">msgtype</font><font color="#990000">=</font><font color="#FF0000">"8"</font> <font color="#009900">dac</font><font color="#990000">=</font><font color="#FF0000">"366"</font> <font color="#009900">fi</font><font color="#990000">=</font><font color="#FF0000">"33"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">messagetype</font><font color="#990000">=</font><font color="#FF0000">"3"</font> 
+          <font color="#009900">contenttype</font><font color="#990000">=</font><font color="#FF0000">"partial"</font> <font color="#009900">droptime</font><font color="#990000">=</font><font color="#FF0000">"1215819600"</font> <font color="#009900">priority</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+    <i><font color="#9A1900">&lt;!-- WKT == Well-known Text http://en.wikipedia.org/wiki/Well-known_text --&gt;</font></i>
+    <i><font color="#9A1900">&lt;!-- Using EPSG SRID 4326 http://en.wikipedia.org/wiki/SRID --&gt;</font></i>
+    <b><font color="#0000FF">&lt;bounding_region_wkt&gt;</font></b>POLYGON((101.5555 -74.543, 104.214 -74.543, 104.214 -72.102, 101.5555 -72.102, 101.5555 -74.543))<b><font color="#0000FF">&lt;/bounding_region_wkt&gt;</font></b>
+    <b><font color="#0000FF">&lt;marktime&gt;</font></b>1215819000<b><font color="#0000FF">&lt;/marktime&gt;</font></b> <i><font color="#9A1900">&lt;!-- time the data was recorded or generated --&gt;</font></i>
+    <i><font color="#9A1900">&lt;!-- binary data but without the dac and fi --&gt;</font></i>
+    <b><font color="#0000FF">&lt;binary&gt;</font></b>111000000110100000000001001101000000010100000000001001010000000000100100000000000000000000000000<b><font color="#0000FF">&lt;/binary&gt;</font></b>
+  <b><font color="#0000FF">&lt;/binmsg&gt;</font></b>
+<!-- -->
+  <i><font color="#9A1900">&lt;!-- more messages can go here... --&gt;</font></i>
+<!-- -->
+<b><font color="#0000FF">&lt;/fetcherformatter&gt;</font></b>
+</tt></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-12T18_47_02.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-13T09_13_11.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-12T07_53_49.txt" name="e2009-01-12T07_53_49.txt"></a>
+<h2 class="date">01.12.2009 07:53</h2>
+<div class="blogbody">
+<h3 class="title">modwsgi for apache2 in fink</h3>
+<div class="item-description">
+<a href="http://www.python.org/dev/peps/pep-0333/">WSGI</a> is the Python Web Server Gateway Interface.
+<br /><br />
+I just added modwsgi to fink for Mac OSX 10.5.  Here is a quick
+tutorial that shows it working adapted from <a
+href="http://www.rkblog.rk.edu.pl/w/p/mod_wsgi/">rkblog mod_wsgi</a>.
+<br /><br />
+First, enable mod-wsgi for apache2:
+<pre>% <b>fink selfupdate</b>
+% <b>fink install libapache2-mod-wsgi-py26</b>
+% <b>sudo a2enmod wsgi2.6</b>
+% <b>sudo apache2ctl restart</b></pre>
+Now we can create the test app:
+<pre>% <b>mkdir ~/Sites/test-wsgi && cd ~/Sites/test-wsgi</b>
+% <b>echo "AddHandler wsgi-script .wsgi" &gt; .htaccess</b></pre>
+Now create test.wsgi
+<pre><tt><b><font color="#0000FF">def</font></b> <b><font color="#000000">application</font></b><font color="#990000">(</font>environ<font color="#990000">,</font> start_response<font color="#990000">):</font>
+    status <font color="#990000">=</font> <font color="#FF0000">'200 OK'</font> 
+    output <font color="#990000">=</font> <font color="#FF0000">'Hello World from a WSGI app!'</font>
+<!-- -->
+    response_headers <font color="#990000">=</font> <font color="#990000">[(</font><font color="#FF0000">'Content-type'</font><font color="#990000">,</font> <font color="#FF0000">'text/plain'</font><font color="#990000">),</font>
+                        <font color="#990000">(</font><font color="#FF0000">'Content-Length'</font><font color="#990000">,</font> <b><font color="#000000">str</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>output<font color="#990000">)))]</font>
+    <b><font color="#000000">start_response</font></b><font color="#990000">(</font>status<font color="#990000">,</font> response_headers<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">return</font></b> <font color="#990000">[</font>output<font color="#990000">]</font></tt></pre>
+Now try the test:
+<pre>% <b>open http://localhost/~$USER/test-wsgi/test.wsgi</b></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-12T07_53_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-12T18_47_02.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-11T16_58_25.txt" name="e2009-01-11T16_58_25.txt"></a>
+<h2 class="date">01.11.2009 16:58</h2>
+<div class="blogbody">
+<h3 class="title">fink mod_python</h3>
+<div class="item-description">
+I've covered CGI's, so now it is time to explore <a
+href="http://modpython.org/">mod_python</a> as I climb up the stack
+back towards Django.  Again, this is using fink's apache2 on Mac OSX
+10.5.6 (uname -r returns 9.6.0, fink --version gives 0.28.6).  First,
+we need to install mod python:
+<pre>% <b>fink install libapache2-mod-python-py26</b>
+% <b>sudo a2enmod python2.6</b>
+% <b>sudo apache2ctl restart</b></pre>
+This time, I'm going to use .htaccess in a test directory to control apache2's loading of python.
+<pre>% <b>mkdir ~/Sites/test2 && cd ~/Sites/test2</b>
+% <b>cat &lt;&lt; EOF &gt; .htaccess</b>
+AddHandler mod_python .py
+PythonHandler mptest
+PythonDebug On
+EOF
+% <b>cat &lt;&lt; EOF &gt; mptest.py</b>
+from mod_python import apache
+def handler(req):
+    req.content_type = 'text/plain'
+    req.write("Hello World!")
+    return apache.OK
+EOF
+% <b>open http://localhost/~$USER/test2/mptest.py</b></pre>
+You should now be looking at a <i>Hello World!</i> in your web browser.
+<br /><br />
+Time to switch to a real handler.  The publisher.
+<pre>% <b>mkdir ~/Sites/test3 && cd ~/Sites/test3</b>
+% <b>cat &lt;&lt; EOF &gt; .htaccess</b>
+AddHandler mod_python .py
+PythonHandler mod_python.publisher
+PythonDebug On
+EOF
+% <b>cat &lt;&lt; EOF &gt; hello.py</b>
+def index():
+   s = '''&lt;html&gt;
+&lt;body&gt;
+&lt;h2&gt;Hello World! mod python publisher&lt;/h2&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+'''
+   return s
+EOF
+% <b>open http://localhost/~$USER/test3/hello.py</b></pre>
+You can then add a page indexing into functions in hello.py.  Add this method:
+<pre>def another_page():
+    return 'yup, another page'</pre>
+Then check out this new URL:
+<pre>% <b>open http://localhost/~$USER/test3/hello.py/another_page</b></pre>
+Or add any object that has a string representation.  Add these strings to hello.py
+<pre>foo = 'bar'
+_fubar = 'not visible'</pre>
+Now try these two URLs:
+<pre>% <b>open http://localhost/~$USER/test3/hello.py/foo</b>
+% <b>open http://localhost/~$USER/test3/hello.py/fubar</b></pre>
+Any object that starts with an underscore is not visible and returns a mod python error in debug mode.
+<pre>MOD_PYTHON ERROR
+<!-- -->
+ProcessId:      78240
+Interpreter:    '127.0.0.1'
+<!-- -->
+ServerName:     '127.0.0.1'
+DocumentRoot:   '/sw/var/www/'
+<!-- -->
+URI:            '/~schwehr/test3/hello.py/fubar'
+Location:       None
+Directory:      '/Users/schwehr/Sites/test3/'
+Filename:       '/Users/schwehr/Sites/test3/hello.py'
+PathInfo:       '/fubar'
+<!-- -->
+Phase:          'PythonHandler'
+Handler:        'mod_python.publisher'
+<!-- -->
+Traceback (most recent call last):
+...</pre>
+Now to add form handling.  Create form.py:
+<pre><tt><b><font color="#000080">import</font></b> cgi
+<b><font color="#000080">import</font></b> urllib
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">handle_form</font></b><font color="#990000">(</font>req<font color="#990000">):</font>
+    form <font color="#990000">=</font> req<font color="#990000">.</font>form
+    s <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'&lt;html&gt;&lt;body&gt;&lt;b&gt;Form fields:&lt;/b&gt;&lt;ul&gt;'</font><font color="#990000">,]</font>
+    <b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> form<font color="#990000">:</font>
+        s<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font><font color="#FF0000">'  &lt;li&gt;%s - %s&lt;/li&gt;'</font> <font color="#990000">%</font> <font color="#990000">(</font>key<font color="#990000">,</font>cgi<font color="#990000">.</font><b><font color="#000000">escape</font></b><font color="#990000">(</font>urllib<font color="#990000">.</font><b><font color="#000000">unquote</font></b><font color="#990000">(</font>form<font color="#990000">[</font>key<font color="#990000">]))))</font>
+    s<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font><font color="#FF0000">'&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;'</font><font color="#990000">)</font>
+    <b><font color="#0000FF">return</font></b> <font color="#FF0000">'\n'</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>s<font color="#990000">)</font></tt></pre>
+And open it:
+<pre>% <b>open http://localhost/~$USER/test3/form.py/handle_form\?first=one&second=two</b></pre>
+The results should look like this:
+<pre><b>Form fields:</b>
+<!-- -->
+    * second - two
+    * first - one</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-11T16_58_25.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-12T07_53_49.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-11T13_53_50.txt" name="e2009-01-11T13_53_50.txt"></a>
+<h2 class="date">01.11.2009 13:53</h2>
+<div class="blogbody">
+<h3 class="title">CGI with Python on a Mac</h3>
+<div class="item-description">
+See: <a href="http://docs.python.org/library/cgi.html">cgi - Common Gateway Interface support</a> [docs.python.org]
+<br /><br />
+I've done a bit more with CGI and Python.  This works up to handling a
+form with user input.  In my first post on python and cgi, I created
+helloworld-py.cgi.  To improve on this, I first wanted to get some
+better error handling going.  Python provides this through a cgitb
+module.  cgitb (or CGI TraceBack) can be used either just as a
+response to the web browser, saved as a log file, or both.  Here I
+have both turned on.  I then use the AssertionError to force a
+traceback.  cd ~/Sites/test and create <i>demo-py.cgi</i>:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+<i><font color="#9A1900">#import cgitb; cgitb.enable()</font></i>
+<i><font color="#9A1900">#import cgitb; cgitb.enable(display=0, logdir="/tmp") # Only write log file</font></i>
+<b><font color="#000080">import</font></b> cgitb<font color="#990000">;</font> cgitb<font color="#990000">.</font><b><font color="#000000">enable</font></b><font color="#990000">(</font>logdir<font color="#990000">=</font><font color="#FF0000">"/tmp"</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'Content-type: text/html\n'</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'Hello, World.'</font>
+<b><font color="#0000FF">raise</font></b> <b><font color="#000000">AssertionError</font></b><font color="#990000">(</font><font color="#FF0000">'Test raising some exception'</font><font color="#990000">)</font>
+</tt></pre>
+Save this as ~/Sites/test/demo-py.cgi and run <b>open http://localhost/~$USER/test/demo-py.cgi</b>.  The results should look like this:
+<pre>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#6622aa">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>&lt;type 'exceptions.AssertionError'&gt;</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial">Python 2.6: /sw/bin/python<br>Sun Jan 11 13:19:45 2009</font></td></tr></table>
+A problem occurred in a Python script.  Here is the sequence of
+function calls leading up to the error, in the order they occurred.
+<table width="100%" cellspacing=0 cellpadding=0 border=0>
+<tr><td bgcolor="#d8bbff"><big>&nbsp;</big><a href="file:///Users/schwehr/Sites/test/demo-py.cgi">/Users/schwehr/Sites/test/demo-py.cgi</a> in <strong><module></strong>()</td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;6</small>&nbsp;import&nbsp;cgitb;&nbsp;cgitb.enable(logdir="/tmp")</tt></font></td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;7</small>&nbsp;</tt></font></td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;8</small>&nbsp;print&nbsp;'Content-type:&nbsp;text/html\n'</tt></font></td></tr>
+<tr><td><font color="#909090"><tt><small>&nbsp;&nbsp;&nbsp;&nbsp;9</small>&nbsp;print&nbsp;'Hello,&nbsp;World.'</tt></font></td></tr>
+<tr><td bgcolor="#ffccee"><tt><small>&nbsp;&nbsp;&nbsp;10</small>&nbsp;raise&nbsp;AssertionError('Test&nbsp;raising&nbsp;some&nbsp;exception')</tt></td></tr>
+<tr><td><small><font color="#909090"><em>builtin</em> <strong>AssertionError</strong>&nbsp;= &lt;type 'exceptions.AssertionError'&gt;</font></small></td></tr></table><p><strong>&lt;type 'exceptions.AssertionError'&gt;</strong>: Test raising some exception
+<tt><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;</tt>args&nbsp;=
+('Test raising some exception',)
+<tt><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;</tt>message&nbsp;=
+'Test raising some exception'</pre>
+You can also look in /tmp for the same results: <b>ls -ltr
+/tmp/tmp*.html</b>.  That's much easier to debug than "Internal Server
+Error"!  It would also be nice to be able to allow importing these
+scripts.  This requires that there are no '-' characters in the CGI
+script names and that the file names end in <i>.py</i>.  To handle the
+file extention, we need to add it to apache2's mime type hander.
+<pre> % <b>sudo emacs /sw/etc/apache2/mods-enabled/mime.conf</b></pre> and
+add this line next to <i>AddHandler cgi-script .cgi</i>:
+<pre>AddHandler cgi-script .py</pre>
+Then restart apache2:
+<pre>% <b>sudo apache2ctl restart</b></pre>
+Now we are ready to attempt the next demo where we create a html form document
+that calls a python cgi when the user presses the submit button.  Save this as
+<i>demo2-from.html</i>
+<pre><tt><b><font color="#0000FF">&lt;html&gt;</font></b>
+<b><font color="#0000FF">&lt;body&gt;</font></b>
+<b><font color="#0000FF">&lt;form</font></b> <font color="#009900">method</font><font color="#990000">=</font><font color="#FF0000">"POST"</font> <font color="#009900">action</font><font color="#990000">=</font><font color="#FF0000">"demo2.py"</font><b><font color="#0000FF">&gt;</font></b>
+  <b><font color="#0000FF">&lt;p&gt;</font></b>Some text: <b><font color="#0000FF">&lt;input</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"text"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"text"</font><b><font color="#0000FF">/&gt;&lt;/p&gt;</font></b>
+  <b><font color="#0000FF">&lt;p&gt;&lt;input</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"submit"</font> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"Press to submit"</font><b><font color="#0000FF">/&gt;&lt;/p&gt;</font></b>
+  <b><font color="#0000FF">&lt;input</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"hidden"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"hiddenname"</font> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"foo"</font><b><font color="#0000FF">/&gt;</font></b>
+<b><font color="#0000FF">&lt;/form&gt;</font></b>
+<b><font color="#0000FF">&lt;/body&gt;</font></b>
+<b><font color="#0000FF">&lt;/html&gt;</font></b>
+</tt></pre>
+Now create <i>demo2.py</i>:
+<pre><tt><i><font color="#9A1900">#!/sw/bin/python</font></i>
+<i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+<b><font color="#000080">import</font></b> cgitb<font color="#990000">;</font> cgitb<font color="#990000">.</font><b><font color="#000000">enable</font></b><font color="#990000">()</font> <i><font color="#9A1900"># For debugging</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Content-type: text/html\n'</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;p&gt;Processing form&lt;/p&gt;'</font> 
+    form <font color="#990000">=</font> cgi<font color="#990000">.</font><b><font color="#000000">FieldStorage</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Form:'</font><font color="#990000">,</font>form
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;ul&gt;'</font>
+    <b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> form<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;li&gt;'</font>
+        <b><font color="#0000FF">print</font></b> key<font color="#990000">,</font><font color="#FF0000">'-'</font><font color="#990000">,</font>form<font color="#990000">[</font>key<font color="#990000">].</font>value
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/li&gt;'</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/ul&gt;'</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font> 
+    <b><font color="#000000">main</font></b><font color="#990000">()</font></tt></pre>
+Now run the demo:
+<pre>% <b>chmod +x demo2.py</b>
+% <b>open http://localhost/~$USER/test/demo2-from.html</b></pre>
+Put <i>test 123</i> in the text field and press submit.  You should see something like this:
+<pre>Processing form
+Form: FieldStorage(None, None, [MiniFieldStorage('text', 'test 123'), MiniFieldStorage('hiddenname', 'foo')])
+<!-- -->
+    * text - test 123
+    * hiddenname - foo</pre>
+FieldStorage works similar to a python dictionary.
+<br /><br />
+A final improvement to the script is to combine the form html and the
+form processing script.  <i>cgi.FieldStorage()</i> will return
+<i>None</i> if there is no form data.  demo3.py:
+<pre><tt><i><font color="#9A1900">#!/sw/bin/python</font></i>
+<i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+<b><font color="#000080">import</font></b> cgitb<font color="#990000">;</font> cgitb<font color="#990000">.</font><b><font color="#000000">enable</font></b><font color="#990000">()</font> <i><font color="#9A1900"># For debugging</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Content-type: text/html\n'</font>
+<!-- -->
+    form <font color="#990000">=</font> cgi<font color="#990000">.</font><b><font color="#000000">FieldStorage</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> form<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b><font color="#FF0000"> '''&lt;html&gt;</font>
+<font color="#FF0000">&lt;body&gt;</font>
+<font color="#FF0000">&lt;form method="POST" action="demo2.py"&gt;</font>
+<font color="#FF0000">  &lt;p&gt;Some text: &lt;input type="text" name="text"/&gt;&lt;/p&gt;</font>
+<font color="#FF0000">  &lt;p&gt;&lt;input type="submit" value="Press to submit"/&gt;&lt;/p&gt;</font>
+<font color="#FF0000">  &lt;input type="hidden" name="hiddenname" value="foo"/&gt;</font>
+<font color="#FF0000">&lt;/form&gt;</font>
+<font color="#FF0000">&lt;/body&gt;</font>
+<font color="#FF0000">&lt;/html&gt;'''</font>
+        <b><font color="#0000FF">return</font></b>
+<!-- -->
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;p&gt;Processing form&lt;/p&gt;'</font> 
+    <b><font color="#0000FF">print</font></b> form
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;ul&gt;'</font>
+    <b><font color="#0000FF">for</font></b> key <b><font color="#0000FF">in</font></b> form<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;li&gt;'</font>
+        <b><font color="#0000FF">print</font></b> key<font color="#990000">,</font><font color="#FF0000">'-'</font><font color="#990000">,</font>form<font color="#990000">[</font>key<font color="#990000">].</font>value
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/li&gt;'</font>
+<!-- -->
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'&lt;/ul&gt;'</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font> 
+    <b><font color="#000000">main</font></b><font color="#990000">()</font>
+</tt></pre>
+You can also use the GET method rather than the POST that I used above.  Try this:
+<pre>% <b>open http://localhost/~$USER/test/demo2.py?first=one\&second=two</b></pre>
+You should see this:
+<pre>Processing form
+Form: FieldStorage(None, None, [MiniFieldStorage('first', 'one'), MiniFieldStorage('second', 'two')])
+<!-- -->
+    * second - two
+    * first - one</pre>
+To see everything that is going on with cgi, there is a test() function.  Try out demo4.py:
+<pre><tt><i><font color="#9A1900">#!/sw/bin/python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> cgi
+cgi<font color="#990000">.</font><b><font color="#000000">test</font></b><font color="#990000">()</font></tt></pre>
+And open it:
+<pre>% <b>chmod +x demo4.py</b>
+% <b>open http://localhost/~$USER/test/demo4.py?first=one\&second=two</b></pre>
+You will be presented with a large amount of info about your cgi environment:
+<pre><b>Current Working Directory:</b>
+/Users/schwehr/Sites/test
+<b>Command Line Arguments:</b>
+['/Users/schwehr/Sites/test/demo4.py']
+<b>Form Contents:</b><DL><DT>first: <i>&lt;type 'instance'&gt;</i>
+<DD>MiniFieldStorage('first', 'one')
+<DT>second: <i>&lt;type 'instance'&gt;</i>
+<DD>MiniFieldStorage('second', 'two')
+</DL>
+<b>Shell Environment:</b><DL><DT> DOCUMENT_ROOT <DD> /sw/var/www/
+<DT> GATEWAY_INTERFACE <DD> CGI/1.1
+<DT> HTTP_ACCEPT <DD> text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+<DT> HTTP_ACCEPT_CHARSET <DD> ISO-8859-1,utf-8;q=0.7,*;q=0.7
+<DT> HTTP_ACCEPT_ENCODING <DD> gzip,deflate
+<DT> HTTP_ACCEPT_LANGUAGE <DD> en-us,en;q=0.5
+<DT> HTTP_CACHE_CONTROL <DD> max-age=0
+<DT> HTTP_CONNECTION <DD> keep-alive
+<DT> HTTP_HOST <DD> localhost
+<DT> HTTP_KEEP_ALIVE <DD> 300
+<DT> HTTP_USER_AGENT <DD> Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.0.5) Gecko/2008120121 Firefox/3.0.5
+<DT> PATH <DD> /sw/bin:/sw/sbin:...
+<DT> QUERY_STRING <DD> first=one&amp;second=two
+<DT> REMOTE_ADDR <DD> 127.0.0.1
+<DT> REMOTE_PORT <DD> 56992
+<DT> REQUEST_METHOD <DD> GET
+<DT> REQUEST_URI <DD> /~schwehr/test/demo4.py?first=one&amp;second=two
+<DT> SCRIPT_FILENAME <DD> /Users/schwehr/Sites/test/demo4.py
+<DT> SCRIPT_NAME <DD> /~schwehr/test/demo4.py
+<DT> SERVER_ADDR <DD> 127.0.0.1
+<DT> SERVER_ADMIN <DD> webmaster@localhost
+<DT> SERVER_NAME <DD> localhost
+<DT> SERVER_PORT <DD> 80
+<DT> SERVER_PROTOCOL <DD> HTTP/1.1
+<DT> SERVER_SIGNATURE <DD> &lt;address&gt;Apache/2.2.9 (Unix) PHP/5.2.6 Server at localhost Port 80&lt;/address&gt;
+<DT> SERVER_SOFTWARE <DD> Apache/2.2.9 (Unix) PHP/5.2.6</DL>
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-11T13_53_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-11T16_58_25.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-11T13_09_39.txt" name="e2009-01-11T13_09_39.txt"></a>
+<h2 class="date">01.11.2009 13:09</h2>
+<div class="blogbody">
+<h3 class="title">Images of winter</h3>
+<div class="item-description">
+Time to shovel:
+<br /><br />
+<img title="Out the window" withgrayborder="True" src="../attachments/2009-01/wintersnow.jpg"/>
+<br /><br />
+A frozen log jam in New Market
+<br /><br />
+<img title="Newmarket Lamprey River falls" withgrayborder="True" src="../attachments/2009-01/newmarket-falls.jpg"/>
+<br /><br />
+Winter sunset colors can be really awesome...
+<br /><br />
+<img title="Newmarket Sunset" withgrayborder="True" src="../attachments/2009-01/newmarket-sunset.jpg"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-11T13_09_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-11T13_53_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-11T09_12_56.txt" name="e2009-01-11T09_12_56.txt"></a>
+<h2 class="date">01.11.2009 09:12</h2>
+<div class="blogbody">
+<h3 class="title">fink apache2 cgi hello world tutorial</h3>
+<div class="item-description">
+It took me a while, but I finally succeeded at getting a simple cgi
+script to work with a fink apache2 setup.  This is on Mac OSX 10.5.6
+using fink with apache2 2.2.9-4.  Some of what I do here might not be
+in the best part of the apache2 config files.  Let me know if there
+is a better place to put some of these config options.  Let's get started.
+<br /><br />
+First, in System Preferences -&gt; Sharing, make sure the "Web Sharing" is off.
+Web Sharing will turn on Apple's apache2 server.
+<pre>% <b>fink install apache2</b> # I pick apache2-mpm-prefork when asked, but it does not matter
+% <b>open http://localhost</b></pre>
+You should now be seeing a working apache2 via fink.  It should say
+something like "It works!" in your web browser.  Now we need to set about
+configuring apache2.  Here I will use emacs as my editor (fink install 
+emacs22), but you can replace that with your favorite editor, but I don't 
+know how to edit system config files with Aqua based editors like Smultron 
+and AquaEmacs.
+<pre>% <b>sudo a2enmod cgi</b> # Enable CGI applications 
+% <b>sudo emacs /sw/etc/apache2/mods-enabled/userdir.conf &</b></pre>
+Now in emacs, edit the apache2 userdir.conf config file and add a second 
+<i>Options</i> line to look like this:
+<pre>Options +ExecCGI</pre>
+This enables CGI programs for any user web area on the computer.  You
+will likely not want to do this if this machine has untrusted users.
+Now we need to tell apache2 which files will be treated as CGI programs.
+Uncomment the cgi-script AddHandler line in the mime type config file:
+<pre>% <b>sudo emacs /sw/etc/apache2/mods-enabled/mime.conf &</b></pre>
+The line should now look like:
+<pre>AddHandler cgi-script .cgi</pre>
+The last config change we need to make is to disable suexec.  In the
+current fink setup, suexec is always enabled and breaks cgi.  If it
+is not disabled, you will your CGI will return <i>Internal Server Error</i>
+and see errors like this in the logs:
+<pre>% <b>tail -1 /sw/var/log/apache2/suexec.log</b>
+[2009-01-11 09:01:36]: user mismatch (_www instead of www)</pre>
+Alex Vial has a <a href="http://www.nabble.com/apache2:-user-mismatch-(_www-instead-of-www)-td21114233.html">post</a> on fink users about how he got
+things working again.
+<pre>% <b>sudo mv /sw/lib/apache2/suexec2{,_inactive}</b></pre>
+Now it is time to restart apache2 so we can going on the hello world program.
+<pre>% <b>sudo apache2ctl restart</b></pre>
+Let's create the cgi script:
+<pre>% <b>mkdir -p ~/Sites/test && cd ~/Sites/test</b>
+% <b>cat &lt;&lt; EOF &gt; helloworld.cgi</b>
+#!/usr/bin/perl
+print "Content-type: text/html\n\n";
+print "Hello, World.";
+EOF
+% <b>chmod +x helloworld.cgi</b>
+% <b>open http://localhost/~$USER/test/helloworld.cgi</b></pre>
+Hopefully at this point you should have "Hello, World." displaying in your
+browser.  Perl is the default for most old world cgi scripts, but since
+I like python, I will leave off with a python cgi example.
+<pre>% <b>cat &lt;&lt; EOF &gt; helloworld-py.cgi</b>
+#!/usr/bin/env python
+print "Content-type: text/html\n"
+print "Hello, World."
+EOF
+% <b>chmod +x helloworld-py.cgi</b>
+% <b>open http://localhost/~$USER/test/helloworld-py.cgi</b></pre>
+Note that the number of newlines after the content type is important.  There
+must be at least one blank line after the header.
+<br /><br />
+The above has been adapted from: <a href="http://httpd.apache.org/docs/2.0/howto/cgi.html">Apache Tutorial: Dynamic Content with CGI - Apache HTTP Server</a>.  This is the check to see if suexec has been built into the default setup:
+<pre>% <b>apache2ctl -V | grep suexec</b>
+ -D SUEXEC_BIN="/sw/lib/apache2/suexec2"</pre>
+suexec is trouble as there are now 'www' and '_www' user names in mac osx.  They both have the same uid (70), but suexec gets confused.
+<pre>% <b>id www</b>
+uid=70(_www) gid=70(_www) groups=70(_www)
+% <b>dscl . -read /Users/www</b>
+% <b>dscl . -read /Users/_www</b></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-11T09_12_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-11T13_09_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-09T11_26_58.txt" name="e2009-01-09T11_26_58.txt"></a>
+<h2 class="date">01.09.2009 11:26</h2>
+<div class="blogbody">
+<h3 class="title">Django Book 2.0 for Django 1.0</h3>
+<div class="item-description">
+This is great news as I head into a sprint to revamp and improve some
+old Django code for a demo next week in Florida: <a
+href="http://www.djangobook.com/en/2.0/">Django Book v2.0</a> for
+Django 1.0.
+<br /><br />
+<a href="http://www.holovaty.com/blog/archive/2009/01/09/0133">Announcing the Django Book, second edition</a> [Adrian Holovaty]
+<pre>I'm excited to announce that I'm working on a second edition of the
+Django Book.
+<!-- -->
+The first edition, which I cowrote with Jacob Kaplan-Moss, was
+published in print by Apress more than a year ago, and, sadly, it's
+become out of date. It covers Django version 0.96, and many of the
+examples don't work with the current version, 1.0.
+<!-- -->
+Fortunately, now that Django has reached 1.0 and is committed to
+backwards compatibility, this book will have a much longer shelf
+life.
+<!-- -->
+At this point, I've rewritten/edited the first three chapters and
+published the drafts for free online, as we did the first time
+around. I plan to add chapters incrementally over the coming
+weeks. Instead of posting blog entries here, I'll make those "new
+chapter posted" announcements on my Twitter account.
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-09T11_26_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-11T09_12_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-08T21_10_54.txt" name="e2009-01-08T21_10_54.txt"></a>
+<h2 class="date">01.08.2009 21:10</h2>
+<div class="blogbody">
+<h3 class="title">Phoenix used in MacWorld 2009 Keynote</h3>
+<div class="item-description">
+Philip Schiller's <a
+href="http://www.apple.com/quicktime/qtv/macworld-san-francisco-2009/">MacWorld
+2009 Keynote</a> features Phoenix in the demo of Pages in iWork 09.
+<br /><br />
+<img title="Phoenix in Pages" withgrayborder="True" src="../attachments/2009-01/macworld2009-keynote-phoenix.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-08T21_10_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-09T11_26_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-07T11_54_35.txt" name="e2009-01-07T11_54_35.txt"></a>
+<h2 class="date">01.07.2009 11:54</h2>
+<div class="blogbody">
+<h3 class="title">Kitchen table AIS</h3>
+<div class="item-description">
+It's snowing outside, so here it what my table looks like right now...
+my "Vessel" is currently showing a "Safety Depth Violated" <img src="../moods/smilies/smiley.gif" alt=":)" border="0" 
+<br /><br />
+The SR162G takes a really long time for the GPS to lock up.  AIS demo
+mode setup with wireless internet connection not shown.
+<br /><br />
+<img title="Mac vrs PC" withgrayborder="True" src="../attachments/2009-01/kitch-table-ais.jpg"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-07T11_54_35.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-08T21_10_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-07T08_53_32.txt" name="e2009-01-07T08_53_32.txt"></a>
+<h2 class="date">01.07.2009 08:53</h2>
+<div class="blogbody">
+<h3 class="title">fink info testing - sqlalchemy</h3>
+<div class="item-description">
+<a href="http://www.sqlalchemy.org/">SQLAlchemy</a> is my first
+released fink info package to providing testing.  I wanted to make
+sure that it worked with Python 2.6.  When I upgraded the package to 
+version 0.5.0, I added these lines to the info file:
+<br /><br />
+<b>Updated 18-Jan:</b> Must force the pythonpath to pick up the source
+area incase an older version of the package is still installed.
+See also:
+<br /><br />
+<a href="http://www.sqlalchemy.org/trac/ticket/1283">http://www.sqlalchemy.org/trac/ticket/1283</a>
+<br /><br />
+<pre>InfoTest: &lt;&lt;
+  #TestConflicts: sqlalchemy-py%type_pkg[python]  # Not needed with PYTHONPATH
+  TestScript: &lt;&lt;
+    #!/bin/bash -ev
+    export PYTHONPATH=$PWD/lib
+    pushd test 
+      %p/bin/python%type_raw[python] alltests.py || exit 2
+    popd
+  &lt;&lt;
+&lt;&lt;</pre>
+Now you can run the test like this:
+<pre>% <b>fink --test rebuild sqlalchemy-py26</b></pre>
+When you run that command you will see this appear deep in the middle
+of the output:
+<pre>...
+SQLAlchemy-0.5.0/test/zblog/blog.py
+SQLAlchemy-0.5.0/test/zblog/mappers.py
+SQLAlchemy-0.5.0/test/zblog/tables.py
+SQLAlchemy-0.5.0/test/zblog/tests.py
+SQLAlchemy-0.5.0/test/zblog/user.py
+echo Skipping build
+Skipping build
+cd test && /sw/bin/python2.6 alltests.py || exit 2
+test_fixture (profiling.memusage.MemUsageTest) ... ok
+test_mapper_reset (profiling.memusage.MemUsageTest) ... ok
+test_mutable_identity (profiling.memusage.MemUsageTest) ... ok
+test_session (profiling.memusage.MemUsageTest) ... ok
+test_with_inheritance (profiling.memusage.MemUsageTest) ... ok
+test_with_manytomany (profiling.memusage.MemUsageTest) ... ok
+test_insert (profiling.compiler.CompileTest) ... ok
+...</pre>
+The alternative command that I will be using to checkout new versions in the
+future is this:
+<pre>% <b>fink --maintainer rebuild sqlalchemy-py26</b></pre>
+This should validate the resulting debian in addition to running the tests.
+Testing will hopefully help reduce the load from package updating.  If there
+are good tests in place, we won't have to try by hand to see if a package
+is okay.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-07T08_53_32.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-07T11_54_35.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-06T15_29_10.txt" name="e2009-01-06T15_29_10.txt"></a>
+<h2 class="date">01.06.2009 15:29</h2>
+<div class="blogbody">
+<h3 class="title">MER rovers in Government Computer News</h3>
+<div class="item-description">
+Thanks to Andy A for pointing me to this month's cover of the <a
+href="http://gcn.com">GCN</a> magazine.  It's an image of a Mars
+Exploration Rover (MER).  Back in 1998-99, I was a part of the Mars
+Autonomy project at CMU working to get D* and Morphin ready for use on
+the mars rovers:  <a href="http://gcn.com/articles/2008/12/15/the-outer-limits-of-embedded-systems.aspx">The outer limits of embedded systems</a>
+<br /><br />
+<pre>Embedded systems are becoming increasingly sophisticated, as
+their use on the Mars Rover and at the South Pole attest. And they're
+becoming more integrated with larger information technology systems
+<!-- -->
+Think writing an artificial intelligence program is hard? Try writing
+one that works on a 20 MHz processor and runs a NASA rover scuttling
+across Mars.
+<!-- -->
+The rovers were already moving about on the Red Planet on their own
+because sending move-by-move directions from Earth would take too
+long. But their autonomous navigation software kept getting the units
+trapped in cul-de-sacs and other locations that were tricky to escape
+from.
+<!-- -->
+To boost the machine's driving skills, NASA's Jet Propulsion
+Laboratory, which runs the rover space mission, turned to software
+developed by Carnegie Mellon University research professor Tony Stentz
+and his student Dave Ferguson.
+<!-- -->
+The program, called Field D*, was developed with funding from the Army
+Research Laboratory and the Defense Advanced Research Projects
+Agency. The software essentially builds a large-scale map of the
+terrain it encounters so that when a self-guiding vehicle needs to
+back out of a dead end, it can easily do so by retracing its steps.
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-06T15_29_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-07T08_53_32.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-06T07_37_49.txt" name="e2009-01-06T07_37_49.txt"></a>
+<h2 class="date">01.06.2009 07:37</h2>
+<div class="blogbody">
+<h3 class="title">Phoenix is number 1 Wired Science Breathrough of 2008</h3>
+<div class="item-description">
+There are some seriously impressive contenders in this list: <a href="http://blog.wired.com/wiredscience/2009/01/top-10-scientif.html">Top 10 Scientific Breakthroughs of 2008</a> [wired.com]
+<pre>1. Finding ice on Mars
+<!-- -->
+After a seven-month journey through space, the Phoenix lander touched
+down on Martian soil, and soon after discovered ice.
+<!-- -->
+On May 31, two days after the lander's robotic arm went to work, its
+camera caught a glimpse of something shiny under the craft. Lead
+researcher Peter Smith speculated that the landing rockets had blown a
+thin layer of soil away, exposing buried ice.
+<!-- -->
+The big announcement came on Jan. 19, after scientists compared two
+photos of a ditch called Dodo-Goldilocks. In the first image, several
+bright nuggets were visible, and four days later the chunks had
+disappeared. Taking the temperature and atmospheric pressure into
+account, the specks had to be ice that sublimated after being
+uncovered by the mechanical claw.
+<!-- -->
+The red planet may have an inhospitable climate, but at least it has
+water, and that will be tremendously useful when the first group of
+explorers lands there.</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-06T07_37_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-06T15_29_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-05T10_34_39.txt" name="e2009-01-05T10_34_39.txt"></a>
+<h2 class="date">01.05.2009 10:34</h2>
+<div class="blogbody">
+<h3 class="title">Open Street Map - A year of edits</h3>
+<div class="item-description">
+This is really awesome!  Found it via <a href="http://appdomains.slashgeo.org/article.pl?sid=09/01/05/142227"></a> [slashgeo]
+<br /><br />
+<object width="400" height="300"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=2598878&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=2598878&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="400" height="300"></embed></object><br /><a href="http://vimeo.com/2598878">OSM 2008: A Year of Edits</a> from <a href="http://vimeo.com/itoworld">ItoWorld</a> on <a href="http://vimeo.com">Vimeo</a>.
+<br /><br />
+<img title="OSM - A Year of Edits" withgrayborder="True" src="../attachments/2009-01/osm-a-year-of-edits.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-05T10_34_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-06T07_37_49.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-04T19_04_15.txt" name="e2009-01-04T19_04_15.txt"></a>
+<h2 class="date">01.04.2009 19:04</h2>
+<div class="blogbody">
+<h3 class="title">noaadata 0.41 released</h3>
+<div class="item-description">
+This was long overdue and I still have much I need to get done on this
+in the next few days, but before I dig back into noaadata, it is time
+to get the changes out the door.  <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.41.tar.bz2">noaadata-py-0.41.tar.bz2</a>
+or the pypy entry: <a
+href="http://pypi.python.org/pypi/noaadata-py/0.41">noaadata-py/0.41</a>
+<ul>
+	<li>Added missing close of tr tag in HTML message output reported by Hubert Bischoff</li>
+	<li>port-server now can add uscg style per line timestamps and station</li>
+	<li>port-server logs the start/stop times, the host info, and the ntp status for each log file</li>
+	<li>Think I've fixed the AIS NMEA regex</li>
+	<li>Added log_udp script</li>
+	<li>New in aisutils: nmea_ait.py (AIS text format), nmea_cnc.py (IVS Vessel Monitor Format), server.py</li>
+	<li>New in scripts: decimate, log_udp, and xy2kmlline</li>
+	<li>ais_liststations improved</li>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-04T19_04_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-05T10_34_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-04T17_48_16.txt" name="e2009-01-04T17_48_16.txt"></a>
+<h2 class="date">01.04.2009 17:48</h2>
+<div class="blogbody">
+<h3 class="title">AIS JSON encoding</h3>
+<div class="item-description">
+Update: Sean Gillies suggested using a standard time format like RFC
+3339 (ISO 8601). <a
+href="http://www.ietf.org/rfc/rfc3339.txt">rfc3339.txt</a>
+<br /><br />
+Was just googling the combination of AIS and <a href="http://aprs.org/">APRS</a> and ran into this:
+<a href="http://wiki.ham.fi/JSON_AIS.en">JSON AIS transmission
+protocol</a>.  I sent an email in the last couple weeks suggesting
+that JSON might be better for sending AIS messages over the Internet
+compared to XML.  Of note: I don't see any mention of <a href="http://geojson.org/">GeoJSON</a> on the
+page.  It would be important to consider GeoJSON when building an JSON
+AIS definition.
+<pre>This is a work-in-progress specification for passing parsed AIS data
+in human- and computer-readable JSON format. If you have ideas for
+this specification, please email Heikki Hannikainen, OH7LZB (hessu at
+hes dot iki dot fi).
+<!-- -->
+This protocol is useful for transmitting AIS data between AIS receiver
+sites and live AIS database services, and also for transmitting AIS
+data between AIS database services which choose to trust each other
+and exchange data.
+<!-- -->
+This specification was initially implemented by Lekkas Dimitris of
+marinetraffic.com, and documented by Heikki Hannikainen of
+aprs.fi. Additional feedback has been received from Tapio Sokura,
+OH2KKU.
+...</pre>
+Their two sample messages:
+<pre>{
+    "msgtype": 3,
+    "mmsi":2320787,
+    "status":14,
+    "speed":0,
+    "lon":-1.11023795604706,
+    "lat":50.7996215820313,
+    "course":0,
+    "heading":0,
+    "timestamp":"20081013091401"
+}
+<!-- -->
+{
+    "msgtype": 5,
+    "mmsi":211189000,
+    "imo":8705383,
+    "callsign":"DQEJ",
+    "shipname":"SASSNITZ",
+    "shiptype":69,
+    "length":0,
+    "width":0,
+    "eta":"20081014101000",
+    "draught":58,
+    "destination":"TRELLEBORG/SASSNITZ",
+    "timestamp":"20081013091717"
+}</pre>
+I also just stumbled into <a href="http://www.erikburrows.com/index.php?node=AIS">aislib</a> - a java AIS parser that integrates with <a href="http://openmap.bbn.com/">OpenMap</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-04T17_48_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-04T19_04_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-04T14_02_17.txt" name="e2009-01-04T14_02_17.txt"></a>
+<h2 class="date">01.04.2009 14:02</h2>
+<div class="blogbody">
+<h3 class="title">ps on mac osx</h3>
+<div class="item-description">
+I think I've finally read the ps man page for the 10 millionth time.
+I used to think I had ps (and top) under control until I hit mac osx.
+Before I knew that I could generally get what I wanted one of these ways
+depending on what OS type I was on:
+<pre>% <b>ps -aux</b>
+% <b>ps -adef</b>
+% <b>top</b></pre>
+On the mac, that's just no good.  Here is what I finally have figured out:
+<pre>% <b>top -o cpu -s 2</b>
+% <b>ps -a -w -w -x -O user | grep -i ntp</b>
+ 2811 root       ??  Ss     0:26.78 /usr/sbin/ntpd -n -g -p /var/run/ntpd.pid -f /var/db/ntp.drift</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-04T14_02_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-04T17_48_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-04T10_58_00.txt" name="e2009-01-04T10_58_00.txt"></a>
+<h2 class="date">01.04.2009 10:58</h2>
+<div class="blogbody">
+<h3 class="title">Old - SigGraph2006</h3>
+<div class="item-description">
+Ran into this an realized that I never posted it.  I was the moderator
+for this session during SIGGRAPH 2006: <a href="http://www.siggraph.org/s2006/main.php?p=special&s=3&f=conference">20,000 Bits Under the Sea: How Robotics, Visualization, and Scientific Computing Are Changing the Way We Explore, Discover, and Understand Our Oceans</a>
+<br /><br />
+<img title="20,000 Bits Under the Sea" withgrayborder="True" src="../attachments/2009-01/siggraph2006.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-04T10_58_00.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-04T14_02_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-04T10_20_16.txt" name="e2009-01-04T10_20_16.txt"></a>
+<h2 class="date">01.04.2009 10:20</h2>
+<div class="blogbody">
+<h3 class="title">Templating a python project</h3>
+<div class="item-description">
+Things to do when you are home sick...
+<br /><br />
+Back at the beginning of December, Sean Gillies posted on <a href="http://sgillies.net/blog/845/how-to-lay-out-python-project-code/">How to lay out Python project code</a>.  I've created two fink info files, but cheetah is not up to 2.6 in fink.  You can do an "mdfind cheetah-py.info" and add 2.6 so the type line is like this:
+<pre>Type: python (2.4 2.5 2.6)</pre>
+Now get and install the paste programs:
+(21-Jan-2009 Note: pastescript-py is now in fink, so you only need the fink install line).
+<pre>% <b>fink install wget</b>
+% <b>sudo -s</b>
+% <b>cd /sw/fink/10.4/local/main/finkinfo</b>
+% <b>mkdir -p libs/pythonmodes</b>
+% <b>cd libs/pythonmodes</b>
+% <b>wget http://vislab-ccom.unh.edu/~schwehr/software/fink/pastedeploy-py.info</b>
+% <b>wget http://vislab-ccom.unh.edu/~schwehr/software/fink/pastescript-py.info</b>
+% <b>exit</b>
+% <b>fink install pastescript-py26</b></pre>
+Now, try out paster: 
+<pre>% <b>paster create -t basic_package</b>
+Selected and implied templates:
+  PasteScript#basic_package  A basic setuptools-enabled package
+<!-- -->
+Enter project name: sampleprj
+Variables:
+  egg:      sampleprj
+  package:  sampleprj
+  project:  sampleprj
+Enter version (Version (like 0.1)) ['']: 0.1
+Enter description (One-line description of the package) ['']: Sample project
+Enter long_description (Multi-line description (in reST)) ['']: multi line description here
+Enter keywords (Space-separated keywords/tags) ['']: Demo trial     
+Enter author (Author name) ['']: Kurt Schwehr
+Enter author_email (Author email) ['']: kurt _at_ ccom.unh.edu
+Enter url (URL of homepage) ['']: http://schwehr.org
+Enter license_name (License name) ['']: GPL
+Enter zip_safe (True/False: if the package can be distributed as a .zip file) [False]: 
+Creating template basic_package
+Creating directory ./sampleprj
+  Recursing into +package+
+    Creating ./sampleprj/sampleprj/
+    Copying __init__.py to ./sampleprj/sampleprj/__init__.py
+  Copying setup.cfg to ./sampleprj/setup.cfg
+  Copying setup.py_tmpl to ./sampleprj/setup.py
+Running /sw/bin/python2.6 setup.py egg_info</pre>
+The results:
+<pre>find sampleprj 
+sampleprj
+sampleprj/sampleprj
+sampleprj/sampleprj/__init__.py
+sampleprj/sampleprj.egg-info
+sampleprj/sampleprj.egg-info/dependency_links.txt
+sampleprj/sampleprj.egg-info/entry_points.txt
+sampleprj/sampleprj.egg-info/not-zip-safe
+sampleprj/sampleprj.egg-info/PKG-INFO
+sampleprj/sampleprj.egg-info/SOURCES.txt
+sampleprj/sampleprj.egg-info/top_level.txt
+sampleprj/setup.cfg
+sampleprj/setup.py</pre>
+The setup.py is fairly standard setuptools (ezinstall... not python's default distutils):
+<pre><tt><b><font color="#000080">from</font></b> setuptools <b><font color="#000080">import</font></b> setup<font color="#990000">,</font> find_packages
+<b><font color="#000080">import</font></b> sys<font color="#990000">,</font> os
+<!-- -->
+version <font color="#990000">=</font> <font color="#FF0000">'0.1'</font>
+<!-- -->
+<b><font color="#000000">setup</font></b><font color="#990000">(</font>name<font color="#990000">=</font><font color="#FF0000">'sampleprj'</font><font color="#990000">,</font>
+      version<font color="#990000">=</font>version<font color="#990000">,</font>
+      description<font color="#990000">=</font><font color="#FF0000">"Sample project"</font><font color="#990000">,</font>
+      long_description<font color="#990000">=</font><font color="#FF0000">"""\</font>
+<font color="#FF0000">multi line description here"""</font><font color="#990000">,</font>
+      classifiers<font color="#990000">=[],</font> <i><font color="#9A1900"># Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers</font></i>
+      keywords<font color="#990000">=</font><font color="#FF0000">'Demo trial'</font><font color="#990000">,</font>
+      author<font color="#990000">=</font><font color="#FF0000">'Kurt Schwehr'</font><font color="#990000">,</font>
+      author_email<font color="#990000">=</font><font color="#FF0000">'kurt _at_ ccom.unh.edu'</font><font color="#990000">,</font>
+      url<font color="#990000">=</font><font color="#FF0000">'http://schwehr.org'</font><font color="#990000">,</font>
+      license<font color="#990000">=</font><font color="#FF0000">'GPL'</font><font color="#990000">,</font>
+      packages<font color="#990000">=</font><b><font color="#000000">find_packages</font></b><font color="#990000">(</font>exclude<font color="#990000">=[</font><font color="#FF0000">'ez_setup'</font><font color="#990000">,</font> <font color="#FF0000">'examples'</font><font color="#990000">,</font> <font color="#FF0000">'tests'</font><font color="#990000">]),</font>
+      include_package_data<font color="#990000">=</font>True<font color="#990000">,</font>
+      zip_safe<font color="#990000">=</font>False<font color="#990000">,</font>
+      install_requires<font color="#990000">=[</font>
+          <i><font color="#9A1900"># -*- Extra requirements: -*-</font></i>
+      <font color="#990000">],</font>
+      entry_points<font color="#990000">=</font><font color="#FF0000">"""</font>
+<font color="#FF0000">      # -*- Entry points: -*-</font>
+<font color="#FF0000">      """</font><font color="#990000">,</font>
+      <font color="#990000">)</font></tt></pre>
+This is a bit different from how I setup things, but is a really great concept.
+I like to include a Makefile and a fink info template.  I should also try making
+a couple template files that I can use to create new python source files with all
+the epydoc headers setup.  I might have a set of options to be a source file, an
+__init__.py, a unittest, or a script (with optparse started).
+<br /><br />
+Right now, I just cut and paste from these two: <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/Makefile">Makefile</a>
+and <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/template.py">template.py</a>.
+Their of which is really what I want.  I also do non-standard <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ChangeLog.html">ChangeLog
+files</a>.  In the <a
+href="http://www.cs.utah.edu/dept/old/texinfo/standards/standards.html#SEC3">GNU
+Coding Standards</a> guide, this would be more of a NEWS file and it
+would be text, not html.  A sample of the GNU style (and my one contribution to grep <img src="../moods/smilies/smiley.gif" alt=":)" border="0" 
+)...
+<pre>...
+2001-08-30  Alain Magloire
+<!-- -->
+	* configure.in: Add gl in ALL_LINGUAS.
+<!-- -->
+2001-08-30  Kurt D Schwehr
+<!-- -->
+	* doc/grep.1: Warn that grep insert a "--" between groups of matches,
+	when using the context options.
+	* doc/grep.texi: Likewised.
+<!-- -->
+2001-08-25  Heikki Korpela
+<!-- -->
+	* doc/grep.texi: Point out that some Platforms do not support
+	reading of directories and silently ignore them.
+...</pre>
+I thought briefly about providing a <i>configure</i> work-alike written in
+python, but it's not worth the time.
+<br /><br />
+There is a showmedo video: <a href="http://showmedo.com/videos/video?name=2910000&fromSeriesID=291">Using Virtualenv and PasteScript</a> by <a href="http://www.percious.com/">Chris Perkins</a>.
+<br /><br />
+The whole idea is similar to the what <a href="http://directory.fsf.org/project/autoproject/">autoproject</a> does:
+<pre>% <b>fink install autoproject getoptbin</b>
+% <b>fink install automake1.10 libtool2</b> # Get the newest versions installed
+% <b>autoproject</b>
+What is the program name? <b>mbsystem</b>
+<!-- -->
+Please describe in one line what mbsystem will do:
+Multibeam sonar file io and processing
+The main program will be written in what language?
+    select from:  c sh c++ fortran lex yacc awk  [c]: 
+What other languages will be used in the package?
+    select from:  c sh c++ fortran lex yacc awk  none  [none]: 
+What command line parser generator will be used?
+    select from:  argp autogen clig none  [none]: 
+Please indicate which of the following standard options mbsystem will use:
+    dry-run? [yN] 
+    no-warn? [yN] 
+    output? [yN] 
+    brief? [yN] 
+    quiet? [yN] 
+    verbose? [yN] 
+    directory? [yN] 
+    cd? [yN] 
+    interactive? [yN] 
+Can't match key schwehr in map passwd.byname. Reason: Request arguments bad
+What is the name of the author? []: <b>Caress and Chayes</b>
+What is the email address of the author? [schwehr@CatBoxIII]: <b>mbsystem@mbari.org</b>
+Program Name            : mbsystem
+Description             : Multibeam sonar file io and processing
+Version                 : 0.1.0
+Language                : c 
+Interface               : cli
+Parser Generator        : none
+Long Options            :
+Author                  : Caress and Chayes
+Email-Address           : mbsystem@mbari.org
+Date                    : January 4, 2009
+19 files processed
+acinclude.m4:9: warning: underquoted definition of jm_CHECK_TYPE_STRUCT_UTIMBUF
+acinclude.m4:9:   run info '(automake)Extending aclocal'
+...
+checking for mkfifo... yes
+checking for mknod... yes
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating mbsystem.lsm
+config.status: creating mbsystem.spec
+config.status: creating config.h
+config.status: executing depfiles commands</pre>
+The resulting mbsystem directory contains:
+<pre>ls -l | cut -c29-
+<!-- -->
+     39 Jan  4 11:33 AUTHORS
+  17992 Jan  4 11:33 COPYING
+     84 Jan  4 11:33 ChangeLog
+     31 Jan  4 11:33 INSTALL -> /sw/share/automake-1.10/INSTALL
+  29677 Jan  4 11:33 Makefile
+    540 Jan  4 11:33 Makefile.am
+  29855 Jan  4 11:33 Makefile.in
+      0 Jan  4 11:33 NEWS
+    854 Jan  4 11:33 README
+    982 Jan  4 11:33 acinclude.m4
+  32964 Jan  4 11:33 aclocal.m4
+    238 Jan  4 11:33 autom4te.cache
+     36 Jan  4 11:33 config.guess -> /sw/share/automake-1.10/config.guess
+   4456 Jan  4 11:33 config.h
+   4212 Jan  4 11:33 config.h.in
+  28437 Jan  4 11:33 config.log
+  34041 Jan  4 11:33 config.status
+     34 Jan  4 11:33 config.sub -> /sw/share/automake-1.10/config.sub
+ 215148 Jan  4 11:33 configure
+    965 Jan  4 11:33 configure.in
+     31 Jan  4 11:33 depcomp -> /sw/share/automake-1.10/depcomp
+  30212 Jan  4 11:33 getopt.c
+   5861 Jan  4 11:33 getopt.h
+   4550 Jan  4 11:33 getopt1.c
+  18378 Jan  4 11:33 gpl.texinfo
+     34 Jan  4 11:33 install-sh -> /sw/share/automake-1.10/install-sh
+   1731 Jan  4 11:33 mbsystem.1
+   2424 Jan  4 11:33 mbsystem.c
+    688 Jan  4 11:33 mbsystem.lsm
+    653 Jan  4 11:33 mbsystem.lsm.in
+   1762 Jan  4 11:33 mbsystem.spec
+   1722 Jan  4 11:33 mbsystem.spec.in
+   6176 Jan  4 11:33 mbsystem.texinfo
+     31 Jan  4 11:33 missing -> /sw/share/automake-1.10/missing
+     23 Jan  4 11:33 stamp-h1
+  10589 Jan  4 11:33 system.h
+     35 Jan  4 11:33 texinfo.tex -> /sw/share/automake-1.10/texinfo.tex
+   2914 Jan  4 11:33 xmalloc.c</pre>
+This has a configure that should be set to start working on:
+<pre>% <b>./configure --help</b>
+`configure' configures this package to adapt to many kinds of systems.
+<!-- -->
+Usage: ./configure [OPTION]... [VAR=VALUE]...
+<!-- -->
+To assign environment variables (e.g., CC, CFLAGS...), specify them as
+VAR=VALUE.  See below for descriptions of some of the useful variables.
+<!-- -->
+Defaults for the options are specified in brackets.
+<!-- -->
+Configuration:
+  -h, --help              display this help and exit
+      --help=short        display options specific to this package
+      --help=recursive    display the short help of all the included packages
+  -V, --version           display version information and exit
+  -q, --quiet, --silent   do not print `checking...' messages
+      --cache-file=FILE   cache test results in FILE [disabled]
+  -C, --config-cache      alias for `--cache-file=config.cache'
+  -n, --no-create         do not create output files
+      --srcdir=DIR        find the sources in DIR [configure dir or `..']
+...</pre>
+However, this tries to create an actual program called mbsystem and there is a
+template mbsystem.c file.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-04T10_20_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-04T10_58_00.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-04T09_10_01.txt" name="e2009-01-04T09_10_01.txt"></a>
+<h2 class="date">01.04.2009 09:10</h2>
+<div class="blogbody">
+<h3 class="title">Python tricks - line numbers, which function, and file location</h3>
+<div class="item-description">
+Here are some python tricks that people might find handy.  The first
+is to use __file__ variable.  This is set to the current file name that
+python is in.  If you are in a python or ipython command prompt, it won't 
+work.
+<pre>% <b>python2.6</b>
+&gt;&gt;&gt; __file__
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: name '__file__' is not defined</pre>
+However, inside a running script, it can help you figure out where
+the file in question is.  This is helpful for relocatable groups of
+files such as with a Django project.  Do something like this in your manage.py.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> os<font color="#990000">.</font>path
+PROJECT_DIR <font color="#990000">=</font> os<font color="#990000">.</font>path<font color="#990000">.</font><b><font color="#000000">dirname</font></b><font color="#990000">(</font>__file__<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> PROJECT_DIR</tt></pre>
+Results in:
+<pre> % <b>`pwd`/try1.py</b>
+/Users/schwehr/Desktop</pre>
+Surprisingly, python does not have the C equivalent to __line__.  I
+often want to throw checkpoints into some code to see where it is.  I
+could use pdb and step through the debugger, but that is often too
+much trouble.  The <a
+href="http://docs.python.org/library/inspect.html">inspect</a> python
+module lets you check out live objects.  <i>currentframe()</i> returns
+where python is at the moment.  From this you can get the line, file, 
+object/function name, etc.  There is also f_back attribute that gives
+the frame one stack level up.  This lets me write a checkpoint function
+that matches the GCC compiler file:lineno convention so that emacs will
+jump to that location.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i><b>
+<font color="#0000FF">def</font></b> <b><font color="#000000">checkpoint</font></b><font color="#990000">():</font>
+    <b><font color="#000080">import</font></b> inspect
+    f <font color="#990000">=</font> inspect<font color="#990000">.</font><b><font color="#000000">currentframe</font></b><font color="#990000">().</font>f_back
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'%s:%d: Function %s CHECKPOINT'</font> <font color="#990000">%</font> <font color="#990000">(</font>__file__<font color="#990000">,</font>f<font color="#990000">.</font>f_lineno<font color="#990000">,</font>f<font color="#990000">.</font>f_code<font color="#990000">.</font>co_name<font color="#990000">)</font>
+<!-- -->
+<b><font color="#000000">checkpoint</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">test</font></b><font color="#990000">():</font>
+    <b><font color="#000000">checkpoint</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#000000">test</font></b><font color="#990000">()</font></tt></pre>
+The results:
+<pre>% <b>./try2.py</b>
+./try2.py:8: Function &lt;module&gt; CHECKPOINT
+./try2.py:11: Function test CHECKPOINT</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-04T09_10_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-04T10_20_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-02T12_39_46.txt" name="e2009-01-02T12_39_46.txt"></a>
+<h2 class="date">01.02.2009 12:39</h2>
+<div class="blogbody">
+<h3 class="title">Visual Passage Planner 2</h3>
+<div class="item-description">
+Last week, Capt Ben showed me <a href="http://www.digwave.com/">Visual
+Passage Planner</a>.  It used the Pilot Charts to calculate best
+routes.  Unfortunately, these are not realtime ocean properties, so
+the routes are often not right for the particular time period.
+Hopefully, as operational models become more available, this kind of
+planning can occur with near-realtime data.
+<br /><br />
+<img title="Visual Pasage Planner" withgrayborder="True" src="../attachments/2009-01/optimization-visual-passage-planner2.gif"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-02T12_39_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-04T09_10_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2009-01-01T18_06_42.txt" name="e2009-01-01T18_06_42.txt"></a>
+<h2 class="date">01.01.2009 18:06</h2>
+<div class="blogbody">
+<h3 class="title">Me on NOVA</h3>
+<div class="item-description">
+Thanks to the parents for telling me that I was very briefly on NOVA
+last night.  Today, I went and found it online.  The series is <a
+href="http://www.pbs.org/wgbh/nova/mars/program.html">NOVA Mars</a>
+and I'm in chapter 5 at the beginning.  There are lots of videos
+through out that I help with as a part of the Solar System
+Visualization (SSV) group.
+<br /><br />
+<a href="http://www.pbs.org/wgbh/nova/programs/ht/tm/3518.html?site=44&pl=qt&rate=hi&ch=5">Ch 5: The Rise of Phoenix - Quicktime</a>
+<pre>Landing successfully in the planet's arctic north in May 2008, Phoenix
+takes up the hunt for evidence of water. Before the frigid martian
+winter shuts it down, the robot geologist makes a stunning discovery.</pre>
+<br /><br />
+<img title="SSV's VIP room" withgrayborder="True" src="../attachments/2009-01/nova-visualization-room.png"/>
+<br /><br />
+<img title="Kurt pointing out something to the group" withgrayborder="True" src="../attachments/2009-01/nova-visualization-room-kurt.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2009-01.html#e2009-01-01T18_06_42.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2009-01-02T12_39_46.html#comments">Comments</a> -->
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="links">
+
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary="Calendar with links to days with entries">
+<caption class="calendarhead">January 2009</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td> <td align="center"></td> <td align="center"></td> <td align="center"></td>      
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-01T18_06_42.txt">1</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-02T12_39_46.txt">2</a></span></td>
+<td align="center"><span class="calendar">3</span></td>
+</tr>
+<tr>
+            
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-04T19_04_15.txt">4</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-05T10_34_39.txt">5</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-06T15_29_10.txt">6</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-07T11_54_35.txt">7</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-08T21_10_54.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-09T11_26_58.txt">9</a></span></td>
+<td align="center"><span class="calendar">10</span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-11T16_58_25.txt">11</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-12T18_47_02.txt">12</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-13T09_13_11.txt">13</a></span></td>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-15T06_02_27.txt">15</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-16T13_52_03.txt">16</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-17T20_50_18.txt">17</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-18T22_36_45.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-19T23_43_02.txt">19</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-20T22_05_40.txt">20</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-21T18_04_15.txt">21</a></span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-23T21_58_29.txt">23</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-24T16_21_48.txt">24</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-25T13_25_56.txt">25</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-26T14_04_49.txt">26</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-27T21_29_33.txt">27</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-28T09_57_45.txt">28</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-29T16_36_14.txt">29</a></span></td>
+<td align="center"><span class="calendar"><a href="2009-01.html#e2009-01-30T14_53_40.txt">30</a></span></td>
+<td align="center"><span class="calendar">31</span></td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<br clear="all" />
+
+</body>
+</html>

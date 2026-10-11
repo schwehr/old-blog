@@ -1,0 +1,72 @@
+TITLE: UNH Seismometer Install
+AUTHOR: Kurt
+DATE: 05.17.2011 11:32
+DESC: initial step
+-----
+BODY:
+On May 3rd and 4th, <a href="https://www2.bc.edu/~hagertmb/">Mike
+Hagerty</a>, Margaret, Monica, and I setup the new UNH Seismometer.
+Monica has written up the seismometer: <a
+href="http://the-moni-blog.blogspot.com/2011/05/unh-now-has-seismometer.html">UNH
+now has a seismometer!</a>.  I took a few pictures during the install process:
+
+The initial configuration is done with a Palm Pilot.  I haven't see
+one of those in quite a while.  If it works, don't change it.
+
+<img title="Setup via a palm pilot"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2011-05/dunh-seismometer-install.jpg"/>
+
+We performed a jump test to see if the seismometer was recording.
+This is a first indication that the sensor is well coupled to the
+building (which is not a desirable trait).  But we were sure that the
+sensor was working
+
+<img title="Jump Test"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2011-05/dunh-seismometer-jumptest.jpg"/>
+
+Is is a day of data plotted up.  First the broadband signal:
+
+<img title="Broadband from May 10th"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2011-05/DUNH_BHZ_NE-2011051000.png"/>
+
+The high frequency spectrum is where we look for local
+quakes.  It's seeing building and train noise.
+
+<img title="High pass filtered"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2011-05/DUNH_SHZ_NE-2011051000.png"/>
+
+The low frequency plot is detecting teleseisms, but there is also
+other stuff on there.
+
+<img title="Low pass filtered"
+withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2011-05/DUNH_LHZ_NE-2011051000.png"/>
+
+This setup is great for us to get started learning about the system.
+It is located in the basement of James Hall, so we can access it any
+time.  However, in the long term, this device needs to find a quieter
+home with good coupling to bedrock.
+
+During the setup, most of my contribution was on the network side of
+things.  The device is linux based and has a pretty aggressive
+firewall on it.  It only talks on a very local subnet and to
+the Boston College data logging system.  That's great for security, but
+we can't yet get at the data in way that we could
+monitor it with nagios.  
+
+The device uses the <a
+href="http://www.geo.utep.edu/pub/kaip/RT130/RTPD/documentation/RTPDprotocol.pdf">RTP
+protocol</a>, which is an interesting UDP reliable transport
+mechanism.  The transmit mechanism is very similar to how I did image
+sending from the Nomad Rover in the Atacama desert over a "long-skinny
+pipe".  I still kick myself for not writing up that design back in
+1997.  The basic idea is to strongly decouple the acknowledgments of
+data and to have a very light connection protocol that assumes that
+connections go up and down.  Data transmission is a continuous process
+between periods of no connectivity.  There is a big buffer that the
+device keeps working on sending when it can.
+-----

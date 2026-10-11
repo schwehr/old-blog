@@ -1,0 +1,55 @@
+TITLE: python doctest
+AUTHOR: Kurt
+DATE: 04.21.2005 17:48
+DESC: doctest is pretty darn cool
+-----
+BODY:
+Just yesterday, I noticed python's doctest module and realized what a
+really excellent idea it is.  It is the perfect compliment to pyunit.
+The idea is that you put examples with answers in your module's doc
+strings.  doctest then goes in, finds these examples, and verifies
+that they work as advertized.  Here is a super small example to get
+started with that I call dc1.py:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">square</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    &gt;&gt;&gt; square(2)
+    4
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <strong>return</strong> <font color="#2040a0">x</font><font color="4444FF">*</font><font color="#2040a0">x</font>
+
+<font color="#2040a0">def</font> <font color="#2040a0">_test</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>import</strong> <font color="#2040a0">doctest</font>
+    <font color="#2040a0">doctest</font>.<font color="#2040a0">testmod</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">&quot;__main__&quot;</font><font color="4444FF">:</font>
+    <font color="#2040a0">_test</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Then run it like this:
+<pre>
+  chmod +x dc1.py
+  ./dc1.py -v
+</pre>
+The -v is for verbose mode.  Here is what verbose mode should give you
+showing that everything is all happy:
+<pre>
+  Trying:
+      square(2)
+  Expecting:
+      4
+  ok
+  2 items had no tests:
+      __main__
+      __main__._test
+  1 items passed all tests:
+     1 tests in __main__.square
+  1 tests in 3 items.
+  1 passed and 0 failed.
+  Test passed.
+</pre>
+To learn more <a
+href="http://docs.python.org/lib/module-doctest.html">read on
+here</a> 
+-----

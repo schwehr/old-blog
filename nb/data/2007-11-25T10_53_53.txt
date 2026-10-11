@@ -1,0 +1,105 @@
+TITLE: NTP restart on Mac Laptop network change and Verizon VZAccessManager + Cisco VPN
+AUTHOR: Kurt
+DATE: 11.25.2007 10:53
+DESC: long winded
+-----
+BODY:
+In a sudden act of procrastination, I decided to fix my network time
+(NTP) setup on my laptop.  What a way to procrastinate, eh?  Here is what
+I did...  First, the ntp config that comes with Mac OSX just sucks.
+<pre>
+sudo mkdir /var/log/ntpstats
+sudo emacs /etc/ntpd.conf
+</pre>
+<pre>
+# This is the line that comes with the mac:
+#server time.apple.com minpoll 12 maxpoll 17
+#
+# /etc/ntp.conf, configuration for ntpd
+#
+# ntpd will use syslog() if logfile is not defined
+#logfile /var/log/ntpd
+#
+driftfile /var/run/ntp.drift
+statsdir /var/log/ntpstats/
+#
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+#
+# You do need to talk to abuncha NTP servers
+server 0.us.pool.ntp.org
+server 1.us.pool.ntp.org
+server 2.us.pool.ntp.org
+server 3.us.pool.ntp.org
+server 0.north-america.pool.ntp.org minpoll 12 maxpoll 17
+server 1.north-america.pool.ntp.org minpoll 12 maxpoll 17
+server 2.north-america.pool.ntp.org minpoll 12 maxpoll 17
+#
+# ... and use the local system clock as a reference if all else fails
+# NOTE: in a local network, set the local stratum of *one* stable server
+# to 10; otherwise your clocks will drift apart if you lose connectivity.
+server 127.127.1.0
+fudge 127.127.1.0 stratum 13
+# By default, exchange time with everybody, but don't allow configuration.
+restrict default kod notrap nomodify nopeer noquery
+# Local users may interrogate the ntp server more closely.
+restrict 127.0.0.1 nomodify
+</pre>
+You can then force a restart of ntp.  I suggest watch in the system
+log in another window.
+<pre>
+# Window 1
+sudo tail -f /var/log/system.log
+# Window 2
+SystemStarter restart "Network Time"
+</pre>
+Now for laptops, ntp is likely to get wedged every time the laptop
+leaves/returns to the internet.  Following <a
+href="http://www.macosxhints.com/article.php?story=20070517224112286">How
+to perform an action on change of network</a>[macosxhists], I edited the kicker file for the network (this is 10.4.11):
+<pre>
+sudo emacs -nw /System/Library/SystemConfiguration/Kicker.bundle/Contents/Resources/enable-network
+</pre>
+And made this change:
+<pre>
+# From
+/System/Library/StartupItems/NetworkTime/NetworkTime start
+# To
+/System/Library/StartupItems/NetworkTime/NetworkTime restart
+</pre>
+Now check on the ntp system:
+ntpq -p -n
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+ 132.177.137.2   128.10.252.7     2 u 1383  256  340   95.592    0.104 402.440
+ 82.165.184.7    74.208.4.166     3 u 1379  256  340  162.323   33.797   5.747
+ 209.132.176.4   .CDMA.           1 u 1383  256  340  156.286   -3.097   0.384
+ 208.100.3.151   128.105.201.11   2 u 1382  256  340   95.572   -6.588  40.938
+ 69.36.240.252   69.36.224.15     2 u 1379  256  340  251.479   36.842  17.826
+ 66.96.30.35     139.78.133.139   2 u 1635  68m    1  187.738   16.972   0.001
+ 64.202.112.75   .CDMA.           1 u 1634  68m    1  104.038   -2.208   0.001
+ 209.167.68.100  192.5.41.209     2 u 1633  68m    1   94.400   -0.719   0.001
+*127.127.1.0     LOCAL(0)        13 l   17   64  377    0.000    0.000   0.001
+</pre>
+Looks like the system is still figuring itself out...
+
+Also, looking at the system log, I now see that the newer version of
+the Verizon connection manager seems to be aware of the Cisco VPN
+client software that I use.  I figured it was time another try of the VPN
+and this time it worked!  From /var/log/system.log:
+<pre>
+Nov 25 10:24:00 CatBoxIII kernel[0]: CiscoVPN : interface: ppp0, filter attached.
+Nov 25 10:24:00 CatBoxIII kernel[0]: CiscoVPN : current MTU for ppp0 is 1500, saving it.
+...
+Nov 25 10:25:35 CatBoxIII kernel[0]: CiscoVPN : shutting down VPN driver.
+Nov 25 10:25:35 CatBoxIII kernel[0]: CiscoVPN : waking up VPN driver.
+Nov 25 10:25:58 CatBoxIII configd[36]: posting notification com.apple.system.config.network_change
+</pre>
+As a note to users of the VZAccess Manager software, the Verizon tech that I
+talked to this weekend said that the automatic software update checks for
+verizon pretty much do not work.  You have to manually check every so often.
+I just went from 3.3 to 3.7 this weekend.  I still get a fair number of kernel
+panics and wedged connections, but it does work a bit better.  The download site: <a href="http://www.vzam.net/download/supported.aspx">Supported Devices</a> [vzam.net]
+-----

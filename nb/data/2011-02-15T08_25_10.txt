@@ -1,0 +1,73 @@
+TITLE: Problem reporting
+AUTHOR: Kurt
+DATE: 02.15.2011 08:25
+DESC: need more input
+-----
+BODY:
+Writing a bug report or problem report that is usable by the person
+you are giving it to is a very difficult thing to do.  I recently got
+this at 4:15AM:
+<pre>GOOD MORNING. THE FEED IS CURRENTLY NOT CONNECTED.</pre>
+While technically correct, it took me a second report before I think, but
+am not totally sure, I found the problem on a different feed than was
+reported.  As quoted from the movie <a
+href="http://en.wikipedia.org/wiki/Short_Circuit">Short Circuit</a>,
+"Malfunction.  Need input!"
+
+Each type of system is going to have a different set of things that
+should be reported.  If it was from a normal user program (say
+ArcGIS), failing, you will want to write one style of bug report.  In
+this case, it was for one of my 3 NAIS feeds.  Here is some of what I 
+probably need in a problem report.  <a
+href="http://en.wikipedia.org/wiki/Checklist">Checklists</a> can be
+really helpful.
+<ul>
+  <li>The exact name of the feed that has a problem</li>
+  <li>What is wrong?  Is the network connection slow or totally out?</li>
+  <li>When did the problem start?</li>
+  <li>Can you ping my machine?</li>
+  <li>If ping is down, how about a traceroute?</li>
+  <li>What IP/hostname was the connection with before the problem started?</li>
+  <li>Was there a graph of the feed to see if there were indications
+  of impending trouble?</li>
+  <li>What versions of the software are involved?</li>
+  <li>Was any software updated recently?</li>
+  <li>Are there any other unusual problems in the system that occured
+  about the same time?</li>
+  <li>And????</li>
+</ul>
+Coming up with a good lost of items to check isn't always easy, but if
+we as a community keep trying to iterate, we will eventually get to
+a good working set.
+
+In this case it turned out to be a client problem where, when the
+connection flaps, there end up being too many improperly closed TCP
+connections.  On mac osx, I could see the problem like this using
+<b>lsof</b> (list of open files) which can monitor network connections
+in addition to files that are currently open.
+<pre>
+sudo lsof -i -nP | grep java | wc -l
+    <b>1016</b>
+sudo lsof -i -nP | grep java | head 
+java      55103        schwehr    7u  IPv6 0x2848fa70      0t0  TCP *:31414 (LISTEN)
+java      55103        schwehr    8u  IPv6  0xb2bc19c      0t0  TCP [::127.0.0.1]:31414->[::127.0.0.1]:52550 (ESTABLISHED)
+java      55103        schwehr    9u  IPv6  0xb2bc664      0t0  TCP [::1]:52545->[::1]:52544 (TIME_WAIT)
+java      55103        schwehr   11u  IPv6  0xb2bbf38      0t0  TCP [::CLIENT_IP]:52620->[::SERVER_1_IP]:REMOTE_PORT (CLOSE_WAIT)
+java      55103        schwehr   12u  IPv6 0x26320258      0t0  TCP [::CLIENT_IP]:52619->[::SERVER_2_IP]:REMOTE_PORT (CLOSED)
+java      55103        schwehr   13u  IPv6 0x283d0e4c      0t0  TCP [::CLIENT_IP]:52868->[::SERVER_2_IP]:REMOTE_PORT (SYN_SENT)
+java      55103        schwehr   14u  IPv6  0xba85d90      0t0  TCP [::CLIENT_IP]:59909->[::SERVER_1_IP]:REMOTE_PORT (SYN_SENT)
+java      55103        schwehr   15u  IPv6  0xb2bb5a8      0t0  TCP [::127.0.0.1]:31414->[::127.0.0.1]:52645 (ESTABLISHED)
+java      55103        schwehr   16u  IPv6  0xb2bc400      0t0  TCP [::CLIENT_IP]:52870->[::SERVER_2_IP]:REMOTE_PORT (SYN_SENT)
+java      55103        schwehr   17u  IPv6  0xb2bb0e0      0t0  TCP [::CLIENT_IP]:52874->[::SERVER_2_IP]:REMOTE_PORT (SYN_SENT)</pre>
+1016 is a lot of connections for a process to have.  I'm guessing that
+in the normal case, this should be between 3-20 connections.  The
+minimum is 3 with an AISUser connected to the system and listening for
+a connection locally to forward the data.
+
+In this case, my lesson is that when I don't see the exact problem reported
+by the watch stander, to kick it over to the USCG Help Desk right
+away.  The watch standers are there to catch the event, not to debug it.
+The NAIS team has more tools and background available to know what is
+going on.  This stuff is fairly complicated, so it takes everyone
+working together.
+-----

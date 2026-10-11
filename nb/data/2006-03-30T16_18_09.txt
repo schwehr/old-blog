@@ -1,0 +1,50 @@
+TITLE: reading sqlalchemy data
+AUTHOR: Kurt
+DATE: 03.30.2006 16:18
+DESC: simple example
+-----
+BODY:
+
+<b>Question:</b> What exactly is the difference between the __repr__
+and __str__ class methods?
+
+I figured out how to do the object relational mapping so that database
+comes back as a list of objects.  A couple points about this code.
+First, I had to change messageId to be the primary_key.  Second.  The
+online docs have a mistake.  It should not be
+"results=mapper.select_text"  What I have below works.  Third,
+printing just r gives things like '&lt;__main__.Msg1 object at
+0x1009970&gt;'.  I probably need to add a __repr__ to make print nice.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">os</font>,<font color="#2040a0">sys</font>
+<strong>from</strong> <font color="#2040a0">sqlalchemy</font> <strong>import</strong> <font color="4444FF">*</font>
+<font color="#2040a0">db</font> <font color="4444FF">=</font> <font color="#2040a0">create_engine</font><font color="4444FF">(</font><font color="#008000">'sqlite://filename=ais.db'</font> <font color="4444FF">)</font>
+<font color="#2040a0">msg1table</font> <font color="4444FF">=</font> <font color="#2040a0">Table</font><font color="4444FF">(</font><font color="#008000">'msg1'</font>, <font color="#2040a0">db</font>,
+		  <font color="#444444">#  unique index</font>
+		  <font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'messageId'</font>, <font color="#2040a0">Integer</font>,<font color="#2040a0">primary_key</font> <font color="4444FF">=</font> <font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'mmsi'</font>,<font color="#2040a0">Integer</font>, <font color="#2040a0">index</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lon'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lat'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'SOG'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'ROT'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'time'</font>,<font color="#2040a0">TIMESTAMP</font><font color="4444FF">)</font>
+		  <font color="4444FF">)</font>
+<strong>class</strong> <font color="#2040a0">Msg1</font><font color="4444FF">(</font><font color="#2040a0">object</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>pass</strong> <font color="#444444"># Yikes</font>
+<font color="#2040a0">msg1mapper</font> <font color="4444FF">=</font> <font color="#2040a0">mapper</font><font color="4444FF">(</font><font color="#2040a0">Msg1</font>,<font color="#2040a0">msg1table</font><font color="4444FF">)</font>
+<font color="#2040a0">results</font> <font color="4444FF">=</font> <font color="#2040a0">msg1mapper</font>.<font color="#2040a0">select_text</font><font color="4444FF">(</font><font color="#008000">'select * from msg1 where mmsi=353556000 order by messageId'</font><font color="4444FF">)</font>
+<strong>for</strong> <font color="#2040a0">r</font> <strong>in</strong> <font color="#2040a0">results</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">r</font>.<font color="#2040a0">lon</font>, <font color="#2040a0">r</font>.<font color="#2040a0">lat</font>
+</pre>
+Running this gives:
+<pre>
+PYTHONPATH=.. ./ais-sql2geozui 
+-70.7583333333 43.08
+-70.7583166667 43.0799833333
+-70.7583166667 43.08
+-70.7583 43.08
+-70.7583 43.0799833333
+-70.7583 43.0799833333
+</pre>
+-----

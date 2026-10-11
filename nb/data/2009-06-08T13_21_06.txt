@@ -1,0 +1,17 @@
+TITLE: windows xp - starting cron under cygwin
+AUTHOR: Kurt
+DATE: 06.08.2009 13:21
+DESC: windows is different
+-----
+BODY:
+We've got a windows xp machine doing datalogging.  It's behind a
+firewall, so it has to push data out.  I wrote installed cygwin,
+created a rsync script and added an entry to cron.  I then sat back
+to watch the data come in.  Nothing happened...  I didn't know that
+if you install cron, you have to go and enable it:
+
+<a gref="http://www.devdaily.com/blog/post/linux-unix/get-crontab-started-running-when-using-cygwin/">How do I get crontab started when using cygwin</a> [devdaily]
+<pre>$ <b>cygrunsrv -I cron -p /usr/sbin/cron -a -D</b>
+$ <b>net start cron</b></pre>
+I'm not seeing anything in /var/log/cron.log, but I appear to be getting my data now.
+-----

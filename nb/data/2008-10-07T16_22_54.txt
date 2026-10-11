@@ -1,0 +1,74 @@
+TITLE: Class B AIS passes FCC in US
+AUTHOR: Kurt
+DATE: 10.07.2008 16:22
+DESC: Soon in a harbor near you
+-----
+BODY:
+I've seen some class B messages in the US, but now we will see more.
+I'm looking for 2-3 Class B units for 3 small research vessels at UNH
+(R/V Cocheco, R/V Coastal Surveyor, and the R/V Gulf Challenger).  If
+you are a vender and interested in becoming an industrial partner with
+the Center for Coastal and Ocean mapping, let me know.
+
+<a href="http://www.panbo.com/archives/2008/10/navico_nais300_class_b_fcc_certified.html">Navico NAIS-300 Class B, FCC certified!</a> [panbo]
+
+From the ITU spec:
+<pre>
+<b>Message 18: Standard Class B equipment position report</b>
+The Standard Class B equipment position report should be output
+periodically and autonomously instead of Messages 1, 2, or 3 by Class
+B shipborne mobile equipment, only. The reporting interval should
+default to the values given in table , Annex 1, unless otherwise
+specified by reception of a Message 16 or 23; and depending on the
+current SOG and navigational status flag setting.
+.
+<b>Message 19: Extended Class B equipment position report</b>
+This message should be used by Class B shipborne mobile
+equipment. This message should be transmitted once every 6 min in two
+slots allocated by the use of Message 18 in the ITDMA communication
+state. This message should be transmitted immediately after the
+following parameter values change: dimension of ship/reference for
+position or type of electronic position fixing device.
+</pre>
+What is Message 19?
+<pre>
+% <b>ipython</b>
+&gt;&gt;&gt; <b>import ais.binary</b>
+&gt;&gt;&gt; <b>binary.encode[18]</b>
+'B'
+&gt;&gt;&gt; <b>print binary.encode[19]</b>
+'C'
+</pre>
+I can look for these messages in the AIS logs, but I seem to be
+getting just a lot of bad messages.
+<pre>
+for file in uscg-logs-2008-*.bz2; do 
+  bzcat $file | egrep '!AIVDM,1,1,[0-9]?,[AB],B'
+done
+</pre>
+Or to look at one day:
+<pre>% <b>egrep '!AIVDM,1,1,[0-9]?,[AB],B' uscg-logs-2008-10-07 | wc -l</b>
+1202</pre>
+If I look closer, the one is in Canada...
+<pre>% <b>./ais_msg_18.py -d '!AIVDM,1,1,,A,B819&lt;C@005jiRCVuUn5UGwV5oP06,0*5E,x539161,b003669704,1223409073'</b>
+positionb:
+        MessageID:          18
+        RepeatIndicator:    0
+        UserID:             538070093
+        Reserved1:          0
+        SOG:                0
+        PositionAccuracy:   0
+        longitude:          -123.4051616666666666666666667
+        latitude:           48.670455
+        COG:                162.1
+        TrueHeading:        511
+        TimeStamp:          12
+        RegionalReserved:   0
+        Spare:              0
+        RAIM:               True
+        CommStateSelector:  1
+        CommState:          393222
+% <b>./ais_msg_18.py -d -T kml-full '!AIVDM,1,1,,A,B819<C@005jiRCVuUn5UGwV5oP06,0*5E,x539161,b003669704,1223409073' > foo.kml</b></pre>
+
+<img title="Class B AIS in Canada viewed with Google Earth" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/class-b-ais-canada.png"/>
+-----

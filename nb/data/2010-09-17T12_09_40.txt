@@ -1,0 +1,21 @@
+TITLE: LogMeIn locking up Firefox
+AUTHOR: Kurt
+DATE: 09.17.2010 12:09
+DESC: ugly
+-----
+BODY:
+I have been frustrated with Firefox / Logmein locking up on just one
+of my macs.  (Note: I do not like logmein).   All the other macs were fine.
+The info in /var/log/system.log was:
+<pre>Sep 17 11:46:17 snipe firefox-bin[91421]: Same cached value:LogMeIn Plugin 1.0.0.497 actual value:LogMeIn Plugin 1.0.0.497
+Sep 17 11:46:17 snipe [0x0-0x3ca3ca].org.mozilla.firefox[0]: 2010-09-17 11:46:17.413 firefox-bin[91421:903] Same cached value:LogMeIn Plugin 1.0.0.497 actual value:LogMeIn Plugin 1.0.0.497
+Sep 17 11:46:28 snipe [0x0-0x3ca3ca].org.mozilla.firefox[0]: ### MRJPlugin:  getPluginBundle() here. ###
+Sep 17 11:46:29 snipe [0x0-0x3ca3ca].org.mozilla.firefox[0]: ### MRJPlugin:  CFBundleGetBundleWithIdentifier() succeeded. ###
+Sep 17 11:46:29 snipe [0x0-0x3ca3ca].org.mozilla.firefox[0]: ### MRJPlugin:  CFURLGetFSRef() succeeded. ###
+Sep 17 11:46:31 snipe firefox-bin[91421]: Java_registerNatives(): JavaPluginCocoa.bundle's registerNatives() failed [JavaNativeException: sun.misc.ServiceConfigurationError: javax.imageio.spi.ImageOutputStreamSpi: Provider com.sun.media.imageioimpl.stream.ChannelImageOutputStreamSpi not found]
+Sep 17 11:46:31 snipe [0x0-0x3ca3ca].org.mozilla.firefox[0]: 2010-09-17 11:46:31.164 firefox-bin[91421:1350b] Java_registerNatives(): JavaPluginCocoa.bundle's registerNatives() failed [JavaNativeException: sun.misc.ServiceConfigurationError: javax.imageio.spi.ImageOutputStreamSpi: Provider com.sun.media.imageioimpl.stream.ChannelImageOutputStreamSpi not found]</pre>
+I finally found the sollution: <a href="http://osdir.com/ml/gis.gvsig.english/2008-03/msg00071.html">gvSIG installed a Java jar that crashes firefox</a>.  Here is what I did:
+<pre><b>cd ~/Library/Java/Extensions
+rm jai_imageio.jar</b></pre>
+I had installed gvSIG on just that machine to give it a try.  Now Logmein works just fine in firefox.
+-----

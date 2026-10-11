@@ -1,0 +1,59 @@
+TITLE: PHP iCalendar, Galerie, and WordPress
+AUTHOR: Kurt
+DATE: 01.13.2005 18:45
+DESC: setup phpicalendar
+-----
+BODY:
+<a href="http://sourceforge.net/projects/phpicalendar">PHP
+iCalendar</a> looks like it might be what we need for a calendar
+program.  Have to give this one a try.  And I did.  Took about 15
+minutes to setup everything since I am already running apache2 on my laptop.
+Here is what I did:
+<ul>
+<li>Download phpicalendar from <a href="http://sourceforge.net/projects/phpicalendar">http://sourceforge.net/projects/phpicalendar</a> - I got 2.0beta from Oct 2004.
+<li>Edit your /sw/etc/apache2/httpd.conf and add this for php4:
+<pre>
+  AddHandler php-script php
+  AddType text/html       php
+  # PHP Syntax Coloring
+  # (optional but useful for reading PHP source for debugging):
+  AddType application/x-httpd-php-source phps
+</pre>
+<li>Uncomment the php module in httpd.conf 
+<pre>
+LoadModule php4_module        /sw/lib/apache2/modules/libphp4.so
+</pre>
+<li>Change the httpd.conf index list:
+<pre>
+  DirectoryIndex index.html index.php
+</pre>
+<li>cd ~/Sites
+<li>tar xfz  ~/Desktop/phpicalendar-2.0b.tgz 
+<li>cd phpicalendar-2.0b/calendars
+<li>cp ~/Library/Calendars/Work.ics Kurt.ics
+<li>sudo /sw/sbin/apachectl restart
+<li>open http://localhost/~$USER/phpicalendar-2.0b/index.php
+<li>That's it!  Now you can go figure out how to configure other stuff
+</ul>
+I used this <a href="http://dan.drydog.com/apache2php.html">blog entry</a> to get the apache2 configuration tips.
+
+Apple's <a
+href="http://developer.apple.com/internet/appleapplications/icalendarfiles.html">iCalendar
+parsing page</a>
+
+<a
+href="http://www.myriad-online.com/en/products/galerie.htm">Galarie</a>
+looks handy for generating galleries of images.  Ok!  This is really
+nice.  I made a test web page call <a
+href="http://schwehr.org/GalTest/">GalTest</a> from some pictures in
+iPhoto.  It noticed my selected pictures.
+
+Maybe Lisa would want to try <a
+href="http://roughingit.subtlehints.net/pyblosxom/">PyBlosxom</a>?
+Are comments build into it?  Seems poorly maintained.  Very messy and
+broken web pages.
+
+Actually WordPress is GPL and sounds pretty good.  <a
+href="http://wordpress.org/">wordpress.org</a>  If I was not already
+using NanoBlogger, I might try it out myself.
+-----

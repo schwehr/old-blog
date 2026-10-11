@@ -1,0 +1,45 @@
+TITLE: not following your own conventions
+AUTHOR: Kurt
+DATE: 09.02.2012 15:09
+DESC: annoyed
+-----
+BODY:
+Arg!  Little things can cause lots of friction.  I don't trust web
+server timestamps.  But now I also have to not trust file naming
+conventions too.  Note to all... if you are writing filenames with
+date stamps in them, please used numerically sorted formats
+(e.g. %Y%m%d for 20120902).  Anything else is going to cause long term
+pain.  Note: I'm using BeautifulSoup version 3 in this example.
+Version 4 is the latest.
+<pre><tt><font color="#990000">%</font>logstart <font color="#990000">-</font>t <font color="#FF0000">'/home/schwehr/.ipython_log.py'</font> append
+<!-- -->
+<b><font color="#000080">from</font></b> BeautifulSoup <b><font color="#000080">import</font></b> BeautifulSoup
+<b><font color="#000080">import</font></b> re
+<b><font color="#000080">import</font></b> urllib2
+<!-- -->
+url <font color="#990000">=</font> <font color="#FF0000">'http://vdatum.noaa.gov/download/data/'</font>
+vdatum_regex <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>r<font color="#FF0000">'vdatum_regional(?P&lt;d&gt;[0-9][0-9])'</font>
+                          <font color="#FF0000">'(?P&lt;m&gt;[0-9][0-9])(?P&lt;y&gt;[0-9][0-9])\.zip'</font><font color="#990000">,</font>
+                          re<font color="#990000">.</font>IGNORECASE<font color="#990000">)</font>
+req <font color="#990000">=</font> urllib2<font color="#990000">.</font><b><font color="#000000">urlopen</font></b><font color="#990000">(</font>url<font color="#990000">)</font>
+data <font color="#990000">=</font> req<font color="#990000">.</font><b><font color="#000000">read</font></b><font color="#990000">()</font>
+soup <font color="#990000">=</font> <b><font color="#000000">BeautifulSoup</font></b><font color="#990000">(</font>data<font color="#990000">)</font>
+soup<font color="#990000">.</font><b><font color="#000000">findAll</font></b><font color="#990000">(</font><font color="#FF0000">'a'</font><font color="#990000">,</font> href<font color="#990000">=</font>vdatum_regex<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#990000">[</font>link<font color="#990000">[</font><font color="#FF0000">'href'</font><font color="#990000">]</font> <b><font color="#0000FF">for</font></b> link <b><font color="#0000FF">in</font></b> soup<font color="#990000">.</font><b><font color="#000000">findAll</font></b><font color="#990000">(</font><font color="#FF0000">'a'</font><font color="#990000">,</font> href<font color="#990000">=</font>vdatum_regex<font color="#990000">)]</font>
+<!-- -->
+<font color="#990000">[</font>u<font color="#FF0000">'VDatum_Regional041112.zip'</font><font color="#990000">,</font>
+ u<font color="#FF0000">'VDatum_Regional041812.zip'</font><font color="#990000">,</font>
+ u<font color="#FF0000">'VDatum_Regional041912.zip'</font><font color="#990000">,</font>
+ u<font color="#FF0000">'VDatum_Regional062912.zip'</font><font color="#990000">,</font>
+ u<font color="#FF0000">'VDatum_Regional081111.zip'</font><font color="#990000">,</font>
+ u<font color="#FF0000">'VDatum_Regional092711.zip'</font><font color="#990000">,</font>
+ u<font color="#FF0000">'vdatum_Regional150312.zip'</font><font color="#990000">]</font></tt></pre>
+So here are the things I see:
+<ul><li>mmddyy is opposite of numerically sorting</li>
+<li>wait, there is a ddmmyy in there - switching mm and dd</li>
+<li>did we not learn anything from the hell of Y2K compliance?  yy?</li>
+<li>VDatum and one vdatum.  Mixing capitalization.  Fun</li></ul>
+If the files had been named YYYYmmdd, my code to get the latest would
+have been much simpler.
+-----

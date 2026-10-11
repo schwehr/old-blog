@@ -1,0 +1,68 @@
+TITLE: svn ignore
+AUTHOR: Kurt
+DATE: 03.22.2006 10:15
+DESC: a little confusing
+-----
+BODY:
+I am working on understanding how to use svn's ignore tag so that svg
+status skips things like python byte compiled files (*.pyc).  This
+does not work the same way that .cvsignore works.  Here is a quick
+example.
+<pre>
+$ svn status
+?      version.pyc
+?      verbosity.pyc
+?      BitVector-1.2
+?      dist
+?      html
+?      MANIFEST
+?      ais.pyc
+M      ais.py
+
+$ cd && svn propset svn:ignore "*.pyc" .
+property 'svn:ignore' set on '.'
+
+$ svn status
+?      BitVector-1.2
+?      dist
+?      html
+?      MANIFEST
+ M     .
+M      ais.py
+</pre>
+That is great, but I also want to ignore the html subdirectory.
+<pre>
+$ cd && svn propset svn:ignore "html" .
+property 'svn:ignore' set on '.'
+
+$ svn status
+?      version.pyc
+?      verbosity.pyc
+?      BitVector-1.2
+?      dist
+?      MANIFEST
+?      ais.pyc
+ M     .
+M      ais.py
+</pre>
+Whoops.  *.pyc came back to life!  Instead, I discovered that propedit
+will bring up my text editor to do the job and that new lines between
+each entry works. 
+<pre>
+  svn propedit svn:ignore .
+</pre>
+I then put in this
+<pre>
+html
+*.pyc
+MANIFEST
+dist
+BitVector*
+</pre>
+And now my svn status is much nicer.
+<pre>
+$ svn status
+ M     .
+M      ais.py
+</pre>
+-----

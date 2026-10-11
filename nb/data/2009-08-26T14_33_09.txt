@@ -1,0 +1,180 @@
+TITLE: Detecting duplicate AIS packets in the database
+AUTHOR: Kurt
+DATE: 08.26.2009 14:33
+DESC: rather than in just in the nmea
+-----
+BODY:
+The last release of noaadata contained ais_nmea_remove_duplicates that
+<a
+href="http://schwehr.org/blog/archives/2009-08.html#e2009-08-01T15_16_46.txt">I
+talked about a couple weeks ago</a>.  This program kept a running list
+of packets and used the NMEA data payload string has a hash.  That was
+nice in that it dropped the data volume down as early in the process
+as possible.  However, with the timing issue, I want to keep the
+duplicate packets around.  This will allow me to compute the USCG
+timestamp skew, which is non-monotonic and jumpy.  More importantly,
+when I have my time sense figured out with my new algorithms, I should
+be able to compare each receivers sense of time.  Hopefully, I can
+then put together the best possible set of position reports and time
+for each vessel.
+
+ais_build_sqlite now has a new class called "TrackDuplicates".  It
+keeps a queue of recent packets.  The list is constrained both by
+length and time.  If I know that my time source is good to a couple
+minutes, I can constrain the queue to be 5 minutes and I should be
+able to catch all of the duplicate packets.  When a new packet is
+received, it is assigned a pkt_id.  When any additional duplicate
+packets come in, the tracker will return a duplicate indicator and the
+pkt_id of the original packet.  I keep the pkt_id unique across all of
+the message types so that I can keep things in order for time analysis
+that includes both basestations and class A transceivers.
+
+Here are the new columns in the database.  Currently, I only check
+messages 1-4.
+<pre>ALTER TABLE position ADD pkt_id INTEGER; 
+ALTER TABLE position ADD dup_flag BOOLEAN;
+ALTER TABLE bsreport ADD pkt_id INTEGER; 
+ALTER TABLE bsreport ADD dup_flag BOOLEAN;</pre>
+Here is a quick example of what the code does:
+<pre><b>SELECT COUNT(*) duplicates FROM position WHERE dup_flag=1;</b>
+duplicates
+3
+<b>SELECT COUNT(*) duplicates FROM position WHERE dup_flag=0;</b>
+duplicates
+10
+<b>SELECT key,userid,longitude,latitude,pkt_id,dup_flag FROM position;</b></pre>
+<table  border="1">
+<TR  bgcolor="orange"><TH>key</TH><TH>UserID</TH><TH>longitude</TH><TH>latitude</TH><TH>pkt_id</TH><TH>dup_flag</TH></TR>
+<TR><TD>0</TD>
+<TD>367110280</TD>
+<TD>-70.9717683333</TD>
+<TD>42.2428966667</TD>
+<TD>1</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>1</TD>
+<TD>367029470</TD>
+<TD>-71.03155</TD>
+<TD>42.36275</TD>
+<TD>2</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>2</TD>
+<TD>304887000</TD>
+<TD>-70.5767166667</TD>
+<TD>41.7548</TD>
+<TD>3</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>3</TD>
+<TD>367138830</TD>
+<TD>-71.04781</TD>
+<TD>42.3813933333</TD>
+<TD>4</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>4</TD>
+<TD>366883240</TD>
+<TD>-70.9786833333</TD>
+<TD>42.3332166667</TD>
+<TD>5</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>5</TD>
+<TD>368504000</TD>
+<TD>-70.6958666667</TD>
+<TD>41.6759383333</TD>
+<TD>6</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>6</TD>
+<TD>366976890</TD>
+<TD>-71.0473816667</TD>
+<TD>42.38136</TD>
+<TD>7</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>12</TD>
+<TD>367327910</TD>
+<TD>-70.5932983333</TD>
+<TD>42.4034733333</TD>
+<TD>10</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>13</TD>
+<TD>367327910</TD>
+<TD>-70.5932983333</TD>
+<TD>42.4034733333</TD>
+<TD>10</TD>
+<TD bgcolor="red">1</TD>
+</TR>
+<TR><TD>14</TD>
+<TD>367327910</TD>
+<TD>-70.5932983333</TD>
+<TD>42.4034733333</TD>
+<TD>10</TD>
+<TD bgcolor="red">1</TD>
+</TR>
+<TR><TD>15</TD>
+<TD>367078250</TD>
+<TD>-71.0449</TD>
+<TD>42.3726333333</TD>
+<TD>11</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>16</TD>
+<TD>366999985</TD>
+<TD>-70.9762733333</TD>
+<TD>42.338805</TD>
+<TD>12</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>17</TD>
+<TD>366999985</TD>
+<TD>-70.9762733333</TD>
+<TD>42.338805</TD>
+<TD>12</TD>
+<TD bgcolor="red">1</TD>
+</TR>
+</table>
+And now for basestations:
+<pre><b>SELECT key,userid,Position_longitude as lon,Position_latitude as lat,pkt_id,dup_flag FROM bsreport;</b></a></pre>
+<table  border="1">
+<TR bgcolor="orange"><TH>key</TH><TH>UserID</TH><TH>lon</TH><TH>lat</TH><TH>pkt_id</TH><TH>dup_flag</TH></TR>
+<TR><TD>7</TD>
+<TD>3669713</TD>
+<TD>-71.0531116667</TD>
+<TD>42.368345</TD>
+<TD>8</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>8</TD>
+<TD>3669713</TD>
+<TD>-71.0531116667</TD>
+<TD>42.368345</TD>
+<TD>8</TD>
+<TD bgcolor="red">1</TD>
+</TR>
+<TR><TD>9</TD>
+<TD>3669971</TD>
+<TD>-70.9544866667</TD>
+<TD>42.3467866667</TD>
+<TD>9</TD>
+<TD>0</TD>
+</TR>
+<TR><TD>10</TD>
+<TD>3669971</TD>
+<TD>-70.9544866667</TD>
+<TD>42.3467866667</TD>
+<TD>9</TD>
+<TD bgcolor="red">1</TD>
+</TR>
+<TR><TD>11</TD>
+<TD>3669971</TD>
+<TD>-70.9544866667</TD>
+<TD>42.3467866667</TD>
+<TD>9</TD>
+<TD bgcolor="red">1</TD>
+</TR>
+</table>
+-----

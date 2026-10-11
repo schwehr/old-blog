@@ -1,0 +1,69 @@
+TITLE: UDP with python
+AUTHOR: Kurt
+DATE: 09.04.2008 10:04
+DESC: Pretty easy
+-----
+BODY:
+We have a weather station in our building sending UDP messages to the
+network.  Here is some quickly thrown together python code to listen 
+to UDP messages.  It doesn't have all the fancy features, but it
+illustrates how easy it is to start getting data.  I'm using the USCG
+N-AIS style logging format with a station name and Unix UTC timestamp at 
+the end of each line.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">socket</font>
+<strong>import</strong> <font color="#2040a0">time</font>
+<font color="#444444">#</font>
+<font color="#2040a0">host</font><font color="4444FF">=</font><font color="#008000">'0.0.0.0'</font> <font color="#444444"># All interfaces</font>
+<font color="#2040a0">device_address</font> <font color="4444FF">=</font> <font color="#008000">'192.168.8.35'</font>
+<font color="#2040a0">port</font><font color="4444FF">=</font><font color="#FF0000">4000</font>
+<font color="#2040a0">buffer</font> <font color="4444FF">=</font> <font color="#FF0000">10000</font>
+<font color="#444444">#</font>
+<font color="#2040a0">sock</font> <font color="4444FF">=</font> <font color="#2040a0">socket</font>.<font color="#2040a0">socket</font><font color="4444FF">(</font><font color="#2040a0">socket</font>.<font color="#2040a0">AF_INET</font>,<font color="#2040a0">socket</font>.<font color="#2040a0">SOCK_DGRAM</font><font color="4444FF">)</font>
+<font color="#2040a0">sock</font>.<font color="#2040a0">bind</font><font color="4444FF">(</font><font color="4444FF">(</font><font color="#2040a0">host</font>,<font color="#2040a0">port</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">verbose</font><font color="4444FF">=</font><font color="#2040a0">True</font>
+<font color="#444444">#</font>
+<strong>while</strong> <font color="#FF0000">1</font><font color="4444FF">:</font>
+    <font color="#2040a0">data</font>,<font color="#2040a0">addr</font> <font color="4444FF">=</font> <font color="#2040a0">sock</font>.<font color="#2040a0">recvfrom</font><font color="4444FF">(</font><font color="#2040a0">buffer</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">addr</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">device_address</font><font color="4444FF">:</font>
+        <strong>if</strong> <font color="#2040a0">verbose</font><font color="4444FF">:</font>
+            <strong>print</strong> <font color="#008000">'dropping data from '</font>,<font color="#2040a0">addr</font>
+        <strong>continue</strong>
+    <strong>if</strong> <strong>not</strong> <font color="#2040a0">data</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#008000">&quot;No data.&quot;</font>
+        <strong>break</strong>
+    <strong>else</strong><font color="4444FF">:</font>
+        <font color="#2040a0">timestamp</font> <font color="4444FF">=</font> <font color="#2040a0">time</font>.<font color="#2040a0">time</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <strong>print</strong> <font color="#008000">'%s,r%s,%d'</font> <font color="4444FF">%</font> <font color="4444FF">(</font><font color="#2040a0">data</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font>,<font color="#2040a0">addr</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>,<font color="#2040a0">timestamp</font><font color="4444FF">)</font>
+</pre>
+And here is a bit of test code to send out a UDP test message:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">socket</font>
+<font color="#2040a0">UDP_IP</font><font color="4444FF">=</font><font color="#008000">&quot;127.0.0.1&quot;</font>
+<font color="#2040a0">UDP_PORT</font><font color="4444FF">=</font><font color="#FF0000">4000</font>
+<font color="#2040a0">MESSAGE</font><font color="4444FF">=</font><font color="#008000">&quot;Hello, World!&quot;</font>
+<font color="#2040a0">sock</font> <font color="4444FF">=</font> <font color="#2040a0">socket</font>.<font color="#2040a0">socket</font><font color="4444FF">(</font> <font color="#2040a0">socket</font>.<font color="#2040a0">AF_INET</font>, <font color="#444444"># Internet</font>
+                       <font color="#2040a0">socket</font>.<font color="#2040a0">SOCK_DGRAM</font> <font color="4444FF">)</font> <font color="#444444"># UDP</font>
+<font color="#2040a0">sock</font>.<font color="#2040a0">sendto</font><font color="4444FF">(</font> <font color="#2040a0">MESSAGE</font>, <font color="4444FF">(</font><font color="#2040a0">UDP_IP</font>, <font color="#2040a0">UDP_PORT</font><font color="4444FF">)</font> <font color="4444FF">)</font>
+</pre>
+See also: <a href="http://wiki.python.org/moin/UdpCommunication">http://wiki.python.org/moin/UdpCommunication</a>
+
+Here are the results:
+<pre> % <b>./log-udp.py</b>
+Date/Time:  8.09.04 14:21:46
+01 Reference             652,r192.168.8.35,1220538575
+02 Wind Speed Avg.         0.46 m/s,r192.168.8.35,1220538579
+03 Wind Gust               0.93 m/s,r192.168.8.35,1220538583
+04 Air Temperature        25.32 Deg.C,r192.168.8.35,1220538587
+05 Wind Direction        297.10 Deg.,r192.168.8.35,1220538591
+Date/Time:  8.09.04 14:22:46
+01 Reference             652,r192.168.8.35,1220538635
+02 Wind Speed Avg.         0.62 m/s,r192.168.8.35,1220538639
+03 Wind Gust               1.55 m/s,r192.168.8.35,1220538643
+04 Air Temperature        25.32 Deg.C,r192.168.8.35,1220538647
+05 Wind Direction        269.32 Deg.,r192.168.8.35,1220538651
+</pre>
+-----

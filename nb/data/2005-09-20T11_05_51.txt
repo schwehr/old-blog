@@ -1,0 +1,57 @@
+TITLE: Extracting just one channel from a segy file
+AUTHOR: Kurt
+DATE: 09.20.2005 11:05
+DESC: huntec
+-----
+BODY:
+I am reprocessing the Huntec data from line 43 with sioseis.  I needed
+to be able to extract just one channel.  Channel 1 is the higher
+frequence receiver inside of the fish.  Channel 2 is flapping in the
+breeze.
+<pre>
+lsd t.sgy | head
+      SHOT   TR       RP    TR ID  RANGE DELAY NSAMPS
+      5575     <b>1</b>       0     0  1      0   610   2048
+      5575     <b>2</b>       0     0  1      0   610   2048
+      5576     <b>1</b>       0     0  1      0   610   2048
+      5576     <b>2</b>       0     0  1      0   610   2048
+</pre>
+The run the script and I end up with this lsd:
+<pre>
+lsd t-5575-6175.sgy  | head
+      SHOT   TR       RP    TR ID  RANGE DELAY NSAMPS    
+      5575     <b>1</b>       0     0  1      0   610   2048
+      5576     <b>1</b>       0     0  1      0   610   2048
+      5577     <b>1</b>       0     0  1      0   610   2048
+      5578     <b>1</b>       0     0  1      0   610   2048
+</pre>
+Here is the code with the key change in diskoa in bold:
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+<font color="#2040a0">start</font>=<font color="#2040a0">$2</font>
+<font color="#2040a0">end</font>=<font color="#2040a0">$3</font>
+declare -r <font color="#2040a0">INFILE</font>=<font color="#2040a0">$1</font>
+declare -r <font color="#2040a0">OUTFILE</font>=${INFILE%%.sgy}-<font color="#2040a0">$start</font>-<font color="#2040a0">$end</font>.sgy
+echo RANGE:  <font color="#2040a0">$start</font> ... <font color="#2040a0">$end</font>
+echo INFILE <font color="#2040a0">$INFILE</font>
+echo OUTFILE <font color="#2040a0">$OUTFILE</font>
+<font color="#2040a0">OS</font>=`uname -s`
+<font color="#2040a0">sioseis</font>=${HOME}/x/src/sioseis/sioseis.${OS}
+<font color="#2040a0">$sioseis</font> &lt;&lt; EOF 
+procs diskin prout diskoa end
+diskin
+  ipath <font color="#2040a0">$INFILE</font> end
+end
+!
+prout
+ indices l1 l2 l3 l4 l6 noinc 500 end
+end
+!
+diskoa
+ opath <font color="#2040a0">$OUTFILE</font>  fno <font color="#2040a0">$start</font> lno  <font color="#2040a0">$end</font> <b>FTR 0 LTR 1</b> end
+end
+!
+end
+EOF
+</pre>
+-----

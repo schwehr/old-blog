@@ -1,0 +1,47 @@
+TITLE: OPeNDAP confusion
+AUTHOR: Kurt
+DATE: 01.03.2007 12:34
+DESC: close, but no luck yet
+-----
+BODY:
+I decided to give OPeNDAP a try.  It all sounds great, but getting to
+the data that I want does not seem to come easily.  I built fink
+packages for the python dap library (<a
+href="http://pydap.org">pydap.org</a>) and httplib2, both of which are
+in <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/fink">vislab-ccom.unh.edu/~schwehr/software/fink</a>.
+I had a little trouble with the setuptools/ez_setup based install so
+there is a hack in there that copies dap/__init__.py into the
+installation directory.  Once I got pydap working (aka dap-py24 and
+dap-py25), the examples in the documentation work.  But trying to go
+to the NOAA DODS server, I get stuck.  Here is what I have so far.
+<pre>
+ipython2.4
+
+import dap.client
+dataset=dap.client.open('http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level')
+wl = dataset.WATERLEVEL_RAW_PX
+
+wl.keys()
+['_STATION_ID',
+ '_DATUM',
+ '_BEGIN_DATE',
+ '_END_DATE',
+ 'DCP',
+ 'SENSOR_ID',
+ 'DATE_TIME',
+ 'WL_VALUE',
+ 'SIGMA',
+ 'O',
+ 'F',
+ 'R',
+ 'L']
+
+type(wl)
+&lt;class 'dap.dtypes.SequenceType'&gr;</pre>
+Now what?  I am not quite sure how to setup the query.  I figured it
+was time to try out a GUI dap/dods type tool, so I gave OPeNDAP Data
+Connector (<a href="http://www.opendap.org/ODC/">ODC</a>).  I think this will take work to figure out how to fetch and view the waterlevel NOAA data that I am looking for.
+
+<img src="http://schwehr.org/blog/attachments/2007-01/odc.png">
+-----

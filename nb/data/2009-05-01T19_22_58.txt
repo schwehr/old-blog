@@ -1,0 +1,118 @@
+TITLE: Configuring an ACR Nauticast Class B transceiver
+AUTHOR: Kurt
+DATE: 05.01.2009 19:22
+DESC: success
+-----
+BODY:
+Today I configured my first AIS Class B device.  As a research
+institution, we got an exemption so that we can program our own
+class B devices.  I believe we are still subject to the devices
+being locked to an MMSI after being set.  Today, I was using an
+ACR Nauticast AIS-300 (P/N 2680).  I first powered up the unconfigured
+unit and this is what the unit responds with:
+<pre>$PSRT,001,,,***************************************34
+$PSRT,001,,,Software Bootloader Ver 3*6E
+$PSRT,VER,,,,,,00001403*6E
+$PSRT,001,,,Booting main application*13
+$PSRT,001,,,--- -----------------------------------*14
+$PSRT,001,,,--- Class B AIS Transponder*16
+$PSRT,001,,,--- *39
+$PSRT,001,,,--- SW Ver 10.0.7.0 Dec 11 2007 15:30:43 *03
+$PSRT,001,,,--- FPGA Ver 5   HW Ver unknown    *4B
+$PSRT,001,,,--- Power requirements: 12V 6W     *64
+$PSRT,001,,,--- Compass safe distance: 0.5m *07,
+$PSRT,VER,,,00000000,007A16AC,00000005,0A000700 *48
+$PSRT,001,,,--- Loading previous settings...    *45
+$GPTXT,01,01,02,ANTSUPERV=AC SD OD PDoS SR*0B
+$GPTXT,01,01,02,ANTSTATUS=OK*3B
+!AIVDO,1,1,,,B0000003wk?8mP=18D3Q3wv5kP06,0*1A
+!AIVDO,1,1,,,B0000003wk?8mP=18D3Q3wv5kP06,0*1A
+$AITXT,01,01,61,MMSI not programmed - TX disabled*31</pre>
+Unlike the Class A devices that I've used, this one will not
+transmit until it has an MMSI.  I then fired up the windows
+LINK2AIS software from ACR and connected to the serial port.
+
+<img title="Starting LINK2AIS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/acr-classb-link2ais-static-data-config.png"/>
+
+The NMEA traffic changes to look like this:
+<pre>$PSRT,010,,,000000000*04
+$PSRT,LED,06*4E
+$PSRT,ADC,0100,0002,0072,0069,0255,0209,0194*4F
+$PSRT,SRM,01,02,@@@@@@@*0A
+!AIVDO,1,1,,,B0000003wk?8mP=18D3Q3wv5kP06,0*1A
+$AISSD,@@@@@@@,@@@@@@@@@@@@@@@@@@@@,000,000,00,00,1,AI*35
+$PSRT,SRM,01,02,@@@@@@@*0A
+$AIVSD,037,00.0,0000,@@@@@@@@@@@@@@@@@@@@,000000,00,00,00,00*4F
+$PSRT,SNO,0008001196*50
+$PSRT,SWF,10.0.7.0,05*76
+$PSRT,010,,,000000000*04</pre>
+I also got alarms that my antenna wasn't hooked up correctly.
+<pre>$AIALR,000000,001,V,A,AIS: Tx malfunction*72
+$AIALR,000000,002,V,A,AIS: Antenna VSWR fault*2A
+$AIALR,000000,003,V,A,AIS: Rx channel 1 malfunction*24
+$AIALR,000000,004,V,A,AIS: Rx channel 2 malfunction*20
+$AIALR,000000,067,V,A,AIS: Noise threshold exceeded Chan A*4B
+$AIALR,000000,068,V,A,AIS: Noise threshold exceeded Chan B*47
+$AIALR,000000,057,V,A,AIS: 12v alarm*39
+$AIALR,000000,058,V,A,AIS: 6v alarm*03
+$AIALR,000000,076,V,A,AIS: 3V3 alarm*19</pre>
+After a while, it also informed me that it had no position
+information.  The GPS antenna was sitting in the window of my office,
+which is good enough for some GPS receivers, but not this one.
+<pre>$AITXT,01,01,62,TX attempt failed (msg 18 no pos'n)*63
+$AITXT,01,01,60,AIS: Internal GNSS not in use*28</pre>
+I then started into the process of filling out the "static data" for
+the transceiver.
+
+<img title="Static Data entry" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/acr-classb-static-data.png"/>
+
+It's strange that in all these fields, the application allows you
+to type lower case letters, which AIS does not permit.  It also lets
+you type sizes for A, B, C, and D with decimal places.  Would be good
+to explain that only integer meter values are allowed.  And meters should
+be made more obvious so that people know it's not feet.
+
+For the call sign, I tried to leave it blank, but the interface forced
+one.  I made a compromise of "NONE".  
+
+<img title="Call sign rejected" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/acr-classb-call-sign.png"/>
+
+This is a research vessel, so I wasn't sure what class to make the
+vessel type.  I also noticed that the interface restricted which
+types are allowed.  I haven't read the whole class B specification
+to know if this is required.  Also, the interface only shows 8 types
+at a time, making it hard to figure out what to do if you are not
+familar with the options.
+
+<img title="Vessel type" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/acr-classb-vessel-type.png"/>
+
+Here is what I got when I set the static data:
+<pre>$PSRT,003,,,1*07
+$PSRT,010,,,369970120*05
+$PSRT,003,,,1*07
+$PSRT,003,,,1*07
+$AISSD,NONE@@@,R/V COCHECO@@@@@@@@@,007,004,03,01,1,AI*3B
+$PSRT,SRM,01,02,@@@@@@@*0A
+$AIVSD,056,00.0,0000,@@@@@@@@@@@@@@@@@@@@,000000,00,00,00,00*48
+$PSRT,SNO,0008001196*50
+$PSRT,SWF,10.0.7.0,05*76
+!AIVDO,1,1,,,B5Pm;j03wk?8mP=18D3Q3wv5sP06,0*6B
+$PSRT,010,,,369970120*05</pre>
+Having the GPS in my office, the unit only showed the yellow "warning"
+light.  In the LINK2AIS interface, this shows up at the bottom:
+
+<img title="Status bar with a warning" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/acr-classb-status-bar.png"/>
+
+In order to get more detailed information about what is wrong, you
+have to bring up the "Device Status" from the menu.
+
+<img title="The more detailed device status" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-05/acr-classb-device-status.png"/>
+
+We then took the transceiver out to the ship and installed it (on the
+wall inside the head).  One of the existing VHF antennas was not in
+use, so we only had to install another GPS antenna (for a count of 3).
+I then went over to my new receiver site in the new buildings at the UNH
+pier and found that I was receiving Class B position reports.  The receiver
+isn't on the network yet, so it'll be a few days before I can show decoding
+a received class B packet.
+-----

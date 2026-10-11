@@ -1,0 +1,45 @@
+TITLE: libais 0.7
+AUTHOR: Kurt
+DATE: 04.30.2012 13:20
+DESC: finally  poky
+-----
+BODY:
+After 2 years, I've finally done a point release of libais.  I also
+put it into pypi.  That took me long enough!  I'm still working on 
+my git skillz as Roland and I try to trade patches.  Last Friday,
+I got my first Google approved open source patch out the door.  It
+was just one line, but it was a start.  
+
+<a href="http://pypi.python.org/pypi/libais/0.7">pypi libais 0.7 entry</a>
+
+<pre>git checkout -b release0.7
+# lots of hacking
+make -f Makefile-custom test
+python setup.py sdist
+git commit -a -m "proper sdist and go to version 0.7"
+cd dist
+wget http://vislab-ccom.unh.edu/~schwehr/software/libais/downloads/libais-0.6.tar.bz2
+tar xf libais-0.6.tar.bz2
+tar xf libais-0.7.tar.bz2
+diff -ruN libais-0.[67]
+cd ..
+git format-patch master --stdout > ~/Desktop/libais-prep-0.7.patch
+# Send the patch for review
+# Get LGTM
+git checkout master
+git merge release0.7
+git tag -a v0.7 -m 'version 0.7'
+git push --tags</pre>
+Then send it off to pypi.
+<pre>python setup.py register
+python setup.py sdist --formats=bztar upload</pre>
+See also: <a href="https://github.com/schwehr/libais">https://github.com/schwehr/libais</a>
+
+<b>Trackback:</b>
+
+2012-05-025: I was surprised to see a mention of this release on
+SlashGeo - <a
+href="http://slashgeo.org/2012/05/25/Open-Source-Geonews-HSLayers-Proxy4OWS-Worst-OpenStreetMap-AP-moving-TileMill-Leaftlet-an">Open
+Source Geonews: HSLayers, Proxy4OWS, the Worst of OpenStreetMap, AP
+moving to TileMill + Leaftlet, and more</a>
+-----

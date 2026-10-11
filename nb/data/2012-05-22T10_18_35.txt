@@ -1,0 +1,58 @@
+TITLE: gnu screen program
+AUTHOR: Kurt
+DATE: 05.22.2012 10:18
+DESC: kickin it
+-----
+BODY:
+I have been pushing hard to get my workflow straight (it's shifted a
+fair bit this year).  Back in 2004, I met <a href="https://twitter.com/#!/tinio">Aurelio</a> on the JPL MER
+mission.  He was seriously rocking the <a
+href="http://www.gnu.org/software/screen/">gnu screen</a>.
+I got to hang with Aurelio last week when <a href="http://codeforamerica.org/">Code for America</a>, where he
+currently works, hosted the geomeetup about RedHat's OpenShift.  I
+asked Aurelio if he would share some of his wizardry with screen.  I
+am just getting into using "emacsclient -nw" to connect to an existing
+emacs session from an ssh'ed shell session, but the emacs shell never 
+quite does it for me.  So here is what Aurelio had to say:
+
+<b>Guest post by Aurelio</b>
+
+I normally use screen as soon as I log on to a remote server for the
+first time, essentially as a means to make sure that the session stays
+alive in case the connection is dropped.
+<pre>$ ssh aurelio@tinio.org
+$ screen</pre>
+This means that I can just log back in to the server and continue working from where I left off. 
+<pre>$ screen -r</pre>
+I've found this to be really useful for a few scenarios logging, db,
+irc, and at time's as a poor man's daemon. For logging, it's nice when
+I do something like apt-get upgrade on a lot of packages and have the
+peace of mind that if my laptop battery dies out the process continues
+on the server. For IRC, I continually have <a href="http://irssi.org/">irssi</a> running so that I can
+look back at conversations that I missed. As a poor man's daemon, I
+sometimes run a `./manage.py runserver` for development testing.
+
+There are other scenarios as well, and it essentially let's me tab
+through windows on a remote terminal w/o having to log in for each
+session.
+<pre>create new window: ctrl-a c 
+switch to previous window: ctrl-a p
+switch to next window: ctrl-a n</pre>
+The session windows can also be named with:
+<pre>ctrl-a A</pre>
+I usually have them named, logging, runserver, working, etc.. which can be viewed with:
+<pre>ctrl-a "</pre>
+Finally, to detach the session and go back to the regular terminal:
+<pre>ctrl-a d</pre>
+However, with all that said my use of screen has actually diminished
+quite a bit since the JPL days and with the advent of services such as
+<a href="http://www.heroku.com/">heroku</a> where there is no server
+to 'ssh' into. I've mainly only been using it for IRC, but even that
+might be going away soon with the use of something like <a
+href="https://irccloud.com/">irccloud.com</a> which I 
+have started to really like.
+
+Update 2012-Jun-19: Mark Sibenac suggested <a
+href="http://en.wikipedia.org/wiki/Byobu_%28software%29">Byobu</a> to
+go along with GNU screen or tmux.
+-----

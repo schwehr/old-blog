@@ -1,0 +1,89 @@
+TITLE: NMEA / AIS highlighting using python pygments
+AUTHOR: Kurt
+DATE: 08.02.2009 00:21
+DESC: highlighting is under way
+-----
+BODY:
+I've taken the first stab at a Lexer for pygments to
+colorize/highlight general NMEA statements and more specifically USCG
+old style AIS with receive metadata.  It's by no means perfect, but 
+it does get things going.  Pygments uses regular expressions to allow
+parsing of languages and formats, so let me start with my current python
+re definition for the USCG N-AIS format:
+<pre><tt>uscg_ais_nmea_regex_str <font color="#990000">=</font> r<font color="#FF0000">"""[!$](?P&lt;talker&gt;AI)(?P&lt;stringType&gt;VD[MO])</font>
+<font color="#FF0000">,(?P&lt;total&gt;\d?)</font>
+<font color="#FF0000">,(?P&lt;senNum&gt;\d?)</font>
+<font color="#FF0000">,(?P&lt;seqId&gt;[0-9]?)</font>
+<font color="#FF0000">,(?P&lt;chan&gt;[AB])</font>
+<font color="#FF0000">,(?P&lt;body&gt;[;:=@a-zA-Z0-9&lt;&gt;\?\'\`]*)</font>
+<font color="#FF0000">,(?P&lt;fillBits&gt;\d)\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])</font>
+<font color="#FF0000">(  </font>
+<font color="#FF0000">  (,S(?P&lt;slot&gt;\d*))</font>
+<font color="#FF0000">  | (,s(?P&lt;s_rssi&gt;\d*))</font>
+<font color="#FF0000">  | (,d(?P&lt;signal_strength&gt;[-0-9]*))</font>
+<font color="#FF0000">  | (,t(?P&lt;t_unknown&gt;[^,]*))</font>
+<font color="#FF0000">  | (,T(?P&lt;time_of_arrival&gt;[0-9.]*))</font>
+<font color="#FF0000">  | (,x(?P&lt;x_station_counter&gt;[0-9]*))</font>
+<font color="#FF0000">  | (,(?P&lt;station&gt;(?P&lt;station_type&gt;[rbB])[a-zA-Z0-9]*))</font>
+<font color="#FF0000">)*</font>
+<font color="#FF0000">,(?P&lt;timeStamp&gt;\d+([.]\d+)?)?</font>
+<font color="#FF0000">"""</font></tt></pre>
+A traditional NMEA string stops at the checksum, so I should be able to handle
+sentences (one line of text) that either come with or withou the metadata.
+I created a file called: pygments/lexers/nmea.py
+<pre><tt><b><font color="#000080">import</font></b> re
+<b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+    set
+<b><font color="#0000FF">except</font></b> NameError<font color="#990000">:</font>
+    <b><font color="#000080">from</font></b> sets <b><font color="#000080">import</font></b> Set as set
+<!-- -->
+<b><font color="#000080">from</font></b> pygments<font color="#990000">.</font>lexer <b><font color="#000080">import</font></b> RegexLexer
+<b><font color="#000080">from</font></b> pygments<font color="#990000">.</font>token <b><font color="#000080">import</font></b> Text<font color="#990000">,</font> Name<font color="#990000">,</font> String<font color="#990000">,</font> Literal
+<!-- -->
+__all__ <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'NmeaLexer'</font><font color="#990000">]</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">NmeaLexer</font></b><font color="#990000">(</font>RegexLexer<font color="#990000">):</font>
+<i><font color="#9A1900">    '''Data streams from GPS, AIS, and other sensors.</font></i>
+<i><font color="#9A1900">    Does not support the NMEA 4.0 TAG Block extensions</font></i>
+<i><font color="#9A1900">    '''</font></i>
+<!-- -->
+    name <font color="#990000">=</font> <font color="#FF0000">'Nmea'</font>
+    aliases <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'nmea'</font><font color="#990000">,</font> <font color="#FF0000">'NMEA'</font><font color="#990000">,</font> <font color="#FF0000">'GPS'</font><font color="#990000">,</font> <font color="#FF0000">'AIS'</font><font color="#990000">,</font> <font color="#FF0000">'ais'</font><font color="#990000">]</font>
+    filenames <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'*.ais'</font><font color="#990000">,]</font> <i><font color="#9A1900"># And?</font></i>
+<!-- -->
+    flags <font color="#990000">=</font> re<font color="#990000">.</font>VERBOSE
+<!-- -->
+    tokens <font color="#990000">=</font> <font color="#990000">{</font>
+        <font color="#FF0000">'root'</font><font color="#990000">:</font> <font color="#990000">[</font>
+            
+            <font color="#990000">(</font>r<font color="#FF0000">'[!$][^,]*'</font><font color="#990000">,</font> String<font color="#990000">),</font> <i><font color="#9A1900">#,'fields'), # Talker and message type</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',[^,*\n]*'</font><font color="#990000">,</font> Text<font color="#990000">),</font> <i><font color="#9A1900"># Field</font></i>
+            <i><font color="#9A1900">#(r',</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">'[*][0-9A-F][0-9A-F]'</font><font color="#990000">,</font> Name<font color="#990000">,</font> <font color="#FF0000">'uscg-metadata'</font><font color="#990000">),</font> <i><font color="#9A1900"># Checksum and move into USCG metadata</font></i>
+            <font color="#990000">],</font>
+        <font color="#FF0000">'uscg-metadata'</font><font color="#990000">:</font> <font color="#990000">[</font>
+            <font color="#990000">(</font>r<font color="#FF0000">',[^drstTx0-9][^,]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Entity<font color="#990000">),</font> <i><font color="#9A1900"># Unknown things</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',d[^,]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Builtin<font color="#990000">),</font> <i><font color="#9A1900"># signal strength</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',r[^,]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Attribute<font color="#990000">),</font> <i><font color="#9A1900"># Station id/name</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',s[^,]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Class<font color="#990000">),</font> <i><font color="#9A1900"># RSSI</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',t[^,]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Constant<font color="#990000">),</font> <i><font color="#9A1900"># unknown </font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',T[^,]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Decorator<font color="#990000">),</font> <i><font color="#9A1900"># time of arrival</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',x[^,]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Function<font color="#990000">),</font> <i><font color="#9A1900"># station counter</font></i>
+            <font color="#990000">(</font>r<font color="#FF0000">',[0-9]*'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Constant<font color="#990000">,</font><font color="#FF0000">'#pop'</font><font color="#990000">),</font>
+            <font color="#990000">(</font>r<font color="#FF0000">'$'</font><font color="#990000">,</font>Name<font color="#990000">.</font>Tag<font color="#990000">,</font><font color="#FF0000">'#pop'</font><font color="#990000">),</font> <i><font color="#9A1900"># Make sure we pop.  Doesn't see to help</font></i>
+            <font color="#990000">]</font>
+        <font color="#990000">}</font></tt></pre>
+Since NMEA is line oriented, I had to add a <b>flags</b> member to the class
+to turn off the default re.M (multiline) behavior.  Then, to enable the lexer,
+I edited _mapping.py and added this line to the LEXERS dictionary:
+<pre>    'NmeaLexer': ('pygments.lexers.nmea', 'Nmea', ('nmea',), ('*.ais',), ()),</pre>
+Now it is ready to try:
+
+<img title="Pygments rendering NMEA AIS w/ USCG metadata to the terminal" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/pygments-nmea-highlighting.png"/>
+
+You can see that this test file with partial metadata on the 2nd to last line
+causes something to go wrong with the last line.  Hopefully, the community 
+can improve upon this start.
+
+And yes, I used kodos to help me debug my typos in the regex's.
+-----

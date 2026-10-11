@@ -1,0 +1,77 @@
+TITLE: plpgsql AIS transit lines
+AUTHOR: Kurt
+DATE: 07.07.2007 15:11
+DESC: finally works
+-----
+BODY:
+I finally have a function that properly creates a line for each AIS
+transit through an area.  I learned quite a bit in the process.  I
+know now that '--' is the SQL comment character and that when a query
+drops the SRID projection information, I have to add it back in with a
+setSRID(someGeometry,4326) for WGS84 GPS data.
+
+First setup the tables and functions that will be used:
+<pre>
+psql ais
+--
+CREATE TABLE tpath (id INTEGER, userid INTEGER);
+SELECT AddGeometryColumn('tpath','track',4326,'LINESTRING',2);
+-- Add this function which does all the work within a for loop
+CREATE OR REPLACE FUNCTION aisTransitLines () RETURNS text
+AS '
+  DECLARE
+       text_output TEXT := '' '';
+       arow transit%ROWTYPE;
+  BEGIN
+       FOR arow IN SELECT * FROM transit LOOP
+           text_output := text_output || arow.userid || ''\n'';
+	   --
+           INSERT INTO tpath 
+           SELECT arange.id as id, arange.userid, setSRID(MakeLine(position),4326) AS track
+                  FROM 
+                  	    position,
+                  	    (SELECT userid,startpos,endpos,id FROM transit WHERE transit.id=arow.id) AS arange 
+                  WHERE 
+                  	    position.key >= arange.startpos 
+           	    AND 
+           	    position.key <= arange.endpos
+           	    AND
+           	    position.userid = arange.userid
+                  GROUP BY id,arange.userid
+             ;
+       END LOOP;
+       RETURN text_output;
+  END;
+' LANGUAGE 'plpgsql';
+</pre>
+Now run the function:
+<pre>
+SELECT aisTransitLines();
+ aistransitlines 
+=================
+  33187
+ 10622474
+ 33951750
+ 42716912
+ 220396000
+ 220396000
+ 220396000
+...
+</pre>
+And take a look at the results:
+<pre>
+select id,userid,AsText(track) from tpath limit 3;
+ id |  userid  |                    astext                     
+====+==========+===============================================
+  1 |    33187 | LINESTRING(118.971788333333 59.2525)
+  2 | 10622474 | LINESTRING(57.7280283333333 7.09979166666667)
+  3 | 33951750 | LINESTRING(28.19416 0.43712)
+</pre>
+
+There has been some feedback asking why I didn't use plpython as I am
+such a big python fan.  My answer: PostgreSQL only comes with plpgsql
+installed by default and I am trying to push my SQL knowledge as much
+as possible.  I keep dropping back to python when I get stuck, but it
+is better for me to push through with plpgsql and get exposed to more
+of PostgreSQL.
+-----

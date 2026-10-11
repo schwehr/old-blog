@@ -1,0 +1,135 @@
+TITLE: Testing SEGY data
+AUTHOR: Kurt
+DATE: 02.13.2009 14:16
+DESC: validation begins
+-----
+BODY:
+I keep running into "SEG-Y" files that don't match what I think a
+SEG-Y file should be.  Rather than struggle through the error messages
+that my code gives when it hits something strange, I created a script
+in simplesegy called segy-validate.  This script doesn't check all
+that much yet, but so far it range checks about 80% of the binary header
+and the first trace header.  This catches most of the things that have
+burned me so far.  I am sure I could spend days coming up with checks, but
+it is a start.  I hope this will be helpful to people when they are 
+inspecting new data streams.
+
+A couple examples...
+
+First ODEC Bathy 2000:
+<pre>% <b>segy-validate -v -B -T 320 Bathy2000/y0902-01.dat | egrep 'ERRORS|WARNING|FAIL|^\['</b>
+[validating file]
+Invalid trace trailer present ... <font color="orange">WARNING</font> (Present)
+Byte order ... <font color="orange">WARNING</font> (Backwards)
+vertical_sum ... <font color="red">FAIL</font> (0)
+amp_recov_meth in (1,2,3,4) ... <font color="red">FAIL</font> (0)
+impulse_polarity in (1,2) ... <font color="red">FAIL</font> (0)
+[trace]
+vert_sum_no ... <font color="red">FAIL</font>
+horz_stacked_no ... <font color="red">FAIL</font>
+data_use in (1,2) ... <font color="red">FAIL</font> (0)
+scaler_elev_depth in +/- (1,10,100,100,1000) ... <font color="red">FAIL</font> (0)
+scaler_coord in +/- (1,10,100,100,1000) ... <font color="red">FAIL</font> (0)
+coord_units in (1,2,3,4) ... <font color="red">FAIL</font> (0)
+ERRORS: 9
+</pre>
+Knudsen where the year and day are not getting set:
+<pre>% <b>segy-validate -v Marianas_Line_013.sgy| egrep 'ERRORS|WARNING|FAIL|^\['</b>
+[validating file]
+vertical_sum ... <font color="red">FAIL</font> (0)
+correlated_traces in (1,2) ... <font color="red">FAIL</font> (0)
+amp_recov_meth in (1,2,3,4) ... <font color="red">FAIL</font> (0)
+impulse_polarity in (1,2) ... <font color="red">FAIL</font> (0)
+[trace]
+data_use in (1,2) ... <font color="red">FAIL</font> (0)
+correlated in (1,2) ... <font color="red">FAIL</font> (0)
+year ... <font color="red">FAIL</font> (0)
+time_basis in (1,2,3,4) ... <font color="red">FAIL</font> (0)
+ERRORS: 8</pre>
+Knudsen where things worked better.  This time without the grep to
+show all the things that appear correct.
+<pre>% <b>segy-validate -v GOA_line_5.sgy</b>
+[validating file]
+filename = GOA_line_5.sgy
+Invalid trace trailer present ... <font color="green">ok</font>
+Byte order ... <font color="green">ok</font>
+Text header starts with a C ... <font color="green">ok</font>
+job_id positive ... <font color="green">ok</font>
+line_no positive ... <font color="green">ok</font>
+traces_per_ensemble positive ... <font color="green">ok</font>
+aux_traces_per_ensemble positive ... <font color="green">ok</font>
+sample_interval positive ... <font color="green">ok</font>
+orig_sample_interval positive ... <font color="green">ok</font>
+samples_per_trace greater than 0 ... <font color="green">ok</font>
+orig_samples_per_trace positive positive ... <font color="green">ok</font>
+sample_format in 1,2,3,4,5, or 8 ... <font color="green">ok</font>
+ensemble_fold positive ... <font color="green">ok</font>
+trace_sorting in [-1 ... 9]  ... <font color="green">ok</font>
+vertical_sum ... <font color="red">FAIL</font> (0)
+sweep_start positive ... <font color="green">ok</font>
+sweep_end greater than or equal to start ... <font color="green">ok</font>
+sweep_len positive ... <font color="green">ok</font>
+sweep_type in segy bin header in [0 ... 4] ... <font color="green">ok</font>
+trace_sweep_channel positive ... <font color="green">ok</font>
+sweep_taper_len_start positive ... <font color="green">ok</font>
+sweep_taper_len_end positive ... <font color="green">ok</font>
+taper_type is valid ... <font color="green">ok</font>
+correlated_traces in (1,2) ... <font color="red">FAIL</font> (0)
+bin_gain_recovered ... <font color="green">ok</font>
+amp_recov_meth in (1,2,3,4) ... <font color="red">FAIL</font> (0)
+measurement_system ... <font color="green">ok</font>
+impulse_polarity in (1,2) ... <font color="red">FAIL</font> (0)
+vib_polarity in [0...8] ... <font color="green">ok</font>
+seg_y_rev ... <font color="green">ok</font>
+fixed_len_trace_flag ... <font color="green">ok</font>
+num_extended_text_headers ... <font color="green">ok</font>
+<!-- -->
+[trace]
+line_seq_no ... <font color="green">ok</font>
+file_seq_no ... <font color="green">ok</font>
+field_rec_no ... <font color="green">ok</font>
+trace_no ... <font color="green">ok</font>
+esrc_pt_no ... <font color="green">ok</font>
+ensemble_no ... <font color="green">ok</font>
+trace_no_ensemble ... <font color="green">ok</font>
+trace_id ... <font color="green">ok</font>
+vert_sum_no ... <font color="green">ok</font>
+horz_stacked_no ... <font color="green">ok</font>
+data_use in (1,2) ... <font color="red">FAIL</font> (0)
+water_depth_src ... <font color="green">ok</font>
+water_depth_grp ... <font color="green">ok</font>
+scaler_elev_depth in +/- (1,10,100,100,1000) ... <font color="green">ok</font>
+scaler_coord in +/- (1,10,100,100,1000) ... <font color="green">ok</font>
+coord_units in (1,2,3,4) ... <font color="green">ok</font>
+wx_vel ... <font color="green">ok</font>
+sub_wx_vel ... <font color="green">ok</font>
+uphole_t_src ... <font color="green">ok</font>
+uphole_t_grp ... <font color="green">ok</font>
+mute_start ... <font color="green">ok</font>
+mute_end ... <font color="green">ok</font>
+trace_samples ... <font color="green">ok</font>
+sample_interval ... <font color="green">ok</font>
+gain_type ... <font color="green">ok</font>
+gain_type optional used ... <font color="green">ok</font>
+correlated in (1,2) ... <font color="red">FAIL</font> (0)
+sweep_freq_start ... <font color="green">ok</font>
+sweep_freq_end greater than start ... <font color="green">ok</font>
+sweep_len ... <font color="green">ok</font>
+sweep_type in trace ... <font color="green">ok</font>
+sweep_taper_len_start ... <font color="green">ok</font>
+sweep_taper_len_end ... <font color="green">ok</font>
+taper_type ... <font color="green">ok</font>
+alias_filt_freq ... <font color="green">ok</font>
+notch_filt_freq ... <font color="green">ok</font>
+low_cut_freq ... <font color="green">ok</font>
+high_cut_freq ... <font color="green">ok</font>
+year ... <font color="green">ok</font>
+day ... <font color="green">ok</font>
+hour ... <font color="green">ok</font>
+min ... <font color="green">ok</font>
+sec ... <font color="green">ok</font>
+time_basis in (1,2,3,4) ... <font color="green">ok</font>
+trace_weight ... <font color="green">ok</font>
+<!-- -->
+ERRORS: 6</pre>
+-----

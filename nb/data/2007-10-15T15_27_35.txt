@@ -1,0 +1,26 @@
+TITLE: gdal jpeg2000 support in fink via jasper
+AUTHOR: Kurt
+DATE: 10.15.2007 15:27
+DESC: not quite good enough
+-----
+BODY:
+I've added JPEG 2000 support to gdal in fink using the JasPer library.
+Unfortunetly, that means that HiRise Mars images will not load.
+Sorry.  The other libraries are all non-source based distributions and
+MrSID seems to be MS Windows only.
+
+You may see something like this (or a segfault) when trying to handle
+large images.  Here I tried to take a small subset of an image.
+<pre>
+gdal_translate -of PNG -srcwin 10 10 1000 1000 PSP_005372_1515_RED.QLOOK.JP2 foo.png
+Input file size is 32369, 95295
+error: cannot decode code stream
+gdal_translate(22843) malloc: *** vm_allocate(size=3084607488) failed (error code=3)
+gdal_translate(22843) malloc: *** error: can't allocate region
+gdal_translate(22843) malloc: *** set a breakpoint in szone_error to debug
+ERROR 2: Internalize failed
+ERROR 1: GetBlockRef failed at X block offset 0, Y block offset 0
+libpng error: No IDATs written into file
+Abort trap
+</pre>
+-----

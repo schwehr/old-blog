@@ -1,0 +1,20 @@
+TITLE: Dealing with SQL Nulls
+AUTHOR: Kurt
+DATE: 12.12.2005 16:59
+DESC: piece of cake
+-----
+BODY:
+I though Nulls in SQL might be a bit confusing.  Turns out that a
+really simple case is no big deal, but all the details can make things
+very confusing.  SQLite has a <a
+href="http://www.sqlite.org/nulls.html">Null Handling</a> page which
+show how things can get confusing.  My simple case worked out pretty
+well.  I have samples where only the bulk susceptibility has been
+measured.  These samples do not have tau[123] and all the other AMS
+parameters.  I do not want those samples messing up otherwise nice
+code.
+<pre>
+  sqlite ttn136b.db 'SELECT samplename,bulksusc,tau1 FROM ams \
+     WHERE corenum=5 AND tau1 NOT NULL'
+</pre>
+-----

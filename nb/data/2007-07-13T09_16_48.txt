@@ -1,0 +1,46 @@
+TITLE: Building an ESRI Shape File of an area from AIS
+AUTHOR: Kurt
+DATE: 07.13.2007 09:16
+DESC: how fast can you plot the data?
+-----
+BODY:
+Here are some quick notes on how I created a WKT file and an ESRI
+Shape file from AIS data over a bounding box region.  All of the code
+will be available in noaadata-py in the next release accept for
+AisPartioning (sorry, not a public code base).  This example is for
+the Delaware Bay area.
+<pre>
+# Pull only the position messages
+bzcat log-2007-07-10.bz2 | egrep 'AIVDM,1,1,[0-9]?,[AB],[123]' &gt; log-2007-07-10.123
+AisPartitioning -75.7 -73.8 38.2 39.5 log-2007-07-10.123 > 10.123.bbox
+ais_build_sqlite.py -C -d delaware.db3 10.123.bbox 11.123.bbox 
+
+# Use SQLite 3 first
+sqlite3 delaware.db3 'SELECT longitude,latitude,UserID,cg_timestamp,cg_sec FROM position' | tr '|' ' ' &gt;.xymt
+sqlite3 delaware.db3 'SELECT longitude,latitude,UserID,cg_timestamp,cg_sec FROM position' | tr '|' '\t' &gt; delaware.xymt.tab
+ais_transits.py -f -F delaware.xymt -g -s --gmt-multisegment --excel
+xymt2kml.py  delaware.xymt > delaware.kml
+
+# Use PostgreSQL/PostGIS next
+createdb delawaredemo
+psql delawaredemo < /sw/share/doc/postgis82/lwpostgis.sql
+psql delawaredemo < /sw/share/doc/postgis82/spatial_ref_sys.sql 
+ais_build_postgis.py -d delawaredemo -C 10.123.bbox  11.123.bbox 
+ais_pg_create_transit_table.py -d delawaredemo -C -t 900 
+~/projects/src/noaadata/scraps/ais_pg_transitlines_noMakeLine.py -d delawaredemo -C 
+echo "SELECT AsText(track) FROM tpath;" | psql delawaredemo | grep LINE > delaware.wkt
+ogr2ogr -f "ESRI Shapefile" delaware PG:"host=localhost user=schwehr dbname=delawaredemo" -sql "select track from tpath;"
+</pre>
+Got that?  No time for explanations right now, so you will have to
+"Use the source Luke" as there is manual such that RTFM is just not
+possible yet.  One you have done the above, it is time to look at the
+results:
+<pre>
+ls -l delaware
+total 596
+-rw-r--r-- 1 schwehr staff   6449 Jul 13 08:45 sql_statement.dbf
+-rw-r--r-- 1 schwehr staff 589956 Jul 13 08:45 sql_statement.shp
+-rw-r--r-- 1 schwehr staff   4356 Jul 13 08:45 sql_statement.shx
+</pre>
+<img src="http://schwehr.org/blog/attachments/2007-07/qgis-ais.png">
+-----

@@ -1,0 +1,318 @@
+TITLE: SQLite cheat sheet / tutorial
+AUTHOR: Kurt
+DATE: 03.15.2009 10:30
+DESC: hope this is useful
+-----
+BODY:
+I don't know if this cheat sheet will be helpful to others or not, but
+it will help me spend less time looking up SQL syntax.  I hope that
+the sections for table one and table two will be accessable to
+beginners.  This is a different style than other tutorials I have seen
+on the web.  It is done as a big SQL file that you can either run at
+once or paste in line by line.  It only runs on SQLite, but I will try 
+to alter it to work with PostgreSQL and explain the differences in another
+post.  SQLite does some quirky things, but it is a good learning environment.
+For example, it allows field types that do not make sense:
+<pre>CREATE TABLE foo (a ASDF);</pre>
+ASDF is not a valid SQL type, but the command works.
+
+You can run these commands in one of three ways.  The most educational is
+way is to just run this command:
+<pre>% <b>sqlite3</b></pre>
+This will put you into sqlite's shell.  You can paste in commands from the
+text and when you are done, quit it like this:
+<pre>sqlite&gt; <b>.quit</b></pre>
+If you want to quickly see what everything does, try this:
+<pre>% <b>sqlite3 < sqlite-tutorial.sql | less</b></pre>
+This will let you see both the commands being entered and the results.
+
+The above two examples use an "in memory" database, so when you exit,
+everything goes away.  If you want to have a database be saved to disk,
+do one of these two:
+<pre>% <b>sqlite3 demo.db3</b>
+% <b>sqlite3 demo.db3 < sqlite-tutorial.sql </b></pre>
+And now for the big tutorial...
+<pre><tt><i><font color="#9A1900">-- This is an SQLite tutorial / cheat sheet by Kurt Schwehr, 2009</font></i>
+<!-- -->
+<i><font color="#9A1900">-- Conventions:</font></i>
+<i><font color="#9A1900">--   All SQL keyworks are written UPPERCASE, other stuff lowercase</font></i>
+<i><font color="#9A1900">--   All SQLite commands start with a "."</font></i>
+<!-- -->
+<i><font color="#9A1900">-- Two dashes start a comment in SQL</font></i>
+<i><font color="#9A1900">/* Another style of comments */</font></i>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Setup SQLite for the tutorial</font></i>
+<i><font color="#9A1900">----------------------------------------</font></i>
+<!-- -->
+<i><font color="#9A1900">-- Ask SQLite for instructions</font></i>
+<font color="#990000">.</font>help
+<!-- -->
+<i><font color="#9A1900">-- Repeat every command for this tutorial</font></i>
+<font color="#990000">.</font>echo <b><font color="#0000FF">ON</font></b>
+<!-- -->
+<i><font color="#9A1900">-- Ask SQLite to print column names</font></i>
+<font color="#990000">.</font>header <b><font color="#0000FF">ON</font></b>
+<!-- -->
+<i><font color="#9A1900">-- Switch the column separator from '|' to tabs</font></i>
+<font color="#990000">.</font>separator <font color="#FF0000">"</font><font color="#CC33CC">\t</font><font color="#FF0000">"</font>
+<!-- -->
+<i><font color="#9A1900">-- Make SQLite print "Null" rather than blanks for an empty field</font></i>
+<font color="#990000">.</font>nullvalue <font color="#FF0000">"Null"</font>
+<!-- -->
+<i><font color="#9A1900">-- Dump the settings before we go on</font></i>
+<font color="#990000">.</font><b><font color="#0000FF">show</font></b>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Additional resources</font></i>
+<i><font color="#9A1900">----------------------------------------</font></i>
+<!-- -->
+<i><font color="#9A1900">-- This tutorial misses many important database concepts (e.g. JOIN and SUBQUERIES)</font></i>
+<!-- -->
+<i><font color="#9A1900">-- http://swc.scipy.org/lec/db.html</font></i>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Basics</font></i>
+<i><font color="#9A1900">----------------------------------------</font></i>
+<!-- -->
+<i><font color="#9A1900">-- All SQL command end with a semicolon</font></i>
+<i><font color="#9A1900">-- Commands to query the database engine start with SELECT.</font></i>
+<!-- -->
+<i><font color="#9A1900">-- First hello world:</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#FF0000">"hello world"</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- What is the current date and time?</font></i>
+<b><font color="#0000FF">SELECT</font></b> CURRENT_TIMESTAMP<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Simple math</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#993399">1</font><font color="#990000">+</font><font color="#993399">2</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Calling a function</font></i>
+<b><font color="#0000FF">SELECT</font></b> ROUND<font color="#990000">(</font><font color="#993399">9.8</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Multiple columns are separated by ","</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#FF0000">"col1"</font><font color="#990000">,</font> <font color="#FF0000">"col2"</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Label columns with AS</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#993399">1</font> <b><font color="#0000FF">AS</font></b> first<font color="#990000">,</font> <font color="#993399">2</font> <b><font color="#0000FF">AS</font></b> second<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Time to make a database table!</font></i>
+<i><font color="#9A1900">----------------------------------------</font></i>
+<!-- -->
+<i><font color="#9A1900">-- Create a first table containing two numbers per row</font></i>
+<i><font color="#9A1900">-- The table name follewd by pairs of &lt;variable name&gt;, &lt;type&gt; in ()</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> tbl_one <font color="#990000">(</font>a INTEGER<font color="#990000">,</font> b INTEGER<font color="#990000">,</font> c INTEGER<font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- List all tables</font></i>
+<font color="#990000">.</font><b><font color="#0000FF">tables</font></b>
+<!-- -->
+<i><font color="#9A1900">-- List the CREATE commands for all tables</font></i>
+<font color="#990000">.</font>schema
+<!-- -->
+<i><font color="#9A1900">-- Add some data to the table</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_one <font color="#990000">(</font>a<font color="#990000">,</font>b<font color="#990000">,</font>c<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">3</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_one <font color="#990000">(</font>a<font color="#990000">,</font>b<font color="#990000">,</font>c<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">,</font><font color="#993399">6</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_one <font color="#990000">(</font>a<font color="#990000">,</font>b<font color="#990000">,</font>c<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">17</font><font color="#990000">,</font><font color="#993399">19</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_one <font color="#990000">(</font>a<font color="#990000">,</font>b<font color="#990000">,</font>c<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">42</font><font color="#990000">,</font><font color="#993399">8</font><font color="#990000">,</font><font color="#993399">72</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Show all of the data in the tables</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Show a smaller number of rows from the table</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">LIMIT</font></b> <font color="#993399">2</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Only show a subset of the rows</font></i>
+<b><font color="#0000FF">SELECT</font></b> a<font color="#990000">,</font>c <b><font color="#0000FF">FROM</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Fetch only rows that meet one criteria</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">WHERE</font></b> a<font color="#990000">=</font><font color="#993399">4</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Fetch only rows that meet multiple criteria</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">WHERE</font></b> a<font color="#990000">=</font><font color="#993399">4</font> <b><font color="#0000FF">AND</font></b> b<font color="#990000">=</font><font color="#993399">5</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Fetch only rows that meet one of multiple criteria</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">WHERE</font></b> a<font color="#990000">=</font><font color="#993399">1</font> <b><font color="#0000FF">OR</font></b> b<font color="#990000">=</font><font color="#993399">47</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Greater and less than comparisons work too</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">WHERE</font></b> b <font color="#990000">&gt;=</font> <font color="#993399">8</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- List all that are not equal too</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">WHERE</font></b> a <font color="#990000">&lt;&gt;</font> <font color="#993399">4</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Or list from a set of items</font></i>
+<b><font color="#0000FF">SELECT</font></b> c<font color="#990000">,</font>b <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">WHERE</font></b> c <b><font color="#0000FF">IN</font></b> <font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font> <font color="#993399">19</font><font color="#990000">,</font> <font color="#993399">72</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Order the output base on a field / column</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">ORDER</font></b> <b><font color="#0000FF">BY</font></b> b<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Flip the sense of the order</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">ORDER</font></b> <b><font color="#0000FF">BY</font></b> b <b><font color="#0000FF">DESC</font></b><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- How many rows in the table?</font></i>
+<b><font color="#0000FF">SELECT</font></b> COUNT<font color="#990000">(*)</font> <b><font color="#0000FF">FROM</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- List the unique values for column a</font></i>
+<b><font color="#0000FF">SELECT</font></b> <b><font color="#0000FF">DISTINCT</font></b><font color="#990000">(</font>a<font color="#990000">)</font> <b><font color="#0000FF">FROM</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Count the distinct values for column a</font></i>
+<b><font color="#0000FF">SELECT</font></b> COUNT<font color="#990000">(</font><b><font color="#0000FF">DISTINCT</font></b><font color="#990000">(</font>a<font color="#990000">))</font> <b><font color="#0000FF">FROM</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Get the minumum, maximum, average, and total values for column a</font></i>
+<b><font color="#0000FF">SELECT</font></b> MIN<font color="#990000">(</font>a<font color="#990000">),</font>MAX<font color="#990000">(</font>a<font color="#990000">),</font> AVG<font color="#990000">(</font>a<font color="#990000">),</font> TOTAL<font color="#990000">(</font>a<font color="#990000">)</font> <b><font color="#0000FF">FROM</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Remove a rows from the table</font></i>
+<b><font color="#0000FF">DELETE</font></b> <b><font color="#0000FF">FROM</font></b> tbl_one <b><font color="#0000FF">WHERE</font></b> a<font color="#990000">=</font><font color="#993399">4</font><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- See that we have gotten rid of two rows</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- Adding more data.  You can leave out the column/field names</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_one <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">101</font><font color="#990000">,</font><font color="#993399">102</font><font color="#990000">,</font><font color="#993399">103</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Delete a table</font></i>
+<b><font color="#0000FF">DROP</font></b> <b><font color="#0000FF">TABLE</font></b> tbl_one<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Time to try more SQL data types</font></i>
+<!-- -->
+<i><font color="#9A1900">-- There are many more types.  For example, see:</font></i>
+<i><font color="#9A1900">-- http://www.postgresql.org/docs/current/interactive/datatype.html</font></i>
+<!-- -->
+<i><font color="#9A1900">-- WARNING: SQLite plays fast and loose with data types</font></i>
+<i><font color="#9A1900">-- We will pretend this is not so for the next section</font></i>
+<!-- -->
+<i><font color="#9A1900">-- Make a table with all the different types in it</font></i>
+<i><font color="#9A1900">-- We will step through the types</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> tbl_two <font color="#990000">(</font>
+       an_int   INTEGER<font color="#990000">,</font>
+       a_key    INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+       a_char   <font color="#009900">CHAR</font><font color="#990000">,</font>
+       a_name   <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">25</font><font color="#990000">),</font>
+       a_text   <font color="#009900">TEXT</font><font color="#990000">,</font>
+       a_dec    <font color="#009900">DECIMAL</font><font color="#990000">(</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">),</font>
+       a_real   REAL<font color="#990000">,</font>
+       a_bool   <b><font color="#0000FF">BOOLEAN</font></b><font color="#990000">,</font>
+       a_bit    BIT<font color="#990000">,</font>
+       a_stamp  <font color="#009900">TIMESTAMP</font><font color="#990000">,</font>
+       a_xml    XML
+       <font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- If we add a row that is just an integer, all the fields</font></i>
+<i><font color="#9A1900">-- except a_key will be empty (called 'Null').</font></i>
+<i><font color="#9A1900">-- If you don't specify the primary key value, it will be </font></i>
+<i><font color="#9A1900">-- created for you.</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_name<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">42</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- See what you just added.  There will be a number of 'Null' columns</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_two<font color="#990000">;</font> 
+<!-- -->
+<i><font color="#9A1900">-- A single character</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_char<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'z'</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- VARCHAR are length limited strings.  </font></i>
+<i><font color="#9A1900">-- The number in () is the maximum number of characters</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_name<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'up to 25 characters'</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- TEXT can be any amount of characters</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_text<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'yada yada...'</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- DECIMAL specifies an number with a certain number of decimal digits</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_dec<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b>
+<!-- -->
+<i><font color="#9A1900">-- Booleans can be true or false</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_bool<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'TRUE'</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_bool<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'FALSE'</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Adding bits</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_bit<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_bit<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Adding timestamps... right now</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_stamp<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font>CURRENT_TIMESTAMP<font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Date, time, or both.  Date is year-month-day.</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_stamp<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'2009-03-15'</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_stamp<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'9:02:15'</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_stamp<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'2009-03-15 9:02:15'</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Using other timestamps</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_stamp<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#009900">datetime</font><font color="#990000">(</font><font color="#993399">1092941466</font><font color="#990000">,</font> <font color="#FF0000">'unixepoch'</font><font color="#990000">));</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_stamp<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font>strftime<font color="#990000">(</font><font color="#FF0000">'%Y-%m-%d %H:%M'</font><font color="#990000">,</font> <font color="#FF0000">'2009-03-15 14:02'</font><font color="#990000">));</font>
+<!-- -->
+<i><font color="#9A1900">-- XML markup</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_two <font color="#990000">(</font>a_xml<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#FF0000">'&lt;start&gt;Text&lt;tag2&gt;text2&lt;/tag2&gt;&lt;/start&gt;'</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- Now you can search by columns being set (aka not Null)</font></i>
+<b><font color="#0000FF">SELECT</font></b> a_key<font color="#990000">,</font>a_stamp <b><font color="#0000FF">from</font></b> tbl_two <b><font color="#0000FF">WHERE</font></b> a_stamp <b><font color="#0000FF">NOT</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Putting constraints on the database</font></i>
+<i><font color="#9A1900">-- and linking tables</font></i>
+<!-- -->
+<i><font color="#9A1900">-- NOT NULL forces a column to always have a value.</font></i>
+<i><font color="#9A1900">--   Inserting without a value causes an error</font></i>
+<i><font color="#9A1900">-- UNIQUE enforces that you can not make entries that are the same</font></i>
+<i><font color="#9A1900">-- DEFAULT sets the value if you don't give one</font></i>
+<i><font color="#9A1900">-- REFERENCES adds a foreign key pointing to another table</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> tbl_three <font color="#990000">(</font>
+       a_key     INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+       a_val     REAL    <b><font color="#0000FF">NOT</font></b> <b><font color="#0000FF">NULL</font></b><font color="#990000">,</font>
+       a_code    INTEGER <b><font color="#0000FF">UNIQUE</font></b><font color="#990000">,</font>
+       a_str     <font color="#009900">TEXT</font>    <b><font color="#0000FF">DEFAULT</font></b> <font color="#FF0000">'I donno'</font><font color="#990000">,</font>
+       tbl_two   INTEGER<font color="#990000">,</font>       
+       <b><font color="#0000FF">FOREIGN</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">(</font>tbl_two<font color="#990000">)</font> <b><font color="#0000FF">REFERENCES</font></b> tbl_two<font color="#990000">(</font>a_key<font color="#990000">)</font>
+       <font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- a_key and a_str are automatically given values</font></i>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_three <font color="#990000">(</font>a_val<font color="#990000">,</font>a_code<font color="#990000">,</font>tbl_two<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">11.2</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_three <font color="#990000">(</font>a_val<font color="#990000">,</font>a_code<font color="#990000">,</font>tbl_two<font color="#990000">)</font> <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">12.9</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">3</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- This would be an SQL error, as the table already has a code of 2</font></i>
+<i><font color="#9A1900">-- INSERT INTO tbl_three (a_code) VALUES (2);</font></i>
+<!-- -->
+<i><font color="#9A1900">-- This would be an SQL error, as it has no a_val (which is NOT NULL)</font></i>
+<i><font color="#9A1900">--INSERT INTO tbl_three (a_code) VALUES (3);</font></i>
+<!-- -->
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> tbl_three<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- We can now combine the two tables.  This is called a 'join'</font></i>
+<i><font color="#9A1900">-- It is not required to have foreign keys for joins</font></i>
+<b><font color="#0000FF">SELECT</font></b> tbl_three<font color="#990000">.</font>a_code<font color="#990000">,</font>tbl_two<font color="#990000">.*</font> <b><font color="#0000FF">FROM</font></b> tbl_two<font color="#990000">,</font>tbl_three <b><font color="#0000FF">WHERE</font></b> tbl_two<font color="#990000">.</font>a_key <font color="#990000">==</font> tbl_three<font color="#990000">.</font>tbl_two<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Extras for speed</font></i>
+<!-- -->
+<i><font color="#9A1900">-- For more on speed, see: </font></i>
+<i><font color="#9A1900">-- http://web.utk.edu/~jplyon/sqlite/SQLite_optimization_FAQ.html</font></i>
+<!-- -->
+<i><font color="#9A1900">-- TRANSACTIONs let you group commands together.  They all work or if there is</font></i>
+<i><font color="#9A1900">-- trouble, they all fail.  Transactions are faster than one at a time too!</font></i>
+<i><font color="#9A1900">-- You can also write "COMMIT;" to end a transaction</font></i>
+BEGIN TRANSACTION<font color="#990000">;</font>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> tbl_four <font color="#990000">(</font>
+       a_key    INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+       sensor   REAL<font color="#990000">,</font>
+       log_time <font color="#009900">TIMESTAMP</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_four <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">3.14</font><font color="#990000">,</font><font color="#FF0000">'2009-03-15 14:02'</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_four <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">3.00</font><font color="#990000">,</font><font color="#FF0000">'2009-03-15 14:03'</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_four <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">2.74</font><font color="#990000">,</font><font color="#FF0000">'2009-03-15 14:04'</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_four <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">2.87</font><font color="#990000">,</font><font color="#FF0000">'2009-03-15 14:05'</font><font color="#990000">);</font>
+<b><font color="#0000FF">INSERT</font></b> <b><font color="#0000FF">INTO</font></b> tbl_four <b><font color="#0000FF">VALUES</font></b> <font color="#990000">(</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">3.04</font><font color="#990000">,</font><font color="#FF0000">'2009-03-15 14:06'</font><font color="#990000">);</font>
+END TRANSACTION<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">-- INDEXes are important if you are searching on a particular field</font></i>
+<i><font color="#9A1900">-- or column often.  It might take a while to create the index,</font></i>
+<i><font color="#9A1900">-- but once it is there, searching on that column is faster</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">INDEX</font></b> log_time_indx <b><font color="#0000FF">ON</font></b> tbl_four<font color="#990000">(</font>log_time<font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- INDEXes are automatically created for PRIMARY KEYs and UNIQUE fields</font></i>
+<!-- -->
+<i><font color="#9A1900">-- Run vacuum if you have done a lot of deleting of tables or rows</font></i>
+VACUUM<font color="#990000">;</font>
+<!-- -->
+<i><font color="#9A1900">----------------------------------------</font></i>
+<i><font color="#9A1900">-- Find out SQLite's internal state</font></i>
+<i><font color="#9A1900">----------------------------------------</font></i>
+<b><font color="#0000FF">SELECT</font></b> <font color="#990000">*</font> <b><font color="#0000FF">FROM</font></b> sqlite_master<font color="#990000">;</font></tt></pre>
+-----

@@ -1,0 +1,22 @@
+TITLE: xargs to run commands in parallel
+AUTHOR: Kurt
+DATE: 01.18.2013 12:52
+DESC: shell for the easy win
+-----
+BODY:
+I recently found out xargs had options to parallelize what it is
+working on.  I finally had a good reason to try it.  I'm processing
+log files for the last year.  Each day is it's own unique standalone
+task.  My workstation is has 1 CPU with 6 cores that are hyperthreaded
+to give 12 logical cores.  So... I asked xargs to run the processing
+script with 6 day log files and to run 10 processes in parallel.
+Zoom!
+<pre>ls 2012*.tar | xargs -n 6 -P 10 process_log_files.py</pre>
+The script takes a tar for the day and outputs a csv.  So I am
+running watch to count the number of csv files I have as a watch to
+track progress.
+<pre>watch -n "ls 2012*.csv | wc -l"</pre>
+This will only work for certain limited types of operations, but in the
+case of my log files, it is a massive speedup of what I am doing.  What used
+to take hours, now runs in about 20 minutes.
+-----

@@ -1,0 +1,40 @@
+TITLE: Validating NGDC metadata submission
+AUTHOR: Kurt
+DATE: 10.18.2009 08:40
+DESC: bummer
+-----
+BODY:
+I've been trying to figure out how to validate XML metadata easily.
+Here is what the top of the metadata file looks like:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;metadata</font></b> <font color="#009900">xmlns:xsi</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2001/XMLSchema-instance"</font> <font color="#009900">xsi:noNamespaceSchemaLocation</font><font color="#990000">=</font><font color="#FF0000">"http://ngdc.noaa.gov/metadata/published/xsd/ngdcSchema/schema.xsd"</font><b><font color="#0000FF">&gt;</font></b>
+   <b><font color="#0000FF">&lt;idinfo&gt;</font></b>
+       <b><font color="#0000FF">&lt;citation&gt;</font></b>
+           <b><font color="#0000FF">&lt;citeinfo&gt;</font></b>
+               <b><font color="#0000FF">&lt;origin&gt;</font></b>
+                   UNH/CCOM-JHC : Center for Coastal and Ocean Mapping/Joint Hydrographic Center, University of New Hampshire
+               <b><font color="#0000FF">&lt;/origin&gt;</font></b>
+               <b><font color="#0000FF">&lt;pubdate&gt;</font></b>
+                   2009-10-30
+               <b><font color="#0000FF">&lt;/pubdate&gt;</font></b></tt></pre>
+I tried running this to see if xmllint would handle the XSD schema:
+<pre>xmllint --noout multibeam_line0001_metadata.xml</pre>
+If runs and return 0 if you run "echo $?" to see what exit code it gave.
+xmllint requires that you tell it the name of the schema file.  So I tried
+this:
+<pre>xmllint --noout --schema http://ngdc.noaa.gov/metadata/published/xsd/ngdcSchema/schema.xsd multibeam_line0001_metadata.xml</pre>
+Unfortunately, the results do not look so good:
+<pre>multibeam_line0001_metadata.xml:4: element citation: Schemas validity error : Element 'citation': This element is not expected. Expected is ( datsetid ).
+multibeam_line0001_metadata.xml:231: element procdate: Schemas validity error : Element 'procdate': '
+                   2009-10-14
+               ' is not a valid value of the union type 'procdateType'.
+multibeam_line0001_metadata.xml:293: element geogunit: Schemas validity error : Element 'geogunit': [facet 'enumeration'] The value 'Decimal Degrees' is not an element of the set {'Decimal degrees', 'Decimal minutes', 'Decimal seconds', 'Degrees and decimal minutes', 'Degrees, minutes, and decimal seconds', 'Radians', 'Grads'}.
+multibeam_line0001_metadata.xml:293: element geogunit: Schemas validity error : Element 'geogunit': 'Decimal Degrees' is not a valid value of the atomic type 'geogunitType'.
+multibeam_line0001_metadata.xml:417: element metd: Schemas validity error : Element 'metd': [facet 'pattern'] The value '2009-10-15' is not accepted by the pattern 'cd\d{5,}'.
+multibeam_line0001_metadata.xml:417: element metd: Schemas validity error : Element 'metd': '2009-10-15' is not a valid value of the atomic type 'metdType'.
+multibeam_line0001_metadata.xml:473: element mettc: Schemas validity error : Element 'mettc': [facet 'enumeration'] The value 'Universal Time' is not an element of the set {'local time', 'local time with time differential factor', 'universal time'}.
+multibeam_line0001_metadata.xml:473: element mettc: Schemas validity error : Element 'mettc': 'Universal Time' is not a valid value of the atomic type 'mettcType'.
+multibeam_line0001_metadata.xml fails to validate</pre>
+<b>Update 2009-Oct-19:</b>  Briana informed me that the above complaints from xmllint are currently expected.  They come from 
+the migration from FGDC metadata towards ISO metadata.
+-----

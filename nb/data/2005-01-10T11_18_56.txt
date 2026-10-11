@@ -1,0 +1,29 @@
+TITLE: density bug
+AUTHOR: Kurt
+DATE: 01.10.2005 11:18
+DESC: Working around my path bug
+-----
+BODY:
+Just ran back into a bug in density that I forgot was there.  So here
+is the work around until I get it fixed.  First the problem:
+<pre>
+  simpleview body.wrl 
+  /sw/bin/simpleview: line 9: ./simpleview_bin: No such file or directory
+</pre>
+The simpleview script is supposed to set the DYLD_LIBRARY_PATH for
+the simage library and then call simpleview_bin with all the same args
+as usual.  Looks like I forgot to really handle finding simpleview_bin
+in the scripts.  So for now, you need to set the DYLD_LIBRARY_PATH and
+use simpleview_bin directly.  Sorry about that.
+<pre>
+  export DYLD_LIBRARY_PATH=/sw/lib
+</pre>
+This will mess up a few things like man page formating.  To undo this
+change when done, just type this:
+<pre>
+  unset DYLD_LIBRARY_PATH
+</pre>
+When I get this fixed, I will release density 0.18.  Do not expect
+this anytime soon.  An alternate fix is to edit /sw/bin/simpleview and
+/sw/bin/render and change "./" to be "/sw/bin"
+-----

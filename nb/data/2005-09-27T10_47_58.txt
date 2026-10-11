@@ -1,0 +1,48 @@
+TITLE: segysqldump.py with pretty Longitude/Latitude
+AUTHOR: Kurt
+DATE: 09.27.2005 10:47
+DESC: seismic line locations
+-----
+BODY:
+I just fixed up segysqldump.py to allow for pretty printing of X,Y
+locations for shots.  Sometimes it just takes a piece of paper to
+figure out a silly little equation like calculating the seconds from a
+decimal coordinate.  I am still wondering how I avoid the fun
+traceback with head that you will see below.  I guess I could wrap my
+printing code in try: foo except IOError: quietly die, but that seems
+ugly.
+<pre>
+segysqldump.py  --verbosity=0 -n1 --min-sec -w 15| head 
+['fileKey', 'traceNumber', 'X', 'Y', 'EnsembleNo', 'FieldRecNo', 
+         'Xensemble', 'Yensemble', 'Shotpoint', 'TraceNoEnsemble']
+['fileKey', 'traceNumber', 'X', 'Y', 'Shotpoint']
+
+fileKey  traceNumber   X                Y                 Shotpoint         
+
+1        1             124 29 55.00 W   40 50 16.00 N     88500            
+1        2             124 29 55.00 W   40 50 16.00 N     88501            
+1        3             124 29 55.00 W   40 50 16.00 N     88502            
+1        4             124 29 55.00 W   40 50 16.00 N     88503            
+1        5             124 29 55.00 W   40 50 16.00 N     88504            
+Traceback (most recent call last):
+  File "/Users/schwehr/x/src/segy-py/segysqldump.py", line 260, in ?
+    print val,' ',
+IOError: [Errno 32] Broken pipe
+
+# schwehr@CatBoxII 38 $ cd && segysqldump.py  --verbosity=0 -n1 --min-sec -w 15| tail 
+1        1495          124 31 5.00 W    40 50 24.00 N     89994            
+1        1496          124 31 5.00 W    40 50 24.00 N     89995            
+1        1497          124 31 6.00 W    40 50 24.00 N     89996            
+1        1498          124 31 6.00 W    40 50 24.00 N     89997            
+1        1499          124 31 6.00 W    40 50 24.00 N     89998            
+1        1500          124 31 6.00 W    40 50 24.00 N     89999            
+</pre>
+I am sitting in a coffee shop and what do I get next to me, but a
+group of moms meeting about being Brownie troop leaders :)  I now know
+that all Brownie troop leaders have to be finger printed.
+
+I tried to lookup my old UCSD library checkout record to find a book I
+was looking at last year.  Nope.  They dump all records once a book is
+returned for privacy reasons.  Both good and bad.  I have to keep my
+own records better.
+-----

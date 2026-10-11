@@ -1,0 +1,83 @@
+TITLE: Time Management in N-AIS
+AUTHOR: Kurt
+DATE: 04.05.2010 13:29
+DESC: bad interactions
+-----
+BODY:
+I have been looking more into how time is managed on N-AIS receive
+stations.  And think I have it worked out.  This has big implications
+on how NAIS logs can be used.  For situational awareness / Maritime
+Domain Awareness (MDA), this really does not have any huge implications.
+But definitely do not navigate using NAIS feeds.
+
+First off, I do not know the full range of setups for how AIS data is
+collected.  I am sure that there are additional issues for data that
+comes from places like Alaska that are done through the local marine
+exchange.  This is just based on what I have worked with.
+
+The systems that I have seen are running Windows XP (I use Ubuntu for
+mine) and do NOT run NTP.  That means these systems are using are
+probably using XP's <a
+href="http://technet.microsoft.com/en-us/library/cc773263%28WS.10%29.aspx">W32tm.exe</a>
+[MS TechNet, thanks Jordan!]  This is almost SNTP, and definitely not the equivalent to running a
+full NTP daemon.  From Microsoft's web page: <a href="http://support.microsoft.com/kb/939322">http://support.microsoft.com/kb/939322</a>
+<pre>
+We do not guarantee and we do not support the accuracy of the W32Time
+service between nodes on a network. The W32Time service is not a
+full-featured NTP solution that meets time-sensitive application
+needs. The W32Time service is primarily designed to do the following:
+<!-- -->
+Make the Kerberos version 5 authentication protocol work.
+Provide loose sync time for client computers.The W32Time service
+cannot reliably maintain sync time to the range of 1 to 2
+seconds. Such tolerances are outside the design specification of the
+W32Time service.</pre>
+The java recording software on these machines listens to the AIS
+serial port and watches for the traditional GPS ZDA timestamp.  It
+keeps an internal offset count between the system clock obtained by
+calling System.currentTimeMillis().  The code differences the system
+clock and the ZDA time to calculate this offset that it stores.  If
+the offset is more than 59 seconds old when it receives a ZDA, the
+system repeats the process of calculating an offset.  Here is a quick
+sample bit of code that shows the system call from java:
+<pre><tt><b><font color="#0000FF">class</font></b> <font color="#008080">TimeTest</font> <font color="#FF0000">{</font>
+    <b><font color="#0000FF">public</font></b> <b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">main</font></b><font color="#990000">(</font>String<font color="#990000">[]</font> args<font color="#990000">)</font> <font color="#FF0000">{</font>
+        System<font color="#990000">.</font>out<font color="#990000">.</font><b><font color="#000000">println</font></b><font color="#990000">(</font>System<font color="#990000">.</font><b><font color="#000000">currentTimeMillis</font></b><font color="#990000">());</font>
+        System<font color="#990000">.</font>out<font color="#990000">.</font><b><font color="#000000">println</font></b><font color="#990000">(</font>System<font color="#990000">.</font><b><font color="#000000">currentTimeMillis</font></b><font color="#990000">()/</font><font color="#993399">1000</font><font color="#990000">);</font>
+    <font color="#FF0000">}</font>
+<font color="#FF0000">}</font></tt></pre>
+And a sample run (on my Mac)... I am also using the unix date command to
+show that the UNIX UTC timestamp is the same.
+<pre><b>javac TimeTest.java 
+java TimeTest ; date +%s</b>
+1270487642567
+1270487642
+1270487642</pre>
+I see some trouble in this kind of implementation.  What if W32Time
+disciplines the clock right after the logging software gets an offset?
+This means that for as much as 59 seconds, the system can be off in
+time by as far as W32Time jumps.  The W32Time control parameters are available
+in the Windows registry (thanks again to Jordan):
+<pre>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Parameters\<b>NtpServer</b>
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Config\<b>MaxPollInterval</b>
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Config\<b>MinPollInterval</b>
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Config\<b>AnnounceFlags</b>
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\TimeProviders\<b>NtpClient\Enabled</b>
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\TimeProviders\<b>NtpServer\Enabled</b></pre>
+We have seen windows boxes jump at least a minute and my data suggest
+jumps as much 7+ minutes.
+
+I am not sure the best solution to this, but an easy way would be to
+switch these machines over to Linux or OpenBSD, setup NTP as a stratum
+1 server using a PPS feed, remove this clock offset business, and log NTP's status.
+
+On three NOAA run NAIS receivers, we installed Meinberg's NTP software
+earlier this year.  I gave a look at what AISMiner outputs for Mar 26
+for the same station that I was looking at and I have really strange
+results.  It looks just confusing.  Time is all over the place.  I think
+NTP is doing a better job of disciplining the system clock, but there
+are still is the really strange large jump in time.
+
+<img title="SONS 2010 This is an excercise" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-04/ais-miner.jpg"/>
+-----

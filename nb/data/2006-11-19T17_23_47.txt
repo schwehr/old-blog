@@ -1,0 +1,103 @@
+TITLE: using gmt from c++ code
+AUTHOR: Kurt
+DATE: 11.19.2006 17:23
+DESC: language troubles
+-----
+BODY:
+(NOTE: This was using GMT 4.1.3)
+
+While on the last cruise, I tried to use gmt from within some c++
+code.  I was in a hurry, so when it did not work, I reverted to
+straight C.  Now that I have a few minutes, I went back and took a
+look at what was going on.  I will submit this to the gmt guys when I
+get a chance.  First, here is the error that I got:
+<pre>
+g++ testgmt.C -I/Users/schwehr/gmt/include -L/Users/schwehr/gmt/lib \
+               -lgmt -I/sw/include -lnetcdf -L/sw/lib \
+               -o testgmt 
+gmt/include/gmt_io.h:237: error: expected ',' or '...' before 'template'
+gmt/include/gmt_io.h:238: error: expected ',' or '...' before 'template'
+gmt/include/gmt_io.h:239: error: expected ',' or '...' before 'template'
+gmt/include/gmt_io.h:240: error: expected ',' or '...' before 'template'
+</pre>
+Here is the offending code:
+<pre>
+<font color="#2040a0">EXTERN_MSC</font> <strong>void</strong> <font color="#2040a0">GMT_date_C_format</font> <font color="4444FF">(</font><strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">template</font>, <strong>struct</strong> <font color="#2040a0">GMT_DATE_IO</font> <font color="4444FF">*</font><font color="#2040a0">S</font>, <strong>int</strong> <font color="#2040a0">mode</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="#2040a0">EXTERN_MSC</font> <strong>void</strong> <font color="#2040a0">GMT_clock_C_format</font> <font color="4444FF">(</font><strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">template</font>, <strong>struct</strong> <font color="#2040a0">GMT_CLOCK_IO</font> <font color="4444FF">*</font><font color="#2040a0">S</font>, <strong>int</strong> <font color="#2040a0">mode</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="#2040a0">EXTERN_MSC</font> <strong>void</strong> <font color="#2040a0">GMT_geo_C_format</font> <font color="4444FF">(</font><strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">template</font>, <strong>struct</strong> <font color="#2040a0">GMT_GEO_IO</font> <font color="4444FF">*</font><font color="#2040a0">S</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<font color="#2040a0">EXTERN_MSC</font> <strong>void</strong> <font color="#2040a0">GMT_plot_C_format</font> <font color="4444FF">(</font><strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">template</font>, <strong>struct</strong> <font color="#2040a0">GMT_GEO_IO</font> <font color="4444FF">*</font><font color="#2040a0">S</font><font color="4444FF">)</font><font color="4444FF">;</font>
+</pre>
+The first problem is that template is a reserved word in C++.  Changing template to "Template" did the trick, but left me with a link error.
+<pre>
+g++ testgmt.C -I/Users/schwehr/gmt/include -L/Users/schwehr/gmt/lib \
+     -lgmt -I/sw/include -lnetcdf -L/sw/lib -o testgmt 
+/usr/bin/ld: Undefined symbols:
+GMT_grd_init(GRD_HEADER*, int, char**, int)
+GMT_read_grd_info(char*, GRD_HEADER*)
+GMT_begin(int, char**)
+collect2: ld returned 1 exit status
+</pre>
+I've run into this one enough times in my life.  The trick is to tell
+the compiler that the header is C so that it does not apply name
+mangling.  C++ changes the function name based on the arguments so
+that it can use the arguments to distinguish different functions using
+the same name but different types.  Here is an example of how gdbm
+gets around this:
+<pre>
+<font color="#444444">/* GDBM C++ support */</font>
+<font color="0000ff"><strong>#if defined(__cplusplus) || defined(c_plusplus)</strong></font>
+<strong>extern</strong> <font color="#008000">&quot;C&quot;</font> <font color="4444FF"><strong>{</strong></font>
+<font color="0000ff"><strong>#endif</strong></font>
+<font color="#444444">// The normal header goes here</font>
+<font color="0000ff"><strong>#if defined(__cplusplus) || defined(c_plusplus)</strong></font>
+<font color="4444FF"><strong>}</strong></font>
+<font color="0000ff"><strong>#endif</strong></font>
+</pre>
+If you can't alter the include file, the support for C code can be
+done around the include within the C++ file.  My final work example
+looks like this:
+<pre>
+<font color="#444444">/*
+  gxx testgmt2.C -I/Users/schwehr/gmt/include -L/Users/schwehr/gmt/lib \
+  -lgmt -I/sw/include -lnetcdf -L/sw/lib -o testgmt2 
+*/</font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;cassert&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;iostream&gt;</font></strong></font>
+<strong>using</strong> <strong>namespace</strong> <font color="#2040a0">std</font><font color="4444FF">;</font>
+<strong>extern</strong> <font color="#008000">&quot;C&quot;</font> <font color="4444FF"><strong>{</strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;gmt.h&gt;</font></strong></font>
+<font color="4444FF"><strong>}</strong></font>
+
+<strong>int</strong> <font color="#2040a0">main</font> <font color="4444FF">(</font><strong>int</strong> <font color="#2040a0">argc</font>, <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">argv</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>struct</strong> <font color="#2040a0">GRD_HEADER</font> <font color="#2040a0">hdr</font><font color="4444FF">;</font>
+    <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">filename</font> <font color="4444FF">=</font> <font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">;</font>
+    <font color="#2040a0">argc</font><font color="4444FF">=</font><font color="#2040a0">GMT_begin</font><font color="4444FF">(</font><font color="#2040a0">argc</font>,<font color="#2040a0">argv</font><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#444444">// Sets crazy globals</font>
+    <font color="#2040a0">GMT_grd_init</font> <font color="4444FF">(</font><font color="4444FF">&amp;</font><font color="#2040a0">hdr</font>, <font color="#2040a0">argc</font>, <font color="#2040a0">argv</font>, <strong>false</strong><font color="4444FF">)</font><font color="4444FF">;</font> <font color="#444444">// Initialize grd header structure </font>
+    <strong>const</strong> <strong>int</strong> <font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#2040a0">access</font><font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="#2040a0">R_OK</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <strong>if</strong> <font color="4444FF">(</font><font color="#FF0000">0</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">r</font><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+	<font color="#2040a0">cerr</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;ERROR: Unable to read file: &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">filename</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font> 
+	     <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;  r == &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">r</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">;</font>
+	<strong>return</strong> <strong>false</strong><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+    <font color="#2040a0">GMT_read_grd_info</font> <font color="4444FF">(</font><font color="#2040a0">filename</font>,<font color="4444FF">&amp;</font><font color="#2040a0">hdr</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">cout</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">hdr</font>.<font color="#2040a0">y_max</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;  &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">hdr</font>.<font color="#2040a0">x_max</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font>
+	 <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">hdr</font>.<font color="#2040a0">y_min</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">hdr</font>.<font color="#2040a0">x_min</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font>
+	 <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">hdr</font>.<font color="#2040a0">z_max</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">hdr</font>.<font color="#2040a0">z_min</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font>
+	 <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;format: &quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">hdr</font>.<font color="#2040a0">type</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">;</font>
+    <strong>return</strong> <font color="#2040a0">EXIT_SUCCESS</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Running this test program is a lot like grdinfo.
+<pre>
+./testgmt2 0002_20061112_173100_raw.all.grd
+testgmt2: WARNING: The step size of coordinate (Longitude) in grid 0002_20061112_173100_raw.all.grd is not constant.
+testgmt2: WARNING: GMT will use a constant step size of 0.000298538; the original ranges from 0.000297546 to 0.000305176.
+34.2195  -119.345
+34.0943-119.595
+221.855151.599
+format: 18
+</pre>
+Now I am happily able to use gmt from within C++, which is good
+because I need to write a whole bunch of code that uses portions of
+gmt.
+-----

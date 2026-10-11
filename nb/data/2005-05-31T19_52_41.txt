@@ -1,0 +1,113 @@
+TITLE: segy sql database working
+AUTHOR: Kurt
+DATE: 05.31.2005 19:52
+DESC: quick hack that works
+-----
+BODY:
+Just packaged up segy-py-0.3.tar.bz2 for release... sql database generation.
+
+Doh!  I just spent 15 minutes writing a nice explanation of the
+database building of SEGY header information (both file and trace).
+Then I hit the wrong key in the nanoblogger add and nuked the whole
+thing.  Basic gist... it works.  It is heavy on disk usage and cpu
+cycles, but I wrote it in less than an hour and a half while on the
+airplane.  It needs better typing as I assumed everything should be
+saved as a 4 byte integer, but it is a great first pass.
+<pre>
+ls -l *db
+
+-rw-r--r--    1 schwehr  staff    18501632 May 31 19:40 bpsegy.db
+
+sqlite bpsegy.db 'select x/3600.0,y/3600.0 from segyTrace' | head
+
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+-120.101111111111|34.4061111111111
+</pre>
+The sample db creation code:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">segy</font> <strong>import</strong> <font color="#2040a0">Segy</font>
+<strong>import</strong> <font color="#2040a0">sqlite</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">&quot;__main__&quot;</font><font color="4444FF">:</font>
+	<font color="#2040a0">dbName</font> <font color="4444FF">=</font> <font color="#008000">'bpsegy.db'</font>
+	<strong>if</strong> <font color="#2040a0">os</font>.<font color="#2040a0">access</font><font color="4444FF">(</font><font color="#2040a0">dbName</font>,<font color="#2040a0">os</font>.<font color="#2040a0">W_OK</font><font color="4444FF">)</font><font color="4444FF">:</font>
+            <font color="#2040a0">os</font>.<font color="#2040a0">remove</font><font color="4444FF">(</font><font color="#2040a0">dbName</font><font color="4444FF">)</font>
+	<font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#2040a0">dbName</font><font color="4444FF">)</font>
+	<font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+	
+	<font color="#2040a0">xstar</font> <font color="4444FF">=</font> <font color="#2040a0">Segy</font><font color="4444FF">(</font><font color="#008000">'bpsio01L00.xstar'</font><font color="4444FF">)</font>
+
+	<font color="#444444">#</font>
+	<font color="#444444"># CREATE the database tables</font>
+	<font color="#444444">#</font>
+	<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">xstar</font>.<font color="#2040a0">header</font>.<font color="#2040a0">sqlCreate</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">True</font><font color="4444FF">:</font>
+	    <font color="#2040a0">t</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+	    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">t</font>.<font color="#2040a0">sqlCreate</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+	<font color="#444444">#</font>
+	<font color="#444444"># POPULATE the tables</font>
+	<font color="#444444">#</font>
+	<font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">xstar</font>.<font color="#2040a0">header</font>.<font color="#2040a0">sqlInsert</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">xstar</font>.<font color="#2040a0">getNumberOfTraces</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font>
+	    <font color="#2040a0">t</font> <font color="4444FF">=</font> <font color="#2040a0">xstar</font>.<font color="#2040a0">getTraceHdr</font><font color="4444FF">(</font><font color="#2040a0">i</font><font color="4444FF">)</font>
+
+	    <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">i</font><font color="4444FF">%</font><font color="#FF0000">500</font><font color="4444FF">:</font>
+		    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">t</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'X'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+		    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">t</font>.<font color="#2040a0">getHeader</font><font color="4444FF">(</font><font color="#008000">'Y'</font><font color="4444FF">)</font>/<font color="#FF0000">3600</font>.
+		    <strong>print</strong> <font color="#2040a0">i</font>,<font color="#008000">':   '</font>,<font color="#2040a0">x</font>,<font color="#2040a0">y</font>
+	
+	    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">t</font>.<font color="#2040a0">sqlInsert</font><font color="4444FF">(</font><font color="#2040a0">traceNumber</font><font color="4444FF">=</font><font color="#2040a0">i</font><font color="4444FF">)</font><font color="4444FF">)</font>
+	<font color="#2040a0">cx</font>.<font color="#2040a0">commit</font><font color="4444FF">(</font><font color="4444FF">)</font>	<font color="#444444"># Flush this to the db!</font>
+</pre>
+My quick and dirty sql string generation code.  Note that there are
+only INTEGER fields!
+<pre>
+  ...
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> sqlCreate</font><font color="2040a0">(self,specificKeys=None, table='segyFile')</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        Build an SQL string to create a table for the keys/fields in a
+        SEGY file header
+
+        arguments:
+        specificKeys - in set, these are the keys that will used in the create string
+        table - SQL table name (may have different tables for different formats)
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <strong>if</strong> <strong>not</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">specificKeys</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">drv</font>.<font color="#2040a0">binaryHeaderEntries</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">cStr</font>  <font color="4444FF">=</font> <font color="#008000">'CREATE TABLE '</font><font color="4444FF">+</font><font color="#2040a0">table</font><font color="4444FF">+</font><font color="#008000">' ('</font>
+        <strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">cStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">key</font><font color="4444FF">+</font><font color="#008000">' INTEGER,'</font>
+        <font color="#2040a0">cStr</font> <font color="4444FF">=</font> <font color="#2040a0">cStr</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+        <font color="#2040a0">cStr</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">');'</font>
+        <strong>return</strong> <font color="#2040a0">cStr</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> sqlInsert</font><font color="2040a0">(self,specificKeys=None, table='segyFile')</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+        Build an SQL string to INSERT the values for the current file
+        &quot;</font><font color="#008000">&quot;&quot;</font>
+        <strong>if</strong> <strong>not</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">specificKeys</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">drv</font>.<font color="#2040a0">binaryHeaderEntries</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">iStrStart</font> <font color="4444FF">=</font> <font color="#008000">'INSERT INTO '</font><font color="4444FF">+</font><font color="#2040a0">table</font><font color="4444FF">+</font><font color="#008000">' ('</font>
+        <font color="#2040a0">iStrEnd</font> <font color="4444FF">=</font> <font color="#008000">' VALUES ('</font><font color="4444FF">;</font>
+        <strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">specificKeys</font><font color="4444FF">:</font>
+            <font color="#2040a0">iStrStart</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">key</font><font color="4444FF">+</font><font color="#008000">','</font>
+            <font color="#2040a0">iStrEnd</font>   <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">getBinEntry</font><font color="4444FF">(</font><font color="#2040a0">key</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">','</font>
+        <font color="#2040a0">iStrStart</font> <font color="4444FF">=</font> <font color="#2040a0">iStrStart</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#008000">')'</font>
+        <font color="#2040a0">iStrEnd</font>   <font color="4444FF">=</font> <font color="#2040a0">iStrEnd</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="4444FF">+</font> <font color="#008000">');'</font>
+        <strong>return</strong> <font color="#2040a0">iStrStart</font> <font color="4444FF">+</font> <font color="#2040a0">iStrEnd</font>
+</pre>
+Feels strange to have the sql string generators inside the header
+instances, but that way, I know the driver is loaded.
+-----

@@ -1,0 +1,54 @@
+TITLE: Finding time outliers in an ais feed
+AUTHOR: Kurt
+DATE: 08.25.2009 19:20
+DESC: think I am on the right track
+-----
+BODY:
+Here is my attempt at an algorithm to find the time outliers in a
+stream of packets.  The goal is to throw out packets where the sense
+of time is corrupted.  This is the same Boston area data that has one
+ship that completely looses its sense of time that I showed a few days
+ago.  First some results.  Red x's for points that were rejected,
+green +'s for points that I kept.  This is only the points where I have
+the commstate for positions or valid basestation reports.
+
+<img title="One days AIS time data" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/ais-finding-time-outliers-1.png"/>
+
+Zooming in to a window of about 400 second period of time shows how
+the algorithm does a pretty good job removing packets that are close,
+but not quite on the general time curve.  It looks like I have one
+time record that I should have removed, but I think that will go away
+with some tuning.
+
+<img title="Zoom in to a small section of results." withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/ais-finding-time-outliers-2.png"/>
+
+Here is my algorithm for each packet in the sequence:
+
+Go through all the point and mark as invalid any time that is more than minutes away from the timestamp.  I have seen errors of up to 80 seconds in the datalogging systems timestamping.
+
+From here on forward, I only consider packets that have not already been flagged as invalid.
+
+I then walk the data in order received from one station.  Look back
+over the last N points.  These should be all have times that are
+older.  Stop looking at packets when they are more than 60 seconds
+older than the current packet.  Count how many are newer than a buffer
+time (using 10 seconds now).  If I get more than a critical number of
+future packets, then I flag the point as invalid.
+
+I then flip this around and look forward.  This is a bit more risky.
+An unflagged bad point could stop my search before I realize that it
+is bad by triggering the search to stop by being too far in the future.
+Packets ahead in the stream (received in a later slot) should have
+newer times.  If we see too many old packets, then this packet thinks
+it is newer than it really is.  I am wondering if I should look
+backwards across the whole data set first, rather alternating looking backward and forward.
+
+Right now, I only look at the next 10 valid points in each direction
+and clip this if the data is too sparse in time; I only scan up to 200
+received messages out and up to 60 seconds.  With the 10 second delta
+time parameter, that gives me 4 degrees of freedom to tune.  Here is a
+quick illustration of looking to either side in the data.  They show the
+direction in which they were found to be bad.
+
+<img title="Flagged to packets" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/ais-finding-time-outliers-3.png"/>
+-----

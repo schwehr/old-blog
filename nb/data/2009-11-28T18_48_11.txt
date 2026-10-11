@@ -1,0 +1,89 @@
+TITLE: Using QGIS to view PostGIS data
+AUTHOR: Kurt
+DATE: 11.28.2009 18:48
+DESC: working
+-----
+BODY:
+I've tried several times in the past to get my data from PostGIS to
+show up in QGIS and I never figured it out until today.  The punch line
+is to create you database tables using "WITH OID".  I had created two
+point and 1 line tables in my database.  In the add PostGIS layers dialog,
+I saw my 3 tables, but there was a blank in the primary key column.  The
+first problem is that the QT drop-down selector doesn't show.  If you click
+in that blank space, you will see the possible key fields.  This has nothing
+to do with what you call your PRIMARY KEY when you create the table.
+
+<img title="Adding a layer from PostGIS to QGIS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-11/qgis-adding-postgis-layer.png"/>
+
+The second problem I had was that the "Add" button was always grey.
+Thanks to a kind person on the QGIS IRC channel, I now know that I
+have to create my table with knowledge of the <a
+href="http://www.postgresql.org/files/documentation/books/aw_pgsql/node71.html">PostgreSQL
+OID</a> information.  OIDs are number assigned to each row in
+PostgreSQL that are unique across all tables <b>and databases</b>.  For example,
+in my ais_pg_transitlines_noMakeLines.py script, here is my new create statement:
+<pre>CREATE TABLE tpath
+(
+  id INTEGER NOT NULL REFERENCES transit(id),
+  userid INTEGER NOT NULL
+) <b>WITH OIDS</b>;
+SELECT AddGeometryColumn('tpath','track',4326,'LINESTRING',2);</pre>
+I can now see the oids in my table:
+<pre><b>SELECT id,userid,oid FROM tpath LIMIT 10;</b>
+ id | userid |  oid  
+====+========+======
+  1 |      0 | 35963
+  2 |      0 | 35965
+  3 |      0 | 35967
+  4 |      0 | 35968
+  5 |      1 | 35970
+  6 |      1 | 35971
+  7 |    310 | 35973
+  8 |    310 | 35975
+  9 |  80396 | 35977
+ 10 |  80399 | 35979</pre>
+And with that, I can now add my layer into PostGIS and view the lines:
+
+<img title="Data from PostGIS in QGIS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-11/qgis-with-postgis-vectors.png"/>
+
+Only trouble is that I'm getting this error:
+<pre>Your PostGIS installation has no GEOS support.
+Feature selection and identification will not work properly.
+Please install PostGIS with GEOS support (<a href="http://geos.refractions.net">http://geos.refractions.net</a>)</pre>
+I do have GEOS installed in my PostGIS installation.  Things like this work:
+<pre><b>SELECT ST_Extent(track) FROM tpath;</b>
+                                 st_extent                                 
+==========================================================================
+ BOX(-70.5970764160156 42.093505859375,-70.0352401733398 42.7661170959473)</pre>
+But digging farther, I sliced and diced my PostGIS install:
+<pre><b>SELECT ST_Buffer(track,100) FROM tpath LIMIT 1;</b>
+ERROR:  buffer:: operation not implemented - compile PostGIS with JTS or GEOS support</pre>
+The PostGIS PG/SQL code is loaded from this file: /sw32/share/doc/postgis83/lwpostgis.sql
+We can open it up and see what buffer is doing:
+<pre>CREATE OR REPLACE FUNCTION buffer(geometry,float8)
+   RETURNS geometry
+   AS '/sw32/lib/postgresql-8.3/liblwgeom.so','buffer'
+   LANGUAGE 'C' IMMUTABLE STRICT; -- WITH (isstrict,iscachable);</pre>
+Time to follow that file path to the shared library.
+<pre>ls -l /sw32/lib/postgresql-8.3/liblwgeom*
+-rwxr-xr-x  1 root  admin  504388 Oct 25 21:19 /sw32/lib/postgresql-8.3/liblwgeom.1.3.so
+lrwxr-xr-x  1 root  admin      16 Oct 25 21:19 /sw32/lib/postgresql-8.3/liblwgeom.1.so -&gt; liblwgeom.1.3.so
+lrwxr-xr-x  1 root  admin      16 Oct 25 21:19 /sw32/lib/postgresql-8.3/liblwgeom.so -&gt; liblwgeom.1.3.so</pre>
+Macs have otool, which will let us see what a library is linked against (similar to ldd on normal Unix machines).
+<pre><b>otool -L /sw32/lib/postgresql-8.3/liblwgeom.1.3.so</b>
+/sw32/lib/postgresql-8.3/liblwgeom.1.3.so:
+        /sw32/lib/libproj.0.dylib (compatibility version 7.0.0, current version 7.6.0)
+        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 124.1.1)</pre>
+On one of my Mac OSX 10.5 machines, I can see that libgeos3 did indeed make it into the build.
+<pre><b>otool -L /sw/lib/postgresql-8.3/liblwgeom.1.3.so</b>
+/sw/lib/postgresql-8.3/liblwgeom.1.3.so:
+        /sw/lib/libgeos3/libgeos_c.1.dylib (compatibility version 6.0.0, current version 6.2.0)
+        /sw/lib/libproj.0.dylib (compatibility version 6.0.0, current version 6.5.0)
+        /usr/lib/libgcc_s.1.dylib (compatibility version 1.0.0, current version 1.0.0)
+        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 111.1.4)</pre>
+Back to the drawing boards.
+
+<b>Update 29-Nov-2009:</b> Recompiled postgis83 1.3.5 and it works
+now.  I have no idea why it didn't get libgeos3 linked in correctly
+before.
+-----

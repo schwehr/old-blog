@@ -1,0 +1,94 @@
+TITLE: libais 0.1 - a C++ library for decoding AIS and a python wrapper
+AUTHOR: Kurt
+DATE: 05.03.2010 15:21
+DESC: first release
+-----
+BODY:
+In the spirit of open source, I have made my first release of my
+libais source code... version 0.1.  The code really isn't usable yet,
+but it can decode messages 1-5.  The decoding happens in C++ and I've
+written a C++ wrapper for python that given a message NMEA payload, is
+able to return a dictionary back to python.  I expect this to be about
+50x faster than my noaadata code.  Why another library for AIS?  I
+like the code that ESR did for GPSD, but I wanted:
+<ul>
+<li>A C++ interface with a class heirarchy.  Why polute GPSD with C++?</li>
+<li>I am uncomfortable with unions and I am not smart enough to program with more than just simple unions (libais uses one small union for signed integer decoding)</li>
+<li>Being able to decode AIS in the same process</li>
+<li>I really wanted to use the C++ bitset type to handle the bit level stuff</li>
+</ul>
+So, should you use libais or gpsd?  My answer is right now you should
+be using gpsd.  My code is really rough.  But, you might find using
+libais fun and a good learning tool.  I took the function names for
+ubits and sbits from gpsd.  I've made use of templating to get around
+the issue of bitset size being a compile time fixed constant.
+Here is an example of using libais.  (Doing anything else right now will make it crash).
+<pre>wget http://vislab-ccom.unh.edu/~schwehr/software/libais/downloads/libais-0.1.tar.bz2
+tar xf libais-0.1.tar.bz2
+cd libais-0.1
+make python
+export PYTHONPATH=build/lib.*
+ipython
+import ais
+ais.decode('15PIIv7P00D5i9HNn2Q3G?wB0t0I')
+ais.decode('402u=TiuaA000r5UJ`H4`?7000S:')
+ais.decode('55NBjP01mtGIL@CW;SM&lt;D60P5Ld000000000000P0`&lt;3557l0&lt;50@kk@K5h@00000000000') 
+</pre>
+The return dictionaries look like this:
+<pre>{'cog': 86.0,
+ 'id': 1,
+ 'mmsi': 369515000,
+ 'nav_status': 7,
+ 'position_accuracy': 0,
+ 'raim': False,
+ 'received_stations': 25,
+ 'repeat_indicator': 0,
+ 'rot': -53.547782897949219,
+ 'rot_over_range': True,
+ 'sog': 0.0,
+ 'spare': 0,
+ 'special_manoeuvre': 0,
+ 'timestamp': 41,
+ 'true_heading': 511,
+ 'x': -166.51214599609375,
+ 'y': 53.904434204101562}
+<!-- -->
+{'day': 2,
+ 'fix_type': 7,
+ 'hour': 0,
+ 'id': 4,
+ 'minute': 0,
+ 'mmsi': 3100051,
+ 'month': 5,
+ 'position_accuracy': 1,
+ 'raim': True,
+ 'repeat_indicator': 0,
+ 'second': 0,
+ 'slot_offset': 2250,
+ 'spare': 0,
+ 'x': -82.666099548339844,
+ 'y': 42.069435119628906,
+ 'year': 2010}
+<!-- -->
+{'ais_version': 0,
+ 'callsign': 'WDD9287',
+ 'destination': 'TACOMA,WA@@@@@@@@@@@',
+ 'dim_a': 5,
+ 'dim_b': 12,
+ 'dim_c': 3,
+ 'dim_d': 5,
+ 'draught': 4,
+ 'dte': 0,
+ 'eta_day': 15,
+ 'eta_minute': 0,
+ 'eta_month': 4,
+ 'fix_type': 1,
+ 'id': 5,
+ 'imo_num': 7729526,
+ 'mmsi': 367309440,
+ 'name': 'SEA HAWK@@@@@@@@@@@@',
+ 'repeat_indicator': 0,
+ 'spare': 0,
+ 'type_and_cargo': 80}
+</pre>
+-----

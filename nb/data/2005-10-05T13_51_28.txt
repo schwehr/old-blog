@@ -1,0 +1,63 @@
+TITLE: Layback.py
+AUTHOR: Kurt
+DATE: 10.05.2005 13:51
+DESC: dealing with the offset from gps to the block
+-----
+BODY:
+I finally got around to writing up functions for layback.  Right now,
+they are extremely basic.
+<pre>
+from projections import feet2meters
+import layback
+
+layback.angledepthLayback(fishdepth=143,gpsoffset=feet2meters(69),cableangle=40)
+191.45196374097205
+</pre>
+I gave is 69 feet from the gps to the block on the fan tail.  Then
+there is a 40 degree on the angle, calculated from other measurements
+at the same speed.  Next, we need meters per shot.  That can be done
+with two points.  I don't have a working utmZone finder, so I still
+have to pass that in.
+<pre>
+from projections import metersPerShot
+metersPerShot(87542,(-124.4866666,40.835555555),
+              89042,(-124.5052777,40.839166666),
+	      utmZone=10)
+
+Out[4]: 1.0798502731674162
+</pre>
+The shot offset is then pretty easy to calculate:
+<pre>
+&gt;&gt;&gt; 191.45/1.07985
+
+177.29314256609715
+</pre>
+177 shots back lets us recompute the befit shot number.
+<pre>
+offset = 177
+c=1;s=88850; print s+offset,'-460\n',s+offset,'-470\n'
+c=2;s=88802; print s+offset,'-460\n',s+offset,'-470\n'
+c=7;s=88765; print s+offset,'-460\n',s+offset,'-470\n'
+</pre>
+Toss that into a gnuplot file called <em>cores-shots-177.dat</em> and
+give it something close to the bottom:
+<pre>
+88850 -462
+88850 -470
+
+88802 -460
+88802 -467
+
+88765 -458
+88765 -465
+</pre>
+Now gnuplot it:
+<pre>
+plot 'wbt.dat' using 4:5 with l, \
+     'cores-shots-177.dat' with l,\
+     'cores-shots-0.dat' with l
+</pre>
+Here is the layback that looks like the best estimate.  The core
+lengths are not right, just rough guesses without looking back at my notes.
+<img src="http://schwehr.org/blog/attachments/2005-10/cores-layback-177shots.gif">
+-----

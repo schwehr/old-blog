@@ -1,0 +1,21 @@
+TITLE: mbsystem, coin 2.5.0, and density for fink 10.5
+AUTHOR: Kurt
+DATE: 01.21.2008 10:14
+DESC: more progress
+-----
+BODY:
+I gave it a go and I've got coin 2.5.0 (coin46) working for Mac OSX
+10.5 and everything needed to build density so that I can use
+simpleview on my laptops.  I used SetLDFLAGS to make them work:
+<pre>
+SetLDFLAGS: -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+</pre>
+mbsystem gave me more trouble.  There is a missing symbol issue with
+GLwCreateMDrawingArea that I don't know how to fix.  As a result, mbsystem
+for 10.5 does not have mbview, but the rest of mbsystem should work.
+
+For gdal, I committed the 10.5 gdal 1.5.0 and the associated python
+module.  Soon, I will push that back down to 10.4.  The new python module
+is gdal-py25 rather than the old gdal-python-py2[45].  I am trying to
+drop support for python 2.4 as fast as I can.
+-----

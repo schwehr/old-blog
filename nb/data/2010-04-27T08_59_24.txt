@@ -1,0 +1,87 @@
+TITLE: updating PostGIS
+AUTHOR: Kurt
+DATE: 04.27.2010 08:59
+DESC: trouble
+-----
+BODY:
+I should have followed my own advice last week... think before you
+update (and backup your database first)!!!  I've been working to hand off some ERMA tasks to the new team
+and in the process, I'm walking them through updating fink.  Without
+people to support the system, I had pretty much left well alone on
+server for way more than 1 year.  That meant that it was using python
+2.5 and an older version of PostGIS.  Here you can see the history of
+postgis on the machine as I have yet to run <i>fink cleanup</i> to remove
+the old debs.
+<pre><b>locate postgis | grep debs  | grep -v java</b>
+/sw/fink/debs/postgis82_1.3.2-2_darwin-i386.deb
+/sw/fink/debs/postgis83_1.3.3-2_darwin-i386.deb
+/sw/fink/debs/postgis83_1.5.1-2_darwin-i386.deb
+<b>cd /sw/fink/10.5/local/main/binary-darwin-i386/database && ls -l postgis83_1.3.3-2_darwin-i386.deb</b>
+-rw-r--r-- 1 root admin 495640 Aug 26  2008 postgis83_1.3.3-2_darwin-i386.deb</pre>
+After doing the update, the world blew up on me:
+<pre><b>psql ais</b>
+ <b>SELECT ST_astext('POINT EMPTY');</b> -- dummy NOOP to test PostGIS
+ ERROR:  could not access file "/sw/lib/postgresql-8.3/liblwgeom.1.3.so": No such file or directory
+<b>dpkg -L postgis83 | grep lib</b>
+/sw/lib/postgresql-8.3/postgis-1.5.so
+</pre>
+Whoops!  The library name has changed.  At this point, I attempted to
+upgrade postgis in the ais database by 3 three upgrade scripts and the
+postgis.sql script.  That was going to be a serious pain.  The
+upgrades did not work and I had to remove the type definition from
+postgis.sql and that seemed risky.  Thankfully, the ais database is 
+not precious at the moment, so I did a <i>dropdb ais</i> to blast it
+into the ether.  I fixed up my ais-db script to handle the latest
+postgis needs and rebuilt the database like this:
+<pre><b>ais-db -v -d foo --create-database --add-postgis --create-tables --create-track-lines --create-last-position</b></pre>
+As I have not deleted the old deb, I am thinking through my options to
+recover my other postgis databases on the server.  It wouldn't be the
+end of the world if these could not come back, but it would be a shame.
+I think I can do a dump of the old debian and put the necessary shared
+libs back in place by hand and then do a backup.  If not, I might be
+able to uninstall postgis from the databases and then reinstall it.
+<pre><b>file *.deb</b>
+postgis83_1.3.3-2_darwin-i386.deb: Debian binary package (format 2.0)
+<b>mkdir foo && cd foo</b>
+<b>dpkg --extract ../postgis83_1.3.3-2_darwin-i386.deb .</b>
+<b>du sw</b>
+164     sw/bin
+476     sw/lib/postgresql-8.3
+476     sw/lib
+3344    sw/share/doc/postgis83
+3344    sw/share/doc
+3344    sw/share
+3984    sw</pre>
+I probably also need these:
+<pre><b>ls -1 /sw/fink/debs/libgeos*3.0*</b>
+/sw/fink/debs/libgeos3-shlibs_3.0.0-2_darwin-i386.deb
+/sw/fink/debs/libgeos3_3.0.0-2_darwin-i386.deb
+/sw/fink/debs/libgeosc1-shlibs_3.0.0-2_darwin-i386.deb
+/sw/fink/debs/libgeosc1_3.0.0-2_darwin-i386.deb</pre>
+There is also a more interesting trick with deb files.  It turns out
+that debs are <i>ar</i> archives (people still use these???).  This
+lets you really see what is in the deb:
+<pre><b>ar x ../libgeosc1-shlibs_3.0.0-2_darwin-i386.deb</b>
+<b>ls -l</b>
+total 32
+-rw-r--r-- 1 schwehr staff  1313 Apr 27 09:21 control.tar.gz
+-rw-r--r-- 1 schwehr staff 20706 Apr 27 09:21 data.tar.gz
+-rw-r--r-- 1 schwehr staff     4 Apr 27 09:21 debian-binary
+<b>tar tf data.tar.gz</b>
+./
+./sw/
+./sw/lib/
+./sw/lib/libgeos_c.1.4.1.dylib
+<b>tar tf control.tar.gz</b>
+./
+./control
+./package.info
+./shlibs</pre>
+Handy when trying to see how things were put together.  Strikes me
+as funny that there are tars embedded in an ar archive.  Why not just
+use tar throughout?  Congrats to <i>file</i> for looking closer at the
+ar archive to see that it's really a debian package.
+
+I'll leave it to another time to try to restore the other
+non-essential databases on that server.
+-----

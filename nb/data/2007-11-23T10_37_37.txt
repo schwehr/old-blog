@@ -1,0 +1,26 @@
+TITLE: Lightwave VRML export to Inventor pieces
+AUTHOR: Kurt
+DATE: 11.23.2007 10:37
+DESC: ShapeHints in Inventor 2.x
+-----
+BODY:
+Today, I'm doing a little bit of work with VRML 2.0 that was exported
+from LightWave.  The conversion process does some strange things.  After
+my quick conversion of a piece of geometry, it looks pretty bad:
+
+<img src="http://schwehr.org/blog/attachments/2007-11/geom-no-shapehint.png"/>
+
+My conversion process to strip down the object removes the VRML 2.0
+appearance marks and I have to insert Inventor 2.1 ShapeHints like this:
+<pre>
+ShapeHints {
+                  vertexOrdering CLOCKWISE
+                  shapeType SOLID
+		  faceType UNKNOWN_FACE_TYPE
+	   }
+</pre>
+The results are more like the geometry expected by the people who work
+with Lightwave:
+
+<img src="http://schwehr.org/blog/attachments/2007-11/geom-with-shapehint.png"/>
+-----

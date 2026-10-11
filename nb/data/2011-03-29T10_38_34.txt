@@ -1,0 +1,51 @@
+TITLE: Going with google test
+AUTHOR: Kurt
+DATE: 03.29.2011 10:38
+DESC: time to get moving
+-----
+BODY:
+Time to just pick one and give it a go... I've picked <a
+href="http://code.google.com/p/googletest/">Google Test</a> (gtest).
+I've packaged it for Mac OSX on fink.  <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/fink/gtest.info">gtest.info</a>
+uses the Feb 2011 1.6.0 RC.  I got intrigued by <a href="http://cukes.info/">Cucumber</a> (Ruby <a href="http://en.wikipedia.org/wiki/Behavior_Driven_Development">bdd</a> test framework) based on discussions
+with Les and I see that there has been some Cucumber / C++ work (e.g. <a href="https://github.com/paoloambrosio/cukebins">cukebin</a>).  
+
+I liked that there were a set of <a href="http://code.google.com/p/googletest/source/browse/#svn/trunk/samples">samples</a> that got me to a working test, the building of gtest was clean, cmake &amp; xcode &amp; msvc support,and I found a nice <a href="http://www.cheezyworld.com/2010/12/30/google-test-quick-reference/">Quick Reference guide</a>.  Here is what I did to get going with sample 1.  First the GNU Makefile that will put it together
+<pre><tt><font color="#990000">sample1_unittest:</font> sample1_unittest.cc sample1.o
+	g<font color="#990000">++</font>-<font color="#993399">4</font> -g -Wall -O<font color="#993399">3</font> -L/sw/lib -I/sw/include -o <font color="#009900">$@</font> <font color="#009900">$^</font> -lgtest -lgtest_main
+<!-- -->
+<font color="#990000">sample1.o:</font> sample1.cc
+	g<font color="#990000">++</font>-<font color="#993399">4</font> -g -Wall -O<font color="#993399">3</font> -I/sw/include -c <font color="#009900">$&lt;</font></tt></pre>
+Then grab the source files:
+<pre><b>wget http://googletest.googlecode.com/svn/trunk/samples/sample1.cc
+wget http://googletest.googlecode.com/svn/trunk/samples/sample1.h
+wget http://googletest.googlecode.com/svn/trunk/samples/sample1_unittest.cc</b></pre>
+There currently are some weird buried malloc / free issues in the test suit, but when I
+look past those, I see:
+<pre><b>make && ./sample1_unittest</b>
+Running main() from gtest_main.cc
+[==========] Running 6 tests from 2 test cases.
+[----------] Global test environment set-up.
+[----------] 3 tests from FactorialTest
+[ RUN      ] FactorialTest.Negative
+[       OK ] FactorialTest.Negative (0 ms)
+[ RUN      ] FactorialTest.Zero
+[       OK ] FactorialTest.Zero (0 ms)
+[ RUN      ] FactorialTest.Positive
+[       OK ] FactorialTest.Positive (0 ms)
+[----------] 3 tests from FactorialTest (0 ms total)
+<!-- -->
+[----------] 3 tests from IsPrimeTest
+[ RUN      ] IsPrimeTest.Negative
+[       OK ] IsPrimeTest.Negative (0 ms)
+[ RUN      ] IsPrimeTest.Trivial
+[       OK ] IsPrimeTest.Trivial (0 ms)
+[ RUN      ] IsPrimeTest.Positive
+[       OK ] IsPrimeTest.Positive (0 ms)
+[----------] 3 tests from IsPrimeTest (0 ms total)
+<!-- -->
+[----------] Global test environment tear-down
+[==========] 6 tests from 2 test cases ran. (2 ms total)
+[  PASSED  ] 6 tests.</pre>
+-----

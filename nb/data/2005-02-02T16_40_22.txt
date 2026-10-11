@@ -1,0 +1,94 @@
+TITLE: Movable type frustration
+AUTHOR: Kurt
+DATE: 02.02.2005 16:40
+DESC: Need help with Mac OSX install and TypeKey
+-----
+BODY:
+I tried to help out Lisa with getting Movable Type installed on any
+Mac OSX box.  After about three hours, I have not made it to where she
+got to.  She was able to add entries but had things lock up when
+trying to add comments.  She and I both got this message when trying
+to use the TypeKey signin:
+<pre>
+  The site you're trying to comment on has not signed up for this
+  feature. Please inform the site owner.
+</pre>
+Looking at the internals of MovableType, I decided to attempt to start
+from the beginning on my laptop (10.3.7 + fink).  I finally got sqlite
+working and got to try to add a comment and it blew up with this
+message.  BTW, a lot of their cgi's spew warning at the end.
+<pre>
+The 'year' parameter (undef) to DateTime::new was an 'undef', which is
+not one of the allowed types: scalar Params::Validate::__ANON__('The
+\'year\' parameter (undef) to DateTime::new was an \'unde...') called
+at /Users/schwehr/Sites/blog/mt/extlib/Params/ValidatePP.pm line 467
+Params::Validate::_validate_one_param('undef','HASH(0xa4e3cc)',
+'HASH(0xa2883c)','The
+\'year\' parameter (undef)') called at
+/Users/schwehr/Sites/blog/mt/extlib/Params/ValidatePP.pm line 346
+Params::Validate::validate('ARRAY(0xad0520)','HASH(0xaf2950)') called
+at /Users/schwehr/Sites/blog/mt/extlib/DateTime.pm line 165
+DateTime::new('undef','year','undef','month','undef','day','undef','hour',
+'undef',...)
+called at /Users/schwehr/Sites/blog/mt/lib/MT/Template/Context.pm line
+1429
+MT::Template::Context::_hdlr_date('MT::Template::Context=HASH(0xa49eb8)
+','HASH(0xa5b9b4)')
+called at /Users/schwehr/Sites/blog/mt/lib/MT/Template/Context.pm line
+
+...
+
+called at /Users/schwehr/Sites/blog/mt/lib/MT.pm line 496
+MT::rebuild_entry('MT::App::CMS=HASH(0x8c3e3c)','Entry','MT::Entry=HASH(0x992ca0)','BuildDependencies',1,'OldPrevious',2,'OldNext',1,...)
+called at /Users/schwehr/Sites/blog/mt/lib/MT/App/CMS.pm line 3426
+MT::App::CMS::rebuild_pages('MT::App::CMS=HASH(0x8c3e3c)') called at
+/Users/schwehr/Sites/blog/mt/lib/MT/App.pm line 352  eval {...} called
+at /Users/schwehr/Sites/blog/mt/lib/MT/App.pm line 301
+MT::App::run('MT::App::CMS=HASH(0x8c3e3c)') called at
+/Users/schwehr/Sites/blog/mt/mt.cgi line 26  eval {...} called at
+/Users/schwehr/Sites/blog/mt/mt.cgi line 20
+</pre>
+Perhaps it is the version of perl that ships with osx?
+<pre>
+  perl --version
+  This is perl, v5.8.1-RC3 built for darwin-thread-multi-2level
+</pre>
+Briefly, here are some (but not all) of the steps I took:
+<pre>
+sudo emacs /sw/etc/apache2/httpd.conf
+    AddHandler cgi-script .cgi
+And added this at the end:
+    <Directory "/Users/schwehr/Sites/blog">
+        Options ExecCgi Includes MultiViews Indexes
+    </Directory>
+
+emacs -nw ~/Site/blog/mt/mt.cfg and add:
+  CGIPath http://localhost/~schwehr/blog/mt
+  DataSource ./db
+  ObjectDriver DBI::sqlite
+  Database db/mtdb.sqlite
+
+open http://localhost/~schwehr/blog/mt-check.cgi
+sudo cpan
+Answer the default to all questions and wait about 15 minute for cpan
+to sort itself out and get the mirror file.
+   install DBI
+   install SQLite
+All the other cpan modules I tried choked.
+
+cd /Users/schwehr/Sites/blog/mt && chmod 755 mt-load.cgi
+
+open http://localhost/~schwehr/blog/mt/mt-load.cgi
+
+chmod 000 mt-load.cgi
+
+open http://localhost/~schwehr/blog/mt.cgi
+
+Go read the manual for the default login and how to setup...
+</pre>
+What is the trick to Mac OSX 10.3.7 for Movable Type?  Do I need to
+switch to fink perl?
+
+I should really see if I can get comments working in nanoblogger,
+blosxom or pyblosxom.
+-----

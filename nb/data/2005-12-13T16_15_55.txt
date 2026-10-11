@@ -1,0 +1,51 @@
+TITLE: Rotation k15 ams samples
+AUTHOR: Kurt
+DATE: 12.13.2005 16:15
+DESC: rot about vert
+-----
+BODY:
+I know I am not really doing a web log right now, but this needs
+documentating!  I need to get the s tensor + sigma for doing a bootams
+on each stratigraphic unit.  Up until now, I did the rotation of the
+eigenvectors on my own in python.  Rotating vectors around a vertical
+pole of rotation is pretty easy.
+
+I did PCA on the AF demagnetizations of the NRM.  Then I did a gofish
+to get the mean declination to remove.  I got 24.4&deg; With a little
+help from Lisa, I created a new k15 entry for the sample.  First the
+original sample:
+<pre>
+ttn136b-01pw-s2-005  ajharris    3/14/02  1:15:55 PM  
+9.790000E+1  9.835000E+1  9.815000E+1  9.750000E+1  9.810000E+1  
+9.715000E+1  9.555000E+1  9.785000E+1  9.715000E+1  9.550000E+1  
+9.660000E+1  9.615000E+1  9.475000E+1  9.655000E+1  9.600000E+1  
+</pre>
+Now, I need to replace the stuff after the sample name with correct
+rotation.  Going through the database changes how the numbers are
+formated, but they are really the same.
+<pre>
+ttn136b-01pw-s2-005 24.4 0 0 0
+97.9 98.35 98.15 97.5 98.1 
+97.15 95.55 97.85 97.15 95.5 
+96.6 96.15 94.75 96.55 96.0 
+</pre>
+Now I need to convert the new k15 file to rotated eigenvectors to
+check the value.
+<pre>
+# k15_s -g &lt; new.k15 | s_eigs
+0.32516053  101.64   76.43 0.33633894  341.95    6.82 0.33850062  250.54   11.68
+</pre>
+And to check the rotation, I dumped the ams_geo table's V3 dec inc:
+<pre>
+# cat new.k15.check 
+101.6 76.4 ttn136b-01pw-s2-005
+</pre>
+Finally, here are my new s matrix values that I can pass (along with
+its cousins) to bootams.
+<pre>
+# k15_s -g < new.k15
+0.33654407 0.33759156 0.32586446 0.00077286 -.00290113 0.00037149 0.00045243
+</pre>
+I put all this in writeK15withRot.py for now.  This program will
+hopefully see the light of day after I graduate.
+-----

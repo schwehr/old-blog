@@ -1,0 +1,158 @@
+TITLE: Making a gdaldem hillshade have proper transparency
+AUTHOR: Kurt
+DATE: 06.01.2010 13:59
+DESC: finally, it works
+-----
+BODY:
+Note: If anyone can show me how to make a transparent hillshade using
+gdal without having to resort to the python code below, I would really
+appreciate hearing from you!
+
+Back in November/December of last year, I had trouble with
+transparency in the output of gdaldem hillshade.  Thanks to help from
+the IRC #gdal channel (and especially EvenR), I managed to get through
+the whole process and I will try to document it here.  I definitely do
+not understand why gdaldem color-relief works as expected (using some
+extra flags) for alpha/transparency and gdaldem hillshade actually
+writes 50% gray into areas with nodata.  EvenR suggested I add a
+command like this to set the nodata value, but the results were either
+a 50% gray (for -1 or 1e6) or the gray that matches the value.  I have
+much to learn about gdal.
+<pre><b>gdal_translate -a_nodata 0 H11296_5m-depths-f32.tif H11296_5m-depths-f32-with-nodata.tif</b></pre>
+Here is the hillshade with the 50% gray that I do not want:
+
+<img title="gdaldem hillshade" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/gdaldem-hillshade-nodata-not-transparent.png"/>
+
+To help understand the problem, I will show gdalinfo commands (but
+truncated to save space) as things progress.  Here is the original
+bag:
+<pre>gdalinfo H11296_5m.bag
+Driver: BAG/Bathymetry Attributed Grid
+...
+PROJCS["UTM Zone 19, Northern Hemisphere",
+...
+Pixel Size = (5.001271523178817,-5.002456140350830)
+...
+Band 1 Block=3021x1 Type=Float32, ColorInterp=Undefined
+  Description = elevation
+  Min=-25.697 Max=2.399 
+  NoData Value=1000000
+Band 2 Block=3021x1 Type=Float32, ColorInterp=Undefined
+  Description = uncertainty
+  Min=0.500 Max=0.601 
+  <b>NoData Value=0</b></pre>
+So we are starting with a BAG.  The basic NOAA published bag has two
+layers, which surprised a few people on IRC.  A bag could have just
+one layer or it could have 3 or more.  The nice thing about HDF5 is
+that you can put other information into a BAG when necessary.  (Which
+is better: HDF5 or the latest NetCDF?)
+<pre>gdalwarp -ot Float32 -t_srs EPSG:4326  $patch.bag ${patch}-depths-f32.tif</pre>
+The first real step is to convert the BAG to a GeoTiff.  I am using a
+32 bit floating point tif so I don't have to worry about the precision
+of the data in the BAG.  Now that I realize GeoTiffs are not just for
+images, things are better.  The geotiff:
+<pre>gdalinfo H11296_5m-depths-f32.tif 
+Driver: GTiff/GeoTIFF
+Files: H11296_5m-depths-f32.tif
+Size is 3205, 1278
+Coordinate System is:
+GEOGCS["WGS 84",
+...
+Band 1 Block=3205x1 Type=Float32, ColorInterp=Gray
+Band 2 Block=3205x1 Type=Float32, ColorInterp=Undefined</pre>
+Note that the nodata value that was in the BAG has been lost.  I
+generate the hillshade from the GeoTiff of depths:
+<pre><b>gdaldem hillshade ${patch}-depths-f32.tif $patch-hillshade.tif</b></pre>
+This resulting image has a 1 pixel border of transparency, but the
+internal cells without data are all 50% gray as shown above.
+<pre>gdalinfo H11296_5m-hillshade.tif 
+Driver: GTiff/GeoTIFF
+...
+Band 1 Block=3205x2 Type=Byte, ColorInterp=Gray
+  NoData Value=0</pre>
+Thankfully, the color-relief image has proper transparency, so the next idea I had was to copy the transparency.
+<pre><b>gdaldem color-relief ${patch}-depths-f32.tif ../../color_ramp_fixed.dat  ${patch}-color-relief.tif -alpha -co ALPHA=YES</b>
+<b>gdalinfo H11296_5m-color-relief.tif</b>
+Driver: GTiff/GeoTIFF
+...
+Band 1 Block=3205x1 Type=Byte, ColorInterp=Red
+  Mask Flags: PER_DATASET ALPHA 
+Band 2 Block=3205x1 Type=Byte, ColorInterp=Green
+  Mask Flags: PER_DATASET ALPHA 
+Band 3 Block=3205x1 Type=Byte, ColorInterp=Blue
+  Mask Flags: PER_DATASET ALPHA 
+Band 4 Block=3205x1 Type=Byte, ColorInterp=Alpha</pre>
+The code below takes the gray values from the hillshade and the alpha
+channel from the color-relief and combines them into a new RGB geotiff
+based off the color-relief geotiff.  I copy the gray channel into all
+three of the R, G, and B channels to make an overly large gray image
+with the alpha/transparency the way I need it.  
+
+<img title="gdaldem hillshade with good transparency" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/gdaldem-hillshade-with-proper-transparency.png"/>
+
+I then combine the color-relief and the new transparent hillshade into
+what I want: an image with hillshading and color:
+<pre><b>composite -blend 50 $patch-hillshade-transparent.tif ${patch}-color-relief.tif ${patch}-blend.tif</b></pre>
+<img title="gdaldem hillshade and color-relief composite" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/working-composite.png"/>
+
+That last step looses the georeferencing, so I have to go back in and add it in from an original that has knows where it is at:
+<pre><b>listgeo -tfw ${patch}-depths-f32.tif
+geotifcp -e ${patch}-depths-f32.tfw ${patch}-blend.tif ${patch}.tif</b></pre>
+And the results in Google Earth:
+
+<img title="gdaldem hillshade and color-relief composite in Google Earth" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/gdaldem-hillshade-alpha-in-ge.png"/>
+
+My not yet polished python code that uses gdal to copy in transparency:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">from</font></b> __future__ <b><font color="#000080">import</font></b> print_function
+<b><font color="#000080">import</font></b> sys
+<b><font color="#000080">import</font></b> osgeo<font color="#990000">.</font>gdal as gdal
+<b><font color="#000080">import</font></b> osgeo<font color="#990000">.</font>gdalconst
+gdal<font color="#990000">.</font><b><font color="#000000">AllRegister</font></b><font color="#990000">()</font>
+<!-- -->
+patch_name <font color="#990000">=</font> <font color="#FF0000">'H11296_5m'</font>
+hillshade <font color="#990000">=</font> gdal<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">(</font>patch_name <font color="#990000">+</font> <font color="#FF0000">'-hillshade.tif'</font><font color="#990000">,</font> gdal<font color="#990000">.</font>GA_ReadOnly<font color="#990000">)</font>
+color <font color="#990000">=</font> gdal<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">(</font>patch_name <font color="#990000">+</font> <font color="#FF0000">'-color-relief.tif'</font><font color="#990000">,</font> gdal<font color="#990000">.</font>GA_ReadOnly<font color="#990000">)</font>
+<!-- -->
+w<font color="#990000">,</font>h <font color="#990000">=</font> color<font color="#990000">.</font>RasterXSize<font color="#990000">,</font>color<font color="#990000">.</font>RasterYSize
+<b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'dim:'</font><font color="#990000">,</font>w<font color="#990000">,</font>h<font color="#990000">,</font><font color="#FF0000">'\t\t'</font><font color="#990000">,</font>hillshade<font color="#990000">.</font>RasterXSize<font color="#990000">,</font>hillshade<font color="#990000">.</font>RasterYSize<font color="#990000">)</font>
+<!-- -->
+driver <font color="#990000">=</font> gdal<font color="#990000">.</font><b><font color="#000000">GetDriverByName</font></b><font color="#990000">(</font><font color="#FF0000">'GTiff'</font><font color="#990000">)</font>
+<b><font color="#0000FF">if</font></b> driver <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font>
+    <b><font color="#0000FF">print</font></b><font color="#990000">(</font><font color="#FF0000">'Format driver %s not found, pick a supported driver.'</font> <font color="#990000">%</font> format<font color="#990000">)</font>
+    sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font> <font color="#993399">1</font> <font color="#990000">)</font>
+<!-- -->
+dst <font color="#990000">=</font> driver<font color="#990000">.</font><b><font color="#000000">CreateCopy</font></b><font color="#990000">(</font> <font color="#FF0000">'dst.tif'</font><font color="#990000">,</font> color<font color="#990000">)</font> <i><font color="#9A1900">#, 0) # what was the zero for?</font></i>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'gdal.GCI_AlphaBand:'</font><font color="#990000">,</font> gdal<font color="#990000">.</font>GCI_AlphaBand<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> band_num <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font>color<font color="#990000">.</font>RasterCount<font color="#990000">+</font><font color="#993399">1</font><font color="#990000">):</font>
+    band <font color="#990000">=</font> color<font color="#990000">.</font><b><font color="#000000">GetRasterBand</font></b><font color="#990000">(</font>band_num<font color="#990000">)</font>
+    <b><font color="#0000FF">if</font></b> band <b><font color="#0000FF">is</font></b> None<font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'band is None'</font><font color="#990000">)</font>
+        <b><font color="#0000FF">continue</font></b>
+    bandmin<font color="#990000">,</font>bandmax <font color="#990000">=</font> band<font color="#990000">.</font><b><font color="#000000">ComputeRasterMinMax</font></b><font color="#990000">()</font>
+    clr_interp <font color="#990000">=</font> band<font color="#990000">.</font><b><font color="#000000">GetColorInterpretation</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">print</font></b> <font color="#990000">(</font>band_num<font color="#990000">,</font> bandmin<font color="#990000">,</font>bandmax<font color="#990000">,</font> clr_interp<font color="#990000">,</font> gdal<font color="#990000">.</font><b><font color="#000000">GetColorInterpretationName</font></b><font color="#990000">(</font>clr_interp<font color="#990000">))</font>
+<!-- -->
+alpha <font color="#990000">=</font> color<font color="#990000">.</font><b><font color="#000000">GetRasterBand</font></b><font color="#990000">(</font><font color="#993399">4</font><font color="#990000">)</font>
+gray_band <font color="#990000">=</font> hillshade<font color="#990000">.</font><b><font color="#000000">GetRasterBand</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font>
+<!-- -->
+<i><font color="#9A1900"># Shove all the same gray values into all the color channels</font></i>
+<b><font color="#0000FF">for</font></b> band_num <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">):</font>
+    dst<font color="#990000">.</font><b><font color="#000000">GetRasterBand</font></b><font color="#990000">(</font>band_num<font color="#990000">).</font><b><font color="#000000">WriteArray</font></b><font color="#990000">(</font>gray_band<font color="#990000">.</font><b><font color="#000000">ReadAsArray</font></b><font color="#990000">())</font>
+<!-- -->
+<i><font color="#9A1900"># Set the alpha</font></i>
+dst<font color="#990000">.</font><b><font color="#000000">GetRasterBand</font></b><font color="#990000">(</font><font color="#993399">4</font><font color="#990000">).</font><b><font color="#000000">WriteArray</font></b><font color="#990000">(</font>alpha<font color="#990000">.</font><b><font color="#000000">ReadAsArray</font></b><font color="#990000">())</font></tt></pre>
+As an aside, this data set is actually an airborne bathymetric LIDAR
+survey.  Unfortunately, nothing in the XML metadata says that this is
+a lidar.  The only clue is in a textual description that hints that
+this came from a plane.  You would have to go read the <a href="http://surveys.ngdc.noaa.gov/mgg/NOS/coast/H10001-H12000/H11296/DR/H11296.pdf">H11296 Descriptive Report</a> to know that it came from a "SHOALS-1000T Bathymetric and Topographic LiDAR."
+<pre><tt><b><font color="#0000FF">&lt;abstract&gt;</font></b> 
+Project: OPR-A321-KRL-05; Survey: H11296; State: New Hampshire;
+General Locality: Approaches to Portsmouth; Sublocality: Rye Harbor
+and Isle of Shoals; Date of Survey: 09/09/05-09/12/05; Surveyed by:
+Beechcraft King Air 90; Verification by: Atlantic Hydrographic
+Branch&amp;#xD;
+<b><font color="#0000FF">&lt;/abstract&gt;</font></b></tt></pre>
+-----

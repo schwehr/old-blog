@@ -1,0 +1,44 @@
+TITLE: panda and backups
+AUTHOR: Kurt
+DATE: 02.25.2005 13:37
+DESC: blah blah Friday afternoon
+-----
+BODY:
+Cooked up a quick script to put in the crontab for sorcerer.  This
+generates a 400 MB compress tar.bz2 archive.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+cd ~pmag
+<font color="#2040a0">TAR</font>=~/Desktop/rawdat-`date <font color="#008000">&quot;+%C%y%m%d&quot;</font>`.tar
+echo <font color="#008000">&quot;Create a tar of RAWDAT&quot;</font>
+tar cf <font color="#2040a0">$TAR</font> RAWDAT
+echo <font color="#008000">&quot;Compressing the tar&quot;</font>
+cd ~/Desktop
+bzip2 -9 <font color="#2040a0">$TAR</font>
+echo <font color="#008000">&quot;Done.  Pleae write the tar on your desktop to a CD and take it home!&quot;</font>
+</pre>
+To work with the bziped archive:
+<pre>
+  View:  tar tfjvv rawdat-20050225.tar.bz2
+  Extract: tar xfjvv rawdat-20050225.tar.bz2
+</pre>
+I started working on a fink info file for <a
+href="http://www.stillhq.com/cgi-bin/blosxom/panda/">panda</a>.  This
+one does not yet conform to the shared lib policy.  I will do that
+some other day.  It does fix the libtool symbolic links that the 0.5.4
+distribution has.  <a href="http://schwehr.org/software/fink">My draft
+fink packages</a>.  Basically, I want to autogenerate a large poster
+of AF Demagnetization plots for my core samples.
+
+Update on panda:  This does not seem to be the most stable of
+libraries.  I do not have time to fight with a program that is so
+touch with what it can and cannot read.  Even one of the demo programs
+gives a bus error.  My set program fails when I give it my tif versus
+working with theirs.
+<pre>
+./testpanda3 
+Welcome to the Panda 0.5 sample application...
+TIFFClientOpen: One of the client procedures are NULL pointer.
+Bus error
+</pre>
+-----

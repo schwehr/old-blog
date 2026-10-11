@@ -1,0 +1,25 @@
+TITLE: Converting IBM floating point segy to IEEE float
+AUTHOR: Kurt
+DATE: 08.28.2005 12:37
+DESC: sioseis so that I can use segy-py
+-----
+BODY:
+I now have a little script that converts IBM floating point SEGY data
+to IEEE floating point using sioseis:
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+
+<font color="#2040a0">fileIn</font>=<font color="#2040a0">$1</font>
+<font color="#2040a0">fileOut</font>=<font color="#2040a0">$2</font>
+
+sioseis &lt;&lt;EOF
+  procs diskin diskoa end
+  diskin lno 99999 ipath <font color="#2040a0">$fileIn</font> end end
+  diskoa opath <font color="#2040a0">$fileOut</font> ofmt 5 end end end
+EOF
+</pre>
+ofmt 5 is IEEE floating point, while 1 would be IBM floating point.
+
+The segy-py programs can't currently read IBM floating point, so this
+lets me use those tools.
+-----

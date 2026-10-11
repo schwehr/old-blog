@@ -1,0 +1,73 @@
+TITLE: pca in python
+AUTHOR: Kurt
+DATE: 10.09.2005 22:48
+DESC: see also R
+-----
+BODY:
+Lisa has a Principal Component Analysis (PCA) function in her pmag-py,
+but I wanted to take a quick look at what is available elsewhere.  I
+need to start adding -schwehr to my google searches.  I often mention
+the sort of things that I am interested and then I use those same
+words in a search.  Funny how I think like myself.  Not useful.
+
+A package writen for neurological analysis came up that looks
+generally promising: <a
+href="http://mdp-toolkit.sourceforge.net/">MDP</a>
+<pre>
+  Modular toolkit for Data Processing (MDP) is a Python library to
+  perform data processing. Already implemented algorithms include:
+  Principal Component Analysis (PCA), Independent Component Analysis
+  (ICA), Slow Feature Analysis (SFA), and Growing Neural Gas (GNG). 
+
+  MDP supports the most common numerical extensions to Python and the
+  symeig package (a Python wrapper for the LAPACK functions to solve
+  the standard and generalized eigenvalue problems for symmetric
+  (hermitian) positive definite matrices). MDP also includes graph (a
+  lightweight package to handle graphs).
+</pre>
+FINK-TODO: mdp python library
+
+But not tonight.  I am going to adapt Lisa's PCA to work from data
+passed in and not from a file.
+
+<b>Update:</b> Um... that would be dopca in pmag.py.  Here is an
+example pulling values out of the database.
+<pre>
+    <font color="#2040a0">cx</font> <font color="4444FF">=</font> <font color="#2040a0">sqlite</font>.<font color="#2040a0">connect</font><font color="4444FF">(</font><font color="#008000">&quot;ttn136b.db&quot;</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">cu</font> <font color="4444FF">=</font> <font color="#2040a0">cx</font>.<font color="#2040a0">cursor</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">s</font> <font color="4444FF">=</font> <font color="#008000">'select treatment,dec,inc,intensity from mag '</font>
+    <font color="#2040a0">s</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#008000">'where samplename=&quot;ttn136b-01pw-010&quot; and type=&quot;afdemag&quot;  order by treatment ;'</font>
+    <font color="#2040a0">cu</font>.<font color="#2040a0">execute</font><font color="4444FF">(</font><font color="#2040a0">s</font><font color="4444FF">)</font>
+    <font color="#2040a0">rows</font> <font color="4444FF">=</font> <font color="4444FF">[</font><font color="4444FF">]</font>
+    <strong>for</strong> <font color="#2040a0">row</font> <strong>in</strong> <font color="#2040a0">cu</font>.<font color="#2040a0">fetchall</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#2040a0">row</font>
+        <font color="#2040a0">rows</font>.<font color="#2040a0">append</font><font color="4444FF">(</font><font color="#2040a0">row</font><font color="4444FF">)</font>
+    <strong>import</strong> <font color="#2040a0">pmag</font>
+    <font color="#2040a0">pcaData</font> <font color="4444FF">=</font> <font color="#2040a0">pmag</font>.<font color="#2040a0">dopca</font><font color="4444FF">(</font><font color="#2040a0">rows</font>,<font color="#FF0000">2</font>,<font color="#FF0000">100</font>,<font color="#008000">'p'</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#2040a0">pcaData</font>
+</pre>
+Which when run gives something like this:
+./magplots.py --verbosity=1
+(0.0, 257.5, 70.099999999999994, 3.7360000000000001e-05)
+(2.5, 250.40000000000001, 71.799999999999997, 3.4480000000000002e-05)
+(5.0, 241.80000000000001, 71.099999999999994, 3.1040000000000001e-05)
+(7.5, 241.0, 71.0, 2.851e-05)
+(10.0, 237.0, 71.0, 2.6290000000000001e-05)
+(12.5, 228.80000000000001, 71.799999999999997, 2.4539999999999999e-05)
+(15.0, 233.90000000000001, 71.700000000000003, 2.141e-05)
+(15.0, 232.90000000000001, 70.799999999999997, 2.2019999999999999e-05)
+(20.0, 231.5, 70.700000000000003, 1.8170000000000001e-05)
+(20.0, 223.69999999999999, 68.900000000000006, 1.9369999999999999e-05)
+(30.0, 242.5, 71.099999999999994, 1.344e-05)
+(30.0, 233.69999999999999, 69.900000000000006, 1.434e-05)
+(40.0, 245.5, 66.200000000000003, 9.3700000000000001e-06)
+(40.0, 234.5, 67.799999999999997, 1.0020000000000001e-05)
+(60.0, 191.30000000000001, 65.400000000000006, 4.9819999999999999e-06)
+(60.0, 221.59999999999999, 73.900000000000006, 5.6799999999999998e-06)
+(80.0, 214.69999999999999, 51.0, 2.2129999999999998e-06)
+(80.0, 155.59999999999999, 55.600000000000001, 2.6960000000000001e-06)
+[[242.94491290687807, 71.338744095815557, 1.0], 4.7963548164164731, 16, 3.3448784483489629]
+</pre>
+-----

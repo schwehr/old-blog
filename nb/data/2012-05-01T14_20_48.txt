@@ -1,0 +1,42 @@
+TITLE: git cherry-picking
+AUTHOR: Kurt
+DATE: 05.01.2012 14:20
+DESC: go git go
+-----
+BODY:
+Roland has been getting me to push my git skills.  I wanted to merge
+one of his changes to libais for include guards in the C++ headers,
+but I didn't want to merge some of his prior changes.  Git let's you
+do this with a "cherry-pick".  I should have done this on a branch
+rather than master, but it's a start.
+<pre>git checkout master
+git fetch git://github.com/rolker/libais.git
+git cherry-pick  45bcad5630052030d65e89e01605614da1d65ebc
+# edit ais.h - fix that it pulled 1 line of a different change
+git add ais.h
+git status
+git commit -m "use Roland's include guards"
+git push</pre>
+<img width="600" height="600" title="The git cherry-pick-process" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-05/git-cherry-pick.png"/>
+
+I am a little bummed that the changes are not shown with a link
+between our two master lines on the github network display.
+
+<a href="https://github.com/schwehr/libais/network">libais schwehr network graph</a>
+
+See also:
+
+<a href="http://technosophos.com/content/git-cherry-picking-move-small-code-patches-across-branches">Git Cherry Picking: Move small code patches across branches</a>
+
+I also used a stash to take some changes from master that I hadn't committed to a branch.  Pretty awesome!
+<a href="http://stackoverflow.com/questions/52704/how-do-you-discard-unstaged-changes-in-git">How do you discard unstaged changes in git?</a> [stackoverflow]
+<pre>git stash save
+git status
+git branch -a
+git checkout -b somebranch
+git stash list
+git stash show
+git stash pop
+git diff # Now your changes are in somebranch!
+git commit -a -m "my comment about the change" # Don't forget to commit the changes</pre>
+-----

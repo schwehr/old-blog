@@ -1,0 +1,45 @@
+TITLE: debugging with python
+AUTHOR: Kurt
+DATE: 09.22.2005 21:40
+DESC: starting to get the hang of it
+-----
+BODY:
+<a href=http://www.ferg.org/papers/debugging_in_python.html">Debugging
+in Python</a> seems like a pretty good into to pdb.  Once I am in the
+debugger and see the <b>(Pdb)</b> prompt, it feels a lot like gdb.
+<pre>
+#!/usr/bin/env python
+a = "aaa"
+
+import pdb
+pdb.set_trace()
+
+b = "bbb"
+c = "ccc"
+final = a + b + c
+print final
+</pre>
+I then did some stuff with next and continue.
+<pre>
+(Pdb) n
+> /Users/schwehr/Desktop/py/epdb1.py(7)?()
+-> c = "ccc"
+(Pdb) n
+> /Users/schwehr/Desktop/py/epdb1.py(8)?()
+-> final = a + b + c
+(Pdb) c
+aaabbbccc
+</pre>
+The grand unified debugger (gud) does not know how to cope with pdb,
+but there is an emacs mode for the python debugger: <a
+href="http://stein.bioch.dundee.ac.uk/~charlie/scripts/pdb-mode.html">pdb-mode</a>.
+I added this to my .emacs file:
+<pre>
+(setq load-path
+      (append
+       '("~/.emacs-lisp")
+       load-path))
+
+(autoload 'pdb-mode "pdb" "python debugger major mode" t)
+</pre>
+-----

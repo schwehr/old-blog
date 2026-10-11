@@ -1,0 +1,22 @@
+TITLE: svn keyword properties
+AUTHOR: Kurt
+DATE: 04.10.2006 07:52
+DESC: time to start using keywords
+-----
+BODY:
+In order to use keywork substitution in svn like what is available by
+default in CVS (which is not a good thing to have automatically turned
+on), you need to use a svn command like this:
+<pre>
+  svn propset svn:keywords "Revision Date" myfile.py
+  svn commit -m "added keywords" myfile.py
+</pre>
+Which ended up doing something like this:
+<pre>
+  __version__ = '$Revision: 347 $'.split()[1]
+  __date__ = '$Date: 2006-03-31 10:00:27 -0500 (Fri, 31 Mar 2006) $'.split()[1]
+  __author__ = 'Kurt Schwehr'
+</pre>
+Too bad epydoc currently does not understand that I want my __version__
+to be just 347.
+-----

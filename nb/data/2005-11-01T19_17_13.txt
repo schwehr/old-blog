@@ -1,0 +1,23 @@
+TITLE: python optparse choices
+AUTHOR: Kurt
+DATE: 11.01.2005 19:17
+DESC: is there a better way?
+-----
+BODY:
+I came up with my own little way to deal with optparse choice items.
+This lets me specify the choices once and then make a list of options
+for the user.  The for loop builds a string that contains all the
+choices.  I was surprised not to see anything that already handled
+this in optparse.  If it is there, please someone tell me what it is!
+<pre>
+    <font color="#2040a0">densityChoices</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#008000">'linear'</font>,<font color="#008000">'exp'</font>,<font color="#008000">'const'</font><font color="4444FF">)</font>
+    <font color="#2040a0">choicesStr</font> <font color="4444FF">=</font> <font color="#008000">''</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">densityChoices</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">:</font> <font color="#2040a0">choicesStr</font><font color="4444FF">+</font><font color="4444FF">=</font><font color="#2040a0">densityChoices</font><font color="4444FF">[</font><font color="#2040a0">i</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#008000">', '</font>
+    <font color="#2040a0">choicesStr</font><font color="4444FF">=</font><font color="#2040a0">choicesStr</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">2</font><font color="4444FF">]</font>
+    <font color="#2040a0">myparser</font>.<font color="#2040a0">add_option</font><font color="4444FF">(</font><font color="#008000">'--density-type'</font>,<font color="#2040a0">dest</font><font color="4444FF">=</font><font color="#008000">'densityType'</font>,
+                        <font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'choice'</font>,<font color="#2040a0">choices</font><font color="4444FF">=</font><font color="#2040a0">densityChoices</font>,
+                        <font color="#2040a0">default</font><font color="4444FF">=</font><font color="#008000">'linear'</font>,
+                        <font color="#2040a0">help</font><font color="4444FF">=</font><font color="#008000">'What method to use to generate density '</font>
+                        <font color="4444FF">+</font><font color="#008000">'[default: %default] [choices: '</font><font color="4444FF">+</font><font color="#2040a0">choicesStr</font><font color="4444FF">+</font><font color="#008000">']'</font><font color="4444FF">)</font>
+</pre>
+-----

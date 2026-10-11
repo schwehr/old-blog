@@ -1,0 +1,41 @@
+TITLE: Bad apple
+AUTHOR: Kurt
+DATE: 03.01.2006 16:31
+DESC: 10.4 migration woes
+-----
+BODY:
+Doh!  Today has been a tough one.  I have been trying to multitask my
+way through a large number of issues to get my development environment
+back to a happier state.  It is a really good thing that I did not
+upgrade before I finished my PhD.  Here are some of the battles.
+
+GeoZui started using the new "|" rule dependency construct as a easy
+way to avoid always running configure in each subdir.  There may be
+other ways around this, but this one was simple, so Roland went for
+it.  I figured that I could just update the fink make to be 3.80 and
+all would be well.  That was easy enough, but Max Horn informed me
+that Apple has made all kinds of tweaks to their gnu make and they did
+not merge them back into the gnu make tree.  So some things will not
+build with the stock gnu make.  BAD APPLE!  Please, please, please
+integrate your changes in or stop using them!
+
+The next is my trouble with Coin3d and clashing libjpeg and the
+ImageIO framework.  I can't follow the advice I found via google to
+just fink remove libjpeg.  That would probably nuke quite a bit!  This
+may be an simage issue, but I am not totally sure.  I miss the linux
+ldd command for programs.  What is the equivalent for the Mac?  I did
+make an info file for coin45 2.4.4 which looks close except for this
+clash problem.
+
+Then cam SoQt 1.3.  It seems to be a bit cranky.  Something was wrong
+with the man page install code and it never seemed to generate a
+shared library.  Doh.
+
+Then in working with GeoZui, it looks like the wxglade generated code
+from Roland is now getting nuked on clean and fink does not have
+wxglade.  No problemo... except that wxglade does not have a setup.py,
+so I need to create one and hopefully the project will take it.
+
+Yikes.  But tomorrow I get to take a short road trip, so that should
+be fun.
+-----

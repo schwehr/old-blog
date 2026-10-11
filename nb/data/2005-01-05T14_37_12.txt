@@ -1,0 +1,43 @@
+TITLE: Converting to unix formatted text
+AUTHOR: Kurt
+DATE: 01.05.2005 14:37
+DESC: Tip to fix magnetic data to be usable
+-----
+BODY:
+This keeps coming up.  Our lab instruments save data in a format that
+causes the unix tools to not be able to read them.  First off, you
+should open a window with <b>man ascii</b> in it.  First I opened the
+original data file in emacs.  Emacs puts a <em>(Mac)</em> in the
+bottom left corner to let us know that this file in not a unix text
+file.  The other thing you might see would be a <em>(DOS)</em>.  There
+will be nothing there for a unix style file.  Then put the emacs
+window into hexl mode like this: <b>M-x hexl-mode</b>.  
+<pre>
+emacs for mac format file:
+  000000c0: 31<b>0d</b> 6270 3034 2d36 6777 2d31 3333 2e30  1<b>.</b>bp04-6gw-133.0
+              ^^                                      ^
+man ascii:
+  00 nul   01 soh   02 stx   03 etx   04 eot   05 enq   06 ack   07 bel
+  08 bs    09 ht    <b>0a nl</b>    0b vt    0c np    <b>0d cr</b>    0e so    0f si
+
+emacs for unix text file:
+  000000c0: 31<b>0a</b> 6270 3034 2d36 6777 2d31 3333 2e30  1.bp04-6gw-133.0
+              ^^                                      ^
+</pre>
+So the new line for mac is 0x0d in hex and we need to get these files
+to 0x0a.  Which from man ascii, we see that this is changing cl to
+nl.  If you have GNU tr installed (with fink you need to <b>fink
+install textutils</b> to get gnu tr), GNU tr allows you to use some
+standard escape sequences to make things easier to remember.  The
+command to convert mac to unix then becomes:
+<pre>
+  tr '\r' '\n' < rawdat.k15 > myunixdat.k15
+</pre>
+This also helps if you keep your data in a CVS tree.  If you do not
+convert the data file to unix, CVS will consider the entire file
+changed since it sees one line that is changing.
+
+A total change of topic, but it is nice to be able to track airline
+flight status on line using <a
+href="http://www.flightview.com/TravelTools/">flightview</a>
+-----

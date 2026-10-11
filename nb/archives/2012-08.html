@@ -1,0 +1,894 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: August 2012 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2012-08-30T23_34_59.txt" name=
+"e2012-08-30T23_34_59.txt"></a>
+<h2 class="date">08.30.2012 23:34</h2>
+<div class="blogbody">
+<h3 class="title">John Hunter of matplotlib</h3>
+<div class="item-description">I saw on <a href=
+"http://sgillies.net/blog/1150/john-hunter-1968-2012">Sean
+Gillies</a> blog, that Fernando had posted sad news about <a href=
+"https://groups.google.com/forum/#!msg/pydata/FpwXp3sX6N8/mxopkZ1PkBQJr">
+John Hunter passing</a>. We got to have him come to Google earlier
+this year. He weill be greatly missed. <a href=
+"http://numfocus.org/johnhunter/">memorial fund</a><br />
+<br />
+I decided it was time to stop everything and watch his SciPy 2012
+keynote video:<br />
+<br />
+<iframe width="640" height="480" src=
+"http://www.youtube.com/embed/e3lTby5RI54" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-30T23_34_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-29T21_46_02.txt" name=
+"e2012-08-29T21_46_02.txt"></a>
+<h2 class="date">08.29.2012 21:46</h2>
+<div class="blogbody">
+<h3 class="title">Hacking on mb-system</h3>
+<div class="item-description">I needed a bit of a change of pace
+for a little while, so I started working on my git clone of
+MB-system (multibeam sonar echo sounder processing software). I've
+created an instance of the install_template Makefiles, got it
+building on my mac, and then removed libgsf. I used emacs and git
+to really attack the code. There are still GSF vestiges in the code
+that I need to remove (e.g. MB_DATA_SUMMARY), but these will take
+more thought to make sure I'm removing the right code. Some of the
+command that I ran: (grep's were with M-x grep in emacs).
+<pre>
+<b># WARNING: this is an approximation</b>
+git clone git@github.com:schwehr/mb-system.git
+cd mb-system
+git checkout -b macosx_build # create a branch and go into it
+git branch # make sure I am in the branch
+perl -pi.bak -e  's|\@FINKPREFIX\@|/sw|g' install_makefiles # fixes the gmt error below
+./install_makefiles -Pmacosxfink
+make -j 4
+# fiddle a bit till it was ready to commit
+git checkout install_makefiles # drop the changes to this file
+git -a Makefile */Makefile */*/Makefile
+git commit -m "path tweaks by install_makefiles"
+git checkout -b rm_gsf # branch off of the first branch
+cd src
+git rm -r gsf
+find . -name "*.[ch]" | xargs egrep -i 'mb_data_summary|gsf'
+grep -nH -i -e gsf */Makefile */*/Makefile
+# Lots of hacking
+make -j5  # yup.  compiles!
+git commit -a -m "gsf does not have a license"
+git checkout master
+# edit .gitignore
+git commit -a -m "ignore more"
+git push --all # push master and all branches back to github
+</pre>
+<img width="542" height="321" title="MB-System github graph"
+withgrayborder="True" src=
+"../attachments/2012-08/mbsystem-hacking.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-29T21_46_02.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-30T23_34_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-28T15_22_10.txt" name=
+"e2012-08-28T15_22_10.txt"></a>
+<h2 class="date">08.28.2012 15:22</h2>
+<div class="blogbody">
+<h3 class="title">Joel Johnson's IODP short course</h3>
+<div class="item-description">I wish I had been able to attend a
+course like this when I was a grad student. At SIO, I was lucky to
+have Warren Smith, Jerry Bode, Neal Driscoll, Lisa Tauxe and Liz
+Johnstone to help me figure out how to work with my piston cores.
+Without them, I'd have been lost trying to analize flow-in (which
+is not a geologic process). I've attached my time lapse video of
+taking notes and samples from one of my cores. I ended up building
+a core logger out of foam core... what a pain.
+<pre>
+Comprehensive shipboard core description and data integration in the
+sedimentology lab during IODP expeditions provides a fundamental
+framework for the science party as they work toward the expedition
+objectives. It is primarily during this shipboard time that the cores
+are systematically described and sampled and the characteristics of
+the stratigraphy resolved and integrated with paleontological,
+paleomagnetic, physical property, geochemical, and seismic reflection
+data sets. This workprovides the science team with a record of what
+the cores contain; where there are interesting occurrences and
+transitions in primary composition, diagentic mineralization,
+deformation and biostratigraphic data; and the timescale over which
+these changes occur. 
+<!-- -->
+This short course on shipboard sedimentology will cover marine
+sedimentary processes and products, smear slide and coarse fraction
+petrography, core logging and synthesis into DescLogik, and
+integration of sedimentology data with physical property,
+biostratratigraphy, and geochemistry data.   
+<!-- -->
+The course will take place October 1-4, 2012 at the IODP Gulf Coast
+Repository in College Station, Texas. It is open to anyone who would
+like to attend, but space is limited. Travel funding is available for
+U.S.-affiliated scientists. Graduate students, post-docs, and
+professionals that will or are planning to sail on future IODP
+expeditions are particularly encouraged to apply. Participants may
+include sedimentologists, paleontologists, paleomagnetic scientists,
+geochemists, structural geologists, and physical property scientists. 
+<!-- -->
+To apply, send your contact information, a two-page CV, and a brief
+statement of interest to Charna Meth at the U.S. Science Support
+Program (cmeth@oceanleadership.org). For questions concerning course
+content, please contact Joel Johnson at the University of New
+Hampshire (joel.johnson@unh.edu). 
+</pre>
+<iframe width="640" height="480" src=
+"http://www.youtube.com/embed/BgYZyEXa0cs" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-28T15_22_10.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-29T21_46_02.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-27T11_32_31.txt" name=
+"e2012-08-27T11_32_31.txt"></a>
+<h2 class="date">08.27.2012 11:32</h2>
+<div class="blogbody">
+<h3 class="title">cloning the mbsystem svn tree to git</h3>
+<div class="item-description">I have been wanting to hack on
+MB-System for a long long time. Last night, I finally took the
+initial steps. My fiddling should be properly to the side of the
+mbsystem svn world that the community is working with (aka... Fork!
+Or spork?) and I should do each task in a branch so that it is
+easier for people to take parts of what I am doing for
+myself.<br />
+<br />
+If you want check out what I've done so far, see:<br />
+<br />
+<a href=
+"https://github.com/schwehr/mb-system">https://github.com/schwehr/mb-system</a><br />
+
+<br />
+To get the code:
+<pre>
+git clone https://github.com/schwehr/mb-system.git
+</pre>
+<br />
+<br />
+Here is what I did to start off:
+<pre>
+# made mb-system empty repo on github 
+fink install git-svn
+git svn clone svn://svn.ilab.ldeo.columbia.edu/repo/mb-system/trunk
+# wait 5 minutes
+cd trunk
+git remote add origin git@github.com:schwehr/mb-system.git
+git push origin master
+<!-- -->
+# stare at code base wondering what I should do first
+</pre>
+<br />
+<br />
+Now, here are some of the tasks on my todo list:<br />
+<br />
+<ul>
+<li>Rip out libgsf as it is not legally usable code</li>
+<li>Remove all extranious comment lines, especially the cvs/svn log
+entries</li>
+<li>Remove all dead code. The easiest is unused variables.</li>
+<li>Switch to C++ so variables do not have to be declared at the
+top</li>
+<li>Start using const and references where ever possible</li>
+<li>Add lots and lots of unit and integration testing</li>
+<li>Collapse the giant fprintf chains by adding a couple simple
+helper macros</li>
+<li>Switch the build system (this one has been on my list the
+longest)</li>
+<li>Consider adding a python interface</li>
+</ul>
+<br />
+<br />
+Here is an example of an extranious bit of commenting:
+<pre>
+   /* return status */
+        return(status);
+</pre>
+<br />
+<br />
+In case people were wondering, I'm not going to try to push any of
+this back at the main line of mb-system and I'm not going to
+support anyone using this code base. I'm doing this for my own
+use.<br />
+<br />
+Now to find lots of extra hacking time!</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-27T11_32_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-28T15_22_10.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-24T14_47_31.txt" name=
+"e2012-08-24T14_47_31.txt"></a>
+<h2 class="date">08.24.2012 14:47</h2>
+<div class="blogbody">
+<h3 class="title">Optical flow and horizon finding for flight</h3>
+<div class="item-description">Fun videos of old concepts. The
+biologists see this kind of stuff in bees... Srinivasan has some
+fun demos. <a href=
+"http://en.wikipedia.org/wiki/Optical_flow">Optical flow</a> has
+been around in computer vision for a long time.<br />
+<br />
+<a href=
+"http://www.unols.org/meetings/2012/201207sco/201208scoap16.pdf">Insect-inspired
+vision guidance systems for UAVs, Mandyam Srinivasan</a><br />
+<br />
+<iframe width="640" height="360" src=
+"http://www.youtube.com/embed/U9iy1B5QG-0" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+<iframe width="480" height="360" src=
+"http://www.youtube.com/embed/yHNib60qRYI" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+<iframe width="640" height="360" src=
+"http://www.youtube.com/embed/U9iy1B5QG-0" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-24T14_47_31.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-27T11_32_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-23T15_44_38.txt" name=
+"e2012-08-23T15_44_38.txt"></a>
+<h2 class="date">08.23.2012 15:44</h2>
+<div class="blogbody">
+<h3 class="title">maritime domain awareness - icode-mda</h3>
+<div class="item-description">This project is interesting. OSSIM
+Planet and other fun tools.<br />
+<br />
+<a href="http://code.google.com/p/icode-mda/">icode-mda</a> on
+Google Code:
+<pre>
+International Collaborative Development (I CODE) of Open Source
+Tools for Enhanced Maritime Domain Awareness (MDA) Program
+</pre>
+<br />
+<br />
+<a href=
+"http://maps.google.com/maps/ms?msid=206599459418962527974.0004bfb0f288f5c28ac95&amp;msa=0">
+ICODE-MDA on a Google Map</a><br />
+<br />
+<img width="600" height="447" title="iCode MDA on a Google Map"
+withgrayborder="True" src=
+"../attachments/2012-08/icode-mda-on-google-maps.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-23T15_44_38.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-24T14_47_31.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-23T08_27_03.txt" name=
+"e2012-08-23T08_27_03.txt"></a>
+<h2 class="date">08.23.2012 08:27</h2>
+<div class="blogbody">
+<h3 class="title">Google Mars for Mars Science Laborator (MSL) /
+Curiosity</h3>
+<div class="item-description">Thanks to Jody Davis and Jeremy
+Shidner of NASA Langley for creating and sharing this great video
+of the Mars Science Laboratory (MSL) going through Entry, Decent
+and Landing (EDL) using the Mars mode Google Earth!<br />
+<br />
+<iframe width="640" height="360" src=
+"http://www.youtube.com/embed/videoseries?list=UUqKjRzvYd2QmW-Pa-VNCZSQ&amp;hl=en_US"
+frameborder="0" allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-23T08_27_03.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-23T15_44_38.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-12T03_16_59.txt" name=
+"e2012-08-12T03_16_59.txt"></a>
+<h2 class="date">08.12.2012 03:16</h2>
+<div class="blogbody">
+<h3 class="title">Dr Seuss and NASA</h3>
+<div class="item-description">Yesterday, I heard the story of Dr.
+Seuss and NASA from the long time legal council for Dr. Seuss. He
+told it differently than I find it in the book "Dr. Seuss: American
+Icon". The way I heard, DRSEUSS was destined for a Mars and that it
+was supposed to be the acronym that stood for: "Deep Reconnaissance
+Space Exploration US Spaceship". The part about the NASA staff
+retiring or being fired matches what I heard.<br />
+<br />
+<img width="600" height="307" title="Dr Seuss" withgrayborder=
+"True" src=
+"../attachments/2012-08/dr-seuss-nasa-1.png" />
+<br />
+<br />
+<img width="600" height="355" title="Dr Seuss" withgrayborder=
+"True" src=
+"../attachments/2012-08/dr-seuss-nasa-2.png" />
+<br />
+<br />
+<a href=
+"http://books.google.com/books?id=IjvHQsCn_pgC&amp;pg=PA135&amp;lpg=PA135&amp;dq=dr+seuss+nasa&amp;source=bl&amp;ots=Zo3djPP4TZ&amp;sig=auMc8XsXB2_GgERn9j1q-HT1hps&amp;hl=en&amp;sa=X&amp;ei=fX8nUNiIHsGYiQKs9YHoCQ&amp;ved=0CFoQ6AEwAg#v=onepage&amp;q&amp;f=false">
+books.google.com</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-12T03_16_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-23T08_27_03.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-10T19_04_45.txt" name=
+"e2012-08-10T19_04_45.txt"></a>
+<h2 class="date">08.10.2012 19:04</h2>
+<div class="blogbody">
+<h3 class="title">Google Mars on UStream</h3>
+<div class="item-description">Google Mars in the MSL Press
+conference is on UStream:<br />
+<br />
+<img width="600" height="375" title=
+"Google Mars from MSL on UStream" withgrayborder="True" src=
+"../attachments/2012-08/googlemars-ustream.png" />
+<br />
+<br />
+To see Google Mars, skip in to 36:52<br />
+<br />
+<iframe src="http://www.ustream.tv/embed/recorded/24606644" width=
+"608" height="368" scrolling="no" frameborder="0" style=
+"border: 0px none transparent;"></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-10T19_04_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-12T03_16_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-10T18_51_54.txt" name=
+"e2012-08-10T18_51_54.txt"></a>
+<h2 class="date">08.10.2012 18:51</h2>
+<div class="blogbody">
+<h3 class="title">MSL Videos</h3>
+<div class="item-description">Here are MSL videos that I (via SSV)
+helped with this last week on MSL:<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/8_-A5-lclQk" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+I didn't realize that this next overall video was out. I was on the
+team that created most of the animations used.<br />
+<br />
+<iframe width="560" height="315" src=
+"http://www.youtube.com/embed/yKDBojlncss" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-10T18_51_54.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-10T19_04_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-10T10_45_45.txt" name=
+"e2012-08-10T10_45_45.txt"></a>
+<h2 class="date">08.10.2012 10:45</h2>
+<div class="blogbody">
+<h3 class="title">Google Mars in the MSL press conference</h3>
+<div class="item-description">Woohoo! Google Mars being used by the
+MSL EDL Team!<br />
+<br />
+This visualization was produced by <a href=
+"http://www.nasa.gov/centers/langley/news/researchernews/snapshot_JDavisuse.html">
+Jody Davis</a> and the rest of the EDL team. She works at NASA
+Langley Research Center.<br />
+<br />
+<img width="600" height="450" title="Google Mars for MSL"
+withgrayborder="True" src=
+"../attachments/2012-08/googlemars-msl-1.jpg" />
+<br />
+<br />
+<img width="600" height="450" title="Google Mars for MSL"
+withgrayborder="True" src=
+"../attachments/2012-08/googlemars-msl-2.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-10T10_45_45.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-10T18_51_54.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-09T10_40_44.txt" name=
+"e2012-08-09T10_40_44.txt"></a>
+<h2 class="date">08.09.2012 10:40</h2>
+<div class="blogbody">
+<h3 class="title">Gale Crater - Mars Science Laboratory /
+Curiosity</h3>
+<div class="item-description">Google Earth has a Mars mode that can
+help you see the shape of the crater. If you make a profile, you
+can right click on the profile and see the topography. This was a
+question at the press conference today by the Irish reporter.<br />
+<br />
+<img width="600" height="375" title=
+"Google Mars profile of Gale Crater" withgrayborder="True" src=
+"../attachments/2012-08/gale-crater-profile-in-google-earth.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-09T10_40_44.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-10T10_45_45.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-07T08_56_22.txt" name=
+"e2012-08-07T08_56_22.txt"></a>
+<h2 class="date">08.07.2012 08:56</h2>
+<div class="blogbody">
+<h3 class="title">MSL/Curiosity in Google Mars</h3>
+<div class="item-description">At the press conference yesterday at
+4PM PDT, Mike Malin announced the landing location. He used the
+decent imagery from MRDI to pick out features as the spacecraft
+came in for a landing. I didn't write down the numbers, but Emily
+Lakdawalla has a very detailed blog post on the Planetary Society's
+web site: <a href=
+"http://www.planetary.org/blogs/emily-lakdawalla/2012/08061740-curiosity-press-briefing-notes.html">
+Curiosity: Notes from the two day-after-landing press briefings</a>
+<pre>
+4.5895 S, 137.4417 E
+</pre>
+Check it out on Google Mars! Thanks to the team that is updating
+that visualization that you can see from the inside of Google
+Earth.<br />
+<br />
+An entertain note: Sitting pretty close to me right now is the PI,
+John Grotzinger. He and another scientist are having a great
+geology discussion.<br />
+<br />
+<img width="" height="" title="MSL in Google Mars/Earth"
+withgrayborder="True" src=
+"../attachments/2012-08/google-mars-msl.png" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-07T08_56_22.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-09T10_40_44.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-05T23_00_09.txt" name=
+"e2012-08-05T23_00_09.txt"></a>
+<h2 class="date">08.05.2012 23:00</h2>
+<div class="blogbody">
+<h3 class="title">on mars</h3>
+<div class="item-description">on mars<br />
+<br />
+<img width="256" height="256" title="one of the first images"
+withgrayborder="True" src=
+"../attachments/2012-08/mars.jpg" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-05T23_00_09.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-07T08_56_22.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-05T21_30_34.txt" name=
+"e2012-08-05T21_30_34.txt"></a>
+<h2 class="date">08.05.2012 21:30</h2>
+<div class="blogbody">
+<h3 class="title">About to land on Mars</h3>
+<div class="item-description">I am in the weird mode on this
+mission where I can actually write a quick blog post. On prior
+missions, I was so swamped that I didn't know up from down. It
+looks like today will be a 20 hour day for me. Most of my time will
+be in an area known as the DIAL (digital imaging and analysis lab).
+This is an area with a lot of behind the scenes folks who do image
+handling, visualization and zillion small pieces.<br />
+<br />
+I got a short break and got to talk to Monica. I got to say a quick
+hi to Wil Wheaton who is getting swamped by people and walked past
+Seth Greene. I saw the ISS pass over for the first time. Dang, that
+is bright.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-05T21_30_34.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-05T23_00_09.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-05T07_51_00.txt" name=
+"e2012-08-05T07_51_00.txt"></a>
+<h2 class="date">08.05.2012 07:51</h2>
+<div class="blogbody">
+<h3 class="title">Cartoon style explanation of landing</h3>
+<div class="item-description">I am highly entertained by this
+version of MSL EDL explained.<br />
+<br />
+<iframe width="853" height="480" src=
+"http://www.youtube.com/embed/pyaXie9ZCos" frameborder="0"
+allowfullscreen=""></iframe></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-05T07_51_00.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-05T21_30_34.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-04T16_29_05.txt" name=
+"e2012-08-04T16_29_05.txt"></a>
+<h2 class="date">08.04.2012 16:29</h2>
+<div class="blogbody">
+<h3 class="title">At JPL</h3>
+<div class="item-description">MSL lands tomorrow. This morning, I
+took a walk around to get familar with where I will be working
+before it is full of busy people. I also ended up hanging out in
+the back of a press conference waiting to hand off some material...
+so I had Droid make an impromptu appearance.<br />
+<br />
+TODO: write some captions for these image!<br />
+<br />
+<img width="600" height="279" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug03-1-nasasocial-in-dial.jpg" />
+<br />
+<br />
+<img width="600" height="273" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-1-flight-controllers.jpg" />
+<br />
+<br />
+<img width="600" height="323" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-2-mission-control.jpg" />
+<br />
+<br />
+<img width="600" height="407" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-3-time-till-landing.jpg" />
+<br />
+<br />
+<img width="600" height="326" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-4-science-ops.jpg" />
+<br />
+<br />
+<img width="600" height="286" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-5-testbed.jpg" />
+<br />
+<br />
+<img width="600" height="308" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-6-monica-nasasocial.jpg" />
+<br />
+<br />
+<img width="600" height="450" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-7-kurt-behind-press-conf.jpg" />
+<br />
+<br />
+<img width="600" height="432" title="" withgrayborder="True" src=
+"../attachments/2012-08/msl-aug04-8-droid-visits-press-conf.jpg" />
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-04T16_29_05.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-05T07_51_00.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-03T07_40_13.txt" name=
+"e2012-08-03T07_40_13.txt"></a>
+<h2 class="date">08.03.2012 07:40</h2>
+<div class="blogbody">
+<h3 class="title">Monica's day for NASA Social</h3>
+<div class="item-description">Today is my 2nd day working on MSL
+and Monica's 1st for the MSL NASA Social Team. Her schedule is a
+lot crazy!
+<pre>
+Friday, Aug. 3/Landing Minus 2: Registration and NASA Social Day 1
+8 a.m. to 8:30 a.m. &acirc;&Auml;&igrave;Registration at the JPL Von Karman Auditorium;
+connect to WiFi, meet fellow participants, hands-on demonstrations 
+8:30 a.m. - Welcome by Jason Townsend (@NASA) and John Yembrick (@NASA)
+8:35 a.m. - Introductions
+9:15 a.m. - Break
+9:30 a.m. - Televised #NASASocial program starts on NASA TV and http://www.ustream.tv/nasajpl with welcome by Veronica McGregor (@NASAJPL)
+9:30 a.m. - Charles Elachi, director, NASA&acirc;&Auml;&ocirc;s Jet Propulsion Laboratory
+9:40 a.m. - Dave Lavery, NASA Program Executive, NASA Headquarters
+9:50 a.m. - Clara Ma, student who named Curiosity
+10 a.m. - Curiosity Science Panel and Q&amp;A
+10:35 a.m. - Curiosity Engineering Panel and Q&amp;A
+11:35 a.m. - Lunch Break and Group Photo
+12:30 p.m. - Meet with NASA Deputy Administrator Lori Garver
+1 p.m. - Tour of NASA&acirc;&Auml;&ocirc;s Jet Propulsion Laboratory, including Mission
+Control, Earth Science Center, Mars Yard and Digital Image Animation
+Laboratory 
+5:00 p.m. - Return to von Karman Auditorium for departure
+</pre>
+I've got my "Operations Team" credentials yesterday and this
+morning I have an appointment to get my JPL "hard badge"... the one
+with the chip in it, so I can get through the doors that have card
+readers. Without that, it would be hard for me to help the team.
+The buzz around JPL is fantastic!</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-03T07_40_13.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-04T16_29_05.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-03T07_37_17.txt" name=
+"e2012-08-03T07_37_17.txt"></a>
+<h2 class="date">08.03.2012 07:37</h2>
+<div class="blogbody">
+<h3 class="title">Apple's mobile time machine</h3>
+<div class="item-description">mtmfs on Mac OSX 10.7 is really
+seriously annoying. It just ate about 15% of the battery life of my
+Macbook Air while I tried to figure out why the CPU was going crazy
+and the fan was cranking. Can I make this darn too not run while on
+battery?
+<pre>
+MTMFS(8)                  BSD System Manager's Manual                 MTMFS(8)
+<!-- -->
+NAME
+     mtmfs -- Mobile Time Machine file system daemon
+<!-- -->
+DESCRIPTION
+     mtmfs is the Mobile Time Machine file system daemon. It provides facili-
+     ties that allow the system to view local snapshots created by mtmd.
+<!-- -->
+     There are no configurations to mtmfs, and users should not run mtmfs man-
+     ually.
+<!-- -->
+SEE ALSO
+     mtmd(8), tmutil(8)
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-03T07_37_17.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-03T07_40_13.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-01T13_10_51.txt" name=
+"e2012-08-01T13_10_51.txt"></a>
+<h2 class="date">08.01.2012 13:10</h2>
+<div class="blogbody">
+<h3 class="title">vdatum update</h3>
+<div class="item-description">Just got this through the NOAA grape
+vine:
+<pre>
+VDatum website: <a href=
+"http://vdatum.noaa.gov">http://vdatum.noaa.gov</a>
+<!-- -->
+GEOID 2012 and VDatum 2.3.5 are released!
+<!-- -->
+VDatum 2.3.5 is released with following changes:
+    - Added GEOID12
+    - Fixed bug that set horizontal datum as NAD83(1986) in v2.3.4
+</pre>
+And a look towards the future: "I hope this would be the last
+update for VDatum version 2."<br />
+<br />
+Nice! I reported that 2nd bug last week.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-01T13_10_51.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-03T07_37_17.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-01T07_56_00.txt" name=
+"e2012-08-01T07_56_00.txt"></a>
+<h2 class="date">08.01.2012 07:56</h2>
+<div class="blogbody">
+<h3 class="title">Arctic ERMA NOAA announcement</h3>
+<div class="item-description">I definitely like seeing ERMA take
+off on its own! It's great to see this joint announcement with NOAA
+and BSEE (Bureau of Safety and Environmental Enforcement).<br />
+<br />
+<a href=
+"http://www.noaanews.noaa.gov/stories2012/arcticerma_finalfinal.pdf">
+http://www.noaanews.noaa.gov/stories2012/arcticerma_finalfinal.pdf</a>
+<pre>
+<b>Federal mapping tool that aided first responders in Gulf spill
+expanded to Arctic</b>
+<!-- -->
+A new federal interactive online mapping tool used by emergency
+responders during the Deepwater Horizon oil spill has been expanded to
+include the Arctic, and will help address numerous challenges in the
+Arctic posed by increasing ship traffic and proposed energy
+development.
+<!-- -->
+NOAA and the Department of the Interior's Bureau of Safety and
+Environmental Enforcement (BSEE), called the Environmental Response
+Management Application, known as ERMA, an important step forward for
+the Arctic region.
+<!-- -->
+"The addition of Arctic ERMA will be a tremendous benefit to
+responders in this rapidly developing region," said Jane Lubchenco,
+under secretary of commerce for oceans and atmosphere and NOAA
+administrator. "This scientific tool could provide essential
+information in responding to potential oil spills and pollution
+releases in the Arctic."
+<!-- -->
+"We are committed to a comprehensive, science-based approach to energy
+policy in the Arctic," said Deputy Secretary of the Interior David
+J. Hayes. "This initiative is part of the Administration's commitment
+to continuing the expansion of safe and responsible production of our
+domestic resources and is an exciting step forward in our efforts to
+collect, synthesize and deliver relevant information to
+decision-makers."
+<!-- -->
+"I know first-hand how critical it is for emergency responders to have
+the common operating picture ERMA provides," said BSEE director James
+A. Watson. "With the potential for oil and natural gas development, as
+well as increased shipping activity offshore Alaska, it is essential
+that responders have access to real-time information that provides
+full situational awareness. That's why I'm so pleased that BSEE was
+able to partner with NOAA to help complete this invaluable
+application."
+...
+The Alaska Ocean Observing System, the University of Alaska Fairbanks,
+and the University of New Hampshire, as well as Alaska's Arctic
+boroughs, are working with NOAA's Office of Response and Restoration
+to keep this database current. Data includes the traditional and local
+knowledge of cultural and subsistence resources. They also include
+observations of the extent and concentration of sea ice, locations of
+ports and pipelines, and vulnerable environmental
+resources. Information in Arctic ERMA is pulled from many innovative
+and current sources, including data provided through a recent
+Memorandum of Agreement with Shell, Conoco-Phillips and Statoil USA
+that calls for the sharing of physical and biological data in the
+Arctic, as well as information gained during the August 2012
+hydrographic survey cruise by the NOAA Ship Fairweather.
+...
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-01T07_56_00.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-01T13_10_51.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2012-08-01T07_43_30.txt" name=
+"e2012-08-01T07_43_30.txt"></a>
+<h2 class="date">08.01.2012 07:43</h2>
+<div class="blogbody">
+<h3 class="title">NASA software release award</h3>
+<div class="item-description">Yesterday, I just got a small check
+in the mail from the US Treasury for work I did more than a decade
+ago. While I'm not named on the official documents, NASA noticed my
+contributions to the K9 Rover Control software. Why did it take so
+long for me to get the award? Mostly that delay comes from me not
+wanting to give my SSN to someone who emails or calls me claiming
+to be from the government. I dropped by Ames and filled out the
+forms. Rich Washington, if you are reading this, they are still
+looking for you to give you your award. No, this is not like "The
+Island."<br />
+<br />
+<a href=
+"http://ntrs.nasa.gov/search.jsp?R=20100014161">Architecture for
+Control of the K9 Rover - Report/Patent Number: ARC-14587-1, March
+2006</a>
+<pre>
+Software featuring a multilevel architecture is used to control the
+hardware on the K9 Rover, which is a mobile robot used in research on
+robots for scientific exploration and autonomous operation in
+general. The software consists of five types of modules: Device
+Drivers - These modules, at the lowest level of the architecture,
+directly control motors, cameras, data buses, and other hardware
+devices. Resource Managers - Each of these modules controls several
+device drivers. Resource managers can be commanded by either a remote
+operator or the pilot or conditional-executive modules described
+below. Behaviors and Data Processors - These modules perform
+computations for such functions as planning paths, avoiding obstacles,
+visual tracking, and stereoscopy. These modules can be commanded only
+by the pilot. Pilot - The pilot receives a possibly complex command
+from the remote operator or the conditional executive, then decomposes
+the command into (1) more-specific commands to the resource managers
+and (2) requests for information from the behaviors and data
+processors. Conditional Executive - This highest-level module
+interprets a command plan sent by the remote operator, determines
+whether resources required for execution of the plan are available,
+monitors execution, and, if necessary, selects an alternate branch of
+the plan.
+</pre>
+<img width="484" height="402" title="k9 award form" withgrayborder=
+"True" src=
+"../attachments/2012-08/k9-control-architecture.png" /></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2012-08.html#e2012-08-01T07_43_30.txt">Permalink</a> 
+<!-- <br /><a href="archives/2012-08-01T07_56_00.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">August 2012</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-01T13_10_51.txt">1</a></span></td>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-03T07_40_13.txt">3</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-04T16_29_05.txt">4</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-05T23_00_09.txt">5</a></span></td>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-07T08_56_22.txt">7</a></span></td>
+<td align="center"><span class="calendar">8</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-09T10_40_44.txt">9</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-10T19_04_45.txt">10</a></span></td>
+<td align="center"><span class="calendar">11</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-12T03_16_59.txt">12</a></span></td>
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar">17</span></td>
+<td align="center"><span class="calendar">18</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">19</span></td>
+<td align="center"><span class="calendar">20</span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-23T15_44_38.txt">23</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-24T14_47_31.txt">24</a></span></td>
+<td align="center"><span class="calendar">25</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-27T11_32_31.txt">27</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-28T15_22_10.txt">28</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-29T21_46_02.txt">29</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2012-08.html#e2012-08-30T23_34_59.txt">30</a></span></td>
+<td align="center"><span class="calendar">31</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

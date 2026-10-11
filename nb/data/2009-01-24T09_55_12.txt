@@ -1,0 +1,108 @@
+TITLE: The (un)joy of SEG-Y
+AUTHOR: Kurt
+DATE: 01.24.2009 09:55
+DESC: help
+-----
+BODY:
+SEG-Y is a really common format, but it is almost the UN-format.  It
+really seems to only be a hint.  Everybody seems to write it slightly
+differently.  I hit this in the past and even wrote a paper on it:
+
+[<a href="http://vislab-ccom.unh.edu/~schwehr/papers/schwehr2008-pythonpapers-seismic-py.pdf">PDF</a>] Schwehr, seismic-py: Reading seismic data with Python., The Python Papers, 3:2, 8 pages, Sep 4, 2008.
+
+I'm in the process of rewriting segy-py/seismic-py and calling it
+simplesegy.  This new library is only meant to handle the low level
+parsing with minimal logic and preferably no support for things like
+header math.  BTW, I think header math is a bad thing... use a
+separate database to prevent polution of the original segy.
+
+One feature I do want to get right is being able to return the
+location/position of traces/shots.  With the Driscoll <a href="http://www.edgetech.com/">EdgeTech</a> Chirp
+system, I had it right.  Just divide the raw values by 3600.0 and I
+had the position...
+<pre>    def position_geographic(self):
+        return self.hdr['X'] / 3600., self.hdr['Y']/ 3600.</pre>
+This gives:
+<pre>Position Raw: (-422142, 118406)
+Position:     (-117.26166666666667, 32.890555555555558)</pre>
+For this current rewrite, the goal is to be able to do templated 
+metadata generation of UN Law of the Sea <a href="http://www.knudsenengineering.com/">Knudsen</a> chirp data.
+When I try the same thing, I get:
+<pre>Position Raw: (513074681, 52682969)
+Position?     (142520.74472222221, 14634.158055555556)</pre>
+I know that 142&deg;E,14&deg;N is the right neck of the woods, but
+the format does not contain any info about how the position is
+represented.  Neither the EdgeTech or Knudsen has anything that 
+says how I am supposed to interpret the coordinates... neither has
+an <i>Extended Textual Stanza</i> (See Rev 1 Appendix D).  To be
+fair, the Knudsen reports it is SEG-Y Rev 0, but still.
+
+From the <a href="http://www.knudsenengineering.com/files/manuals/320BUserManual.pdf">Knudsen 320BR chirp manual</a>: 
+<pre><b>7.3.4.6 SEG-Y Extended Data Fields</b>
+The original SEG-Y specification does not account for many useful data
+fields. If the user selects the option to include the extended data
+fields, numerous operation controls are recorded in the unassigned
+bytes at the end of the Rev0 Trace header. Some SEG-Y readers do not
+recognize files that contain data in these bytes so it is advisable to
+verify the requirements for the desired reader application before
+selecting this option.</pre>
+There doesn't seem to be any documentation out there, but I've at least
+got other software around that can decode the positions that I can look at - mbystem:
+<pre>% <b>mbsegylist -Ifoo.sgy | head -3</b>
+2007/11/29/13/24/20.002000      0.000    142.520747       14.634158       4806       1       0       0  2.666   0.000060         22222  1.333320
+2007/11/29/13/24/24.002000      4.000    142.520836       14.634398       4807       1       0       0  2.666   0.000060         22222  1.333320
+2007/11/29/13/24/28.002000      4.000    142.520942       14.634687       4808       1       0       0  2.666   0.000060         22222  1.333320</pre>
+Looking at the EdgeTech, mbsegylist can't read it:
+<pre>% <b>mbsegylist -Ilj101.sgy | head -3</b>
+2002/11/13/21/48/05.003000      0.000     -0.000000        0.000000      49573       1       0       0  0.017   0.000040          1988  0.079520
+2002/11/13/21/48/05.003000      0.000     -0.000000        0.000000      49574       1       0       0  0.017   0.000040          1988  0.079520
+2002/11/13/21/48/05.003000      0.000     -0.000000        0.000000      49575       1       0       0  0.017   0.000040          1988  0.079520</pre>
+This causes me to have horrible code like this to detect the two
+cases.  It is pretty safe, but if I end up with a seismic line that
+passes really close to (0,0) I will have a problem.  And I'm likely
+leaving out lots of other ways that people are encoding X and Y.
+<pre><tt>    <b><font color="#0000FF">def</font></b> <b><font color="#000000">position_geographic</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+<i><font color="#9A1900">        '''@bug: this will fail near 0,0'''</font></i>
+        h <font color="#990000">=</font> self<font color="#990000">.</font>hdr
+        x <font color="#990000">=</font> h<font color="#990000">[</font><font color="#FF0000">'X'</font><font color="#990000">]</font> <font color="#990000">/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+        y <font color="#990000">=</font> h<font color="#990000">[</font><font color="#FF0000">'Y'</font><font color="#990000">]/</font> <font color="#993399">3600</font><font color="#990000">.</font>
+        <b><font color="#0000FF">if</font></b> <b><font color="#000000">abs</font></b><font color="#990000">(</font>x<font color="#990000">)</font> <font color="#990000">&gt;</font> <font color="#993399">180</font> <b><font color="#0000FF">or</font></b> <b><font color="#000000">abs</font></b><font color="#990000">(</font>y<font color="#990000">)&gt;</font><font color="#993399">90</font><font color="#990000">:</font>
+            x <font color="#990000">/=</font> <font color="#993399">1000</font><font color="#990000">.</font>
+            y <font color="#990000">/=</font> <font color="#993399">1000</font><font color="#990000">.</font>
+        <b><font color="#0000FF">return</font></b>  x<font color="#990000">,</font>y</tt></pre>
+My favorite part of all this is the Knudsen SEG-Y Text Header.  This is not helpful!  Yes
+the fields are there, but it would help if they were filled in more than just the 
+instrument type in <i>C 4</i>!
+<pre>C 1 CLIENT                        COMPANY                       CREW NO
+C 2 LINE            AREA                        MAP ID
+C 3 REEL NO           DAY-START OF REEL     YEAR      OBSERVER
+C 4 INSTRUMENT: <b>MFG KEL</b>        MODEL <b>320B/R</b>     SERIAL NO <b>030505</b>
+C 5 DATA TRACES/RECORD        AUXILIARY TRACES/RECORD         CDP FOLD
+C 6 SAMPLE INTERVAL         SAMPLES/TRACE       BITS/IN      BYTES/SAMPLE
+C 7 RECORDING FORMAT        FORMAT THIS REEL        MEASUREMENT SYSTEM
+C 8 SAMPLE CODE: FLOATING PT     FIXED PT X   FIXED PT-GAIN     CORRELATED
+C 9 GAIN  TYPE: FIXED     BINARY     FLOATING POINT     OTHER
+C10 FILTERS: ALIAS     HZ  NOTCH     HZ  BAND     -     HZ  SLOPE    -    DB/OCT
+C11 SOURCE: TYPE            NUMBER/POINT        POINT INTERVAL
+C12     PATTERN:                           LENGTH        WIDTH
+C13 SWEEP: START     HZ  END.    HZ  LENGTH      MS  CHANNEL NO     TYPE
+C14 TAPER: START LENGTH       MS  END LENGTH       MS  TYPE
+C15 SPREAD: OFFSET        MAX DISTANCE        GROUP INTERVAL
+C16 GEOPHONES: PER GROUP     SPACING     FREQUENCY     MFG          MODEL
+C17     PATTERN:                           LENGTH        WIDTH
+C18 TRACES SORTED BY: RECORD     CDP     OTHER
+C19 AMPLITUDE RECOVERY: NONE      SPHERICAL DIV       AGC    OTHER
+C20 MAP PROJECTION                      ZONE ID       COORDINATE UNITS
+C21 PROCESSING:
+C22 PROCESSING:
+...</pre>
+At this point, I'm also able to print out a trace:
+
+<img title="Single trace shown in gnuplot" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/knudsen-320br-trace.png"/>
+
+I've also got a screenshot from <a href="http://www.chesapeaketech.com/">SonarWeb</a> to help me sort things out:
+
+<img title="SonarWeb image of SEG-Y line" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-01/knudsen-320br-line-sonarweb.jpg"/>
+
+Code should be online in a couple days.
+-----

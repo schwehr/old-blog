@@ -1,0 +1,105 @@
+TITLE: Rough cut of KML popup for BAGs
+AUTHOR: Kurt
+DATE: 12.09.2009 16:01
+DESC: the process and all its warts
+-----
+BODY:
+This is really ugly, but it gets the idea across.  The KML and HTML
+are far from pretty.  The code is train of throught and undocumented.
+It's still missing a lot of features including links, percent of the
+grid that has data, who created the bag (e.g. which NOAA contractor),
+and the bag cell size and count.  The links will likely include: the
+orignal BAG and related descriptive report (DR) on the NGDC server,
+the gdalinfo dump, and the complete xml document.
+
+<img title="Rough and ugly 1st draft" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-12/google-earth-bag-popup-preview.png"/>
+
+Here is the KML template file as it stands right now (using the Python 2.6 format style):
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;kml</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"http://earth.google.com/kml/2.1"</font><b><font color="#0000FF">&gt;</font></b>
+<b><font color="#0000FF">&lt;Document&gt;</font></b>
+	<b><font color="#0000FF">&lt;name&gt;</font></b>{bag}<b><font color="#0000FF">&lt;/name&gt;</font></b>
+	<b><font color="#0000FF">&lt;Placemark&gt;</font></b>
+		<b><font color="#0000FF">&lt;name&gt;</font></b>{bag}<b><font color="#0000FF">&lt;/name&gt;</font></b>
+		<b><font color="#0000FF">&lt;description&gt;</font></b>
+&lt;![CDATA[
+  <b><font color="#0000FF">&lt;img</font></b> <font color="#009900">src</font><font color="#990000">=</font><font color="#FF0000">"{thumb}"</font><b><font color="#0000FF">/&gt;</font></b> <b><font color="#0000FF">&lt;img</font></b> <font color="#009900">width</font><font color="#990000">=</font><font color="#FF0000">"200"</font> <font color="#009900">src</font><font color="#990000">=</font><font color="#FF0000">"{histogram}"</font><b><font color="#0000FF">/&gt;</font></b> <i><font color="#9A1900">&lt;!-- link to a full image --&gt;</font></i> 
+  <b><font color="#0000FF">&lt;p&gt;&lt;b&gt;</font></b>Summary for BAG: {bag}<b><font color="#0000FF">&lt;/b&gt;&lt;/p&gt;</font></b>
+  <b><font color="#0000FF">&lt;table</font></b> <font color="#009900">border</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;tr&gt;</font></b> <b><font color="#0000FF">&lt;td&gt;</font></b>Resolution<b><font color="#0000FF">&lt;/td&gt;</font></b>  <b><font color="#0000FF">&lt;td&gt;</font></b>{dx_m} x {dy_m} (m)<b><font color="#0000FF">&lt;/td&gt;&lt;/tr&gt;</font></b>
+    <b><font color="#0000FF">&lt;tr&gt;</font></b> <b><font color="#0000FF">&lt;td&gt;</font></b>Lower left<b><font color="#0000FF">&lt;/td&gt;</font></b>  <b><font color="#0000FF">&lt;td&gt;</font></b>{x0} {y0}<b><font color="#0000FF">&lt;/td&gt;</font></b>          <b><font color="#0000FF">&lt;/tr&gt;</font></b>
+    <b><font color="#0000FF">&lt;tr&gt;</font></b> <b><font color="#0000FF">&lt;td&gt;</font></b>Upper right<b><font color="#0000FF">&lt;/td&gt;</font></b> <b><font color="#0000FF">&lt;td&gt;</font></b>{x1} {y1}<b><font color="#0000FF">&lt;/td&gt;</font></b>          <b><font color="#0000FF">&lt;/tr&gt;</font></b>
+  <b><font color="#0000FF">&lt;/table&gt;</font></b>
+]]&gt;
+<b><font color="#0000FF">&lt;/description&gt;</font></b>
+<b><font color="#0000FF">&lt;Point&gt;</font></b>
+  <b><font color="#0000FF">&lt;coordinates&gt;</font></b>{x0},{y0}<b><font color="#0000FF">&lt;/coordinates&gt;</font></b>
+<b><font color="#0000FF">&lt;/Point&gt;</font></b>
+<b><font color="#0000FF">&lt;/Placemark&gt;</font></b>
+<b><font color="#0000FF">&lt;/Document&gt;</font></b>
+<b><font color="#0000FF">&lt;/kml&gt;</font></b></tt></pre>
+I am not going to explain details of the python that fills in the template,
+but it basically reads the geotiff that I make in geographic and pulls out a 
+bunch of information.  I use matplotlib to make graph of the depth levels
+and then I pass the template dictionary (td) to the format command to 
+get the kml file.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> osgeo<font color="#990000">.</font>gdal
+<b><font color="#000080">import</font></b> osgeo<font color="#990000">.</font>gdalconst
+<b><font color="#000080">import</font></b> numpy as np
+<!-- -->
+patch_name <font color="#990000">=</font> <font color="#FF0000">'H11657_1of5_1m_Final_Depth'</font>
+td <font color="#990000">=</font> <font color="#990000">{}</font> <i><font color="#9A1900"># template_dict for rendering the kml</font></i>
+td<font color="#990000">[</font><font color="#FF0000">'patch'</font><font color="#990000">]</font> <font color="#990000">=</font> patch_name
+td<font color="#990000">[</font><font color="#FF0000">'bag'</font><font color="#990000">]</font> <font color="#990000">=</font> patch_name <font color="#990000">+</font> <font color="#FF0000">'.bag'</font>
+td<font color="#990000">[</font><font color="#FF0000">'thumb'</font><font color="#990000">]</font> <font color="#990000">=</font> patch_name <font color="#990000">+</font> <font color="#FF0000">'-thumb.jpg'</font>
+<!-- -->
+osgeo<font color="#990000">.</font>gdal<font color="#990000">.</font><b><font color="#000000">AllRegister</font></b><font color="#990000">()</font>
+patch <font color="#990000">=</font> osgeo<font color="#990000">.</font>gdal<font color="#990000">.</font><b><font color="#000000">Open</font></b><font color="#990000">(</font>patch_name <font color="#990000">+</font> <font color="#FF0000">'.tif'</font><font color="#990000">)</font>
+w<font color="#990000">,</font>h <font color="#990000">=</font> patch<font color="#990000">.</font>RasterXSize<font color="#990000">,</font>patch<font color="#990000">.</font>RasterYSize
+td<font color="#990000">[</font><font color="#FF0000">'w'</font><font color="#990000">]</font> <font color="#990000">=</font> w
+td<font color="#990000">[</font><font color="#FF0000">'h'</font><font color="#990000">]</font> <font color="#990000">=</font> h
+gt <font color="#990000">=</font>  patch<font color="#990000">.</font><b><font color="#000000">GetGeoTransform</font></b><font color="#990000">()</font>
+gt_dict <font color="#990000">=</font> <font color="#990000">{</font><font color="#FF0000">'ul_x'</font><font color="#990000">:</font>gt<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font> <font color="#FF0000">'x_res'</font><font color="#990000">:</font>gt<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],</font> <font color="#FF0000">'ul_y'</font><font color="#990000">:</font>gt<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">],</font> <font color="#FF0000">'y_res'</font><font color="#990000">:</font>gt<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">]}</font>
+<!-- -->
+dx <font color="#990000">=</font> gt<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]</font>
+x0 <font color="#990000">=</font> gt<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font>
+x1 <font color="#990000">=</font> x0 <font color="#990000">+</font> w <font color="#990000">*</font> dx
+<!-- -->
+dy <font color="#990000">=</font> gt<font color="#990000">[</font><font color="#993399">5</font><font color="#990000">]</font>
+y1 <font color="#990000">=</font> gt<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">]</font>
+y0 <font color="#990000">=</font> y1 <font color="#990000">+</font> h <font color="#990000">*</font> dy <i><font color="#9A1900"># dy should be negative</font></i>
+<!-- -->
+td<font color="#990000">[</font><font color="#FF0000">'x0'</font><font color="#990000">]</font> <font color="#990000">=</font> <font color="#FF0000">'%02.3f'</font> <font color="#990000">%</font> x0
+td<font color="#990000">[</font><font color="#FF0000">'x1'</font><font color="#990000">]</font> <font color="#990000">=</font> <font color="#FF0000">'%02.3f'</font> <font color="#990000">%</font> x1
+<!-- -->
+td<font color="#990000">[</font><font color="#FF0000">'y0'</font><font color="#990000">]</font> <font color="#990000">=</font> <font color="#FF0000">'%02.3f'</font> <font color="#990000">%</font> y0
+td<font color="#990000">[</font><font color="#FF0000">'y1'</font><font color="#990000">]</font> <font color="#990000">=</font> <font color="#FF0000">'%02.3f'</font> <font color="#990000">%</font> y1
+<!-- -->
+band <font color="#990000">=</font> patch<font color="#990000">.</font><b><font color="#000000">GetRasterBand</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font>
+bandmin<font color="#990000">,</font>bandmax <font color="#990000">=</font> band<font color="#990000">.</font><b><font color="#000000">ComputeRasterMinMax</font></b><font color="#990000">()</font>
+hist <font color="#990000">=</font> band<font color="#990000">.</font><b><font color="#000000">GetDefaultHistogram</font></b><font color="#990000">()</font>
+<!-- -->
+td<font color="#990000">[</font><font color="#FF0000">'histogram'</font><font color="#990000">]</font> <font color="#990000">=</font> patch_name <font color="#990000">+</font> <font color="#FF0000">'-hist.png'</font>
+<!-- -->
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>mlab as mlab
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>pyplot as plt
+<!-- -->
+hist_vals <font color="#990000">=</font> hist<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">][:-</font><font color="#993399">1</font><font color="#990000">]</font>  <i><font color="#9A1900"># ignore the no data values of 0</font></i>
+<b><font color="#0000FF">while</font></b> hist_vals<font color="#990000">[-</font><font color="#993399">1</font><font color="#990000">]</font> <font color="#990000">==</font> <font color="#993399">0</font><font color="#990000">:</font> <i><font color="#9A1900"># Skip the tail that is all 0 counts</font></i>
+    hist_vals<font color="#990000">.</font><b><font color="#000000">pop</font></b><font color="#990000">()</font>
+<!-- -->
+xticks <font color="#990000">=</font> <font color="#990000">[</font><font color="#FF0000">'%02.1f'</font> <font color="#990000">%</font> depth <b><font color="#0000FF">for</font></b> depth <b><font color="#0000FF">in</font></b>  np<font color="#990000">.</font><b><font color="#000000">arange</font></b><font color="#990000">(</font>hist<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">],</font>hist<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">],(</font>hist<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">]-</font>hist<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])/</font><font color="#993399">5</font><font color="#990000">)]</font>
+xticks<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font><font color="#FF0000">'%.1f'</font> <font color="#990000">%</font> hist<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">])</font>
+plt<font color="#990000">.</font><b><font color="#000000">xticks</font></b><font color="#990000">([</font>val <font color="#990000">*</font> <b><font color="#000000">len</font></b><font color="#990000">(</font>hist_vals<font color="#990000">)/</font><font color="#993399">5</font> <b><font color="#0000FF">for</font></b> val <b><font color="#0000FF">in</font></b> <b><font color="#000000">range</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>xticks<font color="#990000">))],</font>xticks<font color="#990000">)</font> <i><font color="#9A1900"># Yuck!</font></i>
+plt<font color="#990000">.</font><b><font color="#000000">fill</font></b><font color="#990000">(</font><b><font color="#000000">range</font></b><font color="#990000">(</font><b><font color="#000000">len</font></b><font color="#990000">(</font>hist_vals<font color="#990000">)),</font>hist_vals<font color="#990000">)</font>
+plt<font color="#990000">.</font><b><font color="#000000">grid</font></b><font color="#990000">(</font>True<font color="#990000">)</font>
+plt<font color="#990000">.</font><b><font color="#000000">savefig</font></b><font color="#990000">(</font>patch_name<font color="#990000">+</font><font color="#FF0000">'-hist.png'</font><font color="#990000">,</font>dpi<font color="#990000">=</font><font color="#993399">50</font><font color="#990000">)</font>
+<!-- -->
+template <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">"template.kml"</font><font color="#990000">).</font><b><font color="#000000">read</font></b><font color="#990000">()</font>
+out <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font>patch_name<font color="#990000">+</font><font color="#FF0000">'.kml'</font><font color="#990000">,</font><font color="#FF0000">'w'</font><font color="#990000">)</font>
+out<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font> template<font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font>td<font color="#990000">)</font> <font color="#990000">)</font>
+</tt></pre>
+Not pretty, but it's enough to kick things off.
+-----

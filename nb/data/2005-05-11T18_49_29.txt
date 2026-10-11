@@ -1,0 +1,52 @@
+TITLE: Wireless woe
+AUTHOR: Kurt
+DATE: 05.11.2005 18:49
+DESC: sql self join
+-----
+BODY:
+So I can't seem to get a reliable wireless connection to the
+basestation about 15 feet away.  I think there are just too many base
+stations all trying to use the same freqeuencies.  Is there a decent
+tool for Mac OSX that will tell me the real scoup on what it sees?
+
+I am looking right now at how to do a funky self join in SQL.  We will
+see if I can figure it out.... after about 15 minutes, here is what I
+have.  I am guessing that there probably is a much better (read more
+efficient) way to rewrite this.  First the table schema:
+
+<pre>
+  .schema mag
+  CREATE TABLE mag ( samplename VARCHAR(40), treatment REAL, csd REAL,
+  intensity REAL, dec REAL, inc REAL, timeMeasured TIMESTAMP,  type
+  VARCHAR(10), operator VARCHAR(20),  depth REAL,  cruise VARCHAR(20),
+  corenum INTEGER, coretype VARCHAR(1), corehalf VARCHAR(1) ,  section
+  INTEGER, sectionoffset REAL);
+</pre>
+I want arm from the table and irm from the table for the same
+samplename.  But I want the arm to always be from the same treatment
+of 100.  This makes a table alias ARM and a table alias IRM table
+which I bring together:
+<pre>
+  SELECT arm.samplename,arm.intensity,irm.intensity
+   FROM mag arm 
+   INNER JOIN mag irm 
+   ON arm.samplename=irm.samplename 
+   WHERE arm.type='arm'
+    AND irm.type='irm' 
+    AND arm.treatment=100
+    AND arm.corenum=5 
+   ORDER BY arm.depth;
+</pre>
+Which gives results like this with the middle column being ARM 100 and the
+right column being IRM.
+<pre>
+  ...
+  bp04-5gw-s2-126|0.0000317600|0.0014030000
+  bp04-5gw-s2-129|0.0000277200|0.0011360000
+  bp04-5gw-s2-132|0.0000372000|0.0014940000
+  bp04-5gw-s2-135|0.0000351100|0.0013400000
+  bp04-5gw-s2-138|0.0000301600|0.0011740000
+  bp04-5gw-s2-141|0.0000346500|0.0014260000
+  bp04-5gw-s2-144|0.0000361300|0.0014160000
+</pre>
+-----

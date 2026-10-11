@@ -1,0 +1,51 @@
+TITLE: network uptime derived from data logging
+AUTHOR: Kurt
+DATE: 04.09.2009 07:08
+DESC: evaluating the system
+-----
+BODY:
+I just tried out the idea of using my N-AIS feed to check network
+uptime and it worked much better than I though it would.  For each
+day, I counted the unique seconds in the data timestamps and divided
+by the number of seconds in a day.  This is not the best way to
+measure the uptime, but it is interesting.  The main causes of outages are:
+<ol>
+  <li>Power outages to our building (we are on the wrong site of the train tracks)</li>
+  <li>Loss of network connectivity at CCOM or UNH</li>
+  <li>Loss of the network between Groton, CT and UNH</li>
+  <li>Three hangs of my Mac desktop that is logging before I upgraded to 10.5</li>
+  <li>One outage of 1 hour as I upgraded to mac osx 10.5</li>
+</ol>
+The last item comes from the fact that I am only allowed to have one
+specific machine subscribing to N-AIS, so any computer maintanence
+requires data loss.  I have no information for the USCG network
+performance, so I can't comment on the impact of any outages there.
+We sometimes get big storms here and it has taken as much as a day and
+a half to get out power back.  This graph starts at 01-Jan-2008 and
+goes through 04-Apr-2009.
+
+<img title="data received - fraction of a day " withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-04/nais-ccom-uptime.png"/>
+
+Overall uptime for the entire datalogging system as seen by CCOM:
+<pre>seconds = [int(d.split()[1]) for d in file('sec-per-day.dat')]
+len(seconds)
+<i>Out: 458  # Days</i>
+sum(seconds) / (len(seconds)*24*60*60.)
+<i>Out: 0.97799285844250361</i></pre>
+The overall system was not working for 10 days worth of time during those 458 days.
+
+Note that this is not a good way to judge any one component of the system.
+The timestamps are being added regionally by the uscg and I have no
+way of separating out the failure modes from just the timestamped NMEA strings.
+
+Contrast that with one of our field data loggers running Ubuntu 7.10.
+<pre>% <b>uptime</b>
+ 06:58:57 up 408 days, 17:31,  1 user,  load average: 0.00, 0.07, 0.23</pre>
+The field machine is at Adams Point in Jackson lab and has a small UPS
+that has made it through all the local power hickups.  Plus the machine
+logs locally with periodic dumps back to ccom.  Too bad the sensors
+attached to it are not as reliable.
+
+NOTE: I found that my script didn't notice entire days with no data.
+For 2008-06-{13,14}, there was nothing, so my % uptime is over estimated.
+-----

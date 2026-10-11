@@ -1,0 +1,46 @@
+TITLE: Python inheritance
+AUTHOR: Kurt
+DATE: 06.24.2009 12:40
+DESC: and it works
+-----
+BODY:
+I'm building some python code where the parent needs some information
+from the child classes to serialize an AIS Binary Message.  I gave
+it a try and somehow thought that python couldn't do this.  I resorted
+to setting an attribute in the child, which is ugly.  I posted to the
+python mailing list and quickly got an answer!
+
+Thanks to <a href="http://groups.google.com/group/comp.lang.python/browse_thread/thread/626f4f444ac68bfb">Jean-Michel for setting me straight</a> on this.  I must have
+done something dumb in my trying to do this.  He wrote a great
+example.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#0000FF">class</font></b> Parent<font color="#990000">:</font>
+   <b><font color="#0000FF">def</font></b> <b><font color="#000000">foo</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+      <b><font color="#0000FF">raise</font></b> <b><font color="#000000">NotImplementedError</font></b><font color="#990000">()</font> <i><font color="#9A1900"># virtual method, it has to be overridden by any children</font></i>
+<!-- -->
+   <b><font color="#0000FF">def</font></b> <b><font color="#000000">bar</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+      self<font color="#990000">.</font><b><font color="#000000">foo</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">Son</font></b><font color="#990000">(</font>Parent<font color="#990000">):</font>
+   <b><font color="#0000FF">def</font></b> <b><font color="#000000">foo</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+      <b><font color="#0000FF">print</font></b> <font color="#FF0000">"I'm your son"</font>
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">Daughter</font></b><font color="#990000">(</font>Parent<font color="#990000">):</font>
+   <b><font color="#0000FF">def</font></b> <b><font color="#000000">foo</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+      <b><font color="#0000FF">print</font></b> <font color="#FF0000">"I'm your daughter"</font>
+<!-- -->
+<b><font color="#000000">Son</font></b><font color="#990000">().</font><b><font color="#000000">bar</font></b><font color="#990000">()</font>
+<i><font color="#9A1900">"I'm your son" </font></i>
+<!-- -->
+d <font color="#990000">=</font> <b><font color="#000000">Daughter</font></b><font color="#990000">()</font>
+d<font color="#990000">.</font><b><font color="#000000">bar</font></b><font color="#990000">()</font></tt></pre>
+Running it:
+<pre>% <b>./foo.py</b>
+I'm your son
+I'm your daughter</pre>
+I definitely like the concept of adding the NotImplmentedError to give
+the same concept as a pure virtual in C++.
+
+As yes, it does work as I originally thought it should!
+-----

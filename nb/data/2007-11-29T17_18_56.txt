@@ -1,0 +1,49 @@
+TITLE: Fun with timestamps in PostgreSQL
+AUTHOR: Kurt
+DATE: 11.29.2007 17:18
+DESC: how to write effecient queries
+-----
+BODY:
+I found that this is a pretty nice query, but super slow.  The idea of
+this query is to count the number of vessels in an area for each day
+of the year (doy; see also <a href="http://www.sql.org/sql-database/postgresql/manual/functions-datetime.html">functions-datetime</a>[sql.org])
+<pre>
+select distinct(userid) from position where 2 = EXTRACT(doy FROM cg_timestamp);
+  userid   
+===========
+ 303388000
+ 316012950
+ 366897920
+ 367075760
+ 477930000
+(5 rows)
+</pre>
+I thought maybe my index on the cg_timestamp didn't cross over to my new
+laptop, but no, it is still there:
+<pre>
+\d position
+...
+Indexes:
+    "position_pkey" PRIMARY KEY, btree ("key")
+    "cg_timestamp_idx" btree (cg_timestamp)
+    "userid_idx" btree (userid)
+</pre>
+
+Doing just 5 days takes just over 17 seconds. with my small dataset of
+4.14 million records.  Not good.  Now doing the same thing with date
+ranges is much faster.  The following queries take only 0.27s.
+<pre>
+SELECT count(distinct(userid)) FROM position WHERE cg_timestamp &gt;= '2006-01-01 00:00:00' AND cg_timestamp &lt;= '2006-01-01 23:59:59';
+SELECT count(distinct(userid)) FROM position WHERE cg_timestamp &gt;= '2006-01-02 00:00:00' AND cg_timestamp &lt;= '2006-01-02 23:59:59';
+SELECT count(distinct(userid)) FROM position WHERE cg_timestamp &gt;= '2006-01-03 00:00:00' AND cg_timestamp &lt;= '2006-01-03 23:59:59';
+SELECT count(distinct(userid)) FROM position WHERE cg_timestamp &gt;= '2006-01-04 00:00:00' AND cg_timestamp &lt;= '2006-01-04 23:59:59';
+SELECT count(distinct(userid)) FROM position WHERE cg_timestamp &gt;= '2006-01-05 00:00:00' AND cg_timestamp &lt;= '2006-01-05 23:59:59';
+</pre>
+Another little fun SQL command:
+<pre>
+SELECT now();
+              now              
+==============================
+ 2007-11-29 17:31:13.825532-05
+</pre>
+-----

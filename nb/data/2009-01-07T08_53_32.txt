@@ -1,0 +1,56 @@
+TITLE: fink info testing - sqlalchemy
+AUTHOR: Kurt
+DATE: 01.07.2009 08:53
+DESC: testing good
+-----
+BODY:
+<a href="http://www.sqlalchemy.org/">SQLAlchemy</a> is my first
+released fink info package to providing testing.  I wanted to make
+sure that it worked with Python 2.6.  When I upgraded the package to 
+version 0.5.0, I added these lines to the info file:
+
+<b>Updated 18-Jan:</b> Must force the pythonpath to pick up the source
+area incase an older version of the package is still installed.
+See also:
+
+<a href="http://www.sqlalchemy.org/trac/ticket/1283">http://www.sqlalchemy.org/trac/ticket/1283</a>
+
+<pre>InfoTest: &lt;&lt;
+  #TestConflicts: sqlalchemy-py%type_pkg[python]  # Not needed with PYTHONPATH
+  TestScript: &lt;&lt;
+    #!/bin/bash -ev
+    export PYTHONPATH=$PWD/lib
+    pushd test 
+      %p/bin/python%type_raw[python] alltests.py || exit 2
+    popd
+  &lt;&lt;
+&lt;&lt;</pre>
+Now you can run the test like this:
+<pre>% <b>fink --test rebuild sqlalchemy-py26</b></pre>
+When you run that command you will see this appear deep in the middle
+of the output:
+<pre>...
+SQLAlchemy-0.5.0/test/zblog/blog.py
+SQLAlchemy-0.5.0/test/zblog/mappers.py
+SQLAlchemy-0.5.0/test/zblog/tables.py
+SQLAlchemy-0.5.0/test/zblog/tests.py
+SQLAlchemy-0.5.0/test/zblog/user.py
+echo Skipping build
+Skipping build
+cd test && /sw/bin/python2.6 alltests.py || exit 2
+test_fixture (profiling.memusage.MemUsageTest) ... ok
+test_mapper_reset (profiling.memusage.MemUsageTest) ... ok
+test_mutable_identity (profiling.memusage.MemUsageTest) ... ok
+test_session (profiling.memusage.MemUsageTest) ... ok
+test_with_inheritance (profiling.memusage.MemUsageTest) ... ok
+test_with_manytomany (profiling.memusage.MemUsageTest) ... ok
+test_insert (profiling.compiler.CompileTest) ... ok
+...</pre>
+The alternative command that I will be using to checkout new versions in the
+future is this:
+<pre>% <b>fink --maintainer rebuild sqlalchemy-py26</b></pre>
+This should validate the resulting debian in addition to running the tests.
+Testing will hopefully help reduce the load from package updating.  If there
+are good tests in place, we won't have to try by hand to see if a package
+is okay.
+-----

@@ -1,0 +1,39 @@
+TITLE: sci-oppix
+AUTHOR: Kurt
+DATE: 03.06.2005 13:04
+DESC: pie in the sky
+-----
+BODY:
+I have been thinking about the best way to handle the paleomag code
+for the whole community.  The big problem is that many people in our
+community insist in using MS-Windows.  Windows has piddly squat for
+package management.  It is not a nice thing to tell someone that they
+need to install cygwin and make sure to get X11 and Fortran.  Then
+they need to also get python and sqlite correctly installed.  Once
+that is done, they need to install all the pmag software.  If they are
+doing stuff like I do, they also need coin, soqt/sowin, SimVoleon,
+gmt, and mbsystem.  Ouch.  That can be rough on an experienced person
+if the Windows box is not in perfect condition.  Plus uninstalling
+software on ms-windows always leaves behind some moose-poop in the
+registry.
+
+Is there an easy answer?  Well here is an answer that is easy on the
+end user but hard on us maintainers.  We need to create a derivative
+of <a href="http://knoppix.net/">knoppix</a> call sci-oppix or
+pmagoppix.  The idea is that we build some custom debian packages for
+all the all these new items.  Then we can remove some of the large
+packages from knoppix that we use and insert ours.  These end users
+just put the bootable sci-oppix cd in their windows computer and
+reboot.  It comes up with a GUI that takes them through importing,
+processing, and submitting to MagIC all of their mag data.  It can
+read/write data from the NTFS partitions, USB drives, or other
+attached firewire drives.  Then, when they are done, they reboot to
+Windows.  Some users might not even realize that they are running
+Linux or have a clue what Linux, GNU, or Debian are.  Now I just need
+a whole pile of free time devoted to this :)
+
+While we are at it, we could build versions for x86, sparc, and
+ppc/mac of these bootable CDs.  Even mac users could just use the CD.
+This is a way to guarantee that the required software and libraries
+are present and working.
+-----

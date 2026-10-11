@@ -1,0 +1,45 @@
+TITLE: libsegy
+AUTHOR: Kurt
+DATE: 01.30.2005 12:14
+DESC: From the "that would be cool department"
+-----
+BODY:
+Another thing that I have been wanting to write for the last 2 years
+is a low-level segy library.  Something that is simple enough that most
+c++ programmers could open up a segy file and start working with it.
+Having to know field numbers is truly insane and not productive.  I
+was thinking that it needed to have a system for people to define how
+each segy type really is.  This would, for example, with the SIO xstar
+data say how fields really are mapped.  There really does not seem to
+be a segy standard in practice.  In sioseis, people are always
+remapping fields between each other.  These config files could also
+have an entry like the Unix magic/file database for detecting data
+formats by providing finger prints.  There would be a truly standard
+compliant spec file provided with the library plus format files for
+each vendor device that writes out funky stuff.  This would allow
+extraction of fields from the unstructured text block in the initial
+header.  Basic operation should be simple.  I should be able to verify
+the segy file and find out what type it is.  Get a bounding box and
+shot range.  Be able to dumb to ASCII a particular shot, etc.  Then
+whatever applications could be layered on top.  Jeff D. could write
+his Matlab trace viewer easily.  We could make a python version of
+the basic features in sioseis with just a couple of days.  The list
+goes on.
+
+The trigger for writing this entry was thinking about how I could use
+<b>libsegy</b> to import all the header info into an SQL database.
+Then we could start making interpretation programs.  It would not be
+too hard to start building tools that helped you define a layer by
+picking from processed images.  I had talked to Jeff Dingler about
+using g3data to pick time/shot pairs.  We could then drop this back
+into a database.  Then build a mesh surface between lines for this
+picked layer.
+
+The basic idea is that when we have a rock solid and flexible
+read/write open source library (LGPL?) people could build whatever
+suited them quickly.
+
+Random slashdot link: <a
+href="http://www.unixwiz.net/techtips/be-consultant.html">Hints to new
+consultants</a>
+-----

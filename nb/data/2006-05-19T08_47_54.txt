@@ -1,0 +1,33 @@
+TITLE: c++ stringstream
+AUTHOR: Kurt
+DATE: 05.19.2006 08:47
+DESC: building large strings
+-----
+BODY:
+Roland showed me a nice way to create large strings (e.g. an html
+page) in C++ without getting into the hell that can be C style
+strings.  Here is a minimal example:
+<pre>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;sstream&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;iostream&gt;</font></strong></font>
+<strong>using</strong> <strong>namespace</strong> <font color="#2040a0">std</font><font color="4444FF">;</font>
+<font color="#444444">//</font>
+<strong>int</strong> <font color="#2040a0">main</font><font color="4444FF">(</font><strong>void</strong><font color="4444FF">)</font> <font color="4444FF"><strong>{</strong></font>
+  <font color="#2040a0">stringstream</font> <font color="#2040a0">s</font><font color="4444FF">;</font>
+  <font color="#2040a0">s</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;foo&quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font><font color="#2040a0">endl</font><font color="4444FF">;</font>
+  <font color="#2040a0">s</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#008000">&quot;bar&quot;</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#FF0000">2</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">endl</font><font color="4444FF">;</font>
+  <font color="#2040a0">cout</font> <font color="4444FF">&lt;</font><font color="4444FF">&lt;</font> <font color="#2040a0">s</font>.<font color="#2040a0">str</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="4444FF">;</font>
+  <strong>return</strong> <font color="#FF0000">0</font><font color="4444FF">;</font>
+<font color="4444FF"><strong>}</strong></font>
+</pre>
+Then building and running the demo:
+<pre>
+$ cd && make ss CPPFLAGS="-g -Wall"
+g++  -g -Wall   ss.C   -o ss
+$ ./ss
+foo
+bar2
+</pre>
+Note that s.str() returns a string object and to get a C string (const
+char *), use s.str().c_str().
+-----

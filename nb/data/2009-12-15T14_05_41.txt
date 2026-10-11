@@ -1,0 +1,41 @@
+TITLE: Rounding in BAG metadata
+AUTHOR: Kurt
+DATE: 12.15.2009 14:05
+DESC: rounding leads to a bounding line
+-----
+BODY:
+Here is an excellent example of how rounding can be a bad thing when
+representing numeric data in text form.  I have been creating bounding
+boxes of surveys, but some of these surveys cover very small areas.
+Here is an except from a gdalinfo (svn of pre 1.7.0) that shows the
+bag's extent in UTM.
+<pre><b>gdalinfo H11301_50cm_23.bag</b>
+Driver: BAG/Bathymetry Attributed Grid
+Files: H11301_50cm_23.bag
+Size is 2464, 1526
+...
+Origin = (427363.890000000013970,4078823.169999999925494)
+Pixel Size = (0.500000000000000,-0.500000000000000)
+...
+Corner Coordinates:
+Upper Left  (  427363.890, 4078823.170) ( 75d48'53.20"W, 36d51'9.11"N)
+Lower Left  (  427363.890, 4078060.170) ( 75d48'52.93"W, 36d50'44.35"N)
+Upper Right (  428595.890, 4078823.170) ( 75d48'3.45"W, 36d51'9.45"N)
+Lower Right (  428595.890, 4078060.170) ( 75d48'3.19"W, 36d50'44.69"N)
+Center      (  427979.890, 4078441.670) ( 75d48'28.19"W, 36d50'56.90"N)
+...
+</pre>
+And here is what I find in the metadata:
+<pre><tt><b><font color="#0000FF">&lt;smXML:EX_Extent&gt;</font></b>
+  <b><font color="#0000FF">&lt;geographicElement&gt;</font></b>
+    <b><font color="#0000FF">&lt;smXML:EX_GeographicBoundingBox&gt;</font></b>
+      <b><font color="#0000FF">&lt;westBoundLongitude&gt;</font></b>-75.81<b><font color="#0000FF">&lt;/westBoundLongitude&gt;</font></b>
+      <b><font color="#0000FF">&lt;eastBoundLongitude&gt;</font></b>-75.80<b><font color="#0000FF">&lt;/eastBoundLongitude&gt;</font></b>
+      <b><font color="#0000FF">&lt;southBoundLatitude&gt;</font></b>36.85<b><font color="#0000FF">&lt;/southBoundLatitude&gt;</font></b>
+      <b><font color="#0000FF">&lt;northBoundLatitude&gt;</font></b>36.85<b><font color="#0000FF">&lt;/northBoundLatitude&gt;</font></b>
+    <b><font color="#0000FF">&lt;/smXML:EX_GeographicBoundingBox&gt;</font></b>
+  <b><font color="#0000FF">&lt;/geographicElement&gt;</font></b>
+<b><font color="#0000FF">&lt;/smXML:EX_Extent&gt;</font></b></tt></pre>
+Notice how the North/South extents round to the same value, so I've
+got a line for the bounding box.
+-----

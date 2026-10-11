@@ -1,0 +1,33 @@
+TITLE: python threads
+AUTHOR: Kurt
+DATE: 05.04.2006 21:49
+DESC: simple threads
+-----
+BODY:
+Today I played some with threads and sockets.  Here is a very simple
+thread program.  Here is a simple alice and bob type thread program.
+Talk about useless, but it does illustrate threads in a pretty simple
+way.  This ends up with 3 threads.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">thread</font>, <font color="#2040a0">time</font>
+<font color="#2040a0">def</font> <font color="#2040a0">a</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">i</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+    <strong>while</strong> <font color="#FF0000">1</font><font color="4444FF">:</font>
+	<font color="#2040a0">i</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+	<font color="#2040a0">time</font>.<font color="#2040a0">sleep</font><font color="4444FF">(</font>.<font color="#FF0000">5</font><font color="4444FF">)</font>
+	<strong>print</strong> <font color="#008000">'a'</font>,<font color="#2040a0">i</font>
+<font color="#2040a0">def</font> <font color="#2040a0">b</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">i</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+    <strong>while</strong> <font color="#FF0000">1</font><font color="4444FF">:</font>
+	<font color="#2040a0">i</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+	<font color="#2040a0">time</font>.<font color="#2040a0">sleep</font><font color="4444FF">(</font>.<font color="#FF0000">5</font><font color="4444FF">)</font>
+	<strong>print</strong> <font color="#008000">'b'</font>,<font color="#2040a0">i</font>
+<font color="#444444">##############################</font>
+<font color="#2040a0">thread</font>.<font color="#2040a0">start_new_thread</font><font color="4444FF">(</font><font color="#2040a0">a</font>,<font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#2040a0">thread</font>.<font color="#2040a0">start_new_thread</font><font color="4444FF">(</font><font color="#2040a0">b</font>,<font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">100</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">time</font>.<font color="#2040a0">sleep</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#2040a0">i</font>
+</pre>
+-----

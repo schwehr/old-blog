@@ -1,0 +1,54 @@
+TITLE: sqlalchemy insert
+AUTHOR: Kurt
+DATE: 03.30.2006 11:59
+DESC: fun with lookup tables
+-----
+BODY:
+So now on to inserting some data into the database with sqlalchemy.
+It does not look like a list of dictionaries is possible, but this is
+not so bad.  This example is a little complicated because I am
+translating between the ais VDM module names and what I might want to
+call things in the database.  Who wants to write out Longitude all the
+time when 'lon' is pretty well known?
+<pre>
+aiskeys = [
+    ['UserID','mmsi']
+    ,['Longitude','lon']
+    ,['Latitude','lat']
+    ,['SOG','SOG']
+    ,['ROT','ROT']
+]
+for key in aiskeys:
+    insdict[key[1]] = fields[key[0]]
+insdict['time'] = ais.nmeamessages.zdaDict2TIMESTAMP(timeDict)
+msg1table.insert().execute(insdict)
+</pre>
+The insertion dictionary looks like this:
+<pre>
+insdict = 
+  {
+  'mmsi': 353556000, 
+  'lon': -70.75833333333334, 
+  'lat': 43.079999999999998, 
+  'SOG': 0, 
+  'ROT': 0,
+  'time': '2006-03-26 13:39:21'
+  }
+</pre>
+Then I can pull data on the command line:
+<pre>
+sqlite ais.db 'select * from msg1' | tr '|' '\t'
+        353556000       -70.7583333333  43.08           0       0       2006-03-26 13:39:21
+        353556000       -70.7583166667  43.0799833333   0       0       2006-03-26 13:39:31
+        224632000       -70.7909966667  43.103435       1       128     2006-03-26 13:39:32
+        353556000       -70.7583166667  43.08           0       0       2006-03-26 13:39:42
+        353556000       -70.7583        43.08           0       0       2006-03-26 13:39:51
+        224632000       -70.7909933333  43.10343        1       128     2006-03-26 13:40:03
+        224632000       -70.7909933333  43.10343        1       128     2006-03-26 13:40:03
+        224632000       -70.7909933333  43.10343        1       128     2006-03-26 13:40:03
+        353556000       -70.7583        43.0799833333   0       0       2006-03-26 13:40:11
+...
+</pre>
+Wow, that was a little complicated for a first example, but it was so
+easy to write.
+-----

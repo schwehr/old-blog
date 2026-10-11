@@ -1,0 +1,570 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Kurt's Weblog: February 2010 Archives</title>
+
+<link rel="stylesheet" href="../styles/nb_default.css" type="text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="../atom.xml" />
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span>
+</div>
+
+<div id="content">
+
+<div class="blog">
+<div id="menu">
+	<a href="../index.html">Main</a>
+</div>
+</div>
+
+<div class="blog">
+<div class="item">
+<a id="e2010-02-22T08_51_40.txt" name="e2010-02-22T08_51_40.txt"></a>
+<h2 class="date">02.22.2010 08:51</h2>
+<div class="blogbody">
+<h3 class="title">AMQP messaging in fink</h3>
+<div class="item-description">
+I need a solid messaging framework for one of my projects.  I've used
+NDDS (now DDS), RTC (an CMU thing), <a
+href="http://pyro.sourceforge.net/">Pyro</a>, and a few others in the
+past.  I want something simple, but that buys me more than just
+managing TCP or UDP myself.  I looked at Jabber/XMPP a bit, but then 
+started reading about AMQP, which sounds attractive, especially with
+the option to allow for keeping messages through a system crash.  
+<br /><br />
+I spent some time with various implementations of AMQP with not much
+success.  I avoided RabbitMQ because it is based on Erlang which is
+not something I am used to.  I tried these two, but got frustrated
+with the code bases.  I don't have time to get them to build
+reasonably on the Mac with fink.
+<ul>
+<li><a href="http://qpid.apache.org/">qpid</a></li>
+<li><a href="http://www.openamq.org/">OpenMQ</a></li>
+</ul>
+I ended up packaging these into fink:
+<ul>
+<li><a href="http://www.rabbitmq.com/">RabbitMQ</a> - Once I realized
+that I don't need to know Erlang to use it</li>
+<li><a href="http://pypi.python.org/pypi/amqplib/">amqplib</a> - basic
+python library</li>
+<li><a href="http://pypi.python.org/pypi/carrot/">carrot</a></li>
+<li><a href="http://pypi.python.org/pypi/celery/">celery</a></li>
+</ul>
+I did some simple tests and have the basics working.  I now need to
+figure out how to use carrot and celery.
+<br /><br />
+For general background, I read <a
+href="http://blogs.digitar.com/jjww/2009/01/rabbits-and-warrens/">Rabbits
+and Warrens</a> and watched this video, but is not the best for seeing
+the figures, but it does give a kickstart.  The slides get better
+about 20 minutes in.
+<br /><br />
+<object width="640" height="505"><param name="movie" value="http://www.youtube.com/v/ZQogoEVXBSA&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/ZQogoEVXBSA&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="640" height="505"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-22T08_51_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-03-01T21_41_35.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-18T09_54_14.txt" name="e2010-02-18T09_54_14.txt"></a>
+<h2 class="date">02.18.2010 09:54</h2>
+<div class="blogbody">
+<h3 class="title">Automatically updating charts in ECDIS</h3>
+<div class="item-description">
+Internet chart updates are a critical capability, but
+I have two concerns with internet chart updates.  The first is that
+all of the bridge crew needs to be aware that the charts have been
+updated.  There does not appear to be a good way to tell what has
+changed between chart updates and if the updates happen without some
+of the bridge crew being aware, they may get a surprise at an
+inopportune moment.  The second concert is with ECDIS systems running
+on MS Windows - internet updating should be an issue with respect to
+viruses, but the track record of the Windows community is that this
+should be a concern.  I still can't believe that large ships run with
+windows as the OS for life critical operations.  I've run linux boxes
+for as long as 2 years without a need for a reboot or update for as
+much as 2 years... right on a bare internet connection with no viruses
+or troubles with hackers.
+<br /><br />
+From Digital Ship, Mar 2010, "Out of date charts lead to accidents":
+<pre>...
+IMO's push for e-Navigation and the introduction of a mandatory
+carriage requirement for ECDIS (electronic chart display and
+information system) from 2012 could help to reduce the possibility of
+vessels sailing with charts that do not represent the most accurate
+and up-to- date representation of their navigational environment.
+<!-- -->
+The transmission of digital chart data, whether by satellite or using
+other broad- cast systems, is quite obviously the fastest way of
+getting the latest corrections on to a vessel bridge. 
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-18T09_54_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-22T08_51_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-17T16_21_06.txt" name="e2010-02-17T16_21_06.txt"></a>
+<h2 class="date">02.17.2010 16:21</h2>
+<div class="blogbody">
+<h3 class="title">ais-areanotice-py 0.2</h3>
+<div class="item-description">
+I've been working on improving the <a href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/">ais-areanotice-py</a> reference
+implementation of the NAV55 proposed AIS Binary Message for Area
+Notices.  Version 0.1 was seriously buggy.  Thanks to Brad for being
+the first to submit bug reports.  He pointed out all sorts of
+unpleasant things.  I bit the bullet and started <a
+href="http://en.wikipedia.org/wiki/Eating_one%27s_own_dog_food">dog
+fooding</a> what I produce.  I've implemented decoders for everything
+but the polylines and polygons that span more than one sub-area.  There
+are lots of changes and at this point, I think this is the beginnings
+of a reasonable test data set.  Please try this!  I really need testing and feedback.
+<br /><br />
+Software is available under <a href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/downloads/">downloads</a> and the test data under <a href="http://vislab-ccom.unh.edu/~schwehr/software/ais-areanotice-py/samples/">samples</a>.
+<br /><br />
+<img title="Updated KML with merged FreeText" withgrayborder="True" src="../attachments/2010-02/ais-areanotice-try2.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-17T16_21_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-18T09_54_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-16T17_41_54.txt" name="e2010-02-16T17_41_54.txt"></a>
+<h2 class="date">02.16.2010 17:41</h2>
+<div class="blogbody">
+<h3 class="title">NAIS data release RFC</h3>
+<div class="item-description">
+I submitted my comments for the USCG RFC about NAIS data release.  I
+hope many other people did to.  It's important to engage the
+government in these types of discussions.  So far, I know one other
+person who has submitted comments:
+<br /><br />
+ESR: <a href="http://esr.ibiblio.org/?p=1616">Comment to USCG on NAIS policy</a>
+<br /><br />
+Let me know if there are others.  I've put mine up in a place that has
+comments.  Feel free to agree, disagree, etc.  This topic is really
+worthy of a whole series of papers, but this is all I can muster right
+now.
+<br /><br />
+<a href="http://schwehr.blogspot.com/2010/02/uscg-request-for-comment-on-nais-data.html">USCG Request For Comment on NAIS data release</a>
+<br /><br />
+The summary:
+<pre>My overall opinion is that the only increased risk from releasing raw
+AIS data comes from the economic impact to those who are trying to
+sell AIS feeds. Outside of the 3 or 4 groups doing Satellite based
+AIS, I don't think these companies should get protection. There is
+already stiff competition, e.g. AIS Hub will give you AIS data for
+free if you contribute back at least a little bit of data. AIS
+receivers start from about $190. The real value comes from
+interpretation - analysis and display of these feeds. More access to
+AIS data means to me that we will get more people involved in analysis
+and it will speed the uptake of AIS binary messages. As for security,
+if the USCG needs to keep this data restricted as sensitive, then it
+should not have been broadcast in the clear to start with. Hiding
+addressed messages is strange when anyone with a receiver and gpsd can
+see most of these addressed messages anyway.</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-16T17_41_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-17T16_21_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-16T08_07_18.txt" name="e2010-02-16T08_07_18.txt"></a>
+<h2 class="date">02.16.2010 08:07</h2>
+<div class="blogbody">
+<h3 class="title">Open Street Map (OSM) Haiti edits</h3>
+<div class="item-description">
+This shows the power of an open system doing what it is supposed to do
+in the event of an emergency.  Hats off to all who contributed.
+<br /><br />
+<object width="400" height="225"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=9182869&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=1&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=9182869&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=1&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="400" height="225"></embed></object><p><a href="http://vimeo.com/9182869">OpenStreetMap - Project Haiti</a> from <a href="http://vimeo.com/itoworld">ItoWorld</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-16T08_07_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-16T17_41_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-11T09_04_30.txt" name="e2010-02-11T09_04_30.txt"></a>
+<h2 class="date">02.11.2010 09:04</h2>
+<div class="blogbody">
+<h3 class="title">Portsmouth, NH pilots</h3>
+<div class="item-description">
+<a
+href="http://www.fosters.com/apps/pbcs.dll/article?AID=/20100211/GJNEWS_01/702119739/">Pilots
+of the Piscataqua: Special skills needed to steer ships through
+complicated waterway</a> ]Fosters]
+<pre>...
+"You have this massive volume of water that wants to go in and come
+back out and the only way to do that is through the main part of the
+river," Johnson said. "There's some pretty wild forces out there. For
+moving ships here we do everything we can to try and utilize the tide
+and the current to our advantage.
+...
+The narrowness of the river mixed with its shallow depth and winding
+nature have forced pilots to develop what he calls a "matrix" for
+moving ships in and out of the river. He credits his predecessors for
+developing the system, but acknowledges that when you're at the mercy
+of Mother Nature, the rules change daily.
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-11T09_04_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-16T08_07_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-10T11_09_34.txt" name="e2010-02-10T11_09_34.txt"></a>
+<h2 class="date">02.10.2010 11:09</h2>
+<div class="blogbody">
+<h3 class="title">Danny Brothers speaking at CCOM this Friday</h3>
+<div class="item-description">
+Danny and I were grad students together in the Driscoll Chirp Lab at
+SIO.
+<br /><br />
+<pre>CCOM/JHC SEMINAR SERIES
+FRIDAY, February 12, 2010
+3:00 pm
+Chase Ocean Engineering Lab, Rm 130
+<!-- -->
+Danny Brothers
+Mendenhall Postdoc Fellow, US Geological Survey, Woods Hole, MA
+<!-- -->
+Marine Paleoseismology and Paleoclimate: Insights from Lake Tahoe and
+Salton Sea, California
+<!-- -->
+Ongoing studies in the Lake Tahoe Basin (LTB) and Salton Sea are aimed
+at understanding earthquake history across submerged and active
+faults. In the LTB, a suite of marine geophysical data (sub-bottom
+CHIRP, sidescan sonar and multibeam bathymetry) and piston cores were
+used to define the timing and magnitude of the most recent earthquake
+on the West Tahoe Fault. However, surveys revealed an ancillary, but
+fascinating, discovery. A group of submerged, upright trees were
+discovered and radiocarbon dated to ~1250 AD. Dendrochronology of wood
+samples and water balance calculations suggest the LTB experienced
+severe, multicentennial drought during medieval times. Similar methods
+were applied in the Salton Sea, California, where the San Andreas
+Fault (SAF) terminates and transfers strain across a series of short,
+extensional faults to the Imperial Fault. The southernmost SAF has not
+ruptured in over 300 years and is considered ‘overdue’ for a
+large-magnitude earthquake. To understand the hazards in the region,
+we collected >1,000 line-km of seismic CHIRP profiles in the Salton
+Sea to define the sedimentary and earthquake history along the
+submerged faults. Our observations suggest faults in the Salton Sea
+can potentially generate M6-6.6 earthquakes every 150 years or so,
+which could act as stress modulators on the southern San Andreas
+Fault. Furthermore, based on the relationship between Holocene
+flooding surfaces and fault displacements, it appears that some
+ruptures are synchronous with Colorado River floods into the
+basin. Flooding increases both the vertical load and pore pressure on
+faults making them more inclined to fail.
+<!-- -->
+All are welcome to attend.
+<!-- -->
+Center for Coastal and Ocean Mapping
+24 Colovos Road
+Durham, New Hampshire 03824 
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-10T11_09_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-11T09_04_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-08T06_47_02.txt" name="e2010-02-08T06_47_02.txt"></a>
+<h2 class="date">02.08.2010 06:47</h2>
+<div class="blogbody">
+<h3 class="title">A simple Django command line program (django "admin" command)</h3>
+<div class="item-description">
+I want to be able to run some Django code from a cron job to update a
+database.  I looked at <a
+href="http://code.google.com/p/django-cron/">Django Cron</a>, but then
+thought about the admin commands and realized that was a better route
+to my goal.  Here is the basic route that I tool:
+<pre>django-admin.py startproject projname
+cd projname
+python manage.py startapp myapp
+# Edit settings.py to add myapp to the INSTALLED_APPS
+cd myapp
+mkdir -p management/commands
+touch management/__init__.py
+touch management/commands/__init__.py
+cd management/commands/
+</pre>
+Now create your command:
+<pre><tt><b><font color="#000080">import</font></b> django<font color="#990000">.</font>core<font color="#990000">.</font>management<font color="#990000">.</font>base as base
+<!-- -->
+<b><font color="#0000FF">class</font></b> <b><font color="#000000">Command</font></b><font color="#990000">(</font>base<font color="#990000">.</font>NoArgsCommand<font color="#990000">):</font>
+  help <font color="#990000">=</font> <font color="#FF0000">'Describe the Command Here'</font>
+  <b><font color="#0000FF">def</font></b> <b><font color="#000000">handle_noargs</font></b><font color="#990000">(</font>self<font color="#990000">,</font> <font color="#990000">**</font>options<font color="#990000">):</font>
+      <b><font color="#0000FF">print</font></b> <font color="#FF0000">'hello world'</font>
+      <b><font color="#0000FF">print</font></b> options</tt></pre>
+Now give it a try:
+<pre>cd ../../.. # back to the project directory
+python manage.py help
+<!-- -->
+Type 'manage.py help <subcommand>' for help on a specific subcommand.
+<!-- -->
+Available subcommands:
+  cleanup
+  compilemessages
+  ...
+  flush
+  <i>hello_world</i>
+  inspectdb
+  loaddata
+  ...
+python manage.py hello_world
+  hello world
+  {'pythonpath': None, 'verbosity': '1', 'traceback': None, 'settings': None}</pre>
+That's it.  Now I have a command (that doesn't really do anything yet)
+that I can put in my crontab.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-08T06_47_02.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-10T11_09_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-05T16_36_44.txt" name="e2010-02-05T16_36_44.txt"></a>
+<h2 class="date">02.05.2010 16:36</h2>
+<div class="blogbody">
+<h3 class="title">Deep ROV and AUV vehicles</h3>
+<div class="item-description">
+We just had <a href="http://www.divediscover.whoi.edu/expedition2/interviews/dana.html">Dana Yoerger</a> from WHOI give seminar about ABE, SENTRY, and NEREUS exploring the deep.  He mentioned a video of deep underwater volconism that sounded pretty exciting, so I went hunting and found this: an eruption at 4000 feet (1200 m).
+<br /><br />
+<object width="560" height="340"><param name="movie" value="http://www.youtube.com/v/x5j4nAVZAJw&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/x5j4nAVZAJw&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="560" height="340"></embed></object>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-05T16_36_44.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-08T06_47_02.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-03T21_51_14.txt" name="e2010-02-03T21_51_14.txt"></a>
+<h2 class="date">02.03.2010 21:51</h2>
+<div class="blogbody">
+<h3 class="title">UNH Stategic Plan</h3>
+<div class="item-description">
+CCOM has several images that were used in the strategic plan
+presentation this week by the President of UNH.  
+<br /><br />
+In this first image, the student is pointing at GeoZui4D image of EK60
+and DeltaT sonars with whales visible in the mid-water multibeam data
+created by Roland.  On the left is an image also from GeoZui, but it
+is hard to make out.
+<br /><br />
+<img title="CCOM in the UNH Strategic Plan" withgrayborder="True" src="../attachments/2010-02/unh-strategicplan-2020-1.png"/>
+<br /><br />
+In this next image, the student is touching with his left hand (on our
+right) a risk analysis of grounding for a ship entering the
+Portsmouth, NH harbor done by Brian Calder.
+<br /><br />
+<img title="CCOM in the UNH Strategic Plan" withgrayborder="True" src="../attachments/2010-02/unh-strategicplan-2020-2.png"/>
+<br /><br />
+The above images are 14 minutes into the video:
+<br /><br />
+<object width="400" height="210"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=9172399&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=9172399&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="400" height="210"></embed></object><p><a href="http://vimeo.com/9172399">UNH in 2020</a> from <a href="http://vimeo.com/unhvideo">UNH Video</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-03T21_51_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-05T16_36_44.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-03T12_38_04.txt" name="e2010-02-03T12_38_04.txt"></a>
+<h2 class="date">02.03.2010 12:38</h2>
+<div class="blogbody">
+<h3 class="title">CCOM on the Google Lat Lon blog</h3>
+<div class="item-description">
+We've been working with Jamie at Google to get the data into Google
+Earth.  Jamie discovered several bugs in tools that we were using to
+get the data out.  Note that a lot of other CCOM data is already 
+in Google Earth, but comes up as "NOAA".
+<br /><br />
+<a href="http://google-latlong.blogspot.com/2010/02/wander-seafloor-like-never-before.html">Wander the seafloor like never before</a> [Google Lat Long blog]
+<pre>...
+Several organizations have provided their ship-collected data for
+publication in Google Earth to improve our undersea maps. The Center
+for Coastal and Ocean Mapping - Joint Hydrographic Center, has shared
+large swaths of underwater depth data collected from their expeditions
+north of Pt. Barrow, Alaska into the Arctic. The Living Oceans Society
+has shared their surveys off of the west coast of British Columbia,
+Canada, so you can now zoom around the Oglala seamount
+...</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-03T12_38_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-03T21_51_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2010-02-01T11_26_09.txt" name="e2010-02-01T11_26_09.txt"></a>
+<h2 class="date">02.01.2010 11:26</h2>
+<div class="blogbody">
+<h3 class="title">gdal 1.7.0 with new drivers</h3>
+<div class="item-description">
+The announcement: <a href="http://www.osgeo.org/node/1000">GDAL/OGR 1.7.0 Released</a>.  All the details turns out to be a very long list: <a href="http://trac.osgeo.org/gdal/wiki/Release/1.7.0-News">1.7.0-News</a>
+<br /><br />
+The summary of changes:
+<ul>
+<li> New Raster Drivers: BAG, EPSILON, Northwood/VerticalMapper, R, Rasterlite, SAGA GIS Binary, SRP (USRP/ASRP), EarthWatch .TIL, WKT Raster</li>
+<li>GDAL PCIDSK driver using the new PCIDSK SDK by default</li>
+<li>New Vector drivers : DXF, GeoRSS, GTM, PCIDSK and VFK</li>
+<li>New utilities: gdaldem, gdalbuildvrt now compiled by default</li>
+<li>Add support for Python 3.X. Compatibility with Python 2.X preserved</li>
+<li>Remove old-generation Python bindings.</li>
+<li>Significantly improved raster drivers: GeoRaster, GeoTIFF, HFA, JPEG2000 JasPer, JPEG2000 Kakadu, NITF</li>
+<li>Significantly improved vector drivers: CSV, KML, SQLite/SpataiLite, VRT</li>
+</ul>
+The most interesting to me are the new BAG and GeoRSS drivers along
+with the gdaldem command line program for hillshading and coloring.
+It will be interesting to see how the GeoRSS works and which of many
+flavors of GeoRSS that it outputs.  SpatiaLite is still on the todo
+queue, but does not have a very high priority.
+<br /><br />
+Fink has not been updated to this version.  Make sure that you are up
+to date on libgeos3 (current is 3.2.0).
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2010-02.html#e2010-02-01T11_26_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2010-02-03T12_38_04.html#comments">Comments</a> -->
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="links">
+
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary="Calendar with links to days with entries">
+<caption class="calendarhead">February 2010</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>            
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-01T11_26_09.txt">1</a></span></td>
+<td align="center"><span class="calendar">2</span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-03T21_51_14.txt">3</a></span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-05T16_36_44.txt">5</a></span></td>
+<td align="center"><span class="calendar">6</span></td>
+</tr>
+<tr>
+         
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-08T06_47_02.txt">8</a></span></td>
+<td align="center"><span class="calendar">9</span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-10T11_09_34.txt">10</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-11T09_04_30.txt">11</a></span></td>
+<td align="center"><span class="calendar">12</span></td>
+<td align="center"><span class="calendar">13</span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-16T17_41_54.txt">16</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-17T16_21_06.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-18T09_54_14.txt">18</a></span></td>
+<td align="center"><span class="calendar">19</span></td>
+<td align="center"><span class="calendar">20</span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar"><a href="2010-02.html#e2010-02-22T08_51_40.txt">22</a></span></td>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar">27</span></td>
+</tr>
+<tr>
+
+<td align="center"><span class="calendar">28</span></td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<br clear="all" />
+
+</body>
+</html>

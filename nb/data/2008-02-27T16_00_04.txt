@@ -1,0 +1,77 @@
+TITLE: python ctypes and finding libraries
+AUTHOR: Kurt
+DATE: 02.27.2008 16:00
+DESC: trouble
+-----
+BODY:
+See also: <a href="http://www.finkproject.org/doc/porting/shared.php?phpLang=en">Porting - 2. Shared Code</a> [finkproject.net]
+
+I just put a <a
+href="http://trac.gispython.org/projects/PCL/wiki/Shapely">Shapely</a>
+package in fink for 10.5 and python 2.5.  I had some trouble with
+allowing shapely to find the libgeos3 shared library.  Fink does not
+set the DYLD_LIBRARY_PATH, so how is a ctype python package supposed
+to find the libraries?  In shapely/geos.py, the library finding code
+looks like this:
+<pre>
+elif sys.platform == 'darwin':
+    lib = find_library('geos_c')
+    if lib is None:
+        ## try a few more locations
+        lib_paths = [
+            # The Framework build from Kyng Chaos:
+            "/Library/Frameworks/GEOS.framework/Versions/Current/GEOS",
+        ]
+        for path in lib_paths:
+            if os.path.exists(path):
+                lib = path
+                break
+            else:
+                raise ImportError, "Could not find geos_c library"
+    lgeos = CDLL(lib)
+    free = CDLL(find_library('libc')).free
+else:
+</pre>
+Here is the library that it needs to find:
+<pre>
+<b>% fink list -i libgeos</b>
+ i   libgeos2                   2.2.3-2007          Geometry Engine - Open Source
+ i   libgeos2-shlibs            2.2.3-2007          Geometry Engine - Open Source
+ i   libgeos3-shlibs            3.0.0-2             Geometry Engine - Open Source
+ i   libgeosc1-shlibs           3.0.0-2             Geometry Engine - Open Source
+<b>% dpkg -L libgeosc1-shlibs | grep 'dylib'</b>
+/sw/lib/libgeos_c.1.4.1.dylib
+<b>% file /sw/lib/libgeos_c.1.4.1.dylib</b>
+/sw/lib/libgeos_c.1.4.1.dylib: Mach-O dynamically linked shared library i386
+<b>% otool -L /sw/lib/libgeos_c.1.4.1.dylib</b>
+/sw/lib/libgeos_c.1.4.1.dylib:
+        /sw/lib/libgeos_c.1.dylib (compatibility version 6.0.0, current version 6.1.0)
+        /sw/lib/libgeos-3.0.0.dylib (compatibility version 0.0.0, current version 0.0.0)
+        /usr/lib/libstdc++.6.dylib (compatibility version 7.0.0, current version 7.4.0)
+        /usr/lib/libgcc_s.1.dylib (compatibility version 1.0.0, current version 1.0.0)
+        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 111.0.0)
+<b>% otool -hv /sw/lib/libgeos_c.1.4.1.dylib</b>
+/sw/lib/libgeos_c.1.4.1.dylib:
+Mach header
+      magic cputype cpusubtype  caps    filetype ncmds sizeofcmds      flags
+   MH_MAGIC    I386        ALL  0x00       DYLIB    13       1648   NOUNDEFS DYLDLINK TWOLEVEL WEAK_DEFINES BINDS_TO_WEAK NO_REEXPORTED_DYLIBS
+</pre>
+My temporary solution is to replace the line after Kyng Chaos:
+<pre>
+PatchScript: &lt;&lt;
+  perl -pi -e 's|/Library/Frameworks/GEOS.framework/Versions/Current/GEOS|/sw/lib/libgeos_c.1.4.1.dylib|g' shapely/geos.py
+&lt;&lt;
+</pre>
+Then running the 2 second demo:
+<pre>
+<b>% fink install shapely-py25</b>
+<b>% ipython</b>
+In [1]: <b>from shapely.geometry import Point</b>
+In [2]: <b>point = Point(-106.0, 40.0)</b>
+In [3]: <b>p = point.buffer(10.0)</b>
+In [4]: <b>print p</b>
+POLYGON ((-96.0000000000000000 40.0000000000000000, -96.0481527332780303 39.0198285967043930, -96.1921471959676921 38.0490967798387203, -96.4305966426779122 37.0971532274553795, -96.7612046748871251 36.1731656763491074, -97.1807873565164471 35.2860326317400279, -97.6853038769745439 34.4442976698039800, -98.2698954663726312 33.65606
+...
+</pre>
+It works, but there has to be a better solution.  Suggestions?
+-----

@@ -1,0 +1,83 @@
+TITLE: mbinfo for metadata?
+AUTHOR: Kurt
+DATE: 10.13.2008 09:35
+DESC: trouble with the bounding box
+-----
+BODY:
+Val suggested mbinfo for extracting metadata.  This sounds great, but
+I ran into trouble on the bounding box.
+<pre>% <b>mbinfo -I0162_20080616_161142_RVCS.all</b>
+.
+Swath Data File:      0162_20080616_161142_RVCS.all
+MBIO Data Format ID:  56
+Format name:          MBF_EM300RAW
+Informal Description: Simrad current multibeam vendor format
+Attributes:           Simrad EM120, EM300, EM1002, EM3000, 
+                      bathymetry, amplitude, and sidescan,
+                      up to 254 beams, variable pixels, ascii + binary, Simrad.
+.
+Data Totals:
+Number of Records:                       85593
+Bathymetry Data (160 beams):
+  Number of Beams:         13694880
+  Number of Good Beams:    13677149     99.87%
+  Number of Zero Beams:       17731      0.13%
+  Number of Flagged Beams:        0      0.00%
+Amplitude Data (160 beams):
+  Number of Beams:         13694880
+  Number of Good Beams:    13677149     99.87%
+  Number of Zero Beams:       17731      0.13%
+  Number of Flagged Beams:        0      0.00%
+Sidescan Data (1024 pixels):
+  Number of Pixels:        87647232
+  Number of Good Pixels:   10341519     11.80%
+  Number of Zero Pixels:   77305713     88.20%
+  Number of Flagged Pixels:       0      0.00%
+.
+Navigation Totals:
+Total Time:             0.5000 hours
+Total Track Length:  7377.5257 km
+Average Speed:      14754.9531 km/hr (7975.6503 knots)
+.
+Start of Data:
+Time:  06 16 2008 16:11:42.497000  JD168
+Lon:    0.0000     Lat:    0.0000     Depth:     7.5700 meters
+Speed:  0.0000 km/hr ( 0.0000 knots)  Heading:  70.7000 degrees
+Sonar Depth:    1.2000 m  Sonar Altitude:    5.7300 m
+.
+End of Data:
+Time:  06 16 2008 16:41:42.509000  JD168
+Lon:  -68.7601     Lat:   44.4260     Depth:    14.7700 meters
+Speed:  9.0000 km/hr ( 4.8649 knots)  Heading: 119.3900 degrees
+Sonar Depth:    1.0600 m  Sonar Altitude:   12.2500 m
+.
+Limits:
+Minimum Longitude:     -68.7785   <b>Maximum Longitude:       0.0001</b>
+<b>Minimum Latitude:       -0.0001</b>   Maximum Latitude:       44.4276
+Minimum Sonar Depth:     1.0100   Maximum Sonar Depth:     1.2400
+Minimum Altitude:        1.9800   Maximum Altitude:       14.8900
+Minimum Depth:           3.6800   Maximum Depth:          19.1600
+Minimum Amplitude:      17.0000   Maximum Amplitude:      75.0000
+Minimum Sidescan:        0.5000   Maximum Sidescan:       69.0000
+</pre>
+The max lon and min lat are off, which is very strange as the nav looks
+okay:
+<pre>% <b>mbnavlist -OXY -I0162_20080616_161142_RVCS.all > xy</b>
+% <b>minmax xy</b>
+xy: N = 18001   &lt;-68.7785/-68.7601&gt;     &lt;44.4007/44.4275&gt;</pre>
+If I use <b>mbinfo -G</b>, then it seems to do the right thing and discard
+the 0,0 points.  It appears that mbnavlist already does that.
+<pre>% <b>mbinfo -I0162_20080616_161142_RVCS.all -G</b>
+...
+Limits:
+Minimum Longitude:     -68.7785   Maximum Longitude:     -68.7599
+Minimum Latitude:       44.4006   Maximum Latitude:       44.4276
+Minimum Sonar Depth:     1.0100   Maximum Sonar Depth:     1.2400
+Minimum Altitude:        1.9800   Maximum Altitude:       14.8900
+Minimum Depth:           3.6800   Maximum Depth:          19.1600
+Minimum Amplitude:      17.0000   Maximum Amplitude:      75.0000
+Minimum Sidescan:        0.5000   Maximum Sidescan:       69.0000</pre>
+Val said this is likely due to Simrad storing navigation in separate
+packets from the pings.  You can have pings before any navigation in
+a raw file.
+-----

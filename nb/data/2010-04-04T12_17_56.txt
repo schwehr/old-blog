@@ -1,0 +1,44 @@
+TITLE: A proprietary NMEA sentence for NTP status
+AUTHOR: Kurt
+DATE: 04.04.2010 12:17
+DESC: is this good?
+-----
+BODY:
+UPDATE: Roland pointed out that proprietary messages are supposed to start with a 'P'.  I'm updating the code in noaadata to start with a P.
+
+Comments can go here: <a href="http://schwehr.blogspot.com/2010/04/nmea-ntp-status-sentence-znt.html">NMEA NTP status sentence ZNT</a> [blogspot]
+
+I have taken a first stab at a proprietary NMEA sentence to report NTP
+status.  My goal is to drop this into my data loggers that are using
+time.time() to log the time of data received.  That way, the quality
+of time information will not get separated from the actual data.  In a
+perfect world, all of my data loggers would be using GPS to be stratum
+1 time servers.  
+
+I am using <a href="http://pypi.python.org/pypi/ntplib/">ntplib</a> to
+query the NTP server.  Here is what running my reference code looks like:
+
+<pre>$NTZNT,1270397106.95,127.0.0.1,17.151.16.23,3,1270396808.14,0.000064,-20,0.118225,0.030853*49
+<!-- -->
+ZNT - NMEA Proprietary NTP status report
+<!-- -->
+            talker:    NT
+         timestamp:    1270397106.95
+              host:    127.0.0.1
+         ref_clock:    17.151.16.23
+           stratum:    3
+       last_update:    1270396808.14
+            offset:    6.4e-05
+         precision:    -20.0
+        root_delay:    0.118225
+   root_dispersion:    0.030853
+<!-- -->
+{'root_delay': 0.118225, 'timestamp': 1270397106.95, 'stratum': 3, 
+ 'precision': -20.0, 'nmea_type': 'ZNT', 'last_update': 1270396808.1400001,
+ 'ref_clock': '17.151.16.23', 'host': '127.0.0.1', 'talker': 'NT', 
+ 'root_dispersion': 0.030852999999999998, 'offset': 6.3999999999999997e-05, 
+ 'checksum': '49'}</pre>
+The code uses a regular expression to parse the sentence and has a little command line interface... "./nmea_znt.py -h" for help.
+
+<a href="http://schwehr.org/blog/attachments/2010-04/nmea_znt.py">nmea_znt.py</a>
+-----

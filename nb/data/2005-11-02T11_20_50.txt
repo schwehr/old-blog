@@ -1,0 +1,42 @@
+TITLE: Frustration with matplotlib
+AUTHOR: Kurt
+DATE: 11.02.2005 11:20
+DESC: moving to illustrator woes
+-----
+BODY:
+I though I had an awesome package in matplotlib and have been hoping
+to start decreasing my useage of gnuplot.  Gnuplot is pretty rugged,
+but is starting to feel its age.  So why am I whining?  I am currently
+working a little program to make cartoons of clay sediment fabric.
+I'd like to make a cute little figure to show what I see going on in
+my cores with overpressure.  This is similar to what Lisa Tauxe got
+Rodrigo Coppelli do in his masters thesis.  I really like what he did
+in Figure 29.  The program is coming along well and the
+figure looks great on the screen.  I decided it is time to put the
+figure in my paper.  I dumped the matplotlib figure to an svg and
+brought it up in Illustrator like this:
+<pre>
+fabricsim.py --noisy --plot-file=fabric.svg \
+    --angular-dist=range_uniform \
+     --max-angle=80 --min-angle=7 \
+     --start=10 --end=30
+
+open -a /Applications/Adobe\ Illustrator\ CS/Illustrator\ CS.app fabric.svg
+</pre>
+It looks great.  I am writing out a separate plot command for each
+line.  This has a terrible side effect.  For each plot command, it
+looks like there is a background box draw for the whole figure size.
+It is transparent, but there are something like a thousand of these
+things.  OUCH!  Guess I have to dump the lines to a gnuplot format
+file and make an SVG from there.  How do I write a whole bunch of discreet
+lines in matplotlib with one plot command?
+
+I think I am also having issues with the randomness of random.random.
+I am using /dev/random for the seed, but that is not going to improve
+the non-randomness of the normal random functions.  Suppose I could
+use one from GSL or just keep reading from /dev/random and pay a speed
+hit.
+
+<img src="http://schwehr.org/blog/attachments/2005-11/fabric-try1b.png">
+
+-----

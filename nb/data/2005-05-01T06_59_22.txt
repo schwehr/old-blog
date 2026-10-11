@@ -1,0 +1,42 @@
+TITLE: why updatedb has been filling my disk
+AUTHOR: Kurt
+DATE: 05.01.2005 06:59
+DESC: so it is not just me
+-----
+BODY:
+I have been dealing with daily find/sort issues stemming from the fink
+locate/updatedb system.  Here are some posts about this.
+
+<pre>
+&gt;&gt;&gt;&gt; When I run updatedb from findutils in fink, I get this error:
+&gt;
+&gt;&gt;&gt; Does /usr/bin/find have the same problem?
+&gt;
+&gt;&gt; It doesn't say it does.
+&gt;
+&gt; Sorry to bother everyone, but found a fix. I added fsdec to the list 
+&gt; of fstypes to prune, and it worked fine (/dev/fd/3 couldn't be 
+stat'd)
+&gt; Maybe we can still track down why it says the hard link count is 
+&gt; incorrect though; if it doesn't have that error there is a very nice 
+&gt; speed boost because it doesn't stat each file then.
+&gt;
+Hey folks,
+
+I'd like to add that this is a *critical* bug, and it occurs on 10.3, 
+too -- maybe the new findutils version introduce the problem?
+
+Today and yesterday my HD run full. The problem is that apparently, for 
+updatedb /dev/fd/3 is an alias for /. So when updatedb scans my FS, it 
+gets into an infinite recursion loop. In my case it created about 15 GB 
+of temp files (indexing the "infinitely many files" on my HD), before 
+it run out of HD space.
+
+Running out of HD space is rather dangerous, if you notice it too late 
+it can cause data loss (10.3 really tries to warn you about this, but 
+if your machine is running while you are absent, as in my case, you can 
+be too late)...
+</pre>
+
+Hula Girl hot sauces
+-----

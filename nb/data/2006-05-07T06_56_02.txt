@@ -1,0 +1,31 @@
+TITLE: Undo C++ name mangling
+AUTHOR: Kurt
+DATE: 05.07.2006 06:56
+DESC: c++filt
+-----
+BODY:
+I am getting into a large sized C++ application and am having some mac
+port issues.  As a part of this, I would like to know how to demangle
+a c++ symbol name.  The short answer:
+<pre>
+echo "__ZN9Sv_Raster7GetSizeEPKcRiS2_12SVR_FileType" | c++filt 
+
+  Sv_Raster::GetSize(char const*, int&, int&, SVR_FileType)
+</pre>
+Don't know what I am talking about?  When compiling C++ code, the
+complier generates a new name for each function that encodes the
+argument types.  This lets the compiler handle operator overloading so
+that you can have multiple functions with the same name, but different
+arguments.  For example, a sqrt function could have a faster version
+for floats compaired to doubles.
+<pre>
+	float sqrt(float);
+	double sqrt(double);
+</pre>
+The next question is probably, "How are you seeing these mangled
+names?"  That come from the compiled objects for each source file,
+which is the output from 'g++ -g -c foo.C'.  That compile command will
+generate a "foo.o".  To get the symbols, run "nm foo.o" and then read
+the man page for nm.  'T' is a symbol definition and a 'U' is where a
+symbol has been called and is "Undefined".
+-----

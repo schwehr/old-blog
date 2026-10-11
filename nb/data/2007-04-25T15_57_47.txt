@@ -1,0 +1,36 @@
+TITLE: Converting from utm to geographic with invproj
+AUTHOR: Kurt
+DATE: 04.25.2007 15:57
+DESC: better results faster
+-----
+BODY:
+I just discovered a nice option in proj.  You can set the output
+format to be nicer with -f.  The default style is not so helpful.
+<pre>
+head stellwagenUTM.dtm.xyz  | invproj +proj=utm +zone=19                     
+70d15'44.167"W  42d5'0.164"N -58.84
+70d15'43.731"W  42d5'0.169"N -58.82
+70d15'43.295"W  42d5'0.174"N -58.80
+70d15'42.859"W  42d5'0.179"N -58.80
+70d15'42.423"W  42d5'0.183"N -58.83
+70d15'41.986"W  42d5'0.188"N -58.87
+70d15'41.55"W   42d5'0.193"N -58.89
+70d15'41.114"W  42d5'0.198"N -58.88
+70d15'40.678"W  42d5'0.203"N -58.88
+70d15'40.241"W  42d5'0.207"N -58.93
+</pre>
+This is more like what I need:
+<pre>
+head stellwagenUTM.dtm.xyz  | invproj +proj=utm +zone=19 -f "%.8f"
+-70.26226874    42.08337894 -58.84
+-70.26214762    42.08338027 -58.82
+-70.26202639    42.08338160 -58.80
+-70.26190527    42.08338293 -58.80
+-70.26178403    42.08338427 -58.83
+-70.26166291    42.08338560 -58.87
+-70.26154167    42.08338693 -58.89
+-70.26142044    42.08338826 -58.88
+-70.26129932    42.08338960 -58.88
+-70.26117808    42.08339093 -58.93
+</pre>
+-----

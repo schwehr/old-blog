@@ -1,0 +1,134 @@
+TITLE: cvs2svn
+AUTHOR: Kurt
+DATE: 03.21.2006 13:20
+DESC: hope this goes well
+-----
+BODY:
+I am finally converting my CVS repository that I used throughout my
+time working on my thesis into a subversion (svn) repository.  Here is
+what I had to do.  The first step was to tar up the CVS repository on
+my server.  Names are ever evolving, so I will just put them in for
+historical kicks.
+<pre>
+ssh my.server.com
+#
+cd projects/xcore/
+ls -l Master
+total 0
+drwxr-xr-x  38 schwehr  schwehr  1292  4 Nov  2002 CVSROOT
+drwxr-xr-x   8 schwehr  schwehr   272 21 Mar 09:34 dotfiles
+drwxr-xr-x   5 schwehr  schwehr   170 12 Feb 10:58 xcore
+#
+tar cf Master.tar Master
+bzip2 -9 Master.tar
+mv Master.tar.bz ~/
+exit
+#
+cd ~/Desktop/
+mkdir ForSVN
+cd ForSVN
+scp my.server.com:Master.tar.bz2 .
+tar xf Master.tar
+#
+### Rearrange things to be happier inside of Master
+#
+ls -l Master Master/src Master/doc
+drwxr-xr-x   38 schwehr  staff        1292 Nov  4  2002 CVSROOT
+drwxr-xr-x    7 schwehr  staff         238 Mar 21 13:15 doc
+drwxr-xr-x    8 schwehr  staff         272 Mar 21 08:42 dotfiles
+drwxr-xr-x    8 schwehr  staff         272 Mar 21 13:13 src
+drwxr-xr-x    5 schwehr  staff         170 Feb 12 13:58 thesis
+#
+Master/doc:
+-r--r--r--    1 schwehr  staff      448433 Apr 12  2005 kurt-2004.txt,v
+-r--r--r--    1 schwehr  staff      273650 Feb 20 12:50 kurt-2005.txt,v
+-r--r--r--    1 schwehr  staff       53270 Mar 21 10:45 kurt-2006.txt,v
+drwxr-xr-x    8 schwehr  staff         272 Mar 21 10:44 segy-py
+-r--r--r--    1 schwehr  staff       10016 Mar 21 10:45 todo.txt,v
+#
+Master/src:
+drwxr-xr-x   51 schwehr  staff        1734 Mar 21 11:26 Terrain
+drwxr-xr-x   92 schwehr  staff        3128 Mar 21 11:26 density
+drwxr-xr-x    6 schwehr  staff         204 Mar 21 11:26 mypy
+drwxr-xr-x   27 schwehr  staff         918 Mar 21 11:26 pmag-kds-py
+drwxr-xr-x   47 schwehr  staff        1598 Mar 21 11:26 segy-py
+drwxr-xr-x    6 schwehr  staff         204 Mar 21 11:26 xsonar
+# 
+cd Master/src && mv segy-py seismic-py
+cd Master && rm -rf CVSROOT # This is why I work on a copy
+mv Master schwehr
+mkdir svnrepo
+</pre>
+Now do the conversion, but the first time I tried, it failed like
+this:
+<pre>
+$ cvs2svn -s svnrepo/schwehr schwehr
+yada yada
+===== pass 2 =====
+Checking for blocked exclusions...
+Checking for forced tags with commits...
+Checking for tag/branch mismatches...
+ERROR: The following symbols are tags in some files and branches in others.
+Use --force-tag, --force-branch and/or --exclude to resolve the symbols.
+    'start' is a tag in 351 files, a branch in 4 files and has commits in 4 files.
+</pre>
+So I then tried
+<pre>
+cvs2svn --force-tag=start -s svnrepo/schwehr schwehr
+...
+===== pass 2 =====
+Checking for blocked exclusions...
+Checking for forced tags with commits...
+ERROR: The following branches cannot be forced to be tags because they have commits:
+    'start'
+</pre>
+So I made them all branches.  I hope this does not give me trouble.
+<pre>
+cvs2svn --force-branch=start -s svnrepo/schwehr schwehr
+tic tock...
+cvs2svn Statistics:
+===============---
+Total CVS Files:              2365
+Total CVS Revisions:          8885
+Total Unique Tags:              13
+Total Unique Branches:           9
+CVS Repos Size in KB:       110389
+Total SVN Commits:            5591
+First Revision Date:    Sat Jul  6 13:05:09 2002
+Last Revision Date:     Tue Mar 21 11:27:42 2006
+===============---
+Timings:
+===============---
+pass 1:    52 seconds
+pass 2:     2 seconds
+pass 3:     0 seconds
+pass 4:     3 seconds
+pass 5:    20 seconds
+pass 6:     0 seconds
+pass 7:     0 seconds
+pass 8:   964 seconds
+total:   1043 seconds
+</pre>
+And finally, to import my stuff into the new svn tree...  first to see what dump-only does.  This file is pretty large.  My 30MB CVS repository jumped to 180MB
+<pre>
+cvs2svn --dump-only --force-branch=start --dumpfile schwehr.svndump svnrepo/schwehr
+</pre>
+So maybe build the dump the way roland did:
+<pre>
+svnadmin dump schwehr --deltas > schwehr.svndump.deltas
+</pre>
+And testing out the repository, I am doing a local checkout.
+<pre>
+cd
+mkdir test
+cd test
+svn checkout file://localhost/home/schwehr/svnrepo/schwehr
+ls -la schwehr/
+  total 12
+  drwxrwxr-x   7 schwehr schwehr 4096 Mar 21 14:55 .svn/
+  drwxrwxr-x  13 schwehr schwehr 4096 Mar 21 14:54 branches/
+  drwxrwxr-x  15 schwehr schwehr 4096 Mar 21 14:55 tags/
+  drwxrwxr-x   8 schwehr schwehr 4096 Mar 21 14:54 trunk/
+</pre>
+More later when this is spliced  into the server.
+-----

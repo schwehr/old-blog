@@ -1,0 +1,99 @@
+TITLE: Ship security NOT compromised
+AUTHOR: Kurt
+DATE: 04.30.2013 12:37
+DESC: idiots
+-----
+BODY:
+<b>Update 3 hours later</b>: I impressed by the interaction around these
+articles that have happened.  Sean has been too kind in mentioning
+some of the material I pointed him to in the article.  Rapid 7 folks
+have been working to clarify what they meant by their writing.
+
+Thanks to Brendan Kenny, I just saw this:
+Sean Gallagher at ars technica wrote <a
+href="http://arstechnica.com/security/2013/04/good-morning-captain-open-ip-ports-let-anyone-track-ships-on-internet/">Good
+Morning, Captain: open IP ports let anyone track ships on Internet In
+12hrs, researchers log more than 2GB of data on ships due to Automatic
+ID Systems</a>.
+
+This article is so totally wrong with it's conclusions.  The issues are
+open ports that could possibly be DOS'ed (denial of serviced) or
+exploited/pwned.  AIS is a broadcast technology meant for public
+consumption.
+
+Note: emphasis added.
+<pre>For many of the ships, the vessel's name was included in the
+broadcast data pulled from the receivers. For others, the
+identification numbers broadcast by their beacons are easily found on
+the Internet. By sifting through the data, the researchers were able
+to plot the location of individual ships. "Considering that a lot of
+military, law enforcement, cargoes, and passenger ships do broadcast
+their positions, <b>we feel that this is a security risk</b>," Guarnieri
+wrote.</pre>
+Guarnieri needs to do a little more research before making statements
+like this.  Even if you plugged all these holes, AIS ship tracking data
+is considered open data and would still be generally available through 
+many sources for prices ranging from free to expensive.  Military vessels
+that are transmitting in the clear either intend to let people know or are
+to dumb to make sure they are either in listen only mode or turn on blue
+force encryption (that that still allows direction finding of them).
+
+According to a USCG Rear Admiral Brian Salerno in official
+documentation from back in 2009, which I received directly from the
+USCG:
+<pre>As a broadcast system (where communications are intended to be
+received by the public), there is no expectation of privacy of any
+transmitted position, binary, or safety related messages, or any
+information transmitted on AIS."</pre>
+<img width="600" height="568" title="USCG says no privacy" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-04/uscg-says-no-privacy.png"/>
+
+<a
+href="https://community.rapid7.com/community/infosec/blog/2013/04/29/spying-on-the-seven-seas-with-ais">Rapid
+7's analysis</a> gets closer to the mark with this:
+<pre>A quick fingerprint shows that many of the systems identified
+have open telnet shells, web interfaces, and VNC servers, and many of
+these are connected to old and vulnerable versions of Windows.</pre>
+Being pwned is generally bad, but if people are relying on this data,
+then doing a DOS or injecting / removing data could do unpleasant things
+that range from implying false cargo movements that might impact prices to
+adding confusion to situation awareness increasing the chances of accidents
+or drawing attention from bad behavior.
+
+Where Rapid 7 missed:
+<pre>We agree that the availability of global AIS data in such an
+unsecured manner is a potential danger, both for the safety of the
+vessels being tracked.</pre>
+
+How does making available data that can be had by anyone a risk to the
+ships?  Fiddling with data and if any of these sites are transceivers
+would put ships and other things at risk, but not data availability
+when it is already available.
+
+See also: <a
+href="http://schwehr.org/blog/archives/2012-11.html#e2012-11-18T12_08_13.txt">AIS
+Security and Integrity</a> post by me back in Nov 2012 for more
+concepts.
+
+<b>Update 2013-May-04</b>: Related links... Geo Garage on 2013-May-01: <a href="http://blog.geogarage.com/2013/05/loose-blips-sink-ships-leaky.html">Loose blips sink ships: leaky communications threaten marine vessels</a>.  My response is "ARG!".  The article at <a href="http://www.technewsdaily.com/17910-loose-blips-sink-ships.html">TechNewsDaily</a> is frustrating.  This stuff is supposted to be decodable and usable by the public:
+
+<pre>To suggest that most seafaring ships — including tankers, fishing
+boats and military vessels — could be hacked would be an insult to
+industrious hackers everywhere.
+<!-- -->
+Instead, reading a ship's private or sensitive communications requires
+no hacking knowledge whatsoever.  The amount of publicly broadcast,
+potentially sensitive material on the ocean is staggering.</pre>
+Yes, I realize that it doesn't say that this is bad or anything new, but 
+it tries to lead the reader in that direction.  Geogarage at least links to
+more opinions on both sides of the argument.
+
+I am entertained by his pointer back to his post from May 2005:
+
+<a href="http://blog.geogarage.com/2012/05/google-can-track-ships-at-sea-detailed.html">Google can track ships at sea ; detailed maps planned of sea bottom</a>
+
+If you want some fun, check out 23 minutes into this video by MTJ and
+then watch our upcoming Google I/O talk where we will explain how
+<b>you</b> can track ships (or build all sorts of other tools on Google cloud infrastructure)...
+
+<iframe width="560" height="315" src="http://www.youtube.com/embed/Dk3IIOimGwE" frameborder="0" allowfullscreen></iframe>
+-----

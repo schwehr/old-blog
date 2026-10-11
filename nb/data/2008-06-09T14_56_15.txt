@@ -1,0 +1,45 @@
+TITLE: AIS messages split across channels?
+AUTHOR: Kurt
+DATE: 06.09.2008 14:56
+DESC: what is going on?
+-----
+BODY:
+This is really strange!  I am seeing AIS messages split across
+channels.  Is this really going across the VDL?  Is this a receiver
+bug, logging bug, or something else?  Maybe shipdata message is being
+sent over both A and B channels and the data logging system decides to
+keep one part from one and another part from the other?
+<pre>
+!AIVDM,2,1,8,<b>A</b>,55MtCG01ssMAM9?;W;@l58Ttr2220lu84p00000l18L,0*3C,s24576,d-112,r00370003,1167621101
+!AIVDM,2,2,8,<b>B</b>,004@a0&gt;k0H4Sk@CP@00000000000,2*38,s26987,d-107,r00370003,1167621101
+</pre>
+By hacking the checksum and forcing both to be the same channel, I
+created this normalized packaet and decoded it.
+<pre>
+% <b>ais_msg_5.py -d '!AIVDM,1,1,8,A,55MtCG01ssMAM9?;W;@l58Ttr2220lu84p00000l18L004@a0&gt;k0H4Sk@CP@00000000000,2*06,s26987,d-107,r00370003,1167621101'</b>
+shipdata:
+        MessageID:        5
+        RepeatIndicator:  0
+        UserID:           366941020
+        AISversion:       0
+        IMOnumber:        8121812
+        callsign:         WRS2924
+        name:             MARION    MORAN@@@@@
+        shipandcargo:     52
+        dimA:             9
+        dimB:             28
+        dimC:             0
+        dimD:             0
+        fixtype:          1
+        ETAminute:        4
+        ETAhour:          5
+        ETAday:           4
+        ETAmonth:         0
+        draught:          5.9
+        destination:      LA ROMANA@@@@@@@@@@@
+        dte:              0
+        Spare:            0
+</pre>
+I guess they go together, but how to tell?  The next version of ais_normalize.py
+has a -t option to treat A and B as one channel.
+-----

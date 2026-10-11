@@ -1,0 +1,40 @@
+TITLE: segy-py-0.12 release - much better
+AUTHOR: Kurt
+DATE: 06.19.2005 09:21
+DESC: fink package and finds drivers ok
+-----
+BODY:
+<a href="http://schwehr.org/software/segy-py">Segy-py</a> release 0.12
+is now up on the web.  Big improvements!  What are they?  First,
+driver loading will actually look at your python path and
+site-packages directories like it was supposed to all along.  Second,
+there is now a fink info package.  You have to do a manual setup in
+local to get segy-py installed through fink.  Here is how you do it:
+<pre>
+  sudo -s
+  mkdir -p /sw/fink/10.3/local/main/finkinfo/sci
+  cd /sw/fink/10.3/local/main/finkinfo/sci
+  wget http://schwehr.org/software/segy-py/segy-py.info
+  cd /sw/src
+  wget http://schwehr.org/software/segy-py/segy-py-0.12.tar.bz2
+  exit
+  fink install segy-py24
+</pre>
+I whipped up a little makefile trickery this morning to make that info
+file.  Here is how I handle inserting the VERSION and MD5 values into
+the segy-py.info.in to create segy-py.info:
+<pre>
+VERSION:=${shell python -c "import segy_version;print segy_version.VERSION"}
+segy-py.info: segy-py.info.in Makefile
+        perl -p -e "s/\@VERSION\@/${VERSION}/g" $< > fink.tmp
+        MD5=`md5 dist/segy-py-${VERSION}.tar.bz2| awk '{print $$4}'` \
+              && perl -p -e "s/\@MD5\@/$$MD5/g" fink.tmp > $@
+        rm -f fink.tmp
+</pre>
+A little crazy, but it works.  Too bad I had to use perl in there.
+Does anyone know how to do this with a python like that is almost as
+short?
+
+BTW, TimeOut is really nice.  15 second breaks do not eat up much
+time, but are good for the body.
+-----

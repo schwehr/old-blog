@@ -1,0 +1,137 @@
+TITLE: Super quick sqlite3 tutorial
+AUTHOR: Kurt
+DATE: 11.27.2007 18:19
+DESC: just add data
+-----
+BODY:
+Was talking about databases and I again suggested that sqlite3 is the
+quickest way to get a sense of working with a (non-GUI) database.
+This is a couple minute SQL tutorial for mac users with fink
+installed.  Mac OSX 10.4.11 comes with a version of sqlite3, but I
+prefer to use the newer version from fink.
+
+Let's get started.  Install fink and create a database:
+<pre>
+% fink install sqlite3
+% sqlite demo.db3
+</pre>
+Now create a a small database table.  <b>key</b> will get filled in by
+the database everytime you add a new row.  This database has 3 fields of
+info.  There is an string, a number, and a timestamp.  There are many other
+types.
+<pre>
+sqlite&gt; CREATE TABLE animals (key INTEGER PRIMARY KEY, name VARCHAR(32), count INTEGER, timestamp TIMESTAMP);
+</pre>
+Now that you have a table in the database, you need to put some data into it.
+<pre>
+sqlite&gt; INSERT INTO animals (name, count, timestamp) VALUES ('squirrel',4761,'2006-01-01 07:40:12');
+sqlite&gt; INSERT INTO animals (name, count, timestamp) VALUES ('moose',2,'2006-02-25 17:30:00');
+sqlite&gt; INSERT INTO animals (name, count, timestamp) VALUES ('deer',42,'2006-03-13 08:00:00');
+sqlite&gt; INSERT INTO animals (name, count, timestamp) VALUES ('people',1,'2006-11-11 09:10:02');
+sqlite&gt; INSERT INTO animals (name, count, timestamp) VALUES ('groundhog',4761,'2006-12-31 12:30:53');
+</pre>
+Now that you have data in the database, you probably want to take a
+look at what you have got.  First just ask for every field with the <b>*</b>.
+<pre>
+sqlite&gt; SELECT * FROM animals;
+1|squirrel|4761|2006-01-01 07:40:12
+2|moose|2|2006-02-25 17:30:00
+3|deer|42|2006-03-13 08:00:00
+4|people|1|2006-11-11 09:10:02
+5|groundhog|4761|2006-12-31 12:30:53
+</pre>
+Now just ask for the values for the <b>name</b> field.
+<pre>
+sqlite&gt; SELECT name FROM animals;
+squirrel
+moose
+deer
+people
+groundhog
+</pre>
+You can ask for multiple fields.
+<pre>
+SELECT count,name FROM animals;
+4761|squirrel
+2|moose
+42|deer
+1|people
+4761|groundhog
+</pre>
+You can order by any field.
+<pre>
+sqlite&gt; SELECT count,name FROM animals ORDER BY count;
+1|people
+2|moose
+42|deer
+4761|squirrel
+4761|groundhog
+</pre>
+And you can control which way the database will sort your records (aka rows).
+<pre>
+sqlite&gt; SELECT count,name FROM animals ORDER BY count DESC;
+4761|squirrel
+4761|groundhog
+42|deer
+2|moose
+1|people
+</pre>
+Simple logical operations can limit which records are returned.
+<pre>
+sqlite&gt; SELECT count,name FROM animals WHERE count &gt; 40;
+4761|squirrel
+42|deer
+4761|groundhog
+</pre>
+If there are too many records in the database and you just want to see
+the beginning of what will be returned, use a <b>LIMIT</b>.
+<pre>
+sqlite&gt; SELECT name FROM animals LIMIT 2;
+squirrel
+moose
+</pre>
+Sqlite has commands to tell you about the database.  You can ask it
+what tables are in the database.
+<pre>
+sqlite&gt; .tables
+animals
+</pre>
+You can ask how that table is structured.
+<pre>
+sqlite&gt; .schema animals
+CREATE TABLE animals (key INTEGER PRIMARY KEY, name VARCHAR(32), count INTEGER, timestamp TIMESTAMP);
+</pre>
+And you can ask for help to find out about the other commands.
+<pre>
+sqlite&gt; .help
+...
+... lots of help scrolls by
+...
+</pre>
+Of course, you can bail out of the database program.
+<pre>
+sqlite&gt; .quit
+</pre>
+You can use the database from the command line of a shell (e.g. bash, you are not using tcsh, right?)
+<pre>
+% sqlite3 demo.db3 'SELECT count,name FROM animals ORDER BY count;' | tr '|' '\t'
+1       people
+2       moose
+42      deer
+4761    squirrel
+4761    groundhog
+</pre>
+Sqlite uses a single file to represent the database.  There is no server that is
+ever running.
+<pre>
+% ls -l
+-rw-r--r--   1 schwehr  schwehr  2048 Nov 27 18:00 demo.db3
+</pre>
+This makes it easy to play with when starting out.  If you don't like your
+database, just delete it.
+<pre>
+rm demo.db3
+</pre>
+Then when you need more power (and are more comfortable with SQL),
+move up to something like PostgreSQL with PostGIS.
+-----

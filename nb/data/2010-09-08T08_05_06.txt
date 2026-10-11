@@ -1,0 +1,55 @@
+TITLE: Bad idea - reducing the precision of x and y
+AUTHOR: Kurt
+DATE: 09.08.2010 08:05
+DESC: things you should not do
+-----
+BODY:
+I know that this post will not influence those who make the final
+call, but I have to state my thoughts on this issue.
+
+There has been a recent move to reduce the number of bits to specify
+the longitude and latitude for a point or circular area notice in the
+AIS broadcast binary message (DAC:1 FI:22).  The argument is that
+having more bits for these coordinates would imply to the mariner more
+precision that is really there for a point.  I have several reasons
+why I would argue strongly that this makes no sense.
+
+First: we often know the location of the point in question to cm
+accuracy.  Positioning systems are only getting better over time.
+Buoys are starting have RTK GPS on board.  There have already been
+deployments of buoys with that capability.
+
+Second: This is about positioning point and areas on a chart.  If we
+do not have the resolution to place points where they need to be, we
+may run into trouble.
+
+Third: Based on the reasoning of mariners being unable to understand
+positioning accuracy, we could do the same thing to NOAA and make all
+buoys, lines, and marks only be able to be positioned on a grid of 17
+meters.  Imagine canals that have their width changed by 9 meters.  If
+someone relies on the that, there will be trouble with ships being
+built so that they just barely fit.
+
+Fourth: This is a presentation issue being solved by hobbling the
+network protocol.  Why not just state in the specification that from
+2010-2015, electronic chart systems should display the coordinates of
+points on the chart to only 3 decimal places on the minutes (e.g. DD
+MM.MMM), but let them place the point or area on the chart to the full
+precision of the network protocol.
+
+Finally: The network protocol description does not state the
+motiviation beyond the changes.  It is important to include this kind
+of information when writing a specification to that software engineers
+understand what they are coding and designers of other messages can
+decide if they have the same needs.  New messages look to old messages
+for guidance on how things should be done.  The <b>why</b> needs to be
+better captured.
+
+I realize that the standards committee is going to dismiss my
+arguments - many of them have heard me say this before and dismissed
+what I said then.  Therefore, I don't expect to influence the current
+IMO Circ 289, but I hope to influence designers of future AIS binary
+messages and other geospatially enabled data transfer formats.  I
+encourage other people on the standards committees to post their ideas
+and thought processes.
+-----

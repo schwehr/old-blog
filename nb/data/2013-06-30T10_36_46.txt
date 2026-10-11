@@ -1,0 +1,274 @@
+TITLE: A simple autoconf example
+AUTHOR: Kurt
+DATE: 06.30.2013 10:36
+DESC: endian
+-----
+BODY:
+In going through autoconf setup for mb-system, I have started feeling
+much better about autoconf.  I think that one of the main things
+missing are a nice collection of simple examples.  I wanted to see
+what it looked like to setup an example of the bare minimum to test
+byte order.  Here is what I did.
+
+First, create a file called configure.ac (formerly known as configure.in):
+<pre>AC_PREREQ([2.65])
+<!-- -->
+AC_INIT([endian],[1.0])
+<!-- -->
+AM_INIT_AUTOMAKE
+dnl AM_MAINTAINER_MODE
+AM_PROG_CC_C_O
+<!-- -->
+AC_C_BIGENDIAN
+<!-- -->
+dnl AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_FILES([Makefile])
+<!-- -->
+AC_OUTPUT</pre>
+Note that "dnl" is the start of comment designation (aka Do Not Load).
+
+This basically says that we have an autoconf 2.65 based configuration
+for a project called "endian".    We want to use automake to build C
+programs and that we need to know the endian-ness of the machine.
+
+Next, I need an automake input file, Makefile.am, that says how to
+build our endian.c code.
+<pre><font color="#009900">bin_PROGRAMS =</font> endian
+<font color="#009900">endian_SOURCES =</font> endian.c</pre>
+And now for the source code:
+<pre><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+<!-- -->
+<font color="#009900">int</font> <b><font color="#000000">main</font></b><font color="#990000">(</font><font color="#009900">void</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+<b><font color="#000080">#ifdef</font></b> WORDS_BIGENDIAN
+  <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"big</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+  <b><font color="#0000FF">return</font></b> <font color="#993399">1</font><font color="#990000">;</font>
+<b><font color="#000080">#else</font></b>
+  <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"little</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+  <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<b><font color="#000080">#endif</font></b>
+<font color="#FF0000">}</font></pre>
+To set this up, create an autogen.sh script:
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+<!-- -->
+autoreconf --force --install</tt></pre>
+We are now ready to try building our project.
+<pre><b>chmod +x autogen.sh
+ls -l</b>
+total 32
+-rw-r--r--  1 schwehr  5000   48 Jun 29 23:04 Makefile.am
+-rwxr-xr-x  1 schwehr  5000  102 Jun 30 07:50 autogen.sh
+-rw-r--r--  1 schwehr  5000  226 Jun 30 07:51 configure.ac
+-rw-r--r--  1 schwehr  5000  140 Jun 29 23:23 endian.c
+<b>./autogen.sh</b>
+configure.ac:8: installing './compile'
+configure.ac:6: installing './install-sh'
+configure.ac:6: installing './missing'
+Makefile.am: installing './INSTALL'
+Makefile.am: error: required file './NEWS' not found
+Makefile.am: error: required file './README' not found
+Makefile.am: error: required file './AUTHORS' not found
+Makefile.am: error: required file './ChangeLog' not found
+Makefile.am: installing './COPYING' using GNU General Public License v3 file
+Makefile.am:     Consider adding the COPYING file to the version control system
+Makefile.am:     for your code, to avoid questions about which license your project uses
+Makefile.am: installing './depcomp'
+autoreconf: automake failed with exit status: 1
+<b>touch AUTHORS ChangeLog NEWS README
+./autogen.sh</b>
+# No output
+ls -l
+total 696
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 AUTHORS
+-rw-r--r--  1 schwehr  5000   35147 Jun 30 07:53 COPYING
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 ChangeLog
+-rw-r--r--  1 schwehr  5000   15749 Jun 30 07:55 INSTALL
+-rw-r--r--  1 schwehr  5000      48 Jun 29 23:04 Makefile.am
+-rw-r--r--  1 schwehr  5000   20989 Jun 30 07:55 Makefile.in
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 NEWS
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 README
+-rw-r--r--  1 schwehr  5000   36026 Jun 30 07:55 aclocal.m4
+-rwxr-xr-x  1 schwehr  5000     106 Jun 30 07:55 autogen.sh
+drwxr-xr-x  7 schwehr  5000     238 Jun 30 07:55 autom4te.cache
+-rwxr-xr-x  1 schwehr  5000    7333 Jun 30 07:55 compile
+-rwxr-xr-x  1 schwehr  5000  160168 Jun 30 07:55 configure
+-rw-r--r--  1 schwehr  5000     226 Jun 30 07:51 configure.ac
+-rwxr-xr-x  1 schwehr  5000   23910 Jun 30 07:55 depcomp
+-rw-r--r--  1 schwehr  5000     140 Jun 29 23:23 endian.c
+-rwxr-xr-x  1 schwehr  5000   13997 Jun 30 07:55 install-sh
+-rwxr-xr-x  1 schwehr  5000   10179 Jun 30 07:55 missing</pre>
+Now we have a world that will hopefully work.  We need to try it out.
+<pre><b>./configure --help</b>
+`configure' configures endian 1.0 to adapt to many kinds of systems.
+<!-- -->
+Usage: ./configure [OPTION]... [VAR=VALUE]...
+<!-- -->
+To assign environment variables (e.g., CC, CFLAGS...), specify them as
+VAR=VALUE.  See below for descriptions of some of the useful variables.
+<!-- -->
+Defaults for the options are specified in brackets.
+<!-- -->
+Configuration:
+  -h, --help              display this help and exit
+      --help=short        display options specific to this package
+      --help=recursive    display the short help of all the included packages
+  -V, --version           display version information and exit
+...
+  CPP         C preprocessor
+<!-- -->
+Use these variables to override the choices made by `configure' or to help
+it to find libraries and programs with nonstandard names/locations.
+<!-- -->
+Report bugs to the package provider.
+<!-- -->
+<b>./configure --prefix=/tmp/endian</b>
+checking for a BSD-compatible install... /sw/bin/ginstall -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /sw/bin/gmkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for style of include used by make... GNU
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking dependency style of gcc... gcc3
+checking whether gcc and cc understand -c and -o together... yes
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking whether byte ordering is bigendian... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: executing depfiles commands
+<!-- -->
+<b>ls -l config.{status,log} Makefile</b>
+-rw-r--r--  1 schwehr  5000  21248 Jun 30 07:59 Makefile
+-rw-r--r--  1 schwehr  5000  14512 Jun 30 07:59 config.log
+-rwxr-xr-x  1 schwehr  5000  29185 Jun 30 07:59 config.status
+<!-- -->
+<b>make</b>
+gcc -DPACKAGE_NAME=\"endian\" -DPACKAGE_TARNAME=\"endian\" \
+-DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"endian\ 1.0\" \
+-DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"endian\" \
+-DVERSION=\"1.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 \
+-DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 \
+-DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 \
+-DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -I.     \
+-g -O2 -MT endian.o -MD -MP -MF .deps/endian.Tpo -c -o endian.o endian.c
+mv -f .deps/endian.Tpo .deps/endian.Po
+gcc  -g -O2   -o endian endian.o
+<!-- -->
+<b>ls -l endian.o endian</b>
+-rwxr-xr-x  1 schwehr  5000  9048 Jun 30 08:00 endian
+-rw-r--r--  1 schwehr  5000  2328 Jun 30 08:00 endian.o
+<!-- -->
+<b>make install</b>
+ /sw/bin/gmkdir -p '/tmp/endian/bin'
+  /sw/bin/ginstall -c endian '/tmp/endian/bin'
+make[1]: Nothing to be done for `install-data-am'.
+<!-- -->
+<b>ls -la /tmp/endian/bin/</b>
+total 24
+drwxr-xr-x  3 schwehr  wheel   102 Jun 30 08:01 .
+drwxr-xr-x  3 schwehr  wheel   102 Jun 30 08:01 ..
+-rwxr-xr-x  1 schwehr  wheel  9048 Jun 30 08:01 endian
+<!-- -->
+<b>/tmp/endian/bin/endian </b>
+little</pre>
+That's great and it works, but the build line is pretty long.  We can
+use a config.h C include file to track all the defines rather than -D
+flags in the gcc compile line.
+
+First, add this line to the configure.ac right after AC_CONFIG_FILES:
+<pre>AC_CONFIG_HEADERS([config.h])</pre>
+At the top of endian.c, add this include:
+<pre><b><font color="#000080">#include</font></b> <font color="#FF0000">"config.h"</font></pre>
+Then build again:
+<pre><b>./autogen.sh
+./configure
+make </b>
+make  all-am
+gcc -DHAVE_CONFIG_H -I.     -g -O2 -MT endian.o -MD -MP -MF .deps/endian.Tpo -c -o endian.o endian.c
+mv -f .deps/endian.Tpo .deps/endian.Po
+gcc  -g -O2   -o endian endian.o</pre>
+The new config.h file contains this c-pre-processor (cpp) setup:
+<pre><tt><i><font color="#9A1900">/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most</font></i>
+<i><font color="#9A1900">   significant byte first (like Motorola and SPARC, unlike Intel). */</font></i>
+<b><font color="#000080">#if</font></b> <font color="#008080">defined</font> AC_APPLE_UNIVERSAL_BUILD
+<b><font color="#000080"># if</font></b> <font color="#008080">defined</font> __BIG_ENDIAN__
+<b><font color="#000080">#  define</font></b> WORDS_BIGENDIAN <font color="#993399">1</font>
+<b><font color="#000080"># endif</font></b>
+<b><font color="#000080">#else</font></b>
+<b><font color="#000080"># ifndef</font></b> WORDS_BIGENDIAN
+<i><font color="#9A1900">/* #  undef WORDS_BIGENDIAN */</font></i>
+<b><font color="#000080"># endif</font></b>
+<b><font color="#000080">#endif</font></b>
+</tt></pre>
+The final step is removing all the configured files so that only the
+key sources are left.
+<pre><b>make maintainer-clean</b>
+test -z "endian" || rm -f endian
+rm -f *.o
+rm -f *.tab.c
+test -z "" || rm -f 
+test . = "." || test -z "" || rm -f 
+rm -f config.h stamp-h1
+rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+rm -f cscope.out cscope.in.out cscope.po.out cscope.files
+This command is intended for maintainers to use
+it deletes files that may require special tools to rebuild.
+rm -f config.status config.cache config.log configure.lineno config.status.lineno
+rm -rf ./autom4te.cache
+rm -rf ./.deps
+rm -f Makefile
+<!-- -->
+<b>ls -l</b>
+total 744
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 AUTHORS
+-rw-r--r--  1 schwehr  5000   35147 Jun 30 07:53 COPYING
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 ChangeLog
+-rw-r--r--  1 schwehr  5000   15749 Jun 30 08:18 INSTALL
+-rw-r--r--  1 schwehr  5000      48 Jun 29 23:04 Makefile.am
+-rw-r--r--  1 schwehr  5000   21594 Jun 30 08:18 Makefile.in
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 NEWS
+-rw-r--r--  1 schwehr  5000       0 Jun 30 07:54 README
+-rw-r--r--  1 schwehr  5000   36026 Jun 30 08:17 aclocal.m4
+-rwxr-xr-x  1 schwehr  5000     106 Jun 30 07:55 autogen.sh
+-rwxr-xr-x  1 schwehr  5000    7333 Jun 30 08:18 compile
+-rw-r--r--  1 schwehr  5000    1947 Jun 30 08:18 config.h.in
+-rw-r--r--  1 schwehr  5000    1947 Jun 30 08:08 config.h.in~
+-rwxr-xr-x  1 schwehr  5000  164563 Jun 30 08:18 configure
+-rw-r--r--  1 schwehr  5000     224 Jun 30 08:17 configure.ac
+-rwxr-xr-x  1 schwehr  5000   23910 Jun 30 08:18 depcomp
+-rw-r--r--  1 schwehr  5000     161 Jun 30 08:17 endian.c
+-rwxr-xr-x  1 schwehr  5000   13997 Jun 30 08:18 install-sh
+-rwxr-xr-x  1 schwehr  5000   10179 Jun 30 08:18 missing
+<!-- -->
+<b>rm COPYING INSTALL Makefile.in aclocal.m4 compile config.h.in* configure depcomp install-sh missing</b>
+<b>ls -l</b>
+total 32
+-rw-r--r--  1 schwehr  5000    0 Jun 30 07:54 AUTHORS
+-rw-r--r--  1 schwehr  5000    0 Jun 30 07:54 ChangeLog
+-rw-r--r--  1 schwehr  5000   48 Jun 29 23:04 Makefile.am
+-rw-r--r--  1 schwehr  5000    0 Jun 30 07:54 NEWS
+-rw-r--r--  1 schwehr  5000    0 Jun 30 07:54 README
+-rwxr-xr-x  1 schwehr  5000  106 Jun 30 07:55 autogen.sh
+-rw-r--r--  1 schwehr  5000  224 Jun 30 08:17 configure.ac
+-rw-r--r--  1 schwehr  5000  161 Jun 30 08:17 endian.c</pre>
+-----

@@ -1,0 +1,39 @@
+TITLE: My brain is melting
+AUTHOR: Kurt
+DATE: 03.07.2006 16:20
+DESC: yikes
+-----
+BODY:
+I am starting to have strange flashbacks to IRIX/IRIX64/-old-ld/SGI
+death throws.  I got this on OSX 10.4.5.  I was trying to compile
+everything with gcc 3.3 since I am linking against all kinds of junk
+in fink 10.4-transitional that is c++ and compiled with gcc 3.3.  I
+forgot that I need to do the same in a couple of external packages.
+Maybe that is why fprintf is not defined.  Nuts!  That should never
+happen for a straight C call.  Bugger, bugger, bugger.
+<pre>
+ld: warning multiple definitions of symbol _dct64
+/sw/lib/libSDL_sound.dylib(libmpglib_la-dct64_i386.lo) definition of _dct64
+/sw/lib/libmp3lame.dylib(dct64_i386.o) definition of _dct64
+ld: Undefined symbols:
+_fprintf$LDBLStub
+_snprintf$LDBLStub
+_vfprintf$LDBLStub
+_vsnprintf$LDBLStub
+_printf$LDBLStub
+_sscanf$LDBLStub
+make[2]: *** [GeoZui4D] Error 1
+</pre>
+I even got desparate and added -lc to my link line which is now:
+<pre>
+g++-3.3 -g3 -DDEV -Wall -Wno-deprecated -o my-app-please-work
+10-billion-billion-object-files \
+-L../external-libs/lib
+-L../external-libs/lib/Tktable2.9 -L/usr/X11R6/lib -L./lib.Darwin
+-L/sw/lib -lglut -lGLU -lXmu -lXext -lX11 -ljpeg -ltiff -lsmpeg
+-lSDL_mixer -lSDL -lSDL_sound -lxml2 -lnetcdf_c++ -lnetcdf -lccom
+-lgdal -lSDL_net -ltogl -lTktable2.9 -lavformat -lavcodec -lavutil
+-ltk -ltcl -lvorbis -lz -logg -lmp3lame -lvorbisenc <b>-lc</b> -bind_at_load
+-lSDLmain -lGL -framework Cocoa
+</pre>
+-----

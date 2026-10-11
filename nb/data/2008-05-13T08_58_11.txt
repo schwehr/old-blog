@@ -1,0 +1,43 @@
+TITLE: django databrowse
+AUTHOR: Kurt
+DATE: 05.13.2008 08:58
+DESC: first try
+-----
+BODY:
+
+This is my first try at using Django's <a
+href="http://www.djangoproject.com/documentation/databrowse/">databrowse</a>
+system.  First I modified my settings.py to add
+"<b>'django.contrib.databrowse',</b>" to the INSTALLED_APPS.
+Then I had to register the classes with databrowse and give it a URL.
+<pre>from django.contrib import databrowse
+import ais_www.ais_msgs as ais_msgs
+import ais_www.define_ais as define_ais
+#
+databrowse.site.register(ais_msgs.models.Position)
+databrowse.site.register(ais_msgs.models.Shipdata)
+databrowse.site.register(define_ais.models.Aismsg)
+databrowse.site.register(define_ais.models.Field)
+#
+urlpatterns += patterns ('',
+                        (r'^databrowse/(.*)', databrowse.site.root),
+                        )</pre>
+Then I was able to open and test databrowse.
+
+<img src="http://schwehr.org/blog/attachments/2008-05/django-databrowse-1-top.png"/>
+
+I had to slightly tweak the shipdata class to show the names without
+the '<b>@</b>' end of string pad characters that AIS uses.
+<pre>class Shipdata(models.Model):
+    def __str__(self):
+        return str(self.userid) + ' ' + self.name.strip('@') + ' ' + str(self.cg_timestamp)</pre>
+
+<img src="http://schwehr.org/blog/attachments/2008-05/django-databrowse-2-shipdatas.png"/>
+
+And an individual entry:
+
+<img src="http://schwehr.org/blog/attachments/2008-05/django-databrowse-3-shipdata.png"/>
+
+That was fairly easy and now I don't have to use the Admin application
+to view data.
+-----

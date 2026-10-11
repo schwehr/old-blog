@@ -1,0 +1,61 @@
+TITLE: Reading a Bathymetry Attributed Grid (BAG) with python
+AUTHOR: Kurt
+DATE: 04.05.2009 14:32
+DESC: it works
+-----
+BODY:
+Turns out, it is just easier to go read a bag on my own with python.  I just added <a href="http://code.google.com/p/h5py/">h5py</a> to fink.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> h5py
+<!-- -->
+f <font color="#990000">=</font> h5py<font color="#990000">.</font><b><font color="#000000">File</font></b><font color="#990000">(</font><font color="#FF0000">'sample.bag'</font><font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> f<font color="#990000">.</font><b><font color="#000000">listobjects</font></b><font color="#990000">()</font>
+<b><font color="#0000FF">print</font></b> f<font color="#990000">.</font><b><font color="#000000">listitems</font></b><font color="#990000">()</font>
+<!-- -->
+bag_root <font color="#990000">=</font> f<font color="#990000">[</font><font color="#FF0000">'/BAG_root'</font><font color="#990000">]</font>
+metadata <font color="#990000">=</font> <font color="#FF0000">''</font><font color="#990000">.</font><b><font color="#000000">join</font></b><font color="#990000">(</font>bag_root<font color="#990000">[</font><font color="#FF0000">'metadata'</font><font color="#990000">])</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> metadata<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">:</font><font color="#993399">200</font><font color="#990000">]</font>
+<!-- -->
+elevation <font color="#990000">=</font> bag_root<font color="#990000">[</font><font color="#FF0000">'elevation'</font><font color="#990000">]</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> elevation<font color="#990000">.</font>shape
+<!-- -->
+data <font color="#990000">=</font> elevation<font color="#990000">.</font>value
+<b><font color="#0000FF">print</font></b> <b><font color="#000000">type</font></b><font color="#990000">(</font>data<font color="#990000">)</font>
+<b><font color="#0000FF">print</font></b> data
+</tt></pre>
+The results of the above code:
+<pre>[('BAG_root', &lt;HDF5 group "BAG_root" (4 members)&gt;)]
+<!-- -->
+&lt;?xml version="1.0" encoding="UTF-8" standalone="no" ?&gt;&lt;!-- \
+Sample Bathymetric Attribute Grid Meta data - Created by the Open \
+Naviation Surface Working Group.  Based on ISO19139 schema v1.0 --&gt;&lt;smXML:
+<!-- -->
+(10, 10)
+<!-- -->
+&lt;type 'numpy.ndarray'&gt;
+<!-- -->
+[[ 10.          10.10000038  10.19999981  10.30000019  10.39999962  10.5
+   10.60000038  10.69999981  10.80000019  10.89999962]
+ [ 11.          11.10000038  11.19999981  11.30000019  11.39999962  11.5
+   11.60000038  11.69999981  11.80000019  11.89999962]
+ [ 12.          12.10000038  12.19999981  12.30000019  12.39999962  12.5
+   12.60000038  12.69999981  12.80000019  12.89999962]
+ [ 13.          13.10000038  13.19999981  13.30000019  13.39999962  13.5
+   13.60000038  13.69999981  13.80000019  13.89999962]
+ [ 14.          14.10000038  14.19999981  14.30000019  14.39999962  14.5
+   14.60000038  14.69999981  14.80000019  14.89999962]
+ [ 15.          15.10000038  15.19999981  15.30000019  15.39999962  15.5
+   15.60000038  15.69999981  15.80000019  15.89999962]
+ [ 16.          16.10000038  16.20000076  16.29999924  16.39999962  16.5
+   16.60000038  16.70000076  16.79999924  16.89999962]
+ [ 17.          17.10000038  17.20000076  17.29999924  17.39999962  17.5
+   17.60000038  17.70000076  17.79999924  17.89999962]
+ [ 18.          18.10000038  18.20000076  18.29999924  18.39999962  18.5
+   18.60000038  18.70000076  18.79999924  18.89999962]
+ [ 19.          19.10000038  19.20000076  19.29999924  19.39999962  19.5
+   19.60000038  19.70000076  19.79999924  19.89999962]]</pre>
+-----

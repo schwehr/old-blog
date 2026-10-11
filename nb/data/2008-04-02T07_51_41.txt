@@ -1,0 +1,43 @@
+TITLE: Full text searches with PostgreSQL 8.3
+AUTHOR: Kurt
+DATE: 04.02.2008 07:51
+DESC: helpful tools
+-----
+BODY:
+The Linux Gazette has an article <a
+href="http://linuxgazette.net/149/pfeiffer.html">Searching for Text
+(Part I)</a> that covers doing searches for text.  Strange that there
+is no mention of grep, but an excellent starting point.
+
+First it goes through getting text:
+<pre>
+   1. PDF: pdftotext -q -eol unix -enc UTF-8 $IN - > $OUT
+   2. Postscript: pstotext $IN | iconv -f ISO-8859-1 -t UTF-8 -o $OUT -
+   3. MS Word: antiword $IN > $OUT
+   4. HTML: html2text -nobs -o $OUT $IN
+   5. RTF: unrtf --nopict --text $IN > $OUT
+   6. MS Excel: py_xls2txt $IN > $OUT
+   7. any OpenOffice document: ooo_as_text $IN > $OUT
+</pre>
+
+Then MySQL and finally PostgreSQL.
+
+<pre>
+Of course PostgreSQL can also deal with full text searches - a plugin
+called Tsearch2 is available for PostgreSQL database servers prior to
+version 8.3.0 (it's integrated into 8.3.0). Just like for the MySQL
+functions, you can fine-tune these according to the language your
+texts are written in. The content has to be transformed into tokens,
+and PostgreSQL offers new database objects that deal with these
+operations. The Tsearch2 engine provides text parsers for
+tokenisation, dictionaries for normalisation of tokens (and lists of
+stop words), templates for switching between parsers or dictionaries,
+and configurations to use whatever language you need to.
+...
+CREATE INDEX documents_idx ON documents USING gin(to_tsvector('english',content));
+SELECT filename,mtime FROM documents WHERE to_tsvector(content) @@ to_tsquery('lorem');
+...
+</pre>
+
+There is also an article on <a href="http://linuxgazette.net/149/dokopnik.html">PostgreSQL database views</a>
+-----

@@ -1,0 +1,24 @@
+TITLE: OpenEV on fink
+AUTHOR: Kurt
+DATE: 03.30.2006 15:40
+DESC: stuck
+-----
+BODY:
+I've hit a roadblock at the moment trying to build openEV in fink.
+I am using a cvs checkout from today of OpenEV for the build.
+/sw/include/glib-2.0/gobject/gtype.h is giving me trouble here.
+<pre>
+#if	GLIB_SIZEOF_LONG == GLIB_SIZEOF_SIZE_T
+typedef gulong                          GType;
+#else	/* hm, shouldn't happen? */
+typedef gsize                           GType;
+#endif
+</pre>
+Here is my current configure scripts:
+<pre>
+CFLAGS="-I/sw/include/gtk-1.2 -I/sw/include/glib-1.2 -I/sw/lib/glib/include \
+-I/usr/X11R6/include -I/sw/include/pygtk-2.0 -I/sw/include/gdal1 \
+-I/sw/include" LDFLAGS="-L/sw/lib" \
+./configure --prefix=/Users/schwehr/Desktop/openev 
+</pre>
+-----

@@ -1,0 +1,95 @@
+TITLE: USCG T flag time base means what?
+AUTHOR: Kurt
+DATE: 08.19.2009 11:32
+DESC: what to do?
+-----
+BODY:
+I was looking to use the USCG "T" metadata field to help check the validity of the sense of time for an AIS messages,
+but then I ran into this triplet of basestation report receives.  This is the same message received at 3 receivers
+in the Boston area.  "T" is supposed to be the receive time seconds within the UTC minute.
+<pre>!AIVDM,1,1,,B,403OwliuQ3SqiJs&lt;SHH&gt;jB100L0B,0*3C,s34022,d-075,<b>T40.92853791</b>,x123864,r003669945,1207540670
+!AIVDM,1,1,,B,403OwliuQ3SqiJs&lt;SHH&gt;jB100L0B,0*3C,s28210,d-096,<b>T11.02029935</b>,x84922,r003669947,1207540645
+!AIVDM,1,1,,B,403OwliuQ3SqiJs&lt;SHH&gt;jB100L0B,0*3C,s29329,d-096,<b>T50.26997285</b>,x64858,r003669946,1207540666</pre>
+I dropped that section of messages in a SQLite db to take a look at what is going on.
+<pre><b>ais_build_sqlite.py -d trouble.db3 trouble.ais -C</b>
+{1: <b>14</b>, 2: 0, 3: 0, 4: <b>5</b>, 5: 0, 18: 0, 19: 0}</pre>
+Pulling the reports:
+<pre>sqlite3 -html trouble.db3 \
+  'SELECT key, UserID as MMSI, \
+          Time_day as day, Time_hour as hour, Time_min as min, Time_sec AS sec, \
+          sync_state, slot_timeout, received_stations, cg_timestamp, \
+          cg_t_arrival, cg_r \
+   FROM bsreport WHERE userid=3669971;'</pre>
+Here is what I see for those three basestation reports:
+<table border="1">
+<TR><TH>key</TH><TH>MMSI</TH><TH>day</TH><TH>hour</TH><TH>min</TH><TH>sec</TH><TH>sync_state</TH><TH>slot_timeout</TH><TH>received_stations</TH><TH>cg_timestamp</TH><TH>cg_t_arrival</TH><TH>cg_r</TH></TR>
+<TR><TD>3</TD>
+<TD>3669971</TD>
+<TD>7</TD>
+<TD>3</TD>
+<TD>57</TD>
+<TD>49</TD>
+<TD>0</TD>
+<TD>7</TD>
+<TD>18</TD>
+<TD>2008-04-07 03:57:50</TD>
+<TD>40.92853791</TD>
+<TD>r003669945</TD>
+</TR>
+<TR><TD>4</TD>
+<TD>3669971</TD>
+<TD>7</TD>
+<TD>3</TD>
+<TD>57</TD>
+<TD>49</TD>
+<TD>0</TD>
+<TD>7</TD>
+<TD>18</TD>
+<TD>2008-04-07 03:57:25</TD>
+<TD>11.02029935</TD>
+<TD>r003669947</TD>
+</TR>
+<TR><TD>5</TD>
+<TD>3669971</TD>
+<TD>7</TD>
+<TD>3</TD>
+<TD>57</TD>
+<TD>49</TD>
+<TD>0</TD>
+<TD>7</TD>
+<TD>18</TD>
+<TD>2008-04-07 03:57:46</TD>
+<TD>50.26997285</TD>
+<TD>r003669946</TD>
+</TR>
+</table>
+I will abbreviate station names by the last two digits... 45, 46, and
+47.  It looks like station 45 timestamped the the packet as 1 second after it was sent.
+That's pretty good.  However the receiver generated the T as 9 seconds earlier than the
+station timestamp and 8 seconds <b>before</b> the basestation thinks it generated the message.
+This looks like the receiver doesn't have a good sense of time.
+
+Looking at station 47 next, things totally come apart.  The USCG
+timestamp is 24 seconds before the basestation thinks it sent the
+message and the T receive time is either 38 or 22 seconds off
+(assuming that the it is less than one minute off.
+
+Taking a look at the comm state of a SOTDMA Class A position report in
+that batch of data, it shows that things for station 45 are at least
+consistant.
+<pre>SELECT commstate_utc_hour, commstate_utc_min as com_min, timestamp as sec, cg_timestamp, 
+	cg_t_arrival, cg_r 
+    FROM position 
+    WHERE commstate_utc_hour IS NOT NULL;</pre>
+<table border="1">
+<TR><TH>commstate_utc_hour</TH><TH>com_min</TH><TH>sec</TH><TH>cg_timestamp</TH><TH>cg_t_arrival</TH><TH>cg_r</TH></TR>
+<TR><TD>3</TD>
+<TD>57</TD>
+<TD>48</TD>
+<TD>2008-04-07 03:57:52</TD>
+<TD>42.90231408</TD>
+<TD>r003669945</TD>
+</TR>
+</table>
+There doesn't appear to be a way to track the receivers' GPS locks so that I can know when to trust the T field.
+-----

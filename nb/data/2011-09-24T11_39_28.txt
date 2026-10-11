@@ -1,0 +1,100 @@
+TITLE: Adding screen captures to an org-mode buffer in emacs
+AUTHOR: Kurt
+DATE: 09.24.2011 11:39
+DESC: woot!
+-----
+BODY:
+This doesn't look like much, but hopefully, this will cause me to do a
+much better job of taking notes in my org-mode log.  It took too much
+time to add figures before I did this, so I put screen shots into my
+work log.  I took a lot of screenshots, but they just get bulk dumped
+into iPhoto on which ever particular machine I happen to be on at the
+moment.  Not good!
+
+Yesterday, Monica pointed me to org-mode worg (wiki org) <a
+href="http://orgmode.org/worg/org-hacks.html">Org ad hoc code, quick
+hacks and workarounds</a> page, which has a section called "Automatic
+screenshot insertion" created by Russell Adams.  He uses the
+imagemagick/graphicsmagick import command to capture a window.
+<pre><tt><font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> my-org-screenshot <font color="#FF0000">()</font>
+  <font color="#FF0000">"Take a screenshot into a time stamped unique-named file in the</font>
+<font color="#FF0000">same directory as the org-buffer and insert a link to this file."</font>
+  <font color="#FF0000">(</font>interactive<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>setq filename
+        <font color="#FF0000">(</font>concat
+         <font color="#FF0000">(</font>make-temp-name
+          <font color="#FF0000">(</font>concat <font color="#FF0000">(</font>buffer-file-name<font color="#FF0000">)</font>
+                  <font color="#FF0000">"_"</font>
+                  <font color="#FF0000">(</font>format-time-string <font color="#FF0000">"%Y%m%d_%H%M%S_"</font><font color="#FF0000">))</font> <font color="#FF0000">)</font> <font color="#FF0000">".png"</font><font color="#FF0000">))</font>
+  <font color="#FF0000">(</font>call-process <font color="#FF0000">"import"</font> nil nil nil filename<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>insert <font color="#FF0000">(</font>concat <font color="#FF0000">"[["</font> filename <font color="#FF0000">"]]"</font><font color="#FF0000">))</font>
+  <font color="#FF0000">(</font>org-display-inline-images<font color="#FF0000">))</font></tt></pre>
+I tried playing with this on the mac was a bit confused until I
+realized that import only captures X11 windows.  So my attempts
+to add "-window root" to import really did not help much.
+
+I then took a look at the Mac OSX <a
+href="http://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man1/screencapture.1.html">screencapture</a>
+tool.  That works pretty good.  I was confused by the "-T seconds"
+option until I realized that the delay time comes after you select a
+region if you are using the "-i" mode for interactive selection of a
+region.
+
+I then got stuck on trying to write out the screenshots in a place
+that I want.  I keep a directory under my worklogs that is the year.
+In that go each of my screenshots in a MMDD-some-name.png.  I wanted
+to default the some-name section to be HHMMSS.  That way, if I just
+need to keep moving, I don't have to think of a name and I will not
+have collisions with the day.  This part took me a some serious head
+scratching.  emacs lisp doesn't seem to follow quite the same throught
+process as I go through.  I read a number of pages:
+<ul>
+<li><a href="http://www.gnu.org/software/emacs/emacs-lisp-intro/html_node/Interactive-Options.htm">3.4 Different Options for interactive</a></li>
+<li><a href="http://www.gnu.org/s/emacs/manual/html_node/elisp/Interactive-Codes.html">21.2.2 Code Characters for interactive</a></li>
+<li><a href="http://stackoverflow.com/questions/754327/emacs-elisp-dynamic-interactive-prompt">Emacs Elisp dynamic interactive prompt</a></li>
+<li><a href="http://stackoverflow.com/questions/4801556/how-can-i-set-a-default-path-for-interactive-directory-selection-to-start-with-in">How can I set a default path for interactive directory selection to start with in a elisp defun?</a></li>
+</ul>
+The last two are stackoverflow posts that got me to finally realize
+how I needed to do this.   I had to go read <a
+href="http://www.gnu.org/software/emacs/elisp/html_node/Reading-File-Names.html">20.6.5
+Reading File Names</a>.  It definitely requires a close reading to
+understand what it is doing.
+
+Here is my final code that works for me:
+<pre><tt><i><font color="#9A1900">; Mac OSX version.  Tested on 10.7.  Will not work on other OSes.</font></i>
+<font color="#FF0000">(</font><b><font color="#0000FF">defun</font></b> my-org-screenshot <font color="#FF0000">(</font>filename<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>interactive 
+    <font color="#FF0000">(</font> list 
+      <font color="#FF0000">(</font>read-file-name <font color="#FF0000">"What file to write the PNG to? "</font>  
+                      <font color="#FF0000">(</font>format-time-string <font color="#FF0000">"%Y/%m%d-%H%M%S.png"</font><font color="#FF0000">)</font>  
+                      <font color="#FF0000">(</font>format-time-string <font color="#FF0000">"%Y/%m%d-%H%M%S.png"</font><font color="#FF0000">)</font> 
+    <font color="#FF0000">))</font>
+  <font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>message <font color="#FF0000">"Starting screencapture of %s"</font> filename<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>call-process <font color="#FF0000">"screencapture"</font> nil nil nil <font color="#FF0000">"-i"</font> filename<font color="#FF0000">)</font>
+  <font color="#FF0000">(</font>insert <font color="#FF0000">(</font>concat <font color="#FF0000">"[["</font> filename <font color="#FF0000">"]]</font><font color="#CC33CC">\n\n</font><font color="#FF0000">"</font><font color="#FF0000">))</font>
+<font color="#FF0000">)</font></tt></pre>
+There are lots of features that would be nice to have that I will not
+get to.  I'd like to be able to specify the delay time for things
+where I want to catch the process (e.g. menu options).  I would like
+to be able to set the final width in pixels.  And if I could switch to
+jpeg or gif when I know that would be better.
+
+StackOverflow also came through for me on a number of recent
+questions.  For org-mode last week, I couldn't figure out how to put
+org-mode examples into my class lecture notes: <a href="http://stackoverflow.com/questions/7431167/escaping-org-mode-example-block-inside-of-an-example-block">Escaping org-mode example block inside of an example block</a>.  This is the example
+that ended up working for me.  I use a source block with the contents
+escaped.  I then edit the block with C-' aka M-x org-edit-special.
+<pre>&#35;+begin_src org
+  ,&#35;+BEGIN_EXAMPLE  
+  ,* This is a heading
+  ,&#35;+END_EXAMPLE
+&#35;+end_src</pre>
+Monica has also started using StackOverflow and got help on emacs org-mode:
+<a
+href="http://stackoverflow.com/questions/7531672/color-of-date-tag-in-org-mode-publish-to-html-and-boxes-around-text">Color
+of date tag in org-mode publish to HTML and boxes around text</a>
+<pre><tt>#+STYLE: <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"text/css"</font><b><font color="#0000FF">&gt;</font></b> <font color="#993399">.timestamp</font> <font color="#FF0000">{</font> <font color="#0000FF">color:</font> <i><font color="#009900">purple</font></i>; <font color="#0000FF">font-weight:</font> <i><font color="#009900">bold</font></i>; <font color="#FF0000">}</font><b><font color="#0000FF">&lt;/style&gt;</font></b></tt></pre>
+This does a nice job of bringing the timestamps out from their obscure
+grey past.
+-----

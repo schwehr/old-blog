@@ -1,0 +1,67 @@
+TITLE: subversion - svn
+AUTHOR: Kurt
+DATE: 06.06.2005 12:59
+DESC: works well
+-----
+BODY:
+I finally decided to take the plunge and try out Subversion (svn)
+while on the plane.  It only took just over a year from when Aurelio
+showed me how cool svn is.  I have been a long hold in switching.  I
+think started using RCS (Revision Control System) at the prompting of
+Dan Goldman during our work on CS143 (Compilers) back at Stanford.  We
+shared our work via "fs setacl" on the ir.stanford.edu AFS cell.  That
+must have been in early 1993.  Then in 1996, I went to work in the
+Intelligent Mechanisms Group (IMG which is now the Autonomy and
+Robotics Group - or something like that).  At that time, the lead
+engineers were Dan Christian, Hans Thomas, and David Wettergreen.
+Three powerhouses that spun out of the CMU Field Robotics Center.
+Dave was the architect of the Marsokhod software over hall.  He wrote
+what is still the best software design document that I have used in
+developement to date.  They were all CVS (Concurrent Version System)
+guys.  It was great to transition from RCS to CVS.  I have been an
+emacs user since 1990 and like the very simple (it works!) version
+control capability of emacs.  The same commands work for CVS as for
+RCS.  Keeping that capability with SVN was a primary concern for me.
+So today on the plane, I opened up <b>svn-book.pdf</b> and gave SVN a
+quick try.  It just worked!  When I do <b>C-x v v</b> and <b>C-c
+C-c</b>, I am able to commit changes for a file.  The version display
+at the bottom of the frame look a little different.  In CVS, I way
+something like this:
+<pre>
+--:-- segy.py   Top L1  CVS-1.30   (Python)-----12:57PM-----
+</pre>
+Now editing a file under svn control, I see this:
+<pre>
+--:-- segy_drv_xstar.py 24% L125 SVN:1 (Python)----12:57PM 0.18-----
+</pre>
+Where did the 0.18 come from?  And it just went away.
+
+The quick start example in the book's tutorial was great.  Here is
+briefly what I did.  I made a local repository.  I still need to see
+about how to give myself remote access.
+<pre>
+  501  cd /User/Schwehr/Desktop  # not where you want to develop from!
+  504  mkdir svn
+  505  cd svn
+  512  svn --version
+  513  svdadmin create Master-svn
+  # Make a handy alias for later
+  520  export SVNMASTER=/Users/schwehr/Desktop/svn/Master-svn
+  521  mkdir tmp && cd tmp
+  523  mkdir -p project/{branches,tags,trunk}
+  524  cp ~/projects/xcore/src/segy-py/* project/trunk/
+  536  svn --help
+  546  svn import project file:///Users/schwehr/Desktop/svn/Master-svn -m "init
+al import"
+  554  svn checkout file://$SVNMASTER/trunk project
+  561  svn diff segy_drv_xstar.py 
+  562  svn update
+</pre>
+So you can see that it was not too much work, but I suggest reading
+the tutorial as the above will be pretty confusing to try to
+replicate.
+
+It is a little freaky to an old CVS hand to not see the actual
+individual files within the master directory.  Instead, it looks like
+things are being stored inside Berkeley DB files.
+-----

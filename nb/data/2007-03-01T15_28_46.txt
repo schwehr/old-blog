@@ -1,0 +1,95 @@
+TITLE: Monitoring serial port traffic on win32
+AUTHOR: Kurt
+DATE: 03.01.2007 15:28
+DESC: ais basestation vocabulary
+-----
+BODY:
+I wanted to see what some windows software sent to a device attached
+to a serial port.  Turns out that this is not so hard to do.  The only
+trick is to not try to do this on win64 (why did I try the xp64 box
+first?).  I tried Microsoft's suggestion of portmon (<a
+href="http://www.microsoft.com/technet/sysinternals/utilities/portmon.mspx">http://www.microsoft.com/technet/sysinternals/utilities/portmon.mspx</a>)
+but this only seems to record events, not traffic.  Here is a quick
+sample:
+<pre>
+22  0.00000000  someapp.exe  IOCTL_SERIAL_SET_WAIT_MASK  Serial0  Mask: 
+23  0.00000000  someapp.exe  IOCTL_SERIAL_CLR_DTR  Serial0  
+24  0.00000000  someapp.exe  IOCTL_SERIAL_PURGE  Serial0  Purge: TXABORT RXABORT TXCLEAR RXCLEAR
+25  0.00000000  someapp.exe  IRP_MJ_CLEANUP  Serial0  
+26  0.00000000  someapp.exe  IRP_MJ_CLOSE  Serial0  
+27  0.00000000  someapp.exe  IRP_MJ_CREATE  Serial0  Options: Open 
+28  0.00000000  someapp.exe  IOCTL_SERIAL_SET_WAIT_MASK  Serial0  Mask: RXCHAR 
+29  0.00000000  someapp.exe  IOCTL_SERIAL_SET_QUEUE_SIZE  Serial0  InSize: 4096 OutSize: 4096
+30  0.00000000  someapp.exe  IOCTL_SERIAL_PURGE  Serial0  Purge: TXABORT RXABORT TXCLEAR RXCLEAR
+31  0.00000000  someapp.exe  IOCTL_SERIAL_SET_TIMEOUTS  Serial0  RI:-1 RM:0 RC:1000 WM:0 WC:1000
+32  0.00000000  someapp.exe  IOCTL_SERIAL_GET_BAUD_RATE  Serial0  
+33  0.00000000  someapp.exe  IOCTL_SERIAL_GET_LINE_CONTROL  Serial0  
+34  0.00000000  someapp.exe  IOCTL_SERIAL_GET_CHARS  Serial0  
+35  0.00000000  someapp.exe  IOCTL_SERIAL_GET_HANDFLOW  Serial0  
+36  0.00000000  someapp.exe  IOCTL_SERIAL_GET_BAUD_RATE  Serial0  
+37  0.00000000  someapp.exe  IOCTL_SERIAL_GET_LINE_CONTROL  Serial0  
+38  0.00000000  someapp.exe  IOCTL_SERIAL_GET_CHARS  Serial0  
+39  0.00000000  someapp.exe  IOCTL_SERIAL_GET_HANDFLOW  Serial0  
+40  0.00000000  someapp.exe  IOCTL_SERIAL_SET_BAUD_RATE  Serial0  Rate: 38400
+41  0.00000000  someapp.exe  IOCTL_SERIAL_SET_RTS  Serial0  
+42  0.00000000  someapp.exe  IOCTL_SERIAL_SET_DTR  Serial0  
+43  0.00000000  someapp.exe  IOCTL_SERIAL_SET_LINE_CONTROL  Serial0  StopBits: 1 Parity: NONE WordLength: 8
+44  0.00000000  someapp.exe  IOCTL_SERIAL_SET_CHAR  Serial0  EOF:0 ERR:0 BRK:0 EVT:0 XON:11 XOFF:13
+45  0.00000000  someapp.exe  IOCTL_SERIAL_SET_HANDFLOW  Serial0  Shake:1 Replace:40 XonLimit:100 XoffLimit:100
+46  0.00000000  someapp.exe  IOCTL_SERIAL_SET_DTR  Serial0  
+47  0.00000000  someapp.exe  IOCTL_SERIAL_SET_WAIT_MASK  Serial0  Mask: RXCHAR 
+48  0.00000000  someapp.exe  IOCTL_SERIAL_WAIT_ON_MASK  Serial0  
+49  0.00000000  someapp.exe  IOCTL_SERIAL_SET_WAIT_MASK  Serial0  Mask: 
+50  0.00000000  someapp.exe  IOCTL_SERIAL_CLR_DTR  Serial0  
+51  0.00000000  someapp.exe  IOCTL_SERIAL_PURGE  Serial0  Purge: TXABORT RXABORT TXCLEAR RXCLEAR
+52  0.00000000  someapp.exe  IRP_MJ_CLEANUP  Serial0  
+53  0.00000000  someapp.exe  IRP_MJ_CLOSE  Serial0  
+</pre>
+Wow.  That was not want I wanted.  Instead I used the free verision of
+<a
+href="http://www.serial-port-monitor.com/">http://www.serial-port-monitor.com/</a>.
+You need to pay to get the logging to disk to work, but this was enough for me to capture some traffic:
+<pre>
+ 24 78 78 42 43 46 2C 33 36 36 30 30 30 30 30 31   $xxBCF,366000001
+ 2C 37 2C 32 37 35 34 2E 30 30 2C 4E 2C 38 32 34   ,7,2754.00,N,824
+ 35 2E 30 30 2C 57 2C 30 2C 32 30 38 37 2C 32 30   5.00,W,0,2087,20
+ 38 38 2C 32 30 38 37 2C 32 30 38 38 2C 31 2C 31   88,2087,2088,1,1
+ 2C 30 2C 30 2C 38 35 2A 36 39 0D 0A 24 78 78 42   ,0,0,85*69..$xxB
+ 43 46 2C 33 36 36 30 30 30 30 30 31 2C 37 2C 32   CF,366000001,7,2
+ 37 35 34 2E 30 30 2C 4E 2C 38 32 34 35 2E 30 30   754.00,N,8245.00
+ 2C 57 2C 30 2C 32 30 38 37 2C 32 30 38 38 2C 32   ,W,0,2087,2088,2
+ 30 38 37 2C 32 30 38 38 2C 31 2C 31 2C 30 2C 30   087,2088,1,1,0,0
+ 2C 38 35 2A 36 39 0D 0A 24 78 78 44 4C 4D 2C 30   ,85*69..$xxDLM,0
+ 2C 41 2C 2C 30 30 30 30 2C 30 2C 30 2C 30 30 30   ,A,,0000,0,0,000
+ 30 2C 2C 30 30 30 30 2C 30 2C 30 2C 30 30 30 30   0,,0000,0,0,0000
+ 2C 2C 30 30 30 30 2C 30 2C 30 2C 30 30 30 30 2C   ,,0000,0,0,0000,
+ 2C 30 30 30 30 2C 30 2C 30 2C 30 30 30 30 2C 2A   ,0000,0,0,0000,*
+ 31 38 0D 0A 24 50 4C 33 41 2C 52 41 44 49 4F 2C   18..$PL3A,RADIO,
+ 31 2C 2C 2C 2C 2C 2A 32 32 0D 0A 24 50 4C 33 41   1,,,,,*22..$PL3A
+ 2C 52 41 44 49 4F 2C 30 2C 2C 2C 2C 2C 2A 32 33   ,RADIO,0,,,,,*23
+ 0D 0A 24 78 78 43 42 4D 2C 2D 31 2C 2D 31 2C 2C   ..$xxCBM,-1,-1,,
+ 2C 2D 31 2C 30 2C 2D 31 2C 30 2C 2D 31 2C 2C 2C   ,-1,0,-1,0,-1,,,
+ 2D 31 2C 30 2C 2D 31 2C 30 2A 37 43 0D 0A 24 78   -1,0,-1,0*7C..$x
+ 78 43 42 4D 2C 2D 31 2C 2D 31 2C 2C 2C 2D 31 2C   xCBM,-1,-1,,,-1,
+ 30 2C 2D 31 2C 30 2C 2D 31 2C 2C 2C 2D 31 2C 30   0,-1,0,-1,,,-1,0
+ 2C 2D 31 2C 30 2A 37 43 0D 0A 24 78 78 42 53 51   ,-1,0*7C..$xxBSQ
+ 2C 42 43 46 2C 2A 30 37 0D 0A 24 78 78 42 53 51   ,BCF,*07..$xxBSQ
+ 2C 43 42 4D 2C 2A 30 43 0D 0A 24 78 78 42 53 51   ,CBM,*0C..$xxBSQ
+ 2C 44 4C 4D 2C 2A 30 35 0D 0A 24 78 78 42 53 51   ,DLM,*05..$xxBSQ
+ 2C 41 43 41 2C 2A 30 33 0D 0A 24 78 78 42 42 4D   ,ACA,*03..$xxBBM
+ 2C 31 2C 31 2C 30 2C 33 2C 31 34 2C 44 35 43 44   ,1,1,0,3,14,D5CD
+ 50 43 31 36 35 44 49 50 44 35 48 44 50 3D 35 43   PC165DIPD5HDP=5C
+ 43 31 37 35 2C 30 2A 34 42 0D 0A 24 78 78 42 42   C175,0*4B..$xxBB
+ 4D 2C 31 2C 31 2C 30 2C 33 2C 31 34 2C 44 35 43   M,1,1,0,3,14,D5C
+ 44 50 43 31 36 35 44 49 50 44 35 48 44 50 3D 35   DPC165DIPD5HDP=5
+ 43 43 31 37 35 2C 30 2A 34 42 0D 0A 24 50 4C 33   CC175,0*4B..$PL3
+ 41 2C 52 41 44 49 4F 2C 31 2C 2C 2C 2C 2C 2A 32   A,RADIO,1,,,,,*2
+ 32 0D 0A 24 50 4C 33 41 2C 52 41 44 49 4F 2C 2C   2..$PL3A,RADIO,,
+ 32 30 38 37 2C 32 30 38 38 2C 32 30 38 37 2C 30   2087,2088,2087,0
+ 2C 30 2A 31 31 0D 0A 24 50 4C 33 41 2C 52 41 44   ,0*11..$PL3A,RAD
+ 49 4F 2C 30 2C 2C 2C 2C 2C 2A 32 33 0D 0A         IO,0,,,,,*23..
+</pre>
+This answers my question of what I was supposed to replace those two
+'xx' characters with when talking to an AIS base station: <b>xx</b>.
+I was being to clever, I guess...
+-----

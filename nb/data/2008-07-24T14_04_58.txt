@@ -1,0 +1,30 @@
+TITLE: seq and fuser
+AUTHOR: Kurt
+DATE: 07.24.2008 14:04
+DESC: things that keep the system moving
+-----
+BODY:
+For listing out series of sols for the Phx mission, seq really is
+handy.  This little unix program lists a range of numbers.  The
+mission uses 3 digit numbers for the sol directories.
+<pre>
+% <b>seq -s " " -f '%03g' 43 58</b>
+043 044 045 046 047 048 049 050 051 052 053 054 055 056 057 058
+</pre>
+
+From: <a
+href="http://www.ibm.com/developerworks/linux/library/l-10sysadtips/?ca=dgr-lnxw07Linux10Tricks&S_TACT=105AGX59&S_CMP=GR">Lazy
+Linux: 10 essential tricks for admins</a>, which also talks about
+fuser.  fuser lists what processes are using a file.  The opposite of
+lsof (list of open files).
+
+And a little trick for new macs.  If you want to email the serial
+number and ethernet MAC address of a new machine to your admin that
+is keeping track of hardware (or yourself incase it is stolen), try
+this command:
+<pre>
+system_profiler -detailLevel basic SPHardwareDataType \
+SPNetworkDataType | mail -s "New mac hardware report for `hostname`"
+somebody@example.com
+</pre>
+-----

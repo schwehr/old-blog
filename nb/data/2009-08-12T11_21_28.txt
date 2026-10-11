@@ -1,0 +1,31 @@
+TITLE: Plotting in matplotlib from databases
+AUTHOR: Kurt
+DATE: 08.12.2009 11:21
+DESC: down to almost 1 line
+-----
+BODY:
+I've been trying to figure out how to get from data in the database to
+a matplotlib graph with the least amount of typing.  I started with this:
+<pre>fink install matplotlib-py26 ipython
+ipython -pylab
+import sqlite3
+cx = sqlite3.connect('20080407.decimated.db3')
+a = array( [tuple(row) for row in cx.execute('SELECT cg_offset, delta_t_sec FROM bs_time WHERE recvr=2;')] )
+x = a[:,0]
+y = a[:,1]
+plot(x,y)</pre>
+Trey suggested I just try transposing the array.  My original matrix is pairs of x,y:
+<pre>a.shape
+(50756, 2)
+a.T.shape
+(2, 50756)
+a.T
+array([[  2.40000000e+01,   2.50000000e+01,   3.40000000e+01, ...,
+          8.63840000e+04,   8.63940000e+04,   8.64040000e+04],
+       [  0.00000000e+00,  -1.00000000e+00,   0.00000000e+00, ...,
+          2.00000000e+01,   2.00000000e+01,   2.00000000e+01]])</pre>
+Then I can use the "*" before the array in the call to plot to expand out the first dimension of the array to be the arguments... this pulls out x and y separately.  The resulting ploting looks like:
+<pre>plot(*array( [tuple(row) for row in cx.execute('SELECT cg_offset, 
+      delta_t_sec FROM bs_time WHERE recvr=2;')] ).T)</pre>
+<img title="Matplotlib graph of data right from the database" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-08/matplotlib-timeoffset-graph.png"/>
+-----

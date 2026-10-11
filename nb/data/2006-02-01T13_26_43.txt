@@ -1,0 +1,30 @@
+TITLE: SDL troubles on 10.3.9
+AUTHOR: Kurt
+DATE: 02.01.2006 13:26
+DESC: quicktime and libstdc++ issues
+-----
+BODY:
+I was unable to build SDL from Fink on Mac OSX.  I got a nice reply
+from Max Horn on the topic.  I will try to see if I can fix this after
+I defend.
+<pre>
+  Well, /usr/lib/libstdc++.6.dylib in this case is conflicting with
+  libstdc++.a, the former is normally found on 10.4, but with
+  QuickTime 7 they backported it to 10.3.9 or something like that. 
+
+  So what happens is that SDL tries to link against both libstdc++.a,
+  and QuickTime, which in turn pulls in libstdc++.6.dylib, resulting
+  in a conflict. 
+
+  I am sorry but at this point I have no good idea how to work around
+  this. Maybe, if you feel brave enough, the SDL 1.2.9 package will
+  help you, because (IIRC) the few bits of C++ were removed again back
+  then (basically, I added an Audio CD driver some time ago for OS X
+  to SDL, which was written in C++, and somebody else then later was
+  so kind as to rewrite it to C, to avoid exactly problems like
+  this). 
+
+  I.e. you could try to copy the SDL 1.2.9 info file from the 10.4
+  tree to your 10.3 tree and try to compile that! 
+</pre>
+-----

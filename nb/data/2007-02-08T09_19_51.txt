@@ -1,0 +1,63 @@
+TITLE: noaadata-0.15 released
+AUTHOR: Kurt
+DATE: 02.08.2007 09:19
+DESC: woo hoo
+-----
+BODY:
+A big leap forward for my ais code.  I am back to being able to create
+sqlite3 databases from N-AIS formatted data.  Here is an example of
+how it works right now (as always... subject to change in future
+versions).  There is still lots of room for improvements.
+<pre>
+egrep 'r000006099|r003669947|r003669959' log-2007-01-25 | \
+./ais_normalize.py | ./ais_build_db.py -d testregion-2007-01-25.db3
+
+sqlite3 testregion-2007-01-25.db3 .tables
+position  shipdata
+
+sqlite3 testregion-2007-01-25.db3 .schema
+
+  CREATE TABLE position ( MessageID INTEGER, RepeatIndicator INTEGER,
+  UserID INTEGER, NavigationStatus INTEGER, ROT INTEGER, SOG
+  DECIMAL(4,1), PositionAccuracy INTEGER, Position_longitude
+  DECIMAL(8,5), Position_latitude DECIMAL(8,5), COG DECIMAL(4,1),
+  TrueHeading INTEGER, TimeStamp INTEGER, RegionalReserved INTEGER,
+  Spare INTEGER, RAIM BOOL, syncstate INTEGER, slottimeout INTEGER,
+  slotoffset INTEGER, cg_r VARCHAR(15), cg_timestamp INTEGER );
+
+  CREATE TABLE shipdata ( MessageID INTEGER, RepeatIndicator INTEGER,
+  UserID INTEGER, AISversion INTEGER, IMOnumber INTEGER, callsign
+  VARCHAR(7), name VARCHAR(20), shipandcargo INTEGER, dimA INTEGER,
+  dimB INTEGER, dimC INTEGER, dimD INTEGER, fixtype INTEGER, ETA
+  INTEGER, draught DECIMAL(3,1), destination VARCHAR(20), dte INTEGER,
+  Spare INTEGER, cg_r VARCHAR(15), cg_timestamp INTEGER );
+
+sqlite3 testregion-2007-01-25.db3 'SELECT \
+MIN(cg_timestamp),MAX(cg_timestamp) FROM position;'
+1169683514|1169769903
+
+sqlite3 testregion-2007-01-25.db3 'SELECT DISTINCT(UserID) FROM shipdata;'
+366981240
+366866560
+636011964
+...
+366939750
+...
+
+sqlite3 testregion-2007-01-25.db3 'SELECT Position_longitude,Position_latitude FROM position WHERE UserID=366939750;'
+-72.0967833333|41.4326833333
+...
+
+# schwehr@eel.ccom.nh 47 $ cd && sqlite3 testregion-2007-01-25.db3 'SELECT COUNT(DISTINCT(UserID)) FROM position;'
+43
+
+# schwehr@eel.ccom.nh 48 $ cd && sqlite3 testregion-2007-01-25.db3 'SELECT COUNT(DISTINCT(UserID)) FROM shipdata;'
+40
+
+# Start sqlite
+sqlite3 testregion-2007-01-25.db3
+
+sqlite&gt; select COUNT(DISTINCT(UserID)) from shipdata;
+40
+</pre>
+-----

@@ -1,0 +1,76 @@
+TITLE: Oddly names NOAA bathymetry grids
+AUTHOR: Kurt
+DATE: 10.02.2013 09:45
+DESC: more issues for NGDC to fix
+-----
+BODY:
+The US government is shut down, so I can't tell if these have been corrected, but here
+are some samples of the 47 NOAA BAG grids that do not match the established naming convention.
+These are all from <a href="http://surveys.ngdc.noaa.gov/mgg/NOS/coast/">http://surveys.ngdc.noaa.gov/mgg/NOS/coast/</a>
+<pre>D00001-D02000/D00168/BAG/D00168_UTM02_MB_4m_MLLW_1of5.bag            # UTM02?
+F00001-F02000/F00583/BAG/F00583_EastBranch_MB_50cm_MLLW_1of6.bag.gz  # EastBranch?
+F00001-F02000/F00586/BAG/F00586_MB_1m_NGVD29_1of1.bag.gz             # NGVD29
+F00001-F02000/F00596/BAG/F00596_MB_1m_HRD_1of1.bag.gz                # HRD?
+H10001-H12000/H11348/BAG/H11348_Combined_20m_MLLW_1of1.bag.gz        # Combined placement
+H10001-H12000/H11384/BAG/H11384_2m__MLLW_1of1.bag.gz                 # __
+H10001-H12000/H11407/BAG/H11407_50cm_MLLW_4oif7.bag.gz               # oif -&gt; of
+H10001-H12000/H11478/BAG/H11478_50cm_MLLW_1of13_A.bag.gz             # _A
+H10001-H12000/H11640/BAG/H11640_MB_1m_awois_MLLW_2of3.bag.gz         # awois
+H10001-H12000/H11849/BAG/H11849_Office_4m_MLLW_3pf4.bag.gz           # pf -&gt; of
+H10001-H12000/H11849/BAG/H11849_Office_2m_MLLW_2of4.bag.gz           # Office!
+H10001-H12000/H11854/BAG/H11854_50cm_MLLW_Combined_16of16.bag.gz     # Combined placement
+H10001-H12000/H11855/BAG/H11855_2m_VBES_1of10.bag.gz                 # VBES -&gt; VB
+H10001-H12000/H11856/BAG/H11856_MB_50cm_CRD_combined.bag.gz          # CRD?
+H10001-H12000/H11929/BAG/H11929_50cm_MLLW_4o6.bag.gz                 # o -&gt; of
+H10001-H12000/H11973/BAG/H11973_MB_10m_MLWW_Combined.bag.gz          # MLWW -&gt; MLLW
+H12001-H14000/H12133/BAG/H12133_MB_1m_IGLD88_1of1.bag.gz             # 88 or no 88?
+H12001-H14000/H12132/BAG/H12132_MB_50cm_IGLD_1of3.bag.gz
+W00001-W02000/W00220/BAG/W00220_MB_1m_other_1of1.bag.gz              # other?
+W00001-W02000/W00230/BAG/W00230_MB_8m_MLLW_Combined2.bag.gz          # Combined gets a number</pre>
+I started with this regular expression that I think matches the general naming convention:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> re
+<!-- -->
+FILENAME_RE <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>
+    r<font color="#FF0000">'(?P&lt;survey&gt;(?P&lt;survey_type&gt;[A-Z])(?P&lt;number&gt;[0-9]{5,})(?P&lt;extra&gt;[A-Z]*))'</font>
+    r<font color="#FF0000">'(_(?P&lt;sensor&gt;(VB|MB|LI)+))?'</font>
+    r<font color="#FF0000">'(_((?P&lt;cell_size&gt;\d+)(?P&lt;units&gt;m|cm)))?'</font>
+    r<font color="#FF0000">'(_(?P&lt;vdatum&gt;MLLW|MLW|MSL|MHW|MHHW))?'</font>
+    r<font color="#FF0000">'(_(?P&lt;grouping&gt;combined|((?P&lt;item_num&gt;\d+)of(?P&lt;item_total&gt;\d+))))?'</font>
+    r<font color="#FF0000">'(?P&lt;complete_ext&gt;\.(?P&lt;ext&gt;tif|bag|BAG|mb168)(\.gz)?)?$'</font><font color="#990000">,</font>
+    re<font color="#990000">.</font>IGNORECASE<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> filename <b><font color="#0000FF">in</font></b> <b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'files.txt'</font><font color="#990000">):</font>
+  match <font color="#990000">=</font> FILENAME_RE<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>filename<font color="#990000">)</font>
+  <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> match<font color="#990000">:</font>
+    <b><font color="#0000FF">print</font></b> filename<font color="#990000">,</font>
+</tt></pre>
+This is the regular expression I ended up with:
+<pre><tt><font color="#9A1900">FILENAME_RE</font> <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>
+    r<font color="#FF0000">'(?P&lt;survey&gt;(?P&lt;survey_type&gt;[A-Z])(?P&lt;number&gt;[0-9]{5,})(?P&lt;extra&gt;[A-Z]*))'</font>
+    r<font color="#FF0000">'(_(Office|EastBranch|Lynnhaven|NewportNews|Pipeline|SouthBranch|Terminal|UTM..))?'</font>
+    r<font color="#FF0000">'(_Combined)?'</font>
+    r<font color="#FF0000">'(_((?P&lt;cell_size_oops&gt;\d+)(?P&lt;units_oops&gt;m|cm)))?'</font>
+    r<font color="#FF0000">'(_(?P&lt;sensor&gt;(VB|VBES|MB|LI)+))?'</font>
+    r<font color="#FF0000">'(_((?P&lt;cell_size&gt;\d+)(?P&lt;units&gt;m|cm)))?'</font>
+    r<font color="#FF0000">'(_awois)?'</font>
+    r<font color="#FF0000">'(_Combined)?'</font>
+    r<font color="#FF0000">'(_+(?P&lt;vdatum&gt;(MLLW|MLWW)|MLW|MSL|MHW|MHHW|IGLD(88)?|other|NGVD29|HRD|CRD))?'</font>
+    r<font color="#FF0000">'(_Combined)?'</font>
+    r<font color="#FF0000">'(_SwashChannel)?'</font>
+    r<font color="#FF0000">'(_(?P&lt;grouping&gt;combined\d?|((?P&lt;item_num&gt;\d+)(of|o|oi|oif|pf)(?P&lt;item_total&gt;\d+))))?'</font>
+    r<font color="#FF0000">'(_A)?'</font>
+    r<font color="#FF0000">'(?P&lt;complete_ext&gt;\.(?P&lt;ext&gt;tif|bag|BAG|mb168)(\.gz)?)?$'</font><font color="#990000">,</font>
+    re<font color="#990000">.</font>IGNORECASE<font color="#990000">)</font>
+</tt></pre>
+Looking at vdatum_regional08132013.zip from <a href="http://vdatum.noaa.gov/download/data/">http://vdatum.noaa.gov/download/data/</a>, I see these:
+<pre>IGLD85/hydroc1.tif
+IGLD85/hydroc2.tif
+IGLD85/hydroc3.tif
+IGLD85/hydroc4.tif
+IGLD85/hydroc5.tif</pre>
+I know that NAVD29 is National Geodetic Vertical Datum of 1929 (NGVD29).  Is HRD the hurricane research division?  I would
+guess that CRD is the Columbia River Datum.
+Dear, National Geodetic Survey (<a href="http://www.ngs.noaa.gov">www.ngs.noaa.gov</a>), what are these?
+-----

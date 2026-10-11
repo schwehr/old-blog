@@ -1,0 +1,162 @@
+TITLE: OpenNS with GeoTrans
+AUTHOR: Kurt
+DATE: 04.05.2009 10:22
+DESC: not really working
+-----
+BODY:
+I just got <a href="http://www.opennavsurf.org/">Open Navigation
+Surface (OpenNS)</a> to compile with NGA's GeoTrans 2.4.2.  OpenNS
+comes with an unversioned geotrans tar, the since then, NGA has
+changed the API for the Lambert projections.  Of course, I tried the
+included bagread to see if what I had done worked on mac osx with the
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/fink/">geograns.info and openns fink packages</a>, and I got this error:
+<pre>% <b>bin/bagread sample-data/sample.bag</b>
+Input BAG file: sample-data/sample.bag
+trying to open: {sample-data/sample.bag}...
+bag file unavailable ! 400</pre>
+I haven't had time to dig into the code to explore what that error
+means.  Here is the diff to OpenNS:
+<pre>% <b>diff -ur OpenNS_CandidateRelease_1.1.0{,-new}</b></pre>
+Giving...
+<pre><tt>diff -ur OpenNS_CandidateRelease_1.1.0/api/bag_geotrans.c OpenNS_CandidateRelease_1.1.0-new/api/bag_geotrans.c
+<font color="#FF6600">--- OpenNS_CandidateRelease_1.1.0/api/bag_geotrans.c	2006-04-28 15:55:50.000000000 -0400</font>
+<font color="#009900">+++ OpenNS_CandidateRelease_1.1.0-new/api/bag_geotrans.c	2009-04-04 21:29:12.000000000 -0400</font>
+<font color="#0000FF">@@ -159,7 +159,7 @@</font>
+     Transverse_Mercator_Parameters tranmerc;	/* transverse mercator */
+     UTM_Parameters utm;				/* universal transverse mercator */
+     Polar_Stereo_Parameters polarst;		/* polar stereographic */
+<font color="#FF6600">-    Lambert_Conformal_Conic_Parameters lambert;	/* lambert conformal conic */</font>
+<font color="#009900">+    Lambert_Conformal_Conic_2_Parameters lambert;	/* lambert conformal conic */</font>
+ } GeotransParameters;
+ 
+ /* union of all the coordinate tuples defined in engine.h needed for bag */
+<font color="#0000FF">@@ -171,7 +171,7 @@</font>
+     UTM_Tuple utm;				/* universal transverse mercator */
+     Polar_Stereo_Tuple polarst;			/* polar stereographic */
+     UPS_Tuple ups;				/* universal polar stereographic */
+<font color="#FF6600">-    Lambert_Conformal_Conic_Tuple lambert;	/* lambert conformal conic */</font>
+<font color="#009900">+    Lambert_Conformal_Conic_2_Tuple lambert;	/* lambert conformal conic */</font>
+ } GeotransTuple;
+ 
+ /* these data are used global within this file */
+<font color="#0000FF">@@ -340,7 +340,7 @@</font>
+ 	{
+ 		case Input:
+ 		{
+<font color="#FF6600">-			inParams.mercator.origin_latitude = params-&gt;origin_latitude*DEG2RAD;</font>
+<font color="#009900">+			inParams.mercator.latitude_of_true_scale = params-&gt;origin_latitude*DEG2RAD;</font>
+ 			inParams.mercator.central_meridian = params-&gt;central_meridian*DEG2RAD;
+ 			inParams.mercator.scale_factor = params-&gt;scale_factor;
+ 			inParams.mercator.false_easting = params-&gt;false_easting;
+<font color="#0000FF">@@ -351,7 +351,7 @@</font>
+ 		break;
+ 		case Output:
+ 		{
+<font color="#FF6600">-			outParams.mercator.origin_latitude = params-&gt;origin_latitude*DEG2RAD;</font>
+<font color="#009900">+			outParams.mercator.latitude_of_true_scale = params-&gt;origin_latitude*DEG2RAD;</font>
+ 			outParams.mercator.central_meridian = params-&gt;central_meridian*DEG2RAD;
+ 			outParams.mercator.scale_factor = params-&gt;scale_factor;
+ 			outParams.mercator.false_easting = params-&gt;false_easting;
+<font color="#0000FF">@@ -670,8 +670,8 @@</font>
+ 			inParams.lambert.std_parallel_2 = params-&gt;std_parallel_2*DEG2RAD;
+ 			inParams.lambert.false_easting = params-&gt;false_easting;
+ 			inParams.lambert.false_northing = params-&gt;false_northing;
+<font color="#FF6600">-			stat |= Set_Coordinate_System( Interactive, Input, Lambert_Conformal_Conic );</font>
+<font color="#FF6600">-			stat |= Set_Lambert_Conformal_Conic_Params( Interactive, Input, inParams.lambert );</font>
+<font color="#009900">+			stat |= Set_Coordinate_System( Interactive, Input, Lambert_Conformal_Conic_2 );</font>
+<font color="#009900">+			stat |= Set_Lambert_Conformal_Conic_2_Params( Interactive, Input, inParams.lambert );</font>
+ 		}
+ 		break;
+ 		case Output:
+<font color="#0000FF">@@ -682,8 +682,8 @@</font>
+ 			outParams.lambert.std_parallel_2 = params-&gt;std_parallel_2*DEG2RAD;
+ 			outParams.lambert.false_easting = params-&gt;false_easting;
+ 			outParams.lambert.false_northing = params-&gt;false_northing;
+<font color="#FF6600">-			stat |= Set_Coordinate_System( Interactive, Output, Lambert_Conformal_Conic );</font>
+<font color="#FF6600">-			stat |= Set_Lambert_Conformal_Conic_Params( Interactive, Output, outParams.lambert );</font>
+<font color="#009900">+			stat |= Set_Coordinate_System( Interactive, Output, Lambert_Conformal_Conic_2 );</font>
+<font color="#009900">+			stat |= Set_Lambert_Conformal_Conic_2_Params( Interactive, Output, outParams.lambert );</font>
+ 		}
+ 		break;
+ 		default:
+<font color="#0000FF">@@ -741,7 +741,7 @@</font>
+ 			stat |= init_ups( Input, input_params );
+ 		}
+ 		break;
+<font color="#FF6600">-		case Lambert_Conformal_Conic:</font>
+<font color="#009900">+		case Lambert_Conformal_Conic_2:</font>
+ 		{
+ 			stat |= init_lambert( Input, input_params );
+ 		}
+<font color="#0000FF">@@ -802,7 +802,7 @@</font>
+ 			stat |= init_ups( Output, output_params );
+ 		}
+ 		break;
+<font color="#FF6600">-		case Lambert_Conformal_Conic:</font>
+<font color="#009900">+		case Lambert_Conformal_Conic_2:</font>
+ 		{
+ 			stat |= init_lambert( Output, output_params );
+ 		}
+<font color="#0000FF">@@ -870,11 +870,11 @@</font>
+ 			Set_UPS_Coordinates( Interactive, Input, inTuple.ups );
+ 		}
+ 		break;
+<font color="#FF6600">-		case Lambert_Conformal_Conic:</font>
+<font color="#009900">+		case Lambert_Conformal_Conic_2:</font>
+ 		{
+ 			inTuple.lambert.easting = input_coords-&gt;easting;
+ 			inTuple.lambert.northing = input_coords-&gt;northing;
+<font color="#FF6600">-			Set_Lambert_Conformal_Conic_Coordinates( Interactive, Input, inTuple.lambert );</font>
+<font color="#009900">+			Set_Lambert_Conformal_Conic_2_Coordinates( Interactive, Input, inTuple.lambert );</font>
+ 		}
+ 		break;
+ 		default:
+<font color="#0000FF">@@ -942,9 +942,9 @@</font>
+ 			output_coords-&gt;hemisphere = outTuple.ups.hemisphere;
+ 		}
+ 		break;
+<font color="#FF6600">-		case Lambert_Conformal_Conic:</font>
+<font color="#009900">+		case Lambert_Conformal_Conic_2:</font>
+ 		{
+<font color="#FF6600">-			stat |= Get_Lambert_Conformal_Conic_Coordinates( Interactive, Output, &amp;outTuple.lambert );</font>
+<font color="#009900">+			stat |= Get_Lambert_Conformal_Conic_2_Coordinates( Interactive, Output, &amp;outTuple.lambert );</font>
+ 			output_coords-&gt;easting = outTuple.lambert.easting;
+ 			output_coords-&gt;northing = outTuple.lambert.northing;
+ 		}
+diff -ur OpenNS_CandidateRelease_1.1.0/api/dt_cc.h OpenNS_CandidateRelease_1.1.0-new/api/dt_cc.h
+<font color="#FF6600">--- OpenNS_CandidateRelease_1.1.0/api/dt_cc.h	2006-02-20 17:07:03.000000000 -0500</font>
+<font color="#009900">+++ OpenNS_CandidateRelease_1.1.0-new/api/dt_cc.h	2009-04-04 17:41:05.000000000 -0400</font>
+<font color="#0000FF">@@ -18,7 +18,7 @@</font>
+ #include &lt;mgrs/mgrs.h&gt;
+ #include &lt;mercator/mercator.h&gt;
+ #include &lt;loccart/loccart.h&gt;
+<font color="#FF6600">-#include &lt;lambert/lambert.h&gt;</font>
+<font color="#009900">+#include &lt;lambert_2/lambert_2.h&gt;</font>
+ #include &lt;grinten/grinten.h&gt;
+ #include &lt;gnomonic/gnomonic.h&gt;
+ #include &lt;georef/georef.h&gt;
+diff -ur OpenNS_CandidateRelease_1.1.0/api/libincludes.pro OpenNS_CandidateRelease_1.1.0-new/api/libincludes.pro
+<font color="#FF6600">--- OpenNS_CandidateRelease_1.1.0/api/libincludes.pro	2006-03-13 15:48:06.000000000 -0500</font>
+<font color="#009900">+++ OpenNS_CandidateRelease_1.1.0-new/api/libincludes.pro	2009-04-04 21:30:26.000000000 -0400</font>
+<font color="#0000FF">@@ -1,5 +1,5 @@</font>
+<font color="#FF6600">-XERCESCROOT = $(PWD)/../extlibs/xerces-c-src_2_6_0</font>
+<font color="#009900">+#XERCESCROOT = $(PWD)/../extlibs/xerces-c-src_2_6_0</font>
+ 
+ # Setup the OpenNS software development includes. Normally application projects 
+ # will just need to include INC_OPENNSALL.
+<font color="#FF6600">-INC_OPENNSALL   = ../api ../extlibs/hdf5-1.6.1/src ../extlibs/geotrans ../extlibs/beecrypt-4.1.2 ../extlibs $(XERCESCROOT)/src</font>
+<font color="#009900">+#INC_OPENNSALL   = ../api ../extlibs/hdf5-1.6.1/src ../extlibs/geotrans ../extlibs/beecrypt-4.1.2 ../extlibs $(XERCESCROOT)/src</font>
+diff -ur OpenNS_CandidateRelease_1.1.0/api/libmaster.pro OpenNS_CandidateRelease_1.1.0-new/api/libmaster.pro
+<font color="#FF6600">--- OpenNS_CandidateRelease_1.1.0/api/libmaster.pro	2006-07-13 10:33:47.000000000 -0400</font>
+<font color="#009900">+++ OpenNS_CandidateRelease_1.1.0-new/api/libmaster.pro	2009-04-04 21:21:49.000000000 -0400</font>
+<font color="#0000FF">@@ -51,7 +51,7 @@</font>
+ 	OBJECTS_DIR = .obj/$(HOSTMACHINE)
+ 	QMAKE_CFLAGS += ${IVSCOPTS} 
+ 	QMAKE_CXXFLAGS += ${IVSCCOPTS2} 
+<font color="#FF6600">-	OPENNSLIBS += -lhdf5 -lxerces-c -lgeotrans -lbeecrypt -lszip -lzlib -lpthread</font>
+<font color="#009900">+	OPENNSLIBS += -lhdf5 -lxerces-c -lgeotrans -lbeecrypt -lsz -lz -lpthread</font>
+ 	LIBS	+= $$SYSOBJFILES $$OPENNSLIBS $$EXTRAUNIXLIBS
+         DESTDIR = ../lib/$(HOSTMACHINE)/
+     macx {
+</tt></pre>
+-----

@@ -1,0 +1,95 @@
+TITLE: Python regular expressions
+AUTHOR: Kurt
+DATE: 04.13.2008 14:14
+DESC: need to learn anyway
+-----
+BODY:
+To use <a href="http://www.djangoproject.com/">django</a>, I need to
+brush up a bit on my Python regular expressions.  I've wanted to get
+comfortable with the python regex module (re) for quite some time.  I
+am a heavy user of egrep, but there is different feel to the python re
+world compared to egrep and shell globs.  I remember <a
+href="http://infolab.stanford.edu/~ullman/">Jeff Ullman</a> teaching
+regular expressions with egrep and lex (now flex) in Intro To Computer
+Science using his text book <a
+href="http://infolab.stanford.edu/~ullman/ullman-books.html#fcsc">Foundations
+of Computer Science</a> (unfortunetly, I have the Pascal edition).
+
+Perl programmers are assumed to know regular expressions.  I think
+python programmers should get more exposure to regular expressions.
+
+Here are a few notes.  First on python resources:
+<ul>
+<li><a href="http://www.diveintopython.org/regular_expressions/">Dive
+Into Python's regular expressions</a> </li>
+<li><a href="http://www.amk.ca/python/howto/regex/">Regular Expression HOWTO</a> by A.M. Kuchling</a></li>
+</ul>
+First a quick use of the handy sub function.  I often use tr to
+replace characters.  Here is converting tabs to spaces with tr.
+<pre>
+tr '\t' ' ' &lt; test.txt 
+</pre>
+Here is the equivalent python:
+<pre>
+#!/usr/bin/env python
+import re, sys
+for line in sys.stdin:
+    print re.sub('\t',' ',line),
+</pre>
+Then getting to more complicated tasks, <a
+href="http://kodos.sourceforge.net/">kodos</a> is a really big leg up.
+It provides a GUI environment to try regular expressions and it shows
+the results as you type.  There is "Regex Reference Guide" hiding
+under the help menu that makes things much easier.  It can then give
+you sample code when you are done.
+
+Remember that you probably want to use <i>raw</i> strings to reduce the
+number of backslashes in your string.
+
+<pre>"\\w+\\s+\\1"</pre>becomes the raw string like this:<pre>r"\w+\s+\1"</pre>
+<img src="http://schwehr.org/blog/attachments/2008-04/kodos-py.png"/>
+
+Here is the sample code (with very minor alterations):
+<pre>
+<font color="orange">#!/usr/bin/env python</font>
+<font color="orange">#</font>
+<strong>import</strong> <font color="#2040a0">re</font>
+<font color="orange">#</font>
+<font color="orange"># common variables</font>
+<font color="#2040a0">rawstr</font> <font color="4444FF">=</font> <font color="#2040a0">r</font><font color="#008000">&quot;&quot;</font><font color="#008000">&quot;(?P&lt;group1&gt;<font color="#77dd77">\d</font>+)(?P&lt;group2&gt;<font color="#77dd77">\w</font>+)&quot;</font><font color="#008000">&quot;&quot;</font>
+<font color="#2040a0">embedded_rawstr</font> <font color="4444FF">=</font> <font color="#2040a0">r</font><font color="#008000">&quot;&quot;</font><font color="#008000">&quot;(?P&lt;group1&gt;<font color="#77dd77">\d</font>+)(?P&lt;group2&gt;<font color="#77dd77">\w</font>+)&quot;</font><font color="#008000">&quot;&quot;</font>
+<font color="#2040a0">matchstr</font> <font color="4444FF">=</font> <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;123abc asdf&quot;</font><font color="#008000">&quot;&quot;</font>
+<font color="orange">#</font>
+<font color="orange"># method 1: using a compile object</font>
+<font color="#2040a0">compile_obj</font> <font color="4444FF">=</font> <font color="#2040a0">re</font>.<font color="#2040a0">compile</font><font color="4444FF">(</font><font color="#2040a0">rawstr</font><font color="4444FF">)</font>
+<font color="#2040a0">match_obj</font> <font color="4444FF">=</font> <font color="#2040a0">compile_obj</font>.<font color="#2040a0">search</font><font color="4444FF">(</font><font color="#2040a0">matchstr</font><font color="4444FF">)</font>
+<font color="orange">#</font>
+<font color="orange"># method 2: using search function (w/ external flags)</font>
+<font color="#2040a0">match_obj</font> <font color="4444FF">=</font> <font color="#2040a0">re</font>.<font color="#2040a0">search</font><font color="4444FF">(</font><font color="#2040a0">rawstr</font>, <font color="#2040a0">matchstr</font><font color="4444FF">)</font>
+<font color="orange">#</font>
+<font color="orange"># method 3: using search function (w/ embedded flags)</font>
+<font color="#2040a0">match_obj</font> <font color="4444FF">=</font> <font color="#2040a0">re</font>.<font color="#2040a0">search</font><font color="4444FF">(</font><font color="#2040a0">embedded_rawstr</font>, <font color="#2040a0">matchstr</font><font color="4444FF">)</font>
+<font color="orange">#</font>
+<font color="orange"># Retrieve group(s) from match_obj</font>
+<font color="#2040a0">all_groups</font> <font color="4444FF">=</font> <font color="#2040a0">match_obj</font>.<font color="#2040a0">groups</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="orange">#</font>
+<font color="orange"># Retrieve group(s) by index</font>
+<font color="#2040a0">group_1</font> <font color="4444FF">=</font> <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+<font color="#2040a0">group_2</font> <font color="4444FF">=</font> <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#FF0000">2</font><font color="4444FF">)</font>
+<font color="orange">#</font>
+<font color="orange"># Retrieve group(s) by name</font>
+<font color="#2040a0">group1</font> <font color="4444FF">=</font> <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'group1'</font><font color="4444FF">)</font>
+<font color="#2040a0">group2</font> <font color="4444FF">=</font> <font color="#2040a0">match_obj</font>.<font color="#2040a0">group</font><font color="4444FF">(</font><font color="#008000">'group2'</font><font color="4444FF">)</font>
+<font color="orange">#</font>
+<strong>print</strong> <font color="#008000">'group1:'</font>,<font color="#2040a0">group1</font>
+<strong>print</strong> <font color="#008000">'group2:'</font>,<font color="#2040a0">group2</font>
+</pre>
+Running it:
+<pre>
+%  <b>./foo.py</b>
+group1: 123
+group2: abc
+</pre>
+
+Track back: Sean Gillies talk about regular expressions - <a href="http://zcologia.com/news/737/python-re-cipe/">Python re.cipe</a>
+-----

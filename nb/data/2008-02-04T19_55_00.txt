@@ -1,0 +1,26 @@
+TITLE: lxml 2.0 trouble
+AUTHOR: Kurt
+DATE: 02.04.2008 19:55
+DESC: need more testing
+-----
+BODY:
+I clearly have some work to do to track down some issues with
+yesterday's upgrade to lxml 2.0.  I ran through my unittests first, but
+I don't have unittests in this section of noaadata.
+<pre>
+Traceback (most recent call last):
+  File "./make_waterlevel_ais.py", line 38, in <module>
+    stations = Stations.ActiveStations(forceCache=True)
+  File "/Users/schwehr/Desktop/production/src/noaadata/noaadata/stations.py", line 233, in __init__
+  File "lxml.etree.pyx", line 2342, in lxml.etree.parse
+  File "parser.pxi", line 1700, in lxml.etree._parseDocument
+  File "parser.pxi", line 1732, in lxml.etree._parseMemoryDocument
+  File "parser.pxi", line 1633, in lxml.etree._parseDoc
+  File "parser.pxi", line 785, in lxml.etree._BaseParser._parseDoc
+  File "parser.pxi", line 450, in lxml.etree._ParserContext._handleParseResultDoc
+  File "parser.pxi", line 534, in lxml.etree._handleParseResult
+  File "parser.pxi", line 476, in lxml.etree._raiseParseError
+lxml.etree.XMLSyntaxError: Namespace prefix soapenv on Envelope is not defined, line 1, column 54
+Traceback (most recent call last):
+</pre>
+-----

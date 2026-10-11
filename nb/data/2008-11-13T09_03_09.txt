@@ -1,0 +1,36 @@
+TITLE: Tide data for tappy
+AUTHOR: Kurt
+DATE: 11.13.2008 09:03
+DESC: funky looking histogram
+-----
+BODY:
+Here is the tide data that I used for tappy.  Small section of waterlevels after converting to metric:
+<img title="waterlevel in meters" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-11/tides-metric.png"/>
+
+Here is a histogram done in matplotlib:
+
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python2.5</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>pyplot as plt
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>mlab as mlab
+<!-- -->
+waterlevels <font color="#990000">=</font> mlab<font color="#990000">.</font><b><font color="#000000">load</font></b><font color="#990000">(</font><font color="#FF0000">'tide-all-2.dat'</font><font color="#990000">)</font>
+<!-- -->
+n<font color="#990000">,</font> bins<font color="#990000">,</font> patches <font color="#990000">=</font> plt<font color="#990000">.</font><b><font color="#000000">hist</font></b><font color="#990000">(</font>waterlevels<font color="#990000">,</font> <font color="#993399">50</font><font color="#990000">)</font>
+<!-- -->
+plt<font color="#990000">.</font><b><font color="#000000">grid</font></b><font color="#990000">(</font>True<font color="#990000">)</font>
+plt<font color="#990000">.</font><b><font color="#000000">show</font></b><font color="#990000">()</font></tt></pre>
+
+<img title="Histgram of many days of waterlevel in meters" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-11/tide-histogram.png"/>
+
+Also, here is the sparse.def file that tappy.py uses for my data:
+<pre>parse = [ 
+          positive_integer('year'),
+          positive_integer('month'),
+          positive_integer('day'),
+          positive_integer('hour'),
+          positive_integer('minute'),
+          positive_integer('second'),
+          real('water_level'),
+         ]</pre>
+-----

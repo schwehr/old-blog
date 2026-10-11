@@ -1,0 +1,29 @@
+TITLE: BitVector improvement
+AUTHOR: Kurt
+DATE: 03.16.2006 07:07
+DESC: ever so cool
+-----
+BODY:
+Avi tweaked BitVector a little bit to allow the binary or operator to
+work on different sized BitVectors.  This is great as it make my
+function to set grow size of a BitVector that much easier.
+<pre>
+In [1]: from BitVector import BitVector
+In [2]: print BitVector(intVal=1) ^ BitVector(intVal=2)
+11
+In [3]: print BitVector(intVal=1) ^ BitVector(bitlist=[0,0,0,0,0,0,0,0])
+00000001
+In [4]: print BitVector(intVal=1) ^ BitVector(bitlist=[0]*8)
+00000001
+</pre>
+So the new function is just two lines...
+<pre>
+def bvSize(bv,size=8):
+    return (bv ^ BitVector(bitlist=[0]*size))
+</pre>
+Which works like this:
+<pre>
+In [6]: print bvSize(BitVector(intVal=123),32)
+00000000000000000000000001111011
+</pre>
+-----

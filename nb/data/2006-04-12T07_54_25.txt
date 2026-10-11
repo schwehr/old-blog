@@ -1,0 +1,22 @@
+TITLE: pysqlite2-py24 in fink
+AUTHOR: Kurt
+DATE: 04.12.2006 07:54
+DESC: trac beware
+-----
+BODY:
+I have stopped putting python 2.3 in my python based packages.  I
+figure less clutter for fink and few maintence issues.  The one
+drawback is that Mac OSX still has python 2.3 and no python 2.4.
+(Grr)
+
+The announcement for this morning is that pysqlite2-py24 is now in
+fink 10.4-transitional/unstable.  Trac users be warned.  If you
+install this and your database is in sqlite2 format with pysqlite,
+when you restart trac it will bomb out.  Here is how to upgrade your
+database:
+<pre>
+  $ mv trac.db trac2.db
+  $ sqlite trac2.db .dump | sqlite3 trac.db
+</pre>
+Which comes from <a href="http://projects.edgewall.com/trac/wiki/PySqlite">http://projects.edgewall.com/trac/wiki/PySqlite</a>
+-----

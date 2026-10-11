@@ -1,0 +1,163 @@
+TITLE: What did the USGS do to topo maps?
+AUTHOR: Kurt
+DATE: 10.01.2010 07:36
+DESC: very sad
+-----
+BODY:
+ <b>Update Oct 2</b>: See my newer posts where I find ways around this issue.
+
+This is very frustrating.  I love USGS Topo Maps.  In the field, I
+have spent a ton of time staring at them and adding field geology to
+them.  I thought it would be easy to go to the USGS web site these
+days and grab digital products that would totally rock.  I was wrong.
+I was hoping that I could grab properly done GeoTIFFs and be able to
+hit the ground running with gdal to pick out the locations I needed.
+Instead, I have spent a lot of hours getting frustrated.  Here is what
+I found.
+
+Most of this will be on Mac OSX 10.6.4.  I will note the Windows sections
+
+I started at <a
+href="http://topomaps.usgs.gov/">http://topomaps.usgs.gov/</a>.  That
+page made me think that I need to be looking at their <a
+href="http://topomaps.usgs.gov/drg/">Digital Raster Graphic (DRG)</a>
+page.  This is looking good.  The page says that the maps were scanned
+at 250 DPI - that should be okay.  But wait, the description and
+ordering page is a <a
+href="http://edc.usgs.gov/products/map/drg.html">Broken Link</a>.
+Right below that is a link to <a
+href="http://store.usgs.gov/locator/">Download free GeoPDF versions
+from the USGS Store</a>.  <a
+href="http://en.wikipedia.org/wiki/GeoPDF">GeoPDF</a> is a trademarked
+name of TerraGo.  This doesn't sound good.  This really is <a href="http://en.wikipedia.org/wiki/Geospatial_PDF">Geospatial PDF</a> which actually has has some info about it.  Looking at the wikipedia page for Geospatial PDF, I realize I am heading for trouble.  There are lots of apps that produce Geospatial PDFs, but there are few that can read them.  But, wohoo, GDAL is on the list that will read Geospatial PDF.  So it is time to try to download some data.
+
+The "locator" URL above redirected me to the <a href="http://store.usgs.gov/">USGS store</a>.  Wee... I can now click on "<a href="http://store.usgs.gov/b2c_usgs/usgs/maplocator/%28xcm=r3standardpitrex_prd&layout=6_1_61_48&uiarea=2&ctype=areaDetails&carea=%24ROOT%29/.do">Find, Order or Download FREE Topographic Maps!</a>".  This page is overly complicated and not at all what I expected.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-map-locator.png"/>
+
+I navigate in to the Grand Canyon and click on the radio button "THEN () MARK POINTS".  Yeah, I didn't see that at first.  Um... nothing changed on the map.  Weird.  I tried clicking on the map and select Google's Hydrid so I can actually see what I am doing.  There is now a placemark on the screen.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-map-locator-placemark.png"/>
+
+I first tried a 30 minute and larger quad, but that was painful.  Here
+I'm trying a 7.5 minute quad.  But why is a 30x60 showing up with the
+7.5 and 15 minute quads selected?  I also tried the <i>US Topo and
+"Digital Maps - Beta"</i>.  This at least lets me see the quad
+boundaries.  I'm going to try downloading the Havasuipai Point since
+this is a 2009 product and will hopefully be better than the abysmal
+Grand Canyon.  The download link is strange in that I'm getting a zip
+file of a PDF.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-map-locator-download.png"/>
+
+<a href="http://ims.er.usgs.gov/gda_services/download?item_id=5096863&quad=Havasupai%20Point&state=AZ&grid=7.5X7.5&series=TNM%20GeoPDF">the actual link</a> that will give you a file called gda_5096863.zip.  Unzipping this file shows us that the zip compression is not helping much.
+<pre><b>ls -l gda_5096863.zip AZ_Havasupai_Point_20090619_OM_geo.pdf</b>
+14554767 2010-10-01 06:58 AZ_Havasupai_Point_20090619_OM_geo.pdf
+14200846 2010-10-01 07:59 gda_5096863.zip</pre>
+Time to give it a little look over from the command line:
+<pre><b>file AZ_Havasupai_Point_20090619_OM_geo.pdf</b>
+AZ_Havasupai_Point_20090619_OM_geo.pdf: PDF document, version 1.6
+<!-- -->
+<b>identify AZ_Havasupai_Point_20090619_OM_geo.pdf</b>  # This took 20-30 seconds on my machine.
+AZ_Havasupai_Point_20090619_OM_geo.pdf PDF 1566x2088 1566x2088+0+0 16-bit Bilevel DirectClass 400KiB 0.070u 0:01.019
+<!-- -->
+<b>gdalinfo AZ_Havasupai_Point_20090619_OM_geo.pdf</b>
+ERROR 4: `AZ_Havasupai_Point_20090619_OM_geo.pdf' not recognised as a supported file format.
+<!-- -->
+gdalinfo failed - unable to open 'AZ_Havasupai_Point_20090619_OM_geo.pdf'.</pre>
+It looks like gdal as I have it setup in fink (1.7.2-3) is not going
+to work.  Based in GDAL's <a
+href="http://www.gdal.org/frmt_pdf.html">Geosptial PDF</a> page that
+PDF support will start in GDAL 1.8 and that it will require a version
+of popplar that is not yet in fink.  Time to try other tools.
+
+First Acrobat Reader 9.  First it wants a plugin.  I don't like that but okay.  2nd, this is not a topo map.  I love orthophotos, but that was not what I was looking for.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-map-7.5-map2pdf.png"/>
+
+Time to try to get the plugin.  Oh great, no Mac support and not even a mention of Linux.  This is getting worse and worse.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-terrago-nomac.png"/>
+
+I am going to revert back to the 30x60 Grand Canyon topo.  And see if I can do anything with it.  It has <b>horrible</b> JPG artifacts, but at least it is a topographic map.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-grandcanyon-jpg-artifacts.png"/>
+
+In Acrobat Pro 8, I can at least see the Geospatial PDF metadata:
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-metadata-acrobat.png"/>
+
+I saved out the file and here is what the "XMP" file looks like:
+<pre><tt><b><font color="#0000FF">&lt;rdf:Description</font></b> <font color="#009900">rdf:about</font><font color="#990000">=</font><font color="#FF0000">""</font>
+            <font color="#009900">xmlns:pdfx</font><font color="#990000">=</font><font color="#FF0000">"http://ns.adobe.com/pdfx/1.3/"</font><b><font color="#0000FF">&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:system_id/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:ctrl_num/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:rec_id/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:title&gt;</font></b>Grand Canyon, AZ<b><font color="#0000FF">&lt;/pdfx:title&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:series_id/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:sheet_id&gt;</font></b>F36112A1<b><font color="#0000FF">&lt;/pdfx:sheet_id&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:edition&gt;</font></b>000<b><font color="#0000FF">&lt;/pdfx:edition&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:scale&gt;</font></b>100000<b><font color="#0000FF">&lt;/pdfx:scale&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:pub_name&gt;</font></b>U.S. Geological Survey<b><font color="#0000FF">&lt;/pdfx:pub_name&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:producer_code&gt;</font></b>090200<b><font color="#0000FF">&lt;/pdfx:producer_code&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:sec_pub_name/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:nrn/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:nsn/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:inset/&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:coordinates&gt;</font></b>-113.000000 -- -112.000000 / 36.500000 -- 36.000000<b><font color="#0000FF">&lt;/pdfx:coordinates&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:pri_gpol&gt;</font></b>US<b><font color="#0000FF">&lt;/pdfx:pri_gpol&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:sec_gpol&gt;</font></b>AZ 04<b><font color="#0000FF">&lt;/pdfx:sec_gpol&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:pri_date&gt;</font></b>19970131<b><font color="#0000FF">&lt;/pdfx:pri_date&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:class&gt;</font></b>Unclassified<b><font color="#0000FF">&lt;/pdfx:class&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:rel_con&gt;</font></b>ZZ<b><font color="#0000FF">&lt;/pdfx:rel_con&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:projection&gt;</font></b>Universal Transverse Mercator<b><font color="#0000FF">&lt;/pdfx:projection&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:horizontal_datum&gt;</font></b>NAD27/Predicted 83<b><font color="#0000FF">&lt;/pdfx:horizontal_datum&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:vertical_datum&gt;</font></b>See Legend<b><font color="#0000FF">&lt;/pdfx:vertical_datum&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:spheroid&gt;</font></b>GRS 1980<b><font color="#0000FF">&lt;/pdfx:spheroid&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:grid_codes&gt;</font></b>Universal Transverse Mercator<b><font color="#0000FF">&lt;/pdfx:grid_codes&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:contour_type&gt;</font></b>See Legend<b><font color="#0000FF">&lt;/pdfx:contour_type&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:contour_units&gt;</font></b>meters<b><font color="#0000FF">&lt;/pdfx:contour_units&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:ll_lat&gt;</font></b>36.000000<b><font color="#0000FF">&lt;/pdfx:ll_lat&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:ll_long&gt;</font></b>-113.000000<b><font color="#0000FF">&lt;/pdfx:ll_long&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:ur_lat&gt;</font></b>36.500000<b><font color="#0000FF">&lt;/pdfx:ur_lat&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:ur_long&gt;</font></b>36.500000<b><font color="#0000FF">&lt;/pdfx:ur_long&gt;</font></b>
+         <b><font color="#0000FF">&lt;pdfx:pdf_version&gt;</font></b>1.6<b><font color="#0000FF">&lt;/pdfx:pdf_version&gt;</font></b>
+      <b><font color="#0000FF">&lt;/rdf:Description&gt;</font></b></tt></pre>
+So there is definitely projection info in there.
+
+Acrobat Pro on the Mac with the full map:
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-grandcanyo-acrobat.png"/>
+
+Trying the MAP2PDF TerraGo tool in Acrobat Pro on Windows XP gave a
+toolbar for geospatial notes and measuring capabilities, but there was
+no ability other than to export a normal (non-Geo) tiff.  Pretty
+useless.  It's not even worth the time to make a screenshot and
+getting back to my mac to include in the blog post.
+
+I figured I would look to see if there is a Google Earth tiled version
+of the map aleady, and there is.
+
+<a href="http://www.usgsquads.com/downloads/KMZ/USGS_24k_topo_index_with_topo_base.kmz">http://www.usgsquads.com/downloads/KMZ/USGS_24k_topo_index_with_topo_base.kmz</a>
+
+Turns out that this is even worse.  This is one of the poorest examples of a tiled view that I've seen.  It is supper slow to load, is horribly fuzzy, and doesn't behave right with flying around.
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-kmz-1.png"/>
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-kmz-2.png"/>
+
+<img title="" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/usgs-topo-kmz-3.png"/>
+
+Hopefully I can either georeference the tiff images by hand or maybe I
+can finally figure out how to properly build poppler 0.14.3 and get it
+integrated right with gdal's svn head.  I tried CentOS, Ubuntu 9.10,
+and Mac OSX 10.6 with fink 32 bit and in all cases I hit roadblocks
+that I have yet to figure out.
+
+Definitely frustrating.  No wonder Geospatial PDF has not taken off.
+I don't mind that the USGS provides Geospatial PDFs, but they need to
+1) step up the support in both free and commercial tools for consuming
+these, 2) they need to provide something like high quality GeoTIFFs in
+addition to the PDF, and 3) create better interfaces for getting at
+the data.
+-----

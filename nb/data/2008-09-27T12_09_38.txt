@@ -1,0 +1,172 @@
+TITLE: Playing with Zotero, GeoEndNote/GeoCite
+AUTHOR: Kurt
+DATE: 09.27.2008 12:09
+DESC: more info on GeoEndNote, GeoCite
+-----
+BODY:
+<a href="http://zotero.org">Zotero</a> just got sued by EndNote.  This
+makes me think more about creating a Django app for references
+complete with GeoDjango geometry.  Not that I have time to try that,
+but it seems like a good basic Django app.
+
+<img title="Zotero viewing my pubs" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-09/zotero.png"/>
+
+Going back to the GeoEndNote stuff that I did with Rochelle and Neil,
+here is a stripped down version of what EndNote puts out as xml:
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font> <b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;xml&gt;</font></b>
+  <b><font color="#0000FF">&lt;records&gt;</font></b>
+    <b><font color="#0000FF">&lt;record&gt;</font></b>
+      <b><font color="#0000FF">&lt;database</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"GEBCO_LIBRARY.enl"</font> <font color="#009900">path</font><font color="#990000">=</font><font color="#FF0000">"\\humpback\classes\SpatialAnalysis\GEBCO_LIBRARY.enl"</font><b><font color="#0000FF">&gt;</font></b>GEBCO_LIBRARY.enl<b><font color="#0000FF">&lt;/database&gt;</font></b>
+      <b><font color="#0000FF">&lt;source-app</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"EndNote"</font> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"11.0"</font><b><font color="#0000FF">&gt;</font></b>EndNote<b><font color="#0000FF">&lt;/source-app&gt;</font></b>
+      <b><font color="#0000FF">&lt;rec-number&gt;</font></b>99<b><font color="#0000FF">&lt;/rec-number&gt;</font></b>
+      <b><font color="#0000FF">&lt;foreign-keys&gt;</font></b>
+	<b><font color="#0000FF">&lt;key</font></b> <font color="#009900">app</font><font color="#990000">=</font><font color="#FF0000">"EN"</font> <font color="#009900">db-id</font><font color="#990000">=</font><font color="#FF0000">"9f5sd9wf8wxar9et9xkxwppg9swsewzf25td"</font><b><font color="#0000FF">&gt;</font></b>99<b><font color="#0000FF">&lt;/key&gt;</font></b>
+      <b><font color="#0000FF">&lt;/foreign-keys&gt;</font></b>
+      <b><font color="#0000FF">&lt;ref-type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"GEBCO"</font><b><font color="#0000FF">&gt;</font></b>40<b><font color="#0000FF">&lt;/ref-type&gt;</font></b>
+      <b><font color="#0000FF">&lt;contributors&gt;</font></b>
+	<b><font color="#0000FF">&lt;authors&gt;</font></b>
+	  <b><font color="#0000FF">&lt;author&gt;</font></b>Hirano, Naoto<b><font color="#0000FF">&lt;/author&gt;</font></b>
+	  <b><font color="#0000FF">&lt;author&gt;</font></b>Ogawa, Yujiro<b><font color="#0000FF">&lt;/author&gt;</font></b>
+	  <b><font color="#0000FF">&lt;author&gt;</font></b>Saito, Kazuo<b><font color="#0000FF">&lt;/author&gt;</font></b>
+	<b><font color="#0000FF">&lt;/authors&gt;</font></b>
+      <b><font color="#0000FF">&lt;/contributors&gt;</font></b>
+      <b><font color="#0000FF">&lt;titles&gt;</font></b>
+	<b><font color="#0000FF">&lt;title&gt;</font></b>Long-lived early Cretaceous seamount volcanism in the Mariana Trench, Western Pacific Ocean<b><font color="#0000FF">&lt;/title&gt;</font></b>
+	<b><font color="#0000FF">&lt;secondary-title&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/secondary-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/titles&gt;</font></b>
+      <b><font color="#0000FF">&lt;periodical&gt;</font></b>
+	<b><font color="#0000FF">&lt;full-title&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/full-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/periodical&gt;</font></b>
+      <b><font color="#0000FF">&lt;pages&gt;</font></b>371-379<b><font color="#0000FF">&lt;/pages&gt;</font></b>
+      <b><font color="#0000FF">&lt;volume&gt;</font></b>189<b><font color="#0000FF">&lt;/volume&gt;</font></b>
+      <b><font color="#0000FF">&lt;number&gt;</font></b>3-4<b><font color="#0000FF">&lt;/number&gt;</font></b>
+      <b><font color="#0000FF">&lt;keywords&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>Pacific Ocean<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>seamount<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+      <b><font color="#0000FF">&lt;/keywords&gt;</font></b>
+      <b><font color="#0000FF">&lt;dates&gt;</font></b>
+	<b><font color="#0000FF">&lt;year&gt;</font></b>2002<b><font color="#0000FF">&lt;/year&gt;</font></b>
+      <b><font color="#0000FF">&lt;/dates&gt;</font></b>
+      <b><font color="#0000FF">&lt;abstract&gt;</font></b>An alkaline volcanic rock sample, peralkaline rhyolite pillow lava, ...<b><font color="#0000FF">&lt;/abstract&gt;</font></b>
+      <b><font color="#0000FF">&lt;image&gt;</font></b>0247644805Hirano.gif<b><font color="#0000FF">&lt;/image&gt;</font></b>
+      <b><font color="#0000FF">&lt;caption&gt;</font></b>Fig. 2. Multi-narrowbeam map of the study area. ...<b><font color="#0000FF">&lt;/caption&gt;</font></b>
+      <b><font color="#0000FF">&lt;urls&gt;</font></b>
+	<b><font color="#0000FF">&lt;related-urls&gt;</font></b>
+	  <b><font color="#0000FF">&lt;url&gt;</font></b>http://www.sciencedirect.com/science/article/B6V6M-46RDBRM-2/1/fea80f95670b93f99f309ecc5366d201<b><font color="#0000FF">&lt;/url&gt;</font></b>
+	<b><font color="#0000FF">&lt;/related-urls&gt;</font></b>
+      <b><font color="#0000FF">&lt;/urls&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom1&gt;</font></b>POINT(147.67,15.5)<b><font color="#0000FF">&lt;/custom1&gt;</font></b> <i><font color="#9A1900">&lt;!-- This is WKT --&gt;</font></i>
+      <b><font color="#0000FF">&lt;custom2&gt;</font></b>1/1<b><font color="#0000FF">&lt;/custom2&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom4&gt;</font></b>Neil / Rochelle<b><font color="#0000FF">&lt;/custom4&gt;</font></b>
+    <b><font color="#0000FF">&lt;/record&gt;</font></b>
+  <b><font color="#0000FF">&lt;/records&gt;</font></b>
+<b><font color="#0000FF">&lt;/xml&gt;</font></b>
+</tt></pre>
+But if you look at the full original (plus I cleaned up the formatting), you
+will see all sorts of strange style tags that should not become part of a
+GeoCite GeoDjango application.
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font> <b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;xml&gt;</font></b>
+  <b><font color="#0000FF">&lt;records&gt;</font></b>
+    <b><font color="#0000FF">&lt;record&gt;</font></b>
+      <b><font color="#0000FF">&lt;database</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"GEBCO_LIBRARY.enl"</font> <font color="#009900">path</font><font color="#990000">=</font><font color="#FF0000">"\\humpback\classes\SpatialAnalysis\GEBCO_LIBRARY.enl"</font><b><font color="#0000FF">&gt;</font></b>GEBCO_LIBRARY.enl<b><font color="#0000FF">&lt;/database&gt;</font></b>
+      <b><font color="#0000FF">&lt;source-app</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"EndNote"</font> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"11.0"</font><b><font color="#0000FF">&gt;</font></b>EndNote<b><font color="#0000FF">&lt;/source-app&gt;</font></b>
+      <b><font color="#0000FF">&lt;rec-number&gt;</font></b>99<b><font color="#0000FF">&lt;/rec-number&gt;</font></b>
+      <b><font color="#0000FF">&lt;foreign-keys&gt;</font></b>
+	<b><font color="#0000FF">&lt;key</font></b> <font color="#009900">app</font><font color="#990000">=</font><font color="#FF0000">"EN"</font> <font color="#009900">db-id</font><font color="#990000">=</font><font color="#FF0000">"9f5sd9wf8wxar9et9xkxwppg9swsewzf25td"</font><b><font color="#0000FF">&gt;</font></b>99<b><font color="#0000FF">&lt;/key&gt;</font></b>
+      <b><font color="#0000FF">&lt;/foreign-keys&gt;</font></b>
+      <b><font color="#0000FF">&lt;ref-type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"GEBCO"</font><b><font color="#0000FF">&gt;</font></b>40<b><font color="#0000FF">&lt;/ref-type&gt;</font></b>
+      <b><font color="#0000FF">&lt;contributors&gt;</font></b>
+	<b><font color="#0000FF">&lt;authors&gt;</font></b>
+	  <b><font color="#0000FF">&lt;author&gt;</font></b>
+	    <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Hirano, Naoto<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	  <b><font color="#0000FF">&lt;/author&gt;</font></b>
+	  <b><font color="#0000FF">&lt;author&gt;</font></b>
+	    <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Ogawa, Yujiro<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	  <b><font color="#0000FF">&lt;/author&gt;</font></b>
+	  <b><font color="#0000FF">&lt;author&gt;</font></b>
+	    <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Saito, Kazuo<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	  <b><font color="#0000FF">&lt;/author&gt;</font></b>
+	<b><font color="#0000FF">&lt;/authors&gt;</font></b>
+      <b><font color="#0000FF">&lt;/contributors&gt;</font></b>
+      <b><font color="#0000FF">&lt;titles&gt;</font></b>
+	<b><font color="#0000FF">&lt;title&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Long-lived early Cretaceous seamount volcanism in the Mariana Trench, Western Pacific Ocean<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/title&gt;</font></b>
+	<b><font color="#0000FF">&lt;secondary-title&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/secondary-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/titles&gt;</font></b>
+      <b><font color="#0000FF">&lt;periodical&gt;</font></b>
+	<b><font color="#0000FF">&lt;full-title&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Marine Geology<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/full-title&gt;</font></b>
+      <b><font color="#0000FF">&lt;/periodical&gt;</font></b>
+      <b><font color="#0000FF">&lt;pages&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>371-379<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/pages&gt;&lt;volume&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>189<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/volume&gt;</font></b>
+      <b><font color="#0000FF">&lt;number&gt;&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>3-4<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/number&gt;</font></b>
+      <b><font color="#0000FF">&lt;keywords&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Pacific Ocean<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>seamount<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Ar-Ar age<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>alkali-basalt<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>rhyolite<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>post-shield volcanism<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+	<b><font color="#0000FF">&lt;keyword&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Cretaceous<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/keyword&gt;</font></b>
+      <b><font color="#0000FF">&lt;/keywords&gt;</font></b>
+      <b><font color="#0000FF">&lt;dates&gt;</font></b>
+	<b><font color="#0000FF">&lt;year&gt;</font></b>
+	  <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>2002<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	<b><font color="#0000FF">&lt;/year&gt;</font></b>
+      <b><font color="#0000FF">&lt;/dates&gt;</font></b>
+      <b><font color="#0000FF">&lt;abstract&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>An alkaline volcanic rock sample, peralkaline rhyolite pillow lava, in addition to some radiolarian-bearing pelagic sedimentary rocks, were collected by the Japanese submersible Shinkai 6500 from Quesada Seamount on the oceanward slope of the Mariana Trench. 40Ar-39Ar dating resulted in a plateau age of 129.3±2.6 Ma, which is approximately 10 Myr younger than the radiolarian age of the oldest intercalated tuffaceous radiolarian claystone of early Berriasian age (approximately 140 Ma). Fragments of volcanic glass that are of alkali-basalt (hawaiite) composition may indicate that this tuffaceous claystone was formed during the shield-building volcanic stage. Because the peralkaline rhyolite is a very differentiated volcanic rock and commonly erupts in the post-shield stage, we interpret that the activity lasted for a long period (approximately 10 Myr). This long-lived shield-building stage may be due to the slow moving rate of the Pacific Plate during the Early Cretaceous.<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/abstract&gt;</font></b>
+      <b><font color="#0000FF">&lt;image&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>0247644805Hirano.gif<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/image&gt;</font></b>
+      <b><font color="#0000FF">&lt;caption&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Fig. 2. Multi-narrowbeam map of the study area. The dive site is shown by an arrow. Contour interval is 100 m. Referred to Ogawa et al. (1994). <b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/caption&gt;</font></b>
+      <b><font color="#0000FF">&lt;urls&gt;</font></b>
+	<b><font color="#0000FF">&lt;related-urls&gt;</font></b>
+	  <b><font color="#0000FF">&lt;url&gt;</font></b>
+	    <b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>http://www.sciencedirect.com/science/article/B6V6M-46RDBRM-2/1/fea80f95670b93f99f309ecc5366d201<b><font color="#0000FF">&lt;/style&gt;</font></b>
+	  <b><font color="#0000FF">&lt;/url&gt;</font></b>
+	<b><font color="#0000FF">&lt;/related-urls&gt;</font></b>
+      <b><font color="#0000FF">&lt;/urls&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom1&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>POINT(147.67,15.5)<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/custom1&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom2&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>1/1<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/custom2&gt;</font></b>
+      <b><font color="#0000FF">&lt;custom4&gt;</font></b>
+	<b><font color="#0000FF">&lt;style</font></b> <font color="#009900">face</font><font color="#990000">=</font><font color="#FF0000">"normal"</font> <font color="#009900">font</font><font color="#990000">=</font><font color="#FF0000">"default"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"100%"</font><b><font color="#0000FF">&gt;</font></b>Neil / Rochelle<b><font color="#0000FF">&lt;/style&gt;</font></b>
+      <b><font color="#0000FF">&lt;/custom4&gt;</font></b>
+    <b><font color="#0000FF">&lt;/record&gt;</font></b>
+  <b><font color="#0000FF">&lt;/records&gt;</font></b>
+<b><font color="#0000FF">&lt;/xml&gt;</font></b>
+</tt></pre>
+BTW, I am now just using source-highlight for my blog...
+<pre>source-highlight -i geoendnote.xml -s xml --doc --out-format=html -o geoendnote.html</pre>
+-----

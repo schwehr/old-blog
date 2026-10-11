@@ -1,0 +1,82 @@
+TITLE: verizon evdo data service
+AUTHOR: Kurt
+DATE: 09.11.2007 07:14
+DESC: the good and the bad
+-----
+BODY:
+<b>NOTE:</b> More to come as I get used to working with this service.
+
+I've now had EVDO service from Verizon for a whopping 12 hours now.
+Somehow I both love it and hate it at the same time.  The unlimited
+package sounds good, but if you use more than 5GB per month, they say
+they will cancel your contract.  Not really unlimited.  As a tech
+professional, I can do that without blinking an eye or doing anything
+particularly interesting.  Assuming that I could get 1 Mb service (I'm
+seeing about half that), about 11 hours would put me over the monthly
+quota.  There will be no download of big disk images or data files via
+this service or much in the way of Google Earth flying.  
+
+I've had a couple disconnect issues with the USB720 EVDO device.
+Something about error 913.  Hmm.  I guess I need to get an extension
+cord for USB so that I can get power to the device from both USB
+ports.  For this, it is a bummer that the macs have one USB port on
+either side of the keyboard.  The cable from Verizon is not long
+enough (just 3-4 inches) to reach the other port.
+
+There is much good about this service.  Ping times around around 100ms
+from my house to my work server about 10 miles away.  The best part is
+ssh work and that is a pretty consistent time and typing on the server
+is just fine for a touch typist.  IRC works.  Yahoo and AIM work well.
+
+Everything feels pretty spunky.  They must have a quick DNS server on
+the wireless network.  It feels much faster for web browsing than over
+Verizon DSL.
+
+NTP seems to work, but not that well.  I see the packets coming into the computer by watching the network interface with <b>tcpdump -i ppp0</b>
+<pre>
+07:11:05.626982 IP 246.sub-75-193-34.myvzw.com.ntp > 38.99.80.156.ntp: NTPv4 client, strat 3, poll 6, prec -18
+07:11:05.790574 IP 38.99.80.156.ntp > 246.sub-75-193-34.myvzw.com.ntp: NTPv4 server, strat 2, poll 6, prec -19
+07:11:13.626148 IP 246.sub-75-193-34.myvzw.com.ntp > astoria.ccjclearline.com.ntp: NTPv4 client, strat 3, poll 6, prec -18
+07:11:13.626297 IP 246.sub-75-193-34.myvzw.com.ntp > s0106000ae61de0db.wp.shawcable.net.ntp: NTPv4 client, strat 3, poll 6, prec -18
+07:11:13.743254 IP astoria.ccjclearline.com.ntp > 246.sub-75-193-34.myvzw.com.ntp: NTPv4 server, strat 2, poll 6, prec -20
+07:11:13.873270 IP s0106000ae61de0db.wp.shawcable.net.ntp > 246.sub-75-193-34.myvzw.com.ntp: NTPv3 server, strat 4, poll 6, prec -6
+07:11:14.626034 IP 246.sub-75-193-34.myvzw.com.ntp > dworley.hsd1.ma.comcast.net.ntp: NTPv4 client, strat 3, poll 6, prec -18
+07:11:14.714244 IP dworley.hsd1.ma.comcast.net.ntp > 246.sub-75-193-34.myvzw.com.ntp: NTPv4 server, strat 2, poll 6, prec -17
+07:11:15.625947 IP 246.sub-75-193-34.myvzw.com.ntp > c-24-99-198-56.hsd1.ga.comcast.net.ntp: NTPv4 client, strat 3, poll 6, prec -18
+07:11:15.742216 IP c-24-99-198-56.hsd1.ga.comcast.net.ntp > 246.sub-75-193-34.myvzw.com.ntp: NTPv4 server, strat 2, poll 6, prec -20
+</pre>
+It took about 15 minutes for ntp to get itself setup, but then when I
+checked back later, it was back to trying to figure out the time
+servers.  This looks okay accept for the first 3 servers.
+<pre>
+ntpq -p -n
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+ 24.113.37.65    208.201.242.2    3 u  792  68m    1  175.081  -139.85   0.004
+ 24.6.113.157    209.81.9.7       2 u  789  68m    1  427.540  -288.45   0.004
+ 64.34.177.148   209.81.9.7       2 u  789  68m    1   87.062  -140.66   0.004
+*24.99.198.56    192.168.3.19     2 u   21   64  377  116.986  -142.03   7.947
+-8.15.10.42      132.163.4.102    2 u   19   64  377   86.039  -129.46   4.650
++38.99.80.156    209.81.9.7       2 u    8   64  377  179.685  -141.94   2.715
+-24.34.79.42     129.6.15.28      2 u   10   64  377  104.705  -135.36   3.697
+-64.235.106.9    128.233.150.93   2 u    9   64  377  129.718  -145.77   6.177
+-24.79.79.83     207.61.229.70    4 u   14   64  377  194.477  -146.78   7.466
++24.57.67.214    69.20.226.105    3 u   18   64  377  133.036  -141.75   4.571
+</pre>
+But then a couple minutes later, what happened?
+<pre>
+ntpq -p -n
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+ 24.113.37.65    208.201.242.2    3 u  235  68m    1  168.033   -2.610   0.004
+ 24.6.113.157    209.81.9.7       2 u  239  68m    1  1250.52  -545.74   0.004
+ 64.34.177.148   209.81.9.7       2 u  234  68m    1   95.519    7.780   0.004
+ 24.99.198.56    192.168.3.19     2 u   33   64   17  112.627   36.727  17.335
+ 8.15.10.42      132.163.4.102    2 u   42   64   17  106.708   60.707  24.993
+ 38.99.80.156    209.81.9.7       2 u  233   64   10  175.131    3.466   0.004
+ 24.34.79.42     129.6.15.28      2 u   34   64   17  108.377   50.153   5.339
+ 64.235.106.9    128.233.150.93   2 u   34   64   17  124.365   39.152  29.727
+ 24.79.79.83     207.61.229.70    4 u   37   64   17  162.554   31.220   2.209
+ 24.57.67.214    69.20.226.105    3 u   49   64   17  127.334   35.442   2.259
+</pre>
+-----

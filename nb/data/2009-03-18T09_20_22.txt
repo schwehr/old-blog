@@ -1,0 +1,34 @@
+TITLE: mysql kickstart in fink
+AUTHOR: Kurt
+DATE: 03.18.2009 09:20
+DESC: setting up a database
+-----
+BODY:
+Based on <a
+href="http://waage.sr.unh.edu/~braswell/blog/setting-up-a-secure-server-on-osx-105-with-fink/">notes
+by Rob Braswell</a>...
+
+First install mysql:
+<pre>% <b>fink install mysql-client mysql</b></pre>
+or
+<pre>% <b>fink install mysql-ssl-client mysql-ssl</b></pre>
+Now get the server running and make it start at boot.
+<pre>% <b>sudo daemonic enable mysql</b>
+% <b>sudo systemstarter start daemonic-mysql</b>
+% <b>sudo mysqladmin -u root password myrootpassword</b></pre>
+Create a user account for yourself.  If you use the nopasswd account, this db will be wide open to trouble.
+<pre>% <b>echo "CREATE USER $USER;" | mysql -u root -p</b>  # For unsecure no pass account...
+% <b>echo "CREATE USER $USER IDENTIFIED BY 'myuserpassword';" | mysql -u root -p</b> # Better version with password</pre>
+Give your account access to all the databases.
+<pre>% <b>echo "GRANT ALL PRIVILEGES ON *.* TO $USER@\"localhost\";" | mysql -u root -p</b>  # No passwd version
+% <b>echo "GRANT ALL PRIVILEGES ON *.* TO $USER@\"localhost\" IDENTIFIED BY 'myuserpassword';" | mysql -u root -p</b> # Password version
+</pre>
+Make a database to which you can add tables.  I'm playing with a library dump.
+<pre>% <b>echo "CREATE DATABASE library;" | mysql</b>
+% <b>echo "CREATE DATABASE library;" | mysql -p</b> # password version</pre>
+Now I insert the dump Les made into the local mysql database:
+<pre>% <b>mysql library &lt; library-dump.sql</b></pre>
+Warning: running mysql with no password for a user is only advisable in a sandbox for testing.  If you 
+do that in an environment where others can get anywhere near your database, you will be asking for 
+trouble.
+-----

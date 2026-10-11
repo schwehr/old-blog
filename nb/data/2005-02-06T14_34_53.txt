@@ -1,0 +1,21 @@
+TITLE: First python sqlite scripts
+AUTHOR: Kurt
+DATE: 02.06.2005 14:34
+DESC: Creating the magnetometer table
+-----
+BODY:
+I just wrote my first python script using pysqlite.  It loads in the
+magnetometer data from the current format used by both Bubba and Flo.
+The big bonus is that it is about a billion times faster than going
+from bash.  My bash import code made about 100 exec calls for each k15
+entry including the startup and shutdown of the sqlite command line
+interface.  Talk about ways to slow yourself down.  With perl or
+python all those awk like commands are just the use of the builtin
+split command.  And the "cat file | while read line; do" loops are
+just "for line in magfile.xreadline():" which is a little more
+intuitive for me.
+
+<a href="http://schwehr.org/software/scripts/build-db.py.html">Here is
+the script!</a>  20 lines of python.  It could use a little error
+cheecking, especially around the "create table mag" command.
+-----

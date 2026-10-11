@@ -1,0 +1,61 @@
+TITLE: When did a vessel leave an area?
+AUTHOR: Kurt
+DATE: 10.23.2008 14:20
+DESC: and N-AIS sample rates
+-----
+BODY:
+I'm getting an N-AIS feed of some vessels.  I just got asked about how
+often vessels are being sampled.  Here some quick analysis for one
+vessel just off of Boston (MMSI=366956050).  First I wrote a program
+to take my XYMT (long lat MMSI UTC_unix_timestamp) and convert it to a
+delta time.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+prev <font color="#990000">=</font> None
+<b><font color="#0000FF">for</font></b> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'one-vessel.xymt'</font><font color="#990000">):</font>
+    f <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()</font>
+<!-- -->
+    val <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>f<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">])</font>
+    <b><font color="#0000FF">if</font></b> prev <font color="#990000">==</font> None<font color="#990000">:</font>
+        prev <font color="#990000">=</font> val
+        <b><font color="#0000FF">continue</font></b>
+    delta <font color="#990000">=</font> val <font color="#990000">-</font> prev
+    prev <font color="#990000">=</font> val
+<i>    <b><font color="#0000FF">if</font></b> delta <font color="#990000">&gt;</font> <font color="#993399">200</font><font color="#990000">:</font>
+        <b><font color="#0000FF">continue</font></b></i>
+    <b><font color="#0000FF">print</font></b> delta
+</tt></pre>
+I ran the above first without the <i>italic</i> bit above to plot all
+times.  This gives spikes where ever the vessel left the search
+bounding box or the data logging system was offline.  You will see
+most of the points are close to 0.  The channel I'm using is supposed
+to decimate reports to one every 60 seconds.  This removes the
+negative delta times that I get from the full rate data feeds (due to
+USCG clock skews on the site controllers for each receive station).
+
+<img title="When did this vessel leave the area?" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/nais-reports-vessel-left.png"/>
+
+Then I reran the code with the <i>italic</i> code that throws out the
+times over 200 seconds.  This shows the stability of the 60 second
+reporting.  I am not sure where the timestamp is coming from, but it is probably one of:
+<ul>
+  <li>At the site controller next to the receiver</li>
+  <li>At the USCG aggregator</li>
+  <li>At my end in the USCG software that receives from the agregator via TCP/IP</li>
+</ul>
+This plot shows that the time between samples that I log ranges from
+60 to 180 seconds.
+
+<img title="Hard to see what the sample rates are" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/nais-reports-sample-rate.png"/>
+
+Finally a closeup that gives a sens of how stable the report interval is:
+
+<img title="With a subset of time, we can see the N-AIS reporting rate" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/nais-reports-sample-rate-closeup.png"/>
+
+It takes a histogram to see what is going on.  For samples that are
+less than 200 seconds apart, there are samples centered around 60
+seconds, 120 seconds, and 180 seconds.  Perhaps my TCP/IP assumption is wrong?
+I need to run a packet sniffer to check.
+
+<img title="Histogram of time " withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-10/nais-deltat-hist.png"/>
+-----

@@ -1,0 +1,123 @@
+TITLE: Upgrading to Tiger/Mac OSX 10.4
+AUTHOR: Kurt
+DATE: 02.21.2006 08:19
+DESC: Tips
+-----
+BODY:
+<b>Update:</b> This now becoming my how to upgrade document.
+
+I am in the middle of upgrading my Mac to OSX 10.4/Tiger.  My system
+info is now:
+<pre>
+  # uname -a
+  Darwin 
+  8.5.0 
+  Darwin Kernel Version 8.5.0: Sun Jan 22 10:38:46 PST 2006; 
+  root:xnu-792.6.61.obj~1/RELEASE_PPC Power Macintosh 
+  powerpc
+</pre>
+There are two questions that I am getting about upgrading to 10.4.5
+from 10.3.9.  First is "Why didn't you do this sooner?"  That one is
+simple!  Like I wanted to screw it up and spend time on my mac when I
+should be finishing my thesis.  The second question is a combined "How
+long did it take and did anything not work afterward?"  The answer to
+that is a little bit more complicated.  Yes it worked, but the time it
+took me will likely not be the same for you.  
+
+The basic install from the 10.4.3 DVD took about 1.5 hours on a 1.5
+GHz G4 Ti laptop.  The CD/DVD writer on these laptops is SLOW!  So I
+think that was the major bottleneck.  If you can use an external DVD
+reader that is faster, you should.  There is a half hour for Mac OSX
+updates.  Then I had to get XCode 2.2 from apple which is a 833 MB
+download.  That took another 2 hours over my home DSL link.  Then
+finally is fink which will be a day or two of background compiling.
+So the core is about 4-5 hours.  And most of that time, you can be
+doing something else like watching the Olympics.
+
+Does it work?  I think so!  Everything I have tried so far has worked
+fine.  I have yet to reinstall any of my applications.
+
+<a href="http://fink.sourceforge.net/download/upgrade.php">http://fink.sourceforge.net/download/upgrade.php</a>
+
+Here is a walk through with some of my notes...
+<ol>
+<li> First, I did a backup of my critical data and applications.
+Pic2Icon has disappeared from the net and I need both Acrobat 5 and 6
+to generate my thesis.  Grr.  
+<li> I made dmg DVD images with /Applications/Utilities/Disk\
+Utility.app on a firewire drive and then filled those with stuff I
+wanted to burn.  However, UFS firewire drives seem to not be able to
+build images &gt; 2 GB, so you must use a drive that uses the Mac OSX
+extended file system.
+<li>I then threw /sw in the Trash and emptied the trash.  It took
+about 15 minutes for the machine to delete 250k files.  Talk about
+slow.  I was a little nervous about using rm -rf, but that would have
+run a lot quicker.
+<li>According to the fink upgrade path, here is where to nuke your developer tools. /Developer/Tools/uninstall-devtools.pl in a terminal
+<li>FinkCommander also ended up in the trash.
+<li>I made sure that I had quite a bit of free disk space before
+starting the upgrade.  Turns out that it added about 4 GB of stuff to
+my machine.  I have no idea how much went where!
+<li>Then I detached my external monitor, keyboard, and mouse just to
+be safe.  I am sure they would not have caused trouble, but what the
+heck.
+<li>Dropped in the 10.4.3 Tiger DVD.  Read the readme; kick the the
+kickme.  Nothing really interesting in the readme.
+<li>Clicked the install icon and the machine rebooted.
+<li>Selected upgrade.  It then crunched away for 1:15.
+<li>Rebooted and then plugged the keyboard, mouse, and keyboard.  I
+have a Microsoft split keyboard and the mac asked me to press a bunch
+of keys.  Then it said something like ANSI/ISO keyboard.  I said yes
+and everything worked for logging back in.
+<li>Went through the setup program that popped up on login and
+registered my Tiger install.  Made sure not to ask for emails.
+<li>Then went right to Apple - Software Update.  That updated Java
+1.3.1 and 1.4.2 Release 2; Al Powerbook(15 inch); and Mac OSX Update
+Combined (PowerPC).  When that finished I rebooted.
+<li>Did Software update again and Got J2SE 5.0 Release 3.
+<li>Opened up Mail.app and let it take 10 minutes to grind through 10k
+emails.
+<li> Install the 10.4 X11 from the DVD.  /Volumes/Mac OS X Install DVD/System/Installation/Packages
+<li>Got the X-Code 2.2 dmg from apple: <a
+href="http://developer.apple.com/tools/xcode/index.html">http://developer.apple.com/tools/xcode/index.html</a>.
+This is free for any educational user.  Note that Firefox seems unable
+to pause restart the download, so I used Safari and had to do about 3
+pause/resumes to get all 833 MB to download.
+
+<li> Uninstall the Xcode stuff from 10.3.9.  Mount the xcode 2.2 dmg and run: sudo /Volumes/Xcode\ Tools/Utilities/uninstall-devtools.pl 
+This will nuke any stale headers or libraries.  
+<li> Reboot and ONLY then...
+<li>Installed Xcode 2.2.  Took about 20 minutes (not sure since I was
+watching the Olympics).  I noticed that Apple is now installing the
+X11SDK in the default installer.  I don't know if this because I had
+a 10.3.9 X11 SDK already installed, but I hope they just install it no
+matter what these days.
+<li><a href="http://fink.sf.net/">http://fink.sf.net/</a> - Download
+Fink 0.8.0 binary installer.  Install it and don't forget to drop
+FinkCommander in your /Applications folder.
+<li>From a terminal did "fink selfupdate".  I did CVS, but all normal
+users should use rsync!!  This took about 15 minutes.
+<li>Installed postgres-ssl-8.0, tetex, Qt and emacs from binaries
+(blue install button) in fink commander
+<li>FinkCommander - preferences - fink:  Turned on unstable and
+unstable crypto packages.
+<li>Started installing things like wget-ssl and gdal-py24.  Awesome!
+I can't wait to try the gdal python API!
+</ol>
+That is where I am at right now.  Mail is working.  MenuMeters kept
+right on cranking.  My desktop images stayed.  The Adobe CS programs
+work as well as before (I am not happy about Acrobat pro 5 or 6 right
+now).  A few preferences have been lost.  "open foo.pdf" has gone back
+to using preview, which I do not like.  Apple-I on a PDF, Open With,
+set to Adobe Reader 7.0, then Change All. 
+
+<b>WARNING:</b> Remember to backup critical data before upgrading!!!
+You are making regular backups right?!?!?  This is an extra important
+time to make backups.  Burn some DVDs and keep them away from your
+machine.  With upgrading 10.2 to 10.3 I had something like 10
+successes and 1 machine freak.  That 1 machine lost whatever was on
+the disk.  I don't know what the cause was and the 10.4 updater is
+probably better, but you are duly warned.
+
+Thanks to the Fink IRC folks for help with this!
+-----

@@ -1,0 +1,52 @@
+TITLE: Lazy loading for python
+AUTHOR: Kurt
+DATE: 01.25.2009 13:25
+DESC: handy
+-----
+BODY:
+For parsing binary SEGY data, I often only use a few of the attributes
+for each trace.  In order to speed up the code, I'm switching to lazy
+decoding of each trace.  The idea is to only decode that which we need.
+For a Python class, if you add a <i>__getattr__</i> method, python
+will call it if the class instance does not find that attribute.  Here is
+a small example:
+<pre><tt><font color="#000000">01:</font> <i><font color="#9A1900">#!/usr/bin/env python </font></i>
+<font color="#000000">02:</font> 
+<font color="#000000">03:</font> <b><font color="#0000FF">class</font></b> foo<font color="#990000">:</font>
+<font color="#000000">04:</font>     <b><font color="#0000FF">def</font></b> <b><font color="#000000">__init__</font></b><font color="#990000">(</font>self<font color="#990000">):</font>
+<font color="#000000">05:</font>         self<font color="#990000">.</font>existing_attr <font color="#990000">=</font> <font color="#FF0000">'Hello there'</font>
+<font color="#000000">06:</font> 
+<font color="#000000">07:</font>     <b><font color="#0000FF">def</font></b> <b><font color="#000000">__getattr__</font></b><font color="#990000">(</font>self<font color="#990000">,</font>name<font color="#990000">):</font>
+<font color="#000000">08:</font>         <b><font color="#0000FF">if</font></b> name<font color="#990000">==</font><font color="#FF0000">'not_there'</font><font color="#990000">:</font>
+<font color="#000000">09:</font>             val <font color="#990000">=</font> <font color="#FF0000">'a dynamic value'</font>
+<font color="#000000">10:</font>             self<font color="#990000">.</font>__dict__<font color="#990000">[</font>name<font color="#990000">]</font> <font color="#990000">=</font> val <i><font color="#9A1900"># Cache for future requests</font></i>
+<font color="#000000">11:</font>             <b><font color="#0000FF">return</font></b> 
+<font color="#000000">12:</font>         <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+<font color="#000000">13:</font>             <b><font color="#0000FF">raise</font></b> AttributeError<font color="#990000">,</font> name
+<font color="#000000">14:</font> 
+<font color="#000000">15:</font> f <font color="#990000">=</font> <b><font color="#000000">foo</font></b><font color="#990000">()</font>
+<font color="#000000">16:</font> <b><font color="#0000FF">print</font></b> <font color="#FF0000">'existing '</font><font color="#990000">,</font>f<font color="#990000">.</font>existing_attr
+<font color="#000000">17:</font> <b><font color="#0000FF">print</font></b> <font color="#FF0000">'missing  '</font><font color="#990000">,</font>f<font color="#990000">.</font>not_there
+<font color="#000000">18:</font> <b><font color="#0000FF">print</font></b> <font color="#FF0000">'exception'</font><font color="#990000">,</font>f<font color="#990000">.</font>causes_exception</tt></pre>
+On line 16, accessing <i>existing_attr</i> grabs that attribute as it
+was set in the __init__.  The second try on line 17, <i>not_there</i>
+triggers the __getattr__ and returns the string 'a dynamic value'.
+Finally on line 18, <i>causes_exception</i> falls through the else and
+triggers a Traceback by raising an exception.  
+<pre>% <b>./attrtest.py</b>
+existing  Hello there
+missing   a dynamic value
+exception
+Traceback (most recent call last):
+  File "./attrtest.py", line 16, in <module>
+    print 'exception',f.causes_exception
+  File "./attrtest.py", line 11, in __getattr__
+    raise AttributeError, name
+AttributeError: causes_exception</pre>
+If the computation is expensive and may be accessed again, the
+__getattr__ function can save the results in <i>self.__dict__[name]</i> (see line 10).
+
+Note: this is the first time I used source-highlight's line number feature.
+Here is the command line:
+<pre>% <b>source-highlight --doc --out-format=html -i attrtest.py -o attrtest.py.html -n</b></pre>
+-----

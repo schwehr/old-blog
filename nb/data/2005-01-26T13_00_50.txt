@@ -1,0 +1,29 @@
+TITLE: AMS database craziness
+AUTHOR: Kurt
+DATE: 01.26.2005 13:00
+DESC: How I parse sample names
+-----
+BODY:
+All I can say is that there has to be a better way!  I created this
+script today: <a
+href="http://schwehr.org/software/scripts/build-db.bash.html">build-db.bash</a>
+that creates the database of cores and k15/s7 data for each paleomag
+cube.  This is just out and out ugly.  Probably 80&#37; of the problem
+is that I am using bash.  Python or perl would make this less
+painful.  The rest of the problem comes from that this is not a
+straight import.  Data for each sample takes 4 lines: 1 line of header
+and 3 lines of 5 measurements each.  In that header is a lot of
+information.  My sample names look like this:
+<pre>
+   bp04-6gw-s2-141.2
+   |    |||  | |   |- Optional cm decimal place
+   |    |||  | |- Depth in cm
+   |    |||  |- Section number.  1 is the top section (water/bottom interface)
+   |    |||- (w)orking or (a)rchive half
+   |    ||- (g)ravity, (p)iston, (t)rigger
+   |    |- Core number
+   |- Cruise abbreviation -> BPSIO 2004 == bp04
+</pre>
+And then there is the trouble of making an SQL date out of "<em>1/3/05
+4:33 PM</em>."  It all adds up to a whacked out script.  Suggestions?
+-----

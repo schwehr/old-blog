@@ -1,0 +1,265 @@
+TITLE: pydap retrieves NOAA waterlevel raw 6 minute data
+AUTHOR: Kurt
+DATE: 01.03.2007 18:53
+DESC: a long one
+-----
+BODY:
+Many thanks to Rob Cermak on the pydap mailing list for helping me
+figure this out.  Clearly, I have more to learn about how to do these
+queries efficiently.  However, this is good enough for now.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">''</font><font color="#008000">'
+Try out pydap to fetch the current water level from the NOAA Co-ops
+server.  This is a really slow way to pull one data point!
+'</font><font color="#008000">''</font>
+<strong>import</strong> <font color="#2040a0">dap</font>.<font color="#2040a0">client</font>
+<font color="#2040a0">dataset</font><font color="4444FF">=</font><font color="#2040a0">dap</font>.<font color="#2040a0">client</font>.<font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="#008000">'Dataset keys:'</font>
+<strong>for</strong> <font color="#2040a0">item</font> <strong>in</strong> <font color="#2040a0">dataset</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">'  '</font>,<font color="#2040a0">item</font>
+<font color="#2040a0">seq</font> <font color="4444FF">=</font> <font color="#2040a0">dataset</font><font color="4444FF">[</font><font color="#008000">'WATERLEVEL_RAW_PX'</font><font color="4444FF">]</font>
+<font color="#2040a0">filt_seq</font><font color="4444FF">=</font><font color="#2040a0">seq</font>.<font color="#2040a0">filter</font><font color="4444FF">(</font><font color="#008000">'_STATION_ID=&quot;1615680&quot;&amp;_BEGIN_DATE=&quot;20060101&quot;&amp;_END_DATE=&quot;20060101&quot;&amp;_DATUM=&quot;MLLW&quot;'</font><font color="4444FF">)</font> 
+<strong>print</strong> <font color="#008000">'filter keys:'</font>
+<strong>for</strong> <font color="#2040a0">item</font> <strong>in</strong> <font color="#2040a0">filt_seq</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">'  '</font>,<font color="#2040a0">item</font>
+<font color="#444444">#</font>
+<font color="#444444"># Print the results.  To just get field, do this...</font>
+<font color="#444444">#</font>
+<strong>print</strong> <font color="#008000">'Just the WL_VALUE field:'</font>,<font color="#2040a0">filt_seq</font><font color="4444FF">[</font><font color="#008000">'WL_VALUE'</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<font color="#444444">#</font>
+<font color="#444444"># Fetch all the fields...</font>
+print 'One data point:'
+<strong>for</strong> <font color="#2040a0">item</font> <strong>in</strong> <font color="#2040a0">filt_seq</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#008000">'  '</font>,<font color="#2040a0">item</font>,<font color="#008000">':'</font>,<font color="#2040a0">filt_seq</font><font color="4444FF">[</font><font color="#2040a0">item</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font> 
+</pre>When I run the above, I get this after a long wait.  I really am fetching too many points and I am refetching for each field.
+<pre>./test_pydap.py 
+Dataset keys:
+   WATERLEVEL_RAW_PX
+filter keys:
+   _STATION_ID
+   _DATUM
+   _BEGIN_DATE
+   _END_DATE
+   DCP
+   SENSOR_ID
+   DATE_TIME
+   WL_VALUE
+   SIGMA
+   O
+   F
+   R
+   L
+Just the WL_VALUE field: 0.474
+One data point:
+   _STATION_ID : 1615680
+   _DATUM : MLLW
+   _BEGIN_DATE : 20060101
+   _END_DATE : 20060101
+   DCP : 1
+   SENSOR_ID : A1
+   DATE_TIME : l
+   WL_VALUE : 0.474
+   SIGMA : 0.064
+   O : 0
+   F : 0
+   R : 0
+   L : 0
+</pre>
+The answer on speed is to both constrain the time window to the 6
+minute interval (thereby not pulling the whole day) and getting all
+the fields in one call.  I was able to do the later from ipython like this:
+<pre>
+filt_seq._get_data()
+...
+ ('1615680',
+  'MLLW',
+  '20060101',
+  '20060101',
+  '1',
+  'A1',
+  'Jan  1 2006 11:48PM',
+  0.43099999999999999,
+  0.097000000000000003,
+  0,
+  0,
+  0,
+  0),
+ ('1615680',
+  'MLLW',
+  '20060101',
+  '20060101',
+  '1',
+  'A1',
+  'Jan  1 2006 11:54PM',
+  0.47399999999999998,
+  0.064000000000000001,
+  0,
+  0,
+  0,
+  0)]
+</pre>
+For some reason, I can't do this from a script?  This happens if I tack a _get_data() on the end of the above script.  I get this loveliness:
+<pre>
+Traceback (most recent call last):
+  File "./test_pydap.py", line 25, in <module>
+    data = filt_seq._get_data()
+  File "/sw/lib/python2.5/site-packages/dap/dtypes.py", line 223, in _get_data
+    return _build_data(self.level, *[var.data for var in self.values()])
+  File "/sw/lib/python2.5/site-packages/dap/dtypes.py", line 517, in _build_data
+    out = [_build_data(level-1, *els) for els in itertools.izip(*vars_)]
+  File "/sw/lib/python2.5/site-packages/dap/proxy.py", line 37, in __iter__
+    return iter(self[:])
+  File "/sw/lib/python2.5/site-packages/dap/proxy.py", line 105, in __getitem__
+    resp, data = openurl(url, self.cache, self.username, self.password)
+  File "/sw/lib/python2.5/site-packages/dap/util/http.py", line 21, in openurl
+    raise ClientError(msg)
+dap.exceptions.ClientError: 'Server error 0: "java.sql.SQLException:
+JZ006: Caught IOException: java.io.IOException: JZ0PA: The query has
+been cancelled and the response discarded.  The cancel was probably
+issued by another statement on the connection.";\n};\nError {\n code =
+0;\n message = "java.sql.SQLException: JZ0S2: Statement object has
+already been closed."'
+</pre>
+I am not sure what that java SQL error is about.  But when I use a
+very limited script, it all works?
+<pre>
+#!/usr/bin/env python
+import dap.client
+dataset=dap.client.open('http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level')
+seq = dataset['WATERLEVEL_RAW_PX']
+filt_seq=seq.filter('_STATION_ID="1615680"&_BEGIN_DATE="20060101"&_END_DATE="20060101"&_DATUM="MLLW"') 
+data = filt_seq._get_data()
+print 'Found this many waterlevel points:',len(data)
+print data[-1]
+</pre>
+Results in this:
+<pre>./test_pydap2.py 
+Dataset keys:
+   WATERLEVEL_RAW_PX
+Found this many waterlevel points: 240
+('1615680', 'MLLW', '20060101', '20060101', '1', 'A1', 'Jan  1 2006 11:54PM', 0.47399999999999998, 0.064000000000000001, 0, 0, 0, 0)
+</pre>
+Now to jump back to that performance problem.  I only want one sample,
+not 240.  Pulling only one should be much faster.  If I try limiting the 
+start and end dates by adding time, that should work, but it doesn't.
+<pre>filt_seq=seq.filter('_STATION_ID="1615680"&_BEGIN_DATE="20060101 10:00"&_END_DATE="20060101 11:00"&_DATUM="MLLW"') 
+</pre>
+Gives another server side error.
+<pre>
+dap.exceptions.ClientError: 'Server error 3: "Encountered
+\'\\\'20060101\' at line 1, column 65.\nWas expecting one of:\n \'*\'
+...\n \'{\' ...\n <ID> ...\n <INT> ...\n <FLOAT> ...\n <STR> ...\n
+";\n};\nError {\n code = 0;\n message = "java.sql.SQLException: JZ0S2:
+Statement object has already been closed."'
+</pre>
+When formatted for humans...
+<pre>
+dap.exceptions.ClientError: 
+Server error 3: 
+"Encountered '\'20060101\' at line 1, column 65.
+Was expecting one of:
+    \'*\' ...
+    \'{\' ...
+    <ID> ...
+    <INT> ...
+    <FLOAT> ...
+    <STR> ...
+    ";
+};
+Error {
+    code = 0;
+    message = "java.sql.SQLException: JZ0S2: Statement object has already been closed."
+</pre>
+Does this mean there is an error in the server side parser?  The spec
+(<a
+href="http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level.das">Raw_Water_Level.das</a>)
+says that this should be okay, right?
+<pre>
+_BEGIN_DATE {
+        String long_name "REQUIRED 8- to 14-character Begin Date (yyyymmdd hh:mi) surrounded in double quotes";
+        String Examples " 20040321  OR 20030712 19:02 ";
+    }
+</pre>
+I do have a 14 character string.  Hmmm.  Rob Cermak had an example URL
+for pulling the data.  Time to try out the URL query method.  Try it in a <a target="new" href="http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level.ascii?WATERLEVEL_RAW_PX.WL_VALUE&WATERLEVEL_RAW_PX._STATION_ID="1615680"&WATERLEVEL_RAW_PX._DATUM="MLLW"&WATERLEVEL_RAW_PX._BEGIN_DATE="20060101"&WATERLEVEL_RAW_PX._END_DATE="20060102"&WATERLEVEL_RAW_PX.WL_VALUE!=-999.9
+">pop-up window.</a>
+<pre>
+http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level.ascii?\
+WATERLEVEL_RAW_PX.WL_VALUE&WATERLEVEL_RAW_PX._STATION_ID="1615680"&\
+WATERLEVEL_RAW_PX._DATUM="MLLW"&WATERLEVEL_RAW_PX._BEGIN_DATE="20060101"&\
+WATERLEVEL_RAW_PX._END_DATE="20060102"&WATERLEVEL_RAW_PX.WL_VALUE!=-999.9
+</pre>
+You can try that on the command line something like this, but remove
+the \ characters and make it one monster line.
+<pre>
+wget -O data 'http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level.ascii?\
+WATERLEVEL_RAW_PX.WL_VALUE&WATERLEVEL_RAW_PX._STATION_ID="1615680"&\
+WATERLEVEL_RAW_PX._DATUM="MLLW"&\
+WATERLEVEL_RAW_PX._BEGIN_DATE="20060101"&\
+WATERLEVEL_RAW_PX._END_DATE="20060102"&\
+WATERLEVEL_RAW_PX.WL_VALUE!=-999.9'
+# Then check out the results...
+wc -l data 
+488 data
+head data
+Dataset {
+    Sequence {
+        Float64 WL_VALUE;
+    } WATERLEVEL_RAW_PX;
+} WATERLEVEL_RAW_PX;
+=============================================
+WATERLEVEL_RAW_PX.WL_VALUE
+0.436
+0.466
+0.428
+</pre>
+Note that I switched out the - for = to not freak out nano blogger.
+Now I should be able to specify time and get fewer results.
+<pre>
+wget -O data.1hr 'http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level.ascii?\
+WATERLEVEL_RAW_PX.WL_VALUE&
+WATERLEVEL_RAW_PX._STATION_ID="1615680"&\
+WATERLEVEL_RAW_PX._DATUM="MLLW"&\
+WATERLEVEL_RAW_PX._BEGIN_DATE="20060101"&\
+WATERLEVEL_RAW_PX._END_DATE="20060102"&\
+WATERLEVEL_RAW_PX.WL_VALUE!=-999.9'
+# Then check out the results...
+wc -l data.1hr
+19 data.1hr
+</pre>
+I can also pull the times for those samples.
+<pre>
+wget -O data.1hr 'http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level.ascii?\
+WATERLEVEL_RAW_PX.DATE_TIME&
+WATERLEVEL_RAW_PX._STATION_ID="1615680"&\
+WATERLEVEL_RAW_PX._DATUM="MLLW"&\
+WATERLEVEL_RAW_PX._BEGIN_DATE="20060101"&\
+WATERLEVEL_RAW_PX._END_DATE="20060102"&\
+WATERLEVEL_RAW_PX.WL_VALUE!=-999.9'
+</pre>
+Which give:
+<pre>
+Dataset {
+    Sequence {
+        String DATE_TIME;
+    } WATERLEVEL_RAW_PX;
+} WATERLEVEL_RAW_PX;
+===================================
+WATERLEVEL_RAW_PX.DATE_TIME
+"Jan  1 2006 10:00AM"
+"Jan  1 2006 10:06AM"
+"Jan  1 2006 10:12AM"
+"Jan  1 2006 10:18AM"
+"Jan  1 2006 10:24AM"
+"Jan  1 2006 10:30AM"
+"Jan  1 2006 10:36AM"
+"Jan  1 2006 10:42AM"
+"Jan  1 2006 10:48AM"
+"Jan  1 2006 10:54AM"
+"Jan  1 2006 11:00AM"
+</pre>
+I do not understand why I can't get a smaller time window through dap,
+but it does work through a URL.
+
+Have I lost you yet??? :)
+-----

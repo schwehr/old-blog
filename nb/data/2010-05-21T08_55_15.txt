@@ -1,0 +1,48 @@
+TITLE: Noaadata 0.44 released
+AUTHOR: Kurt
+DATE: 05.21.2010 08:55
+DESC: progress?
+-----
+BODY:
+It has been almost 10 months since I released an update to noaadata.
+I'm now putting more energy into libais, but noaadata is a reference
+to how I developed a lot of my processing techniques and it is much
+easier to try things out in noaadata and BitVector.  This really is
+the release where I realized that my XML language is not currently up
+to the task.  It has been a while since I've heard from the European
+group that is exploring the same idea using FreeAIS.  Also, I've added
+links to FreeAIS, gpsd, noaadata, and libais to the <a
+href="http://en.wikipedia.org/wiki/Automatic_Identification_System">wikipedia
+AIS</a> page.  Thanks to ESR, the state of non-paywalled documentation
+for AIS has greatly improved.  His <a
+href="http://gpsd.berlios.de/AIVDM.txt">AIVDM.txt</a> is currently the
+best non-code and open documentation of the NMEA side of AIS. Eric and
+I have had some really good discussion over IRC on #gpsd that have
+helped to illuminate some of the most confusing aspects of AIS
+messages.  Many issues still remain, so please join in the
+conversation.  For example, why do messages 22 and 23 have huge spare
+blocks when it is important to keep messages short to decrease the
+chance of noise on the VHF channel from corrupting the message?
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/downloads/noaadata-py-0.44.tar.bz2">noaadata-py-0.44.tar.bz2</a>
+<ul>
+  <li>Started working on the new and separate libais C++ library for AIS with C-Python bridge for Deepwater Horizon</li>
+   <li>Allow ais_bin_msgs.py to print out the corresponding AIVDM line</li>
+   <li>Msgs 6 and 8 decode dac and fi</li>
+	<li>Msg 21 fixed for ATONS to handle two new flags</li>
+	<li>Msg 21 handcoded can now deal with the extended name</li>
+	<li>ZNT NMEA string for NTP time quality</li>
+	<li>ais_normalize can handle data w/out timestamps</li>
+	<li>Add first C++ AIS code - ais_filter_by_mmsi</li>
+	<li>In ais.binary, fixed a 2's complement bug for the lowest negative number... this was bad!</li>
+	<li>Msg 7 had the spare as 1 bit when it should have been 2.
+      Creating a handcoded version to deal with shorter messages</li>
+	<li>This version corresponds to working on libais-0.1 to libais-0.2</li>
+   <li>New INSTALL file base on report from gemiller on irc:gpsd</li>
+   <li>NEW FILES: ais_msg_21_handcoded.py ais_msg_7_handcoded.py imo_001_11_handcoded.py </li>
+   <li>NEW FILES: template.bash nmea_error.py znt.py ais_filter_by_mmsi.cxx ais_bin_msgs.py </li>
+   <li>NEW FILES: ais_decimate_traffic.py ais_distance.py ais_info.py ais_nmea_find_matches.py </li>
+   <li>NEW FILES: ais_nmea_uptime2.py ais_nmea_uscg_timeshift.py ais_pg_grid_transits.py </li>
+   <li>NEW FILES: find_missing_logs.py logger_handlers.py serial-logger2.py </li>
+</ul>
+-----

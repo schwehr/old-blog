@@ -1,0 +1,66 @@
+TITLE: ivcon
+AUTHOR: Kurt
+DATE: 03.27.2005 13:02
+DESC: my packaging for building on MacOSX/Linux
+-----
+BODY:
+A while back, I worked on ivcon trying to get it to convert
+OpenInventor or WRL (VRML) files to DXF so that they were much easier
+to import into Blender, Lightwave, and Maya.  Well, no luck since it
+seemed to miss out on parts of the model.  But before what I did is
+lost, here it is.  The sourceforge project for ivcon has changes made
+post what the main author had done, but it is all MS Windows based.
+They fixed it so that it is not allocating large buffers on the stack
+which causes troubles on PPC/OSX, but works ok on Linux x86/MSWin.  I
+needed a Make system to build this and I wanted the MS Visual C++
+cruft out of there.  Here is the make file and I put up a tar ball
+snapshot should anyone want to play with it.  This Makefile is public
+domain or GPL'ed.  Your choice.
+<pre>
+   The original author's <a href="http://www.csit.fsu.edu/~burkardt/g_src/ivcon/ivcon.html">ivcon</a>
+   The source forge <a href="http://sourceforge.net/projects/ivcon/">ivcon</a>
+   My Makefile and source tar ball: <a href="http://schwehr.org/software/ivcon-sf1.0-kds-hack.tar.bz2">ivcon-sf1.0-kds-hack.tar.bz2</a>
+</pre>
+The Makefile:
+<pre>
+<font color="2040a0">SRCS+=</font>byu.cpp
+<font color="2040a0">SRCS+=</font>dxf.cpp
+<font color="2040a0">SRCS+=</font>gmod.cpp
+<font color="2040a0">SRCS+=</font>hrc.cpp
+<font color="2040a0">SRCS+=</font>iv.cpp
+<font color="2040a0">SRCS+=</font>ivconv.cpp
+<font color="2040a0">SRCS+=</font>main.cpp
+<font color="2040a0">SRCS+=</font>obj.cpp
+<font color="2040a0">SRCS+=</font>pov.cpp
+<font color="2040a0">SRCS+=</font>smf.cpp
+<font color="2040a0">SRCS+=</font>stl.cpp
+<font color="2040a0">SRCS+=</font>tds.cpp
+<font color="2040a0">SRCS+=</font>tec.cpp
+<font color="2040a0">SRCS+=</font>tmat.cpp
+<font color="2040a0">SRCS+=</font>tri.cpp
+<font color="2040a0">SRCS+=</font>txt.cpp
+<font color="2040a0">SRCS+=</font>ucd.cpp
+<font color="2040a0">SRCS+=</font>utils.cpp
+<font color="2040a0">SRCS+=</font>vla.cpp
+<font color="2040a0">SRCS+=</font>wrl.cpp
+<font color="2040a0">SRCS+=</font>xgl.cpp
+<font color="8b2252">
+<strong>OBJS</strong>:</font>=<font color="2040a0">${SRCS:.cpp=.o}</font>
+<font color="8b2252">
+<strong>TARGETS</strong>:</font>=ivconv mesh
+<font color="2040a0">CXXFLAGS:=</font> -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG -ffast-math -mpowerpc
+<font color="8b2252">
+<strong>targets</strong>:</font> <font color="2040a0">${TARGETS}</font>
+<font color="8b2252">
+<strong>ivconv</strong>:</font> <font color="2040a0">${OBJS}</font>
+	g++ $^ -o <font color="4080ff">$@</font> <font color="2040a0">${CXXFLAGS}</font>
+<font color="8b2252">
+<strong>mesh</strong>:</font> mesh.o
+	g++ $^ -o <font color="4080ff">$@</font> <font color="2040a0">${CXXFLAGS}</font>
+<font color="8b2252">
+<strong>clean</strong>:</font>
+	rm <font color="2040a0">${OBJS}</font> <font color="2040a0">${TARGETS}</font>
+
+
+</pre>
+-----

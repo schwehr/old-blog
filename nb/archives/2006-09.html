@@ -1,0 +1,904 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: September 2006 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2006-09-28T15_44_34.txt" name=
+"e2006-09-28T15_44_34.txt"></a>
+<h2 class="date">09.28.2006 15:44</h2>
+<div class="blogbody">
+<h3 class="title">xslt for ais</h3>
+<div class="item-description">I finally had to give XSLT a try and
+I am using my prototype XML language for the AIS binary messages (6
+and 8). The initial results are fantastic. First, here is a
+stripped down message in XML format.
+<pre>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">?xml</font> <font color=
+"#2040A0">version=</font><font color=
+"#008000">"1.0"</font> <font color=
+"#2040A0">encoding=</font><font color=
+"#008000">"utf-8"</font><font color="#2040A0">?</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+ <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">?xml-stylesheet</font> <font color=
+"#2040A0">type=</font><font color=
+"#008000">"text/xsl"</font> <font color=
+"#2040A0">href=</font><font color=
+"#008000">"ais.xsl"</font><font color=
+"#2040A0">?</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font> 
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">ais-binary-message</font> <font color=
+"#2040A0">version=</font><font color=
+"#008000">"1.0"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">message</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"waterlevel"</font> <font color=
+"#2040A0">aismsgnum=</font><font color=
+"#008000">"8"</font> <font color="#2040A0">dac=</font><font color=
+"#008000">"366"</font> <font color=
+"#2040A0">fid=</font><font color="#008000">"63"</font> <font color=
+"#2040A0">efid=</font><font color="#008000">"1"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Water level report.  In this case from the NOAA Co-Ops 6 minute raw data<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">note</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Prototype only for the Hampton Roads/Elizabeth River 2007 demonstration project<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/note</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">see-also</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>http://opendap.co-ops.nos.noaa.gov/axis/<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/see-also</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+<br /><br />    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"dac"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"16"</font> <font color=
+"#2040A0">type=</font><font color="#008000">"uint"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Designated Area Code<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">required</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>366<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/required</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"fid"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"4"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"uint"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Functional Identifier<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">required</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>1<font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/required</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"efid"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"12"</font> <font color=
+"#2040A0">type=</font><font color="#008000">"uint"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>extended functional identifier<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">required</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>12<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/required</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<br /><br />    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"stationid"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"6"</font> <font color=
+"#2040A0">arraylength=</font><font color=
+"#008000">"7"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"aisstr6"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Character identifier of the station.  Usually a number.<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">note</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>station name should be taken from an external lookup table based on stationid<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/note</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">unavailable</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>@@@@@@@<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/unavailable</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"waterlevel"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"16"</font> <font color=
+"#2040A0">type=</font><font color="#008000">"sdecimal"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Water level in centimeters<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">unavailable</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>-32768<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/unavailable</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"sigma"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"32"</font> <font color=
+"#2040A0">type=</font><font color="#008000">"float"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Standard deviation of 1 second samples used to compute the water level height<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">note</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>could easily be make a more compact decimal<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/note</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">units</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>m<font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/units</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">field</font> <font color=
+"#2040A0">name=</font><font color=
+"#008000">"link_down"</font> <font color=
+"#2040A0">numberofbits=</font><font color=
+"#008000">"1"</font> <font color="#2040A0">type=</font><font color=
+"#008000">"bool"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">description</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Unable to communicate with the tide system.  All data invalid<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/description</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/field</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/message</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font> <font color=
+"#444444">&lt;!-- waterlevel --&gt;</font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/ais-binary-message</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+That is not the most fun to read. I then started to read the XSLT
+tutorial here:<a href=
+"http://www.w3schools.com/xsl/xsl_value_of.asp">XSLT at
+w3schools.com</a>. My first example stylesheet looks like this.
+Note that I added a line to the above xml to use this stylessheet
+transformation. ais.xsl:
+<pre>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">?xml</font> <font color=
+"#2040A0">version=</font><font color=
+"#008000">"1.0"</font> <font color=
+"#2040A0">encoding=</font><font color=
+"#008000">"ISO-8859-1"</font><font color=
+"#2040A0">?</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:stylesheet</font> <font color=
+"#2040A0">version=</font><font color=
+"#008000">"1.0"</font> <font color=
+"#2040A0">xmlns:xsl=</font><font color=
+"#008000">"http://www.w3.org/1999/XSL/Transform"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:template</font> <font color=
+"#2040A0">match=</font><font color="#008000">"/"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">html</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">body</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">h2</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>AIS Message<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/h2</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">table</font> <font color=
+"#2040A0">border=</font><font color=
+"#008000">"1"</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">tr</font> <font color=
+"#2040A0">bgcolor=</font><font color=
+"#008000">"#9acd32"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">th</font> <font color="#2040A0">align=</font><font color=
+"#008000">"left"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Name<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/th</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">th</font> <font color="#2040A0">align=</font><font color=
+"#008000">"left"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>NumberOfBits<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/th</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">th</font> <font color="#2040A0">align=</font><font color=
+"#008000">"left"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>ArrayLength<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/th</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">th</font> <font color="#2040A0">align=</font><font color=
+"#008000">"left"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Type<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/th</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">th</font> <font color="#2040A0">align=</font><font color=
+"#008000">"left"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>Description<font color="#2040A0"><strong><font color="#4444FF"><strong>&lt;</strong></font><font color="#2040A0">/th</font><font color="#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/tr</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:for-each</font> <font color=
+"#2040A0">select=</font><font color=
+"#008000">"ais-binary-message/message/field"</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">tr</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:value-of</font> <font color=
+"#2040A0">select=</font><font color=
+"#008000">"@name"</font><font color="#2040A0">/</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:value-of</font> <font color=
+"#2040A0">select=</font><font color=
+"#008000">"@numberofbits"</font><font color=
+"#2040A0">/</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:value-of</font> <font color=
+"#2040A0">select=</font><font color=
+"#008000">"@arraylength"</font><font color=
+"#2040A0">/</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:value-of</font> <font color=
+"#2040A0">select=</font><font color=
+"#008000">"@type"</font><font color="#2040A0">/</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+      <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">xsl:value-of</font> <font color=
+"#2040A0">select=</font><font color=
+"#008000">"description"</font><font color=
+"#2040A0">/</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font><font color=
+"#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/td</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/tr</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/xsl:for-each</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+    <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/table</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/body</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/html</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/xsl:template</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040A0"><strong><font color=
+"#4444FF"><strong>&lt;</strong></font><font color=
+"#2040A0">/xsl:stylesheet</font><font color=
+"#4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+To first look at the results, I just loaded the file into firefox.
+Then when it came to writing this up, I used
+<pre>
+xsltproc waterlevel.xml &gt; waterlevel.xml
+</pre>
+Here are the very nice looking results. Hopefully the nanoblogger
+css does not mess with the look.
+<h2>AIS Message</h2>
+<br />
+<table border="1">
+<tr bgcolor="#9ACD32">
+<th align="left">Name</th>
+<th align="left">NumberOfBits</th>
+<th align="left">ArrayLength</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+<tr>
+<td>dac</td>
+<td>16</td>
+<td></td>
+<td>uint</td>
+<td>Designated Area Code</td>
+</tr>
+<tr>
+<td>fid</td>
+<td>4</td>
+<td></td>
+<td>uint</td>
+<td>Functional Identifier</td>
+</tr>
+<tr>
+<td>efid</td>
+<td>12</td>
+<td></td>
+<td>uint</td>
+<td>extended functional identifier</td>
+</tr>
+<tr>
+<td>stationid</td>
+<td>6</td>
+<td>7</td>
+<td>aisstr6</td>
+<td>Character identifier of the station. Usually a number.</td>
+</tr>
+<tr>
+<td>waterlevel</td>
+<td>16</td>
+<td></td>
+<td>sdecimal</td>
+<td>Water level in centimeters</td>
+</tr>
+<tr>
+<td>sigma</td>
+<td>32</td>
+<td></td>
+<td>float</td>
+<td>Standard deviation of 1 second samples used to compute the
+water level height</td>
+</tr>
+<tr>
+<td>link_down</td>
+<td>1</td>
+<td></td>
+<td>bool</td>
+<td>Unable to communicate with the tide system. All data
+invalid</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-28T15_44_34.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-10-02T09_41_30.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-28T07_52_35.txt" name=
+"e2006-09-28T07_52_35.txt"></a>
+<h2 class="date">09.28.2006 07:52</h2>
+<div class="blogbody">
+<h3 class="title">Portsmouth 1.2 Million for port security</h3>
+<div class="item-description"><br />
+<br />
+NOTE: nano blogger does not like '$' in the title<br />
+<br />
+<a href=
+"http://www.seacoastonline.com/news/09272006/nhnews-ph-por-port.security.html">
+seacoast online article</a>
+<pre>
+Port gets $1.2M to make water and bridges safer
+<br /><br />By Adam Leech
+aleech@seacoastonline.com
+<br /><br />PORTSMOUTH -- A $1.2 million homeland security grant will provide the
+Port of New Hampshire with sonar equipment that will allow for better
+surveillance of the port, both above and below the water's surface.
+<br /><br />The Pease Development Authority Division of Ports and Harbors was one
+of 100 ports in the country on the U.S. Coast Guard's most critical
+seaport list and one of 50 to receive federal grants. In all, the
+Department of Homeland Security awarded $168 million for port
+infrastructure improvements.
+<br /><br />The money will go toward permanent mounted sonar units that will
+enable port security to see the entire port, the river and bridges,
+according to Dick Green, executive director of Pease Development
+Authority. A portable sonar unit will also be purchased and placed on
+a small boat to enable port security to detect suspicious items
+underwater.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-28T07_52_35.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-28T15_44_34.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-28T07_36_36.txt" name=
+"e2006-09-28T07_36_36.txt"></a>
+<h2 class="date">09.28.2006 07:36</h2>
+<div class="blogbody">
+<h3 class="title">python wsgi - web server gateway interface</h3>
+<div class="item-description"><a href=
+"http://www.xml.com/pub/a/2006/09/27/introducing-wsgi-pythons-secret-web-weapon.html">
+wsgi on xml.com</a>
+<pre>
+Web Server Gateway Interface Part I: Getting Started
+<br /><br />The recent Python 2.5 release features the addition of the Web Server
+Gateway Interface Utilities and Reference Implementation package
+(wsgiref) to Python's standard library.
+<br /><br />In this two-part article, we will look at what the Web Server Gateway
+Interface is, how to use it to write web applications, and how to use
+middleware components to quickly add powerful functionality. Before
+diving into these topics, we will also take a brief look at why the
+specification was created in the first place.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-28T07_36_36.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-28T07_52_35.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-22T13_59_34.txt" name=
+"e2006-09-22T13_59_34.txt"></a>
+<h2 class="date">09.22.2006 13:59</h2>
+<div class="blogbody">
+<h3 class="title">wxGlade for python GUIs</h3>
+<div class="item-description">I think I am still stuck in the dark
+ages with the old SGI xforms from 1994/5. That was totally trivial
+to use, but not overly flexible. I gave wxGlade a try to day and it
+was not the most fun. The app crashed quite a few times and there
+is not the ability to just draw the widgets in place. Yes, it is
+much more powerful that xforms, but I was hoping to bang out a
+quick app. It looks like there are quite a few bugs. Things did not
+render right and were very confusing. I think I am going back to
+the command line generator. But at least Roland gave me enough of a
+tutorial that I can get going on things now if I need to come back
+to writing the little GUI that I want.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-22T13_59_34.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-28T07_36_36.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-22T08_29_07.txt" name=
+"e2006-09-22T08_29_07.txt"></a>
+<h2 class="date">09.22.2006 08:29</h2>
+<div class="blogbody">
+<h3 class="title">python 2.5 packages - setuptools and lxml</h3>
+<div class="item-description">It has begun... the great switch to
+python 2.5 for fink. This morning, I got setuptools and lxml out
+for python 2.5. I have only done trivial testing, but things seem
+to be ok. I am still not up for making python 2.5 be my default
+python.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-22T08_29_07.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-22T13_59_34.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-21T13_13_59.txt" name=
+"e2006-09-21T13_13_59.txt"></a>
+<h2 class="date">09.21.2006 13:13</h2>
+<div class="blogbody">
+<h3 class="title">python 2.5 in fink</h3>
+<div class="item-description">Woo hoo! Python 2.5 is on my mac via
+fink.
+<pre>
+# python2.5
+Python 2.5 (r25:51908, Sep 21 2006, 13:08:01) 
+[GCC 4.0.1 (Apple Computer, Inc. build 5341)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; print "yes" if True else "no"
+yes
+&gt;&gt;&gt; print "yes" if False else "no"
+no
+&gt;&gt;&gt;
+</pre>
+It also seems that python 2.5 is much faster, but this probably has
+to do with me having absolutely no additional packages installed.
+<pre>
+# time python2.5 -c "print 'hello'"
+hello
+<br /><br />real    0m0.081s
+user    0m0.012s
+sys     0m0.067s
+<br /><br /># time python2.4 -c "print 'hello'"
+hello
+<br /><br />real    0m0.211s
+user    0m0.012s
+sys     0m0.104s
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-21T13_13_59.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-22T08_29_07.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-20T11_19_16.txt" name=
+"e2006-09-20T11_19_16.txt"></a>
+<h2 class="date">09.20.2006 11:19</h2>
+<div class="blogbody">
+<h3 class="title">Dynamic streaming music - pandora.com</h3>
+<div class="item-description">This is one of the coolest things
+that has come my way for music. I still do not buy music from
+iTunes, but this morning I discovered <a href=
+"http://pandora.com/">pandora.com</a>. I picked an artist (in this
+case Depeche Mode) and pandora started playing similiar music.
+Surprisingly, it did a GREAT job. Then I tried some obscure
+industrial. That worked too. Now I am trying some punk using AFI
+and I am definitely enjoying the playlist. As you go, you rate the
+songs with a thumbs up/thumbs down. What a great way to discover
+new music!<br />
+<br />
+Love it!</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-20T11_19_16.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-21T13_13_59.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-19T06_20_39.txt" name=
+"e2006-09-19T06_20_39.txt"></a>
+<h2 class="date">09.19.2006 06:20</h2>
+<div class="blogbody">
+<h3 class="title">GIS and Time</h3>
+<div class="item-description"><a href=
+"http://technology.slashgeo.org/article.pl?sid=06/09/15/1713242">Time
+for Time in GIS</a> [slashgeo]
+<pre>
+Christian Spanring links to a FOSS4G2006 open document presentation
+named It's About Time for Time. From the abstract: ""The weakness of
+current cartography is its poor representation of time. The surface of
+the earth is treated as a static thing." (Anselm Hook) [...] There are
+numerous experiments, but little solid support in tools or data
+structures for representing the 4th dimension (when we're still
+getting used to the 3rd dimension in GIS)." The time capabilities of
+GeoRSS and Google Earth are mentioned. Previous poll on time.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-19T06_20_39.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-20T11_19_16.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-18T10_18_47.txt" name=
+"e2006-09-18T10_18_47.txt"></a>
+<h2 class="date">09.18.2006 10:18</h2>
+<div class="blogbody">
+<h3 class="title">braces in python</h3>
+<div class="item-description">This should put a smile on the face
+of any python programmer:
+<pre>
+In [1]: import __future__
+<br /><br />In [2]: from __future__ import braces
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-18T10_18_47.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-19T06_20_39.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-12T07_59_17.txt" name=
+"e2006-09-12T07_59_17.txt"></a>
+<h2 class="date">09.12.2006 07:59</h2>
+<div class="blogbody">
+<h3 class="title">Then end of SVG?</h3>
+<div class="item-description"><a href=
+"http://www.oreillynet.com/xml/blog/2006/09/wherefore_art_thou_svg.html">
+Wherefore art thou, SVG?</a> by Kurt Cagle
+<pre>
+Adobe this week made an announcement that was, while not unexpected,
+yet another blow - they were choosing to stop supporting the Adobe SVG
+Viewer in any fashion, to make it unable for download by the end of
+the year and to effectively dismantle the last vestiges of SVG outside
+of the fairly secondary roles that that standard plays in Adobe
+products in favor of their own FLEX language, acquired from Macromedia
+during the merger last year.
+<br /><br />Meanwhile, work has effectively stopped on the Mozilla Firefox SVG
+implementation, at least until after the release of Firefox 2.0, and
+while it is certainly hoped that the program will be continued the
+rumors at this point are somewhat grim, with the very real possibility
+that SVG is considered to be disliked politically by certain factions
+within the organization in favor of the WHATWG Canvas specification.
+</pre></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-12T07_59_17.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-18T10_18_47.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-08T08_27_14.txt" name=
+"e2006-09-08T08_27_14.txt"></a>
+<h2 class="date">09.08.2006 08:27</h2>
+<div class="blogbody">
+<h3 class="title">Fledermaus 6.3</h3>
+<div class="item-description">I just downloaded and installed
+Fledermaus 6.3. Seems to start up fine on my Mac 4xG5. I have yet
+to dig into the features. Hopefully this will solve some of the GMT
+grid reading trouble that I had with 6.2.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-08T08_27_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-12T07_59_17.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-02T10_41_43.txt" name=
+"e2006-09-02T10_41_43.txt"></a>
+<h2 class="date">09.02.2006 10:41</h2>
+<div class="blogbody">
+<h3 class="title">visible shipwrecks in google earth</h3>
+<div class="item-description">The title says it all. Ship wrecks as
+seen in google earth: <a href=
+"http://www.gearthblog.com/blog/archives/2006/09/shipwrecks_arou.html">
+http://www.gearthblog.com/blog/archives/2006/09/shipwrecks_arou.html</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-02T10_41_43.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-08T08_27_14.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-02T10_22_21.txt" name=
+"e2006-09-02T10_22_21.txt"></a>
+<h2 class="date">09.02.2006 10:22</h2>
+<div class="blogbody">
+<h3 class="title">gengetopt 2.17 fails for fink</h3>
+<div class="item-description">Here is an error that I am really not
+sure about. Why is this not working?
+<pre>
+Unpacking replacement gengetopt ...
+Setting up gengetopt (2.17-1) ...
+<br /><br />No `START-INFO-DIR-ENTRY' and no `This file documents'.
+install-info(/sw/share/info/gengetopt.info): unable to determine description for `dir' entry - giving up
+/sw/bin/dpkg: error processing gengetopt (--install):
+ subprocess post-installation script returned error exit status 1
+Errors were encountered while processing:
+ gengetopt
+### execution of /sw/bin/dpkg-lockwait failed, exit code 1
+Failed: can't install package gengetopt-2.17-1
+</pre>
+I guess I get to work on this now since it removed my working 2.15
+gengetopt.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-02T10_22_21.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-02T10_41_43.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2006-09-01T11_55_14.txt" name=
+"e2006-09-01T11_55_14.txt"></a>
+<h2 class="date">09.01.2006 11:55</h2>
+<div class="blogbody">
+<h3 class="title">geoscience cyberinfrastructure videos</h3>
+<div class="item-description"><a href=
+"http://www.geongrid.org/CSIG06/program_info.html#sched">http://www.geongrid.org/CSIG06/program_info.html</a><br />
+
+<br />
+This site has videos of the workshop. I have yet to watch one, so I
+don't know how useful this info is. The quality of the video is not
+too bad. Just wish I knew how to download the file so it doesn't
+have to be streaming.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2006-09.html#e2006-09-01T11_55_14.txt">Permalink</a> 
+<!-- <br /><a href="archives/2006-09-02T10_22_21.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">September 2006</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-01T11_55_14.txt">1</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-02T10_41_43.txt">2</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar">5</span></td>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-08T08_27_14.txt">8</a></span></td>
+<td align="center"><span class="calendar">9</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-12T07_59_17.txt">12</a></span></td>
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar">14</span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar">16</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">17</span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-18T10_18_47.txt">18</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-19T06_20_39.txt">19</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-20T11_19_16.txt">20</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-21T13_13_59.txt">21</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-22T13_59_34.txt">22</a></span></td>
+<td align="center"><span class="calendar">23</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar"><a href=
+"2006-09.html#e2006-09-28T15_44_34.txt">28</a></span></td>
+<td align="center"><span class="calendar">29</span></td>
+<td align="center"><span class="calendar">30</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

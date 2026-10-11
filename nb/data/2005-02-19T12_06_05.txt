@@ -1,0 +1,86 @@
+TITLE: k15_hext from python getting better
+AUTHOR: Kurt
+DATE: 02.19.2005 12:06
+DESC: closer and closer
+-----
+BODY:
+If I had more time, it sounds like what I need is <a
+href="http://pexpect.sourceforge.net/">Pexpect</a>.  Bummer that it is
+not in fink.
+
+I have not been able to get k15_hext to hang out and let me talk to
+it.  I figured that it would be easy to pass it 4 lines at a time, but
+no.  There is no time to really figure out how to do this, so I am on
+to the next thing. Here is the code that works for cat, but not
+k15_hext:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">os</font>,<font color="#2040a0">string</font>
+<font color="#2040a0">fin</font>,<font color="#2040a0">fout</font><font color="4444FF">=</font><font color="#2040a0">os</font>.<font color="#2040a0">popen4</font><font color="4444FF">(</font><font color="#008000">&quot;cat&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">fin</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;bp04-6gw-s1-141.2	schwehr	1/3/05	4:33 PM	 1716	 -4.75<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">fin</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;9.3800E+1	9.2950E+1	9.3550E+1	9.3550E+1	9.2950E+1<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">fin</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;8.9150E+1	8.9100E+1	9.2900E+1	8.9150E+1	8.8900E+1<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">fin</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">&quot;8.9950E+1	8.8750E+1	8.5100E+1	8.9950E+1	8.8800E+1<font color="#77dd77">\n</font>&quot;</font><font color="4444FF">)</font>
+<font color="#444444">#fout.close()</font>
+<font color="#2040a0">fin</font>.<font color="#2040a0">flush</font><font color="4444FF">(</font><font color="4444FF">)</font>  <font color="#444444"># &lt;---- this works for cat, but not k15_hext!!!????</font>
+<strong>print</strong> <font color="#2040a0">fout</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>,
+<strong>print</strong> <font color="#2040a0">fout</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>,
+<strong>print</strong> <font color="#2040a0">fout</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>,
+<strong>print</strong> <font color="#2040a0">fout</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>,
+<font color="#2040a0">fout</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Here is what I have so far which starts and kills a k15_hext instance
+each time.  Not efficient, but it works.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">popen2</font>,<font color="#2040a0">string</font>
+
+<strong>class</strong> <font color="#2040a0">K15HextEngine</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+    Doc for K15.  Uses the k15_hext from Lisa's pmag to convert k15
+    Kappabridge measurements to hext statistics.
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __init__</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">self</font>.<font color="#2040a0">totCount</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+        <strong>print</strong> <font color="#008000">&quot;finished init&quot;</font>
+
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> getHext</font> <font color="2040a0">(self, line1, line2, line3, line4)</font>:
+</strong>        <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Unable to keep a k15_hext open and write to it over time.  Why not?&quot;</font><font color="#008000">&quot;&quot;</font>
+        <font color="#444444"># FIX: check if new line at end, if not, add one</font>
+        <font color="#2040a0">blah</font><font color="4444FF">=</font><font color="#FF0000">2</font>
+        <font color="#2040a0">fin</font>,<font color="#2040a0">fout</font><font color="4444FF">=</font><font color="#2040a0">popen2</font>.<font color="#2040a0">popen2</font><font color="4444FF">(</font><font color="#008000">&quot;k15_hext&quot;</font><font color="4444FF">)</font>
+        <font color="#2040a0">fout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line1</font><font color="4444FF">)</font>
+        <font color="#2040a0">fout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line2</font><font color="4444FF">)</font>
+        <font color="#2040a0">fout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line3</font><font color="4444FF">)</font>
+        <font color="#2040a0">fout</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line4</font><font color="4444FF">)</font>
+        <font color="#2040a0">fout</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">hline1</font> <font color="4444FF">=</font> <font color="#2040a0">fin</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">hline2</font> <font color="4444FF">=</font> <font color="#2040a0">fin</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">hline3</font> <font color="4444FF">=</font> <font color="#2040a0">fin</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">hline4</font> <font color="4444FF">=</font> <font color="#2040a0">fin</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">hline5</font> <font color="4444FF">=</font> <font color="#2040a0">fin</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+        <font color="#2040a0">self</font>.<font color="#2040a0">totCount</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+        <strong>print</strong> <font color="#008000">&quot;total = &quot;</font>,<font color="#2040a0">self</font>.<font color="#2040a0">totCount</font>
+        <strong>return</strong> <font color="#2040a0">hline1</font>,<font color="#2040a0">hline2</font>,<font color="#2040a0">hline3</font>,<font color="#2040a0">hline4</font>,<font color="#2040a0">hline5</font>
+
+<font color="#444444"># Test code</font>
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">K15HextEngine</font>.<font color="#2040a0">__doc__</font>
+    <font color="#2040a0">k15_hext</font> <font color="4444FF">=</font> <font color="#2040a0">K15HextEngine</font><font color="4444FF">(</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">l1</font> <font color="4444FF">=</font> <font color="#008000">&quot;bp04-6gw-s1-141.2	schwehr	1/3/05	4:33 PM	 1716	 -4.75<font color="#77dd77">\n</font>&quot;</font>
+    <font color="#2040a0">l2</font> <font color="4444FF">=</font> <font color="#008000">&quot;9.3800E+1	9.2950E+1	9.3550E+1	9.3550E+1	9.2950E+1<font color="#77dd77">\n</font>&quot;</font>
+    <font color="#2040a0">l3</font> <font color="4444FF">=</font> <font color="#008000">&quot;8.9150E+1	8.9100E+1	9.2900E+1	8.9150E+1	8.8900E+1<font color="#77dd77">\n</font>&quot;</font>
+    <font color="#2040a0">l4</font> <font color="4444FF">=</font> <font color="#008000">&quot;8.9950E+1	8.8750E+1	8.5100E+1	8.9950E+1	8.8800E+1<font color="#77dd77">\n</font>&quot;</font>
+    
+    <font color="#2040a0">h1</font>,<font color="#2040a0">h2</font>,<font color="#2040a0">h3</font>,<font color="#2040a0">h4</font>,<font color="#2040a0">h5</font> <font color="4444FF">=</font> <font color="#2040a0">k15_hext</font>.<font color="#2040a0">getHext</font><font color="4444FF">(</font><font color="#2040a0">l1</font>,<font color="#2040a0">l2</font>,<font color="#2040a0">l3</font>,<font color="#2040a0">l4</font><font color="4444FF">)</font>
+    <font color="#2040a0">h1</font>,<font color="#2040a0">h2</font>,<font color="#2040a0">h3</font>,<font color="#2040a0">h4</font>,<font color="#2040a0">h5</font> <font color="4444FF">=</font> <font color="#2040a0">k15_hext</font>.<font color="#2040a0">getHext</font><font color="4444FF">(</font><font color="#2040a0">l1</font>,<font color="#2040a0">l2</font>,<font color="#2040a0">l3</font>,<font color="#2040a0">l4</font><font color="4444FF">)</font>
+    <font color="#2040a0">h1</font>,<font color="#2040a0">h2</font>,<font color="#2040a0">h3</font>,<font color="#2040a0">h4</font>,<font color="#2040a0">h5</font> <font color="4444FF">=</font> <font color="#2040a0">k15_hext</font>.<font color="#2040a0">getHext</font><font color="4444FF">(</font><font color="#2040a0">l1</font>,<font color="#2040a0">l2</font>,<font color="#2040a0">l3</font>,<font color="#2040a0">l4</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#008000">&quot;  RESULTS: &quot;</font>
+    <strong>print</strong> <font color="#2040a0">h1</font>,<font color="#2040a0">h2</font>,<font color="#2040a0">h3</font>,<font color="#2040a0">h4</font>
+    <strong>del</strong> <font color="#2040a0">k15_hext</font>
+</pre>
+Now I just need to make this a nice module that lets me get some sort
+of hext object.
+-----

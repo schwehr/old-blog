@@ -1,0 +1,22 @@
+TITLE: svn:executable
+AUTHOR: Kurt
+DATE: 05.04.2007 08:41
+DESC: sigh
+-----
+BODY:
+Doing the equivalent of "chmod +x"/"chmod -x" or "chmod 755"/"chmod
+644" on a file to make it (not) executable in svn (subversion) is a bit
+confusing.  I accidentally set the execute bits on a bunch of data
+files which is a bit annoying.  This was my first time trying to
+remove the execute bit.  It is easier to make a executable than
+removing exacutability (is that a word?):
+<pre>svn propset svn:executable ON foo.script</pre>
+But the obvious match does not work.
+<pre>svn propset svn:executable OFF foo.dat</pre>
+That does not do what you expect.  What you want is:
+<pre>svn propdel svn:executable foo.dat
+svn update
+svn commit -m "no longer executable" foo.dat
+</pre>
+Maybe someday I will remember without have to look this up.
+-----

@@ -1,0 +1,68 @@
+TITLE: closest shot to a lon,lat position
+AUTHOR: Kurt
+DATE: 06.22.2005 07:50
+DESC: layer thickness, rms on patents
+-----
+BODY:
+<a href="http://lxer.com/module/newswire/view/38501/index.html">Patent
+absurdity</a> by Richard Stallman.  If you think software patents are
+good, you should read this article.
+
+Becca and I talked some more yesterday about seismic data processing.
+There are big issues with surfaces with big slopes.  Even small errors
+can produce huge errors.  We really need a way to calculate layer
+thickness that is perpendicular to bedding.  On steep slopes, a bed of
+zero thickness can get contorted to a rapidly changing bed up to
+meters thick which which know is no there at all.
+
+When working with this stuff, "Gnuplot is the bomb!"  We were quickly
+able to see what our picks look like.  The 750 below converts to
+meters from time.  Here is an example from memory.
+<pre>
+ gnuplot 
+   f(x) = 750 * x
+   plot 'top.h2o' using 1:(f($2)) with lp,\
+        'bot.h2o' using 1:(f($2)) with lp
+   set terminal pdf
+   set output 'layer-picks.pdf'
+   replot
+   quit
+
+ open layer-picks.pdf
+</pre>
+My project that I started working on yesterday is to create a python
+program that can find the closest shots to a point.  I want to know
+what file, shotpoint, and tracenum (the offset in the segy file for the
+shot) that best shows a particular core.
+
+I needed a quick algorithm to calculate distance between to locations
+on the Earth's geoid (I don't want to know about height).  Wikipedia
+came through with <a
+href="http://en.wikipedia.org/wiki/Great_circle_distance">great circle
+distance</a> complete with a test case.  This is not the best method
+for points close together but it works.  What I really need is a
+python wrapper for Proj.4 (the USGS projection library).  I think the
+gdal package as a pretty complete python interface
+to coordinate frame conversions, but the fink build explicitly
+excludes the python interface.  Doh!
+
+The new application that I am working on is called "segysqldist.py."
+It uses an SQL database of the trace header data to speed up the
+search.  Right now, I am just using two lines.  My next task is to
+have the program be able to find the <b>N</b> closest points so I can
+plot up the location and shots to see how they relate.  The cores from
+last years cruise were taken on crossing lines or very close to
+crossing points. <a target="new"
+href="http://schwehr.org/Gaviota/bpsio-Aug04/sb-location-1-sml.gif">Location
+animated gif</a>
+
+<b>On pltsegy</b>:  I was getting annoyed by the jagged, upside-down
+staircase underneath my plots with pltsegy.  Becca pointed out that
+the gains set in sioseis can be used to get rid of most of them.  Just
+drop the gain down a ways after a you think there will be no more good 
+data (just noise and multiples).  Dangerous, but works great.
+
+Some interesting features seen by Spirit.  Weathered rocks or
+something else?<br> <a href="http://schwehr.org/blog/attachments/2005-06/2-172615113-6.png"><img
+src="http://schwehr.org/blog/attachments/2005-06/2-172615113-6.jpg"></a>
+-----

@@ -1,0 +1,90 @@
+TITLE: SWIG interface for GSF
+AUTHOR: Kurt
+DATE: 11.09.2008 19:50
+DESC: Perhaps the wrong approach?
+-----
+BODY:
+I've been thinking about a python interface for the SAIC
+Generic Sensor Format (GSF) for sensor data.  If I use
+<a href="http://swig.org/">SWIG</a>, then it can support
+other languages in addition to Python (e.g. Perl).  However,
+it turns out to create a very awkward interace.  I was hoping
+that it would be easy to do a quick swig run and that I could
+write a Python class around it, but I am wondering if that is
+worth my time.  Roland has taken a liking to boost, but this
+is straight C and I think that ctypes would work nicely (and
+keep me in working python as much as possible).  Can SWIG 
+include docstrings?
+
+Here is what I've got on the SWIG front.  I probably won't put
+more into it, but feel free to take it farther if you want.
+My first try was to let swig do all the work.  In the make file,
+I had to add a CFLAG:
+<pre>CFLAGS += ${shell python-config --includes} -std=c99</pre>
+Then I build the library like this:
+<pre>% <b>swig -python -module gsf gsf.h</b> # Produces gsf_wrap and gsf.py
+% <b>perl -pi -e 's|\#define SWIGPYTHON|\#include "gsf.h"\n\#define SWIGPYTHON|' gsf_wrap.c</b>
+% <b>gcc-4  -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG -ffast-math \
+        -Wall -Wimplicit -W -pedantic  -Wredundant-decls -Wimplicit-int  \
+        -Wimplicit-function-declaration -Wnested-externs -march=core2  
+        -I/sw/include/python2.6 -I/sw/include/python2.6 -std=c99   
+        -c -o gsf_wrap.o gsf_wrap.c</b>
+% <b>gcc-4 -L/sw/lib -bundle -undefined dynamic_lookup  libgsf.a gsf_wrap.o -o _gsf.so</b>
+% <b>ipython</b>
+In [1]: <b>import gsf</b></pre>
+I was then unable to use <b>gsf.gsfOpen</b>.  The prototype for
+gsfOpen shows that it returns the handle the memory pointed to by
+handle.
+<pre>int gsfOpen(const char *filename, const int mode, int *handle);</pre>
+I then read <a
+href="http://www.opensource.apple.com/darwinsource/Current/swig-4/swig/Examples/python/pointer/index.html">SWIG:Examples:python:pointer</a>
+[os.apple.com].  I realized that I have to create a swig interface file
+to go this route.  In the examples, they have a typemap to specify which 
+pointers are inputs and which are outputs.
+<pre><tt><i><font color="#9A1900">// -*- c -*-</font></i>
+<font color="#990000">%</font>module gsf
+<i><font color="#9A1900">//</font></i>
+<b><font color="#000080">#define</font></b> GSF_CREATE             <font color="#993399">1</font>
+<b><font color="#000080">#define</font></b> GSF_READONLY           <font color="#993399">2</font>
+<b><font color="#000080">#define</font></b> GSF_UPDATE             <font color="#993399">3</font>
+<b><font color="#000080">#define</font></b> GSF_READONLY_INDEX     <font color="#993399">4</font>
+<b><font color="#000080">#define</font></b> GSF_UPDATE_INDEX       <font color="#993399">5</font>
+<b><font color="#000080">#define</font></b> GSF_APPEND             <font color="#993399">6</font>
+<i><font color="#9A1900">//</font></i>
+<i><font color="#9A1900">//%{</font></i>
+<i><font color="#9A1900">//int gsfOpen(const char *filename, const int mode, int *handle);</font></i>
+<i><font color="#9A1900">//%}</font></i>
+<i><font color="#9A1900">//</font></i>
+<font color="#990000">%</font>include typemaps<font color="#990000">.</font>i
+<font color="#009900">int</font> <b><font color="#000000">gsfOpen</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>INPUT<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> <font color="#009900">int</font> INPUT<font color="#990000">,</font> <font color="#009900">int</font><font color="#990000">*</font> OUTPUT<font color="#990000">);</font></tt></pre>
+Now I run swig on the .i interface definition to build the gsf_wrap.c file:
+<pre>% <b>swig -python gsf.</b></pre>
+Then recompile as above and build the .so shared object.  Here is running what
+I have so far:
+<pre>% <b>ipython</b>
+In [1]: <b>import gsf</b>
+In [2]: <b>status,fd = gsf.gsfOpen('C1101635.gsf',gsf.GSF_READONLY)</b>
+In [3]: <b>print status,fd</b>
+(0, 1)</pre>
+What I really want is something like this:
+<pre>
+import mb.gsf
+new_line = gsf('C1101635-v2.gsf',gsf.CREATE) # Note that I got ride of GSF_ from GSF_CREATE
+for ping in gsf('C1101635.gsf'):             # Note that GSF_READONLY is the default
+    # plot ping
+    new_ping = ping.dup() # or gsf.ping(template=ping) or gsf.ping(ping) to copy all the nav in a ping?
+    for beam_num,beam in enumerate(ping):
+       # Apply some function to the beam
+       new_ping[beam_num] = some_transform(beam)
+new_line.close()
+</pre>
+Or something like that.  BTW, I had trouble finding GSF lines while
+not at CCOM.  Thanks to Dave C.  for this Reson 8101 survey off of
+Alaska: <a
+href="http://www.ngdc.noaa.gov/nndc/struts/results?op_0=l&v_0=H10906&t=101378&s=8&d=70&d=75&d=76&d=74&d=73&d=72&d=81&d=82&d=79&no_data=suppress">H10906</a>
+[NGDC] and I was looking at this file: <a
+href="http://surveys.ngdc.noaa.gov/mgg/NOS/coast/H10906/ESDIM_Products/GSF/H10906/Quicksilver/1999-205/C1101635.gsf">C1101635.gsf</a>.
+Hmm... try googling for <b>H10906 multibeam</b>.  Or search for
+<b>H10906 site:noaa.gov</b> - these sites are really not setup well
+for searching.  I tried to find the metadata.
+-----

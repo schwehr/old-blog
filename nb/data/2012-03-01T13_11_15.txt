@@ -1,0 +1,23 @@
+TITLE: Python try finally
+AUTHOR: Kurt
+DATE: 03.01.2012 13:11
+DESC: simple and effective
+-----
+BODY:
+I never really got why python had a "finally" with try/except.  Now I
+do.  If you need to exit out of a function when something goes wrong,
+you can just call return.  With a try / finally, you can put cleanup
+in the finally.  For example, if you have a file that needs to be deleted
+from some processing, you can just call os.remove in finally.  Nice!
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">test_try</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'inside try'</font>
+        <b><font color="#0000FF">return</font></b>
+    <b><font color="#0000FF">finally</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'this always runs, even with the return inside the try'</font>
+<!-- -->
+<b><font color="#000000">test_try</font></b><font color="#990000">()</font></tt></pre>
+No crazy "goto cleanup" construct required.
+-----

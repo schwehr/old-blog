@@ -1,0 +1,60 @@
+TITLE: Debugging KML that will not work in Maps / iPad GE
+AUTHOR: Kurt
+DATE: 07.23.2010 10:58
+DESC: what is going on?  Folder vrs Style fight
+-----
+BODY:
+Earlier this week, I was unable to get my KML to load in Maps or the
+iPad.  Mano had me export from Google Earth the visualization that was
+working there.  He gave me some questions, which turned out to be some
+good starting points for debugging KML issues.
+<pre>How are you loading the KML? None of our mobile versions officially supports loading KML at this time.</pre>
+I was loading it into My Maps when logged into <a href="http://maps.google.com/">maps.google.com</a>.  He then followed up with:
+<pre>Does it work directly in My Maps?</pre>
+Um... no, it was broken there to.  I had incorrectly assumed that I
+had just used something in my KML that was not supported in Maps.  I
+looked at another visualization and that worked great in maps with
+icons and line styles.
+<pre>Does re-exporting it still work in Earth? That is, when you load the NL in Earth, does it look right, or is it still broken?</pre>
+Uh... that works and then I load that export file from Earth in to
+Maps, it worked.  Then I pulled it up on the iPad from under "My
+Maps," it looked fantastic.  I showed the results to a number of NOAA
+folks visiting CCOM from the Office of Coast Survey (and a couple
+other groups) and they all thought it was pretty cool.
+
+Now, I'm back to trying to figure out what was wrong in mine original
+that was fixed in the version exported from Google Earth.  My first
+approach was to see if I can do an XML schema validation.  Hopefully
+that will hightlight the trouble that I'm causing.
+<pre><b>wget http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd
+wget http://schemas.opengis.net/kml/2.2.0/atom-author-link.xsd
+xmllint --noout --schema ogckml22.xsd zone9-10.kml</b>
+zone9-10.kml:2: element kml: Schemas validity error : 
+  Element '{http://earth.google.com/kml/2.2}kml': 
+    No matching global declaration available for the validation root.
+zone9-10.kml fails to validate</pre>
+That just means that I need to change my name space definition to
+match the namespace of the OGC schema.  I change the 2nd line to this
+<pre>&lt;kml xmlns="http://www.opengis.net/kml/2.2"&gt;</pre>
+I reran the xmllint and found that <b>name</b> is supposed to be before <b>description</b>. And I found a bunch more things that are not validating:  (namespace info removed)
+<pre><b>xmllint --noout --schema ogckml22.xsd zone9-10.kml</b>
+zone9-10.kml:24: element IconStyle: Schemas validity error : Element 'IconStyle': This element is not expected. Expected is ( ListStyle ).
+<i>[repeats 4 more times]</i>
+<!-- -->
+zone9-10.kml:237: element description: Schemas validity error : Element 'description': 
+    This element is not expected. 
+    Expected is one of ( AbstractStyleSelectorGroup, Style, StyleMap, Region, Metadata, ExtendedData, AbstractGeometryGroup, MultiGeometry, Point, LineString ).
+<!-- -->
+zone9-10.kml:345: element description: Schemas validity error :
+  Element 'description': This element is not expected. 
+  Expected is one of ( AbstractStyleSelectorGroup, Style, StyleMap, Region, Metadata, ExtendedData, AbstractGeometryGroup, MultiGeometry, Point, LineString ).
+<!-- -->
+zone9-10.kml fails to validate</pre>
+I backed up at this point and did a diff between the original and the
+Google Earth export.  I had my style inside of a folder and the export didn't.
+
+Lesson: do not put your style information inside of a folder.  Earth
+is okay with it, but Maps and Earth on the iPad become unhappy.
+
+Thanks to Mano for setting me on a more logical approach to attacking this issue.
+-----

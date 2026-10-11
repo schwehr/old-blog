@@ -1,0 +1,93 @@
+TITLE: AIS hack in a box is not an AIS hack
+AUTHOR: Kurt
+DATE: 10.17.2013 09:43
+DESC: grandstanding
+-----
+BODY:
+While I think this is a nice demonstration, it is most definitely NOT
+an AIS hack.  I'm not saying that AIS is in any way secure (unless
+maybe you talk about blue force encrypted messages).  However, this is
+a nice example of why you don't want to have totally open ports on
+your server accepting random data.  Okay, so there are some cases where
+accepting data on a port can be sort of a good idea, but this is not one of them.
+You can shove any AIS message you craft at the marinetraffic.com server and it 
+will process it and add it to the map.  Yes, if there was a signature component
+to AIS, these messages could be cryptographically rejected, but that's a separate
+issue.  If marinetraffic had a way to vet people and only allowed vetted people
+to send messages to the server (e.g. using ssh with a list of known ssh public keys), then
+this attack is dead, but AIS would still be the same old swiss cheese.  You just would
+either have to spend some work to trick marine traffic that you are a good guy or
+go near a receiver and transmit your attack packets.  The later is trivial.
+Also, if marinetraffic payed attention to which receiver the packet came from, the
+location, timestamps (no, they don't take a receiver timestamp), receive strength and
+direction, then they would have a chance to filter some attacks, but again, there
+would be plenty of attacks still on the table.
+
+<img width="600" height="399" title="Trend Micro not attacking AIS" withgrayborder="True" src="http://schwehr.org/blog/attachments/2013-10/trend-micros-non-ais-hack.png"/>
+
+This attack does have merit on grounds that these two guys did not
+mention.  First, Iceland's Coast Guard runs a control station that has
+to allow uncleared people to work in it.  Therefore, they can't show
+the NATO EU AIS feed in the room.  To have vessel traffic up, you
+guessed it, they use marinetraffic.com.  So Iceland's Coast Guard is
+vulnerable to this trouble because they trust a website that has no
+measure of security.
+
+Second, the USCG sends messages for NAIS without encryption.  You
+could easily craft a <a href="http://en.wikipedia.org/wiki/Man-in-the-middle_attack">man-in-the-middle attack</a> with any consumer of
+NAIS data and inject or remove messages at will.  No, the packets
+aren't raw NMEA, but they are just zlib compressed and I saw nothing
+in the code that checks the validity of these messages.  I just ran a
+java decompiler on AISUser.  Note that this was when I found out that
+they are using the unix ls command to get the inode of the current
+directy for the authentication key for an ais server.  Why didn't they
+just use OpenSSH and have users send them their public key or use one
+of the many other easy ways to do this cleanly?
+
+This means that the ERMA disaster service that I helped build is
+susceptible to this mode of attack.  There is nothing that the ERMA
+team can do to prevent the attack and it may be hard to detect if done
+carefully.
+
+I believe the upstream sending of messages to the NAIS aggregation is
+equally weak and if you inject there, you could hit all of the USCG
+and any of their NAIS customers.
+
+<iframe width="640" height="480" src="//www.youtube.com/embed/QObWQ14EtFA" frameborder="0" allowfullscreen></iframe>
+
+Thanks to gcaptain for posting with a link to this video:
+<a href="http://gcaptain.com/researchers-discover-security/">Researchers Discover Serious Security Vulnerabilities to AIS Data</a> (but I would suggest a different title)
+
+Could you build a very secure system to do what AIS is designed to do?
+Yes, but you should just throw out all of the AIS standards out there
+and only use them as a source of use cases.  I'd call it something
+totally different because it would have little relationship to current
+AIS.
+
+<b>Update 2013-10-18:</b> This made it to the BBC: <a
+href="http://www.bbc.co.uk/news/technology-24586394">Ship trackers
+'vulnerable to hacking', experts warn By Dave Lee</a> which has quotes
+from Lloyds.
+<pre>...
+"The spoofing would immediately be identified by [Lloyd's List
+Intelligence] as a warp vessel,"
+...</pre>
+That assumes that Lloyd's is seeing the input that marinetraffic.com,
+which is a separate country.  It would be possible to do an injection
+of fake data that would be extremely hard to detect.  e.g. If you have
+a transmitter near a ship, send out noise to corrupt that ships
+packets.  You only have to detect the mmsi portion and then start
+noise to corrupt the packet's tail.  Then, transmit on a different slot,
+and slowly change the location of that ship.   There are enless variations
+that would be hard for anyone to catch.
+
+The hack described just used a laptop, so I'm not sure how this cost
+600 euros.  This was just sending UDP packets over the internet, so
+I don't see any need for extra hardware (I'm assuming you already have
+a computer).  
+
+As for pirates, I don't see much evidence for the use of AIS.  They go
+out and attack what ever they see, which includes warships.  Their
+boats are often barely afloat.  There is no need for AIS when a
+constant stream of targets goes by.  And socat/netcat is free open source software.
+-----

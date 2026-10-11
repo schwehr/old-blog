@@ -1,0 +1,65 @@
+TITLE: Histogram/PDF of vessel draughts
+AUTHOR: Kurt
+DATE: 02.25.2009 11:46
+DESC: first pass
+-----
+BODY:
+I'm getting back into matplotlib for looking at some vessel traffic.
+Not very exciting but is useful for the learning matplotlib and getting
+a feel for this dataset.
+
+First, I need a list of the unique vessles to inspect.  I haven't
+decimated the shipdata to just the vessels in the study area.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> sqlite3
+<!-- -->
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'2008-10.db3'</font><font color="#990000">)</font>
+cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'vessels = ('</font>
+cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT DISTINCT(userid) FROM position;'</font><font color="#990000">)</font>
+<b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cu<font color="#990000">.</font><b><font color="#000000">fetchall</font></b><font color="#990000">():</font>
+    <b><font color="#0000FF">if</font></b> row<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <b><font color="#0000FF">in</font></b> <font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1193046</font><font color="#990000">):</font>
+        <i><font color="#9A1900"># not useful to deal with miss configured vessels</font></i>
+        <b><font color="#0000FF">continue</font></b>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'    \'%s\','</font> <font color="#990000">%</font> row<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font>
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'   )'</font></tt></pre>
+Now run it like this:
+<pre>% <b>./vessel-list.py &gt; vessels.py</b></pre>
+Now the code to make the histogram.  This is my first idea about how to make
+a histogram that is more fair (what fair means, I'm not yet sure).  Each vessel
+contributes a list of draughts uniq for that vessel.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> sqlite3
+<b><font color="#000080">from</font></b> vessels <b><font color="#000080">import</font></b> vessels
+<b><font color="#000080">import</font></b> sets
+<b><font color="#000080">import</font></b> array
+<!-- -->
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>mlab as mlab
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>pyplot as plt
+<!-- -->
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'2008-10-shipdata.db3'</font><font color="#990000">)</font>
+cu <font color="#990000">=</font> cx<font color="#990000">.</font><b><font color="#000000">cursor</font></b><font color="#990000">()</font>
+<!-- -->
+lengths <font color="#990000">=</font> array<font color="#990000">.</font><b><font color="#000000">array</font></b><font color="#990000">(</font><font color="#FF0000">'i'</font><font color="#990000">)</font>
+widths <font color="#990000">=</font> array<font color="#990000">.</font><b><font color="#000000">array</font></b><font color="#990000">(</font><font color="#FF0000">'i'</font><font color="#990000">)</font>
+draughts <font color="#990000">=</font> array<font color="#990000">.</font><b><font color="#000000">array</font></b><font color="#990000">(</font><font color="#FF0000">'f'</font><font color="#990000">)</font>
+<b><font color="#0000FF">for</font></b> vessel <b><font color="#0000FF">in</font></b> vessels<font color="#990000">:</font>
+    d <font color="#990000">=</font> sets<font color="#990000">.</font><b><font color="#000000">Set</font></b><font color="#990000">()</font>
+    cu<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font><font color="#FF0000">'SELECT draught FROM shipdata WHERE userid=?;'</font><font color="#990000">,</font> <font color="#990000">(</font>vessel<font color="#990000">,))</font>
+    <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cu<font color="#990000">:</font>
+        d<font color="#990000">.</font><b><font color="#000000">add</font></b><font color="#990000">(</font>row<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])</font>
+    <b><font color="#0000FF">for</font></b> val <b><font color="#0000FF">in</font></b> d<font color="#990000">:</font>
+        draughts<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font>val<font color="#990000">)</font>
+<!-- -->
+<i><font color="#9A1900"># select min(draught),max(draught) from shipdata;</font></i>
+<i><font color="#9A1900"># 0 to 25.5</font></i>
+<!-- -->
+n<font color="#990000">,</font>bins<font color="#990000">,</font>patches <font color="#990000">=</font> plt<font color="#990000">.</font><b><font color="#000000">hist</font></b><font color="#990000">(</font>draughts<font color="#990000">,</font> <font color="#993399">25.5</font><font color="#990000">,</font> facecolor<font color="#990000">=</font><font color="#FF0000">'green'</font><font color="#990000">,</font> alpha<font color="#990000">=</font><font color="#993399">0.75</font><font color="#990000">)</font>
+l <font color="#990000">=</font> plt<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">(</font>bins<font color="#990000">,</font>linewidth<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">)</font> <i><font color="#9A1900">#,'r--',linewidth=1)</font></i>
+plt<font color="#990000">.</font><b><font color="#000000">grid</font></b><font color="#990000">(</font>True<font color="#990000">)</font>
+plt<font color="#990000">.</font><b><font color="#000000">show</font></b><font color="#990000">()</font></tt></pre>
+And you will notice that I don't yet have units on my graph.
+<img title="Histogram of vessel draughts in meters" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-02/draughts-histogram.png"/>
+-----

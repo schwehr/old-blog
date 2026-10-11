@@ -1,0 +1,68 @@
+TITLE: Fast AIS name database creation and highlighting of bad AIS data
+AUTHOR: Kurt
+DATE: 05.08.2010 18:28
+DESC: what is the solution?
+-----
+BODY:
+We really need a system in the US that helps mariners get their AIS
+units configured correctly.  Using an incorrect MMSI is dangerous.
+Your vessel may appear to change names on other peoples displays and
+if you call for help, the USCG may go to the location of the other
+vessel(s) with that MMSI.  I'm redoing some code to cache vessel names
+to be easier on the database and as a result my code is highlighting
+some invalid MMSI's.  The number after the name is the type and cargo field.
+<pre>UPDATING: 100000000    SYMMETRY 147 -&gt; CDA 64
+UPDATING: 101010101    JEAN RIBAULT 80 -&gt; RIP 148
+UPDATING: 101010101    RIP 148 -&gt; JEAN RIBAULT 80
+UPDATING: 111111111     0 -&gt; SOLO TU 243
+UPDATING: 111111111    CABLE FERRY ICW130 16 -&gt; ISLAND PROGRESS 51
+UPDATING: 111111111    GALLANT LADY 19 -&gt;  0
+UPDATING: 111111111    GALLANT LADY 19 -&gt; GRENADIER 33
+UPDATING: 111111111    GRENADIER 33 -&gt;  0
+UPDATING: 111111111    ISLAND PROGRESS 51 -&gt; GALLANT LADY 19
+UPDATING: 111111111    ISLAND PROGRESS 51 -&gt; GRENADIER 33
+UPDATING: 111111111    SOLO TU 243 -&gt; CABLE FERRY ICW130 16
+UPDATING: 111111111    SOLO TU 243 -&gt; ISLAND PROGRESS 51
+UPDATING: 123456789    IRONWOOD 35 -&gt; MV PATHFINDER USACE 104
+UPDATING: 123456789    ISLAND PILOT 51 -&gt; IRONWOOD 35
+UPDATING: 123456789    MV PATHFINDER USACE 104 -&gt; ISLAND PILOT 51
+UPDATING: 319892000    GIGA-BYTE 145 -&gt; SEA FEVER 80
+UPDATING: 319892000    SEA FEVER 80 -&gt; GIGA-BYTE 145
+UPDATING: 366759130    WSF PUYALLUP 49 -&gt; PUYALLUP WSF 86
+UPDATING: 366773060    ELWHA 197 -&gt;  ELWHA 83
+UPDATING: 367178330    SHELL AUGER NE 129 -&gt; SHELL AUGER SW 129
+UPDATING: 367178330    SHELL AUGER SW 129 -&gt; SHELL AUGER NE 129
+UPDATING: 367341450    ENCHILADA 224 -&gt; ENCHILADA/SHELL RIG 224
+UPDATING: 367341450    ENCHILADA/SHELL RIG 224 -&gt; ENCHILADA 224
+USELESS: mmsi = 0 name: 
+USELESS: mmsi = 0 name: LADY BROWARD
+USELESS: mmsi = 0 name: P301
+USELESS: mmsi = 0 name: P\B SANDY HOOK
+USELESS: mmsi = 0 name: SUBMARINE
+USELESS: mmsi = 1 name: 
+USELESS: mmsi = 1 name: BIL HOLMAN DREDGE
+USELESS: mmsi = 1 name: SANLORENZ0 108
+USELESS: mmsi = 1193046 name: ANGIE M BRUSCO
+USELESS: mmsi = 1193046 name: AUDREY
+USELESS: mmsi = 1193046 name: HARDHEAD
+USELESS: mmsi = 1193046 name: JAY GENE
+USELESS: mmsi = 1193046 name: MAJESTIC
+USELESS: mmsi = 1193046 name: MUSE
+USELESS: mmsi = 1193046 name: NAUTICAST
+USELESS: mmsi = 1193046 name: NIKOLA
+USELESS: mmsi = 1193046 name: NORWEGIAN QUEEN</pre>
+All mariners should take a few minutes and make sure that they have
+the correct MMSI and name for their vessel.  Ask a buddy or
+neighboring ship to see what they are receiving for you.  All ships
+should have a number that is 201,000,000 or higher.  The first 3
+digits on the left are a DAC, basically a country code, where the
+vessel is registered.  These are refered to by ITU as <a
+href="http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E">Maritime
+Identification Digits</a>.  Some countries have more than one,
+e.g. the United States has 338, 366, 367, 368, 369, and even more
+(there is one marked as Alaska).
+
+In environments such as the Deepwater Horizon incident in the Gulf of Mexico,
+it is especially important to have your information correct to aid in the
+coordination of the response.
+-----

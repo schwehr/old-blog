@@ -1,0 +1,53 @@
+TITLE: Using GPSD to read AIS data
+AUTHOR: Kurt
+DATE: 01.20.2010 12:28
+DESC: working code!
+-----
+BODY:
+Here is my first program to read AIS data with GPSD.  First I started the gps daemon such that I can see what it is doing in a terminal:
+<pre><b>sudo gpsd -N -G -D 4 ais://localhost:31414</b></pre>
+Then I created this code that does a dumb poll.  This is not a good
+way to write a program to listen for data.  It will be hard on the
+system.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<b><font color="#000080">import</font></b> gps
+<b><font color="#000080">import</font></b> time
+<!-- -->
+daemon <font color="#990000">=</font> gps<font color="#990000">.</font><b><font color="#000000">gps</font></b><font color="#990000">(</font>host<font color="#990000">=</font><font color="#FF0000">'localhost'</font><font color="#990000">,</font> mode<font color="#990000">=</font>gps<font color="#990000">.</font>WATCH_ENABLE<font color="#990000">|</font>gps<font color="#990000">.</font>WATCH_JSON<font color="#990000">|</font>gps<font color="#990000">.</font>WATCH_SCALED<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">while</font></b> True<font color="#990000">:</font>
+    <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> daemon<font color="#990000">.</font><b><font color="#000000">waiting</font></b><font color="#990000">():</font>
+        time<font color="#990000">.</font><b><font color="#000000">sleep</font></b><font color="#990000">(</font><font color="#993399">0.01</font><font color="#990000">)</font>
+        <b><font color="#0000FF">continue</font></b>
+    msg <font color="#990000">=</font> None
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        msg <font color="#990000">=</font> daemon<font color="#990000">.</font><b><font color="#000000">next</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'ERROR: some bug with GPSD'</font>
+        <b><font color="#0000FF">continue</font></b>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> msg<font color="#990000">[</font><font color="#FF0000">'class'</font><font color="#990000">]</font> <font color="#990000">!=</font> <font color="#FF0000">'AIS'</font><font color="#990000">:</font>
+        <b><font color="#0000FF">continue</font></b>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> msg<font color="#990000">[</font><font color="#FF0000">'type'</font><font color="#990000">]</font> <b><font color="#0000FF">in</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">3</font><font color="#990000">):</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'position message from: '</font><font color="#990000">,</font> msg<font color="#990000">[</font><font color="#FF0000">'mmsi'</font><font color="#990000">]</font>
+        <b><font color="#0000FF">continue</font></b>
+<!-- -->
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'msg:'</font><font color="#990000">,</font> msg<font color="#990000">[</font><font color="#FF0000">'type'</font><font color="#990000">]</font></tt></pre>
+Then when I run it, I see messages coming in!
+<pre>
+./gpsd_test.py 
+position message from:  366909530
+position message from:  367043190
+position message from:  366974680
+position message from:  310470000
+position message from:  367192060
+position message from:  367360990
+position message from:  367078250
+msg: 4
+msg: 4
+msg: 14
+position message from:  366998520
+msg: 14
+position message from:  205445000</pre>
+-----

@@ -1,0 +1,22 @@
+TITLE: counting samples in a database
+AUTHOR: Kurt
+DATE: 11.13.2005 17:38
+DESC: which is better?
+-----
+BODY:
+I have lots of measurements (we call them treatments) of samples in a
+database table.  I would like to have a count of how many samples have
+gone through the process.  A subquery using distinct passing to count
+will do the trick.  Which one of these is more correct?  They both
+give the same answer.
+<pre>
+sqlite ttn136b.db
+sqlite&gt; SELECT COUNT(samplename) FROM (SELECT DISTINCT(samplename) AS SAMPLENAME FROM mag);
+310
+sqlite&gt; SELECT COUNT(samplename) FROM (SELECT DISTINCT samplename FROM mag);
+310
+</pre>
+The top one looks more correct to me, but the bottom one is shorter.
+It would be great if sqlite would tell me if what I was doing was iffy
+SQL.  Just because some code works doesn't mean that it is a good idea.
+-----

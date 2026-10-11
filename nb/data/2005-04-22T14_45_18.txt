@@ -1,0 +1,76 @@
+TITLE: debugging python
+AUTHOR: Kurt
+DATE: 04.22.2005 14:45
+DESC: unittest, doctest, etc
+-----
+BODY:
+Doh.  I found a couple buglets in my python code today.  I figured it
+is time to write some more test cases into my database handler.  Here
+are some useful notes.
+
+First, I have never tried the python debugger before.  pdb is in some
+ways very like gdb, but embedding commands to the debugger caught me
+off guard.  Once this code drops into the debugger, gdb like commands
+work.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444"># epdb1.py -- experiment with the Python debugger, pdb</font>
+<strong>import</strong> <font color="#2040a0">pdb</font>
+<font color="#2040a0">a</font> <font color="4444FF">=</font> <font color="#008000">&quot;aaa&quot;</font>
+<font color="#2040a0">pdb</font>.<font color="#2040a0">set_trace</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">b</font> <font color="4444FF">=</font> <font color="#008000">&quot;bbb&quot;</font>
+<font color="#2040a0">c</font> <font color="4444FF">=</font> <font color="#008000">&quot;ccc&quot;</font>
+<font color="#2040a0">final</font> <font color="4444FF">=</font> <font color="#2040a0">a</font> <font color="4444FF">+</font> <font color="#2040a0">b</font> <font color="4444FF">+</font> <font color="#2040a0">c</font>
+<strong>print</strong> <font color="#2040a0">final</font>
+</pre>
+Then just type <b>python epdb1.py</b>.  Then I use n for next, p for
+print, l for list, and c for continue.
+<pre>
+&gt; /Users/schwehr/Desktop/epdb1.py(6)?()
+-&gt; b = "bbb"
+(Pdb) n
+&gt; /Users/schwehr/Desktop/epdb1.py(7)?()
+-&gt; c = "ccc"
+(Pdb) print b
+bbb
+(Pdb) l
+  2     # epdb1.py -- experiment with the Python debugger, pdb
+  3     import pdb
+  4     a = "aaa"
+  5     pdb.set_trace()
+  6     b = "bbb"
+  7  -&gt; c = "ccc"
+  8     final = a + b + c
+  9     print final
+[EOF]
+(Pdb) c
+aaabbbccc
+</pre>
+Pretty easy, but using <b>pdf.set_trace()</b> is a little strange to
+me.  Is there an equivalent in C/C++?
+
+Here is the pdb tutorial where I got this from: <a
+href="http://www.ferg.org/papers/debugging_in_python.html>debugging in
+python</a>
+
+Then there is the unittest/pyunit tutorial at onlamp: <a
+href="http://www.onlamp.com/pub/a/python/2004/12/02/tdd_pyunit.html">Test-Driven
+Development in Python</a>.  There is a follow on <a
+href="http://www.onlamp.com/pub/a/python/2005/02/03/tdd_pyunit2.html">More
+Test-Driven Development in Python</a>
+
+There also looks to be some good info here at the <a
+href="http://agiletesting.blogspot.com/2005/02/articles-and-tutorials.html">Agile
+Testing Blog</a>.  There is coverage of all sorts of tools including
+unittest, doctest, pytest, FitNesse, and lots of other stuff that is
+totally new to me.
+
+What I really want now is to figure out how to connect to the database
+before all the tests get run.  Otherwise every single test will have
+to connect, create a cursor, do the test, and finally nuke the cursor
+and the connection.
+
+Found it!  setUp and tearDown handle pre and post testing needs.  From
+the python documentation: <a
+href="http://docs.python.org/lib/node163.html">5.3.1 Basic example</a>
+-----

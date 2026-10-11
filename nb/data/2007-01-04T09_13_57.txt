@@ -1,0 +1,30 @@
+TITLE: pydap success
+AUTHOR: Kurt
+DATE: 01.04.2007 09:13
+DESC: yeah!
+-----
+BODY:
+Thanks to Roberto De Almeida for replying to my posts on the pydap
+google group (<a
+href="http://groups.google.com/group/pydap/">http://groups.google.com/group/pydap</a>),
+I now have a working test script that pulls just one row of data from
+the NOAA CO-OPS server.  I have a serious speed problem (22 seconds to
+fetch), but this is great and I am now not depending on the obsolete
+SOAPpy package.  Note that someone has picked SOAPpy back up and
+started maintaining it,but most of the developers are on to ZSI.
+
+Here is my small test script to fetch one waterlevel point.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">dap</font>.<font color="#2040a0">client</font>
+<strong>import</strong> <font color="#2040a0">urllib</font>
+<font color="#2040a0">dataset</font><font color="4444FF">=</font><font color="#2040a0">dap</font>.<font color="#2040a0">client</font>.<font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'http://opendap.co-ops.nos.noaa.gov/dods/IOOS/Raw_Water_Level'</font><font color="4444FF">)</font>
+<font color="#2040a0">seq</font> <font color="4444FF">=</font> <font color="#2040a0">dataset</font><font color="4444FF">[</font><font color="#008000">'WATERLEVEL_RAW_PX'</font><font color="4444FF">]</font>
+<font color="#2040a0">reqStr</font><font color="4444FF">=</font><font color="#2040a0">urllib</font>.<font color="#2040a0">quote</font><font color="4444FF">(</font><font color="#008000">'_STATION_ID=&quot;1615680&quot;&amp;_BEGIN_DATE=&quot;20060101 10:06&quot;&amp;_END_DATE=&quot;20060101 10:06&quot;&amp;_DATUM=&quot;MLLW&quot;'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">'reqStr:'</font>,<font color="#2040a0">reqStr</font>
+<font color="#2040a0">filt_seq</font><font color="4444FF">=</font><font color="#2040a0">seq</font>.<font color="#2040a0">filter</font><font color="4444FF">(</font><font color="#2040a0">reqStr</font><font color="4444FF">)</font> 
+<font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">filt_seq</font>.<font color="#2040a0">_get_data</font><font color="4444FF">(</font><font color="4444FF">)</font> <font color="#444444"># Is this bad - using private method?</font>
+<strong>print</strong> <font color="#008000">'Found this many waterlevel points:'</font>,<font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">data</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#2040a0">data</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+</pre>
+-----

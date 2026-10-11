@@ -1,0 +1,59 @@
+TITLE: possible scipy regression
+AUTHOR: Kurt
+DATE: 11.21.2005 07:36
+DESC: uh oh
+-----
+BODY:
+This morning, I rebuilt my AMS graphs for my paper and got that all
+but a couple samples here trixial.  What the?  This is totally not
+what was going on last week.  I logged into my server and did the
+sample thing there and got the old results with samples falling in
+every catagory and looking much more plausible.  The F distribution
+code in scipy was broken for a very long time and recently started
+working.  It looks like there may be a regression that happened at the
+same time I started getting those import printouts.  Here is what I am
+seeing on my server that has not been updated.  This is what I expect.
+<pre>
+fink list scipy
+
+ i   scipy-py24        1:0.3.2-2     Scientific tools for Python
+
+import ams
+&gt;&gt;&gt; ams.getF()
+3.4817
+&gt;&gt;&gt; ams.getF12()
+4.25649472909
+&gt;&gt;&gt; import scipy.stats
+&gt;&gt;&gt; scipy.stats.distributions.f.ppf(0.95,2,9)
+4.25649472909
+</pre>
+Now for the broken results on my laptop:
+<pre>
+fink list scipy
+ i   scipy-core-py24       0.6.1-2          Replacement of Numeric python
+ i   scipy-py24            1:0.4.3-1        Scientific tools for Python
+
+In [1]: import ams
+In [2]: ams.getF()
+Out[2]: 3.4817
+In [3]: ams.getF12()
+Importing io to scipy
+Importing fftpack to scipy
+Importing special to scipy
+Importing utils to scipy
+Importing cluster to scipy
+Importing sparse to scipy
+Importing interpolate to scipy
+Importing lib to scipy
+Importing integrate to scipy
+Importing signal to scipy
+Importing optimize to scipy
+Importing linalg to scipy
+Importing stats to scipy
+Out[3]: 0.0
+In [4]: import scipy.stats
+In [5]: scipy.stats.distributions.f.ppf(0.95,2,9)
+Out[5]: 0.0
+</pre>
+Time to hardcode the 0.95 values (again) and move on.
+-----

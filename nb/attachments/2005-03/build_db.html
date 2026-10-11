@@ -1,0 +1,114 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module build_db</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>build_db</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/schwehr/projects/xcore/data/BPSIO-04/build_db.py">/Users/schwehr/projects/xcore/data/BPSIO-04/build_db.py</a></font></td></tr></table>
+    <p><tt>######################################################################<br>
+#&nbsp;Table&nbsp;list<br>
+######################################################################<br>
+#&nbsp;CoreLoc&nbsp;&nbsp;&nbsp;-&nbsp;for&nbsp;each&nbsp;core&nbsp;collected:&nbsp;date,&nbsp;cruise,&nbsp;lat/lon,&nbsp;water&nbsp;depth<br>
+#&nbsp;Sections&nbsp;&nbsp;-&nbsp;track&nbsp;all&nbsp;the&nbsp;sections&nbsp;that&nbsp;a&nbsp;core&nbsp;gets&nbsp;divided&nbsp;into<br>
+#&nbsp;AMS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Basic&nbsp;anisotropy&nbsp;data&nbsp;-&nbsp;depth,&nbsp;K15&nbsp;Kappabridge&nbsp;and&nbsp;S&nbsp;matrix<br>
+#&nbsp;Weights&nbsp;&nbsp;&nbsp;-&nbsp;How&nbsp;many&nbsp;grams&nbsp;of&nbsp;goo&nbsp;in&nbsp;each&nbsp;cube<br>
+#&nbsp;Mag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Magnetometer&nbsp;data<br>
+######################################################################<br>
+&nbsp;<br>
+Using&nbsp;sqlite&nbsp;from&nbsp;the&nbsp;command&nbsp;line...&nbsp;super&nbsp;quick&nbsp;tutorial<br>
+SAMPLE&nbsp;QUERIES:<br>
+sqlite&nbsp;bpsio04.db&nbsp;"select&nbsp;*&nbsp;from&nbsp;ams;"<br>
+sqlite&nbsp;bpsio04.db&nbsp;"select&nbsp;s1,s2,s3,s4,s5,s6,sigma&nbsp;from&nbsp;ams&nbsp;where&nbsp;corenum&nbsp;=&nbsp;1&nbsp;order&nbsp;by&nbsp;depth;"&nbsp;|&nbsp;tr&nbsp;'|'&nbsp;'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'<br>
+sqlite&nbsp;bpsio04.db&nbsp;"select&nbsp;samplename,s1,s2,s3,s4,s5,s6,sigma&nbsp;from&nbsp;ams&nbsp;where&nbsp;depth&nbsp;&gt;&nbsp;80&nbsp;and&nbsp;depth&nbsp;&lt;&nbsp;100&nbsp;and&nbsp;corenum&nbsp;=&nbsp;1&nbsp;order&nbsp;by&nbsp;depth;"<br>
+&nbsp;<br>
+sqlite&nbsp;bpsio04.db&nbsp;".tables"<br>
+sqlite&nbsp;bpsio04.db&nbsp;".schema&nbsp;CoreLog"<br>
+&nbsp;<br>
+Next&nbsp;time&nbsp;use&nbsp;mysql.&nbsp;&nbsp;Importing&nbsp;is&nbsp;way&nbsp;better&nbsp;there...<br>
+<a href="http://dev.mysql.com/doc/mysql/en/load-data.html">http://dev.mysql.com/doc/mysql/en/load-data.html</a><br>
+<a href="http://dev.mysql.com/doc/mysql/en/mysqlimport.html">http://dev.mysql.com/doc/mysql/en/mysqlimport.html</a></tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ams.html">ams</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="sqlite.html">sqlite</a><br>
+<a href="string.html">string</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-add_odp_msl"><strong>add_odp_msl</strong></a>(db_cx, odpMSLDataFile)</dt><dd><tt>use&nbsp;what&nbsp;janus&nbsp;web&nbsp;returns&nbsp;for&nbsp;MSL&nbsp;susceptibility</tt></dd></dl>
+ <dl><dt><a name="-build_ams"><strong>build_ams</strong></a>(db_cx, depthLookup, k15fileName)</dt><dd><tt>Parse&nbsp;Jeff&nbsp;Gee's&nbsp;kappa&nbsp;bridge&nbsp;format&nbsp;file<br>
+&nbsp;<br>
+#&nbsp;I&nbsp;think&nbsp;people&nbsp;will&nbsp;hate&nbsp;us&nbsp;come&nbsp;to&nbsp;the&nbsp;end&nbsp;of&nbsp;this&nbsp;century&nbsp;since<br>
+#&nbsp;we&nbsp;are&nbsp;using&nbsp;only&nbsp;2&nbsp;digits&nbsp;for&nbsp;the&nbsp;year.&nbsp;&nbsp;NICE!<br>
+&nbsp;<br>
+#&nbsp;id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Unique&nbsp;database&nbsp;id.&nbsp;&nbsp;Has&nbsp;no&nbsp;meaning<br>
+#&nbsp;samplename&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;The&nbsp;user&nbsp;specified&nbsp;name&nbsp;in&nbsp;the&nbsp;k15&nbsp;file<br>
+#&nbsp;user&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Who&nbsp;did&nbsp;the&nbsp;measuring&nbsp;on&nbsp;the&nbsp;kappabridge<br>
+#&nbsp;datemeasured&nbsp;&nbsp;-&nbsp;Local&nbsp;time&nbsp;that&nbsp;the&nbsp;sample&nbsp;was&nbsp;measured&nbsp;on&nbsp;the&nbsp;KLY-2<br>
+#&nbsp;cruise&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;The&nbsp;cruise&nbsp;identifier&nbsp;(e.g.&nbsp;bp04&nbsp;==&nbsp;bpsio-04)<br>
+#&nbsp;corenum&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Number&nbsp;of&nbsp;the&nbsp;core&nbsp;for&nbsp;that&nbsp;cruise.&nbsp;&nbsp;1&nbsp;is&nbsp;the&nbsp;first&nbsp;core&nbsp;collected.<br>
+#&nbsp;coretype&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;g&nbsp;==&nbsp;gravity,&nbsp;m&nbsp;==&nbsp;multicore,&nbsp;b&nbsp;==&nbsp;boxcore,&nbsp;p&nbsp;==&nbsp;piston,&nbsp;t&nbsp;==&nbsp;trigger<br>
+#&nbsp;corehalf&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;w&nbsp;==&nbsp;working,&nbsp;a&nbsp;==&nbsp;archive&nbsp;half<br>
+#&nbsp;section&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;section&nbsp;1&nbsp;is&nbsp;at&nbsp;the&nbsp;top&nbsp;(closest&nbsp;to&nbsp;the&nbsp;water/bottom&nbsp;interface)<br>
+#&nbsp;sectionoffset&nbsp;-&nbsp;cm&nbsp;offset&nbsp;down&nbsp;from&nbsp;the&nbsp;top&nbsp;of&nbsp;that&nbsp;section<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;number&nbsp;for&nbsp;pmag&nbsp;cubes&nbsp;refers&nbsp;to&nbsp;the&nbsp;top&nbsp;side&nbsp;of&nbsp;the&nbsp;cube<br>
+#&nbsp;depth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Depth&nbsp;below&nbsp;the&nbsp;water/bottom&nbsp;interface&nbsp;in&nbsp;cm<br>
+#&nbsp;counts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;This&nbsp;MAY&nbsp;be&nbsp;the&nbsp;average&nbsp;value&nbsp;read&nbsp;by&nbsp;the&nbsp;kappabridge&nbsp;in&nbsp;counts.&nbsp;&nbsp;No&nbsp;range&nbsp;mult<br>
+#&nbsp;sampleholder&nbsp;&nbsp;-&nbsp;SI&nbsp;value&nbsp;of&nbsp;the&nbsp;sample&nbsp;holder<br>
+#&nbsp;k1&nbsp;..&nbsp;k15&nbsp;&nbsp;&nbsp;-&nbsp;The&nbsp;15&nbsp;Jelinek&nbsp;positions&nbsp;from&nbsp;kappabridge.&nbsp;&nbsp;The&nbsp;raw&nbsp;data<br>
+#&nbsp;s1&nbsp;..&nbsp;s6&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;the&nbsp;results&nbsp;from&nbsp;k15_s<br>
+#&nbsp;sigma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;AKA&nbsp;s[7]&nbsp;the&nbsp;sigma&nbsp;for&nbsp;the&nbsp;6&nbsp;s&nbsp;values<br>
+#<br>
+######&nbsp;&nbsp;HEXT&nbsp;SECTION<br>
+#<br>
+#&nbsp;bulksusc&nbsp;REAL<br>
+#&nbsp;F&nbsp;REAL<br>
+#&nbsp;F12&nbsp;REAL<br>
+#&nbsp;F23&nbsp;REAL<br>
+#&nbsp;tau1&nbsp;REAL<br>
+#&nbsp;dec1&nbsp;REAL<br>
+#&nbsp;inc1&nbsp;REAL<br>
+#&nbsp;tau2&nbsp;REAL<br>
+#&nbsp;dec2&nbsp;REAL<br>
+#&nbsp;inc2&nbsp;REAL<br>
+#&nbsp;tau3&nbsp;REAL<br>
+#&nbsp;dec3&nbsp;REAL<br>
+#&nbsp;inc3</tt></dd></dl>
+ <dl><dt><a name="-build_coreloc"><strong>build_coreloc</strong></a>(db_cx)</dt></dl>
+ <dl><dt><a name="-build_mag"><strong>build_mag</strong></a>(db_cx, depthLookup, magfileName)</dt><dd><tt>Create&nbsp;the&nbsp;magnetometer&nbsp;data.&nbsp;&nbsp;nrm,&nbsp;afdemag,&nbsp;etc</tt></dd></dl>
+ <dl><dt><a name="-build_sections"><strong>build_sections</strong></a>(db_cx)</dt><dd><tt>How&nbsp;long&nbsp;is&nbsp;each&nbsp;section&nbsp;of&nbsp;cores.&nbsp;&nbsp;Cores&nbsp;are&nbsp;split&nbsp;to&nbsp;fit&nbsp;into&nbsp;D-tubes.<br>
+&nbsp;<br>
+Here&nbsp;is&nbsp;what&nbsp;I&nbsp;did&nbsp;for&nbsp;the&nbsp;TTN136B&nbsp;cruise:<br>
+&lt;a&nbsp;href="<a href="http://schwehr.org/TTN136B/Data/core_liner_lengths.txt&quot;&gt;http://schwehr.org/TTN136B/Data/core_liner_lengths.txt&lt;/a">http://schwehr.org/TTN136B/Data/core_liner_lengths.txt&quot;&gt;http://schwehr.org/TTN136B/Data/core_liner_lengths.txt&lt;/a</a>&gt;<br>
+&nbsp;<br>
+id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;SQL&nbsp;unique&nbsp;id&nbsp;number&nbsp;in&nbsp;this&nbsp;table<br>
+cruise&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;bp04&nbsp;for&nbsp;BPSIO-04,&nbsp;unique&nbsp;id&nbsp;for&nbsp;the&nbsp;cruise<br>
+corenum&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;The&nbsp;number&nbsp;of&nbsp;the&nbsp;core&nbsp;in&nbsp;that&nbsp;cruise.&nbsp;&nbsp;Core&nbsp;"1"&nbsp;is&nbsp;the&nbsp;first&nbsp;core<br>
+section&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Which&nbsp;section&nbsp;of&nbsp;the&nbsp;core.&nbsp;&nbsp;1&nbsp;is&nbsp;the&nbsp;top&nbsp;at&nbsp;the&nbsp;bottom/water&nbsp;interface.&nbsp;&nbsp;2&nbsp;is&nbsp;deeper,&nbsp;etc<br>
+sectopdepth&nbsp;&nbsp;&nbsp;-&nbsp;add&nbsp;this&nbsp;number&nbsp;to&nbsp;sectionoffset&nbsp;to&nbsp;get&nbsp;the&nbsp;actual&nbsp;depth&nbsp;of&nbsp;a&nbsp;sample<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;units&nbsp;are&nbsp;cm<br>
+sectionlength&nbsp;-&nbsp;How&nbsp;long&nbsp;is&nbsp;this&nbsp;piece&nbsp;of&nbsp;mud&nbsp;in&nbsp;cm.<br>
+&nbsp;<br>
+Using&nbsp;the&nbsp;info&nbsp;from&nbsp;core&nbsp;description&nbsp;sheets&nbsp;plus&nbsp;total&nbsp;length&nbsp;from<br>
+processCore&nbsp;to&nbsp;calc&nbsp;sections&nbsp;lengths.</tt></dd></dl>
+ <dl><dt><a name="-build_weights"><strong>build_weights</strong></a>(db_cx, weightsfileName)</dt></dl>
+ <dl><dt><a name="-help_pysqlite"><strong>help_pysqlite</strong></a>()</dt><dd><tt>Open&nbsp;a&nbsp;web&nbsp;browser&nbsp;on&nbsp;OSX&nbsp;with&nbsp;the&nbsp;pysqlite&nbsp;web&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-help_sqlite"><strong>help_sqlite</strong></a>()</dt><dd><tt>Open&nbsp;a&nbsp;web&nbsp;browser&nbsp;on&nbsp;OSX&nbsp;with&nbsp;the&nbsp;sqlite&nbsp;web&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-makeSqlDate"><strong>makeSqlDate</strong></a>(date, time, ampm)</dt><dd><tt>Convert&nbsp;'&nbsp;1/3/05&nbsp;&nbsp;4:33&nbsp;PM'&nbsp;-&gt;&nbsp;'2005-03-01&nbsp;16:33:00'</tt></dd></dl>
+</td></tr></table>
+</body></html>

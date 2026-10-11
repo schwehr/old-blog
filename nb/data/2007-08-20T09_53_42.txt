@@ -1,0 +1,24 @@
+TITLE: trac update for fink
+AUTHOR: Kurt
+DATE: 08.20.2007 09:53
+DESC: more better
+-----
+BODY:
+Charles Lepple and I have worked together to get an update to trac in
+fink.  I picked up the maintainership to clearsilver-py to get it to
+python 2.5.  That I did, but I still need to fix up the package to see
+if I can get it to allow python 2.4 and 2.5 variants to be installed
+at the same time.  Charles did the trac update to 0.10.4 and added the
+python 2.5 variant and now has it depending on pysqlite2-py.  That
+means trac will be force into using an sqlite3 database rather than
+the option of sqlite2 or sqlite3 depending on if you have pysqlite2-py
+installed or not.  I think this will reduce confusion in the long run.
+Plus sqlite3 is faster and smaller than sqlite2.  To update your
+database, do this:
+<pre>
+   $ mv trac.db trac2.db
+   $ sqlite trac2.db .dump | sqlite3 trac.db
+</pre>
+and you will be back in business.  For some of my databases, the file
+size dropped to about 1/2 the original size.
+-----

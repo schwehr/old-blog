@@ -1,0 +1,50 @@
+TITLE: Wanted - backup utility
+AUTHOR: Kurt
+DATE: 02.01.2005 08:27
+DESC: Maybe bacula would work
+-----
+BODY:
+I was talking to Myche over the weekend about need for a simple backup
+program for my laptop and desktop.  I was sitting around watching a
+movie that was not too exciting, so I thought, "Let me give this a
+try."  Hah!  It was not quite so simple.  I got totally nailed by
+spaces and funky extended characters in filenames.  Doh!
+
+Here is basically what I want.  Once a [configurable time period, say
+a week], I would like a disk image to appear on my desktop.  In that
+file, I want as many of the files that changed in that week to be in
+that image so the disk is as full as possible.  I would also like a
+list of the files and md5sums to be cached somewhere so that it is
+easy to find later what cds contain that file.  I could then just say
+burn that image when it is convenient for me.
+
+The details of that are not as simple, but not to crazy as they could
+be.  It would be nice to be able to select compressed or
+non-compressed, in a tar or not, and a list of regular expressions
+describing what files are not allowed in the backup.  It might also be
+good to allow multiple CD images.  In the case of a single image, it
+should keep going back in time looking for files that still fit and
+adding them to the image.  For example, if I have a 1GB file next that
+doesn't fit, it skips that moves to the next file, if it fits, add it,
+if not, keep looking for the next older file to add.
+
+Another thing that bit me what trying to create a disk image.  I
+managed to improperly eject an image.  I had to manually delete a
+/Volume/test with rm -rf.  That was scary.  I then had to logout and
+back in for the interface to be happier.
+
+This morning, I thought that maybe tar could do this since it has the
+exclude files using a file containing regular expressions
+functionality, but it does no know how to add starting with the newest
+file in its list.  Tar has these options which might be helpful:
+<pre>
+	--newer
+	--delete
+	--incremental
+</pre>
+I think maybe I just need to check out <a
+href="http://www.bacula.org/">bacula</a> which is in fink.  Maybe it
+already supports making Mac OSX disk images or that could be already
+added.  It sounds like it supports many of my desires.  But no time
+now.  Must get ready for the GP seminar soon.
+-----

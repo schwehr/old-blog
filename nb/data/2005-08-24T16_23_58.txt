@@ -1,0 +1,45 @@
+TITLE: GMT grdblend bug
+AUTHOR: Kurt
+DATE: 08.24.2005 16:23
+DESC: hopefully this does it
+-----
+BODY:
+Thanks to Anthony Koppers for pointing me to this info.
+
+It seems that there was a bug with gmt_grdio.c that prevented
+row-by-row reading of grid files from setting the scale and offset
+correctly.  I found the patch on this page dated 2004-10-10:
+
+<a href="http://gmt.soest.hawaii.edu/gmt/gmt_errata_4.html">GMT 4 Errata</a>
+<pre>
+2004-10-10 gmt_grdio.c <a href="http://gmt.soest.hawaii.edu/gmt/errata/4/patch_4_gmt_grdio.c_1.17_to_1.19.txt">PATCH</a> Subroutine opening grdfile for row-by-row reading (for grdblend.c) failed to initialize scale/offset.
+</pre>
+Now to figure out how to get that patch into the fink build of gmt...
+
+<b>Update:</b> It worked.
+<pre>cat blend.file2
+mbari-1c.grd -R-124.83333/-124.5/40.75/41 3
+eureka.grd -R-124.6/-124.1/40.7/41 2
+3sec.grd -R-125.5/-123/39/42 1
+
+grdblend blend.file2 -Gfoo.grd -R-124.6/-124.1/40.7/41 -I1c
+
+grdinfo foo.grd 
+foo.grd: Title: 
+foo.grd: Command: grdblend blend.file2 -Gfoo.grd -R-124.6/-124.1/40.7/41 -I1c
+foo.grd: Remark: 
+foo.grd: Normal node registration used
+foo.grd: grdfile format # 0
+foo.grd: x_min: -124.6 x_max: -124.1 x_inc: 0.000277778 units: user_x_unit nx: 1801
+foo.grd: y_min: 40.7 y_max: 41 y_inc: 0.000277778 units: user_y_unit ny: 1081
+foo.grd: z_min: -750.13 z_max: 242.963 units: user_z_unit
+foo.grd: scale_factor: 1 add_offset: 0
+</pre>
+
+I modified the fink gmt.patch file for OSX 10.3.  You can replace
+/sw/fink/10.3/unstable/main/finkinfo/sci/gmt.patch if you are
+desparate, but you probably want to wait for fink to pick it up.  I
+will submit it to the maintainer.
+
+<a href="http://schwehr.org/blog/attachments/2005-08/gmt.patch">gmt.patch</a>
+-----

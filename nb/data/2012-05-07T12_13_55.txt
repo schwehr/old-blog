@@ -1,0 +1,209 @@
+TITLE: Bash color prompt
+AUTHOR: Kurt
+DATE: 05.07.2012 12:13
+DESC: how to
+-----
+BODY:
+Here is my take on how to do a color prompt.  This particular version
+will be kind of slow if your python interpreter takes a long time to
+get started.  But more interestingly, it shows how to do some interesting
+things in python.
+
+First, to setup the environment.  In fink:
+<pre>fink selfupdate
+fink install termcolor-py27
+fink install git-py27
+fink install python
+fink install ipython-py27</pre>
+On ubuntu:
+<pre>sudo apt-get install python-git
+sudo apt-get install python-stdeb # turn python packages into debs
+wget http://pypi.python.org/packages/source/t/termcolor/termcolor-1.1.0.tar.gz#md5=043e89644f8909d462fbbfa511c768df
+tar xf termcolor-1.1.0.tar.gz
+cd termcolor-1.1.0
+python setup.py --command-packages=stdeb.command bdist_deb
+sudo dpkg -i deb_dist/python-termcolor_1.1.0-1_all.deb</pre>
+<b>Which git branch?</b>
+
+Now we can start constructing our prompt code in python.  First lets try out the 
+git handling module GitPython.  We will first try it out in ipython.
+<pre>cd ~/Desktop
+ipython
+mkdir foo
+cd foo # definitely not
+import git
+repo = git.Repo('.')</pre>
+This new "foo" directory is not under git control.  As a result
+the git Repo call will fail like this:
+<pre>InvalidGitRepositoryError: /home/schwehr/Desktop</pre>
+This means we know that we have to trap an exception for when we
+open a directory that is not under git control.  Let's try the 
+case where a directory is under git version control.
+<pre>!git init  # Tell git to start controlling this directory
+# Initialized empty Git repository in /home/schwehr/Desktop/foo/.git/
+repo = git.Repo('.')
+# It should return nothing for you.
+print repo.active_branch
+# master</pre>
+We are in the default "master" branch.  You can do all sorts of fancy
+stuff with the git module in python, but for now, all we want is
+to be able to see which branch we are in.
+
+<b>Which directory are we in?</b>
+
+Getting the directory that we are in is pretty easy with os.getcwd, but
+we would like to have "~" in place of the home directory.  I did this
+by using a regular expression substitution that is more powerful than
+just string replace.
+<pre>import os
+import re # get the regular expression module
+homedir = os.path.expanduser('~') # What does the home directory path look like?
+path = re.sub('^' + homedir, '~', os.getcwd()) # If the path starts with the homedir, use ~ 
+print path
+# ~/Desktop/foo</pre>
+<b>When did this happen?</b>
+
+Next we would like to have the current time in the prompt so that when we scroll back
+or come back to the computer later, we can remember when we were working in this shell.
+Helpful if you come back to a terminal a couple days later.  While I know I'm always saying
+to use UTC time, it's probably best here to use local time to reduce confusion.  You should
+always log UTC.
+<pre>import datetime
+datetime.datetime.now().strftime('%a %H:%M:%S')
+# 'Mon 17:23:32'</pre>
+<b>Who am I</b>
+
+When you start really pushing your skills with the terminal and shell, you might
+sometimes find yourself logged in as different users on various computers.  Not knowing
+who and where the shell is, can cause big problems.  os.getlogin says who and os.uname
+says which computer.  uname might not totally work on Windows/cygwin.  In that case you
+will probably want to use the hostname info from the socket module.
+<pre>os.uname()
+# ('Linux', 'schwehr.org', '0.99', '#2 SMP Mon Apr 16 03:28:45 PDT 2012', 'x86_64')
+os.uname()[1]
+# 'server42.schwehr.org'
+os.uname()[1].split('.')[0]
+# 'server42'  # We now have the host name
+'%s@%s' % (os.getlogin(), os.uname()[1].split('.')[0])
+# schwehr@server42
+who = _ # ipython command to stash the last</pre>
+<b>Put it all together</b>
+
+We now want to assemble our humble little prompt string.  If we had saved each of the
+above, here is how we might put it together:
+<pre>'  ({path})  {when}  [{branch}]  {who} '.format(**locals())
+# '  (~/Desktop/foo)  Mon 17:33:00  [master]  (schwehr@schwehr) '</pre>
+<b>Color</b>
+
+But what if I want the color to be different for if we are in a git directory or
+if it is uncontrolled (or only by some other system like cvs, svn, hg, etc).
+<pre>import termcolor
+if branch:
+  fg = 'white'
+  bg = 'on_green'
+else:
+  fg = 'white'
+  bg = 'on_blue'
+prompt_clr = termcolor.colored(prompt, fg, bg, attrs=['bold'])
+print prompt_clr</pre>
+That's great, but the prompt does not go across the whole terminal window.  
+We need to find out how wide the terminal is and pad the string.  The unix
+<b>tput</b> command can tell us.  It's worth wrapping this into a little 
+function:
+<pre>def get_width():
+  proc = subprocess.Popen(['tput', 'cols'] , stdout=subprocess.PIPE)
+  width = proc.communicate()[0].strip()
+  return int(width)</pre>
+Now we can just ask for the width and pad by the missing space:
+<pre>prompt = prompt + ' ' * (get_width() - len(prompt)</pre>
+Then we just have to print out the prompt and add a command prompt
+of a '#'.  Why do I like the '#'?  The hash / pound character is
+a comment, so if we accidentally paste lines from the terminal, there is less
+chance that something nasty (e.g. '; rm -rf *' or the like) doesn't get 
+executed.
+
+<b>All in one file</b>
+
+Now assemble your ~/bin/prompt.py script:
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+__author__ <font color="#990000">=</font> <font color="#FF0000">'Kurt Schwehr'</font>
+<!-- -->
+<b><font color="#000080">import</font></b> datetime, os, re, subprocess, sys
+<!-- -->
+<b><font color="#000080">import</font></b> git
+<b><font color="#000080">import</font></b> termcolor
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">get_width</font></b><font color="#990000">():</font>
+  proc <font color="#990000">=</font> subprocess<font color="#990000">.</font><b><font color="#000000">Popen</font></b><font color="#990000">([</font><font color="#FF0000">'tput'</font><font color="#990000">,</font> <font color="#FF0000">'cols'</font><font color="#990000">]</font> <font color="#990000">,</font> stdout<font color="#990000">=</font>subprocess<font color="#990000">.</font>PIPE<font color="#990000">)</font>
+  width <font color="#990000">=</font> proc<font color="#990000">.</font><b><font color="#000000">communicate</font></b><font color="#990000">()[</font><font color="#993399">0</font><font color="#990000">].</font><b><font color="#000000">strip</font></b><font color="#990000">()</font>
+  <b><font color="#0000FF">return</font></b> <b><font color="#000000">int</font></b><font color="#990000">(</font>width<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+  repo <font color="#990000">=</font> git<font color="#990000">.</font><b><font color="#000000">Repo</font></b><font color="#990000">(</font><font color="#FF0000">'.'</font><font color="#990000">)</font>
+  branch <font color="#990000">=</font> <font color="#FF0000">'%s'</font> <font color="#990000">%</font> repo<font color="#990000">.</font>active_branch
+<b><font color="#0000FF">except</font></b> git<font color="#990000">.</font>InvalidGitRepositoryError<font color="#990000">:</font>
+  branch <font color="#990000">=</font> <font color="#FF0000">''</font>
+<!-- -->
+homedir <font color="#990000">=</font> os<font color="#990000">.</font>path<font color="#990000">.</font><b><font color="#000000">expanduser</font></b><font color="#990000">(</font><font color="#FF0000">'~'</font><font color="#990000">)</font>
+path <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">sub</font></b><font color="#990000">(</font><font color="#FF0000">'^'</font><font color="#990000">+</font>homedir<font color="#990000">,</font> <font color="#FF0000">'~'</font><font color="#990000">,</font> os<font color="#990000">.</font><b><font color="#000000">getcwd</font></b><font color="#990000">())</font>
+<!-- -->
+when <font color="#990000">=</font> datetime<font color="#990000">.</font>datetime<font color="#990000">.</font><b><font color="#000000">now</font></b><font color="#990000">().</font><b><font color="#000000">strftime</font></b><font color="#990000">(</font><font color="#FF0000">'%a %H:%M:%S'</font><font color="#990000">)</font>
+<!-- -->
+who <font color="#990000">=</font> <font color="#FF0000">'%s@%s'</font> <font color="#990000">%</font> <font color="#990000">(</font>os<font color="#990000">.</font><b><font color="#000000">getlogin</font></b><font color="#990000">(),</font> os<font color="#990000">.</font><b><font color="#000000">uname</font></b><font color="#990000">()[</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'.'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">])</font>
+<!-- -->
+prompt <font color="#990000">=</font> <font color="#FF0000">'  ({path})  {when}  [{branch}]  {who} '</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font><b><font color="#000000">locals</font></b><font color="#990000">())</font>
+<!-- -->
+prompt <font color="#990000">+=</font> <font color="#FF0000">' '</font> <font color="#990000">*</font> <font color="#990000">(</font><b><font color="#000000">get_width</font></b><font color="#990000">()</font> <font color="#990000">-</font> <b><font color="#000000">len</font></b><font color="#990000">(</font>prompt<font color="#990000">))</font>
+<!-- -->
+<b><font color="#0000FF">if</font></b> branch<font color="#990000">:</font>
+  fg <font color="#990000">=</font> <font color="#FF0000">'white'</font>
+  bg <font color="#990000">=</font> <font color="#FF0000">'on_green'</font>
+<b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+  fg <font color="#990000">=</font> <font color="#FF0000">'white'</font>
+  bg <font color="#990000">=</font> <font color="#FF0000">'on_blue'</font>
+<!-- -->
+prompt_clr <font color="#990000">=</font> termcolor<font color="#990000">.</font><b><font color="#000000">colored</font></b><font color="#990000">(</font>prompt<font color="#990000">,</font> fg<font color="#990000">,</font> bg<font color="#990000">,</font> attrs<font color="#990000">=[</font><font color="#FF0000">'bold'</font><font color="#990000">])</font>
+<!-- -->
+<b><font color="#0000FF">print</font></b> prompt_clr
+<b><font color="#0000FF">print</font></b> <font color="#FF0000">'# '</font><font color="#990000">,</font>
+</tt></pre>
+<b>How does this get called?</b>
+
+If run the script, it will look like this:
+
+<img width="379" height="90" title="Command prompt first try" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-05/prompt-by-python.png"/>
+
+We need a program that will call this.  There is a special bash
+variable call PROMPT_COMMAND that, if set, will be called each
+time that bash needs to present a prompt.  We can create a bash
+function that will be assigned to PROMPT_COMMAND and will execute
+our prompt python command.
+<pre><tt><b><font color="#000000">function prompt_command </font></b>{
+  <font color="#009900">PS1</font><font color="#990000">=</font><font color="#009900">$(~/bin/prompt.py)</font>
+}
+<!-- -->
+<font color="#009900">PROMPT_COMMAND</font><font color="#990000">=</font>prompt_command</tt></pre>
+You will want to put that in your ~/.bashrc
+
+<b>What does it look like?</b>
+
+<img width="472" height="120" title="The final prompt system" withgrayborder="True" src="http://schwehr.org/blog/attachments/2012-05/installed-prompt.png"/>
+
+I'm sure you can come up with all sorts of ways to improve on this.
+You might let it handle svn, hg, cvs, and other version control
+systems.  It could tell you if there are files that have been modified
+but not committed.  You could add in more of the features from the
+git __git_ps1 function that knows if you are merging, cherry picking
+and many other tasks.
+<pre>echo $(__git_ps1)
+(master)</pre>
+It's up to you how far you want to take it.
+
+<b>See also:</b>
+
+<a href="http://www.gilesorr.com/bashprompt/prompts/">http://www.gilesorr.com/bashprompt/prompts/</a><br/>
+<a href="http://www.physics.ohio-state.edu/~ntg/780/handouts/Bash-Prompt-HOWTO.pdf">http://www.physics.ohio-state.edu/~ntg/780/handouts/Bash-Prompt-HOWTO.pdf</a>
+
+Thanks to Xah for getting more to write this all out.
+-----

@@ -1,0 +1,52 @@
+TITLE: improved printET
+AUTHOR: Kurt
+DATE: 05.13.2006 21:36
+DESC: now with tail
+-----
+BODY:
+ET is for ElementTree. Ok?  Here is an improved print function for
+element trees that includes printing the tails.  Check it out.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#444444">#from elementtree.ElementTree import parse # Element Tree</font>
+<strong>from</strong> <font color="#2040a0">lxml</font>.<font color="#2040a0">etree</font> <strong>import</strong> <font color="#2040a0">parse</font> <font color="#444444"># lxml</font>
+<font color="#444444">#</font>
+<font color="#2040a0">def</font> <font color="#2040a0">printET</font><font color="4444FF">(</font><font color="#2040a0">ele</font>,<font color="#2040a0">indent</font><font color="4444FF">=</font><font color="#008000">'  '</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">ele</font><font color="4444FF">:</font> <strong>return</strong> <font color="#FF0000">0</font>
+    <strong>if</strong> <font color="#2040a0">ele</font>.<font color="#2040a0">keys</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+	<strong>for</strong> <font color="#2040a0">name</font>,<font color="#2040a0">val</font> <strong>in</strong> <font color="#2040a0">ele</font>.<font color="#2040a0">items</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+	    <strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font> <font color="#008000">'attr: '</font><font color="4444FF">+</font><font color="#2040a0">name</font><font color="4444FF">+</font><font color="#008000">' ... '</font><font color="4444FF">+</font><font color="#2040a0">val</font>
+    <font color="#2040a0">c</font> <font color="4444FF">=</font> <font color="#2040a0">ele</font>.<font color="#2040a0">getchildren</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font>
+    <strong>for</strong> <font color="#2040a0">child</font> <strong>in</strong> <font color="#2040a0">c</font><font color="4444FF">:</font>
+	<font color="#2040a0">count</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+	<strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'tag -- '</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font>
+	<strong>if</strong> <font color="#2040a0">child</font>.<font color="#2040a0">text</font> <strong>and</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">child</font>.<font color="#2040a0">text</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">:</font> <strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">' text -- &quot;'</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">text</font><font color="4444FF">+</font><font color="#008000">'&quot;'</font>
+	<strong>else</strong><font color="4444FF">:</font> <strong>print</strong> <font color="#008000">'WHAT?'</font>
+	<font color="#2040a0">num</font> <font color="4444FF">=</font> <font color="#2040a0">printET</font><font color="4444FF">(</font><font color="#2040a0">child</font>,<font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'  '</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">num</font> <font color="4444FF">&gt;</font> <font color="#FF0000">0</font><font color="4444FF">:</font>
+	    <strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">'end -- '</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tag</font><font color="4444FF">+</font><font color="#008000">' numchildren = '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">num</font><font color="4444FF">)</font>
+	<strong>if</strong> <font color="#2040a0">child</font>.<font color="#2040a0">tail</font><font color="4444FF">:</font>
+	    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">child</font>.<font color="#2040a0">tail</font>.<font color="#2040a0">strip</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">:</font>
+		<strong>print</strong> <font color="#2040a0">indent</font><font color="4444FF">+</font><font color="#008000">' tail -- &quot;'</font><font color="4444FF">+</font><font color="#2040a0">child</font>.<font color="#2040a0">tail</font><font color="4444FF">+</font><font color="#008000">'&quot;'</font>
+    <strong>return</strong> <font color="#2040a0">count</font>
+<font color="#444444">#</font>
+<font color="#2040a0">root</font> <font color="4444FF">=</font> <font color="#2040a0">parse</font><font color="4444FF">(</font><font color="#008000">'xml.xml'</font><font color="4444FF">)</font>.<font color="#2040a0">getroot</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#2040a0">printET</font><font color="4444FF">(</font><font color="#2040a0">root</font><font color="4444FF">)</font>
+</pre>
+The strip tries to get rid of white space only tails.  The results:
+<pre>
+  tag -- opening
+   text -- "Dear John"
+  tag -- body
+   text -- "call Jane at "
+    tag -- number
+     text -- "603-555-1234"
+     tail -- ".
+Hurry, John. Time is running out!"
+  end -- body numchildren = 1
+</pre>
+The funny business with the tail comes from there being a newline
+embedded within the text before the end of the tag.  Now I can get to
+all of the content in an xml file.
+-----

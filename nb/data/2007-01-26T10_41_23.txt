@@ -1,0 +1,40 @@
+TITLE: Python Cartographic Library - point within a polygon
+AUTHOR: Kurt
+DATE: 01.26.2007 10:41
+DESC: finally
+-----
+BODY:
+This is one of those basic problems.  How do you know if a point is
+within a polygon.  Yes, I have coded this up myself, but I would
+rather use a solid package to do this and get lots of other operators
+done right.  I just got PCL-Core working and have a little example
+that shows testing points against a polygon.
+
+Note that WKT is the "Well Known Text" form of geographic data.  I
+seem to be unable to get it right when typing.  I think my history
+with World ToolKit (WTK) is messing with my head.
+
+Here is the example:<pre>
+In [1]: from cartography.geometry import Geometry, Point, LinearRing, Polygon
+In [2]: wkt = 'POLYGON ((-1.0 50.5, -0.5 51.2, 0.3 50.9, -1 50.5))'
+In [3]: a = Geometry.fromWKT(wkt)
+In [4]: wtk_POINT_IN = 'POINT (-0.5 51.15)'
+In [5]: pIn = Geometry.fromWKT(wtk_POINT_IN)
+In [6]: wtk_POINT_IN = 'POINT (-0.5 51.5)'
+.
+In [7]: pIn.within(a)
+Out[7]: 1
+.
+In [8]: wtk_POINT_OUT = 'POINT (100 51.5)'
+In [9]: pOut = Geometry.fromWKT(wtk_POINT_OUT)
+.
+In [10]: pOut.within(a)
+Out[10]: 0
+</pre>
+That's it.  I am still working on the fink packaging (which is giving
+me a little bit of trouble), but should have packages up soon.
+<a
+href="http://vislab-ccom.unh.edu/~schwehr/software/fink/">http://vislab-ccom.unh.edu/~schwehr/software/fink/</a>.
+You will need owslib-py.info, quadtree-py.info and a couple pcl-*.info
+files.
+-----

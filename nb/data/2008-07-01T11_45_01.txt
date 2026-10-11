@@ -1,0 +1,75 @@
+TITLE: Figure troubles
+AUTHOR: Kurt
+DATE: 07.01.2008 11:45
+DESC: 
+-----
+BODY:
+I received a tif image for release that was supposed to have a white
+background behind the text.  On the desktop, the icon had a white
+background but photoshop CS3 had it come up black.  Here are the two
+views combined:
+
+<img src="http://schwehr.org/blog/attachments/2008-07/wcl-original-with-white-icon.png"/>
+
+At the time, I wasn't able to check was going on, but looking back, it
+appears that the image has an alpha/transparency layer that is not being
+followed the same by all tools.  First I tried indentify from imagemagick.
+<pre>% <b>identify WCLcell.tif</b>
+WCL cell.tif TIFF 1346x893 1346x893+0+0 8-bit DirectClass 1.55928mb 
+</pre>
+That doesn't tell me much, so I went for tiffinfo from libtiff:
+<pre>% <b>tiffinfo WCLcell.tif</b>
+TIFF Directory at offset 0x18f208 (1634824)
+  Subfile Type: (0 = 0x0)
+  Image Width: 1346 Image Length: 893
+  Resolution: 150, 150 pixels/inch
+  Bits/Sample: 8
+  Compression Scheme: LZW
+  Photometric Interpretation: RGB color
+  Extra Samples: 1<unassoc-alpha>
+  Samples/Pixel: 4
+  Rows/Strip: 2
+  Planar Configuration: single image plane
+  Predictor: none 1 (0x1)
+</pre>
+This tells me that there is likely some transparency troubles.  The Apple Finder 
+shows nice view that proves the transparency theory.
+
+<img src="http://schwehr.org/blog/attachments/2008-07/wcl-transparent.png"/>
+
+For some reason, this transparency really caused trouble with the upstream tools.
+I am not sure why this happened.
+
+<img src="http://schwehr.org/blog/attachments/2008-07/wcl-conversion-trouble.jpg"/>
+
+To solve all the issues with this figure, I started over from scratch
+with the photograph of the WCL in Photoshop.  The background did not
+extend far enough to the left to give me a place for my labels.  I
+cloned and copied the left edge about 5 times.  To blend the joins, I
+made liberal use of the smudge tool.  I then went to the top of the
+image and use the eye dropper and paint brush to remove some minor
+shadows.
+
+Using this updated background, I brought the image into Illustrator
+and added thick lines with no arrows for the location of parts.  For
+labeling, I used Helvetica and pushed the font size up as high as
+possible with the space available.  I think this turned out well.
+
+<img src="http://schwehr.org/blog/attachments/2008-07/wcl-finished.png"/>
+
+A few thoughts on making instrument figures like this:
+<ul>
+<li>Start with the best image you can get</li>
+<li>Make sure your final product is a flattened image without transparency</li>
+<li>Keep the background simple and uniform to not distract from the object</li>
+<li>Use the largest font that you can get away with</li>
+<li>Keep your lines short and distinct.</li>
+<li>Spread the lines as evenly across the image as possible</li>
+<li>Only use arrow heads when you can make them large</li>
+<li>Lines should be a fairly heavy stroke and a bold saturated color</li>
+<li>Arrange labels in a pleasing manner.  Perhaps following a spline</li>
+<li>Have fun with it</li>
+</ul>
+The results are archived here:
+<a href="http://photojournal.jpl.nasa.gov/catalog/PIA10916">PIA10916</a>
+-----

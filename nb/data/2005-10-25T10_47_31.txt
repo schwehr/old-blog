@@ -1,0 +1,26 @@
+TITLE: Change in semantics with Hext class in ams.py
+AUTHOR: Kurt
+DATE: 10.25.2005 10:47
+DESC: getting the units right
+-----
+BODY:
+Up until now, the Hext class in ams.py has just returned the values
+from Lisa's k15_hext.  That means KLY-2 raw data which is in microSI
+will end up generating a bulk susceptibility also in microSI.  I am
+switching the sense of the Hext class to convert to microSI unless you
+tell it not to.  I have only used the KLY-2 at SIO, so I have no idea
+what other Kappabridges return.  Here is a quick example of the new
+values in my Santa Barbara database.  The value for this sample used
+to be 145.95.  The database desperately needs a table that tracks
+units, but I won't get to do that anytime soon.
+<pre>
+sqlite bpsio04.db \
+    'select ams.bulksusc,ams_geo.bulksusc \
+        from ams,ams_geo \
+        where ams.samplename="bp04-1gw-s2-026" 
+          and ams.samplename=ams_geo.samplename' | tr '|' ' '
+
+0.000145950012 0.000145950012
+</pre>
+This change will be in the pmag-py 0.5 release.
+-----

@@ -1,0 +1,85 @@
+TITLE: Frustration with C++ and Python
+AUTHOR: Kurt
+DATE: 04.30.2010 17:13
+DESC: grouchy
+-----
+BODY:
+There are just too many ways to do this with python and I have yet to
+find the right documentation that gets me going.  It seems like such a
+simple task, but I keep getting frustrated.  I would like to create a
+python wrapper for some pretty simple C++ code.  There are lots of
+ways to approach this, but I really wanted to keep it simple.  The
+options are rewrite this as pure C (no thanks, but that is what
+#python suggested), figure out my C++ linking issues, use swig, pyrex,
+ctypes, boost (ack... no, trying to keep this simple), embedc, <a
+href="http://cython.org/">cython</a>, <a
+href="http://www.fenics.org/wiki/Instant">instant</a>, <a
+href="http://www.riverbankcomputing.co.uk/sip">SIP</a>, <a href="http://cxx.sourceforge.net/PyCXX-Python3.html">PyCXX</a>, and I'm sure I
+missed a few others.  I really would like to use CPython to keep the
+dependencies to a minimum. All I want to do is call a function with a
+string parameter and have it return a dictionary based on a bunch of
+C++ work.  When I start putting C++ stuff in there, the world blows
+up...  I found some documentation saying that -fno-line would fix
+this, but it does not.
+<pre>CC=/sw/bin/g++-4 CFLAGS=-m32 /sw/bin/python setup.py build_ext
+Running build_ext
+building 'ais' extension
+g++ -L/sw32/lib -bundle -L/sw32/lib/python2.6/config -lpython2.6 -m32 build/temp.macosx-10.6-i386-2.6/ais.o -o build/lib.macosx-10.6-i386-2.6/ais.so
+Undefined symbols:
+  "std::ctype&lt;char&gt;::_M_widen_init() const", referenced from:
+      _decode in ais.o
+ld: symbol(s) not found
+collect2: ld returned 1 exit status
+error: command 'g++' failed with exit status 1</pre>
+It seems pretty confusing too how I should do this from setup.py.  For
+straight C modules, it handles all the compiler issues for you.  I
+really need a simple example of C++ code being called and link
+correctly so I can load it from Python.
+
+<a
+href="http://paste.lisp.org/display/98607">http://paste.lisp.org/display/98607</a>
+
+Comments can go here: <a
+href="http://schwehr.blogspot.com/2010/04/c-python.html">C++ python -
+need help</a>
+
+<b>Update 2010-May-01</b>: Thanks to Dane (Springmeyer++), now know that it's no me, it's the particular version of python and/or gcc.  The default of building 64bit code is tripping me up.  This works:
+<pre><b>CFLAGS=-m32 /sw32/bin/python setup.py build</b></pre>
+These are on Mac OSX 10.6.3 Using the apple version of python 2.6.1:
+<pre>/usr/bin/python setup.py build
+running build
+running build_ext
+building 'ais' extension
+creating build
+creating build/temp.macosx-10.6-universal-2.6
+gcc-4.2 -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -DENABLE_DTRACE -arch i386 -arch ppc -arch x86_64 -pipe -I/System/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -c ais.cpp -o build/temp.macosx-10.6-universal-2.6/ais.o
+cc1plus: warning: command line option "-Wstrict-prototypes" is valid for C/ObjC but not for C++
+cc1plus: warning: command line option "-Wstrict-prototypes" is valid for C/ObjC but not for C++
+cc1plus: warning: command line option "-Wstrict-prototypes" is valid for C/ObjC but not for C++
+creating build/lib.macosx-10.6-universal-2.6
+g++-4.2 -Wl,-F. -bundle -undefined dynamic_lookup -arch i386 -arch ppc -arch x86_64 build/temp.macosx-10.6-universal-2.6/ais.o -o build/lib.macosx-10.6-universal-2.6/ais.so</pre>
+And it turns out on closer inspection that it is gcc at fault, not python.  If I specify the apple supplied gcc with the fink python, then it builds.
+<pre>CC=/usr/bin/gcc CFLAGS=-m32 /sw32/bin/python setup.py build_ext
+running build_ext
+building 'ais' extension
+creating build
+creating build/temp.macosx-10.6-i386-2.6
+/usr/bin/gcc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -m32 -I/sw32/include/python2.6 -c ais.cpp -o build/temp.macosx-10.6-i386-2.6/ais.o
+cc1plus: warning: command line option "-Wstrict-prototypes" is valid for C/ObjC but not for C++
+creating build/lib.macosx-10.6-i386-2.6
+g++ -L/sw32/lib -bundle -L/sw32/lib/python2.6/config -lpython2.6 -m32 build/temp.macosx-10.6-i386-2.6/ais.o -o build/lib.macosx-10.6-i386-2.6/ais.so</pre>
+And when I've done that, it works just fine using the C++ standard library (tested here by using iostream's cout):
+<pre><b>ipython</b>
+<!-- -->
+In [1]: <b>import ais</b>
+<!-- -->
+In [2]: <b>ais.</b> # Then hit <b>tab</b>
+ais.__class__         ais.__doc__           ais.__getattribute__  ais.__name__          ais.__reduce__        ais.__setattr__       ais.__subclasshook__
+ais.__delattr__       ais.__file__          ais.__hash__          ais.__new__           ais.__reduce_ex__     ais.__sizeof__        ais.cpp
+ais.__dict__          ais.__format__        ais.__init__          ais.__package__       ais.__repr__          ais.__str__           ais.decode
+<!-- -->
+In [2]: <b>ais.decode('hello')</b>
+nmea_payload: hello
+Out[2]: -666</pre>
+Now to go write some code to actually get some work done.
+-----

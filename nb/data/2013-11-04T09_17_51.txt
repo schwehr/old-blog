@@ -1,0 +1,153 @@
+TITLE: FORTRAN and go to / goto
+AUTHOR: Kurt
+DATE: 11.04.2013 09:17
+DESC: disaster
+-----
+BODY:
+This is just out and out evil.  Do not use go to / goto.  Don't use
+fortran.  Just don't.  And if you use fortran and gotos, never use
+goto with a list of jump points and an expression to give yourself
+multiple destination options for "fan-out" or case like statements.
+
+Here is me trying to figure out how gotos really work in fortran.  And
+I didn't get through all the cases that I needed to try before I ran
+out of gas.
+<pre><tt>c <font color="#990000">-*-</font> fortran <font color="#990000">-*-</font>
+c
+c Using gfortran 64bit on mac osx <font color="#993399">10.8</font> from fink
+c GNU <b><font color="#000000">Fortran</font></b> <font color="#990000">(</font>GCC<font color="#990000">)</font> <font color="#993399">4.8</font><font color="#990000">.</font><font color="#993399">2</font>
+c Compiler <b><font color="#000000">warnings</font></b> <font color="#990000">(</font><b><font color="#0000FF">if</font></b> anything new<font color="#990000">)</font> included after each code
+      <b><font color="#0000FF">program</font></b> wtf
+      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> <font color="#993399">130</font>
+c
+      <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'anything'</font>
+ <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'label 80'</font>     
+ <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'label 130'</font>  <i><font color="#9A1900">! jumped here</font></i>
+c
+      <b><font color="#0000FF">end</font></b>
+c This code printed <font color="#FF0000">"label 130"</font>
+c
+c 
+c <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'yes'</font>                                   c            
+c   <font color="#993399">1</font>
+c Warning<font color="#990000">:</font> Label <font color="#993399">80</font> <b><font color="#000000">at</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font> defined but not used
+c
+c <font color="#990000">========================================</font>
+c
+      <b><font color="#0000FF">program</font></b> wtf
+c
+      <b><font color="#0000FF">assign</font></b> <font color="#993399">130</font> <b><font color="#0000FF">to</font></b> myjump
+      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> myjump
+c
+      <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'anything'</font>
+ <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'yes'</font>     
+ <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'label 130'</font>  <i><font color="#9A1900">! jumped here</font></i>
+c
+      <b><font color="#0000FF">end</font></b>
+c
+c The code printed <font color="#FF0000">"label 130"</font>
+c
+c Warning<font color="#990000">:</font> Deleted feature<font color="#990000">:</font> <b><font color="#0000FF">ASSIGN</font></b> statement <b><font color="#000000">at</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font>
+c
+c <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'this is statement 130'</font>                     c          
+c    <font color="#993399">1</font>
+c Warning<font color="#990000">:</font> Label <font color="#993399">130</font> <b><font color="#000000">at</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font> defined but 
+c
+c <font color="#990000">========================================</font>
+c
+      <b><font color="#0000FF">program</font></b> wtf
+c
+      <b><font color="#0000FF">assign</font></b> <font color="#993399">130</font> <b><font color="#0000FF">to</font></b> myjump
+      <b><font color="#0000FF">assign</font></b> <font color="#993399">80</font> <b><font color="#0000FF">to</font></b> myjump
+      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> myjump
+c
+      <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'anything'</font>
+ <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'yes 80'</font>     <i><font color="#9A1900">! jumped here</font></i>
+ <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'this is statement 130'</font>
+c
+      <b><font color="#0000FF">end</font></b>
+c
+c <font color="#990000">========================================</font>
+c
+      <b><font color="#0000FF">program</font></b> wtf
+c
+      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> <font color="#990000">(</font><font color="#993399">80</font><font color="#990000">,</font> <font color="#993399">130</font><font color="#990000">),</font> <font color="#993399">2</font>  <i><font color="#9A1900">! use the 2nd item in the list</font></i>
+c
+      <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'anything'</font>
+ <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'yes 80'</font>
+ <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'this is statement 130'</font>  <i><font color="#9A1900">! jumped here</font></i>
+c
+      <b><font color="#0000FF">end</font></b>
+c
+c <font color="#990000">========================================</font>
+c
+      <b><font color="#0000FF">program</font></b> wtf
+c
+      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> <font color="#990000">(</font><font color="#993399">80</font><font color="#990000">,</font> <font color="#993399">130</font><font color="#990000">),</font> <font color="#993399">3</font>
+c
+      <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'anything'</font>  <i><font color="#9A1900">! NO jump.  ran from here down</font></i>
+ <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'yes 80'</font>     
+ <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'label 130'</font>
+c
+      <b><font color="#0000FF">end</font></b>
+c
+c The code did not jump and I saw anything<font color="#990000">,</font> yes <font color="#993399">80</font> and label <font color="#993399">130</font>
+c
+c <font color="#990000">========================================</font>
+c
+      <b><font color="#0000FF">program</font></b> wtf
+c
+      <b><font color="#0000FF">assign</font></b> <font color="#993399">130</font> <b><font color="#0000FF">to</font></b> mytest
+      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> mytest <font color="#990000">,(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">)</font>
+c
+      <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'anything'</font>
+ <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'yes 80'</font>     
+ <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'this is statement 130'</font>
+c
+      <b><font color="#0000FF">end</font></b>
+c
+c DOES NOT COMPILE
+c
+c Error<font color="#990000">:</font> Label <font color="#993399">3</font> referenced <b><font color="#000000">at</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font> is never defined
+c <font color="#993399">5</font><font color="#990000">.</font>f<font color="#990000">:</font><font color="#993399">4.24</font><font color="#990000">:</font>
+c
+c      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> mytest <font color="#990000">,(</font><font color="#993399">3</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">)</font>                                               
+c                        <font color="#993399">1</font>
+c Error<font color="#990000">:</font> Label <font color="#993399">5</font> referenced <b><font color="#000000">at</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font> is never defined
+c
+c <font color="#990000">========================================</font>
+c 
+      <b><font color="#0000FF">program</font></b> wtf
+c ignores <font color="#993399">80</font> and <font color="#993399">130</font>
+      <b><font color="#0000FF">assign</font></b> <font color="#993399">80</font> <b><font color="#0000FF">to</font></b> mytest
+      <b><font color="#0000FF">go</font></b> <b><font color="#0000FF">to</font></b> mytest <font color="#990000">,(</font><font color="#993399">80</font><font color="#990000">,</font><font color="#993399">130</font><font color="#990000">)</font>  <i><font color="#9A1900">! Always jumps to where ever mytest points</font></i>
+c
+      <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'anything'</font>
+ <font color="#993399">80</font>   <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'yes 80'</font>     
+ <font color="#993399">130</font>  <b><font color="#0000FF">write</font></b><font color="#990000">(</font><font color="#993399">6</font><font color="#990000">,*)</font> <font color="#FF0000">'this is statement 130'</font>
+c
+      <b><font color="#0000FF">end</font></b>
+</tt></pre>
+I am missing cases like checking to make sure that assign and an
+integer variable with the same name are two separate entities.
+Additionally, if the programmer uses a reserved word (e.g. return) for
+a variable or assigned label?  And after all that, do other compilers
+behave the same?  FORTRAN is definitely a <a
+href="http://en.wikipedia.org/wiki/Snafu">SNAFU</a>.  When I was at
+SIO for grad school, I had a good number of professors tell us, the
+students, that FORTRAN is the fastest language in existance.  Oh
+really?  These same professors didn't know about data structures.  I
+tried talking about singly or doubly linked lists or trees and got
+blank looks... especially when I rewrote their big array codes to not
+be one giant blob of memory with endless memory copies.  Sadly, the
+reverse was true.  I don't grok <a
+href="http://en.wikipedia.org/wiki/Einstein_notation">einstein
+notation</a>, <a
+href="http://en.wikipedia.org/wiki/Hilbert_space">hilber spaces</a> or
+other field theory things I was trying to learn from them.  They
+assumed those would be trivial to me like a linked list is.  Why do
+mathematicians insist on one symbol variable names and extreme
+compression on their notation?  I think that's my biggest problem with
+math.  That and studying a lot of these topics before wikipedia
+was flushed out.
+-----

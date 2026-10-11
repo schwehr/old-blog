@@ -1,0 +1,66 @@
+TITLE: AIS vulnerabilities
+AUTHOR: Kurt
+DATE: 10.14.2013 10:33
+DESC: no shit
+-----
+BODY:
+Thanks to Jordan for pointing me to this article.  I'll be curious to
+see if I got all of the weaknesses that these folks say they will be
+using.  Yes, AIS is swiss cheese when it comes to security and
+integrity.  Back in 2006/2007, the USCG directly asked me not to talk
+about these issues, but that makes no sense.  Anyone with a Class A
+device or a software defined radio can make a mess of things with
+little effort - everything from denial-of-service (DOS), to changing
+the frequencies used by some shipts, making fake announcements,
+specifically stepping on others' transmisssions, send fake dgps
+corrections, and the list goes on.  Life is already painful enough if
+you look at the issues that are out there without any black hats adding
+to the mix.
+
+<a href="http://www.darkreading.com/attacks-breaches/researchers-highlight-security-vulnerabi/240162568">Researchers Highlight Security Vulnerabilities In Ship-Tracking System</a>
+<pre>...
+At the upcoming Hack in the Box Security Conference in Malaysia, a
+team of security researchers are preparing to demonstrate how an
+attacker could hijack AIS traffic and perform man-in-the middle
+attacks that enable them to turn the tracking system into a liability.
+...
+According to Trend Micro's Kyle Wilhoit, one of the researchers who
+worked on the project, says the attacks can be broken up into two
+categories: those that target the AIS Internet providers that collect
+and distribute AIS information, and those that target flaws in the
+actual specification of the AIS protocol used by hardware receivers in
+all of the vessels. Without getting too deep into the vulnerabilities
+ahead of the presentation, which is slated for Oct. 16, Wilhoit
+explains that the upstream providers fail to authenticate AIS
+sentences coming from ships.
+<!-- -->
+"I could go out, and I could pretend to be a boat, and they don't even
+fact-check it," he says. "They don't look at, OK ... is this AIS
+sentence actually a boat? They don't check any of that. So it's all
+accepted as is. It's accepted as true."
+...</pre>
+Back in November of last year, I finally got brave enough to post my
+white board summary of AIS weaknesses:
+
+<a href="http://schwehr.org/blog/archives/2012-11.html#e2012-11-18T12_08_13.txt">AIS Security and Integrity</a>
+
+Most of those weaknesses should be immediately obvious to anyone with
+an undergraduate CS background.  This is what happens when you have
+non-practitioners, aka mariners, lawyers, electrical engineers, and
+bureaucrats design a network message specification instead of just
+writing out the use cases.  <a
+href="https://gitorious.org/toils-of-ais/toils-of-ais/source/9fdc70ed69c3cd5ec46e672eb6aa120e335d0e77:toils.txt">Toils
+of AIS</a> by Raymond and Schwehr tries to give a blunt description of
+this.
+
+A challenge to the reader of my blog: Given 30 minutes and no prior
+knowledge of AIS, look at <a
+href="http://www.itu.int/rec/R-REC-M.1371/en">ITU 1371-4</a> and <a
+href="http://vislab-ccom.unh.edu/~schwehr/papers/2010-IMO-SN.1-Circ.289.pdf">IMO
+Circ 289</a> and you should be able to come up with 10 really nasty
+things to do with AIS.  The Spanish have mentioned in public that they
+have practiced making ghost fleets with AIS in preparation for war
+time deceptions.
+
+Original article: <a href="http://blog.trendmicro.com/trendlabs-security-intelligence/captain-where-is-your-ship-compromising-vessel-tracking-systems/">Captain, Where Is Your Ship</a> [trendmicro.com] That post shows just how easy it is to send random UDP packets to open services and send them crap.  It's like turtle graphics / logo in AIS packets.
+-----

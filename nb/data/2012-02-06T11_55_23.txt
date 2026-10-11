@@ -1,0 +1,78 @@
+TITLE: What should a scientist know about MD5 and file verification?
+AUTHOR: Kurt
+DATE: 02.06.2012 11:55
+DESC: written for NGDC
+-----
+BODY:
+When downloading data from other sources (portable drive or the
+Internet), it is important to <a href="http://en.wikipedia.org/wiki/File_verification">verify all files</a> that you have received everything
+you expected and that all the bytes are exactly as they should be.
+There are many problems that can sneak into transfer processes that
+people often do not normally think about.  For example:
+<ul><li>Incomplete transfer of bytes from a broken connection</li>
+<li>Bit errors that are not detected (this is extremely rare buf happens when you have huge amounts of data)</li>
+<li>Extra junk added to a file by poorly crafted software</li>
+<li>And ...</li></ul>
+It is good practice to calculate a check number for each file
+transfered.  There are many algorithms to choose from, but at this
+time, the most commonly used one is "MD5".
+
+A <a href="http://en.wikipedia.org/wiki/MD5">MD5</a> sum is a number computed for a chunk of data (e.g. a file).  It is
+similar to the old <a href="http://en.wikipedia.org/wiki/Cyclic_redundancy_check">CRC32</a> or <a href="http://en.wikipedia.org/wiki/Checksum">checksum</a> that computes a small number used
+to verify a block of data.  While the MD5 algorithm is no longer safe
+to use in cryptographic algorithms, it is still very useful for
+checking that data being downloaded is the expected set of bytes.
+There are stronger check algorithms such as the <a href="http://en.wikipedia.org/wiki/Sha-2">SHA-2</a> (e.g. SHA-256)
+that work well, but these take longer to compute.
+
+An example of compute times with a 887MB file on a Intel Xeon X5650 at
+2.67GHz Linux box with enough ram that the file should all be cached.
+I used the linux time command (man 1 time).
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<col align="left"></col><col align="right"></col><col align="right"></col>
+<tbody>
+<tr><td><b>Algorithm</b></td><td><b>time real (s)</b></td><td><b>time user</b></td></tr>
+<tr><td>md5</td><td>2.015</td><td>1.790</td></tr>
+<tr><td>sha1</td><td>3.421</td><td>3.310</td></tr>
+<tr><td>sha224</td><td>6.180</td><td>5.980</td></tr>
+<tr><td>sha256</td><td>6.184</td><td>6.000</td></tr>
+<tr><td>sha384</td><td>4.393</td><td>4.260</td></tr>
+<tr><td>sha512</td><td>4.395</td><td>4.140</td></tr>
+</tbody>
+</table>
+
+An example of the use of use of md5 hashes to validate files might
+help.  <a href="http://pypi.python.org">Pypi</a> is the distribution site for Python software libraries.
+Take the Shapely module for GIS vector operations.  Release 1.2.14 is
+here: <a href="http://pypi.python.org/pypi/Shapely/1.2.14">http://pypi.python.org/pypi/Shapely/1.2.14</a> I can download the
+source and check against the md5.  The checksum is part of the URL or
+available as the text from a link:
+<a href="http://pypi.python.org/pypi?:action=show_md5&amp;digest=be8efc68e83b3db086ec092a835ae4e5">http://pypi.python.org/pypi?:action=show_md5&digest=be8efc68e83b3db086ec092a835ae4e5</a>
+
+<pre class="src src-sh">
+wget <span style="color: #87cefa;">"http://pypi.python.org/packages/source/S/Shapely/Shapely-1.2.14.tar.gz#md5=be8efc68e83b3db086ec092a835ae4e5"</span>
+md5sum Shapely-1.2.14.tar.gz 
+<span style="color: #add8e6;"># </span><span style="color: #add8e6;">be8efc68e83b3db086ec092a835ae4e5  Shapely-1.2.14.tar.gz</span></pre>
+And now I know that what I downloaded is an exact match to what is on
+the pypi server.
+
+MD5 sums help the world of data transfer detect errors and allow for
+attempts to correct these problems.  This is especially important for
+any process that mirrors data from one location (e.g. a ship where the
+data is collected) to another (e.g. a data center).
+
+There are many ways to calculate md5 sums.  Sometimes this is done as
+a drag-n-drop (DND) windows program.  I stipulate that if your
+workflow contains a manual MD5 checksum calculation, something is
+seriously wrong.  The software you are using should be fixed to
+automatically produce a md5 checksum file when writing data files and 
+automatically check a checksum on read if a checksum file is available.
+There are md5 libraries for just about every programming language and command
+line programs such as md5sum.
+
+See also: 
+<ul><li><a href="http://www.ietf.org/rfc/rfc1321.txt">RFC 1321: The MD5 Message-Digest Algorithm</a></li>
+<li><a href="https://bitbucket.org/schwehr/researchtools/src/tip/hw/hw-2-shell-and-org-mode.org">ResearchTools hw 2</a></li>
+<li><a href="http://youtu.be/dEtC6bRcjvc">Research Tools video 18 - Reading a HDF5 BAG</a></li></ul>
+-----

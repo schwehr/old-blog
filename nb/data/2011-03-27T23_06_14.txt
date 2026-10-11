@@ -1,0 +1,198 @@
+TITLE: unittesting c++ in 2011 - part 1
+AUTHOR: Kurt
+DATE: 03.27.2011 23:06
+DESC: which one to use?
+-----
+BODY:
+Please comment here if you have any thoughts / suggestions: 
+
+<b>Comments</b>: <a
+href="http://schwehr.blogspot.com/2011/03/c-testing-2011.html">C++
+testing 2011</a>
+<p>
+I have talked about unittesting for C++ <a href="http://schwehr.org/blog/archives/2010-08.html#e2010-08-25T08_35_04.txt">before</a> and got <a href="http://schwehr.blogspot.com/2010/06/which-c-logging-and-unit-test-framework.html">some feedback</a>,
+but I never picked a frame work for my code. I've reached the point
+where I really have to make a decision and get going. I'm going to do
+some quick analysis and see if I can take the plunge. My experience
+with python is pretty good, but doesn't make me an expert. Python's 
+unittest makes it pretty safe to pick that and just go forward.  There
+are other good choices for python, but I'm not worried.  For C++, it's
+overwhelming.
+</p>
+<p>
+First a little discussion about requirements.  First, it's got to be
+open source.  I'm not investing my time on something that I can't use
+whenever I need it.  That also leeds into it having to support C
+(which should be a no-brainer for most) and, if possible, ObjC to
+support the Mac environment.  It would be nice it it played well with 
+continuous integrations systems (buildbot, hudson, etc) so that some
+day, I could use one of those.  Any it can't want to fight against the
+basic build systems.  And, it needs to be easily packaged.  If I can't
+get it into fink and ubuntu, then it isn't going to be around and the
+code will not get tested.  Do I care about Windows?  Not really, but
+it would be nice if what ever I picked supported that.
+</p>
+<p>
+Next, where can I find out about these systems?  C++ having two plus
+characters in its name makes searching annoying.  People often write
+cpp (which I still think of as output from the C pre-processor), cxx,
+cc, and C.  R and C have the same problem.  Here are some of the
+places I looked:
+</p>
+<ul>
+<li>
+<a href="http://packages.ubuntu.com/">http://packages.ubuntu.com/</a> (and <code>apt-cache search test</code>)
+</li>
+<li>
+<a href="http://pdb.finkproject.org/pdb/browse.php?nolist=on fink packages">http://pdb.finkproject.org/pdb/browse.php?nolist=on fink packages</a>
+</li>
+<li>
+<a href="http://en.wikipedia.org/wiki/List_of_unit_testing_frameworks#C">Wikipedia C framework list</a>
+</li>
+<li>
+<a href="http://en.wikipedia.org/wiki/List_of_unit_testing_frameworks#C.2B.2B">Wikipedia C++ framework list</a>
+</li>
+<li>
+<a href="http://en.wikipedia.org/wiki/List_of_unit_testing_frameworks#Objective-C">Wikipedia C++ framework list</a>
+</li>
+<li>
+<a href="http://tinyurl.com/62sk5s3">Freshmeat Test with C++ search</a>
+</li>
+</ul>
+<p>
+Now the BFL (big freaking list).  I've included some straight C
+frameforks.  Empty fields mean I didn't check the value or it wasn't
+immediately obvious.
+</p>
+<table  border="1" cellspacing="0" cellpadding="6" rules="all" frame="all">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" /><col class="left" /><col class="left" /><col class="left" /><col class="left" /><col class="right" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Name</th><th scope="col" class="left">License</th><th scope="col" class="left">Ubuntu</th><th scope="col" class="left">Fink</th><th scope="col" class="left">C++</th><th scope="col" class="left">ObjC</th><th scope="col" class="right">Last Update</th><th scope="col" class="left">Notes</th></tr>
+</thead>
+<tbody>
+<tr><td class="left"><a href="http://sourceforge.net/projects/cpunit/"border="1" rules="all" frame="all">CPUnit</a></td><td class="left">BSD</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left">?</td><td class="right"><span class="timestamp-wrapper"> <span class="timestamp">2011-01-29 Sat</span></span></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://code.google.com/p/googletest/"border="1" rules="all" frame="all">googletest</a></td><td class="left">BSD</td><td class="left">libgtest-dev</td><td class="left"></td><td class="left">y</td><td class="left">?</td><td class="right"><span class="timestamp-wrapper"> <span class="timestamp">2011-03-24 Thu</span></span></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://cu.danfis.cz/"border="1" rules="all" frame="all">CU</a></td><td class="left">LGPLv3</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right">2010-01</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://cutest.sourceforge.net/"border="1" rules="all" frame="all">CuTest</a></td><td class="left">xlib</td><td class="left"></td><td class="left"></td><td class="left">n</td><td class="left">n</td><td class="right"></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://oops.se/objcunit/"border="1" rules="all" frame="all">ObjcUnit</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="right">2002</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://simplectest.sourceforge.net/"border="1" rules="all" frame="all">simplectest</a></td><td class="left">LGPLv2.1</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2005</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://testsoon.sourceforge.net/"border="1" rules="all" frame="all">TestSoon</a></td><td class="left">zlib</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="right">2009</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://tut-framework.sourceforge.net/"border="1" rules="all" frame="all">TUT</a></td><td class="left">BSD</td><td class="left">libtut-dev</td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2009</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://unitmm.sourceforge.net/"border="1" rules="all" frame="all">unit--</a></td><td class="left">GPL</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2006</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://sourceforge.net/apps/trac/unity/wiki"border="1" rules="all" frame="all">unity</a></td><td class="left">MIT</td><td class="left"></td><td class="left"></td><td class="left">n</td><td class="left"></td><td class="right">2010-12</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://cxxtest.tigris.org/"border="1" rules="all" frame="all">CxxTest</a></td><td class="left">LGPL</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2009</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://cpptest.sourceforge.net/"border="1" rules="all" frame="all">CppTest</a></td><td class="left">LGPL</td><td class="left">libcpptest-dev</td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2010-03</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://www.objectmentor.com/resources/downloads.html"border="1" rules="all" frame="all">CppUnit Lite</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right"></td><td class="left">sketchy</td></tr>
+<tr><td class="left"><a href="http://unittest-cpp.sourceforge.net/"border="1" rules="all" frame="all">UnitTest++</a></td><td class="left">LGPL</td><td class="left">libunittest++-dev</td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2010-03</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://ceefit.woldrich.com/?page=Home"border="1" rules="all" frame="all">CeeFIT</a></td><td class="left">GPL</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2006</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://cppunit.sourceforge.net"border="1" rules="all" frame="all">CppUnit</a></td><td class="left">LGPLv2</td><td class="left"></td><td class="left">y</td><td class="left">y</td><td class="left"></td><td class="right">2008</td><td class="left"></td></tr>
+<tr><td class="left"><a href="https://launchpad.net/cppunit2"border="1" rules="all" frame="all">CppUnit2</a></td><td class="left">LGPLv3</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2009</td><td class="left">Dead?</td></tr>
+<tr><td class="left"><a href="https://launchpad.net/aeryn"border="1" rules="all" frame="all">Aeryn</a></td><td class="left">LGPL</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2009</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://sourceforge.net/projects/fructose/"border="1" rules="all" frame="all">Fructose</a></td><td class="left">LGPL</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2011</td><td class="left"></td></tr>
+<tr><td class="left"><a href="https://github.com/philsquared/Catch"border="1" rules="all" frame="all">Catch</a> and <a href="http://www.levelofindirection.com/journal/2010/12/28/unit-testing-in-c-and-objective-c-just-got-easier.html"border="1" rules="all" frame="all">2</a></td><td class="left">Boost</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left">y</td><td class="right">2011</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://www.sente.ch/software/ocunit/"border="1" rules="all" frame="all">OCUnit</a> at <a href="http://developer.apple.com/tools/unittest.html"border="1" rules="all" frame="all">Apple</a></td><td class="left">FreeBSD</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="right"></td><td class="left">In XCode</td></tr>
+<tr><td class="left"><a href="http://www.cpputest.org/"border="1" rules="all" frame="all">CppUTest</a></td><td class="left">BSD</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2010-11</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://www.boost.org/doc/libs/?view=category_Correctness"border="1" rules="all" frame="all">Boost Test</a> and <a href="http://www.boost.org/doc/libs/1_46_1/libs/test/doc/html/index.html"border="1" rules="all" frame="all">2</a></td><td class="left">Boost</td><td class="left"></td><td class="left">y</td><td class="left">y</td><td class="left">n</td><td class="right">2007</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://packages.ubuntu.com/maverick/libautounit2"border="1" rules="all" frame="all">libautounit2</a></td><td class="left"></td><td class="left">libautounit2</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right"></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://cutter.sourceforge.net/"border="1" rules="all" frame="all">Cutter</a></td><td class="left">LGPLv3</td><td class="left">cutter-testing-framework-bin</td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2011</td><td class="left">Interesting</td></tr>
+<tr><td class="left"><a href="http://cunit.sourceforge.net/"border="1" rules="all" frame="all">cunit</a></td><td class="left">LGPL</td><td class="left">libcunit1</td><td class="left"></td><td class="left">n</td><td class="left"></td><td class="right">2010-10</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://code.forsyte.de/diagnostics"border="1" rules="all" frame="all">Diagnostics</a></td><td class="left">LGPL</td><td class="left">libdiagnostics0</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right">2011</td><td class="left">ACE framework</td></tr>
+<tr><td class="left"><a href="http://code.launchpad.net/subunit"border="1" rules="all" frame="all">SubUnit</a></td><td class="left">Apache</td><td class="left">libsubunit0</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right">2010</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://www.codesourcery.com/qmtest"border="1" rules="all" frame="all">qmtest</a></td><td class="left">GPLv2</td><td class="left">qmtest</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right"></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://check.sourceforge.net/"border="1" rules="all" frame="all">check</a></td><td class="left">LGPL</td><td class="left">check</td><td class="left">y</td><td class="left">n</td><td class="left"></td><td class="right">2009</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/testenvironmenttoolkit"border="1" rules="all" frame="all">TestEnvironmentToolkit</a></td><td class="left">Artistic</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="right">2010</td><td class="left">Ick.  OpenGroup email ware</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/dut"border="1" rules="all" frame="all">Dave's Unit Test (DUT)</a></td><td class="left">GPLv2</td><td class="left">n</td><td class="left">n</td><td class="left"></td><td class="left"></td><td class="right">2008</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://www.atomicobject.com/pages/Haste"border="1" rules="all" frame="all">Haste</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">n</td><td class="left"></td><td class="right">2005</td><td class="left">No longer maintained.  Not C?</td></tr>
+<tr><td class="left"><a href="http://www.atomicobject.com/pages/System+Testing+in+Ruby"border="1" rules="all" frame="all">Sys Testing in Ruby (Systir)</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right"></td><td class="left">Replaces Haste.  Testing outside of C/C++</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/staf"border="1" rules="all" frame="all">staf</a></td><td class="left">Ecplise</td><td class="left">n</td><td class="left">n</td><td class="left"></td><td class="left"></td><td class="right">2010-12</td><td class="left">Outside engine.  Python based</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/cxxtester"border="1" rules="all" frame="all">cxxtester</a></td><td class="left">?</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right">2003</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/crpcut"border="1" rules="all" frame="all">crpcut</a></td><td class="left">BSD</td><td class="left"></td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="right">2011</td><td class="left">"Crap Cut"</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/oaklib"border="1" rules="all" frame="all">OakUT</a> and <a href="http://sourceforge.net/projects/oaklib/"border="1" rules="all" frame="all">2</a></td><td class="left">BSD</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right">2005</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/testicle"border="1" rules="all" frame="all">Testicle</a></td><td class="left">BSD</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="right">2011</td><td class="left">Worst named package</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/cutee"border="1" rules="all" frame="all">Cutee</a></td><td class="left">GPL</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="right">2003 ?</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/cut"border="1" rules="all" frame="all">cut</a></td><td class="left">zlib</td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left">y</td><td class="right">2008</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/yaktest"border="1" rules="all" frame="all">yaktest</a></td><td class="left">LGPL</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="right">2003</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/atf"border="1" rules="all" frame="all">atf</a></td><td class="left">BSD</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="right">2010-10</td><td class="left">Moving to Kyua</td></tr>
+<tr><td class="left"><a href="http://code.google.com/p/kyua/"border="1" rules="all" frame="all">Kyua</a></td><td class="left">BSD</td><td class="left">n</td><td class="left">n</td><td class="left"></td><td class="left"></td><td class="right">2011</td><td class="left">Formerly atf</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/xtests"border="1" rules="all" frame="all">xtests</a></td><td class="left">BSD</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="right">2010-08</td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://austria.sourceforge.net/"border="1" rules="all" frame="all">austria</a></td><td class="left">LGPL</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="right">2004</td><td class="left"></td></tr>
+</tbody>
+</table>
+<p>
+I am sure to be missing many many open source testing packages.  Other very helpful tools:
+</p>
+<table  border="1" cellspacing="0" cellpadding="6" rules="all" frame="all">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" /><col class="left" /><col class="left" /><col class="left" /><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Name</th><th scope="col" class="left">License</th><th scope="col" class="left">Ubuntu</th><th scope="col" class="left">Fink</th><th scope="col" class="left">C++</th><th scope="col" class="left">ObjC</th><th scope="col" class="left">Last Update</th><th scope="col" class="left">What is it?</th></tr>
+</thead>
+<tbody>
+<tr><td class="left"><a href="http://duma.sf.net"border="1" rules="all" frame="all">duma</a></td><td class="left">GPL</td><td class="left">duma</td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">buffer overflow</td></tr>
+<tr><td class="left"><a href="http://valgrind.org/"border="1" rules="all" frame="all">valgrind</a></td><td class="left">GPLv2</td><td class="left">valgrind</td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">c/c++ memory issue checks</td></tr>
+<tr><td class="left"><a href="http://github.com/cloudera/flume"border="1" rules="all" frame="all">flume</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">log files</td></tr>
+<tr><td class="left"><a href="https://github.com/schwehr/slogcxx"border="1" rules="all" frame="all">slogcxx</a></td><td class="left">LGPL</td><td class="left">n</td><td class="left">n</td><td class="left">y</td><td class="left">n</td><td class="left">2010-09</td><td class="left">Kurt's simple C++ logging util</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/mockpp"border="1" rules="all" frame="all">mockpp</a></td><td class="left">LGPL</td><td class="left">n</td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="left">2010-01</td><td class="left">Mock Objects</td></tr>
+<tr><td class="left"><a href="http://code.google.com/p/googlemock/"border="1" rules="all" frame="all">Google Mock</a></td><td class="left">BSD</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/covtool"border="1" rules="all" frame="all">CovTool</a></td><td class="left">GPL</td><td class="left"></td><td class="left">n</td><td class="left"></td><td class="left"></td><td class="left">2009</td><td class="left">Code coverage</td></tr>
+<tr><td class="left"><a href="http://ltp.sourceforge.net/coverage/lcov.php"border="1" rules="all" frame="all">lcov</a></td><td class="left"></td><td class="left">lcov</td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">Code coverage - Part of the LTP</td></tr>
+<tr><td class="left"><a href="https://www.fortify.com/ssa-elements/threat-intelligence/rats.html"border="1" rules="all" frame="all">RATS</a></td><td class="left">GPL</td><td class="left">rats</td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left">Rought Auditing Tool for Security</td></tr>
+<tr><td class="left"><a href="http://trac.edgewall.org/"border="1" rules="all" frame="all">trac</a></td><td class="left"></td><td class="left">trac</td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left">2011</td><td class="left">Issue Tracking / VC history etc</td></tr>
+<tr><td class="left"><a href="http://www.mantisbt.org/"border="1" rules="all" frame="all">Mantis</a></td><td class="left">GPL</td><td class="left">mantis</td><td class="left">n</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://www.dwheeler.com/flawfinder/"border="1" rules="all" frame="all">flawfinder</a></td><td class="left">GPL</td><td class="left">flawfinder</td><td class="left">y</td><td class="left">y</td><td class="left"></td><td class="left">2007</td><td class="left">Code inspection</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/cppcheck"border="1" rules="all" frame="all">cppcheck</a></td><td class="left">GPLv3</td><td class="left">cppcheck</td><td class="left">n</td><td class="left">y</td><td class="left"></td><td class="left">2011</td><td class="left">Code inspection</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/yasca"border="1" rules="all" frame="all">yasca</a></td><td class="left">BSD</td><td class="left"></td><td class="left"></td><td class="left">uses RATS</td><td class="left"></td><td class="left"></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://www.sonarsource.org/"border="1" rules="all" frame="all">sonar</a> <a href="http://docs.codehaus.org/display/SONAR/Sonar+Plugin+Library"border="1" rules="all" frame="all">plugins</a></td><td class="left">LGPL</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">2011</td><td class="left">Code quality tool</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/metric-plus-plus"border="1" rules="all" frame="all">Metric++</a></td><td class="left">LGPL</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">Sonar plugin</td></tr>
+<tr><td class="left"><a href="http://freshmeat.net/projects/clint"border="1" rules="all" frame="all">clint</a></td><td class="left">GPL</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td></tr>
+<tr><td class="left"><a href="http://lclint.cs.virginia.edu/"border="1" rules="all" frame="all">lclint</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">splint / C source checker</td></tr>
+<tr><td class="left"><a href="http://avro.apache.org/"border="1" rules="all" frame="all">avro</a></td><td class="left">Apache</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">data serialization/ log files</td></tr>
+<tr><td class="left"><a href="http://cruisecontrol.sourceforge.net/"border="1" rules="all" frame="all">CruiseControl</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">Continuous integration - Java Focus</td></tr>
+<tr><td class="left"><a href="http://trac.buildbot.net/"border="1" rules="all" frame="all">BuildBot</a></td><td class="left"></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">Continuous integration</td></tr>
+<tr><td class="left"><a href="http://hudson-ci.org/"border="1" rules="all" frame="all">Hudson</a></td><td class="left"></td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">Continuous integration</td></tr>
+<tr><td class="left"><a href="http://bitten.edgewall.org/"border="1" rules="all" frame="all">trac bitten</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">CI for Trac</td></tr>
+<tr><td class="left"><a href="http://www.gnu.org/software/dejagnu/"border="1" rules="all" frame="all">DejaGNU</a></td><td class="left">GNU</td><td class="left">dejagnu</td><td class="left">y</td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">Testing framework.  TCL expect -  Yuck!</td></tr>
+<tr><td class="left"><a href="http://bugseverywhere.org/"border="1" rules="all" frame="all">Bugs Everywhere</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">Distributed bug tracking</td></tr>
+<tr><td class="left"><a href="http://www.fossil-scm.org/"border="1" rules="all" frame="all">Fossil</a></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left"></td><td class="left">SCM, Wiki, Bugtracking distributed and in one program</td></tr>
+</tbody>
+</table>
+<p>
+I could probably spend forever on research, but I'm going to see if I
+can make a decision quickly.  I want something that has a chance of
+being around for a while.  But boost is kind of a heave weight
+requirement. But first, I wanted to take a quick peak at a system that
+does testing.  Turns out, that gpsd is doing a diff of decoding
+results with a text file, so it's not the in language unittest that I
+was going for.  But it does show how effective that can be and points
+to using the python interface in libais for unit testing.  And I see
+that there is setup info for valgrind, which is a super valuable tool
+and free unlike the very expensive <a href="http://www-01.ibm.com/software/awdtools/purify/">Purify</a>.  Plus purify doesn't work
+on the Mac.
+</p>
+<b>Boost</b>
+<p>
+I gave a look at the Boost testing environment and used <a href="http://www.ibm.com/developerworks/aix/library/au-ctools1_boost/index.html">Open source C/C++ unit testing tools, Part 1: Get to know the Boost unit test framework</a> from IBM.  It definitely works, but with optimization turned
+on, it's really really slow to compile.  I used boost 1.41 from fink.
+If you are already using Boost, this is likely a great choice.
+</p>
+<b>CppUnit </b>
+<p>
+<a href="http://www.ibm.com/developerworks/aix/library/au-ctools2_cppunit/index.html">Open source C/C++ unit testing tools, Part 2: Get to know CppUnit</a> from
+IBM.  I installed cppunit 1.10.2 from fink.  CppUnit compiles test
+orders of magnitude fasters.  It seems pretty nice and it isn't such a
+monster as bringing it Boost.
+</p>
+<b>CppTest</b>
+<p>
+<a href="http://www.ibm.com/developerworks/aix/library/au-ctools3_ccptest/index.html">Open source C/C++ unit testing tools, Part 3: Get to know CppTest</a> from
+IBM seemed okay until I realized that it doesn't actually give you
+working samples.   I installed CppTest 1.1.1 on Ubuntu 10.10.  Then
+I checked <a href="http://cpptest.sourceforge.net/tutorial.html">http://cpptest.sourceforge.net/tutorial.html</a> and there
+wasn't a working example either.  There is an example in git,
+<a href="http://cpptest.git.sourceforge.net/git/gitweb.cgi?p=cpptest/cpptest;a=blob;f=cpptest/test/mytest.cpp;h=1a497c8e1a152cb7264c854b27fdf0674749d40e;hb=HEAD">mytest.cpp</a>, that I assume works, but if there isn't a good tutorial, I
+am not sure it's worth the time.
+</p>
+-----

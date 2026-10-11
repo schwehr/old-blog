@@ -1,0 +1,46 @@
+TITLE: AIS message 20 and noaadata-0.18
+AUTHOR: Kurt
+DATE: 02.26.2007 09:45
+DESC: comments on message definitions
+-----
+BODY:
+I just added AIS Message 20 (Data Link Management - D) to
+noaadata/ais.  This message pushes my xml system to the edge.  I am
+continually discovering places where the AIS specification is not
+<b>"regular"</b>.  In the case of this message, there is a variable
+length spare at the end of the message that is needed to byte-align
+the message.  If you are thinking of creating AIS messages, please
+study up on grammars before doing so.  I suggest Ulman's two books on
+Introduction to Computer Science and Compilers (aka the "Dragon
+Book").  Just because something is easy to describe in English, does
+not me it is easy to code or generalize.  I am trying to avoid special
+cases for each message and I really do not want to hand code messages.
+
+Now that I have said that, here is a quick example of parsing a
+message 20 from an unconfigured base station.  I introduced an
+"optional" tag for message 20.  If you try to use it on another
+message, my compiler will tell you that it is not allowed.  Do NOT use
+it elsewhere!!!
+<pre>
+./ais_msg_20.py -d '!AIVDO,1,1,,B,D000h&gt;@00000,0*75,runhtest,1172243773.6'
+datalinkmng:
+        MessageID:        20
+        RepeatIndicator:  0
+        UserID:           12345
+        Spare:            0
+        offset1:          0
+        numslots1:        0
+        timeout1:         0
+        increment1:       0
+</pre>
+And the changelog for latest release:
+<li>0.18 - 2007-Feb-26
+  <ul>
+    <li>Added base station messages 4, 20, and 22</li>
+    <li>Now using xinclude to pull in structs to xml</li>
+    <li>Added ais_build_postgis.py to scripts</li>
+    <li>ais_normalize.py script handles normalization of nmea messages so that they are one complete message per line</li>
+    <li>sls messages moved to a subdir of ais.  Work-in-progress</li>
+  </ul>
+</li>
+-----

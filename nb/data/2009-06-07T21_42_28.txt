@@ -1,0 +1,47 @@
+TITLE: CentOS 5.3 review
+AUTHOR: Kurt
+DATE: 06.07.2009 21:42
+DESC: help please
+-----
+BODY:
+I'm giving CentOS 5.3 a go and so far, it feels like I'm back in the
+land of RedHat that I left many years ago.  Perhaps I'm just
+approaching things from the wrong point of view.  My first problem I ran
+into was not CentOS's fault.  This is an 8-way 64-bit system:
+<pre>Linux somehost 2.6.18-128.1.6.el5 #1 SMP Wed Apr 1 09:10:25 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux</pre>
+I tried running some C++ code, but it failed totally - turned out to
+be none 64-bit clean code.  That's our own problem.
+
+Next came issues that do belong to CentOS.  First I ran into not
+having lxml for python.  Turns out that it isn't available from
+CentOS, so I had to do this, which makes me nervious:
+<pre>rpm -Uvh http://www.renditionsoftware.com/products/spin/development/centos/5/i386/spin-development-1-1.el5.noarch.rpm</pre>
+Then I could do 
+<pre>sudo yum install python-lxml</pre>
+I figure that I can live with python 2.4.x at this point, but I turn
+out to be wrong.  I next need pysqlite2 to create a database.  I
+really don't want to use the pysqlite1 that is provided by CentOS 5.3.
+I tried grabbing a srpm from rpmfind (not what I wanted to do), and
+figured that might work, but that fails its internal md5 sum check.  I
+hoped over to #centos on IRC to ask and it turns out that python 2.5.x
+or newer is not supported.  At this point, it looks like I've got some 
+serious custom install work to use my 2 year old code.  Also missing are
+psycopg2 for postgres access, scipy, etc.  Fink has 240 python 2.5 
+packages (I ahve about 40 of those installed) and Ubuntu has 150, while CentoOS has 52 (and they are all back in python 2.4.x).
+
+Mac w/ fink:
+<pre>fink list py25 | wc -l</pre>
+CentOS 5.3 w/ spin:
+<pre>yum list | grep python | grep 64 | grep -v devel | wc -l</pre>
+Ubuntu:
+<pre>dpkg -S python | cut -d: -f1 | sort -u | wc -l</pre>
+Python support on CentOS is definitely rating a "poor".
+
+"yum provides" really isn't very helpful.  "yum list | grep python" is
+better.  I really like Ubuntu, where if I try a command and it's not
+installed, the system recommends the package that provides that
+commmand.
+
+If someone can clue me into a land of better python support for
+CentOS, please let me know!
+-----

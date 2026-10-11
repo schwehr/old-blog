@@ -1,0 +1,43 @@
+TITLE: schematic of a chirp pulse
+AUTHOR: Kurt
+DATE: 01.26.2006 21:07
+DESC: in python
+-----
+BODY:
+I told Becca that I would show her how much easier it was to do a
+chirp pulse in python as compared to C/C++, so here it is.  This is
+just a schematic, so do <b>not</b> take this as implying that this is
+exactly the pulse shape for the XStar.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">math</font> <strong>import</strong> <font color="4444FF">*</font>
+<font color="#2040a0">samples</font><font color="4444FF">=</font><font color="#FF0000">5000</font>
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#2040a0">samples</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">x</font> <font color="4444FF">=</font> <font color="#2040a0">i</font>/<font color="#FF0000">100</font>.
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">sin</font><font color="4444FF">(</font><font color="#2040a0">x</font><font color="4444FF">*</font> <font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">+</font>.<font color="#FF0000">7</font><font color="4444FF">*</font><font color="#2040a0">x</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#FF4400"># cosine taper</font>
+    <font color="#2040a0">y</font> <font color="4444FF">=</font> <font color="#2040a0">y</font> <font color="4444FF">*</font> <font color="4444FF">(</font>.<font color="#FF0000">5</font> <font color="4444FF">-</font> .<font color="#FF0000">5</font><font color="4444FF">*</font> <font color="#2040a0">cos</font> <font color="4444FF">(</font> <font color="#2040a0">i</font> <font color="4444FF">*</font> <font color="#FF0000">2</font><font color="4444FF">*</font>  <font color="#2040a0">pi</font> / <font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">samples</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#2040a0">x</font>, <font color="#2040a0">y</font>
+</pre>
+I then ran the program like this to see what it produces:
+<pre>
+./taper.py > taper.dat
+gnuplot
+gnuplot&gt; plot 'taper.dat' with l
+</pre>
+
+This produces a tapered pulse that looks like this:
+
+<img src="http://schwehr.org/blog/attachments/2006-01/chirp.gif">
+
+<a
+href="http://schwehr.org/blog/attachments/2006-01/chirp.svg">SVG</a>
+version if your browser supports SVG and assuming that gnuplot is
+putting out totally valid SVG that will work on the web.
+
+NOTE: See Gutowski et al. 2005 for more details on CHIRP.
+
+This example uses the <a
+href="http://en.wikipedia.org/wiki/Hamming_window#Hann_window">Hann
+window</a>
+-----

@@ -1,0 +1,53 @@
+TITLE: matplotlib and lidar
+AUTHOR: Kurt
+DATE: 09.21.2008 09:09
+DESC: update away
+-----
+BODY:
+<b>Update 20080926</b>: Thanks to Bror Jonsson for a patch to
+matplotlib-basemap-data-py.  How to ask the path to the data files had
+changed.  There is still likely troubles with libgeos2 lurking.  If
+it is not working, make sure to install <b>libgeos2</b> in addition to
+<b>libgeos2-shlibs</b>.  There is some bad version number stuff going
+on with libgeos[23]... libgeos did not increment their version numbers
+of the dylibs enough in the libgeos2 to 3 update.
+
+I finally got around to updating <a href="http://matplotlib.sourceforge.net/tutorial.html">matplotlib</a> and the basemap in fink to
+the latest version.  I really need to spend more time with the package.
+It can produce somereally great results.  I always seem to drop back
+to the old standby of gnuplot.
+
+From <a href="http://matplotlib.sourceforge.net/basemap/doc/html/users/aeqd.html">Jeff Whitaker's tutorial</a>... Azimuthal Equidistant Projection.
+<pre><tt><b><font color="#000080">from</font></b> mpl_toolkits<font color="#990000">.</font>basemap <b><font color="#000080">import</font></b> Basemap
+<b><font color="#000080">import</font></b> numpy as np
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>pyplot as plt
+width <font color="#990000">=</font> <font color="#993399">28000000</font><font color="#990000">;</font> lon_0 <font color="#990000">=</font> <font color="#990000">-</font><font color="#993399">105</font><font color="#990000">;</font> lat_0 <font color="#990000">=</font> <font color="#993399">40</font>
+m <font color="#990000">=</font> <b><font color="#000000">Basemap</font></b><font color="#990000">(</font>width<font color="#990000">=</font>width<font color="#990000">,</font>height<font color="#990000">=</font>width<font color="#990000">,</font>projection<font color="#990000">=</font><font color="#FF0000">'aeqd'</font><font color="#990000">,</font>
+            lat_0<font color="#990000">=</font>lat_0<font color="#990000">,</font>lon_0<font color="#990000">=</font>lon_0<font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color="#000000">drawmapboundary</font></b><font color="#990000">(</font>fill_color<font color="#990000">=</font><font color="#FF0000">'aqua'</font><font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color="#000000">drawcoastlines</font></b><font color="#990000">(</font>linewidth<font color="#990000">=</font><font color="#993399">0.5</font><font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color="#000000">fillcontinents</font></b><font color="#990000">(</font>color<font color="#990000">=</font><font color="#FF0000">'coral'</font><font color="#990000">,</font>lake_color<font color="#990000">=</font><font color="#FF0000">'aqua'</font><font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color="#000000">drawparallels</font></b><font color="#990000">(</font>np<font color="#990000">.</font><b><font color="#000000">arange</font></b><font color="#990000">(-</font><font color="#993399">80</font><font color="#990000">,</font><font color="#993399">81</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">))</font>
+m<font color="#990000">.</font><b><font color="#000000">drawmeridians</font></b><font color="#990000">(</font>np<font color="#990000">.</font><b><font color="#000000">arange</font></b><font color="#990000">(-</font><font color="#993399">180</font><font color="#990000">,</font><font color="#993399">180</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">))</font>
+xpt<font color="#990000">,</font> ypt <font color="#990000">=</font> <b><font color="#000000">m</font></b><font color="#990000">(</font>lon_0<font color="#990000">,</font> lat_0<font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">([</font>xpt<font color="#990000">],[</font>ypt<font color="#990000">],</font><font color="#FF0000">'ko'</font><font color="#990000">)</font> 
+plt<font color="#990000">.</font><b><font color="#000000">title</font></b><font color="#990000">(</font><font color="#FF0000">'Azimuthal Equidistant Projection'</font><font color="#990000">)</font>
+plt<font color="#990000">.</font><b><font color="#000000">savefig</font></b><font color="#990000">(</font><font color="#FF0000">'aeqd.png'</font><font color="#990000">)</font>
+</tt></pre>
+<img title="matplotlib with basemap" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-09/matplotlib-basemap-aeqd.png"/>
+
+Thanks to Jed Frechette for getting me to update the package.  He has
+some open source python software for lidar: <a
+href="http://sourceforge.net/projects/tlspy">TLSpy</a>.  Check out his 
+<a href="http://www.unm.edu/~lidar/Pilots.htm">photo gallery</a>
+I think this one of trees is especially cool...
+
+<img title="UNM terrestrial lidar" withgrayborder="True" src="http://schwehr.org/blog/attachments/2008-09/unm-lidar-trees.png"/>
+
+Side note: I ran into packaging trouble with matplotlib and the basemap portion.
+Both try to put an __init__.py in the same place, such that there is a clash
+between the debs.  The files are identical.  Trying to be a good citizen, I've
+submitted a bug report:
+
+<a href="https://sourceforge.net/tracker/?func=detail&atid=560720&aid=2121676&group_id=80706">[ 2121676 ] Clash between matplotlib and matplotlib-basemap</a> [sf.net matplotlib tracker]
+-----

@@ -1,0 +1,1303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<title>Kurt's Weblog: February 2011 Archives</title>
+
+<link rel="stylesheet" href="../styles/nb_default.css" type="text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3" href="../atom.xml" />
+
+</head>
+
+<body>
+
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span>
+</div>
+
+<div id="content">
+
+<div class="blog">
+<div id="menu">
+	<a href="../index.html">Main</a>
+</div>
+</div>
+
+<div class="blog">
+<div class="item">
+<a id="e2011-02-27T19_15_41.txt" name="e2011-02-27T19_15_41.txt"></a>
+<h2 class="date">02.27.2011 19:15</h2>
+<div class="blogbody">
+<h3 class="title">Sleet, freezing rain, snow, and rain... we have it all tomorrow</h3>
+<div class="item-description">
+This is one of the ugliest weather forcasts I've seen in a while.
+<br /><br />
+<img title="NOAA weather forcast"
+withgrayborder="True"
+src="../attachments/2011-02/20110228-ugly-weather.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-27T19_15_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-03-01T14_58_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-27T12_44_55.txt" name="e2011-02-27T12_44_55.txt"></a>
+<h2 class="date">02.27.2011 12:44</h2>
+<div class="blogbody">
+<h3 class="title">twit Green Tech Today on the Hornblower hybrid ship</h3>
+<div class="item-description">
+I'm a big fan of many of the <a href="http://twit.tv/">TWiT</a> shows
+and often listen to just the audio of them while at the gym,
+especially <a href="http://twit.tv/FLOSS">FLOSS</a> (interviews with
+the people behind really cool open source projects), <a
+href="http://twit.tv/ipt">iPad Today</a>, <a
+href="http://twit.tv/twig">This Week in Google</a> and <a
+href="http://twit.tv/sn">Security Now</a>.
+<br /><br />
+This is a fun quick video to watch about the <a
+href="http://hornblowerhybrid.com">Hornblower Hybrid ferry</a> in the
+San Francisco Bay by Dr. Kiki on <a href="http://twit.tv/gtt">Green
+Tech Today</a> (<a href="http://twit.tv/gtt22">GTT 22:
+Hornblower</a>).  I would love it if any maritime engineers and
+outside mariners could comment or make their own video giving their
+own take.
+<br /><br />
+<iframe title="YouTube video player" width="640" height="390" src="http://www.youtube.com/embed/H_urfnm2tiw" frameborder="0" allowfullscreen></iframe>
+<br /><br />
+<img title="Hornblower Hybrid ship diagram"
+withgrayborder="True"
+src="../attachments/2011-02/hornblower-hybrid-power-systems.png"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-27T12_44_55.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-27T19_15_41.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-26T12_44_17.txt" name="e2011-02-26T12_44_17.txt"></a>
+<h2 class="date">02.26.2011 12:44</h2>
+<div class="blogbody">
+<h3 class="title">Parsing DBT echo sounder depth nmea messages in python</h3>
+<div class="item-description">
+I took a little break to warm up the brain this morning.  John Helly
+posted a message wondering what the format of the timestamp was in
+some data from SIO's R/V Melville.  It turned out to be UNIX UTC
+timestamps followed by DBT depth sounder NMEA strings.  I went a little
+overboard in answering the question and tried to produce the best possible
+python example that I could.  I used kodos to make a regular
+expression, then I added in a command line interface using the new
+argparse module that replaces optparse.  Then I used pylint and epydoc
+to audit the code.  The code can read from stdin or a text file.  I
+will write out an SQLite database and if you ask for verbose mode, it
+will print the parsed results to the screen.  If it can't decode
+lines, it sends them to stderr with a message.  It turns out that
+there is a bit of unexpected interaction between epydoc and the new
+python .format string templating system, but that was fixed by using
+{{name<url>}} instead of {name<url>} for epydoc.  I know, epydoc is
+out of favor, but I still really like it.  DBT (Depth Below
+Transducer) is documented in the GPSD <a
+href="http://gpsd.berlios.de/NMEA.txt">NMEA.txt</a>.  Like most NMEA,
+is is kind of rediculous.  It really should just have the depth in
+meters and let software change the values if the user wants the
+results presenting in feet, fathoms, chains, or whatever.
+<br /><br />
+I also added this nmea to my Healy NMEA parser.  I should really pull
+out the nmea module and post it to github.
+<br /><br />
+Here is the data John posted:
+<pre>1298419231.321 $SDDBT,17960.21,f,5474.27,M,2993.37,F*3E
+1298419243.344 $SDDBT,16168.86,f,4928.27,M,2694.81,F*32
+1298419255.374 $SDDBT,16168.65,f,4928.21,M,2694.78,F*3F
+1298419267.401 $SDDBT,16170.58,f,4928.79,M,2695.10,F*3A
+1298419279.421 $SDDBT,16178.03,f,4931.06,M,2696.34,F*39
+1298419291.440 $SDDBT,10131.89,f,3088.20,M,1688.65,F*30
+1298419303.470 $SDDBT,18892.32,f,5758.38,M,3148.72,F*32
+1298419315.491 $SDDBT,16181.24,f,4932.04,M,2696.87,F*33
+1298419327.515 $SDDBT,17455.23,f,5320.35,M,2909.21,F*36
+1298419339.538 $SDDBT,16187.08,f,4933.82,M,2697.85,F*37</pre>
+And here is the code that I wrote...
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<i><font color="#9A1900"># Turn off pylint messages that don't make sense in my opinion</font></i>
+<i><font color="#9A1900"># C0111: Missing docstring</font></i>
+<i><font color="#9A1900"># C0301: Line too long</font></i>
+<i><font color="#9A1900"># W0105: String statement has no effect - these are doc strings for epydoc</font></i>
+<i><font color="#9A1900"># W0142: parse_dbt_file: Used * or ** magic</font></i>
+<i><font color="#9A1900"># W0622: Redefining built-in '__doc__' - I use a doc string that can include __var__</font></i>
+<i><font color="#9A1900"># pylint: disable-msg=C0111,C0301,W0105,W0142,W0622</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> __future__ <b><font color="#000080">import</font></b> print_function <i><font color="#9A1900"># Aim towards Python 3.2</font></i>
+<!-- -->
+__author__    <font color="#990000">=</font> <font color="#FF0000">'Kurt Schwehr'</font>
+__version__   <font color="#990000">=</font> <font color="#FF0000">'0.1'</font>
+<i><font color="#9A1900">#__revision__  = __version__ # For pylint</font></i>
+__date__ <font color="#990000">=</font> <font color="#FF0000">'2011-Feb-26'</font>
+__copyright__ <font color="#990000">=</font> <font color="#FF0000">'2011'</font>
+__license__   <font color="#990000">=</font> <font color="#FF0000">'MIT'</font> <i><font color="#9A1900"># http://www.opensource.org/licenses/mit-license.php</font></i>
+__contact__   <font color="#990000">=</font> <font color="#FF0000">'kurt@ccom.unh.edu'</font>
+<!-- -->
+<i><font color="#9A1900"># Use two {{ and }} to avoid clashing with .format {var_name} variables</font></i>
+__doc__ <font color="#990000">=</font><font color="#FF0000"> '''</font>
+<font color="#FF0000">Parse NMEA sonar DBT depth reports as seen on the SIO R/V Melville in 2011</font>
+<!-- -->
+<font color="#FF0000">To check style with pylint and epydoc (along with creating the documentation):</font>
+<!-- -->
+<font color="#FF0000">  - pylint -i y dbt.py</font>
+<font color="#FF0000">  - epydoc -v --check dbt.py</font>
+<font color="#FF0000">  - ./dbt.py --doc-test -v</font>
+<font color="#FF0000">  - epydoc dbt.py</font>
+<font color="#FF0000">  - ./dpt.py --help</font>
+<!-- -->
+<font color="#FF0000">You can run the code with either stdin or a filename:</font>
+<!-- -->
+<font color="#FF0000">  - cat nmea.txt | ./dbpt.py</font>
+<font color="#FF0000">  - ./dbpt.py -i nmea.txt</font>
+<font color="#FF0000">  - sqlite3 nmea-dbt.sqlite3 .schema</font>
+<font color="#FF0000">  - sqlite3 nmea-dbt.sqlite3 \'SELECT * FROM dbt LIMIT 5;\'</font>
+<!-- -->
+<font color="#FF0000">@author: {__author__}</font>
+<font color="#FF0000">@version: {__version__}</font>
+<!-- -->
+<font color="#FF0000">@see: U{{Kodos&lt;http://kodos.sourceforge.net/&gt;}} helps build and test python regular expressions</font>
+<font color="#FF0000">@see: U{{Sqlite Manager&lt;https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/&gt;}} to view SQLite Databases as a spreadsheet</font>
+<!-- -->
+<font color="#FF0000">@requires: U{{Python&lt;http://python.org/&gt;}} &gt;= 2.6</font>
+<font color="#FF0000">@requires: U{{epydoc&lt;http://epydoc.sourceforge.net/&gt;}} &gt;= 3.0.1</font>
+<!-- -->
+<font color="#FF0000">@undocumented: __doc__ __revision__ __package__ __author__ __version__</font>
+<font color="#FF0000">@since: 2011-Feb-26</font>
+<font color="#FF0000">@status: Example code</font>
+<font color="#FF0000">@organization: U{{CCOM&lt;http://ccom.unh.edu/&gt;}}</font>
+<font color="#FF0000">'''</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font><b><font color="#000000">locals</font></b><font color="#990000">())</font> <i><font color="#9A1900">#author=__author__,version=__version__)</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> sys
+<b><font color="#000080">import</font></b> re  <i><font color="#9A1900"># Regular expressions</font></i>
+<b><font color="#000080">import</font></b> time
+<b><font color="#000080">import</font></b> datetime
+<b><font color="#000080">import</font></b> sqlite3
+<b><font color="#000080">import</font></b> argparse <i><font color="#9A1900"># Handle command line arguments.  Replaces optparse</font></i>
+<b><font color="#000080">from</font></b> operator <b><font color="#000080">import</font></b> xor <i><font color="#9A1900"># For NMEA checksum</font></i>
+<b><font color="#000080">import</font></b> doctest
+<!-- -->
+<!-- -->
+DBT_NMEA_REGEX_STR <font color="#990000">=</font> r<font color="#FF0000">'''[$](?P&lt;talker&gt;SD)(?P&lt;sentence&gt;DBT),</font>
+<font color="#FF0000">(?P&lt;depth_ft&gt;\d+\.\d+),f,</font>
+<font color="#FF0000">(?P&lt;depth_m&gt;\d+\.\d+),M,</font>
+<font color="#FF0000">(?P&lt;depth_fath&gt;\d+\.\d+),F</font>
+<font color="#FF0000">\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])'''</font>
+<i><font color="#9A1900">'Regular expression to parse sonar depth DBT NMEA strings.  Verbose mode required'</font></i>
+<!-- -->
+DBT_RE <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>DBT_NMEA_REGEX_STR<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">)</font>
+<i><font color="#9A1900">'Compiled regex for NMEA DBT'</font></i>
+<!-- -->
+SQL_CREATE <font color="#990000">=</font><font color="#FF0000"> '''</font>
+<font color="#FF0000">CREATE TABLE IF NOT EXISTS dbt</font>
+<font color="#FF0000">(</font>
+<font color="#FF0000">        id		INTEGER PRIMARY KEY,</font>
+<font color="#FF0000">        dbt_timestamp   TIMESTAMP,</font>
+<font color="#FF0000">        depth_m         REAL        </font>
+<font color="#FF0000">);</font>
+<font color="#FF0000">'''</font>
+<i><font color="#9A1900">'Create an SQLite 3 database for DBT NMEA messages'</font></i>
+<!-- -->
+SQL_INSERT <font color="#990000">=</font> <font color="#FF0000">'INSERT INTO dbt (dbt_timestamp, depth_m) VALUES (:date, :depth_m);'</font>
+<i><font color="#9A1900">'Command to add an entry into a DBT NMEA database'</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">nmea_checksum</font></b><font color="#990000">(</font>sentence<font color="#990000">):</font>
+<i><font color="#9A1900">    '''8-bit XOR of everything between the [!$] and the *</font></i>
+<!-- -->
+<i><font color="#9A1900">    &gt;&gt;&gt; nmea_checksum("$SDDBT,17960.21,f,5474.27,M,2993.37,F*3E")</font></i>
+<i><font color="#9A1900">    \'3E\'</font></i>
+<i><font color="#9A1900">    </font></i>
+<i><font color="#9A1900">    @type sentence: str</font></i>
+<i><font color="#9A1900">    @param sentence: A line with embedded nmea.  </font></i>
+<i><font color="#9A1900">    '''</font></i>
+    nmea <font color="#990000">=</font> <font color="#990000">[</font><b><font color="#000000">ord</font></b><font color="#990000">(</font>c<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> c <b><font color="#0000FF">in</font></b> sentence<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'*'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#993399">1</font><font color="#990000">:]]</font>
+    checksum <font color="#990000">=</font> <b><font color="#000000">reduce</font></b><font color="#990000">(</font>xor<font color="#990000">,</font> nmea<font color="#990000">)</font>
+    checksum_str <font color="#990000">=</font> <b><font color="#000000">hex</font></b><font color="#990000">(</font>checksum<font color="#990000">).</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'x'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">upper</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">if</font></b> <b><font color="#000000">len</font></b><font color="#990000">(</font>checksum_str<font color="#990000">)</font> <font color="#990000">==</font> <font color="#993399">1</font><font color="#990000">:</font>
+        checksum_str <font color="#990000">=</font> <font color="#FF0000">'0'</font> <font color="#990000">+</font> checksum_str
+    <b><font color="#0000FF">return</font></b> checksum_str
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">parse_dbt_file</font></b><font color="#990000">(</font>nmea_file<font color="#990000">,</font> sqlite_filename<font color="#990000">,</font> verbose<font color="#990000">=</font>False<font color="#990000">):</font>
+<i><font color="#9A1900">    '''Parse a NMEA file containing DBT depth entries and write and SQLite 3 database</font></i>
+<i><font color="#9A1900">    @type nmea_file: str or open file</font></i>
+<i><font color="#9A1900">    @param nmea_file: input file name of Unix UTC time stamps followed by DBT NMEA</font></i>
+<i><font color="#9A1900">    @type sqlite_filename: str</font></i>
+<i><font color="#9A1900">    @param sqlite_filename: output filename for SQLite database</font></i>
+<i><font color="#9A1900">    @type verbose: bool</font></i>
+<i><font color="#9A1900">    @param verbose: Write the parsed messages to STDOUT</font></i>
+<i><font color="#9A1900">    '''</font></i>
+<!-- -->
+    db_cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font>sqlite_filename<font color="#990000">)</font>
+    db_cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font>SQL_CREATE<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> <b><font color="#000000">isinstance</font></b><font color="#990000">(</font>nmea_file<font color="#990000">,</font> str<font color="#990000">):</font>
+        nmea_file <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font>nmea_file<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">for</font></b> line_num<font color="#990000">,</font> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>nmea_file<font color="#990000">):</font>
+        line <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">rstrip</font></b><font color="#990000">()</font> <i><font color="#9A1900"># remove any trailing white space and the newline</font></i>
+        <b><font color="#0000FF">if</font></b> line_num <font color="#990000">%</font> <font color="#993399">2</font> <font color="#990000">==</font> <font color="#993399">5000</font><font color="#990000">:</font>
+            sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'line {line_num}\n'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>line_num<font color="#990000">=</font>line_num<font color="#990000">))</font>
+            db_cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font> <i><font color="#9A1900"># Don't let the transaction get to large</font></i>
+<!-- -->
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            match <font color="#990000">=</font> DBT_RE<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>line<font color="#990000">).</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font>
+            checksum <font color="#990000">=</font> <b><font color="#000000">nmea_checksum</font></b><font color="#990000">(</font>line<font color="#990000">[</font>line<font color="#990000">.</font><b><font color="#000000">find</font></b><font color="#990000">(</font><font color="#FF0000">'$'</font><font color="#990000">):])</font>
+            timestamp <font color="#990000">=</font> time<font color="#990000">.</font><b><font color="#000000">gmtime</font></b><font color="#990000">(</font><b><font color="#000000">float</font></b><font color="#990000">(</font>line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()[</font><font color="#993399">0</font><font color="#990000">]))</font>
+        <b><font color="#0000FF">except</font></b> AttributeError<font color="#990000">:</font>
+            sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'NON_DBT_LINE: %d "%s"\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>line_num<font color="#990000">,</font> line<font color="#990000">))</font>
+            <b><font color="#0000FF">continue</font></b>
+<!-- -->
+        <b><font color="#0000FF">if</font></b> checksum <font color="#990000">!=</font> match<font color="#990000">[</font><font color="#FF0000">'checksum'</font><font color="#990000">]:</font>
+            sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'BAD_CHECKSUM: %d "%s"\n'</font><font color="#990000">,</font> <font color="#990000">(</font>line_num<font color="#990000">,</font> line<font color="#990000">))</font>
+            <b><font color="#0000FF">continue</font></b>
+        
+        match<font color="#990000">[</font><font color="#FF0000">'date'</font><font color="#990000">]</font> <font color="#990000">=</font> datetime<font color="#990000">.</font><b><font color="#000000">datetime</font></b><font color="#990000">(</font>timestamp<font color="#990000">.</font>tm_year<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_mon<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_mday<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_hour<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_sec<font color="#990000">)</font>
+        <b><font color="#0000FF">if</font></b> verbose<font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'{depth_m}m\t{date}'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font>match<font color="#990000">))</font>
+            <i><font color="#9A1900">#print (sql_insert)</font></i>
+        db_cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font>SQL_INSERT<font color="#990000">,</font> match<font color="#990000">)</font>
+<!-- -->
+    <i><font color="#9A1900"># Final commit to my sure we have flushed everything to the database</font></i>
+    db_cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font>
+<!-- -->
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+<i><font color="#9A1900">    'Handle command line interface'</font></i>
+    
+    parser <font color="#990000">=</font> argparse<font color="#990000">.</font><b><font color="#000000">ArgumentParser</font></b><font color="#990000">(</font>description<font color="#990000">=</font><font color="#FF0000">'Parse nmea'</font><font color="#990000">,</font>
+                                     formatter_class<font color="#990000">=</font>argparse<font color="#990000">.</font>ArgumentDefaultsHelpFormatter<font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'-i'</font><font color="#990000">,</font> <font color="#FF0000">'--nmea-file'</font><font color="#990000">,</font> default<font color="#990000">=</font>sys<font color="#990000">.</font>stdin<font color="#990000">,</font> <i><font color="#9A1900">#'nmea-dbt.txt',</font></i>
+                       help<font color="#990000">=</font><font color="#FF0000">'Input file with Unix UTC timestamps followed by DBT lines'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'-o'</font><font color="#990000">,</font> <font color="#FF0000">'--sqlite-file'</font><font color="#990000">,</font> default<font color="#990000">=</font><font color="#FF0000">'nmea-dbt.sqlite3'</font><font color="#990000">,</font>
+                       help<font color="#990000">=</font><font color="#FF0000">'Where to write a SQLITE 3 database file for easier handling of the data'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'-v'</font><font color="#990000">,</font> <font color="#FF0000">'--verbose'</font><font color="#990000">,</font> action<font color="#990000">=</font><font color="#FF0000">'store_true'</font><font color="#990000">,</font> default<font color="#990000">=</font>False<font color="#990000">,</font> help<font color="#990000">=</font><font color="#FF0000">'print the parsed results to stdout'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'--doc-test'</font><font color="#990000">,</font> action<font color="#990000">=</font><font color="#FF0000">'store_true'</font><font color="#990000">,</font> default<font color="#990000">=</font>False<font color="#990000">,</font> help<font color="#990000">=</font><font color="#FF0000">'Run the internal checks'</font><font color="#990000">)</font>
+<!-- -->
+    args <font color="#990000">=</font> parser<font color="#990000">.</font><b><font color="#000000">parse_args</font></b><font color="#990000">()</font>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> args<font color="#990000">.</font>doc_test<font color="#990000">:</font>
+        sys<font color="#990000">.</font>argv <font color="#990000">=</font> <font color="#990000">[</font>sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]]</font>
+<!-- -->
+        <b><font color="#0000FF">if</font></b> args<font color="#990000">.</font>verbose<font color="#990000">:</font>
+            sys<font color="#990000">.</font>argv<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font><font color="#FF0000">'-v'</font><font color="#990000">)</font>
+<!-- -->
+        numfail<font color="#990000">,</font> numtests <font color="#990000">=</font> doctest<font color="#990000">.</font><b><font color="#000000">testmod</font></b><font color="#990000">()</font>
+        <b><font color="#0000FF">if</font></b> numfail <font color="#990000">==</font> <font color="#993399">0</font><font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'ok. '</font><font color="#990000">,</font> numtests<font color="#990000">,</font> <font color="#FF0000">'tests passed.'</font><font color="#990000">)</font>
+            sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font>
+        <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'FAILED: %d of %d tests'</font><font color="#990000">,</font> <font color="#990000">(</font>numfail<font color="#990000">,</font> numtests<font color="#990000">))</font>
+            sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font>
+<!-- -->
+    <b><font color="#000000">parse_dbt_file</font></b><font color="#990000">(</font>args<font color="#990000">.</font>nmea_file<font color="#990000">,</font> args<font color="#990000">.</font>sqlite_file<font color="#990000">,</font> args<font color="#990000">.</font>verbose<font color="#990000">)</font>
+<!-- -->
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    <b><font color="#000000">main</font></b><font color="#990000">()</font></tt></pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-26T12_44_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-27T12_44_55.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-21T16_53_05.txt" name="e2011-02-21T16_53_05.txt"></a>
+<h2 class="date">02.21.2011 16:53</h2>
+<div class="blogbody">
+<h3 class="title">Seismic exploration video</h3>
+<div class="item-description">
+This is a nice video showing off seismic surveying.  It's not a bad
+overview.  Worth the 9 minutes to watch it.  Yes, it's definitely an
+advertisement for Schlumberger.
+<br /><br />
+<iframe title="YouTube video player" width="640" height="510" src="http://www.youtube.com/embed/SVvFHrdU19M" frameborder="0" allowfullscreen></iframe>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-21T16_53_05.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-26T12_44_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-21T09_30_30.txt" name="e2011-02-21T09_30_30.txt"></a>
+<h2 class="date">02.21.2011 09:30</h2>
+<div class="blogbody">
+<h3 class="title">Refusing to learn and the cost of learning</h3>
+<div class="item-description">
+Aaron wrote a nice article <a
+href="http://aaronhawley.livejournal.com/27271.html">Refusing to
+learn</a>.  However, it is missing two key items.  The first is the
+cost of learning something or, to borrow from chemistry, the
+activation energy.  Getting going in emacs takes discipline.  It's
+easier these days with the GUI and menus that are available if you
+want them, but learning the key bindings takes energy.  The second
+missing part is the payback of that energy.  If I work hard and the
+payback is short (e.g. the software goes away or changes so much that
+I have to learn it over), then my investment in the tool is worth only
+a small amount.  If however, I end up using something like emacs for
+the rest of my life and it keeps paying off, that activation energy is
+almost insignificant in the long run.  Those two concepts are in the his post, but really not as strong as they should be.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-21T09_30_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-21T16_53_05.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-20T11_12_16.txt" name="e2011-02-20T11_12_16.txt"></a>
+<h2 class="date">02.20.2011 11:12</h2>
+<div class="blogbody">
+<h3 class="title">IMO 289 Current Flow Report 3-dimensions</h3>
+<div class="item-description">
+I've never really looked very hard at the current messages in IMO Circ
+289 until now.  How do I specify currents that are west, south, or
+down when the e, n, and up directions don't have negative signs?  I
+think we can use the spare bits to specify the sign of the 6
+components of the two levels.  That's yet more complexity in the code
+people will have to implement, which is <b>NOT GOOD</b> &reg;
+<br /><br />
+See page 60 of <a href="http://vislab-ccom.unh.edu/~schwehr/papers/2010-IMO-SN.1-Circ.289.pdf">IMO, Guidance on the Use of AIS Application-Specific Messages, IMO, SN.1/Circ.289, Ref. T2-OSS/2.7.1, 2 June 2010</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-20T11_12_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-21T09_30_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-19T13_00_54.txt" name="e2011-02-19T13_00_54.txt"></a>
+<h2 class="date">02.19.2011 13:00</h2>
+<div class="blogbody">
+<h3 class="title">Fairpoint communications</h3>
+<div class="item-description">
+I just got a letter from Fairpoint Communications that my payment
+didn't go through for insufficient funds.  Thankfully, I had written
+down a tech support number that actually works the last time I had
+problems with them.  When I got the tech on the phone, he said that
+their billing system has been having a lot of problems lately and that
+I could pay over the phone on Monday.  I asked him why I couldn't log
+in to my account to check online, he said a lot of customers have been
+having their accounts not work over off and on over the last month.
+He said they are "working on it" and keeping it offline for my
+"safety."  There is no ETA for a fix.  What do I see when I try to
+log in?  Clearly it is not intentionally offline when you dump your
+users into ASP code when they try to log in.  How about some proper
+exception handling?  And now I know you are using code that is 5 years
+old.  How many security holes are in their 6 year old crusty C# code?
+<br /><br />
+This is pretty bad customer service...
+<br /><br />
+<img title="Fairpoint Csharp ASP error on login"
+withgrayborder="True"
+src="../attachments/2011-02/fairpoint-sucks.png"/>
+<br /><br />
+BTW, my <a href="http://www.speakeasy.net/speedtest/">SpeakEasy Speed
+Test</a> numbers for FairPoint DSL in the SeaCoast area of New
+Hampshire are: 2.95 Mbps down and 0.70 Mbps up on a dry line (no phone service).
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-19T13_00_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-20T11_12_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-17T09_06_46.txt" name="e2011-02-17T09_06_46.txt"></a>
+<h2 class="date">02.17.2011 09:06</h2>
+<div class="blogbody">
+<h3 class="title">Substructure Orion survey vessel</h3>
+<div class="item-description">
+UPDATE 2011-Feb-18 1PM: You can sign up to watch the seminar live at 3PM EST: <a href="https://www2.gotomeeting.com/register/486094371">GoToWebinar: CCOM/JHC Lecture Series: Survey Platform Design Considerations and an Unconventional View of the Hydro World</a>.
+<br /><br />
+Yesterday, <a href="http://substructure.com/">Substructure</a> had an open house on their Orion Survey vessel
+in Portsmouth, NH.  My main focus at CCOM is definitely not Multibeam,
+but that doesn't mean I can't enjoy checking out a well thought out
+system.  I don't think you could put together a better overall design
+without forking out a ton more on the price of the vessel and sensors.
+But first, I have to appologize to Tom and Tom of Substructure for the
+poor quality of my iPhone 3GS photos.  I should have grabbed one of the
+CCOM pro cameras.
+<br /><br />
+Substructure will be giving a seminar at CCOM on Friday at 3PM.
+Anyone is welcome to come to the seminar.
+<br /><br />
+First, here is the vessel.  She's small, which is great for getting
+around tight spaces, and designed to be super rigid, which is
+important for the transformations between the GPS antennas, IMU, and
+sensors.  There is a large amount of clear deck space considering how
+small the vessel is.  You can see that there are hard mount points on
+both the port (not currently in use) and starboard (holding a winch
+with CTD).  The VHF antennas fold down to allow for better clearance
+when on the trailer, but the GPS antennas are firmly fixed without
+long lever arms, but reasonable far apart and with minimal sky
+obstructions.  The engines and electrical systems are designed for low
+acoustic/vibrational and electrical noise, which on many other vessels
+is a real killer to sonar data quality.  Additionally, all of the
+water proof deck panels come up allowing for access to the engines,
+electrical, and hydraulic systems.  They were thinking ahead about
+making maintenance and upgrading more manageable.
+<br /><br />
+<img title="Substructure Orion"
+withgrayborder="True"
+src="../attachments/2011-02/substructure-orion-survey-vessel.jpg"/>
+<br /><br />
+Inside the vessel, the piloting and navigation space is best described
+as clean.  There isn't a lot in the way and the space looks efficient.
+The only things not to like is that the sonar operator faces
+backwards.  I would prefer to be looking forward and to have a camera
+looking aft, but that's a small thing to quibble with.  The Hypack
+screens are neatly mounted up against the wall.  The workspace has
+just enough space to work and they have the rubber roll up keyboards
+that are fun and great when you don't have to do a lot of typing.
+<br /><br />
+In this image, we are driving past the Portsmouth commercial dock (the
+one with the super expensive DHS fence protecting the scrap metal
+pile.  You can see the pilings showing up on the left in the realtime
+display.  I got too distracted to by great data to get a better
+picture of one of the wrecks or bridge abutments.  The data looked
+fantastic from a crawl all the way up to 14 knots with calm water and
+even did pretty darn good at 14 knots when we hit our own wake.  While
+I thought the data quality was awesome, I haven't been on a lot of
+other launches in shallow water to be able to compare. 
+<br /><br />
+<img title="Substructure Orion - Acquisition with Hypack"
+withgrayborder="True"
+src="../attachments/2011-02/substructure-acquisition-screens.jpg"/>
+<br /><br />
+The sonar head and IMU sensor are bolted together, which has the super
+advantage that most of the sighting in of the system can be done on a
+lab bench.  Then the IMU and sonar can be sighted in to just the GPS
+antennas.  The pair sit in a moon pool right below the sonar operators
+feet.
+<br /><br />
+Also, they showed off their new <a
+href="http://www.ysi.com/productsdetail.php?CastAway-CTD-49">CastAway
+CTD</a> that is really awesome.  It has a bluetooth interface for
+download the CTD data.  All the CastAway needs now is a RF charging
+system, where just leaving the device on a mat will charge it up
+between casts.  I hope the CastAway produces great data as the concept
+is really slick.
+<br /><br />
+Thanks to Tom and Tom for a great tour!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-17T09_06_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-19T13_00_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-15T08_25_10.txt" name="e2011-02-15T08_25_10.txt"></a>
+<h2 class="date">02.15.2011 08:25</h2>
+<div class="blogbody">
+<h3 class="title">Problem reporting</h3>
+<div class="item-description">
+Writing a bug report or problem report that is usable by the person
+you are giving it to is a very difficult thing to do.  I recently got
+this at 4:15AM:
+<pre>GOOD MORNING. THE FEED IS CURRENTLY NOT CONNECTED.</pre>
+While technically correct, it took me a second report before I think, but
+am not totally sure, I found the problem on a different feed than was
+reported.  As quoted from the movie <a
+href="http://en.wikipedia.org/wiki/Short_Circuit">Short Circuit</a>,
+"Malfunction.  Need input!"
+<br /><br />
+Each type of system is going to have a different set of things that
+should be reported.  If it was from a normal user program (say
+ArcGIS), failing, you will want to write one style of bug report.  In
+this case, it was for one of my 3 NAIS feeds.  Here is some of what I 
+probably need in a problem report.  <a
+href="http://en.wikipedia.org/wiki/Checklist">Checklists</a> can be
+really helpful.
+<ul>
+  <li>The exact name of the feed that has a problem</li>
+  <li>What is wrong?  Is the network connection slow or totally out?</li>
+  <li>When did the problem start?</li>
+  <li>Can you ping my machine?</li>
+  <li>If ping is down, how about a traceroute?</li>
+  <li>What IP/hostname was the connection with before the problem started?</li>
+  <li>Was there a graph of the feed to see if there were indications
+  of impending trouble?</li>
+  <li>What versions of the software are involved?</li>
+  <li>Was any software updated recently?</li>
+  <li>Are there any other unusual problems in the system that occured
+  about the same time?</li>
+  <li>And????</li>
+</ul>
+Coming up with a good lost of items to check isn't always easy, but if
+we as a community keep trying to iterate, we will eventually get to
+a good working set.
+<br /><br />
+In this case it turned out to be a client problem where, when the
+connection flaps, there end up being too many improperly closed TCP
+connections.  On mac osx, I could see the problem like this using
+<b>lsof</b> (list of open files) which can monitor network connections
+in addition to files that are currently open.
+<pre>
+sudo lsof -i -nP | grep java | wc -l
+    <b>1016</b>
+sudo lsof -i -nP | grep java | head 
+java      55103        schwehr    7u  IPv6 0x2848fa70      0t0  TCP *:31414 (LISTEN)
+java      55103        schwehr    8u  IPv6  0xb2bc19c      0t0  TCP [::127.0.0.1]:31414->[::127.0.0.1]:52550 (ESTABLISHED)
+java      55103        schwehr    9u  IPv6  0xb2bc664      0t0  TCP [::1]:52545->[::1]:52544 (TIME_WAIT)
+java      55103        schwehr   11u  IPv6  0xb2bbf38      0t0  TCP [::CLIENT_IP]:52620->[::SERVER_1_IP]:REMOTE_PORT (CLOSE_WAIT)
+java      55103        schwehr   12u  IPv6 0x26320258      0t0  TCP [::CLIENT_IP]:52619->[::SERVER_2_IP]:REMOTE_PORT (CLOSED)
+java      55103        schwehr   13u  IPv6 0x283d0e4c      0t0  TCP [::CLIENT_IP]:52868->[::SERVER_2_IP]:REMOTE_PORT (SYN_SENT)
+java      55103        schwehr   14u  IPv6  0xba85d90      0t0  TCP [::CLIENT_IP]:59909->[::SERVER_1_IP]:REMOTE_PORT (SYN_SENT)
+java      55103        schwehr   15u  IPv6  0xb2bb5a8      0t0  TCP [::127.0.0.1]:31414->[::127.0.0.1]:52645 (ESTABLISHED)
+java      55103        schwehr   16u  IPv6  0xb2bc400      0t0  TCP [::CLIENT_IP]:52870->[::SERVER_2_IP]:REMOTE_PORT (SYN_SENT)
+java      55103        schwehr   17u  IPv6  0xb2bb0e0      0t0  TCP [::CLIENT_IP]:52874->[::SERVER_2_IP]:REMOTE_PORT (SYN_SENT)</pre>
+1016 is a lot of connections for a process to have.  I'm guessing that
+in the normal case, this should be between 3-20 connections.  The
+minimum is 3 with an AISUser connected to the system and listening for
+a connection locally to forward the data.
+<br /><br />
+In this case, my lesson is that when I don't see the exact problem reported
+by the watch stander, to kick it over to the USCG Help Desk right
+away.  The watch standers are there to catch the event, not to debug it.
+The NAIS team has more tools and background available to know what is
+going on.  This stuff is fairly complicated, so it takes everyone
+working together.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-15T08_25_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-17T09_06_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-14T17_07_23.txt" name="e2011-02-14T17_07_23.txt"></a>
+<h2 class="date">02.14.2011 17:07</h2>
+<div class="blogbody">
+<h3 class="title">NOAA FY12 budget</h3>
+<div class="item-description">
+<a
+href="http://www.noaanews.noaa.gov/stories2011/20110214_fy2012budget.html">NOAA
+Announces FY 2012 Budget: Science and Innovation Cited as Keys to
+Economic Recovery</a>
+<pre>...
+The budget request represents a $6.8 million decrease compared to
+the 2011 budget. This budget focuses on program needs, identifies
+efficiencies, and ensures accountability across the agency. Core
+functions and services are sustained, increases are requested for only
+the most critical programs, projects, or activities necessary to meet
+the nation's growing demand for NOAA's services, and careful cuts are
+made throughout the budget. 
+<!-- -->
+"Perhaps most significantly, this budget clearly recognizes the
+central role that science and technology play in stimulating the
+economy, creating new jobs and improving the health and security of
+Americans," said Dr. Jane Lubchenco, Ph.D., under secretary of
+commerce for oceans and atmosphere and NOAA administrator. "Americans
+rely on NOAA science, services and stewardship to keep their families
+safe, their communities thriving, and their businesses strong. Our
+work is everyone's business."
+<!-- -->
+NOAA's budget will focus on an ambitious array of strategic
+priorities, including: 
+<!-- -->
+    * Improving prediction of high impact weather and water forecasts
+    * Supporting sustainable oceans, fisheries, and communities 
+    * Providing critical investments in satellites and sensors to
+      further NOAA's observational mission 
+<!-- -->
+This budget furthers NOAA's commitment to strengthen science
+throughout the agency, providing support for the next generation of
+research and information to meet the growing demand for NOAA's science
+and services and to drive economic recovery. The proposed request
+includes $737 million for research and development related to climate,
+weather and ecosystem science and for infrastructure to support NOAA's
+R&D enterprise.
+...</pre>
+What does having the TJ in the press release imply?  She is designed
+for hydrographic surveying, but here was helping with the oil
+spill research.  We need more resources for both types of tasks.
+<br /><br />
+<img title="NOAA ship Thomas Jefferson from the budget press release" withgrayborder="True" src="../attachments/2011-02/noaa-tj-deepwater-horizon.jpg"/>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-14T17_07_23.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-15T08_25_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-10T12_31_34.txt" name="e2011-02-10T12_31_34.txt"></a>
+<h2 class="date">02.10.2011 12:31</h2>
+<div class="blogbody">
+<h3 class="title">NOAA Administrator on Gulf of Mexico / Deepwater Horizon</h3>
+<div class="item-description">
+<a
+href="http://www.noaanews.noaa.gov/stories2011/20110209_restorethegulf_keynoteaddress.html">NOAA
+Administrator Keynote Address on Restoration in the Gulf of Mexico -
+Beyond Recovery: Moving the Gulf Toward a Sustainable Future</a> by
+Jane Lubchenco:
+<pre>...
+What <a href="http://en.wikipedia.org/wiki/Gaylord_Nelson">Senator Nelson</a> knew was that the environment and the economy were
+inseparable.  His exact words were "Increasingly, we have come to
+understand the wealth of the nation is in its air, water, soil,
+forests, minerals, lakes, oceans, scenic beauty, wildlife habitats,
+and biodiversity... That's the whole economy.  That's where all the
+economic activity and all the jobs come from."
+...</pre>
+Gaylord Nelson was a Senator from Wisconsin and was the principal
+founder of Earth Day.  There are two thing missing from the above quote:
+the brains/innovation of the population and the right of people (not
+limited to
+corporations) to use that intellectual ability and knowledge
+constructively.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-10T12_31_34.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-14T17_07_23.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-09T11_58_30.txt" name="e2011-02-09T11_58_30.txt"></a>
+<h2 class="date">02.09.2011 11:58</h2>
+<div class="blogbody">
+<h3 class="title">Handbook of Offshore Surveying</h3>
+<div class="item-description">
+I've never heard of the Handbook of Offshore Surveying until the Hydro
+International note <a
+href="http://www.hydro-international.com/news/id4512-Handbooks_of_Offshore_Surveying.html">Handbooks
+of Offshore Surveying</a> announcing the 2nd edition.  At roughly <a href="http://www.skilltradebookstore.nl/index.php?page=shop.product_details&flypage=flypage_images1.tpl&product_id=24&category_id=7&option=com_virtuemart&Itemid=20">$500
+for the set</a>, I'm not surprised that I haven't heard of it before.  If
+anyone has reviewed it, please let me know so I can link to your
+review.  I took a peak at the contents, but don't know any of the authors.
+<br /><br />
+Skilltrade doesn't make it very easy to see the contents of the books,
+so I've pulled them out here:
+<br /><br />
+<p>Volume 1</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="right" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="right"><b>Chapter</b></th><th scope="col" class="left"><b>Title</b></th><th scope="col" class="left"><b>Author(s)</b></th></tr>
+</thead>
+<tbody>
+<tr><td class="right">1</td><td class="left">Introduction to Hydrography</td><td class="left">Huibert-Jan Lekkerkkerk; Tim Haycock</td></tr>
+<tr><td class="right">2</td><td class="left">Nautical charting</td><td class="left">Cor Mallie; IHO survey manual</td></tr>
+<tr><td class="right">3</td><td class="left">Dredging</td><td class="left">Huibert-Jan Lekkerkerk; Willem van der Lee</td></tr>
+<tr><td class="right">4</td><td class="left">Inspection</td><td class="left">Pieter Jansen; Tim Haycock</td></tr>
+<tr><td class="right">5</td><td class="left">Survey for Offshore Installation</td><td class="left">Tim Haycock</td></tr>
+<tr><td class="right">6</td><td class="left">Rig Moves</td><td class="left">Tim Haycock</td></tr>
+<tr><td class="right">7</td><td class="left">Cable and Pipe lay</td><td class="left">Pieter Jansen; Tim Haycock</td></tr>
+<tr><td class="right">8</td><td class="left">Remotely Operated Vehicles</td><td class="left">Pieter Jansen; Paul van Waalwijk van Doorn</td></tr>
+<tr><td class="right">9</td><td class="left">Personnel and Organisation</td><td class="left">Pieter Jansen; Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">10</td><td class="left">Geotechnical Survey</td><td class="left">Fugro</td></tr>
+<tr><td class="right">11</td><td class="left">Seismic Survey</td><td class="left">Robert van der Velden</td></tr>
+<tr><td class="right">12</td><td class="left">Land survey</td><td class="left">Huibert-Jan Lekkerkerk; Peter Veldkamp</td></tr>
+<tr><td class="right">13</td><td class="left">Gravity &amp; Magnetic Survey</td><td class="left">Pieter Jansen; Aad van Dam</td></tr>
+<tr><td class="right">14</td><td class="left">Project preparation</td><td class="left">Pieter Jansen; Fugro; Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">15</td><td class="left">Survey Operations</td><td class="left">Huibert-Jan Lekkerkerk; Pieter Jansen; Arie Goedknegt</td></tr>
+<tr><td class="right">16</td><td class="left">Processing and Reporting</td><td class="left">Huibert-Jan Lekkerkerk, Maris; Cor Mallie; Pieter Jansen; Peter Veldkamp</td></tr>
+</tbody>
+</table>
+<p>Volume 2:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="right" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="right"><b>Chapter</b></th><th scope="col" class="left"><b>Title</b></th><th scope="col" class="left"><b>Author(s)</b></th></tr>
+</thead>
+<tbody>
+<tr><td class="right">1</td><td class="left">Geodesy</td><td class="left">Huibert-Jan Lekkerkerk; Tim Haycock; Robert van der Velden; Aad van Dam</td></tr>
+<tr><td class="right">2</td><td class="left">Co-ordinate systems</td><td class="left">Tim Haycock; Piet Pols; Huibert-Jan Lekkerkerk; Paul van Waalwijk van Doorn; Robert van der Velden</td></tr>
+<tr><td class="right">3</td><td class="left">Positioning</td><td class="left">Paul van Waalwijk van Doorn; Huibert-Jan Lekkerkerk; Rob Berlijn†; Peter Veldkamp; Keith Park (MDL)</td></tr>
+<tr><td class="right">4</td><td class="left">Satellite navigation</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">5</td><td class="left">USBL</td><td class="left">Darioosh Naderi (Sonardyne); Pieter Jansen</td></tr>
+<tr><td class="right">6</td><td class="left">LBL</td><td class="left">Darioosh Naderi (Sonardyne); Pieter Jansen</td></tr>
+<tr><td class="right">7</td><td class="left">NASNET</td><td class="left">Sam Hanton (Nautronix)</td></tr>
+<tr><td class="right">8</td><td class="left">SBL</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">9</td><td class="left">LSUSBL</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">10</td><td class="left">LUSBL</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">11</td><td class="left">Bathymeter &amp; Altimeter</td><td class="left">Rein de Vries</td></tr>
+<tr><td class="right">12</td><td class="left">Level Instruments</td><td class="left">Rob Berlijn; Peter Veldkamp; Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">13</td><td class="left">Motion Sensors</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">14</td><td class="left">Gyro compasses</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">15</td><td class="left">Doppler Velocity Log</td><td class="left">Huibert-Jan Lekkerkerk; Pieter Jansen</td></tr>
+<tr><td class="right">16</td><td class="left">GPS Azimuth / INS systems</td><td class="left">Huibert-Jan Lekkerkerk; CDL</td></tr>
+<tr><td class="right">17</td><td class="left">Tides</td><td class="left">Huibert-Jan Lekkerkerk; Aad van Dam; Rein de Vries; Jaap Mooij</td></tr>
+<tr><td class="right">18</td><td class="left">Tidal Correction</td><td class="left">Huibert-Jan Lekkerkerk; Aad van Dam; Rein de Vries</td></tr>
+</tbody>
+</table>
+<p>Volume 3</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="right" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="right"><b>Chapter</b></th><th scope="col" class="left"><b>Title</b></th><th scope="col" class="left"><b>Author(s)</b></th></tr>
+</thead>
+<tbody>
+<tr><td class="right">1</td><td class="left">Sound</td><td class="left">Robert van der Velden; Huibert-Jan Lekkerkerk; Jelle Roders; Maarten-Jan Theijs; Rein de Vries</td></tr>
+<tr><td class="right">2</td><td class="left">Singlebeam ES</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">3</td><td class="left">Multi-channel ES</td><td class="left">Huibert-Jan Lekkerkerk; Aad van Dam</td></tr>
+<tr><td class="right">4</td><td class="left">Scanning sonar / profiler</td><td class="left">Huibert-Jan Lekkerkerk; Rein de Vries</td></tr>
+<tr><td class="right">5</td><td class="left">Multibeam ES</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">6</td><td class="left">Side Scan Sonar</td><td class="left">Jelle Roders; Robert van der Velden</td></tr>
+<tr><td class="right">7</td><td class="left">Airborne laser</td><td class="left">Huug Haasnoot (Fugro Aerial Mapping)</td></tr>
+<tr><td class="right">8</td><td class="left">Mobile laser scanner</td><td class="left">Tjebbe Westerbeek; Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">9</td><td class="left">Remote sensing bathymetry</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">10</td><td class="left">Other depth acquisition techniques</td><td class="left">Huibert-Jan Lekkerkerk; Aad van Dam; Pieter Jansen</td></tr>
+<tr><td class="right">11</td><td class="left">Waves &amp; Current measurement</td><td class="left">Herman Peters; Huibert-Jan Lekkerkerk; Sicco Kamminga</td></tr>
+<tr><td class="right">12</td><td class="left">Soil sampling</td><td class="left">Fugro; Cees Laban</td></tr>
+<tr><td class="right">13</td><td class="left">In-situ testing systems</td><td class="left">Fugro; Cees Laban</td></tr>
+<tr><td class="right">14</td><td class="left">Sediment</td><td class="left">Huibert-Jan Lekkerkerk</td></tr>
+<tr><td class="right">15</td><td class="left">Sub bottom profiler</td><td class="left">Robert van der Velden; Jelle Roders</td></tr>
+<tr><td class="right">16</td><td class="left">Magnetometer</td><td class="left">Dim Coumou; Pieter Jansen</td></tr>
+<tr><td class="right">17</td><td class="left">Pipe and cable tracking systems</td><td class="left">Rein de Vries</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-09T11_58_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-10T12_31_34.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-09T10_23_36.txt" name="e2011-02-09T10_23_36.txt"></a>
+<h2 class="date">02.09.2011 10:23</h2>
+<div class="blogbody">
+<h3 class="title">django security update - 1.2.5 / 1.1.4</h3>
+<div class="item-description">
+UPDATE 2011-Feb-14: Django has been updated to 1.2.5 in fink unstable.
+<br /><br />
+Fink django users: there is a security update for django that was
+released today and with the CVS outage at sourceforge, you will have
+to take extra action to make sure your installations of django through
+fink are secure.  Here is a rough procedure:
+<pre>sudo -s
+mkdir -p /sw/fink/10.6/local/main/finkinfo/web
+cd /sw/fink/10.6/local/main/finkinfo/web
+curl -o django-py-1.2.5.info http://vislab-ccom.unh.edu/~schwehr/software/fink/django-py-1.2.5.info
+fink scanpackages
+fink install django-py27</pre>
+<a
+href="http://www.djangoproject.com/weblog/2011/feb/08/security/">Security
+releases issued</a> (djangoproject)
+<pre>Flaw in CSRF handling
+<!-- -->
+Django includes a CSRF-protection mechanism, which makes use of a
+token inserted into outgoing forms. Middleware then checks for the
+token's presence on form submission, and validates it. 
+<!-- -->
+Previously, however, our CSRF protection made an exception for AJAX requests, on the following basis:
+<!-- -->
+   1. Many AJAX toolkits add an X-Requested-With header when using
+      XMLHttpRequest. 
+   2. Browsers have strict same-origin policies regarding XMLHttpRequest.
+   3. In the context of a browser, the only way that a custom header
+      of this nature can be added is with XMLHttpRequest. 
+<!-- -->
+Therefore, for ease of use, we did not apply CSRF checks to requests
+that appeared to be AJAX on the basis of the X-Requested-With
+header. The Ruby on Rails web framework had a similar exemption. 
+<!-- -->
+Recently, engineers at Google made members of the Ruby on Rails
+development team aware of a combination of browser plugins and
+redirects which can allow an attacker to provide custom HTTP headers
+on a request to any website. This can allow a forged request to appear
+to be an AJAX request, thereby defeating CSRF protection which trusts
+the same-origin nature of AJAX requests. 
+<!-- -->
+Michael Koziarski of the Rails team brought this to our attention, and
+we were able to produce a proof-of-concept demonstrating the same
+vulnerability in Django's CSRF handling. 
+<!-- -->
+To remedy this, Django will now apply full CSRF validation to all
+requests, regardless of apparent AJAX origin. This is technically
+backwards-incompatible, but the security risks have been judged to
+outweigh the compatibility concerns in this case.
+...</pre>
+<br /><br />
+CSRF == <a
+href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">Cross-site
+request forgery</a> (wikipedia)
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-09T10_23_36.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-09T11_58_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-08T12_40_44.txt" name="e2011-02-08T12_40_44.txt"></a>
+<h2 class="date">02.08.2011 12:40</h2>
+<div class="blogbody">
+<h3 class="title">US not ready for Arctic oil drilling</h3>
+<div class="item-description">
+<a href="http://www.google.com/hostednews/afp/article/ALeqM5ig_Sox25wAcsxe6kAUZDBQW2rkCQ?docId=CNG.30a945d880fb0c467a82e584423dac3f.21">US not ready for Arctic oil drilling, say officials</a>
+<pre>WASHINGTON - The United States is ill-equipped to deal with a major
+oil catastrophe in Alaska, the Coast Guard admiral who led the US
+response to the massive Gulf of Mexico oil spill and others have
+warned.
+<!-- -->
+Only one of the US Coast Guard's three ice breakers is operational and
+would be available to respond to a disaster off Alaska's northern
+coast, which is icebound for much of the year, retired admiral Thad
+Allen told reporters this week.
+<!-- -->
+Former Alaska lieutenant governor Fran Ulmer said that before drilling
+in the Arctic, the United States must "invest in the Coast Guard."
+<!-- -->
+"It's not an option; it's a mandatory next step for our country to
+take," said Ulmer, who was a member of a presidential commission that
+last month called for more government oversight to prevent a repeat of
+the Gulf of Mexico disaster.
+<!-- -->
+But funding for expensive new icebreakers is unlikely to be high on
+the list of priorities of Republicans who gained control of the House
+of Representatives by vowing to slash spending.
+<!-- -->
+And yet, Republicans are likely to push for more drilling off Alaska's
+coast, an area rich in oil.
+...</pre>
+and <a href="http://www.govexec.com/dailyfed/0210/021210cdpm1.htm">Coast Guard commandant cites urgent need for icebreakers</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-08T12_40_44.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-09T10_23_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-07T16_47_03.txt" name="e2011-02-07T16_47_03.txt"></a>
+<h2 class="date">02.07.2011 16:47</h2>
+<div class="blogbody">
+<h3 class="title">CCOM in Sea Technologies</h3>
+<div class="item-description">
+<a href="http://www.sea-technology.com/features/2011/0111/coastal_mapping.php">Center for Coastal and Ocean Mapping/Joint Hydrographic Center</a> in Sea Technology by David Sims
+<pre>The last 10 years have brought about a sea change in the world of
+hydrography and ocean mapping, and the University of New Hampshire’s
+(UNH) Center for Coastal and Ocean Mapping/Joint Hydrographic Center
+(CCOM/JHC) has played a vital role.
+<!-- -->
+Guided by a 1999 memorandum of understanding with NOAA, and recently
+continued through a five-year competitive grant from the agency, the
+center began building its staff in January 2000. Today, it is a
+world-class research and teaching facility that trains the nation’s
+future hydrographers. It is also one of only two U.S. institutions
+that have been awarded a Category A certificate for education in
+hydrography, the highest level of international recognition in the
+field.
+<!-- -->
+The center is at the leading edge in developing tools that are
+streamlining the processing of multibeam echosounding data and
+transforming this wealth of information into rich, 3D seafloor
+maps. At the same time, under the rubric of Integrated Ocean and
+Coastal Mapping (IOCM)—in other words, "map once, use the data many
+times"—the center continues to advance the field of hydrography by
+making multibeam data applicable to purposes other than chart making,
+for example, in fisheries management.
+...</pre>
+Wow... I showed up at CCOM during the summer of 2005.  I've been there
+for half of the Center's history.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-07T16_47_03.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-08T12_40_44.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-07T08_52_42.txt" name="e2011-02-07T08_52_42.txt"></a>
+<h2 class="date">02.07.2011 08:52</h2>
+<div class="blogbody">
+<h3 class="title">ResearcherID</h3>
+<div class="item-description">
+Is there any advantange for me to do this?  I already have a bib file
+avaible on my publications page.  It does have a map section, but I
+guess I don't have enough citations for a map to work.  This just makes
+me feel like I haven't done enough.
+<br /><br />
+<span id='badgeCont728347' style='width:126px'><script src='http://labs.researcherid.com/mashlets?el=badgeCont728347&mashlet=badge&showTitle=false&className=a&rid=A-6439-2011'></script></span>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-07T08_52_42.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-07T16_47_03.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-05T08_47_57.txt" name="e2011-02-05T08_47_57.txt"></a>
+<h2 class="date">02.05.2011 08:47</h2>
+<div class="blogbody">
+<h3 class="title">Larry Mayer chairing the National Academies / NRC Deepwater Horizon oil spill project</h3>
+<div class="item-description">
+Found via: <a href="http://www.seacoastonline.com/articles/20110205-NEWS-102050324">UNH oceanographer to lead National Oil Spill Committee</a> (Seacoast Online)
+<br /><br />
+<a
+href="http://www8.nationalacademies.org/cp/projectview.aspx?key=49311">Effects
+of the Deepwater Horizon Mississippi Canyon-252 Oil Spill on Ecosystem
+Services in the Gulf of Mexico ( DELS-OSB-10-02 )</a>.  The first two
+meetings happened in January.  
+<br /><br />
+<a
+href="http://www8.nationalacademies.org/cp/CommitteeView.aspx?key=49311">Committee Members</a>
+<br /><br />
+<pre>In order to evaluate the loss of ecosystem services in the Gulf of
+Mexico Large Marine Ecosystem due to the Deepwater Horizon Mississippi
+Canyon-252 spill, it is necessary not only to collect and analyze
+information related to specific types of services, but also to
+identify relationships among the lost ecosystem services and assess
+interdependencies. An evaluation of the effects of the spill on
+ecosystem services in the Gulf will require consideration of the
+effects of other human activities that have changed the balance of
+ecosystem services in the region. The report will provide a framework
+to assist federal agencies in assessing the effects of the oil spill
+on ecosystem services within the context of other human activities. In
+the foregoing context, an ad hoc committee will conduct a study and
+prepare a report addressing the following questions: 
+<!-- -->
+(1) What methods are available for identifying and quantifying various
+ecosystem services, at spatial and temporal scales conducive to
+research, that provide meaningful information for the public and
+decision-makers? 
+<!-- -->
+(2) What kinds of valuation studies and metrics are appropriate to
+measure the recovery of ecosystem services over time with regard to
+each of the following: natural processes, mitigation, and restoration
+efforts?  What baseline measures are available that would provide
+benchmarks for recovery and restoration efforts? 
+<!-- -->
+(3) Is there sufficient pre-spill baseline information available to
+separate oil spill impacts from impacts of other human activities?
+What methods are available to help distinguish impacts specific to the
+spill? 
+<!-- -->
+(4) What ecosystem services (provisioning, supporting, regulating, and
+cultural services) were provided in the Gulf of Mexico Large Marine
+Ecosystem prior to the oil spill? How do these differ among the
+subregions of the Gulf of Mexico? 
+<!-- -->
+(5) How did the spill affect each of these services in the short-term,
+and what is known about potential long-term impacts given the other
+stresses, such as coastal wetland loss, on the Gulf ecosystem?  
+<!-- -->
+(6) How do spill response technologies (e.g., dispersant use, coastal
+berm construction, absorbent booms, in situ burning) affect ecosystem
+services, taking into account the relative effectiveness of these
+techniques in removing or reducing the impacts of spilled oil?     
+<!-- -->
+(7) In light of the multiple stresses on the Gulf of Mexico ecosystem,
+what practical approaches can managers take to restore and increase
+the resiliency of ecosystem services to future events such as the
+Deepwater Horizon Mississippi Canyon-252 spill?  How can the increase
+in ecosystem resiliency be measured?  
+<!-- -->
+(8) What long term research activities and observational systems are
+needed to understand, monitor, and value trends and variations in
+ecosystem services and to allow the calculation of indices to compare
+with benchmark levels as recovery goals for ecosystem services in the
+Gulf of Mexico?  
+<!-- -->
+The project is sponsored by the National Oceanic and Atmospheric
+Administration</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-05T08_47_57.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-07T08_52_42.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-02T10_53_49.txt" name="e2011-02-02T10_53_49.txt"></a>
+<h2 class="date">02.02.2011 10:53</h2>
+<div class="blogbody">
+<h3 class="title">Google Chrome Cr-48 first impressions</h3>
+<div class="item-description">
+It's a snow day, so I figured I'd give the Google <a
+href="http://www.google.com/support/forum/p/Chrome">Chrome OS</a> <a
+href="http://www.google.com/chromeos/pilot-program-cr48.html">Cr-48
+laptop</a> that arrived last week a spin.  I apologize for the iPhone
+photos of the screen.
+<br /><br />
+Here are my first impressions from getting the machine setup and then
+realizing that I can't really use it much while working.  I was hoping
+that there would be a way to tap into it a bit more and use emacs,
+org-mode, and python on it.  Supposedly there is 16GB of storage
+inside and a SD card slot that I could use to add extra store.  My
+world is not that cloud friendly.
+<br /><br />
+Taking the device out of the overly fancy box, I have to say that it
+feels nice.  Not as pollished as the ipad in it's apple case, but
+clean.  It ways not too much and looks like a clean design.
+<br /><br />
+First, we use mac address filtering at our house.  I looked at the
+back of the laptop and could not believe it when they did NOT include
+the mac address anywhere on the device.  You have got to be kidding!
+I didn't see it on the box either.  
+<br /><br />
+<img title="Google Chrome OS Cr-48: Mac Address??? Nope" withgrayborder="True" src="../attachments/2011-02/cr48-01-no-macaddress.jpg"/>
+<br /><br />
+Google should make sure they put
+in a sticker with the mac address inside the battery bay.  So I had to
+fiddle with the router turn off mac filtering, connect the device to
+the network, add it from the list of devices attached and then turn
+filtering back on.  As I was doing this, the device started updating
+to the latest Chrome OS version without asking or telling me how much
+data was involved.  Not cool.  Always ask the user!  That took about
+4-5 minutes to update and reboot.  But the boot time is great!  Pretty 
+speedy from power on.
+<br /><br />
+<img title="Google Chrome OS Cr-48: Tutorial" withgrayborder="True" src="../attachments/2011-02/cr48-02-getting-started.jpg"/>
+<br /><br />
+I did have some strange flickering of the top of the screen during the
+boot cycle that could either be the video driver or cabling issues for
+the LCD.  This only happened for about 30 seconds on one boot, so I
+don't know if it is a real issue.
+<br /><br />
+Next, getting logged in with my google account was easy.  I entered my
+google account and password.  The computer then took a picture and I
+was at the tutorial page.  The tutorial is definitely helpful.  But I
+closed the laptop and moved to a different room and the laptop
+crashed.  WFT?!?  Turns out that the battery had not been charging.
+<br /><br />
+<img title="Google Chrome OS Cr-48: Battery trouble" withgrayborder="True" src="../attachments/2011-02/cr48-03-battery-trouble.jpg"/>
+<br /><br />
+Yes, it had been plugged in for 30 minutes at this point.  I took a
+look through the Google Forum and found that I was not the only one
+with this problem. <a
+href="http://www.google.com/support/forum/p/Chrome/thread?tid=3f784a59fd76767e">Google
+CR 48 battery WILL NOT charge</a>.  I logged out of my account,
+powered down the machine, took out the battery, waited 20 seconds, put
+the battery in and powered up.  About 15 minutes later, I noticed the battery finally read 1% charged with 2:20 left to charge.
+<br /><br />
+Going through the tutorial, I found out that the thing has a Verizon
+3G chip inside.  That's cool.  But it isn't clear how much activation
+is and if there is a monthly fee.  At least there isn't a contract.
+And 100MB a month is not much data.  I already pay for 3G data from
+ATT, why am I going to pay for a 2nd or 3rd service?
+<br /><br />
+<img title="Google Chrome OS Cr-48: Verizon 3G" withgrayborder="True" src="../attachments/2011-02/cr48-04-3g-verizon.jpg "/>
+<br /><br />
+Once I finished the tutorial, I found myself at the home screen:
+<br /><br />
+<img title="Google Chrome OS Cr-48: Default home" withgrayborder="True" src="../attachments/2011-02/cr48-05-home.jpg"/>
+<br /><br />
+It was time to take a look around.  I went for the tools in the top
+right to see what is in the machine and what it will let me find out
+and/or change.  I was surprised that the OS didn't discover my
+timezone, so that was on my list of things to get fixed.
+<br /><br />
+<img title="Google Chrome OS Cr-48: Tools" withgrayborder="True" src="../attachments/2011-02/cr48-06-tools.jpg"/>
+<br /><br />
+A little searching got me to the system info.  The first thing I confirmed is that it was indeed running linux.  Woot!
+<br /><br />
+<img title="Google Chrome OS Cr-48: isLinux -&gt; True!" withgrayborder="True" src="../attachments/2011-02/cr48-04-yes-linux.jpg"/>
+<br /><br />
+And it is using an Intel Atom chip.  I also noticed that it has 2GB of RAM.
+<br /><br />
+<img title="Google Chrome OS Cr-48: has intel Atom" withgrayborder="True" src="../attachments/2011-02/cr48-08-intel-atom.jpg"/>
+<br /><br />
+Here is the versions page...
+<br /><br />
+<img title="Google Chrome OS Cr-48: versions" withgrayborder="True" src="../attachments/2011-02/cr48-09-chrome-os-version.jpg"/>
+<br /><br />
+I tried installing a couple Android apps and that went well.  I
+haven't really tried the Google Web Apps much, but the one big bummer
+I hit right away was that Bookmarks on the Cr48 didn't sync with my <a
+href="https://www.google.com/bookmarks">Google Bookmarks</a>.  That's
+bizarre and not helpful.  I would have thought that would be something
+that would have been a part of the the sync process.  If it's an
+option to turn on, I can't find it.
+<br /><br />
+At some point soon, I will have to try out Google Docs, Fusion Tables,
+Calendar, Reader, and the rest.  Will I be able to use Google refine
+to work on data?  I need to look through <a
+href="http://www.google.com/support/forum/p/Chrome">Google's Chrome OS
+Forum</a> and <a
+href="http://www.chromeosforums.net/">http://www.chromeosforums.net/</a>,
+but I don't have much time to devote to it.
+<br /><br />
+So what happens when I get on a plane or ship with this device?  And
+how can I get emacs and python working with the system (I don't really
+want to start hacking against the grain)?  <a
+href="http://www.ymacs.org/">Ymacs</a> is an entertaining web version
+of emacs, but M-x org-mode gives nada and ymacs will not work without
+a network.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-02T10_53_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-05T08_47_57.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2011-02-01T14_22_38.txt" name="e2011-02-01T14_22_38.txt"></a>
+<h2 class="date">02.01.2011 14:22</h2>
+<div class="blogbody">
+<h3 class="title">McNutt to talk about Deepwater Horizon - Feb 3</h3>
+<div class="item-description">
+If you are in the Stanford area, this is a public event:
+<br /><br />
+<a href="http://csi.gsb.stanford.edu/event-registration-cvg">Avoiding the Slippery Slope: Leadership Lessons from Inside the Oil Spill
+Featuring Dr. Marcia McNutt</a> [Link likely short lived]
+<pre>The 2011 Conradin Von Gugelberg (CVG) Memorial Lecture on the
+Environment keynote speaker is Dr. Marcia McNutt, director of the
+United States Geological Survey (USGS) and science adviser to the
+United States Secretary of the Interior who will speak on crisis
+management during the 2010 Deepwater Horizon oil spill.
+<!-- -->
+A leader in oceanographic research, Dr. McNutt has also served as the
+president and chief executive officer of the Monterey Bay Aquarium
+Research Institute (1997-2009), and she recently headed the Flow Rate
+Technical Group in May 2010, which attempted to measure the Deepwater
+Horizon oil spill in the Gulf of Mexico.</pre>
+Looks like there will be <a href="http://csi.gsb.stanford.edu/events">live streaming</a>.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2011-02.html#e2011-02-01T14_22_38.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2011-02-02T10_53_49.html#comments">Comments</a> -->
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="links">
+
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary="Calendar with links to days with entries">
+<caption class="calendarhead">February 2011</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td> <td align="center"></td>          
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-01T14_22_38.txt">1</a></span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-02T10_53_49.txt">2</a></span></td>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-05T08_47_57.txt">5</a></span></td>
+</tr>
+<tr>
+          
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-07T16_47_03.txt">7</a></span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-08T12_40_44.txt">8</a></span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-09T11_58_30.txt">9</a></span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-10T12_31_34.txt">10</a></span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar">12</span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-14T17_07_23.txt">14</a></span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-15T08_25_10.txt">15</a></span></td>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-17T09_06_46.txt">17</a></span></td>
+<td align="center"><span class="calendar">18</span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-19T13_00_54.txt">19</a></span></td>
+</tr>
+<tr>
+      
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-20T11_12_16.txt">20</a></span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-21T16_53_05.txt">21</a></span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-26T12_44_17.txt">26</a></span></td>
+</tr>
+<tr>
+ 
+<td align="center"><span class="calendar"><a href="2011-02.html#e2011-02-27T19_15_41.txt">27</a></span></td>
+<td align="center"><span class="calendar">28</span></td>
+</tr>
+</table>
+</div>
+
+</div>
+
+<br clear="all" />
+
+</body>
+</html>

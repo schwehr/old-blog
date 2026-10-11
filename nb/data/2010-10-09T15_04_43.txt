@@ -1,0 +1,142 @@
+TITLE: NGDC BAG work flow
+AUTHOR: Kurt
+DATE: 10.09.2010 15:04
+DESC: where we are now
+-----
+BODY:
+During my visit to NGDC last week, my goal was to work them and
+transfer the knowledge of my experience of converting BAGs to a Google
+Earth visualization.  The goals of this visualization are:
+<ul>
+<li>Improve discovery of this category of bathymetric data by non-hydrographers</li>
+<li>Show off the hard work of all the NOAA survey folks</li>
+<li>Provide a quick way to check the quality and style of data in a bag to see if it is suitable for a particular use</li>
+</ul>
+I've started off on an all open source path to produce BAGs.  There is
+no reason that other tools can't be substituted.  In fact, I'm looking
+at swapping in Fledermaus for the BAG to tiled imagery KML set to get
+better quality images compared to my hackish hillshading blended with
+color relief that comes from using gdaldem.  We have a requirement that
+all processes must be scripted.  Even one mouse click is acceptable.
+The job of running this software must be completely automatic.  There
+just is not enough man power to keep doing this kind of stuff by hand.
+
+First an aside about getting the software running...
+
+Many government computer systems today come with very strict auditing
+requirements before any software is installed.  While this is a good
+thing, the federal government does not have a program to pre-emptively
+inspect software for its users.  It would be awesome if there was a
+group in the government that went through all the packages in Ubuntu,
+RedHad, CentOS, and Fedora to produce documentation as to the hazards
+and suitability of these packages.  Then system admin teams could
+quickly consult this documentation to see how a particular program or
+library impacted their risk assessment.  The risk of installing
+something like h5py (python code to read HDF5 binary data) is
+negligible on a machine where users are allowed to write software.
+This would help NOAA, NASA, USCG/DHS, USGS, etc manage systems more
+efficiently.
+
+We gave a quick go at compiling everything from source and immediately
+ran into trouble.  Compiling lots of packages with many dependencies
+from source takes a lot of time to do for anyone.  We hit a bunch of
+problems and realized that it would take a few days (that we didn't
+have) to work through them all.
+
+So now, you can see that we have a slight problem with rapid
+technology transfer to a place like NGDC that must maintain a stable
+network environment no matter what.  The solution that we came up to
+(which was inspired by my working with Trey Smith at NASA Ames and the
+use of Debian VMs by the ERMA team this last summer), is to create a
+virtual Linux appliance.  In that world, I can install software
+properly.  Here is what I did to create a virtual machine that can
+turn a BAG into a Google Earth visualization.
+
+First I looked at starting with a RedHat Enterprise Linux (REL) VM.  I
+realized that I would have to start from scratch with a NOAA CD or DVD
+of REL.  While I could have gone and borrowed one of their disks, this
+was just time I didn't have.  I looked next at CentOS.  There was an
+image available on the VMWare site, but it was going to take 6 hours
+to download.  I took the next best thing - Fedora 13 is not too far
+from REL and has a lot newer versions of the software packaged, so I
+could hopefully avoid some of the building from source.
+
+I downloaded <a
+href="http://www.vmware.com/appliances/directory/661133">Fedora 13
+lean and snappy desktop</a> by quoTrader and got going.  I was using
+VMWare Fusion 3.1.1 on my 2007 MacBook Pro with OSX 10.6.4.  Task
+number one was to do a system wide update.  This made the VMWare image
+much, much larger, but it is important to have all the latest patches
+in.
+<pre><b>yum -y update<b></pre>
+On my old machine, this took more than an hour.  Then I started working 
+through all the required software.
+<pre><b>yum -y install lxml ipython libgeotiff numpy ImageMagick
+yum -y install hdf5 hdf5-devel git gcc gcc-c++ python-devel
+yum -y install sqlite-devel emacs wget proj proj-devel
+yum -y install python-matplotlib</b></pre>
+Looking at gdal in Fedore, I discoved it was too old to have bag
+support (1.6.x), so I built 1.7.2 from source.
+<pre><b>su -l</b> # password is password
+<b>wget http://download.osgeo.org/gdal/gdal-1.7.2.tar.gz
+tar xf gdal-1.7.2.tar.gz
+cd gdal-1.7.2
+./configure --with-python
+make</b> # takes quite a while
+<b>make install
+ipython
+import osgeo.gdal
+exit</b></pre>
+Here is where I found out that the default for gdal is to install in
+/usr/local/, but the gdal python module is to look for the gdal shared
+library is to look in /usr/lib.  To fix that:
+<pre><b>cd /usr/lib
+ln -s /usr/local/lib/libgdal.so.1 .</b></pre>
+Next, I found that Fedora 13 does not have packages for h5py and pyproj.
+I fixed this, but not in a maintainable way.  It would be better to find or 
+make rpms.  I could have used python distutil's rpm builder, but I did not
+think of that at the time.
+<pre><b>cd
+wget http://pyproj.googlecode.com/files/pyproj-1.8.8.tar.gz
+tar xf pyproj-1.8.8.tar.gz
+cd pyproj-1.8.8
+python setup.py install
+cd
+wget http://h5py.googlecode.com/files/h5py-1.3.0.tar.gz
+tar xf h5py-1.3.0.tar.gz
+cd h5py-1.3.0
+python setup.py install</b></pre>
+I also tried to install the VMWare tools into the virtual machine, but 
+I could not figure out how to specify the linux kernel headers to make 
+the VMWare installer happy.
+
+Next it was time to grab my source code for the bag-py and a sample bag
+to try.  This is not the best BAG for a demo, but it proved things work.
+<pre><b>git clone http://github.com/schwehr/bag-py.git  # Read only
+cd bag-py
+curl http://surveys.ngdc.noaa.gov/mgg/NOS/coast/H12001-H14000/H12059/BAG/H12059_2m_MLLW_4of6.bag.gz -o H12059_2m_MLLW_4of6.bag.gz</b></pre>
+I then copied bags_to_kml.bash to bag_to_kml.bash and modified the
+script to process just one bag.  I also changed the path of icons to load from
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/bags/icons/">http://vislab-ccom.unh.edu/~schwehr/bags/icons/</a>
+
+Finally... some security issues to look after: change the password for
+"user", setup user with sudo, and make root not be able to login with
+a password.
+
+We were able to copy the VMWare image to a REL 5.5 government machine
+and build a Google Earth visualization in the vm.  I didn't upload the
+histogram or preview images up to my server, so those are missing, but
+we now have something that the team can try out and they can decide
+how to migrate to re-implement the process to suit their needs.  Other
+countries are welcome to what I have done and I encourage them to build
+their own system for visualizing their archives of BAGs.
+
+<img title="BAG from a VM in Google Earth" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-10/bag-ge-from-vm.png"/>
+
+Another note: It is very interesting to learn about <a
+href="http://groovy.codehaus.org/">Goovy</a>, which looks like an
+interesting way to take advantage of Java and the JVM without having the pain
+of writing actual Java code.  I'm still going to stick with python, but
+Groovy looks like it has adopted some of what make Python and Ruby great languages.
+-----

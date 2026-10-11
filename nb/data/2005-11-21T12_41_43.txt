@@ -1,0 +1,19 @@
+TITLE: scipy f distribution work around
+AUTHOR: Kurt
+DATE: 11.21.2005 12:41
+DESC: array issues
+-----
+BODY:
+Thanks to Travis for a workaround with the f-distributions.  There is
+a problem with array handling.
+<pre>
+ipython
+In [1]: import scipy.stats
+In [2]: scipy.stats.distributions.f.ppf(0.95,2,9)
+Out[2]: 0.0
+In [3]: scipy.stats.distributions.f.ppf([0.95],2,9)
+Out[3]: array([ 4.25649473])
+In [4]: scipy.stats.distributions.f.ppf([0.95],2,9)[0]
+Out[4]: 4.256494729093748
+</pre>
+-----

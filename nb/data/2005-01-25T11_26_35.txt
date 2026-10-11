@@ -1,0 +1,37 @@
+TITLE: sqlite
+AUTHOR: Kurt
+DATE: 01.25.2005 11:26
+DESC: Just getting a db going
+-----
+BODY:
+My first try with sqlite is showing success.  I am using sqlite 2.8.5
+from fink.  The goal is to create tables for the
+BPSIO / Gaviota / Goleta / Santa Barbara cruise from August 2004.  If
+I can get used to this whole sql thing (better than with MER), I think
+this may be a better way to work with core data.  Here are the first
+few commands that I ran from the shell to get started:
+
+<ol>
+<li>sqlite gaviota.db &quot;
+create table CoreLoc &#40;id INTEGER PRIMARY KEY, cruise VARCHAR&#40;20&#41;, corenum INTEGER, coretype varchar&#40;1&#41;, datecollected TIMESTAMP, lat REAL, lon REAL, depth REAL, sheetURL TEXT&#41;;&quot;
+<li>sqlite gaviota.db &quot;
+insert into CoreLoc &#40;cruise, corenum, coretype, datecollected, lat, lon, depth, sheetURL&#41; values &#40;&#39;
+BPSIO04&#39;
+,1,&#39;
+g&#39;
+,&#39;
+2004-08-04 21:09:15&#39;
+, 34.36116666, 120.108, 480, &#39;
+http://schwehr.org/Gaviota/bpsio-Aug04/bpsio-log/images/bpsio-log-35.jpg&#39;
+&#41;;&quot;
+<li>sqlite gaviota.db &quot;
+select * from CoreLoc&quot;
+</ol>
+Random links:
+
+<a href="http://freshmeat.net/projects/bib2html">bib2html</a> for BibTeX
+
+<a
+href="http://www.lyle.org/mars/imagery/color/1-159268954-6.jpg">1-159268954-6</a>
+- Magnetic dust on mars
+-----

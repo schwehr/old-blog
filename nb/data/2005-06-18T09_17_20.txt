@@ -1,0 +1,39 @@
+TITLE: GMT - Generic Mapping Tool - seg fault
+AUTHOR: Kurt
+DATE: 06.18.2005 09:17
+DESC: bug found
+-----
+BODY:
+Yesterday, I talked to Becca about GMT issues again.  I need to be
+able to make a GMT basemap of some seismic lines.  For this, it would
+be nice to have the full and high coastline maps which are not
+included with the standard fink gmt install.  I created a quick fink
+info package called <a
+href="http://schwehr.org/software/fink/gmt-full.info">gmt-full.info</a>
+
+I then went about testing these files.  I have not directly used GMT
+in quite a while, so I started working on some examples.
+Unfortunately, I ran into a seg fault with one of the pscoast
+examples:
+<pre>
+  pscoast -R-30/30/-40/40 -Jm0.1i  -B5  -I1/1p/0/0/255  -I2/0.25p/0/0/255
+          -N1/0.25tap -W0.25p/255/255/255 -G0/255/0 -S0/0/255 -P > africa.ps
+</pre>
+It seems that "-W0.25p/255/255/255" is the trouble.  Remove the first
+'/' and all seems well.  To test the full database of coasts and
+rivers, just add a '-Df'.  It is a little hard to tell from the whole
+of Africa, but it goes through okay.
+
+The Iceland example actually can show you the difference in the
+coastlines:
+<pre>
+   low res:
+     pscoast -I1 -R-30/-10/60/65 -Jm1c -B5 -Gp100/28 -W > iceland-lr.ps
+     open iceland-lr.ps
+   full res:
+     pscoast -Df -I1 -R-30/-10/60/65 -Jm1c -B5 -Gp100/28 -W > iceland-fr.ps
+     open iceland-fr.ps
+</pre>
+
+
+-----

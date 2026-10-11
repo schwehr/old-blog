@@ -1,0 +1,119 @@
+TITLE: Open Source and GSF - the "Generic Sensor Format" for multibeam sonars
+AUTHOR: Kurt
+DATE: 09.01.2010 17:13
+DESC: progress
+-----
+BODY:
+If you feel a need to discuss this, you can do so <a href="http://schwehr.blogspot.com/2010/09/open-source-and-gsf-generic-sensor.html">here</a>.
+
+I am repeating myself... see <a href="http://schwehr.org/blog/archives/2008-10.html#e2008-10-25T08_23_22.txt">Generic Sensor Format (GSF) Meeting</a> (Sept 2008).
+
+What makes open source software successful is a community that
+contributes back to the code base to make it better.  Val is making a
+huge step towards that for the multibeam Generic Sensor Format by
+working on a sidescan addition to the format and posting about how to
+use <a href="http://www.saic.com/maritime/gsf/">GSF</a>: <a
+href="http://www.aliceandval.com/valswork/blog/archives/2010/09/01/a_gsf_primer/index.html">A GSF Primer</a>.  Val even called for a code review.  Yesterday, 5 of
+us sat down with Val and the code to give it a look.  Many eyes for
+review is a great thing (unlike design by committee, which typically
+makes everyone equally unhappy).
+
+That said, I worry about people using GSF as an archive or interchange
+format for multibeam sonar data right now.  Here are some of the
+issues, some of which can be fixed and others that are intrinsic to
+the design.  There needs to be open discussion and I argue that the
+original data (pre GSF) and the code that generated that data need to
+be archived.
+
+First, the name implies that it is a "generic" format, but if you look
+into the code.  One look at the <b>gsfSensorSpecific struct</b> should
+put this question to rest.  There is a huge amount of information in a
+GSF file that is not generic.  For some vendors, there are even
+multiple model specific structures (I count 7 for
+Simrad/EM/Kongsberg).  This comes from the rapid evolution of sonars
+since GSF was first started in the early 1990's (I see a first date of
+1994).  If we really do want to have a generic sonar format, I think
+we need to design a series of new messages that cover the basic
+multibeam and back scatter data returned such that we don't need these
+vendor specific payloads.  How does the MGD77 format need a special
+case???  This is just x, y, z, depth, gravity, and magnetic field.
+The 77 means 1977.  This format has been around for a long time.
+
+The next thing that is needed is a major code over hall.  This would
+entail distributing a better build system (maybe CMake) that builds
+proper libraries for all the major architectures.  As a part of this,
+GSF needs a series of unit tests that take a very wide range of sample
+multibeam files and convert them to a GSF file.  Then read these back
+in and verify that the resulting GSF file makes sense.  Even simpler
+yet, we need code that exercises all of the GSF code base that
+doesn't need large input files to test it.  This unit test suit needs
+to be public and the non-input-file based code should be a part of the
+standard build process - aka <a
+href="http://en.wikipedia.org/wiki/Unit_testing">unit testing</a>.
+These unit tests also serve a second purpose of providing
+documentation for how the library should be used.  To go along with
+this code base update, the library should be put into the major linux
+distributions as a standard package.  This will mean that the library
+can't be called "libgsf" as that conflicts with the libgsf that is the
+GNOME Structured File library.  Gnome is going to trump the sonar
+library for Ubuntu, Debian, RedHat, etc.
+
+The next code update would be to have functions that can do very basic
+validation of every structure that is passed around the GSF library.
+Client code can then call these to verify that they are, at least at a
+basic level, passing in data that makes sense.  There is still tons of
+room for errors, but if roll is +/- 180 degrees, we should not pass in
+a roll of 720 degrees.  NOTE: roll right now is +/- 90 degrees, which
+will cause trouble for vehicles under overhangs (e.g. under ice, under
+ships, or in caves).  The no data value for roll is 99.0.  That is
+going to be a problem.  I guess we can have rolls that go from -270 to
++90 to get around this.
+
+We also need to look at the performance of GSF.  A mmap implementation
+of GSF would likely be much faster.  What else can be done to speed up
+the code?  We should discuss the idea of a SQLite standard 2nd file to
+go along with GSF and other multibeam log files that is similar to
+what MBSystem does.  If is contains the basic metadata and possibly a
+prebuild index of packets, anything beyond the first pass of a GSF
+file will go much faster. An example would be pulling the navigation
+and sound velocity profiles (SVP) from the tail of the prior log file,
+would be faster if the file was already indexed in a standard way.
+
+A final step of the code update would be to turn on all the major
+compiler warnings and fix them.  At least -Wall for gcc should return
+no warnings.  There appear to be headers that should be included and
+lots of point magic that works right now, but should be better
+documented so compilers can check any code changes.  Also, the readers
+and writers should probably be switched to use a set of inline
+functions that do type checking that wrap the byte swapping and memcpy
+packing.  Is the code totally 32 and 64 bit safe for all execution
+paths???
+
+A very useful addition would be to package native reader/writer
+interfaces the common languages used by people who process this kind
+of data.  This means having perl, python, and matlab interfaces.  This
+should be a part of GSF and distributed along side.  I know many
+people who have written their own interfaces to GSF and, while that is
+instructional to create one, at least one for each major language should
+be included in the distribution.
+
+Finally, the documentation that goes with GSF needs to be updated.  I
+have heard from several people who have written GSF code that the
+documentation is not enough to write a working encoder/decoder.
+Missing from the specification document are a lot of the motivations
+behind these packets.  SAIC has put 16 years of hard work into GSF and
+learned a lot of lessons that can benefit the whole sonar community.
+We need to capture this.
+
+It is super important to note that SAIC is only able to work on GSF
+based on its contracts with the US Navy.  Either someone needs to pay
+SAIC to do some of this work or we, as a community, need to get
+cracking on this if GSF is going to have staying power.  The same goes
+for MBSystem and other critical software.  The lead authors are up to
+their eyeballs in work.  This is a plea for the community to jump in.
+I try to contribute back as much as possible, but am maxed out.  Find
+any nitch and pitch in.  It doesn't matter if your contribution is
+large or small.  Code, documentation, translating documentation to
+other languages, quality bug reports, building test cases, even just
+learning the tools and how they work... it's all important.
+-----

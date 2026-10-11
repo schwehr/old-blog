@@ -1,0 +1,213 @@
+TITLE: Binary format description languages
+AUTHOR: Kurt
+DATE: 06.22.2009 17:56
+DESC: What is the right solution?
+-----
+BODY:
+There are many langages to describe binary data formats.  Probably the
+most common is "use the source" where we are expected to read the
+source code (which is often not available).  I used <a
+href="http://www.faqs.org/rfcs/rfc1832.html">XDR</a> and love the fact
+that it provides a BNF grammar, so it was pretty easy to put together
+a YACC/Bison parser of definitions.  Then came XML and lots more
+complication.  There are things like <a
+href="http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One">ASN.1</a>,
+that while a standard, are not XML.  An example of ASN.1 pulled from the wikipedia article:
+<pre>FooProtocol DEFINITIONS ::= BEGIN
+<!-- -->
+    FooQuestion ::= SEQUENCE {
+        trackingNumber INTEGER,
+        question       IA5String
+    }
+<!-- -->
+    FooAnswer ::= SEQUENCE {
+        questionNumber INTEGER,
+        answer         BOOLEAN
+    }
+<!-- -->
+END</pre>
+I tried to create my own XML definition for AIS
+Messages and got bogged down in trying to push the community towards
+simpler messages.  My message definition is really focused on
+documentation and explicitly defining all sorts of lookup tables (and
+being cross language).  Eric S. Raymond did a nice job of pushing back
+in the other direction with his very direct and minimalistic definition:
+<pre><tt>epfd_type_legends <font color="#990000">=</font> <font color="#990000">(</font>
+	<font color="#FF0000">"Undefined"</font><font color="#990000">,</font>
+	<font color="#FF0000">"GPS"</font><font color="#990000">,</font>
+	<font color="#FF0000">"GLONASS"</font><font color="#990000">,</font>
+	<font color="#FF0000">"Combined GPS/GLONASS"</font><font color="#990000">,</font>
+	<font color="#FF0000">"Loran-C"</font><font color="#990000">,</font>
+	<font color="#FF0000">"Chayka"</font><font color="#990000">,</font>
+	<font color="#FF0000">"Integrated navigation system"</font><font color="#990000">,</font>
+	<font color="#FF0000">"Surveyed"</font><font color="#990000">,</font>
+	<font color="#FF0000">"Galileo"</font><font color="#990000">,</font>
+    <font color="#990000">)</font>
+<!-- -->
+type4 <font color="#990000">=</font> <font color="#990000">(</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"year"</font><font color="#990000">,</font>    <font color="#993399">14</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font>         <font color="#FF0000">"Year"</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"month"</font><font color="#990000">,</font>    <font color="#993399">4</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font>         <font color="#FF0000">"Month"</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"day"</font><font color="#990000">,</font>      <font color="#993399">5</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font>         <font color="#FF0000">"Day"</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"hour"</font><font color="#990000">,</font>     <font color="#993399">5</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> <font color="#993399">24</font><font color="#990000">,</font>        <font color="#FF0000">"Hour"</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"minute"</font><font color="#990000">,</font>   <font color="#993399">6</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> <font color="#993399">60</font><font color="#990000">,</font>        <font color="#FF0000">"Minute"</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"second"</font><font color="#990000">,</font>   <font color="#993399">6</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> <font color="#993399">60</font><font color="#990000">,</font>        <font color="#FF0000">"Second"</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"accuracy"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> None<font color="#990000">,</font>      <font color="#FF0000">"Fix quality"</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"lon"</font><font color="#990000">,</font>     <font color="#993399">28</font><font color="#990000">,</font>  <font color="#FF0000">"signed"</font><font color="#990000">,</font>   <font color="#993399">0x6791AC0</font><font color="#990000">,</font> <font color="#FF0000">"Longitude"</font><font color="#990000">,</font>
+             formatter<font color="#990000">=</font>cnb_latlon_format<font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"lat"</font><font color="#990000">,</font>     <font color="#993399">27</font><font color="#990000">,</font>  <font color="#FF0000">"signed"</font><font color="#990000">,</font>   <font color="#993399">0x3412140</font><font color="#990000">,</font> <font color="#FF0000">"Latitude"</font><font color="#990000">,</font>
+             formatter<font color="#990000">=</font>cnb_latlon_format<font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"epfd"</font><font color="#990000">,</font>     <font color="#993399">4</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> None<font color="#990000">,</font>      <font color="#FF0000">"Type of EPFD"</font><font color="#990000">,</font>
+             validator<font color="#990000">=</font><b><font color="#0000FF">lambda</font></b> n<font color="#990000">:</font> n <font color="#990000">&gt;=</font> <font color="#993399">0</font> <b><font color="#0000FF">and</font></b> n <font color="#990000">&lt;=</font> <font color="#993399">8</font><font color="#990000">,</font>
+             formatter<font color="#990000">=</font>epfd_type_legends<font color="#990000">),</font>
+    <b><font color="#000000">spare</font></b><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"raim"</font><font color="#990000">,</font>     <font color="#993399">1</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> None<font color="#990000">,</font>      <font color="#FF0000">"RAIM flag "</font><font color="#990000">),</font>
+    <b><font color="#000000">bitfield</font></b><font color="#990000">(</font><font color="#FF0000">"radio"</font><font color="#990000">,</font>   <font color="#993399">19</font><font color="#990000">,</font>  <font color="#FF0000">"unsigned"</font><font color="#990000">,</font> None<font color="#990000">,</font>      <font color="#FF0000">"SOTDMA state"</font><font color="#990000">),</font>
+    <font color="#990000">)</font>
+</tt></pre>
+Roland has been watching what Brian Calder and I have been doing for a
+while now.  Brian has a TACC/Bison grammar for multibeam files and I
+have my complicated AIS XML.  Roland took a middle ground approach
+that he has been using for a while.  I like a lot about it.  Perhaps
+that is because it is similar to my AIS XML (e.g. <a
+href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/ais_msg_1.xml">ais_msg_1.xml</a>),
+but simpler.  The complications came from the desire to be able to directly
+represent the messages as spatially SQL database tables (with optional
+spatial support), XML representation for documentation, KML for
+visualization, mandatory units, agressive ranging and enumeration, and
+trying to figure out a cross platform expression implementation (that
+I never attempted).  I definitely should have kept the test component
+out the definition, which I am aiming to do with a JSON based unified
+transport protocol that ESR proposed.  Perhaps if I had started more like
+ASN.1 where the initial specification is separate from the "Encoding Rules" like
+XER (XML Encoding Rules), it would have been a bit cleaner.
+
+Here is a stripped down example of what Roland uses for parsing multibeam packets:
+<pre><tt><b><font color="#0000FF">&lt;BinaryFormat&gt;</font></b>
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"uint8"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint8_t"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Python</font></b> <font color="#009900">structFormat</font><font color="#990000">=</font><font color="#FF0000">"B"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"2"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16_t"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Python</font></b> <font color="#009900">structFormat</font><font color="#990000">=</font><font color="#FF0000">"H"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"int16"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"2"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"int16_t"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Python</font></b> <font color="#009900">structFormat</font><font color="#990000">=</font><font color="#FF0000">"h"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"uint32"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"4"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint32_t"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Python</font></b> <font color="#009900">structFormat</font><font color="#990000">=</font><font color="#FF0000">"I"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"float"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"4"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"float"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Python</font></b> <font color="#009900">structFormat</font><font color="#990000">=</font><font color="#FF0000">"f"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"double"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"8"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"double"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Python</font></b> <font color="#009900">structFormat</font><font color="#990000">=</font><font color="#FF0000">"d"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"char"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"char"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Python</font></b> <font color="#009900">structFormat</font><font color="#990000">=</font><font color="#FF0000">"c"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"String"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"size"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"char"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"size"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"FloatArray"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"size"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"values"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"float"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"size"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"time"</font> <font color="#009900">size</font><font color="#990000">=</font><font color="#FF0000">"8"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Units&gt;</font></b>s<b><font color="#0000FF">&lt;/Units&gt;</font></b>
+        <b><font color="#0000FF">&lt;Documentation&gt;</font></b>Seconds since 1970<b><font color="#0000FF">&lt;/Documentation&gt;</font></b>
+        <b><font color="#0000FF">&lt;Cxx</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"double"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"degrees"</font> <font color="#009900">base</font><font color="#990000">=</font><font color="#FF0000">"double"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Units&gt;</font></b>degrees<b><font color="#0000FF">&lt;/Units&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"heading"</font> <font color="#009900">base</font><font color="#990000">=</font><font color="#FF0000">"degrees_f"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Documentation&gt;</font></b>Clockwise relative to north<b><font color="#0000FF">&lt;/Documentation&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Type</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"altitude"</font> <font color="#009900">base</font><font color="#990000">=</font><font color="#FF0000">"float"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Units&gt;</font></b>meters<b><font color="#0000FF">&lt;/Units&gt;</font></b>
+        <b><font color="#0000FF">&lt;Documentation&gt;</font></b>Positive is up<b><font color="#0000FF">&lt;/Documentation&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Type&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"CompressedValuesBase"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"scale"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"float"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"offset"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"float"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"count"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"CompressedValues8"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Inline</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"CompressedValuesBase"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"values"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint8"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"count"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"GeographicPosition"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font> <font color="#990000">=</font><font color="#FF0000"> "latitude"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"degrees"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font> <font color="#990000">=</font><font color="#FF0000"> "longitude"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"degrees"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"UTMPosition"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"easting"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"double"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"northing"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"double"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"zone"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint8"</font><b><font color="#0000FF">&gt;&lt;Default&gt;</font></b>0<b><font color="#0000FF">&lt;/Default&gt;&lt;/Field&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"latitudeZone"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint8"</font><b><font color="#0000FF">&gt;&lt;Default&gt;</font></b>0<b><font color="#0000FF">&lt;/Default&gt;&lt;/Field&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"Packet"</font> <font color="#009900">sizeField</font><font color="#990000">=</font><font color="#FF0000">"size"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"header"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"char"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"4"</font><b><font color="#0000FF">&gt;</font></b>
+            <b><font color="#0000FF">&lt;Default&gt;</font></b>'g','z','4','d'<b><font color="#0000FF">&lt;/Default&gt;</font></b>
+            <b><font color="#0000FF">&lt;Validation&gt;</font></b>
+                <b><font color="#0000FF">&lt;Equals&gt;</font></b>'g','z','4','d'<b><font color="#0000FF">&lt;/Equals&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Validation&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Field&gt;</font></b>
+        <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"version"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font><b><font color="#0000FF">&gt;&lt;Default&gt;</font></b>1<b><font color="#0000FF">&lt;/Default&gt;&lt;/Field&gt;</font></b>
+        <b><font color="#0000FF">&lt;Switch</font></b> <font color="#009900">indexField</font><font color="#990000">=</font><font color="#FF0000">"type"</font><b><font color="#0000FF">&gt;</font></b>
+<!-- -->
+            <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"Metadata"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"metaType"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;Switch</font></b> <font color="#009900">indexField</font><font color="#990000">=</font><font color="#FF0000">"metaType"</font><b><font color="#0000FF">&gt;</font></b>
+                    <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"Text"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"1"</font><b><font color="#0000FF">&gt;</font></b>
+                        <b><font color="#0000FF">&lt;Inline</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"String"</font><b><font color="#0000FF">/&gt;</font></b>
+                    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+                <b><font color="#0000FF">&lt;/Switch&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+            <b><font color="#0000FF">&lt;Block</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"Navigation"</font> <font color="#009900">base</font><font color="#990000">=</font><font color="#FF0000">"Packet"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"2"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"navChannel"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font><b><font color="#0000FF">&gt;&lt;Default&gt;</font></b>0<b><font color="#0000FF">&lt;/Default&gt;&lt;/Field&gt;</font></b>
+                <b><font color="#0000FF">&lt;Field</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"navType"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"uint16"</font><b><font color="#0000FF">/&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Switch&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Block&gt;</font></b>
+<!-- -->
+    <b><font color="#0000FF">&lt;Implement&gt;</font></b>String<b><font color="#0000FF">&lt;/Implement&gt;</font></b>
+    <b><font color="#0000FF">&lt;Implement&gt;</font></b>CompressedValues8<b><font color="#0000FF">&lt;/Implement&gt;</font></b>
+    <b><font color="#0000FF">&lt;Implement&gt;</font></b>Variance3D<b><font color="#0000FF">&lt;/Implement&gt;</font></b>
+    <b><font color="#0000FF">&lt;Implement&gt;</font></b>Packet<b><font color="#0000FF">&lt;/Implement&gt;</font></b>
+<!-- -->
+<b><font color="#0000FF">&lt;/BinaryFormat&gt;</font></b></tt></pre>
+At this point, Roland just has working code and data definitions as
+the documentation of his specifiation.  The <i>Implement</i> section
+at the end are the objects that should become classes at the end of 
+the parsing.
+
+What I've looked for and haven't found is a version of ASN.1 that is
+XML for the specification (not XER).  There is no need for another library
+if I could just use lxml or such to read the specification.
+-----

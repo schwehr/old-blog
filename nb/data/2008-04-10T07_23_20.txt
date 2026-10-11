@@ -1,0 +1,59 @@
+TITLE: Listing just the vessels with a certain MMSI
+AUTHOR: Kurt
+DATE: 04.10.2008 07:23
+DESC: works!
+-----
+BODY:
+I've finally got a django example that will display all the possition
+reports for a certain vessel.  I'm using a named positional regular
+expression group in the urls.py file:
+<pre>
+from django.conf.urls.defaults import *
+import ais_msgs.views
+urlpatterns = patterns('',
+                       (r'^position/$', ais_msgs.views.position),
+                       (r'^position/mmsi/(?P<userid>\d{9})/$', 'ais_msgs.views.position_userid'),
+)
+</pre>
+The views.py in ais_msgs:
+<pre>
+from django.shortcuts import render_to_response
+import datetime
+import ais_msgs.models
+#
+def position(request):
+    now = datetime.datetime.now()
+    vessels = ais_msgs.models.Position.objects.all()[:20]
+    return render_to_response('position.html',{'vessels':vessels,'current_date':now})
+#
+def position_userid(request,userid):
+    now = datetime.datetime.now()
+    vessels = ais_msgs.models.Position.objects.filter(userid=userid)[:10]
+    return render_to_response('position.html',{'vessels':vessels,'current_date':now})
+</pre>
+Here is the small template html to view the record:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">html</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+Most recent vessels seen as of <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">b</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>{{ current_date }}<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/b</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>:<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">p/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+{% for vessel in vessels %}
+  {{ vessel.userid }} - {{ vessel.cg_timestamp }} - {{ vessel.position }} <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">br/</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+{% endfor %}
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/body</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/html</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+This does not make the prettiest page, but it is functional:
+<pre>
+Most recent vessels seen as of <b>2008-04-10 09:07:04.580713</b>:
+  338029917 - 2008-03-12 14:49:24 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:49:32 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:49:43 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:49:54 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:50:04 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:50:13 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:50:24 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:50:32 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:50:43 - POINT (181.0000000000000000 91.0000000000000000)
+  338029917 - 2008-03-12 14:50:54 - POINT (181.0000000000000000 91.0000000000000000)
+</pre>
+-----

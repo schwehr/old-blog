@@ -1,0 +1,38 @@
+TITLE: python logging
+AUTHOR: Kurt
+DATE: 10.10.2005 17:15
+DESC: twisted works, but don't know all the issues
+-----
+BODY:
+It would be really nice to have a solid logging system.  I'd like to
+be able to send messages to stderr and a file.  The more features the
+better, but it needs to be something that people can pick up quickly.
+
+I tried the scipy logger, but no luck.  Very complicated and no good
+examples are on my machine (no network at the moment).  It follows a
+PEP, but if I can't figure it out, then I'm not going to use it.
+
+It looks like twisted has a powerful logging system.  I got a simple
+example working to a file, but could not figure out how to get both file logging
+and stdout_or_stderr.  Here is my trivial example.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+
+<strong>from</strong> <font color="#2040a0">twisted</font>.<font color="#2040a0">python</font> <strong>import</strong> <font color="#2040a0">log</font>
+<strong>from</strong> <font color="#2040a0">twisted</font>.<font color="#2040a0">python</font> <strong>import</strong> <font color="#2040a0">logfile</font>
+
+<font color="#2040a0">f</font> <font color="4444FF">=</font> <font color="#2040a0">logfile</font>.<font color="#2040a0">LogFile</font><font color="4444FF">(</font><font color="#008000">&quot;test.log&quot;</font>, <font color="#008000">&quot;.&quot;</font>, <font color="#2040a0">rotateLength</font><font color="4444FF">=</font><font color="#2040a0">None</font><font color="4444FF">)</font>
+
+<font color="#444444"># setup logging to use our new logfile</font>
+<font color="#2040a0">log</font>.<font color="#2040a0">startLogging</font><font color="4444FF">(</font><font color="#2040a0">f</font><font color="4444FF">)</font>
+
+<font color="#444444"># print a few message</font>
+<strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">10</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">log</font>.<font color="#2040a0">msg</font><font color="4444FF">(</font><font color="#008000">&quot;this is a test of the logfile: %s&quot;</font> <font color="4444FF">%</font> <font color="#2040a0">i</font><font color="4444FF">)</font>
+
+<font color="#2040a0">f</font>.<font color="#2040a0">close</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+I can <b>tail -f test.log</b> in a xterm to watch the progress.  I
+think this is going to be more work for not much gain.  That's all
+I'll do for now.
+-----

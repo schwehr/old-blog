@@ -1,0 +1,59 @@
+TITLE: AIS in Qgis
+AUTHOR: Kurt
+DATE: 05.18.2010 14:23
+DESC: excellent display
+-----
+BODY:
+I just tweaked my new table design for realtime AIS updates in PostGIS
+to add WITH OIDS so I can view the database in Qgis.  I like it!  This
+is just a couple minutes of a full US feed.  My new design puts only a
+very small load on PostgreSQL and the python job is using about %10 of
+one core to keep up with the entire US (~650 NMEA strings per second).
+Most of my system load is coming from an unrelated wget pulling data
+from a NOAA server across the country at 1.8MB/s.
+<pre>Processes: 119 total, 3 running, 1 stuck, 115 sleeping, 402 threads                                                       14:10:00
+Load Avg: 0.31, 0.23, 0.21  CPU usage: 1.54% user, 0.66% sys, 97.78% idle  SharedLibs: 6656K resident, 7072K data, 0B linkedit.
+<!-- -->
+PID    COMMAND      %CPU TIME     #TH   #WQ  #POR #MREG RPRVT  RSHRD  RSIZE  VPRVT  VSIZE  PGRP  PPID  STATE    UID  FAULTS
+3670-  python2.6    <b>12.2</b> 01:03.75 3/1   0    40   156   13M+   1672K  15M+   90M    663M   3670  234   running  501  4536+
+3671-  postgres     <b>1.0</b>  00:07.86 1     0    9    63    988K   13M    7756K+ 1212K  604M   3671  43481 sleeping 252  2098+
+3632-  Qgis         0.2  00:13.95 2     1    101- 512-  41M-   56M    76M-   123M-  1120M- 3632  173   sleeping 501  42320 
+...</pre>
+Here is my current PostGIS setup:
+<pre><tt><b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> vessel_pos <font color="#990000">(</font>
+       mmsi INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+       cog INTEGER<font color="#990000">,</font>
+       sog REAL<font color="#990000">,</font>
+       time_stamp <font color="#009900">TIMESTAMP</font> <b><font color="#0000FF">WITH</font></b> <font color="#009900">TIME</font> ZONE <b><font color="#0000FF">DEFAULT</font></b> now<font color="#990000">(),</font>
+       nav_status <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">30</font><font color="#990000">)</font> <i><font color="#9A1900">-- convert the code to a string for presentation</font></i>
+       <font color="#990000">)</font> <b><font color="#0000FF">WITH</font></b> OIDS<font color="#990000">;</font>
+<b><font color="#0000FF">SELECT</font></b> AddGeometryColumn<font color="#990000">(</font><font color="#FF0000">'vessel_pos'</font><font color="#990000">,</font><font color="#FF0000">'pos'</font><font color="#990000">,</font><font color="#993399">4326</font><font color="#990000">,</font><font color="#FF0000">'POINT'</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<b><font color="#0000FF">SELECT</font></b> AddGeometryColumn<font color="#990000">(</font><font color="#FF0000">'vessel_pos'</font><font color="#990000">,</font><font color="#FF0000">'track'</font><font color="#990000">,</font><font color="#993399">4326</font><font color="#990000">,</font><font color="#FF0000">'LINESTRING'</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- CREATE INDEX vessel_pos_pkey ON vessel_pos(mmsi); -- created automatically if done through psql</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">INDEX</font></b> vessel_pos_ts_idx <b><font color="#0000FF">ON</font></b> vessel_pos<font color="#990000">(</font>time_stamp<font color="#990000">);</font>
+<!-- -->
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">TABLE</font></b> vessel_name <font color="#990000">(</font>
+       mmsi INTEGER <b><font color="#0000FF">PRIMARY</font></b> <b><font color="#0000FF">KEY</font></b><font color="#990000">,</font>
+       name <font color="#009900">VARCHAR</font><font color="#990000">(</font><font color="#993399">25</font><font color="#990000">),</font> <i><font color="#9A1900">-- only need 20</font></i>
+       type_and_cargo INTEGER<font color="#990000">,</font>
+       response_class INTEGER <i><font color="#9A1900">-- 0 do not display differently.  1 == response vessel</font></i>
+<font color="#990000">);</font>
+<!-- -->
+<i><font color="#9A1900">-- CREATE INDEX vessel_name_pkey ON vessel_name(mmsi); -- created automatically</font></i>
+<b><font color="#0000FF">CREATE</font></b> <b><font color="#0000FF">INDEX</font></b> vessel_name_rc_idx <b><font color="#0000FF">ON</font></b> vessel_name<font color="#990000">(</font>response_class<font color="#990000">);</font>
+</tt></pre>
+Here is the resulting image.  You can see the basic outline of the US (and the fact that some vessels are using the same MMSI).
+
+<img title="Water level via radar" withgrayborder="True"
+src="http://schwehr.org/blog/attachments/2010-05/libais-in-qgis.png"/>
+
+Some fun statistics from a 4 day trial run on the US: I have seen 8600
+unique MMSI's from class A and class B transmitters and 4700 names
+from MMSIs greater than 200,000,000.  And yes, there are many many
+vessels that seem to have miss a digit when configuring their AIS
+units.  For example:
+<pre>mmsi = 36898800 name: ALTAIR</pre>
+ALTAIR is missing a digit somewhere.  Perhaps a "0" on the right.  It is really frustrating
+to have so many ships with bad MMSIs.
+-----

@@ -1,0 +1,118 @@
+TITLE: prototype for web interface for defining AIS binary messages
+AUTHOR: Kurt
+DATE: 02.23.2008 20:44
+DESC: rapid prototyping
+-----
+BODY:
+I've used <a href="http//www.djangoproject.com">django</a> to create a
+quick prototype of a web interface designed to create AIS binary
+message definition.  When looking at this, know that it needs a lot more
+work.  I am also skipping a good number of important commands.
+
+First the models.py:
+<pre>
+<strong>from</strong> <font color="#2040a0">django</font>.<font color="#2040a0">db</font> <strong>import</strong> <font color="#2040a0">models</font>
+<font color="#444444">#</font>
+<strong>class</strong> <font color="#2040a0">Type</font><font color="4444FF">(</font><font color="#2040a0">models</font>.<font color="#2040a0">Model</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">20</font><font color="4444FF">)</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __str__</font><font color="2040a0">(self)</font>:
+</strong>        <strong>return</strong> <font color="#2040a0">self</font>.<font color="#2040a0">name</font>
+    <strong>class</strong> <font color="#2040a0">Admin</font><font color="4444FF">:</font>
+        <strong>pass</strong>
+<font color="#444444">#</font>
+<strong>class</strong> <font color="#2040a0">Unit</font><font color="4444FF">(</font><font color="#2040a0">models</font>.<font color="#2040a0">Model</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">10</font><font color="4444FF">)</font>
+    <font color="#2040a0">shortdescription</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">30</font><font color="4444FF">)</font>
+    <font color="#2040a0">description</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">refURL</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">URLField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __str__</font><font color="2040a0">(self)</font>:
+</strong>        <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#2040a0">self</font>.<font color="#2040a0">name</font>
+        <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">name</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font> <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#008000">'None'</font>
+        <strong>return</strong> <font color="#2040a0">name</font> <font color="4444FF">+</font> <font color="#008000">' - '</font> <font color="4444FF">+</font> <font color="#2040a0">self</font>.<font color="#2040a0">shortdescription</font>
+    <strong>class</strong> <font color="#2040a0">Admin</font><font color="4444FF">:</font>
+        <strong>pass</strong>
+<font color="#444444">#</font>
+<strong>class</strong> <font color="#2040a0">Aismsg</font><font color="4444FF">(</font><font color="#2040a0">models</font>.<font color="#2040a0">Model</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">20</font><font color="4444FF">)</font>
+    <font color="#2040a0">description</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">msgnum</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">PositiveIntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">dac</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">PositiveIntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">fi</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">PositiveIntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<strong>   <font color="ff0000"> def</font><font color="ff0000"> __str__</font><font color="2040a0">(self)</font>:
+</strong>        <strong>return</strong> <font color="#2040a0">self</font>.<font color="#2040a0">name</font> <font color="4444FF">+</font> <font color="#008000">' ('</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">dac</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">':'</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">self</font>.<font color="#2040a0">fi</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">')'</font>
+    <strong>class</strong> <font color="#2040a0">Admin</font><font color="4444FF">:</font>
+        <strong>pass</strong>
+<font color="#444444">#</font>
+<strong>class</strong> <font color="#2040a0">Field</font><font color="4444FF">(</font><font color="#2040a0">models</font>.<font color="#2040a0">Model</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">aismsg</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">ForeignKey</font><font color="4444FF">(</font><font color="#2040a0">Aismsg</font><font color="4444FF">)</font>
+    <font color="#2040a0">name</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">20</font><font color="4444FF">)</font>
+    <font color="#2040a0">description</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">TextField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">numberofbits</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">PositiveIntegerField</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">type</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">ManyToManyField</font><font color="4444FF">(</font><font color="#2040a0">Type</font><font color="4444FF">)</font>
+    <font color="#2040a0">unavailable</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">CharField</font><font color="4444FF">(</font><font color="#2040a0">maxlength</font><font color="4444FF">=</font><font color="#FF0000">120</font><font color="4444FF">)</font>
+    <font color="#2040a0">units</font> <font color="4444FF">=</font> <font color="#2040a0">models</font>.<font color="#2040a0">ForeignKey</font><font color="4444FF">(</font><font color="#2040a0">Unit</font><font color="4444FF">)</font>
+    <strong>class</strong> <font color="#2040a0">Admin</font><font color="4444FF">:</font>
+        <strong>pass</strong>
+</pre>
+Given that model, I asked django to create the database tables:
+<pre>
+% createdb aisdef
+% python manage.py syncdb
+</pre>
+It created a whole bunch of tables.  Here are the key ones:
+<pre>
+% psql aisdef
+# \d
+ public | define_ais_aismsg                 | table    | schwehr
+ public | define_ais_field                  | table    | schwehr
+ public | define_ais_field_type             | table    | schwehr
+ public | define_ais_type                   | table    | schwehr
+ public | define_ais_unit                   | table    | schwehr
+# \d define_ais_field
+ id           | integer                | not null default nextval('define_ais_field_id_seq'::regclass)
+ aismsg_id    | integer                | not null
+ name         | character varying(20)  | not null
+ description  | text                   | not null
+ numberofbits | integer                | not null
+ unavailable  | character varying(120) | not null
+ units_id     | integer                | not null
+</pre>
+I then preload some field types and units into the database:
+<pre>
+% psql aisdef
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_type <strong>(</strong>name) VALUES (<font color="#008000">'bool'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_type <strong>(</strong>name) VALUES (<font color="#008000">'uint'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_type <strong>(</strong>name) VALUES (<font color="#008000">'int'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_type <strong>(</strong>name) VALUES (<font color="#008000">'udecimal'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_type <strong>(</strong>name) VALUES (<font color="#008000">'decimal'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_type <strong>(</strong>name) VALUES (<font color="#008000">'aisstr6'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_type <strong>(</strong>name) VALUES (<font color="#008000">'binary'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_unit <strong>(</strong>name<strong>,</strong>shortdescription<strong>,</strong>description,&quot;refURL&quot;) VALUES (<font color="#008000">'m'</font>,<font color="#008000">'meters'</font>,<font color="#008000">'long description'</font>,<font color="#008000">'http://physics.nist.gov/cuu/Units/meter.html'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_unit <strong>(</strong>name<strong>,</strong>shortdescription<strong>,</strong>description,&quot;refURL&quot;) VALUES (<font color="#008000">'kg'</font>,<font color="#008000">'kilogram'</font>,<font color="#008000">'long description'</font>,<font color="#008000">'http://physics.nist.gov/cuu/Units/kilogram.html'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_unit <strong>(</strong>name<strong>,</strong>shortdescription<strong>,</strong>description,&quot;refURL&quot;) VALUES (<font color="#008000">'K'</font>,<font color="#008000">'kelvin'</font>,<font color="#008000">'long description'</font>,<font color="#008000">'http://physics.nist.gov/cuu/Units/kelvin.html'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_unit <strong>(</strong>name<strong>,</strong>shortdescription<strong>,</strong>description,&quot;refURL&quot;) VALUES (<font color="#008000">'s'</font>,<font color="#008000">'second'</font>,<font color="#008000">'long description'</font>,<font color="#008000">'http://physics.nist.gov/cuu/Units/second.html'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_unit <strong>(</strong>name<strong>,</strong>shortdescription<strong>,</strong>description,&quot;refURL&quot;) VALUES (<font color="#008000">''</font>,<font color="#008000">'practical salinity scale'</font>,<font color="#008000">'long description'</font>,<font color="#008000">'http://en.wikipedia.org/wiki/Salinity'</font>);
+<strong>INSERT</strong> <strong>INTO</strong> define_ais_unit <strong>(</strong>name<strong>,</strong>shortdescription<strong>,</strong>description,&quot;refURL&quot;) VALUES (<font color="#008000">'Pa'</font>,<font color="#008000">'Pascals'</font>,<font color="#008000">'long description'</font>,<font color="#008000">'http://en.wikipedia.org/wiki/Pressure'</font>);
+</pre>
+Start the django development server and open the admin interface.
+<pre>
+% python manage.py runserver
+% open http://127.0.0.1:8000/
+</pre>
+
+Here is a quick spin through adding a field to a message:
+
+<img src="http://schwehr.org/blog/attachments/2008-02/django-ais-def-1.png"/>
+
+<img src="http://schwehr.org/blog/attachments/2008-02/django-ais-def-2.png"/>
+
+<img src="http://schwehr.org/blog/attachments/2008-02/django-ais-def-3.png"/>
+
+This is far from a finished product, but it illustrates the concept.
+From here, a script could read the complete message definition and
+produce the XML description of that message.  There is a lot missing here.
+For example, lookup tables for uint fields that want them.  Additionally,
+there could be a lot of guidance stored in popup help windows.
+
+It's a start.
+-----

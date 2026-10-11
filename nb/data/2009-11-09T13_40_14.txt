@@ -1,0 +1,35 @@
+TITLE: Finding bad points in AIS
+AUTHOR: Kurt
+DATE: 11.09.2009 13:40
+DESC: troubles with tracks
+-----
+BODY:
+We are working through the dataset trying to remove any trouble spots.
+I've made a kml for Google Earth that has all the points where we have
+10 minutes or more between position reports and/or 1km distance.  This
+gives us about 400 points from the 3.3 million that we need to
+carefully check.  This analysis is made more challenging because of
+poor time control on the position reports (remember to use NTP and/or
+log GPS time with your data!)
+
+Here I'm showing one suspect point that actually looks pretty good.
+It shows that the coverage is pretty spotty on the eastern side of the
+study area.
+
+<img title="400 suspect points" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-11/bad-point-analysis.png"/>
+
+However, Brad has checked all of our 3000+ transits and discovered this troublesome track:
+
+<img title="Crazy positioning" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-11/bad-track.png"/>
+
+Unlike my previous trouble that turned out to be a bug in handling
+points in my code, I am pretty sure that this is trouble with GPS on
+the ship.  Our first pass algorithm for trouble detection is
+definitely missing this kind of thing.  Careful tracking of reported
+speed over ground (SOG), course over ground (COG), heading, and
+position derived values with time should be able to catch this type of
+thing, but I don't have a solid time basis for this data.  Best guess is
+that this is multipath with recovery.
+
+<img title="Up close" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-11/bad-track-close-up.png"/>
+-----

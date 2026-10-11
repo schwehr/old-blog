@@ -1,0 +1,37 @@
+TITLE: mesh merging
+AUTHOR: Kurt
+DATE: 08.24.2005 17:41
+DESC: now it works
+-----
+BODY:
+
+Finally I was able to splice multiple meshes together.  Thanks to
+Becca, Anthony and Val for help.  Here is basically what I did.  I
+started with 3 grd files at different resolutions.  For each one
+upsample it by doing grdsample to a common resultion (the highest of
+the batch).  Do a grdinfo on each to make sure that the resolutions
+are really the same.  I had to tweak the region of one grid to remove
+a rounding error that stopped gmt from merging.  The run grdblend
+(after you have patched GMT 4.0) to get one large grd at the higher
+resolution.
+
+My blend file:
+<pre>
+cat blend.file2
+
+mbari-1c.grd -R-124.83333/-124.5/40.75/41 10
+eureka.grd -R-124.6/-124.1/40.7/41 5
+3sec.grd -R-125.5/-123/39/42 1
+</pre>
+
+Build the 1 second mesh that has the MBARI, Strataform and 3sec
+coastal relief(check out the ugly contours).
+<pre>
+export R=-125/-124/40.5/41
+grdblend blend.file2 -Geel-combined.grd -R$R -I1c
+</pre>
+
+I will leave you with a pretty picture:
+
+<img src="http://schwehr.org/blog/attachments/2005-08/eel-merge.png">
+-----

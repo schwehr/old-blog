@@ -1,0 +1,26 @@
+TITLE: GLUT is not GLUT is not GLUT
+AUTHOR: Kurt
+DATE: 08.16.2007 18:12
+DESC: what is the right glut?
+-----
+BODY:
+Ouch... I am trying to track down the source to GLUT that Roland is
+using for some GeoZui development.  I had thought until now that GLUT
+was GLUT and FreeGLUT was pretty much the same thing.  Apparently <b>not</b>.
+
+He has references to these functions: glutStylusButtonFunc
+glutStylusMotionFunc, glutCursorButtonFunc, glutCursorMotionFunc,
+glutEraserButtonFunc, and glutEraserMotionFunc.  I can't seem to find them anywhere.  In the GLUT that he has they look like this:
+<pre>
+GLUTAPI void APIENTRY glutTabletMotionFunc(void (GLUTCALLBACK *func)(int x, int y));
+GLUTAPI void APIENTRY glutTabletButtonFunc(void (GLUTCALLBACK *func)(int button, int state, int x, int y));
+GLUTAPI void APIENTRY glutStylusMotionFunc(void (GLUTCALLBACK *func)(int x, int y, int p));
+GLUTAPI void APIENTRY glutStylusButtonFunc(void (GLUTCALLBACK *func)(int button, int state, int x, int y));
+GLUTAPI void APIENTRY glutEraserMotionFunc(void (GLUTCALLBACK *func)(int x, int y, int p));
+GLUTAPI void APIENTRY glutEraserButtonFunc(void (GLUTCALLBACK *func)(int button, int state, int x, int y));
+GLUTAPI void APIENTRY glutCursorMotionFunc(void (GLUTCALLBACK *func)(int x, int y, int p));
+GLUTAPI void APIENTRY glutCursorButtonFunc(void (GLUTCALLBACK *func)(int button, int state, int x, int y));
+</pre>
+That clearly is not freeGLUT as it has FGAPIENTRY instead of APIENTRY
+and spits the headers out with glut.h including two other headers.
+-----

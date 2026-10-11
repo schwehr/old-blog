@@ -1,0 +1,31 @@
+TITLE: gdal 1.4.0 in fink
+AUTHOR: Kurt
+DATE: 01.12.2007 14:41
+DESC: woo hoo
+-----
+BODY:
+I am just about to check in gdal 1.4.0 into fink.  Why is this so
+interesting?  This lets anyone create a GoogleEarth S57 ENC in just a
+couple minutes.
+
+For Mac users...
+<pre>fink selfupdate
+fink install gdal
+</pre>
+Go to <a
+href="http://chartmaker.ncd.noaa.gov/mcd/enc/download.htm">NOAA
+ENC</a>.  Scroll way down to PROCEED.  Select the "Textual" interface.
+Change the "Show" drop down from 20 to 617.  Search for Cape Cod.
+Check the box next to "Bay of Fundy to Cape Cod - US3EC10M".  Press
+"Review Selections" at the top of the page.  Press "Order Selections."
+Press "Download."
+
+Now unzip the file.  "cd ENC_ROOT/US3EC10M/" and run this command
+(once you have gdal 1.4.0 installed).  
+<pre>ogr2ogr -f KML US3EC10M.kml US3EC10M.000</pre>
+Now run "open US3EC10M.kml" and turn
+off all layers accept DSID, CBLSUB, COALNE, RECARE, RESARE, TSSBND,
+TSSLPT, and USSARE.
+
+<img src="http://schwehr.org/blog/attachments/2007-01/ge-enc-US3EC10M.png">
+-----

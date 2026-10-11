@@ -1,0 +1,126 @@
+TITLE: segy EBCDIC encoded text blocks
+AUTHOR: Kurt
+DATE: 01.19.2009 17:45
+DESC: a better approach
+-----
+BODY:
+I have some EBCDIC Knudsen data that I need to read.  Time to do a
+better job of using python to detect and use EBCDIC, preferably
+without the user having to do anything.  Python has a <a
+href="http://docs.python.org/library/codecs.html">codec module</a>,
+for which I found a <a
+href="http://effbot.org/librarybook/codecs.htm">simple example</a>.
+The list of codecs on the python codec module page is confusing.
+It was only after working on this post that I discovered that I need
+"<i>cp037 IBM037, IBM039</i>".  Here is how I went about trying to figure 
+out this whole system.  First, I wanted to see what happened when I
+loaded the SEGY text header (which in this case is EBCDIC).
+<pre>% python
+&gt;&gt;&gt; import codecs
+&gt;&gt;&gt; f = codecs.open('foo.sgy', 'r', 'ascii')
+&gt;&gt;&gt; hdr = f.read(3200)
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128)</pre>
+This gave me a strategy to see which codecs would work.  Looking at
+the codecs directory:
+<pre>% <b>grep -i ebcdic /sw/lib/python2.6/encodings/*.py</b>
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_ca'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_nl'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_us'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_wt'       : 'cp037',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_he'       : 'cp424',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_be'       : 'cp500',
+/sw/lib/python2.6/encodings/aliases.py:    'ebcdic_cp_ch'       : 'cp500',
+/sw/lib/python2.6/encodings/cp037.py:""" Python Character Mapping Codec cp037 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP037.TXT' with gencodec.py.
+/sw/lib/python2.6/encodings/cp1026.py:""" Python Character Mapping Codec cp1026 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP1026.TXT' with gencodec.py.
+/sw/lib/python2.6/encodings/cp500.py:""" Python Character Mapping Codec cp500 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP500.TXT' with gencodec.py.
+/sw/lib/python2.6/encodings/cp875.py:""" Python Character Mapping Codec cp875 generated from 'MAPPINGS/VENDORS/MICSFT/EBCDIC/CP875.TXT' with gencodec.py.</pre>
+So I expect to get a number of successful decodes by trying every codec. 
+Python already comes with a tool to list the codecs:
+<pre>% <b>python /sw/lib/python2.6/Tools/unicode/listcodecs.py</b>
+all_codecs = [
+    'ascii',
+    'base64_codec',
+    'big5',
+    'big5hkscs',
+    'bz2_codec',
+    'charmap',
+    'cp037',
+    'cp1006',
+    'cp1026',
+    'cp1140',
+    'cp1250',
+...
+    'tis_620',
+    'undefined',
+    'unicode_escape',
+    'unicode_internal',
+    'utf_16',
+    'utf_16_be',
+    'utf_16_le',
+    'utf_32',
+    'utf_32_be',
+    'utf_32_le',
+    'utf_7',
+    'utf_8',
+    'utf_8_sig',
+    'uu_codec',
+    'zlib_codec',
+]</pre>
+Copying the listcodecs.py file to the local directory, I can use it to try each of the codecs.
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> codecs
+<b><font color="#000080">import</font></b> listcodecs
+<b><font color="#000080">import</font></b> encodings
+<!-- -->
+<b><font color="#0000FF">for</font></b> codec_name <b><font color="#0000FF">in</font></b> listcodecs<font color="#990000">.</font><b><font color="#000000">listcodecs</font></b><font color="#990000">(</font>encodings<font color="#990000">.</font>__path__<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]):</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        f <font color="#990000">=</font> codecs<font color="#990000">.</font><b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'foo.sgy'</font><font color="#990000">,</font> <font color="#FF0000">'r'</font><font color="#990000">,</font> codec_name<font color="#990000">)</font>
+<!-- -->
+        hdr <font color="#990000">=</font> f<font color="#990000">.</font><b><font color="#000000">read</font></b><font color="#990000">(</font><font color="#993399">3200</font><font color="#990000">)</font>
+        <b><font color="#000000">str</font></b><font color="#990000">(</font>hdr<font color="#990000">)</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'CODEC SUCCESS:'</font><font color="#990000">,</font>codec_name
+        <b><font color="#0000FF">print</font></b> hdr
+<!-- -->
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'FAILED:'</font><font color="#990000">,</font>codec_name</tt></pre>
+The results of the above look something like this:
+<pre>FAILED: ascii
+FAILED: base64_codec
+FAILED: big5
+FAILED: big5hkscs
+FAILED: bz2_codec
+FAILED: charmap
+CODEC SUCCESS: cp037
+C 1 CLIENT                        COMPANY                       CREW NO         
+C 2 LINE            AREA                        MAP ID                
+C 3 REEL NO           DAY-START OF REEL     YEAR      OBSERVER                  
+C 4 INSTRUMENT: MFG KEL        MODEL 320B/R     SERIAL NO 030505                
+C 5 DATA TRACES/RECORD        AUXILIARY TRACES/RECORD         CDP FOLD          
+C 6 SAMPLE INTERVAL         SAMPLES/TRACE       BITS/IN      BYTES/SAMPLE       
+C 7 RECORDING FORMAT        FORMAT THIS REEL        MEASUREMENT SYSTEM          
+C 8 SAMPLE CODE: FLOATING PT     FIXED PT X   FIXED PT-GAIN     CORRELATED      
+C 9 GAIN  TYPE: FIXED     BINARY     FLOATING POINT     OTHER                   
+C10 FILTERS: ALIAS     HZ  NOTCH     HZ  BAND     -     HZ  SLOPE    -    DB/OCT
+C11 SOURCE: TYPE            NUMBER/POINT        POINT INTERVAL
+...</pre>
+Here are the codecs that succeeded:
+<pre>% <b>./codec_test.py | grep SUCCESS</b>
+CODEC SUCCESS: cp037
+CODEC SUCCESS: cp1026
+CODEC SUCCESS: cp1140
+CODEC SUCCESS: cp424
+CODEC SUCCESS: cp500
+CODEC SUCCESS: cp875
+CODEC SUCCESS: quopri_codec
+CODEC SUCCESS: string_escape</pre>
+Looking at what those values in the <a
+href="http://docs.python.org/library/codecs.html#id3">table of
+Standard Encodings</a>, it is clear that we only want cp027, which is
+EBCDIC in English.  We could also use cp437, cp424, cp500, cp875, 
+cp1026, or cp1140 as fallbacks.  However, quopri_codec and 
+string_escape return junk.
+
+To see what cp037 looks like, take a look at this page:
+<a href="http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/EBCDIC/CP037.TXT">http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/EBCDIC/CP037.TXT</a>
+-----

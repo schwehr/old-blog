@@ -1,0 +1,44 @@
+TITLE: python hotshot
+AUTHOR: Kurt
+DATE: 04.19.2006 08:57
+DESC: profiling results - first time
+-----
+BODY:
+I gave hotshot a try...
+<pre>
+In [1]: import hotshot, hotshot.stats, test.pystone
+In [3]: stats = hotshot.stats.load("ais-log2gzx.profile")
+In [4]: stats.strip_dirs()
+In [5]: stats.sort_stats('time','calls')
+In [6]: stats.print_stats(20)
+         330324 function calls (330249 primitive calls) in 2.546 CPU seconds
+
+   Ordered by: internal time, call count
+   List reduced from 190 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   132849    1.111    0.000    1.111    0.000 BitVector.py:641(_getbit)
+   137087    0.506    0.000    0.506    0.000 BitVector.py:626(_setbit)
+     2607    0.368    0.000    1.481    0.001 BitVector.py:702(__add__)
+     5576    0.230    0.000    0.755    0.000 BitVector.py:541(__init__)
+       87    0.022    0.000    0.029    0.000 decimal.py:1143(_divide)
+     8992    0.020    0.000    0.020    0.000 BitVector.py:599(lambda)
+       22    0.019    0.001    0.830    0.038 msg.py:177(getFields)
+       46    0.017    0.000    1.594    0.035 binary.py:191(ais6tobitvec)
+      599    0.015    0.000    0.022    0.000 ElementTree.py:1072(start)
+    10069    0.015    0.000    0.015    0.000 ElementTree.py:220(__getitem__)
+      420    0.014    0.000    0.027    0.000 BitVector.py:829(intValue)
+     1124    0.013    0.000    0.116    0.000 binary.py:19(setBitVectorSize)
+      474    0.013    0.000    0.670    0.001 BitVector.py:906(__getslice__)
+      991    0.012    0.000    0.012    0.000 msg.py:83(getType)
+        2    0.011    0.005    0.067    0.034 ElementTree.py:1241(feed)
+      495    0.010    0.000    0.017    0.000 msg.py:85(getScale)
+      466    0.009    0.000    0.013    0.000 msg.py:118(isCase)
+        1    0.009    0.009    0.017    0.017 ElementTree.py:1110(__init__)
+      423    0.009    0.000    0.012    0.000 msg.py:102(getDecode)
+      445    0.009    0.000    0.012    0.000 msg.py:107(getUnavailableRaw)
+</pre>
+
+Looks like most of my time is spent in the BitVector _getbit and
+_setbit calls.  Now I need to reduce the number of those calls.
+-----

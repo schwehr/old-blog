@@ -1,0 +1,75 @@
+TITLE: PyGMT data loading
+AUTHOR: Kurt
+DATE: 10.02.2005 08:56
+DESC: woo hoo!
+-----
+BODY:
+I took a little bit of time to port PyGMT to Mac OSX and it looks like
+reading is in great shape.  I am not going to worry about writing
+grids right now because I do not need that feature for my seismic data
+processing.  I accomplished the port by switching the grid file
+reading from an fread with cast from float method to using libgmt's
+GRD_read_grid_info and GMT_read_grd.  This allows the reader to be
+cross platform and read any of the 6 or 7 grid formats supported
+by GMT.  I will be sending the code to Magnus Hagdorn who wrote PyGMT.
+Here is a gnuplot <em>splot</em> of a decimated grid.  The code to
+dump the longitude, latitude and depth follows.<br>
+<img src="http://schwehr.org/blog/attachments/2005-10/eureka-splot.gif">
+<pre>
+<font color="#FF9900">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">PyGMT</font>
+<font color="#2040a0">def</font> <font color="#2040a0">lonlat</font><font color="4444FF">(</font><font color="#2040a0">grd</font>,<font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Calculate the lonlat for a point&quot;</font><font color="#008000">&quot;&quot;</font>
+    <font color="#FF9900">#import pdb</font>
+    <font color="#FF9900">#pdb.set_trace()</font>
+
+    <font color="#2040a0">minx</font> <font color="4444FF">=</font> <font color="#2040a0">grd</font>.<font color="#2040a0">x_minmax</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+    <font color="#2040a0">maxx</font> <font color="4444FF">=</font> <font color="#2040a0">grd</font>.<font color="#2040a0">x_minmax</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+    <font color="#2040a0">miny</font> <font color="4444FF">=</font> <font color="#2040a0">grd</font>.<font color="#2040a0">y_minmax</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+    <font color="#2040a0">maxy</font> <font color="4444FF">=</font> <font color="#2040a0">grd</font>.<font color="#2040a0">y_minmax</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+
+    <font color="#2040a0">nx</font> <font color="4444FF">=</font> <font color="#2040a0">grd</font>.<font color="#2040a0">data</font>.<font color="#2040a0">shape</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>
+    <font color="#2040a0">ny</font> <font color="4444FF">=</font> <font color="#2040a0">grd</font>.<font color="#2040a0">data</font>.<font color="#2040a0">shape</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+
+    <font color="#2040a0">dx</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">maxx</font><font color="4444FF">-</font><font color="#2040a0">minx</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">nx</font><font color="4444FF">)</font>
+    <font color="#2040a0">dy</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#2040a0">maxy</font><font color="4444FF">-</font><font color="#2040a0">miny</font><font color="4444FF">)</font>/<font color="#2040a0">float</font><font color="4444FF">(</font><font color="#2040a0">ny</font><font color="4444FF">)</font>
+
+    <font color="#2040a0">lon</font> <font color="4444FF">=</font> <font color="#2040a0">minx</font> <font color="4444FF">+</font> <font color="#2040a0">dx</font> <font color="4444FF">*</font> <font color="#2040a0">x</font>
+    <font color="#2040a0">lat</font> <font color="4444FF">=</font> <font color="#2040a0">miny</font> <font color="4444FF">+</font> <font color="#2040a0">dy</font> <font color="4444FF">*</font> <font color="#2040a0">y</font>
+    <strong>return</strong> <font color="#2040a0">lon</font>,<font color="#2040a0">lat</font>
+
+<font color="#2040a0">f</font><font color="4444FF">=</font><font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'Eureka.grd'</font>,<font color="#008000">'r'</font><font color="4444FF">)</font>
+<strong>print</strong> <font color="#008000">&quot;reading grid...&quot;</font>
+<font color="#2040a0">g</font><font color="4444FF">=</font><font color="#2040a0">PyGMT</font>.<font color="#2040a0">read_grid</font><font color="4444FF">(</font><font color="#2040a0">f</font><font color="4444FF">)</font>
+<font color="#2040a0">shape</font> <font color="4444FF">=</font> <font color="#2040a0">g</font>.<font color="#2040a0">data</font>.<font color="#2040a0">shape</font>
+<font color="#2040a0">o</font> <font color="4444FF">=</font> <font color="#2040a0">open</font> <font color="4444FF">(</font><font color="#008000">'out.dat'</font>,<font color="#008000">'w'</font><font color="4444FF">)</font>
+
+<strong>print</strong> <font color="#008000">&quot;Writing grid to an ascii file&quot;</font>
+<font color="#2040a0">decimationFactor</font> <font color="4444FF">=</font> <font color="#FF0000">15</font>
+<strong>for</strong> <font color="#2040a0">y</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#2040a0">shape</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>if</strong> <font color="#2040a0">y</font><font color="4444FF">%</font><font color="#FF0000">100</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#008000">' y = '</font>,<font color="#2040a0">y</font>
+    <strong>if</strong> <font color="#2040a0">y</font><font color="4444FF">%</font><font color="#2040a0">decimationFactor</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font> <strong>continue</strong>  <font color="#FF9900"># FIX: decimating</font>
+    <strong>for</strong> <font color="#2040a0">x</font> <strong>in</strong> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">0</font>,<font color="#2040a0">shape</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">:</font>
+        <strong>if</strong> <font color="#2040a0">x</font><font color="4444FF">%</font><font color="#2040a0">decimationFactor</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font> <strong>continue</strong>  <font color="#FF9900"># FIX: decimating</font>
+        <font color="#2040a0">lon</font>,<font color="#2040a0">lat</font> <font color="4444FF">=</font> <font color="#2040a0">lonlat</font><font color="4444FF">(</font><font color="#2040a0">g</font>,<font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">)</font>
+        <font color="#2040a0">o</font>.<font color="#2040a0">write</font> <font color="4444FF">(</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">lon</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">' '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">lat</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">' '</font> <font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">g</font>.<font color="#2040a0">data</font><font color="4444FF">[</font><font color="#2040a0">x</font>,<font color="#2040a0">y</font><font color="4444FF">]</font><font color="4444FF">)</font> <font color="4444FF">+</font> <font color="#008000">'\n'</font><font color="4444FF">)</font>
+</pre>
+
+And a quick hint about installing packages outside of the normal
+package location.  First I had to build and install the package like
+this into a temporary location on my Desktop using the distutils
+install command.
+<pre>
+GMTINC=/sw/include python setup.py install --root=/Users/schwehr/Desktop/pygmt
+</pre>
+Then I have to add this location to the python path.  You might expect
+to point to the PyGMT under the site-packages directory, but that will
+not work.  Just point to the site-packages directory.
+<pre>
+export PYTHONPATH=$PYTHONPATH:~/Desktop/pygmt/sw/lib/python2.4/site-packages
+</pre>
+Now <em>import PyGMT</em> should work.
+
+<b>Note:</b>  The y axis labels are wrong.  I had a bug which is now fixed in the above code.  I did not feel like rebuilding the graph
+-----

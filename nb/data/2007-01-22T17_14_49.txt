@@ -1,0 +1,47 @@
+TITLE: SQL support for AIS databases in noaadata/ais
+AUTHOR: Kurt
+DATE: 01.22.2007 17:14
+DESC: first round
+-----
+BODY:
+I just got initial database support working for the noaadata/ais
+submodule (version 0.13).  This has only passed one test case and I
+am sure there are a few gotchas waiting.  Here is an example of its 
+use on the command line.  I received this AIS message today:
+<pre>!AIVDM,1,1,,B,14QsCc0001JA7Cv>gfkhJa?@0D0w,0*71</pre>
+Now I can prepare for the database:
+<pre>./ais_msg_1.py --sql-create</pre>
+This emits the database table creation command:
+<pre>CREATE TABLE position ( \
+	    MessageID INTEGER, RepeatIndicator INTEGER, \
+	    UserID INTEGER, NavigationStatus INTEGER, \
+	    ROT INTEGER, SOG DECIMAL(4,1), PositionAccuracy INTEGER, \
+	    Position_longitude DECIMAL(8,5), \
+	    Position_latitude DECIMAL(8,5), COG DECIMAL(4,1), \
+	    TrueHeading INTEGER, TimeStamp INTEGER, \
+	    RegionalReserved INTEGER, Spare INTEGER, RAIM BOOL, \
+	    syncstate INTEGER, slotoffset INTEGER );
+</pre>
+That is pretty basic and does not include a primary key, but that is
+enough to test a database.  Now we need the insert string, which can
+be had by this command:
+<pre>./ais_msg_1.py -d -T sql -t nmea \
+       '!AIVDM,1,1,,B,14QsCc0001JA7Cv>gfkhJa?@0D0w,0*71'</pre>
+This results in an insert string like this:
+<pre>INSERT INTO position (RegionalReserved,NavigationStatus,\
+  COG,SOG,slotoffset,Position_longitude,RepeatIndicator,\
+  UserID,RAIM,syncstate,TimeStamp,Spare,PositionAccuracy,\
+  MessageID,TrueHeading,ROT,Position_latitude) 
+  VALUES \
+  (0,0,10.6,0.1,10247,-80.147415,0,304010156,0,0,40,0,0,1,\
+  295,0,25.77015833333333333333333333);
+</pre>
+Now paste those two commands into an sqlite database:
+<pre>
+sqlite3 ais.db3
+[paste CREATE and then INSERT here]
+</pre>
+Now you have a database.
+<pre>sqlite&gt; SELECT UserID FROM position;
+304010156</pre>
+-----

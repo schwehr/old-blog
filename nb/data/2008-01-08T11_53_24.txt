@@ -1,0 +1,63 @@
+TITLE: OSX 10.5 X11
+AUTHOR: Kurt
+DATE: 01.08.2008 11:53
+DESC: confusion
+-----
+BODY:
+Update: Another post about X11 on 10.5 being a mess... <a href="http://www.macresearch.org/x11-and-xquartz">X11 and XQuartz</a> [MacResearch.org]
+
+What do I have installed for X11 on my 10.5 Intel MacBook Pro?
+<pre>
+% pkgutil --packages | grep -i X11
+com.apple.pkg.X11User
+com.apple.pkg.X11SDKLeo
+com.apple.pkg.X11DocumentationLeo
+</pre>
+How do I easily find the version of X11?  Not really that easy to 
+see it the XQuartz 2.1.1 update is in there.
+<pre>
+% pkgutil --export-plist com.apple.pkg.X11User
+        &lt;key&gt;pkg-version&lt;/key&gt;
+        &lt;string&gt;10.5.0.1.1.1192168948&lt;/string&gt;
+        &lt;key&gt;pkgid&lt;/key&gt;
+        &lt;string&gt;com.apple.pkg.X11User&lt;/string&gt;
+</pre>
+There is always the old and crusty method:
+<pre>
+% xdpyinfo
+version number:    11.0
+vendor string:    The X.Org Foundation
+vendor release number:    70200000
+X.Org version: 7.2.0
+...
+number of extensions:    28
+    Apple-DRI
+    Apple-WM
+    BIG-REQUESTS
+    DAMAGE
+    DEC-XTRAP
+    DOUBLE-BUFFER
+    DPMS
+    Extended-Visual-Information
+...
+screen #0:
+  print screen:    no
+  dimensions:    1440x879 pixels (488x298 millimeters)
+  resolution:    75x75 dots per inch
+  depths (7):    24, 1, 4, 8, 15, 16, 32
+...
+</pre>
+Do I want to install 2.1.1?? <a href="http://trac.macosforge.org/projects/xquartz/wiki/Releases">xquarts macosforge.org page</a>
+
+From <a href="http://trac.macosforge.org/projects/xquartz/wiki/X112.1.1">X112.1.1</a>... ??
+<pre>
+Changes in 2.1.1
+...
+  o Added workaround to support Fink until they update their packages
+</pre>
+I definitely need to understand what is going on.
+
+This is a good resource: <a href="http://forums.macosxhints.com/showthread.php?t=80171">Apple's X11 and Leopard FAQs</a>
+
+Apple's X11 Frequently Asked Questions in Leopard (Mac OS X 10.5)</a> [macosxhints.com]
+-----

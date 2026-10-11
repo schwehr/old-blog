@@ -1,0 +1,41 @@
+TITLE: Speeding up queries in a static database
+AUTHOR: Kurt
+DATE: 07.20.2011 15:46
+DESC: simple and it works
+-----
+BODY:
+I've got a midsized database (for me at least) and I'm doing some
+basic queries again and again that are slow even with indexes.  I
+figured I should be able to knock out a little python function that
+checks to see if that query has been done before and if so, reuse the
+old results.  This could be a lot fancier... I could hash the query
+string and use that rather than making the caller remember a name for
+the query, but this is what I could get done in a couple minutes and
+the results are awesome.  The function checks for a python pickle
+file.  If it successfully loads the pickle, it returns the data.  If
+it fails, it does the query, saves a pickle to disk, and returns a
+list of rows with each row as a dictionary.
+
+You could use stat to check the age of the database and the pickle if
+you were worried that the database might change.
+
+<pre><tt><b><font color="#000080">import</font></b> sqlite3<font color="#990000">,</font> cPickle as pickle
+cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font><font color="#FF0000">'data.sqlite3'</font><font color="#990000">)</font>
+cx<font color="#990000">.</font>row_factory <font color="#990000">=</font> sqlite3<font color="#990000">.</font>Row
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">sqlite_query_cached_dict</font></b><font color="#990000">(</font>cx<font color="#990000">,</font> query_name<font color="#990000">,</font> sql<font color="#990000">):</font>
+    <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+        infile <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'cache_'</font><font color="#990000">+</font><b><font color="#000000">str</font></b><font color="#990000">(</font>query_name<font color="#990000">)+</font><font color="#FF0000">'.pickle'</font><font color="#990000">)</font>
+        data <font color="#990000">=</font> pickle<font color="#990000">.</font><b><font color="#000000">load</font></b><font color="#990000">(</font>infile<font color="#990000">)</font>
+        <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Used cache'</font>
+        <b><font color="#0000FF">return</font></b> data
+    <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+        <b><font color="#0000FF">pass</font></b>
+    <i><font color="#9A1900"># No cache, so do the query</font></i>
+    data <font color="#990000">=</font> <font color="#990000">[</font><b><font color="#000000">dict</font></b><font color="#990000">(</font>row<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> row <b><font color="#0000FF">in</font></b> cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font>sql<font color="#990000">)];</font>
+    outfile <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font><font color="#FF0000">'cache_'</font><font color="#990000">+</font><b><font color="#000000">str</font></b><font color="#990000">(</font>query_name<font color="#990000">)+</font><font color="#FF0000">'.pickle'</font><font color="#990000">,</font> <font color="#FF0000">'w'</font><font color="#990000">)</font>
+    pickle<font color="#990000">.</font><b><font color="#000000">dump</font></b><font color="#990000">(</font>data<font color="#990000">,</font> outfile<font color="#990000">)</font>
+    <b><font color="#0000FF">print</font></b> <font color="#FF0000">'Fresh data -&gt; wrote cache'</font>
+    <b><font color="#0000FF">return</font></b> data</tt>
+# Your work here</pre>
+-----

@@ -1,0 +1,56 @@
+TITLE: cloning the mbsystem svn tree to git
+AUTHOR: Kurt
+DATE: 08.27.2012 11:32
+DESC: lots to do
+-----
+BODY:
+I have been wanting to hack on MB-System for a long long time.  Last
+night, I finally took the initial steps.  My fiddling should be
+properly to the side of the mbsystem svn world that the community is
+working with (aka... Fork!  Or spork?) and I should do each task in a
+branch so that it is easier for people to take parts of what I am doing
+for myself.
+
+If you want check out what I've done so far, see:
+
+<a href="https://github.com/schwehr/mb-system">https://github.com/schwehr/mb-system</a>
+
+To get the code:
+<pre>git clone https://github.com/schwehr/mb-system.git</pre>
+
+Here is what I did to start off:
+<pre># made mb-system empty repo on github 
+fink install git-svn
+git svn clone svn://svn.ilab.ldeo.columbia.edu/repo/mb-system/trunk
+# wait 5 minutes
+cd trunk
+git remote add origin git@github.com:schwehr/mb-system.git
+git push origin master
+<!-- -->
+# stare at code base wondering what I should do first</pre>
+
+Now, here are some of the tasks on my todo list:
+
+<ul>
+<li>Rip out libgsf as it is not legally usable code</li>
+<li>Remove all extranious comment lines, especially the cvs/svn log entries</li>
+<li>Remove all dead code.  The easiest is unused variables.</li>
+<li>Switch to C++ so variables do not have to be declared at the top</li>
+<li>Start using const and references where ever possible</li>
+<li>Add lots and lots of unit and integration testing</li>
+<li>Collapse the giant fprintf chains by adding a couple simple helper macros</li>
+<li>Switch the build system (this one has been on my list the longest)</li>
+<li>Consider adding a python interface</li>
+</ul>
+
+Here is an example of an extranious bit of commenting:
+<pre>   /* return status */
+        return(status);
+</pre>
+
+In case people were wondering, I'm not going to try to push any of
+this back at the main line of mb-system and I'm not going to support
+anyone using this code base.  I'm doing this for my own use.
+
+Now to find lots of extra hacking time!
+-----

@@ -1,0 +1,39 @@
+TITLE: Excuse me?  I don't think I am who you think I am
+AUTHOR: Kurt
+DATE: 11.27.2007 08:24
+DESC: why-o-why?
+-----
+BODY:
+Hmmm... I just don't get it. Why does python not know who I am?
+<pre>
+% ipython
+In [1]: import os
+In [2]: os.getlogin()
+Out[2]: 'root'
+In [3]: os.getuid()
+Out[3]: 501
+</pre>
+The bash shell seems to know:
+<pre>
+& echo $USER
+schwehr
+& whoami
+schwehr
+</pre>
+And if I make a file, I am definitely not root:
+<pre>
+% touch foo
+% ls -l foo
+-rw-r--r--   1 schwehr  schwehr  0 Nov 27 08:15 foo
+</pre>
+Perhaps I should be doing <b>os.getenv('USER')</b> instead.  That at
+least knows who I am.
+
+BTW, this is with Mac OSX 10.4.11 intel and seems to be indepent of which version of python.  <b>But... if I open a new terminal, it all works</b>
+<pre>
+In [1]: import os
+In [2]: os.getlogin()
+Out[2]: 'schwehr'
+</pre>
+Gotta love problems that are not reproducable.
+-----

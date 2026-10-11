@@ -1,0 +1,37 @@
+TITLE: Compact bit representations of geometry?
+AUTHOR: Kurt
+DATE: 11.24.2007 11:39
+DESC: what to do?
+-----
+BODY:
+I tried posting to the gdal mailing list, but I have to lookup the
+correct new mailing address as the forwarding currently bounces.  If
+you have an opinion on this kind of thing, please email me at
+kurt _at_ ccom.unh.edu or better yet, on my <a href="http://goatbar.livejournal.com/314.html">livejournal posting</a>.  I have to propose something to the standards
+group soon and I want to have some feedback.  I wonder about things
+like non-concave polygons and triangle meshes.  Too many things
+running through my head.
+
+What I am trying to send to the gdal mailing list:
+
+I figured this is probably a good place to ask this question as you
+all work with a wide range of systems.  I am looking to propose a
+couple a binary messages for maritime communication that must specify
+regions in a very limited message size.  I'd like to be able to handle
+a range of different geometries using a couple different messages to
+obtain the most geometry being sent with the minimum amount of
+bandwidth.  Something standard like WKB (OSgeo's Well-Known Binary)
+would be nice, but uses too much space.  An example of the existing
+message to define a point is the lat/lon fields in this message:
+
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/ais_msg_3.html">ais_msg_3.html</a><br/>
+<a href="http://vislab-ccom.unh.edu/~schwehr/software/noaadata/ais-messages/structs-inc.xml">structs-inc.xml</a><br/>
+
+Where a point takes 55 bits.
+
+I figure a circle is reasonable easy by just adding a radius.  For a "rectangle", I'm wondering if a point with a dx and dy (in meters or 1/600000's of a degree) would be workable rather than two corners.
+
+Then there comes the necessity of specifying an arbitrary polygon.  I'm thinking that I have to bite the bullet and come up with a max number of points two fit within the bit constraint of the max message size that I am going to allow (368 bits).
+
+Any thoughts?  I'm trying to propose a standard that doesn't do more harm than good :)
+-----

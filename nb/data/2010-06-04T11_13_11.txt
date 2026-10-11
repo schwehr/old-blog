@@ -1,0 +1,27 @@
+TITLE: Timemachine failures
+AUTHOR: Kurt
+DATE: 06.04.2010 11:13
+DESC: bugger!
+-----
+BODY:
+I have had this happen a couple times in the last week.  Backups
+shouldn't fail.  Skipping a file you can't handle and issuing warnings
+is okay, but crashing is not okay.  It always seems to work if I restart
+the backup right after the crash.  Here is the report in /var/log/system.log
+<pre>Jun  4 10:50:58 laptop com.apple.backupd[44540]: Starting standard backup
+Jun  4 10:50:59 laptop com.apple.backupd[44540]: Backing up to: /Volumes/Time Machine Backups/B
+ackups.backupdb
+Jun  4 10:51:58 laptop Jun  4 10:52:46 laptop com.apple.backupd[44540]: No pre-backup thinning needed: 3.34 GB requested (including padding), 119.30 GB available
+Jun  4 11:05:21 laptop com.apple.backupd[44540]: Indexing a file failed. 
+  Returned 1 for: /Users/schwehr/projects/src/bag-py/processed/H11288/H11288_2m_2/16/16102/38310.kml, /Volumes/Time Machine Backups/Backups.backupdb/laptop/2010-06-04-105102.inProgress/A806AA65-8347-4607-8D64-8F4FCD263850/laptop/Users/schwehr/projects/src/bag-py/processed/H11288/H11288_2m_2/16/16102/38310.kml
+Jun  4 11:05:21 laptop com.apple.backupd[44540]: Aborting backup because indexing a file failed.
+Jun  4 11:05:21 laptop com.apple.backupd[44540]: Stopping backup.
+Jun  4 11:05:22 laptop com.apple.launchd[1] (com.apple.metadata.mds[43819]): Job appears to have crashed: Segmentation fault
+Jun  4 11:05:22 laptop com.apple.ReportCrash.Root[44601]: 2010-06-04 11:05:22.472 ReportCrash[44601:2803] Saved crash report for mds[43819] version ??? (???) to /Library/Logs/DiagnosticReports/mds_2010-06-04-110522_localhost.crash
+Jun  4 11:05:23 laptop com.apple.backupd[44540]: Copied 63578 files (824.8 MB) from volume laptop.
+Jun  4 11:05:23 laptop com.apple.backupd[44540]: Copy stage failed with error:11
+Jun  4 11:05:31 laptop com.apple.backupd[44540]: Backup failed with error: 11</pre>
+And the file it could not index was not being modified and is still sitting there on the disk doing nothing.
+
+<img title="Time Machine tanks" withgrayborder="True" src="http://schwehr.org/blog/attachments/2010-06/timemachine-failing.png"/>
+-----

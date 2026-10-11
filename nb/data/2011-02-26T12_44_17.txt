@@ -1,0 +1,223 @@
+TITLE: Parsing DBT echo sounder depth nmea messages in python
+AUTHOR: Kurt
+DATE: 02.26.2011 12:44
+DESC: overkill
+-----
+BODY:
+I took a little break to warm up the brain this morning.  John Helly
+posted a message wondering what the format of the timestamp was in
+some data from SIO's R/V Melville.  It turned out to be UNIX UTC
+timestamps followed by DBT depth sounder NMEA strings.  I went a little
+overboard in answering the question and tried to produce the best possible
+python example that I could.  I used kodos to make a regular
+expression, then I added in a command line interface using the new
+argparse module that replaces optparse.  Then I used pylint and epydoc
+to audit the code.  The code can read from stdin or a text file.  I
+will write out an SQLite database and if you ask for verbose mode, it
+will print the parsed results to the screen.  If it can't decode
+lines, it sends them to stderr with a message.  It turns out that
+there is a bit of unexpected interaction between epydoc and the new
+python .format string templating system, but that was fixed by using
+{{name<url>}} instead of {name<url>} for epydoc.  I know, epydoc is
+out of favor, but I still really like it.  DBT (Depth Below
+Transducer) is documented in the GPSD <a
+href="http://gpsd.berlios.de/NMEA.txt">NMEA.txt</a>.  Like most NMEA,
+is is kind of rediculous.  It really should just have the depth in
+meters and let software change the values if the user wants the
+results presenting in feet, fathoms, chains, or whatever.
+
+I also added this nmea to my Healy NMEA parser.  I should really pull
+out the nmea module and post it to github.
+
+Here is the data John posted:
+<pre>1298419231.321 $SDDBT,17960.21,f,5474.27,M,2993.37,F*3E
+1298419243.344 $SDDBT,16168.86,f,4928.27,M,2694.81,F*32
+1298419255.374 $SDDBT,16168.65,f,4928.21,M,2694.78,F*3F
+1298419267.401 $SDDBT,16170.58,f,4928.79,M,2695.10,F*3A
+1298419279.421 $SDDBT,16178.03,f,4931.06,M,2696.34,F*39
+1298419291.440 $SDDBT,10131.89,f,3088.20,M,1688.65,F*30
+1298419303.470 $SDDBT,18892.32,f,5758.38,M,3148.72,F*32
+1298419315.491 $SDDBT,16181.24,f,4932.04,M,2696.87,F*33
+1298419327.515 $SDDBT,17455.23,f,5320.35,M,2909.21,F*36
+1298419339.538 $SDDBT,16187.08,f,4933.82,M,2697.85,F*37</pre>
+And here is the code that I wrote...
+<pre><tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<i><font color="#9A1900"># Turn off pylint messages that don't make sense in my opinion</font></i>
+<i><font color="#9A1900"># C0111: Missing docstring</font></i>
+<i><font color="#9A1900"># C0301: Line too long</font></i>
+<i><font color="#9A1900"># W0105: String statement has no effect - these are doc strings for epydoc</font></i>
+<i><font color="#9A1900"># W0142: parse_dbt_file: Used * or ** magic</font></i>
+<i><font color="#9A1900"># W0622: Redefining built-in '__doc__' - I use a doc string that can include __var__</font></i>
+<i><font color="#9A1900"># pylint: disable-msg=C0111,C0301,W0105,W0142,W0622</font></i>
+<!-- -->
+<b><font color="#000080">from</font></b> __future__ <b><font color="#000080">import</font></b> print_function <i><font color="#9A1900"># Aim towards Python 3.2</font></i>
+<!-- -->
+__author__    <font color="#990000">=</font> <font color="#FF0000">'Kurt Schwehr'</font>
+__version__   <font color="#990000">=</font> <font color="#FF0000">'0.1'</font>
+<i><font color="#9A1900">#__revision__  = __version__ # For pylint</font></i>
+__date__ <font color="#990000">=</font> <font color="#FF0000">'2011-Feb-26'</font>
+__copyright__ <font color="#990000">=</font> <font color="#FF0000">'2011'</font>
+__license__   <font color="#990000">=</font> <font color="#FF0000">'MIT'</font> <i><font color="#9A1900"># http://www.opensource.org/licenses/mit-license.php</font></i>
+__contact__   <font color="#990000">=</font> <font color="#FF0000">'kurt@ccom.unh.edu'</font>
+<!-- -->
+<i><font color="#9A1900"># Use two {{ and }} to avoid clashing with .format {var_name} variables</font></i>
+__doc__ <font color="#990000">=</font><font color="#FF0000"> '''</font>
+<font color="#FF0000">Parse NMEA sonar DBT depth reports as seen on the SIO R/V Melville in 2011</font>
+<!-- -->
+<font color="#FF0000">To check style with pylint and epydoc (along with creating the documentation):</font>
+<!-- -->
+<font color="#FF0000">  - pylint -i y dbt.py</font>
+<font color="#FF0000">  - epydoc -v --check dbt.py</font>
+<font color="#FF0000">  - ./dbt.py --doc-test -v</font>
+<font color="#FF0000">  - epydoc dbt.py</font>
+<font color="#FF0000">  - ./dpt.py --help</font>
+<!-- -->
+<font color="#FF0000">You can run the code with either stdin or a filename:</font>
+<!-- -->
+<font color="#FF0000">  - cat nmea.txt | ./dbpt.py</font>
+<font color="#FF0000">  - ./dbpt.py -i nmea.txt</font>
+<font color="#FF0000">  - sqlite3 nmea-dbt.sqlite3 .schema</font>
+<font color="#FF0000">  - sqlite3 nmea-dbt.sqlite3 \'SELECT * FROM dbt LIMIT 5;\'</font>
+<!-- -->
+<font color="#FF0000">@author: {__author__}</font>
+<font color="#FF0000">@version: {__version__}</font>
+<!-- -->
+<font color="#FF0000">@see: U{{Kodos&lt;http://kodos.sourceforge.net/&gt;}} helps build and test python regular expressions</font>
+<font color="#FF0000">@see: U{{Sqlite Manager&lt;https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/&gt;}} to view SQLite Databases as a spreadsheet</font>
+<!-- -->
+<font color="#FF0000">@requires: U{{Python&lt;http://python.org/&gt;}} &gt;= 2.6</font>
+<font color="#FF0000">@requires: U{{epydoc&lt;http://epydoc.sourceforge.net/&gt;}} &gt;= 3.0.1</font>
+<!-- -->
+<font color="#FF0000">@undocumented: __doc__ __revision__ __package__ __author__ __version__</font>
+<font color="#FF0000">@since: 2011-Feb-26</font>
+<font color="#FF0000">@status: Example code</font>
+<font color="#FF0000">@organization: U{{CCOM&lt;http://ccom.unh.edu/&gt;}}</font>
+<font color="#FF0000">'''</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font><b><font color="#000000">locals</font></b><font color="#990000">())</font> <i><font color="#9A1900">#author=__author__,version=__version__)</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> sys
+<b><font color="#000080">import</font></b> re  <i><font color="#9A1900"># Regular expressions</font></i>
+<b><font color="#000080">import</font></b> time
+<b><font color="#000080">import</font></b> datetime
+<b><font color="#000080">import</font></b> sqlite3
+<b><font color="#000080">import</font></b> argparse <i><font color="#9A1900"># Handle command line arguments.  Replaces optparse</font></i>
+<b><font color="#000080">from</font></b> operator <b><font color="#000080">import</font></b> xor <i><font color="#9A1900"># For NMEA checksum</font></i>
+<b><font color="#000080">import</font></b> doctest
+<!-- -->
+<!-- -->
+DBT_NMEA_REGEX_STR <font color="#990000">=</font> r<font color="#FF0000">'''[$](?P&lt;talker&gt;SD)(?P&lt;sentence&gt;DBT),</font>
+<font color="#FF0000">(?P&lt;depth_ft&gt;\d+\.\d+),f,</font>
+<font color="#FF0000">(?P&lt;depth_m&gt;\d+\.\d+),M,</font>
+<font color="#FF0000">(?P&lt;depth_fath&gt;\d+\.\d+),F</font>
+<font color="#FF0000">\*(?P&lt;checksum&gt;[0-9A-F][0-9A-F])'''</font>
+<i><font color="#9A1900">'Regular expression to parse sonar depth DBT NMEA strings.  Verbose mode required'</font></i>
+<!-- -->
+DBT_RE <font color="#990000">=</font> re<font color="#990000">.</font><b><font color="#000000">compile</font></b><font color="#990000">(</font>DBT_NMEA_REGEX_STR<font color="#990000">,</font> re<font color="#990000">.</font>VERBOSE<font color="#990000">)</font>
+<i><font color="#9A1900">'Compiled regex for NMEA DBT'</font></i>
+<!-- -->
+SQL_CREATE <font color="#990000">=</font><font color="#FF0000"> '''</font>
+<font color="#FF0000">CREATE TABLE IF NOT EXISTS dbt</font>
+<font color="#FF0000">(</font>
+<font color="#FF0000">        id		INTEGER PRIMARY KEY,</font>
+<font color="#FF0000">        dbt_timestamp   TIMESTAMP,</font>
+<font color="#FF0000">        depth_m         REAL        </font>
+<font color="#FF0000">);</font>
+<font color="#FF0000">'''</font>
+<i><font color="#9A1900">'Create an SQLite 3 database for DBT NMEA messages'</font></i>
+<!-- -->
+SQL_INSERT <font color="#990000">=</font> <font color="#FF0000">'INSERT INTO dbt (dbt_timestamp, depth_m) VALUES (:date, :depth_m);'</font>
+<i><font color="#9A1900">'Command to add an entry into a DBT NMEA database'</font></i>
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">nmea_checksum</font></b><font color="#990000">(</font>sentence<font color="#990000">):</font>
+<i><font color="#9A1900">    '''8-bit XOR of everything between the [!$] and the *</font></i>
+<!-- -->
+<i><font color="#9A1900">    &gt;&gt;&gt; nmea_checksum("$SDDBT,17960.21,f,5474.27,M,2993.37,F*3E")</font></i>
+<i><font color="#9A1900">    \'3E\'</font></i>
+<i><font color="#9A1900">    </font></i>
+<i><font color="#9A1900">    @type sentence: str</font></i>
+<i><font color="#9A1900">    @param sentence: A line with embedded nmea.  </font></i>
+<i><font color="#9A1900">    '''</font></i>
+    nmea <font color="#990000">=</font> <font color="#990000">[</font><b><font color="#000000">ord</font></b><font color="#990000">(</font>c<font color="#990000">)</font> <b><font color="#0000FF">for</font></b> c <b><font color="#0000FF">in</font></b> sentence<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'*'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">][</font><font color="#993399">1</font><font color="#990000">:]]</font>
+    checksum <font color="#990000">=</font> <b><font color="#000000">reduce</font></b><font color="#990000">(</font>xor<font color="#990000">,</font> nmea<font color="#990000">)</font>
+    checksum_str <font color="#990000">=</font> <b><font color="#000000">hex</font></b><font color="#990000">(</font>checksum<font color="#990000">).</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">'x'</font><font color="#990000">)[</font><font color="#993399">1</font><font color="#990000">].</font><b><font color="#000000">upper</font></b><font color="#990000">()</font>
+    <b><font color="#0000FF">if</font></b> <b><font color="#000000">len</font></b><font color="#990000">(</font>checksum_str<font color="#990000">)</font> <font color="#990000">==</font> <font color="#993399">1</font><font color="#990000">:</font>
+        checksum_str <font color="#990000">=</font> <font color="#FF0000">'0'</font> <font color="#990000">+</font> checksum_str
+    <b><font color="#0000FF">return</font></b> checksum_str
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">parse_dbt_file</font></b><font color="#990000">(</font>nmea_file<font color="#990000">,</font> sqlite_filename<font color="#990000">,</font> verbose<font color="#990000">=</font>False<font color="#990000">):</font>
+<i><font color="#9A1900">    '''Parse a NMEA file containing DBT depth entries and write and SQLite 3 database</font></i>
+<i><font color="#9A1900">    @type nmea_file: str or open file</font></i>
+<i><font color="#9A1900">    @param nmea_file: input file name of Unix UTC time stamps followed by DBT NMEA</font></i>
+<i><font color="#9A1900">    @type sqlite_filename: str</font></i>
+<i><font color="#9A1900">    @param sqlite_filename: output filename for SQLite database</font></i>
+<i><font color="#9A1900">    @type verbose: bool</font></i>
+<i><font color="#9A1900">    @param verbose: Write the parsed messages to STDOUT</font></i>
+<i><font color="#9A1900">    '''</font></i>
+<!-- -->
+    db_cx <font color="#990000">=</font> sqlite3<font color="#990000">.</font><b><font color="#000000">connect</font></b><font color="#990000">(</font>sqlite_filename<font color="#990000">)</font>
+    db_cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font>SQL_CREATE<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> <b><font color="#000000">isinstance</font></b><font color="#990000">(</font>nmea_file<font color="#990000">,</font> str<font color="#990000">):</font>
+        nmea_file <font color="#990000">=</font> <b><font color="#000000">open</font></b><font color="#990000">(</font>nmea_file<font color="#990000">)</font>
+<!-- -->
+    <b><font color="#0000FF">for</font></b> line_num<font color="#990000">,</font> line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>nmea_file<font color="#990000">):</font>
+        line <font color="#990000">=</font> line<font color="#990000">.</font><b><font color="#000000">rstrip</font></b><font color="#990000">()</font> <i><font color="#9A1900"># remove any trailing white space and the newline</font></i>
+        <b><font color="#0000FF">if</font></b> line_num <font color="#990000">%</font> <font color="#993399">2</font> <font color="#990000">==</font> <font color="#993399">5000</font><font color="#990000">:</font>
+            sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'line {line_num}\n'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(</font>line_num<font color="#990000">=</font>line_num<font color="#990000">))</font>
+            db_cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font> <i><font color="#9A1900"># Don't let the transaction get to large</font></i>
+<!-- -->
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            match <font color="#990000">=</font> DBT_RE<font color="#990000">.</font><b><font color="#000000">search</font></b><font color="#990000">(</font>line<font color="#990000">).</font><b><font color="#000000">groupdict</font></b><font color="#990000">()</font>
+            checksum <font color="#990000">=</font> <b><font color="#000000">nmea_checksum</font></b><font color="#990000">(</font>line<font color="#990000">[</font>line<font color="#990000">.</font><b><font color="#000000">find</font></b><font color="#990000">(</font><font color="#FF0000">'$'</font><font color="#990000">):])</font>
+            timestamp <font color="#990000">=</font> time<font color="#990000">.</font><b><font color="#000000">gmtime</font></b><font color="#990000">(</font><b><font color="#000000">float</font></b><font color="#990000">(</font>line<font color="#990000">.</font><b><font color="#000000">split</font></b><font color="#990000">()[</font><font color="#993399">0</font><font color="#990000">]))</font>
+        <b><font color="#0000FF">except</font></b> AttributeError<font color="#990000">:</font>
+            sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'NON_DBT_LINE: %d "%s"\n'</font> <font color="#990000">%</font> <font color="#990000">(</font>line_num<font color="#990000">,</font> line<font color="#990000">))</font>
+            <b><font color="#0000FF">continue</font></b>
+<!-- -->
+        <b><font color="#0000FF">if</font></b> checksum <font color="#990000">!=</font> match<font color="#990000">[</font><font color="#FF0000">'checksum'</font><font color="#990000">]:</font>
+            sys<font color="#990000">.</font>stderr<font color="#990000">.</font><b><font color="#000000">write</font></b><font color="#990000">(</font><font color="#FF0000">'BAD_CHECKSUM: %d "%s"\n'</font><font color="#990000">,</font> <font color="#990000">(</font>line_num<font color="#990000">,</font> line<font color="#990000">))</font>
+            <b><font color="#0000FF">continue</font></b>
+        
+        match<font color="#990000">[</font><font color="#FF0000">'date'</font><font color="#990000">]</font> <font color="#990000">=</font> datetime<font color="#990000">.</font><b><font color="#000000">datetime</font></b><font color="#990000">(</font>timestamp<font color="#990000">.</font>tm_year<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_mon<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_mday<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_hour<font color="#990000">,</font> timestamp<font color="#990000">.</font>tm_sec<font color="#990000">)</font>
+        <b><font color="#0000FF">if</font></b> verbose<font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'{depth_m}m\t{date}'</font><font color="#990000">.</font><b><font color="#000000">format</font></b><font color="#990000">(**</font>match<font color="#990000">))</font>
+            <i><font color="#9A1900">#print (sql_insert)</font></i>
+        db_cx<font color="#990000">.</font><b><font color="#000000">execute</font></b><font color="#990000">(</font>SQL_INSERT<font color="#990000">,</font> match<font color="#990000">)</font>
+<!-- -->
+    <i><font color="#9A1900"># Final commit to my sure we have flushed everything to the database</font></i>
+    db_cx<font color="#990000">.</font><b><font color="#000000">commit</font></b><font color="#990000">()</font>
+<!-- -->
+<!-- -->
+<b><font color="#0000FF">def</font></b> <b><font color="#000000">main</font></b><font color="#990000">():</font>
+<i><font color="#9A1900">    'Handle command line interface'</font></i>
+    
+    parser <font color="#990000">=</font> argparse<font color="#990000">.</font><b><font color="#000000">ArgumentParser</font></b><font color="#990000">(</font>description<font color="#990000">=</font><font color="#FF0000">'Parse nmea'</font><font color="#990000">,</font>
+                                     formatter_class<font color="#990000">=</font>argparse<font color="#990000">.</font>ArgumentDefaultsHelpFormatter<font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'-i'</font><font color="#990000">,</font> <font color="#FF0000">'--nmea-file'</font><font color="#990000">,</font> default<font color="#990000">=</font>sys<font color="#990000">.</font>stdin<font color="#990000">,</font> <i><font color="#9A1900">#'nmea-dbt.txt',</font></i>
+                       help<font color="#990000">=</font><font color="#FF0000">'Input file with Unix UTC timestamps followed by DBT lines'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'-o'</font><font color="#990000">,</font> <font color="#FF0000">'--sqlite-file'</font><font color="#990000">,</font> default<font color="#990000">=</font><font color="#FF0000">'nmea-dbt.sqlite3'</font><font color="#990000">,</font>
+                       help<font color="#990000">=</font><font color="#FF0000">'Where to write a SQLITE 3 database file for easier handling of the data'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'-v'</font><font color="#990000">,</font> <font color="#FF0000">'--verbose'</font><font color="#990000">,</font> action<font color="#990000">=</font><font color="#FF0000">'store_true'</font><font color="#990000">,</font> default<font color="#990000">=</font>False<font color="#990000">,</font> help<font color="#990000">=</font><font color="#FF0000">'print the parsed results to stdout'</font><font color="#990000">)</font>
+    parser<font color="#990000">.</font><b><font color="#000000">add_argument</font></b><font color="#990000">(</font><font color="#FF0000">'--doc-test'</font><font color="#990000">,</font> action<font color="#990000">=</font><font color="#FF0000">'store_true'</font><font color="#990000">,</font> default<font color="#990000">=</font>False<font color="#990000">,</font> help<font color="#990000">=</font><font color="#FF0000">'Run the internal checks'</font><font color="#990000">)</font>
+<!-- -->
+    args <font color="#990000">=</font> parser<font color="#990000">.</font><b><font color="#000000">parse_args</font></b><font color="#990000">()</font>
+<!-- -->
+    <b><font color="#0000FF">if</font></b> args<font color="#990000">.</font>doc_test<font color="#990000">:</font>
+        sys<font color="#990000">.</font>argv <font color="#990000">=</font> <font color="#990000">[</font>sys<font color="#990000">.</font>argv<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]]</font>
+<!-- -->
+        <b><font color="#0000FF">if</font></b> args<font color="#990000">.</font>verbose<font color="#990000">:</font>
+            sys<font color="#990000">.</font>argv<font color="#990000">.</font><b><font color="#000000">append</font></b><font color="#990000">(</font><font color="#FF0000">'-v'</font><font color="#990000">)</font>
+<!-- -->
+        numfail<font color="#990000">,</font> numtests <font color="#990000">=</font> doctest<font color="#990000">.</font><b><font color="#000000">testmod</font></b><font color="#990000">()</font>
+        <b><font color="#0000FF">if</font></b> numfail <font color="#990000">==</font> <font color="#993399">0</font><font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'ok. '</font><font color="#990000">,</font> numtests<font color="#990000">,</font> <font color="#FF0000">'tests passed.'</font><font color="#990000">)</font>
+            sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font>
+        <b><font color="#0000FF">else</font></b><font color="#990000">:</font>
+            <b><font color="#0000FF">print</font></b> <font color="#990000">(</font><font color="#FF0000">'FAILED: %d of %d tests'</font><font color="#990000">,</font> <font color="#990000">(</font>numfail<font color="#990000">,</font> numtests<font color="#990000">))</font>
+            sys<font color="#990000">.</font><b><font color="#000000">exit</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">)</font>
+<!-- -->
+    <b><font color="#000000">parse_dbt_file</font></b><font color="#990000">(</font>args<font color="#990000">.</font>nmea_file<font color="#990000">,</font> args<font color="#990000">.</font>sqlite_file<font color="#990000">,</font> args<font color="#990000">.</font>verbose<font color="#990000">)</font>
+<!-- -->
+<!-- -->
+<b><font color="#0000FF">if</font></b> __name__ <font color="#990000">==</font> <font color="#FF0000">'__main__'</font><font color="#990000">:</font>
+    <b><font color="#000000">main</font></b><font color="#990000">()</font></tt></pre>
+-----

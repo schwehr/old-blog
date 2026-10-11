@@ -1,0 +1,36 @@
+TITLE: Getting the color table entries from an index color image
+AUTHOR: Kurt
+DATE: 02.19.2008 12:56
+DESC: my first use of the gdal python interface
+-----
+BODY:
+Rob B. helped me figure this one out:
+<pre>
+% ipython
+from osgeo import gdal
+f = gdal.Open('a.gif')
+b = f.GetRasterBand(1)
+c = b.GetRasterColorTable()
+for i in range(c.GetCount()):
+    print c.GetColorEntry(i)
+</pre>
+The output looks something like this:
+<pre>
+(0, 0, 0, 255)
+(255, 255, 255, 255)
+(135, 135, 135, 255)
+(220, 242, 252, 255)
+(184, 229, 246, 255)
+(133, 160, 165, 255)
+(171, 192, 194, 255)
+(89, 93, 91, 255)
+(224, 227, 140, 255)
+(252, 252, 148, 255)
+(247, 244, 90, 255)
+(53, 51, 40, 255)
+(130, 113, 55, 255)
+(198, 143, 80, 255)
+(211, 163, 117, 255)
+(255, 255, 255, 0)
+</pre>
+-----

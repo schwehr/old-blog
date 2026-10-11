@@ -1,0 +1,37 @@
+TITLE: c/c++ double/float trick
+AUTHOR: Kurt
+DATE: 05.20.2006 07:31
+DESC: macro switching
+-----
+BODY:
+I was talking to someone yesterday who had not heard of this C/C++
+trick, so I figured that is good enough reason to document it.  I have
+no idea if I learned this from someone else or not.
+
+The problem is one where you have a floating point numbers and there
+is not a clear case for floats or doubles.  Floats are faster (at
+least on 32bit machines) and take less memory, whereas doubles take 2x
+the memory and a generally much slower.  The trick is that you want to
+be able to switch easily and try out both.  Maybe you will want to
+switch based on how fast the machine is or based on what kind of data
+you will be sending through the program.  This is pretty easy to
+accomplish with a simple macro.  You can make this much more
+complicated and allow for separate components to change
+independently.  Here is the simplest case:
+<pre>
+#define INTEGER int
+//#define INTEGER short
+#define REAL float
+//#define REAL double
+class locationUTM {
+public:
+      REAL easting;
+      REAL northing;
+      INTEGER zone;
+};
+</pre>
+Not the cleverest example, but by changing the definitions of INTEGER
+and REAL, you can quickly change all of the types that follow in that
+source file.  Now it is up to you to make it snazzier with bells and
+whistles. 
+-----

@@ -1,0 +1,39 @@
+TITLE: nagios monitoring
+AUTHOR: Kurt
+DATE: 09.05.2007 08:01
+DESC: monitoring is goodness
+-----
+BODY:
+At Val's prompting, he and I sat down and started working on getting
+<a href="http://www.nagios.org/">nagios</a> working to monitor some of
+our boxes.  We used a ubuntu 6.10 box to test out nagios 3.0b3 and the
+<a
+href="http://nagios.sourceforge.net/docs/3_0/quickstart-ubuntu.html">3_0
+quickstart</a> notes.  The process was not too bad.  BTW, the 2.9
+config process is different enough that we went for the 3 beta.  No
+point in having to relearn something right away!
+
+I think that I should be able to make a fink package for the mac
+without too much trouble now.  We had a few troubles here and there,
+but worked through them.  One was that we want to monitor a box that
+only provides ssh and it does not respond to pings.  The default
+nagios method to tell if a host is up is to ping it.  I had to create
+a new command to make sure the host is alive.
+
+In commands.cfg:
+<pre>define command {
+    command_name check-host-alive-by-ssh
+    command_line $USER1$/check_ssh -H $HOSTADDRESS
+}</pre>
+Then in the host's config file:
+<pre>define host{
+        use             linux-server            ; Inherit default values from a template
+        host_name       xxx                     ; The name we're giving to this host
+        alias           xxx                     ; A longer name associated with the host
+        address         xxx.xxx.xxx.xxx         ; IP address of the host
+        check_command check-host-alive-by-ssh
+        }</pre>
+Replace xxx with your host info.
+
+<img src="http://schwehr.org/blog/attachments/2007-09/nagios.png">
+-----

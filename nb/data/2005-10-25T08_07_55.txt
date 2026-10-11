@@ -1,0 +1,77 @@
+TITLE: Layback improvements
+AUTHOR: Kurt
+DATE: 10.25.2005 08:07
+DESC: getting velocity-shot info
+-----
+BODY:
+Jenna is working up some more layback info for the chirp.  The hope is
+to have a lookup table of ship speed to a range of layback angles.
+Here is a little bit on the commands I am using to generate the
+velocity input table for the work.  Hopefully, the results of this
+will end up in <a
+href="http://schwehr.org/software/segy-py/docs/layback.html">layback.py</a> 
+
+The first task is to remove any bad xstar segy files.  Neal's chirp
+always writes an ASCII header at the front that starts with a company
+entry like this:
+<pre>
+C1  COMPANY:
+</pre>
+A quick grep will list those files without the company entry and move
+them out of the way.  They will confuse segysql.py and cause troubles.
+<pre>
+mkdir Bad
+for file in `grep --files-without-match 'C1  COMPANY' *.xstar`: do
+  mv $file Bad
+done
+</pre>
+This gives me all the munch files:
+<pre>
+ls Bad/
+
+line183.sgy     line350.sgy     line396.sgy     line400.sgy     line406.sgy
+line336.sgy     line351.sgy     line397.sgy     line403.sgy     line407.sgy
+line347.sgy     line352.sgy     line398.sgy     line404.sgy     line408.sgy
+line349.sgy     line353.sgy     line399.sgy     line405.sgy     line409.sgy
+</pre>
+The most likely cause of the errors are bad tape reads or attempting
+to read past the end of data on a tape.  But don't quote me on that
+since I am not an expert with tape drives!
+
+Next, we need a short script to generate databases from the xstar
+files.  Since sqlite 2 gets really slow with monster databases, I am
+going to break them into 5 groups of 100 files.  Here is make-db.bash:
+<pre>
+#!/bin/bash
+
+ segysql.py --noisy -d xstar -f lines001-099.db line[0-9].sgy line[0-9][0-9].sgy
+ segysql.py --noisy -d xstar -f lines100-199.db line1[0-9][0-9].sgy
+ segysql.py --noisy -d xstar -f lines200-299.db line2[0-9][0-9].sgy 
+ segysql.py --noisy -d xstar -f lines300-399.db line3[0-9][0-9].sgy 
+ segysql.py --noisy -d xstar -f lines400-499.db line4[0-9][0-9].sgy 
+</pre>
+
+Once the database is created, here is a sample line used to make the
+lookup table.
+<pre>
+sqlite lines001-099.db 'select shotpoint,speed/10.0,x/3600.0,y/3600.0 \
+                        from segytrace' \
+                        | tr '|' ' ' > 001-099.shot-speed
+</pre>
+Which generates stuff that looks like this with speed in knots.
+<pre>
+bzcat 001-099.shot-speed.bz2 | head
+4729 3.6 -74.6377777777778 36.8233333333333
+4729 3.6 -74.6380555555556 36.8233333333333
+4730 3.6 -74.6380555555556 36.8233333333333
+4730 3.6 -74.6380555555556 36.8233333333333
+4731 3.6 -74.6380555555556 36.8233333333333
+4731 3.6 -74.6380555555556 36.8233333333333
+4732 3.6 -74.6380555555556 36.8233333333333
+4732 3.6 -74.6380555555556 36.8233333333333
+4733 3.6 -74.6380555555556 36.8233333333333
+4733 3.6 -74.6380555555556 36.8233333333333
+</pre>
+Which looks like it is off the eastern seaboard of the US like it is
+supposed to be. 
+-----

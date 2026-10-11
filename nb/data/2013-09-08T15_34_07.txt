@@ -1,0 +1,88 @@
+TITLE: The return of puppet
+AUTHOR: Kurt
+DATE: 09.08.2013 15:34
+DESC: more automation
+-----
+BODY:
+I have a long term goal of automating more of my machine setup notes.
+I do a lot to new machines and I rarely get to where I think I should be.
+For example, what makes the best ntp setup?  And do I have emacs24 in my 
+new Ubuntu 12.04 LTS virtual machine?
+
+I missed out on going to the <a
+href="http://puppetlabs.com/resources/puppetconf-2013">2013 PuppetConf
+in San Francisco</a>, but the conference just posted videos of the
+talks.  I just watched <a
+href="http://puppetlabs.com/presentations/getting-started-puppet">Getting
+Started with Puppet</a>.  The talk doesn't really match what I would
+like to see in a getting started, but it's still great.
+
+<iframe width="640" height="480" src="//www.youtube.com/embed/TdAmAj3eaFI" frameborder="0" allowfullscreen></iframe>
+
+I fired up a brand new and used some of what is in the above talk:
+<pre><tt>sudo add-apt-repository ppa<font color="#990000">:</font>cassou/emacs
+sudo apt-get install emacs24 emacs24-el emacs24-common-non-dfsg
+<!-- -->
+sudo apt-get install puppet
+sudo apt-get install puppet-el
+<!-- -->
+puppet resource user schwehr
+user { <font color="#FF0000">'schwehr'</font><font color="#990000">:</font>
+  ensure  <font color="#990000">=&gt;</font> <font color="#FF0000">'present'</font><font color="#990000">,</font>
+  comment <font color="#990000">=&gt;</font> <font color="#FF0000">'Kurt Schwehr,,,'</font><font color="#990000">,</font>
+  gid     <font color="#990000">=&gt;</font> <font color="#FF0000">'1000'</font><font color="#990000">,</font>
+  groups  <font color="#990000">=&gt;</font> <font color="#990000">[</font><font color="#FF0000">'adm'</font><font color="#990000">,</font> <font color="#FF0000">'cdrom'</font><font color="#990000">,</font> <font color="#FF0000">'sudo'</font><font color="#990000">,</font> <font color="#FF0000">'dip'</font><font color="#990000">,</font> <font color="#FF0000">'plugdev'</font><font color="#990000">,</font> <font color="#FF0000">'lpadmin'</font><font color="#990000">,</font> <font color="#FF0000">'sambashare'</font><font color="#990000">],</font>
+  home    <font color="#990000">=&gt;</font> <font color="#FF0000">'/home/schwehr'</font><font color="#990000">,</font>
+  shell   <font color="#990000">=&gt;</font> <font color="#FF0000">'/bin/bash'</font><font color="#990000">,</font>
+  uid     <font color="#990000">=&gt;</font> <font color="#FF0000">'1000'</font><font color="#990000">,</font>
+}
+<!-- -->
+puppet resource package emacs24
+package { <font color="#FF0000">'emacs24'</font><font color="#990000">:</font>
+  ensure <font color="#990000">=&gt;</font> <font color="#FF0000">'24.3+1-1.1~ppa1~precise1'</font><font color="#990000">,</font>
+}
+<!-- -->
+puppet describe cron
+puppet describe user
+puppet describe group
+<!-- -->
+sudo pupet apply -e <font color="#FF0000">'package { "figlet": ensure =&gt; installed }'</font> --noop --debug
+</tt></pre>
+The (partial) results from the "noop" command at the end of the above:
+<pre><tt>debug<font color="#990000">:</font> Puppet<font color="#990000">::</font>Type<font color="#990000">::</font>Package<font color="#990000">::</font>ProviderFink<font color="#990000">:</font> file /sw/bin/fink does not exist
+debug<font color="#990000">:</font> Creating default schedules
+debug<font color="#990000">:</font> /File<font color="#990000">[</font>/var/lib/puppet/ssl/public_keys<font color="#990000">]:</font> Autorequiring File<font color="#990000">[</font>/var/lib/puppet/ssl<font color="#990000">]</font>
+debug<font color="#990000">:</font> Finishing transaction <font color="#993399">69921012759640</font>
+debug<font color="#990000">:</font> Loaded state <b><font color="#0000FF">in</font></b> <font color="#993399">0.00</font> seconds
+debug<font color="#990000">:</font> Executing <font color="#FF0000">'/etc/puppet/etckeeper-commit-pre'</font>
+debug<font color="#990000">:</font> Loaded state <b><font color="#0000FF">in</font></b> <font color="#993399">0.00</font> seconds
+info<font color="#990000">:</font> Applying configuration version <font color="#FF0000">'1378668951'</font>
+debug<font color="#990000">:</font> Prefetching apt resources <b><font color="#0000FF">for</font></b> package
+debug<font color="#990000">:</font> Executing <font color="#FF0000">'/usr/bin/dpkg-query -W --showformat '</font><font color="#009900">${Status}</font> <font color="#009900">${Package}</font> <font color="#009900">${Version}</font><font color="#990000">\</font>n<font color="#FF0000">''</font>
+debug<font color="#990000">:</font> Puppet<font color="#990000">::</font>Type<font color="#990000">::</font>Package<font color="#990000">::</font>ProviderApt<font color="#990000">:</font> Executing <font color="#FF0000">'/usr/bin/dpkg-query -W --showformat '</font><font color="#009900">${Status}</font> <font color="#009900">${Package}</font> <font color="#009900">${Version}</font><font color="#990000">\</font>n<font color="#FF0000">''</font>
+debug<font color="#990000">:</font> Puppet<font color="#990000">::</font>Type<font color="#990000">::</font>Package<font color="#990000">::</font>ProviderApt<font color="#990000">:</font> Executing <font color="#FF0000">'/usr/bin/dpkg-query -W --showformat ${Status} ${Package} ${Version}</font><font color="#CC33CC">\n</font><font color="#FF0000"> figlet'</font>
+notice<font color="#990000">:</font> /Stage<font color="#990000">[</font>main<font color="#990000">]</font>//Package<font color="#990000">[</font>figlet<font color="#990000">]</font>/ensure<font color="#990000">:</font> current_value purged<font color="#990000">,</font> should be present <font color="#990000">(</font>noop<font color="#990000">)</font>
+debug<font color="#990000">:</font> /Stage<font color="#990000">[</font>main<font color="#990000">]</font>//Package<font color="#990000">[</font>figlet<font color="#990000">]:</font> The container Class<font color="#990000">[</font>Main<font color="#990000">]</font> will propagate my refresh event
+debug<font color="#990000">:</font> /Schedule<font color="#990000">[</font>weekly<font color="#990000">]:</font> Skipping device resources because running on a host
+debug<font color="#990000">:</font> /Schedule<font color="#990000">[</font>puppet<font color="#990000">]:</font> Skipping device resources because running on a host
+notice<font color="#990000">:</font> Class<font color="#990000">[</font>Main<font color="#990000">]:</font> Would have triggered <font color="#FF0000">'refresh'</font> from <font color="#993399">1</font> events
+debug<font color="#990000">:</font> Class<font color="#990000">[</font>Main<font color="#990000">]:</font> The container Stage<font color="#990000">[</font>main<font color="#990000">]</font> will propagate my refresh event
+notice<font color="#990000">:</font> Stage<font color="#990000">[</font>main<font color="#990000">]:</font> Would have triggered <font color="#FF0000">'refresh'</font> from <font color="#993399">1</font> events
+debug<font color="#990000">:</font> Finishing transaction <font color="#993399">69921012931820</font>
+debug<font color="#990000">:</font> Storing state
+debug<font color="#990000">:</font> Stored state <b><font color="#0000FF">in</font></b> <font color="#993399">0.00</font> seconds
+notice<font color="#990000">:</font> Finished catalog run <b><font color="#0000FF">in</font></b> <font color="#993399">0.21</font> seconds
+debug<font color="#990000">:</font> Executing <font color="#FF0000">'/etc/puppet/etckeeper-commit-post'</font>
+debug<font color="#990000">:</font> Finishing transaction <font color="#993399">69921011598240</font>
+debug<font color="#990000">:</font> Received report to process from ubuntu<font color="#990000">.</font>localdomain
+debug<font color="#990000">:</font> Processing report from ubuntu<font color="#990000">.</font>localdomain with processor Puppet<font color="#990000">::</font>Reports<font color="#990000">::</font>Store</tt></pre>
+The most exciting thing?  I see fink in there!
+
+Next up on my "to watch" list: <a href="http://puppetlabs.com/presentations/puppet-now-google">Puppet, now with Google!</a> by Marc Cohen & Eric Johnson from Google.
+
+<iframe width="640" height="480" src="//www.youtube.com/embed/PpoRVQOqzzk" frameborder="0" allowfullscreen></iframe>
+
+Sadly, I don't see Mac OSX listed in the supported platforms for the ntp module:
+
+<a href="http://forge.puppetlabs.com/puppetlabs/ntp">Puppet Labs' ntp on puppet forge</a>
+-----

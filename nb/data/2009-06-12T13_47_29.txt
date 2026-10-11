@@ -1,0 +1,33 @@
+TITLE: Torm Mary grounding in Portsmouth NH
+AUTHOR: Kurt
+DATE: 06.12.2009 13:47
+DESC: what happened?
+-----
+BODY:
+AIS is pretty handy but it can't tell you everything.  A case in
+point: Last night, the Torm Mary ground in Portsmouth, NH.  Thankfully,
+no one was hurt and there wasn't anything spilled.
+
+<a href="http://www.fosters.com/apps/pbcs.dll/article?AID=/20090612/GJNEWS_01/706129901/">Oil tanker moored after striking bottom in the Piscataqua River</a>
+<pre>...
+The tanker struck bottom around 10:30 p.m. Coast Guard station
+Portsmouth Harbor dispatched a 25-foot response boat crew at 11:19
+p.m. after receiving a report that Torm Mary's stern had struck the
+bottom of the riverbed.
+...</pre>
+It helps to have the full vessel on the display, but looking at the
+raw position information, it really is hard to see what is going on.
+
+<img title="Torm Mary" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/torm-mary-ge.png"/>
+
+This plot is dominated by the GPS drift around the dock that looks to
+be about +/- 25m.  Look at the data, it appears that the GPS is mostly
+in low position accuracy mode... "0: low (greater than 10m)":
+<pre>sqlite&gt; select count(positionaccuracy) from position where positionaccuracy=0;
+47444
+sqlite&gt; select count(positionaccuracy) from position where positionaccuracy=1;
+12518</pre>
+Looking at the individual statistics doesn't make the event jump out:
+
+<img title="Torm Mary AIS stats" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/torm-mary-vessel-stats.png"/>
+-----

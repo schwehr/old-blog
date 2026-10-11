@@ -1,0 +1,84 @@
+TITLE: scanning electron microscope
+AUTHOR: Kurt
+DATE: 10.22.2005 11:57
+DESC: taking images of the mud
+-----
+BODY:
+
+<img src="http://schwehr.org/blog/attachments/2005-10/CRW_9738-sml.jpg">
+
+Thanks to Evelyn York for helping me through the whole process.
+
+Yesterday was my first real time using the <a
+href="http://sio-af.ucsd.edu/">SIO Analytical Factilies</a> <a
+href="http://sio-af.ucsd.edu/esem.html">SEM</a>.  I have sat in before
+while Kevin and Rodrigo ran some of their samples through, but that is
+not the same as going through it myself.  I ran three samples through
+yesterday of mud that has been dried.  The first task was to slice my
+cubes into slabs that were as flat as possible and then mount them on
+pedestals that have a special double stick tape.<br>
+<img src="http://schwehr.org/blog/attachments/2005-10/sem-image038.jpg">
+
+We used the low vacuum mode on the FEI Quanta 600 E-SEM.  Images were
+taken in both BSE and SE mode.  Here is an image from the BSE mode of
+pyrite framboids (typical in somewhat reducing sediments).
+
+<img src="http://schwehr.org/blog/attachments/2005-10/69_BSE_10kx_4-small.png">
+
+The instrument also has an Energy Dispersive Xray spectroscopy mode
+(EDX) that is able to composition work.  This mode gives an estimate
+of abundance in a 5 micron spot.  You can also get quick look
+comparisons between two spots like this:
+
+<img src="http://schwehr.org/blog/attachments/2005-10/69_5um_edx_comparison.jpg">
+
+I did not have time to do a compositional map, but that looks like a
+very useful capability.
+
+I was hoping that the tif images from the SEM would have some of the
+instruments status in the tag headers.  Things like knowing the stage
+position would be really great (especially for automated
+visualizations), but no such luck.  Here is what I get from tiffdump.
+tiffdump is a part of the libtiff package.
+<pre>
+tiffdump 54_BSE_100x_5.tif 
+54_BSE_100x_5.tif:
+Magic: 0x4949 <little-endian> Version: 0x2a
+Directory 0: offset 974609 (0xedf11) next 0 (0)
+SubFileType (254) LONG (4) 1<0>
+ImageWidth (256) SHORT (3) 1<1024>
+ImageLength (257) SHORT (3) 1<948>
+BitsPerSample (258) SHORT (3) 1<8>
+Compression (259) SHORT (3) 1<1>
+Photometric (262) SHORT (3) 1<1>
+Make (271) ASCII (2) 22<SIS, D-48153 Muenster\0>
+Artist (315) ASCII (2) 1<\036>
+StripOffsets (273) LONG (4) 1<32>
+StripByteCounts (279) LONG (4) 1<970752>
+SamplesPerPixel (277) SHORT (3) 1<1>
+XResolution (282) RATIONAL (5) 1<200>
+YResolution (283) RATIONAL (5) 1<200>
+ResolutionUnit (296) SHORT (3) 1<1>
+Software (305) ASCII (2) 13<analySIS 3.2\0>
+33560 (0x8318) LONG (4) 1<974493>
+</pre>
+And here is a little bit nicer display of what is in the file:
+<pre>
+tiffinfo 54_BSE_100x_5.tif 
+TIFFReadDirectory: Warning, 54_BSE_100x_5.tif: invalid TIFF directory; tags are not sorted in ascending order.
+TIFFReadDirectory: Warning, 54_BSE_100x_5.tif: unknown field with tag 33560 (0x8318) encountered.
+TIFF Directory at offset 0xedf11
+  Subfile Type: (0 = 0x0)
+  Image Width: 1024 Image Length: 948
+  Resolution: 200, 200 (unitless)
+  Bits/Sample: 8
+  Compression Scheme: None
+  Photometric Interpretation: min-is-black
+  Artist: "\036"
+  Make: "SIS, D-48153 Muenster"
+  Samples/Pixel: 1
+  Planar Configuration: single image plane
+  Software: analySIS 3.2
+  Tag 33560: 974493
+</pre>
+-----

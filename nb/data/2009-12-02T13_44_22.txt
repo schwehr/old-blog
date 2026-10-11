@@ -1,0 +1,56 @@
+TITLE: gdal has BAG support
+AUTHOR: Kurt
+DATE: 12.02.2009 13:44
+DESC: it's a start
+-----
+BODY:
+I just gave gdal (svn as of today) a spin with its new Bathymetry
+Attributed Grid (BAG) support.  I will be following up with more, but this is
+a good beginning.  Note that gdal 1.6.3 does not include BAG support.  Thanks
+to Howard Butler (hobu) for some quick fixups that got me up and running.
+<pre><b>gdalinfo H11657_1of5_1m_Final_Depth.bag</b>
+Driver: BAG/Bathymetry Attributed Grid
+Files: H11657_1of5_1m_Final_Depth.bag
+Size is 1822, 5357
+Coordinate System is:
+PROJCS["UTM Zone 18, Northern Hemisphere",
+    GEOGCS["NAD83",
+        DATUM["North_American_Datum_1983",
+            SPHEROID["GRS 1980",6378137,298.257222101,
+                AUTHORITY["EPSG","7019"]],
+            TOWGS84[0,0,0,0,0,0,0],
+            AUTHORITY["EPSG","6269"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9108"]],
+        AUTHORITY["EPSG","4269"]],
+    PROJECTION["Transverse_Mercator"],
+    PARAMETER["latitude_of_origin",0],
+    PARAMETER["central_meridian",-75],
+    PARAMETER["scale_factor",0.9996],
+    PARAMETER["false_easting",500000],
+    PARAMETER["false_northing",0],
+    UNIT["Meter",1]]
+Origin = (407099.580000000016298,4164366.200000000186265)
+Pixel Size = (1.000000000000000,-1.000000000000000)
+Metadata:
+  BagVersion=1.0.0
+Corner Coordinates:
+Upper Left  (  407099.580, 4164366.200) 
+Lower Left  (  407099.580, 4159009.200) 
+Upper Right (  408921.580, 4164366.200) 
+Lower Right (  408921.580, 4159009.200) 
+Center      (  408010.580, 4161687.700) 
+Band 1 Block=1822x1 Type=Float32, ColorInterp=Undefined
+  Description = elevation
+  Min=-18.725 Max=-7.728 
+  NoData Value=1000000
+Band 2 Block=1822x1 Type=Float32, ColorInterp=Undefined
+  Description = uncertainty
+  Min=0.256 Max=0.557 
+  NoData Value=0</pre>
+Note that I have just updated gdal in fink to 1.6.3.  This does NOT
+include the bag support.  For some reason, I had to add "--without-perl"
+to get gdal to build in fink for 10.6.
+-----

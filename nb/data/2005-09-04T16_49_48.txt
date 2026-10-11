@@ -1,0 +1,212 @@
+TITLE: gdb - the gnu debugger
+AUTHOR: Kurt
+DATE: 09.04.2005 16:49
+DESC: fortran debugging
+-----
+BODY:
+You know that when I bust out the debugger, I am not having the most
+fun.  Today I am trying to figure out an error message from sioseis.
+I have never tried gdb on g77 code.  Now I get to find out.  I have
+not really had to dig into anything with the debugger in a major way
+since the last century.  Back then, I was pretty good about doing
+things like building gdb for VxWorks and then attaching the debugger
+to a remote VxWorks target that was having a bad day.
+
+I noticed a nice command that I have never seen before: <b>finish</b>.
+It continues to the end of the current function.  Nice.
+
+At the moment, I have things compiled like this:
+<pre>
+gcc -g -O0 -Wall -Wimplicit -pedantic -W -Wstrict-prototypes \
+    -Wredundant-decls -Dosx=1   -c -o shifts.o shifts.c
+f77 -g -O2 -Wall   -c -o contro.o contro.f
+</pre>
+The -O2 may get me in trouble with the fortran.  Here goes:
+<pre>
+gdb sioseis 
+run < yr1999day217-2244z.xstar
+</pre>
+Doh!  Tons of errors and binary screwing up the xterm.  Wow.
+<pre>
+bt
+#0  0x000eccb0 in s_copy ()
+#1  0x0000a514 in getoke_ (cbufo=0xbffff4d0, nchars=0xbffff564, __g77_length_cbufo=1) at getoke.f:94
+#2  0x0000610c in MAIN__ () at contro.f:352
+#3  0x000e9dec in main ()
+#4  0x0000236c in _start (argc=-1073744540, argv=0x3c6c0a0, envp=0x3c6bfcf) at /SourceCache/Csu/Csu-47/crt.c:267
+#5  0x8fe1a278 in __dyld__dyld_start ()
+
+break main
+Breakpoint 1 at 0xe9dd0
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /Users/schwehr/projects/xcore/src/sioseis/sioseis < yr1999day217-2244z.xstar
+
+Breakpoint 1, 0x000e9dd0 in main ()
+(gdb) list
+1             SUBROUTINE GETOKE(CBUFO,NCHARS)
+2       c  ****   Watch out - getoke writes a null after the last char,
+3       c         so cbufo must be bigger than the number of characters
+4       C
+5       C   GETOKE RETURNS CONSECUTIVE TOKENS (ITEMS BETWEEN A DELIMITER), ONE PER CALL,
+
+</pre>
+Okay, so I can stop at main but I did not expect to see that listing.
+Now I feel pretty lame. I don't pass in the segy file through stdout.
+I am supposed to pass the scripts.  No wonder it freaked out.
+
+Maybe it would be good to show what the trouble I trying to decipher.
+<pre>
+./xstar2segy.bash yr1999day217-2244z.xstar 
+converting yr1999day217-2244z.xstar to yr1999day217-2244z.sgy
+  SIOSEIS ver 2005.4 (20 May. 2005)(C) Regents of U.C. kds                       
+  
+ procs diskin xstar header diskoa end 
+ !procs diskin  header diskoa end 
+  
+ diskin 
+     format edgetech 
+     ipath yr1999day217-2244z.xstar end 
+ end 
+  
+ xstar 
+    type 2 dummies 2 end 
+ end 
+  
+ header 
+      fno 0 lno 999999 ftr 0 ltr 999999 
+      l3 = l1 l6 = l3 end 
+ end 
+  
+ diskoa 
+   opath yr1999day217-2244z.sgy end 
+ end 
+  
+ end 
+ ****    0 ERRORS IN THIS JOB   ****
+  Dropping trace 2 due to different sample intervals.
+  impossible - icount =0 and its the same ping no
+Done.
+</pre>
+I have prepaired a stripped down script for sioseis to see if I can
+trace what is happening under the hood.
+<pre>
+(gdb) run < zscript.sioseis   
+(bt) bt
+No stack.
+</pre>
+It looks like a I need a break point.  This will be a lot easier from
+ the GUD (Grand Unified Debugger) inside of emacs: M-x gdb
+<pre>
+nm xstarex.o | grep xstarex
+00000000 t ___g77_masterfun_xstarex
+00002844 T _xstarex_
+
+(gdb) break xstarex_
+</pre>
+g77 sticks an extra _ on the end of subroutine names, henc extra _ on
+xstarex_.  Here is an example of a straight C program that does on
+have the trailing _:
+<pre>
+nm core_logger.o | grep T
+
+00001254 T _esc_help
+00000144 T _main
+00000004 C _origTerm
+00000c48 T _process_io
+00000044 T _stablk
+</pre>
+Now that I've set the break point at _xstarex_, it is time to run it
+and see how it works.
+<pre>
+(gdb) run
+(gdb) bt
+#0  0x000b9600 in xstarex_ (buf=0x2877f50, lbuf=0x2877f50, ibuf=0x2877f50, nready=0x1398d0) at xstarex.f:1
+#1  0x00007b68 in MAIN__ () at contro.f:1542
+#2  0x000e9dec in main ()
+#3  0x0000236c in _start (argc=1072604, argv=0x4, envp=0x158) at /SourceCache/Csu/Csu-47/crt.c:267
+#4  0x8fe1a278 in __dyld__dyld_start ()
+
+(gdb) up
+(gdb) list
+1537	          CALL getxstartr(buf(index1),buf(index1),buf(index1),nrdyxstar)
+1538	          nxstar = nxstar -1
+1539	          iout(i) = iout(i) -1
+1540	          GOTO 1010
+1541	      ELSE
+1542	          CALL xstarex( buf(index1), buf(index1), buf(index1),
+1543	     &         nrdyxstar)
+1544	          iout(i) = nrdyxstar + 1
+1545	          nxstar = nrdyxstar
+1546	          IF( nrdyxstar .EQ. 0 ) GOTO 1015
+</pre>
+I think I need to start over with -O0 since I am getting strange
+behavior with next steps. "FFLAGS := -g3 -O0 -Wall".  In inap.f, what
+is an AP? I guess it is a buffer of memory - "COMMON
+/APMEM/AP(500000)".  Is this a fortran or tape specific concept? Here
+is a little quote: 
+<pre>
+  If there isn't really an ap on the system and we are going to use an
+  ap simulator, which uses an internal array specified in contro, make
+  it very large!
+</pre>
+I think the AP is an "array processor."  Is this something for
+parallelizing code?
+
+After <b>s</b>tepping into inap, I did a <b>finish</b> to get back to
+right after the call to inap.  Then to see what the local stack looks
+like do this:
+<pre>
+(gdb) info locals
+deglat = 0
+deglong = 0
+dtemp = 0
+dlong = 0
+dlat = 0
+deltad = 0
+dbuf = (0)
+mlat = 0
+mlong = 0
+distance = 99999
+deglatlast = 0
+deglonglast = 0
+dbub = (0, 0, 0)
+depth_lat__ = 0
+depth_long__ = 0
+boatlat = 0
+boatlong = 0
+deltalat = 0
+deltalong = 0
+itunit = Cannot access memory at address 0x48
+</pre>
+Now, here is where my lack of knowledge about the debugger gets me in
+trouble.
+<pre>
+      CALL inap( buf(numhdr+1), numdat )
+c****
+c****  Treat Triton totally separately from Edgetech
+c****
+      write (*,*) 'type: ',type
+      IF( type .EQ. 3 ) THEN
+
+
+(gdb) n
+ type:  2
+(gdb) print *type
+Cannot access memory at address 0x34
+(gdb) print *type
+Cannot access memory at address 0x34
+</pre>
+Why can I add a write statement, but can't get at the type variable
+from within gdb?  Type is a part of a common block xstar and defined
+as an INTEGER.  I think the problem may be do to a two year old build
+of gdb provided by Apple with OSX 10.3.9:
+<pre>
+gdb --version
+GNU gdb 5.3-20030128 (Apple version gdb-309) (Thu Dec  4 15:41:30 GMT 2003)
+</pre>
+The current release on <a
+ href="http://www.gnu.org/software/gdb/download/">http://www.gnu.org/software/gdb/download/</a>
+ is 6.3.
+-----

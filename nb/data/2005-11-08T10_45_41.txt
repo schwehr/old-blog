@@ -1,0 +1,42 @@
+TITLE: python regex
+AUTHOR: Kurt
+DATE: 11.08.2005 10:45
+DESC: re trouble
+-----
+BODY:
+I need to do a little python regular expression stuff to repeatedly
+crank through some documents to make sure that the figure reference
+and figures matchup.  I was getting very frustrated that my matches
+were constantly empty.  The trick is NOT to use the match(lineStr)
+method.  That always to tries to find the match at the beginning of a
+line.  Grrr.  The correct method to use is search(lineStr).  I am sure
+that match() is faster, but ouch.  I would be so unlucky as to find a
+match() example first.
+
+I am checking out some GUI regex tools since they make life easier
+when building re's.  The first one I tried is kiki which comes as a
+part of SPE (Stanley's Python Editor).  SPE is pretty rough around the
+edges, so I don't use that but kiki can be used by itself.  Problem is
+that the fink package does not directly allow that to be done.  i
+emailed the maintainer, but until then, here is how to use it
+directly.
+<pre>
+sudo -s
+cat <<EOF > /sw/bin/kiki.py2.4
+#!/bin/bash
+
+/sw/bin/python2.4 -OO /sw/lib/python2.4/site-packages/_spe/plugins/kiki/kiki.py
+EOF
+chmod +x /sw/bin/kiki.py2.4
+</pre>
+That is ugly, but it does start kiki.  wxGtk will complain about
+poll() being misused and kiki will eat way too much CPU/battery has it
+pummels the machine, but it does work.  How do I make the fonts larger
+so I can read the text?
+
+The next one is <a
+href="http://kodos.sourceforge.net/about.html">kodos</a> which is
+based on PyQT.  I think this is the one that Gareth showed me.  It is
+much slicker than kiki, but it will need some attention before it can
+go in fink (it has some path problems).
+-----

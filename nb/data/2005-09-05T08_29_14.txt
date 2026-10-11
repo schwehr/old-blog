@@ -1,0 +1,118 @@
+TITLE: gdb conclusion
+AUTHOR: Kurt
+DATE: 09.05.2005 08:29
+DESC: bummer
+-----
+BODY:
+I spent some time tracking down what I could about the state of GDB
+with Mac OSX 10.3.9 and 10.4.x.  I have now officially given up trying
+to get a newer gdb in 10.3.9, but I want to document what I discovered
+before I move on.
+
+The executive summary is that Apple has not merged their changes to
+GDB back into the mainline GDB distribution.  With all the library
+funkiness (e.g. 2 level namespaces), I am sure it was a fair amount of
+work to get gdb going on Mac OSX.  Integrating Mac OSX support into
+the mainline would leverage the work of many more people who use gdb.
+People like me who do not directly contribute code, could help with
+testing and minor patches.
+
+I tried building the stock gdb 6.3 with --target=powerpc-apple-macosx
+and it built.  But I got "not in executable format: File format not
+recognized".
+
+I then asked around on the fink IRC channel and got pointed to Apple's
+<a href="http://opendarwin.org">OpenDarwin</a> site.  A little extra
+help from the list discovered the name Apple gives to their fork of
+gdb.
+<ol><li><a href="http://developer.apple.com/darwin/">Darwin</a>
+<li><a
+href="http://www.opensource.apple.com/darwinsource/">DarwinSource</a>
+<li><a
+href="http://www.opensource.apple.com/darwinsource/10.4.2/">10.4.2</a>
+<li><a
+href="http://www.opensource.apple.com/darwinsource/tarballs/other/gdb-384.tar.gz">gdb-384.tar.gz</a>
+</ol>
+<pre>
+2005-01-19  Jason Molenda  (jmolenda@apple.com)
+
+	* Makefile (GDB_VERSION): Update to reflect the actual date of the
+	last FSF merge.
+</pre>
+Maybe there will be more in the mainline cvs of gdb?
+
+I then opened and started building gdb-384.  I did a <b>./configure
+--prefix=${HOME}/darwin; make install</b> for each of these
+directories in this order:
+<ol>
+<li> mmalloc
+<li> readline
+<li> intl
+<li> libiberty
+<li> bfd
+<li> opcodes
+<li> binutils
+<li> gdb
+</ol>
+
+It worked up until the build of gdb.  There are some hardwired
+references to 64 bit data types that are not in 10.3.9.  It would have
+been nice to have 64 bit / 32 bit truely selectable.  I am not up for
+digging into the macosx directory and crunching internals to gdb right
+now.
+
+From the current CVS world:
+
+<a href="http://www.gnu.org/software/gdb/current/">http://www.gnu.org/software/gdb/current/</a>
+
+wget ftp://sources.redhat.com/pub/gdb/snapshots/current/gdb-6.3.50.20050905.tar.bz2
+
+Now I go through the whole build process and when I get to the gdb
+section, I get
+<pre>
+./configure --prefix=${HOME}/darwincvs 
+
+...
+
+long double support in compiler... yes
+checking for long double support in printf... yes
+checking for long double support in scanf... yes
+checking whether <sys/syscall.h> has __NR_tkill... no
+checking compiler warning flags...  -Wimplicit -Wreturn-type -Wcomment -Wtrigraphs -Wformat -Wparentheses -Wpointer-arith -Wformat-nonliteral -Wunused-label -Wunused-function -Wuninitialized
+checking for cygwin... no
+checking for X... libraries /usr/X11R6/lib, headers /usr/X11R6/include
+configure: error: "*** Gdb does not support native target powerpc-apple-darwin7.9.0"
+</pre>
+But, <b>./configure --prefix=${HOME}/darwincvs
+--target=powerpc-apple-macosx</b> has no such complaints.
+
+And again, I get the same negative results...
+<pre>
+powerpc-apple-macosx-gdb sioseis
+GNU gdb 6.3.50.20050905
+Copyright 2004 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "--host= --target=powerpc-apple-macosx"..."/Users/schwehr/projects/xcore/src/sioseis/sioseis": not in executable format: File format not recognized
+</pre>
+Tried the smallest C program possible and got the same results.
+
+This is even worse than with SGU's o32, n32, n64 fiasco.
+
+An I even managed to wedge the Finder at the same time with an FTP
+copy from the redhat servers.  Doh!
+
+
+That's it.  Time to go walk down to the local bagel store... The Works.
+
+<hr>
+
+<a href="http://cheeseshop.python.org/pypi/pyproj/1.0">pyproj</a>!!!
+Just discovered <a
+href="http://hobu.biz/index_html/pyproj/software/pyprojection">pyprojection</a>
+which looks to have been around a bit longer.
+
+FINK-TODO: Python GIS: <a href="http://thuban.intevation.org/">Thuban</a> gis viewer.
+-----

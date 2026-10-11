@@ -1,0 +1,48 @@
+TITLE: Python CSV module
+AUTHOR: Kurt
+DATE: 06.15.2009 10:29
+DESC: pretty easy
+-----
+BODY:
+I just tried the Python CSV module for the first time today.  It's not
+bad.  But I could have done this with split(',') and just about as
+many lines of code.
+
+Partial sample of the file:
+<pre> 'timestamp', 'pressure-timeout', 'compass-timeout', 'sound-velocity-timeout', 'temperature-timeout', ...
+1216992716,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1216992716,,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1216992779,,,,,,,,,,,,,,,,,1,0,153.446,-0.269165,1.92261,2,-0.000921834,3647,100,0,100,0,0,0,0,38.788175,-75.16170167
+1216992780,,,,,,,,,,,,,,,,,1,0,152.935,-0.335083,2.09839,2,0.00190314,3647,100,0,100,0,0,0,0,38.78830833,-75.16163667
+1216992781,,,,,,,,,,,,,,,,,1,0,152.611,-0.258179,1.98303,2,0.00237893,3647,100,0,100,0,0,0,0,38.78833333,-75.16162
+1216992782,,,,,,33.925,,,,,,,,,,,1,0,152.391,-0.340576,2.005,2,0.00238884,3647,100,0,100,0,0,0,0,38.78835833,-75.16161167
+1216992783,,,,,,33.886,,,,,,,,,,,1,0,152.336,-0.197754,2.12036,2,0.00208156,3647,100,0,100,0,0,0,0,38.78837833,-75.16160333
+1216992784,,,,,,33.847,,,,,,,,,,,1,0,151.985,-0.148315,2.02148,2,0.00206174,3647,100,0,100,0,0,0,0,38.78840167,-75.16159667</pre>
+Now the code to read the file:
+<pre><tt><b><font color="#000080">import</font></b> csv
+<!-- -->
+<i><font color="#9A1900"># Get the names of the fields from the first line</font></i>
+fieldnames <font color="#990000">=</font> <font color="#990000">[</font>item<font color="#990000">.</font><b><font color="#000000">strip</font></b><font color="#990000">(</font><font color="#FF0000">"' "</font><font color="#990000">)</font> <b><font color="#0000FF">for</font></b> item <b><font color="#0000FF">in</font></b> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'navigator072508_Excelwork.csv'</font><font color="#990000">,</font> <font color="#FF0000">'rU'</font><font color="#990000">).</font><b><font color="#000000">readline</font></b><font color="#990000">().</font><b><font color="#000000">strip</font></b><font color="#990000">().</font><b><font color="#000000">split</font></b><font color="#990000">(</font><font color="#FF0000">','</font><font color="#990000">)]</font>
+<!-- -->
+<i><font color="#9A1900"># universal line ending handling for \r delimited files</font></i>
+f <font color="#990000">=</font> <b><font color="#000000">file</font></b><font color="#990000">(</font><font color="#FF0000">'navigator.csv'</font><font color="#990000">,</font> <font color="#FF0000">'rU'</font><font color="#990000">)</font> 
+<!-- -->
+<i><font color="#9A1900"># Each line will be returned as a dictionary</font></i>
+reader <font color="#990000">=</font> csv<font color="#990000">.</font><b><font color="#000000">DictReader</font></b><font color="#990000">(</font>f<font color="#990000">,</font>fieldnames<font color="#990000">=</font>fieldnames<font color="#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> linenum<font color="#990000">,</font>line <b><font color="#0000FF">in</font></b> <b><font color="#000000">enumerate</font></b><font color="#990000">(</font>reader<font color="#990000">):</font>
+        <b><font color="#0000FF">try</font></b><font color="#990000">:</font>
+            timestamp <font color="#990000">=</font> <b><font color="#000000">int</font></b><font color="#990000">(</font>line<font color="#990000">[</font><font color="#FF0000">'timestamp'</font><font color="#990000">])</font>
+            lon <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>line<font color="#990000">[</font><font color="#FF0000">'lon'</font><font color="#990000">])</font>
+            lat <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>line<font color="#990000">[</font><font color="#FF0000">'lat'</font><font color="#990000">])</font>
+            height <font color="#990000">=</font> <font color="#990000">-</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>line<font color="#990000">[</font><font color="#FF0000">'depth'</font><font color="#990000">])</font>
+            heading <font color="#990000">=</font> <b><font color="#000000">float</font></b><font color="#990000">(</font>line<font color="#990000">[</font><font color="#FF0000">'heading'</font><font color="#990000">])</font>
+        <b><font color="#0000FF">except</font></b><font color="#990000">:</font>
+            <i><font color="#9A1900"># Skip lines without enough navigation info</font></i>
+            <b><font color="#0000FF">continue</font></b>
+<!-- -->
+        <i><font color="#9A1900"># Do something with the data</font></i></tt></pre>
+<img title="Gavia navigation in Google Earth" withgrayborder="True" src="http://schwehr.org/blog/attachments/2009-06/gavia-navigation.png"/>
+
+For more, see: <a href="http://blog.doughellmann.com/2007/08/pymotw-csv.html">PyMOTW: csv</a>
+-----

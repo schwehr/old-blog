@@ -1,0 +1,3772 @@
+<div class="item">
+<a id="e2006-03-31T16_11_37.txt" name="e2006-03-31T16_11_37.txt"></a>
+<h2 class="date">03.31.2006 16:11</h2>
+<div class="blogbody">
+<h3 class="title">elog</h3>
+<div class="item-description">
+Val mentioned a program called <a
+href="http://midas.psi.ch/elog/">elog</a>, which is a very interesting
+little web application.
+<br /><br />
+We started putting together a fink package, but it is quite a ways away from working.  <a href="http://schwehr.org/software/fink/elog/">http://schwehr.org/software/fink/elog/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-31T16_11_37.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-04-01T17_12_36.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-31T08_14_24.txt" name="e2006-03-31T08_14_24.txt"></a>
+<h2 class="date">03.31.2006 08:14</h2>
+<div class="blogbody">
+<h3 class="title">svn server side move</h3>
+<div class="item-description">
+Just tried my first server size move of a file through subversion:
+<pre>
+$ svn mv https://cowfish.unh.edu/projects/seismic-py/trunk/segy.py \
+       https://cowfish.unh.edu/projects/seismic-py/trunk/seismic/segy.py
+<br /><br />
+Committed revision 337.
+<br /><br />
+$ cd && svn update
+A    seismic/segy.py
+D    segy.py
+Updated to revision 337.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-31T08_14_24.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-31T16_11_37.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-31T07_34_50.txt" name="e2006-03-31T07_34_50.txt"></a>
+<h2 class="date">03.31.2006 07:34</h2>
+<div class="blogbody">
+<h3 class="title">Other sources for fink debs</h3>
+<div class="item-description">
+I would like to do something like this for ccom a soon as I get a
+server for it.
+<br /><br />
+<a href="http://sidbox.homelinux.org/">http://sidbox.homelinux.org/</a>
+<br /><br />
+<pre>
+This is where I put my compiled debs for future use when I tinker with fink.
+If you are using fink/10.4-transitional you could save some times using my repositories, just add:
+<br /><br />
+deb http://sidbox.homelinux.org/fink stable main crypto
+deb http://sidbox.homelinux.org/fink unstable main crypto
+<br /><br />
+at the end of your /sw/etc/apt/sources.list and:
+<br /><br />
+UseBinaryDist: true
+<br /><br />
+into your /sw/etc/fink.conf
+</pre>
+There is also <a href="http://www.gtlib.gatech.edu/pub/fink/fink/">http://www.gtlib.gatech.edu/pub/fink/fink/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-31T07_34_50.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-31T08_14_24.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T16_43_42.txt" name="e2006-03-30T16_43_42.txt"></a>
+<h2 class="date">03.30.2006 16:43</h2>
+<div class="blogbody">
+<h3 class="title">Dynamically pulling out all of the database fields</h3>
+<div class="item-description">
+Here is a quick example to go with the previous on.  I am sure this is
+not the best way to do it, but it works.  For each row in the
+database, I want to print out all the fields with their values.
+<pre>
+results = usermapper.select_text('select * from msg1 where mmsi=353556000 order by messageId')
+<br /><br />
+for r in results:
+    for attribute in r._managed_attributes.keys():
+	print attribute,':     ',r.__getattribute__(attribute)
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T16_43_42.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-31T07_34_50.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T16_18_09.txt" name="e2006-03-30T16_18_09.txt"></a>
+<h2 class="date">03.30.2006 16:18</h2>
+<div class="blogbody">
+<h3 class="title">reading sqlalchemy data</h3>
+<div class="item-description">
+<br /><br />
+<b>Question:</b> What exactly is the difference between the __repr__
+and __str__ class methods?
+<br /><br />
+I figured out how to do the object relational mapping so that database
+comes back as a list of objects.  A couple points about this code.
+First, I had to change messageId to be the primary_key.  Second.  The
+online docs have a mistake.  It should not be
+"results=mapper.select_text"  What I have below works.  Third,
+printing just r gives things like '&lt;__main__.Msg1 object at
+0x1009970&gt;'.  I probably need to add a __repr__ to make print nice.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">os</font>,<font color="#2040a0">sys</font>
+<strong>from</strong> <font color="#2040a0">sqlalchemy</font> <strong>import</strong> <font color="4444FF">*</font>
+<font color="#2040a0">db</font> <font color="4444FF">=</font> <font color="#2040a0">create_engine</font><font color="4444FF">(</font><font color="#008000">'sqlite://filename=ais.db'</font> <font color="4444FF">)</font>
+<font color="#2040a0">msg1table</font> <font color="4444FF">=</font> <font color="#2040a0">Table</font><font color="4444FF">(</font><font color="#008000">'msg1'</font>, <font color="#2040a0">db</font>,
+		  <font color="#444444">#  unique index</font>
+		  <font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'messageId'</font>, <font color="#2040a0">Integer</font>,<font color="#2040a0">primary_key</font> <font color="4444FF">=</font> <font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'mmsi'</font>,<font color="#2040a0">Integer</font>, <font color="#2040a0">index</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lon'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lat'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'SOG'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'ROT'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'time'</font>,<font color="#2040a0">TIMESTAMP</font><font color="4444FF">)</font>
+		  <font color="4444FF">)</font>
+<strong>class</strong> <font color="#2040a0">Msg1</font><font color="4444FF">(</font><font color="#2040a0">object</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <strong>pass</strong> <font color="#444444"># Yikes</font>
+<font color="#2040a0">msg1mapper</font> <font color="4444FF">=</font> <font color="#2040a0">mapper</font><font color="4444FF">(</font><font color="#2040a0">Msg1</font>,<font color="#2040a0">msg1table</font><font color="4444FF">)</font>
+<font color="#2040a0">results</font> <font color="4444FF">=</font> <font color="#2040a0">msg1mapper</font>.<font color="#2040a0">select_text</font><font color="4444FF">(</font><font color="#008000">'select * from msg1 where mmsi=353556000 order by messageId'</font><font color="4444FF">)</font>
+<strong>for</strong> <font color="#2040a0">r</font> <strong>in</strong> <font color="#2040a0">results</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#2040a0">r</font>.<font color="#2040a0">lon</font>, <font color="#2040a0">r</font>.<font color="#2040a0">lat</font>
+</pre>
+Running this gives:
+<pre>
+PYTHONPATH=.. ./ais-sql2geozui 
+-70.7583333333 43.08
+-70.7583166667 43.0799833333
+-70.7583166667 43.08
+-70.7583 43.08
+-70.7583 43.0799833333
+-70.7583 43.0799833333
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T16_18_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T16_43_42.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T15_40_01.txt" name="e2006-03-30T15_40_01.txt"></a>
+<h2 class="date">03.30.2006 15:40</h2>
+<div class="blogbody">
+<h3 class="title">OpenEV on fink</h3>
+<div class="item-description">
+I've hit a roadblock at the moment trying to build openEV in fink.
+I am using a cvs checkout from today of OpenEV for the build.
+/sw/include/glib-2.0/gobject/gtype.h is giving me trouble here.
+<pre>
+#if	GLIB_SIZEOF_LONG == GLIB_SIZEOF_SIZE_T
+typedef gulong                          GType;
+#else	/* hm, shouldn't happen? */
+typedef gsize                           GType;
+#endif
+</pre>
+Here is my current configure scripts:
+<pre>
+CFLAGS="-I/sw/include/gtk-1.2 -I/sw/include/glib-1.2 -I/sw/lib/glib/include \
+-I/usr/X11R6/include -I/sw/include/pygtk-2.0 -I/sw/include/gdal1 \
+-I/sw/include" LDFLAGS="-L/sw/lib" \
+./configure --prefix=/Users/schwehr/Desktop/openev 
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T15_40_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T16_18_09.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T12_56_53.txt" name="e2006-03-30T12_56_53.txt"></a>
+<h2 class="date">03.30.2006 12:56</h2>
+<div class="blogbody">
+<h3 class="title">sioseis script</h3>
+<div class="item-description">
+Here is a little sioseis script from Becca.  This does not work for
+all datasets.  For example, my Humboldt Slide dataset was not
+correctable in this way.
+<br /><br />
+First her intro:
+<pre>
+I have got the heave correction to work for wire in-out issues where
+you can't see the multiple! I took the depth profile from fledermaus
+and converted it to twtt and used it as a picked water bottom. To do
+this I imported the xy data points that I used to make the vertical
+curtain and draped them on the seafloor, made a note of the depth of
+each one and then converted that depth into twt (using 1500 m/s), Then
+I made a file with the shot number and the fleder seafloor depth and
+used that in the script below. It only works if there is not
+significent layback.
+<br /><br />
+-Becca
+</pre>
+And the script:
+<pre>
+pre>
+<font color="0000ff"><strong>#!/usr/bin/env bash</strong></font>
+<br /><br />
+<font color="#444444"># for shifting when you've picked the multiple/know the seafloor depth or time
+</font>
+declare -r <font color="#2040a0">FNO</font>=<font color="#008000">&quot;94000&quot;</font>
+declare -r <font color="#2040a0">LNO</font>=<font color="#008000">&quot;111047&quot;</font>
+declare -r <font color="#2040a0">BASENAME</font>=ice2003_B7
+<br /><br />
+sioseis &lt;&lt; eof
+procs diskin header mix wbt wbt2 header2 prout shift diskoa end
+<br /><br />
+diskin
+   set 0 .5
+   ipath <font color="#2040a0">$BASENAME</font>.sgy end
+end
+<br /><br />
+header
+    fno <font color="#2040a0">$FNO</font> lnO <font color="#2040a0">$LNO</font> ftr 1 ltr 99 l6 = l3 end
+end
+<br /><br />
+mix
+    type 4  lhdr 59 weight
+    1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1
+    1 1 1 1 1 1 1 1 1 1 end
+end
+<br /><br />
+wbt
+! shot-time pairs for fleder picked seafloor gets asigned to r50
+`cat B7.sf`
+end
+<br /><br />
+wbt2
+! pick the water bottom from the original data, using the method that works best beneath
+   index 60   ! put this pick in real word 60
+<br /><br />
+!   peak pos sepp .07 .09 track .01 lprint 2 end
+!   thres .1e-08 track .005 end
+!   peak pos sepp 0.01 0.25 track 0.005 lprint 2 end
+    solrat 6 ses 0.0010 0.0020 sel 0.1 0.25 lprint 2 end
+!   solrat 4 ses .001 .005 sel .2 .3 lprint 2 end
+end
+<br /><br />
+header2
+   fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftr 1 ltr 99
+      ! substitute the picked water column depth for the theoretical
+   r59 = r50 - r60 end
+end
+prout
+   indices r50 r59 r60
+   fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> noinc 100 end
+end
+shift
+  indices r59 end
+end
+diskoa
+   ofmt 1 opath <font color="#2040a0">$BASENAME</font>-flt.sgy end
+end
+end
+eof
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T12_56_53.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T15_40_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T11_59_17.txt" name="e2006-03-30T11_59_17.txt"></a>
+<h2 class="date">03.30.2006 11:59</h2>
+<div class="blogbody">
+<h3 class="title">sqlalchemy insert</h3>
+<div class="item-description">
+So now on to inserting some data into the database with sqlalchemy.
+It does not look like a list of dictionaries is possible, but this is
+not so bad.  This example is a little complicated because I am
+translating between the ais VDM module names and what I might want to
+call things in the database.  Who wants to write out Longitude all the
+time when 'lon' is pretty well known?
+<pre>
+aiskeys = [
+    ['UserID','mmsi']
+    ,['Longitude','lon']
+    ,['Latitude','lat']
+    ,['SOG','SOG']
+    ,['ROT','ROT']
+]
+for key in aiskeys:
+    insdict[key[1]] = fields[key[0]]
+insdict['time'] = ais.nmeamessages.zdaDict2TIMESTAMP(timeDict)
+msg1table.insert().execute(insdict)
+</pre>
+The insertion dictionary looks like this:
+<pre>
+insdict = 
+  {
+  'mmsi': 353556000, 
+  'lon': -70.75833333333334, 
+  'lat': 43.079999999999998, 
+  'SOG': 0, 
+  'ROT': 0,
+  'time': '2006-03-26 13:39:21'
+  }
+</pre>
+Then I can pull data on the command line:
+<pre>
+sqlite ais.db 'select * from msg1' | tr '|' '\t'
+        353556000       -70.7583333333  43.08           0       0       2006-03-26 13:39:21
+        353556000       -70.7583166667  43.0799833333   0       0       2006-03-26 13:39:31
+        224632000       -70.7909966667  43.103435       1       128     2006-03-26 13:39:32
+        353556000       -70.7583166667  43.08           0       0       2006-03-26 13:39:42
+        353556000       -70.7583        43.08           0       0       2006-03-26 13:39:51
+        224632000       -70.7909933333  43.10343        1       128     2006-03-26 13:40:03
+        224632000       -70.7909933333  43.10343        1       128     2006-03-26 13:40:03
+        224632000       -70.7909933333  43.10343        1       128     2006-03-26 13:40:03
+        353556000       -70.7583        43.0799833333   0       0       2006-03-26 13:40:11
+...
+</pre>
+Wow, that was a little complicated for a first example, but it was so
+easy to write.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T11_59_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T12_56_53.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T11_21_18.txt" name="e2006-03-30T11_21_18.txt"></a>
+<h2 class="date">03.30.2006 11:21</h2>
+<div class="blogbody">
+<h3 class="title">First database creation with sqlalchemy</h3>
+<div class="item-description">
+A quick look in the sqlite driver within sqlalchemy show that it is
+using the pysqlite2 driver (for sqlite3) and if not, it falls back on
+pysqlite which is will only generate sqlite2 databases.  sqlite2 is
+pretty clunky, so I need to get the pysqlite2 drivers into fink soon!
+Here is how they do conditional driver loading.  An interesting read:
+<pre>
+try:
+    from pysqlite2 import dbapi2 as sqlite
+except:
+    try:
+        sqlite = __import__('sqlite') # skip ourselves
+    except:
+        sqlite = None
+</pre>
+Now here is my first attempt at creating a database via sqlalchemy:
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<font color="#008000">''</font><font color="#008000">'Use SQLAlchemy to create/add data to a database'</font><font color="#008000">''</font>
+<strong>from</strong> <font color="#2040a0">sqlalchemy</font> <strong>import</strong> <font color="4444FF">*</font>
+<strong>import</strong> <font color="#2040a0">os</font>
+<strong>if</strong> <font color="#2040a0">os</font>.<font color="#2040a0">access</font><font color="4444FF">(</font><font color="#008000">'ais.db'</font>,<font color="#2040a0">os</font>.<font color="#2040a0">W_OK</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">os</font>.<font color="#2040a0">remove</font><font color="4444FF">(</font><font color="#008000">'ais.db'</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">db</font> <font color="4444FF">=</font> <font color="#2040a0">create_engine</font><font color="4444FF">(</font><font color="#008000">'sqlite://filename=ais.db'</font>,<font color="#2040a0">echo</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">msg1table</font> <font color="4444FF">=</font> <font color="#2040a0">Table</font><font color="4444FF">(</font><font color="#008000">'msg1'</font>, <font color="#2040a0">db</font>,
+		  <font color="#444444">#  unique index</font>
+		  <font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'messageId'</font>, <font color="#2040a0">Integer</font>,<font color="#2040a0">unique</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'mmsi'</font>,<font color="#2040a0">Integer</font>, <font color="#2040a0">index</font><font color="4444FF">=</font><font color="#2040a0">True</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lon'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'lat'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'SOG'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'ROT'</font>,<font color="#2040a0">Float</font><font color="4444FF">)</font>
+		  ,<font color="#2040a0">Column</font><font color="4444FF">(</font><font color="#008000">'time'</font>,<font color="#2040a0">TIMESTAMP</font><font color="4444FF">)</font>
+		  <font color="4444FF">)</font>.<font color="#2040a0">create</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+Running it looks like this.  The key is the "echo=True".
+<pre>
+./ais-sqlalchemy
+[2006-03-30 11:18:44,781] [engine]: 
+CREATE TABLE msg1(
+	messageId INTEGER, 
+	mmsi INTEGER, 
+	lon NUMERIC(10, 2), 
+	lat NUMERIC(10, 2), 
+	SOG NUMERIC(10, 2), 
+	ROT NUMERIC(10, 2), 
+	time TIMESTAMP
+)
+<br /><br />
+<br /><br />
+[2006-03-30 11:18:44,803] [engine]: None
+[2006-03-30 11:18:44,838] [engine]: CREATE UNIQUE INDEX ux_messageId ON msg1 (messageId)
+[2006-03-30 11:18:44,838] [engine]: None
+[2006-03-30 11:18:44,842] [engine]: CREATE INDEX ix_mmsi ON msg1 (mmsi)
+[2006-03-30 11:18:44,842] [engine]: None
+</pre>
+Since I don't have the newer driver, the above code generates and
+sqlite2 database.
+<pre>
+less ais.db
+<br /><br />
+** This file contains an SQLite 2.1 database **^@
+...
+<br /><br />
+sqlite ais.db '.tables'
+msg1
+<br /><br />
+sqlite ais.db '.schema msg1'
+CREATE TABLE msg1(
+        messageId INTEGER, 
+        mmsi INTEGER, 
+        lon NUMERIC(10, 2), 
+        lat NUMERIC(10, 2), 
+        SOG NUMERIC(10, 2), 
+        ROT NUMERIC(10, 2), 
+        time TIMESTAMP
+);
+CREATE INDEX ix_mmsi ON msg1 (mmsi);
+CREATE UNIQUE INDEX ux_messageId ON msg1 (messageId);
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T11_21_18.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T11_59_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T10_47_03.txt" name="e2006-03-30T10_47_03.txt"></a>
+<h2 class="date">03.30.2006 10:47</h2>
+<div class="blogbody">
+<h3 class="title">SQLAlchemy - weird python code</h3>
+<div class="item-description">
+<br /><br />
+I have just started to play with SQLAlchemy now that I have working
+fink packages for setuptools and SQLAlchemy.  I promise will check
+them in when the sf.net CVS server comes back online.  In the process,
+I am working on creating a db of AIS data.  In ipython I wanted some
+more info on various time functionality and I got quite a surpise.
+<pre>
+In [23]: sqlalchemy.Time?
+Type:           type
+Base Class:     &lt;type 'type'&gt;
+String Form:    &lt;class 'sqlalchemy.types.Time'&gt;
+Namespace:      Interactive
+File:           /sw/lib/python2.4/site-packages/sqlalchemy/types.py
+Docstring:
+    &lt;no docstring&gt;
+<br /><br />
+In [24]: help(sqlalchemy.Time)
+<br /><br />
+Help on class Time in module sqlalchemy.types:
+<br /><br />
+class Time(TypeEngine)
+ |  Method resolution order:
+ |      Time
+ |      TypeEngine
+ |      __builtin__.object
+ |  
+ |  Methods inherited from TypeEngine:
+ |  
+ |  __init__(self, *args, **kwargs)
+ |  
+ |  adapt_args(self)
+...
+</pre>
+No doc string?  I figured I could go look at the source and see what
+is goind on.  Maybe the doc string was getting nuked somehow?  Nope!
+I found this in /sw/lib/python2.4/site-packages/sqlalchemy/types.py:
+<pre>
+...
+class DateTime(TypeEngine):
+    pass
+<br /><br />
+class Date(TypeEngine):
+    pass
+<br /><br />
+class Time(TypeEngine):
+    pass
+<br /><br />
+class Binary(TypeEngine):
+    def __init__(self, length=None):
+        self.length = length
+    def convert_bind_param(self, value, engine):
+        return engine.dbapi().Binary(value)
+    def convert_result_value(self, value, engine):
+        return value
+    def get_constructor_args(self):
+        return {'length':self.length}
+...
+</pre>
+<b>Say what?</b>  First off, there is not inline documentation or
+comments.  Secondly, a class with just pass?  So this will inherit
+the parents functionality, but appear as a different object.  Is
+that the point?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T10_47_03.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T11_21_18.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-30T08_10_55.txt" name="e2006-03-30T08_10_55.txt"></a>
+<h2 class="date">03.30.2006 08:10</h2>
+<div class="blogbody">
+<h3 class="title">OpenSoundings</h3>
+<div class="item-description">
+Randomness of the web.  I was looking for that sf.net status page since they appear to be having a cvs outage when I ran into 
+<a href="http://sourceforge.net/projects/opensounding">OpenSounding</a>:
+<pre>
+  A tool for decoding and presenting Geotechnical Sounding data (such
+  as CPTu). Formats supported are the SGF standard as defined by the
+  Swedish Geotechnical Society (<a href="http://www.sgf.net/">www.sgf.net</a>), and used by a number of
+  commercial products, aswell as Generic text
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-30T08_10_55.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T10_47_03.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T19_17_22.txt" name="e2006-03-29T19_17_22.txt"></a>
+<h2 class="date">03.29.2006 19:17</h2>
+<div class="blogbody">
+<h3 class="title">setuptools gets closer</h3>
+<div class="item-description">
+I think I found the trouble for setup tools install from fink....
+/sw/lib/python2.4/site-packages/easy-install.pth was:
+<pre>
+/sw/src/fink.build/root-setuptools-py24-0.6a10-1/sw/lib/python2.4/site-packages\
+/setuptools-0.6a10-py2.4.egg
+</pre>
+Which should not have all that stuff in the beginning:
+<pre>
+/sw/lib/python2.4/site-packages/setuptools-0.6a10-py2.4.egg
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T19_17_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-30T08_10_55.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T18_27_01.txt" name="e2006-03-29T18_27_01.txt"></a>
+<h2 class="date">03.29.2006 18:27</h2>
+<div class="blogbody">
+<h3 class="title">CruiseControl or BuildBot</h3>
+<div class="item-description">
+Brian L mentioned <a
+href="http://cruisecontrol.sourceforge.net/">Cruise Control</a> which
+is a continuous build process system.  Sounds interesting.  I hadn't
+gotten into BuildBot yet.  I need to evaluate the two.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T18_27_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T19_17_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T12_29_26.txt" name="e2006-03-29T12_29_26.txt"></a>
+<h2 class="date">03.29.2006 12:29</h2>
+<div class="blogbody">
+<h3 class="title">WW2d</h3>
+<div class="item-description">
+<a
+href-"http://gnu.wildebeest.org/diary/index.php?p=156">WorldWind2D</a>
+(WW2D).  Check out the screen shot.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T12_29_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T18_27_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T10_06_16.txt" name="e2006-03-29T10_06_16.txt"></a>
+<h2 class="date">03.29.2006 10:06</h2>
+<div class="blogbody">
+<h3 class="title">Mac X11 unhappy</h3>
+<div class="item-description">
+I am starting to have strange problems with X11.  Often xterms popup
+and disappear.  Then when they have been iconofied, the come back
+looking like this.  It would be a lot easier to track down if these
+were consistant problems, but they only happen occasionally.
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-03/x11-trouble.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T10_06_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T12_29_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T09_57_21.txt" name="e2006-03-29T09_57_21.txt"></a>
+<h2 class="date">03.29.2006 09:57</h2>
+<div class="blogbody">
+<h3 class="title">openscience - how to make money from open source</h3>
+<div class="item-description">
+From <a href="http://www.openscience.org/blog/">http://www.openscience.org/blog/</a>.  <a href="http://www.openscience.org/blog/?p=164">How to make money from Open Source scientific software</a>
+<pre>
+...
+  However, their code is not open. And this, I think, is a real
+  problem. Imagine a skeptical researcher who is sent a paper to
+  review. Further imagine that this paper uses this company's
+  software, and the skeptical researcher doesn't have the money for a
+  license. He or she therefore can't "look under the hood" to verify
+  what's going on if they have some questions about how the code is
+  calculating something relevant to the paper. There are good reasons
+  that this company doesn;t give away their code; they like to put
+  food on the table, and they don't trust the rest of the community to
+  shell out the money for their programs if the code were available
+  for free.
+<br /><br />
+  So, I'm left with a dilemma. I want this company to do well, to hire
+  more of my students in the future, and to continue to produce high
+  quality code. I also want the codes that we use in my field to be
+  available for skeptical review. So today, I'm starting a set of
+  posts in which I'll try to hash out the following question: How can
+  people make money from open source scientific software?
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T09_57_21.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T10_06_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T09_45_59.txt" name="e2006-03-29T09_45_59.txt"></a>
+<h2 class="date">03.29.2006 09:45</h2>
+<div class="blogbody">
+<h3 class="title">web mapping services</h3>
+<div class="item-description">
+<a href="http://www.perrygeo.net/wordpress/?p=35">http://www.perrygeo.net/wordpress/?p=35</a>
+<pre>
+  Web Mapping Services (WMS) are not always my prefered option for
+  accessing data; relying on a remote server to generate a pretty
+  picture of the data is hardly a substitute for having the raw data
+  in hand. But for many cases, I just need a decent looking basemap
+  image and don't want to download gigabytes of data, especially if
+  that data is updated frequently.
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T09_45_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T09_57_21.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T08_33_43.txt" name="e2006-03-29T08_33_43.txt"></a>
+<h2 class="date">03.29.2006 08:33</h2>
+<div class="blogbody">
+<h3 class="title">setuptools tests</h3>
+<div class="item-description">
+To play with setuptools, I has to do a little extra work.  I
+downloaded the zip from the cheeseshop and did this.
+<pre>
+cd ~/Desktop
+mkdir setuptools && cd setuptools
+wget http://cheeseshop.python.org/packages/source/s/setuptools/setuptools-0.6a10.zip
+<br /><br />
+mkdir -p /Users/schwehr/Desktop/setuptools/sw/lib/python2.4/site-packages
+<br /><br />
+PYTHONPATH=/Users/schwehr/Desktop/setuptools/sw/lib/python2.4/site-packages/ \
+ python setup.py install --root=/Users/schwehr/Desktop/setuptools/
+</pre>
+If I did not put the target site-packages location in PYTHONPATH it failed to install.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T08_33_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T09_45_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T08_13_29.txt" name="e2006-03-29T08_13_29.txt"></a>
+<h2 class="date">03.29.2006 08:13</h2>
+<div class="blogbody">
+<h3 class="title">py-setuptools Portfile</h3>
+<div class="item-description">
+Here is the port file for py-setyptools: 
+cat /opt/local/var/db/dports/sources/rsync.rsync.darwinports.org_dpupdate_dports/python/py-setuptools/Portfile
+<br /><br />
+<pre>
+# $Id: Portfile,v 1.1 2005/12/15 00:55:31 blb Exp $
+<br /><br />
+PortSystem			1.0
+PortGroup			python24 1.0
+name				py-setuptools
+version				0.6a8
+categories-append	devel
+maintainers			blb@opendarwin.org
+description			distutils enhancement for build and distribution
+long_description \
+	setuptools is a collection of enhancements to the Python distutils that \
+	allow you to more easily build and distribute Python packages, \
+	especially ones that have dependencies on other packages.
+<br /><br />
+platforms			darwin
+<br /><br />
+homepage			http://peak.telecommunity.com/DevCenter/setuptools
+master_sites		http://cheeseshop.python.org/packages/source/s/setuptools/
+distname			setuptools-${version}
+use_zip				yes
+<br /><br />
+checksums			md5 3eecdf66c1a2cf8a6556bc00b69d572a
+<br /><br />
+post-destroot {
+	xinstall -m 755 -d ${destroot}/${prefix}/share/doc/${name}
+	xinstall -m 644 -W ${worksrcpath} EasyInstall.txt api_tests.txt \
+		pkg_resources.txt setuptools.txt \
+		${destroot}/${prefix}/share/doc/${name}
+}
+<br /><br />
+<br /><br />
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T08_13_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T08_33_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T07_54_12.txt" name="e2006-03-29T07_54_12.txt"></a>
+<h2 class="date">03.29.2006 07:54</h2>
+<div class="blogbody">
+<h3 class="title">python setuptools</h3>
+<div class="item-description">
+There are two very interesting looking database abstraction layers for
+python that both require setuptools.  setuptools is not in fink, but
+it is in darwinports, so I am installing it that way to see how
+darwinports handles it.  Hopefully after setuptools, I can go back and
+add wxoptparse to fink too!  That would be great!  I still haven't
+managed to get wxglade working yet.
+<a
+href="http://py-setuptools.darwinports.com/">http://py-setuptools.darwinports.com/</a>
+<pre>
+  sudo port install py-setuptools
+</pre>
+I should have added "-v -d" to the above.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T07_54_12.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T08_13_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T07_17_25.txt" name="e2006-03-29T07_17_25.txt"></a>
+<h2 class="date">03.29.2006 07:17</h2>
+<div class="blogbody">
+<h3 class="title">How to stop worrying and love the blob</h3>
+<div class="item-description">
+A while back (Fall 2004), I made a presentation entitled "How to stop
+worrying and love the blob."  Needless to say I missed the target with
+my audience completely, but now OpenBSD has a very similiar theme (but
+no Dr. Strangelove references).
+<br /><br />
+<img src="https://https.openbsd.org/images/poster15.gif">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T07_17_25.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T07_54_12.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-29T07_08_07.txt" name="e2006-03-29T07_08_07.txt"></a>
+<h2 class="date">03.29.2006 07:08</h2>
+<div class="blogbody">
+<h3 class="title">supporting OpenSSH (OpenBSD)</h3>
+<div class="item-description">
+I bought an OpenBSD CD.  What are you doing to support the puffer fish? 
+<br /><br />
+<a href="http://www.thejemreport.com/mambo/content/view/239/1/">Linux supporters fiddle while OpenSSH burns</a>
+<br /><br />
+<a href="http://openbsd.org/orders.html">http://openbsd.org/orders.html</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-29T07_08_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T07_17_25.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-28T13_52_39.txt" name="e2006-03-28T13_52_39.txt"></a>
+<h2 class="date">03.28.2006 13:52</h2>
+<div class="blogbody">
+<h3 class="title">Ship tracks from AIS</h3>
+<div class="item-description">
+Yes, I am having fun.  I am only using sqlite and gnuplot so far, but
+I will keep stepping it up.  The numbers in the key are the ship
+UserID/MMSI.
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-03/ship-tracks.gif">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-28T13_52_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-29T07_08_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-28T13_03_29.txt" name="e2006-03-28T13_03_29.txt"></a>
+<h2 class="date">03.28.2006 13:03</h2>
+<div class="blogbody">
+<h3 class="title">Greg Stein's talk</h3>
+<div class="item-description">
+Thanks to Roland for this link.
+<br /><br />
+<a href="http://blogs.zdnet.com/Burnette/?p=46">"In 5-10 years, most of the software you use will be free"</a>
+<pre>
+  Greg Stein, chairman of the Apache Software Foundation, currently with
+  Google, delivered this keynote on Wednesday morning at EclipseCon
+  2006. It was titled "Comparing Apache and Eclipse".
+</pre>
+A very interesting read!  Could be very controversial to some.  Quite
+the contrast to listening to the AVSP interviews with some folks at
+ESRI that I was listening to earlier today.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-28T13_03_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-28T13_52_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-28T11_20_01.txt" name="e2006-03-28T11_20_01.txt"></a>
+<h2 class="date">03.28.2006 11:20</h2>
+<div class="blogbody">
+<h3 class="title">python interpreter for fink?</h3>
+<div class="item-description">
+How do I correctly set the python interpreter using setup.py for
+scripts that end up in /sw/bin and what about name clashes?  Guess I
+only allow one version of python?  That just does not seem right.
+Plus, what I am doing now is not safe:
+<pre>
+#!/usr/bin/env python
+</pre>
+Then what happens when the user changes their path to pull some other
+python before the one that I am counting on?  distutils must have
+thought about this, no?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-28T11_20_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-28T13_03_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-28T11_02_23.txt" name="e2006-03-28T11_02_23.txt"></a>
+<h2 class="date">03.28.2006 11:02</h2>
+<div class="blogbody">
+<h3 class="title">signed integers using BitVector</h3>
+<div class="item-description">
+This not the most clever implementation of twos complement signed
+integer decoding, but it seems to work.  I am putting this here since
+Avi is holding off on additional functionality in BitVector until the
+end of his semester.  He did fix the bitvec[-1]=0 reverse accessor bug
+today, so the code below could be even simpler.
+<pre>
+<font color="#FF8800">#!/usr/bin/env python</font>
+<strong>from</strong> <font color="#2040a0">BitVector</font> <strong>import</strong> <font color="#2040a0">BitVector</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">setBitVectorSize</font><font color="4444FF">(</font><font color="#2040a0">bv</font>,<font color="#2040a0">size</font><font color="4444FF">=</font><font color="#FF0000">8</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Pad a BitVector with 0's on the left until it is at least the size specified
+<br /><br />
+    @param bv: BitVector that needs to meet a minimim size
+    @type bv: BitVector
+    @param size: Minimum number of bits to make the new BitVector
+    @type size: int
+    @return: BitVector that is size bits or larger
+    @rtype: BitVector
+<br /><br />
+    @todo: What to do if the vector is larger than size?
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <font color="#2040a0">pad</font><font color="4444FF">=</font><font color="#2040a0">BitVector</font><font color="4444FF">(</font><font color="#2040a0">bitlist</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font>
+    <strong>while</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">&lt;</font><font color="#2040a0">size</font><font color="4444FF">:</font> <font color="#2040a0">bv</font> <font color="4444FF">=</font> <font color="#2040a0">pad</font> <font color="4444FF">+</font> <font color="#2040a0">bv</font>
+    <strong>return</strong> <font color="#2040a0">bv</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">addone</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">''</font><font color="#008000">'
+    Add one bit to a bit vector.  Overflows are silently dropped.
+    &gt;&gt;&gt; print addone(BitVector(bitstring='</font><font color="#FF0000">1100</font><font color="#008000">'))
+    1101
+    &gt;&gt;&gt; print addone(BitVector(bitstring='</font><font color="#FF0000">1111</font><font color="#008000">'))
+    0000
+<br /><br />
+    @param bv: Add one to these bits
+    @type bv: BitVector
+    @return: Bits with one added
+    @rtype: BitVector
+    '</font><font color="#008000">''</font>
+    <font color="#2040a0">new</font> <font color="4444FF">=</font> <font color="#2040a0">bv</font>
+    <font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">r</font><font color="4444FF">:</font>
+	<font color="#2040a0">index</font> <font color="4444FF">=</font> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">-</font><font color="#2040a0">i</font>
+	<strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">bv</font><font color="4444FF">[</font><font color="#2040a0">index</font><font color="4444FF">]</font><font color="4444FF">:</font>
+	    <font color="#2040a0">new</font><font color="4444FF">[</font><font color="#2040a0">index</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+	    <strong>break</strong>
+	<font color="#2040a0">new</font><font color="4444FF">[</font><font color="#2040a0">index</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+    <strong>return</strong> <font color="#2040a0">new</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">subone</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">''</font><font color="#008000">'
+    Subtract one bit from a bit vector
+<br /><br />
+    &gt;&gt;&gt; print subone(BitVector(bitstring='</font><font color="#FF0000">1111</font><font color="#008000">'))
+    1110
+    &gt;&gt;&gt; print subone(BitVector(bitstring='</font><font color="#FF0000">0010</font><font color="#008000">'))
+    0001
+    &gt;&gt;&gt; print subone(BitVector(bitstring='</font><font color="#FF0000">0000</font><font color="#008000">'))
+    1111
+<br /><br />
+    @param bv: Bits to add one bit to the right side
+    @type bv: BitVector
+    @rtype: BitVector
+    '</font><font color="#008000">''</font>
+    <font color="#2040a0">new</font> <font color="4444FF">=</font> <font color="#2040a0">bv</font>
+    <font color="#2040a0">r</font> <font color="4444FF">=</font> <font color="#2040a0">range</font><font color="4444FF">(</font><font color="#FF0000">1</font>,<font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+    <strong>for</strong> <font color="#2040a0">i</font> <strong>in</strong> <font color="#2040a0">r</font><font color="4444FF">:</font>
+	<font color="#2040a0">index</font> <font color="4444FF">=</font> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">-</font><font color="#2040a0">i</font>
+	<strong>if</strong> <font color="#FF0000">1</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">bv</font><font color="4444FF">[</font><font color="#2040a0">index</font><font color="4444FF">]</font><font color="4444FF">:</font>
+	    <font color="#2040a0">new</font><font color="4444FF">[</font><font color="#2040a0">index</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+	    <strong>break</strong>
+	<font color="#2040a0">new</font><font color="4444FF">[</font><font color="#2040a0">index</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+    <strong>return</strong> <font color="#2040a0">new</font>
+<br /><br />
+<font color="#2040a0">def</font> <font color="#2040a0">bvFromSignedInt</font><font color="4444FF">(</font><font color="#2040a0">intVal</font>,<font color="#2040a0">bitSize</font><font color="4444FF">=</font><font color="#2040a0">None</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">''</font><font color="#008000">'
+    Create a twos complement BitVector from a signed integer.
+<br /><br />
+    Positives must have a '</font><font color="#FF0000">0</font><font color="#008000">' in the left hand position.
+<br /><br />
+    &gt;&gt;&gt; print bvFromSignedInt(0,bitSize=4)
+    0000
+    &gt;&gt;&gt; print bvFromSignedInt(1,bitSize=4)
+    0001
+    &gt;&gt;&gt; print bvFromSignedInt(7,bitSize=4)
+    0111
+<br /><br />
+    Negative numbers must have a '</font><font color="#FF0000">1</font><font color="#008000">' in the left hand position.
+<br /><br />
+    &gt;&gt;&gt; print bvFromSignedInt(-1,bitSize=4)
+    1111
+    &gt;&gt;&gt; print bvFromSignedInt(-2,bitSize=4)
+    1110
+    &gt;&gt;&gt; print bvFromSignedInt(-7,bitSize=4)
+    1001
+<br /><br />
+    @param bv: Bits to subtract one bit from the right side
+    @type bv: BitVector
+    @rtype: BitVector
+    '</font><font color="#008000">''</font>
+    <font color="#2040a0">bv</font> <font color="4444FF">=</font> <font color="#2040a0">setBitVectorSize</font><font color="4444FF">(</font><font color="#2040a0">BitVector</font><font color="4444FF">(</font><font color="#2040a0">intVal</font><font color="4444FF">=</font><font color="#2040a0">abs</font><font color="4444FF">(</font><font color="#2040a0">intVal</font><font color="4444FF">)</font><font color="4444FF">)</font>,<font color="#2040a0">bitSize</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">bitSize</font><font color="4444FF">-</font><font color="#FF0000">1</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">)</font> <font color="#FF8800"># FIX: what to do about overflow beyond bitSize?</font>
+    <strong>if</strong> <font color="#2040a0">intVal</font><font color="4444FF">&gt;</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">:</font>
+	<font color="#2040a0">bv</font> <font color="4444FF">=</font> <font color="#2040a0">BitVector</font><font color="4444FF">(</font><font color="#2040a0">intVal</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">)</font> <font color="4444FF">+</font> <font color="#2040a0">bv</font>
+    <strong>else</strong><font color="4444FF">:</font>
+	<font color="#2040a0">bv</font> <font color="4444FF">=</font> <font color="#2040a0">subone</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font>
+	<font color="#2040a0">bv</font> <font color="4444FF">=</font> ~<font color="#2040a0">bv</font>
+	<font color="#2040a0">bv</font> <font color="4444FF">=</font> <font color="#2040a0">BitVector</font><font color="4444FF">(</font><font color="#2040a0">intVal</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">)</font> <font color="4444FF">+</font> <font color="#2040a0">bv</font>
+    <strong>return</strong> <font color="#2040a0">bv</font>
+    
+<font color="#2040a0">def</font> <font color="#2040a0">signedIntFromBV</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">''</font><font color="#008000">'
+    Interpret a bit vector as an signed integer.  int(BitVector)
+    defaults to treating the bits as an unsigned int.  Assumes twos
+    complement representation.
+<br /><br />
+    U{http://en.wikipedia.org/wiki/Twos_complement}
+<br /><br />
+    Positive values decode like so:
+<br /><br />
+    &gt;&gt;&gt; signedIntFromBV(BitVector(bitstring='</font><font color="#FF0000">0000</font><font color="#008000">'))
+    0
+    &gt;&gt;&gt; signedIntFromBV(BitVector(bitstring='</font><font color="#FF0000">0101</font><font color="#008000">'))
+    5
+<br /><br />
+    Here are some negative integer examples:
+<br /><br />
+    &gt;&gt;&gt; signedIntFromBV(BitVector(bitstring='</font><font color="#FF0000">1111</font><font color="#008000">'))
+    -1
+    &gt;&gt;&gt; signedIntFromBV(BitVector(bitstring='</font><font color="#FF0000">1110</font><font color="#008000">'))
+    -2
+    &gt;&gt;&gt; signedIntFromBV(BitVector(bitstring='</font><font color="#FF0000">1010</font><font color="#008000">'))
+    -6
+    &gt;&gt;&gt; signedIntFromBV(BitVector(bitstring='</font><font color="#FF0000">1001</font><font color="#008000">'))
+    -7
+<br /><br />
+    @param bv: Bits to treat as an signed int
+    @type bv: BitVector
+    @return: Signed integer
+    @rtype: int
+<br /><br />
+    @note: Does not know the difference between byte orders.
+    '</font><font color="#008000">''</font>
+    <strong>if</strong> <font color="#FF0000">0</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">bv</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">:</font> <strong>return</strong> <font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">)</font>
+    <font color="#FF8800"># Nope, so it is negative</font>
+    <strong>return</strong> <font color="4444FF">-</font><font color="4444FF">(</font><font color="#2040a0">int</font><font color="4444FF">(</font><font color="#2040a0">addone</font><font color="4444FF">(</font>~<font color="4444FF">(</font><font color="#2040a0">bv</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-28T11_02_23.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-28T11_20_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-28T09_49_28.txt" name="e2006-03-28T09_49_28.txt"></a>
+<h2 class="date">03.28.2006 09:49</h2>
+<div class="blogbody">
+<h3 class="title">First AIS ship location decoding</h3>
+<div class="item-description">
+This is not so exciting for those who have been using AIS for quite a
+while (e.g. Matt and Roland) but it is pretty exciting for me.  First,
+this morning I created functions for the BitVector class that go to
+and from signed integers.  That was pretty cool by itself, but that
+fix the last hurdle to fully decoding the longitude and latitudes from
+AIS messages 1-3.  Those fields use signed integers of 10000 minute
+increments to store the location.  Being in the western hemisphere, I
+was expecting negative longitudes (e.g. NOT 373 degrees).
+<br /><br />
+To give ais-py a sanity test, I did a quick dump of the location and
+got these values for one message:
+<pre>
+  MMSI/UserID Longitude Latitude SpeedOverGround
+   353556000  -70.7583  43.07995        0
+</pre>
+Google Maps/Local was kind enough to show me that this is indeed the
+salt hauler that was docked in Portsmouth over the weekend.
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-03/ship-location.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-28T09_49_28.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-28T11_02_23.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-28T09_37_26.txt" name="e2006-03-28T09_37_26.txt"></a>
+<h2 class="date">03.28.2006 09:37</h2>
+<div class="blogbody">
+<h3 class="title">Hydrologic sensor data</h3>
+<div class="item-description">
+The CUAHSI () has a <a
+href="http://www.cuahsi.org/his.html">Hydrologic Information
+System</a> that looks interesting.  How do I access this data is a
+programmatic way (e.g. via python)?
+<br /><br />
+Here is the USGS New Hampshire <a
+href="http://waterdata.usgs.gov/nh/nwis/rt">webpage</a>.  I am not too
+excited to do web scraping.
+<br /><br />
+Of related interest: NASA/JPL's <a href="http://sensorwebs.jpl.nasa.gov/">sensor webs project</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-28T09_37_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-28T09_49_28.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-27T14_03_39.txt" name="e2006-03-27T14_03_39.txt"></a>
+<h2 class="date">03.27.2006 14:03</h2>
+<div class="blogbody">
+<h3 class="title">online python book - testing and packaging</h3>
+<div class="item-description">
+<a href="http://www.rexx.com/~dkuhlman/python_201/">Python 201</a> --
+(Slightly) Advanced Python Topics by Dave Kuhlman looks pretty
+interesting.  Some stuff is not how I do it in the testing section,
+but this is definitely worth a read.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-27T14_03_39.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-28T09_37_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-27T13_25_13.txt" name="e2006-03-27T13_25_13.txt"></a>
+<h2 class="date">03.27.2006 13:25</h2>
+<div class="blogbody">
+<h3 class="title">How OS X Executes Applications</h3>
+<div class="item-description">
+<a href="http://0xfe.blogspot.com/2006/03/how-os-x-executes-applications.html"> How OS X Executes Applications</a> by 0xFE.  Looks like a good read and not too long.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-27T13_25_13.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-27T14_03_39.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-25T18_22_40.txt" name="e2006-03-25T18_22_40.txt"></a>
+<h2 class="date">03.25.2006 18:22</h2>
+<div class="blogbody">
+<h3 class="title">pyserial</h3>
+<div class="item-description">
+pyserial is <b>great</b>!  Here is how hard it was to create a very
+basic logging program.
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">time</font>
+<strong>import</strong> <font color="#2040a0">serial</font>
+<br /><br />
+<font color="#2040a0">ser</font> <font color="4444FF">=</font> <font color="#2040a0">serial</font>.<font color="#2040a0">Serial</font><font color="4444FF">(</font><font color="#008000">'/dev/tty.KeySerial1'</font>,<font color="#FF0000">38400</font>,<font color="#2040a0">timeout</font><font color="4444FF">=</font><font color="#FF0000">2</font><font color="4444FF">)</font>
+<font color="#2040a0">log</font><font color="4444FF">=</font><font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'ais.log'</font>,<font color="#008000">'a'</font><font color="4444FF">)</font>
+<font color="#2040a0">log</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">'# START LOGGING AT GMTTIME: '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">time</font>.<font color="#2040a0">gmtime</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+<br /><br />
+<font color="#2040a0">i</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+<strong>while</strong> <font color="#2040a0">True</font><font color="4444FF">:</font>
+    <font color="#2040a0">i</font> <font color="4444FF">+</font><font color="4444FF">=</font> <font color="#FF0000">1</font>
+    <font color="#2040a0">line</font> <font color="4444FF">=</font> <font color="#2040a0">ser</font>.<font color="#2040a0">readline</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <strong>print</strong> <font color="#2040a0">i</font>,<font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>,<font color="#008000">':'</font>,<font color="#2040a0">line</font>
+    <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">:</font>
+	<font color="#2040a0">log</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#008000">'# GMTTIME: '</font><font color="4444FF">+</font><font color="#2040a0">str</font><font color="4444FF">(</font><font color="#2040a0">time</font>.<font color="#2040a0">gmtime</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">+</font><font color="#008000">'\n'</font><font color="4444FF">)</font>
+	<font color="#2040a0">log</font>.<font color="#2040a0">write</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+	<font color="#2040a0">log</font>.<font color="#2040a0">flush</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-25T18_22_40.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-27T13_25_13.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-25T14_29_24.txt" name="e2006-03-25T14_29_24.txt"></a>
+<h2 class="date">03.25.2006 14:29</h2>
+<div class="blogbody">
+<h3 class="title">Mac OSX speedups</h3>
+<div class="item-description">
+<a href="http://www.kernelthread.com/mac/apme/optimizations/">Making
+An Operating System Faster</a> (10 Things Apple Did To Make Mac OS X
+Faster).  An interesting read.  Of note is how to make gcc precompiled
+headers for faster compiles.
+<pre>
+% gcc -x c-header -c foo.h 
+% ls foo.* 
+foo.c foo.h foo.gch 
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-25T14_29_24.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-25T18_22_40.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-25T14_02_43.txt" name="e2006-03-25T14_02_43.txt"></a>
+<h2 class="date">03.25.2006 14:02</h2>
+<div class="blogbody">
+<h3 class="title">Portsmouth port noise</h3>
+<div class="item-description">
+This is not bothering us, but it seems to be bothering some of the
+neighbors.  The ships are not there that often.  I would tend to side
+with the local shipping businesses.  Yes, I can hear them unloading
+the salt right now.
+<pre>
+Port Asked To Cut Overnight Work
+<br /><br />
+PORTSMOUTH, N.H. -- Neighbors and a legislator are asking the Port of
+New Hampshire in Portsmouth to stop overnight work so they can get
+some sleep.
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-25T14_02_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-25T14_29_24.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-25T13_58_13.txt" name="e2006-03-25T13_58_13.txt"></a>
+<h2 class="date">03.25.2006 13:58</h2>
+<div class="blogbody">
+<h3 class="title">Vessel tracking in the news</h3>
+<div class="item-description">
+High-tech trackers: <a
+href="http://www.dailypress.com/business/local/dp-93018sy0mar25,0,4978330.story?coll=dp-business-localheads">A
+local initiative to track vessels in and out of the Port of Hampton
+Roads is now being used in San Diego.</a>
+<pre>
+PORTSMOUTH -- A Coast Guard and Navy vessel tracking initiative that
+began in Hampton Roads in 2001 is going national.
+<br /><br />
+The Joint Harbor Operations Center, which monitors ships on local
+waterways through a combination of radar systems, cameras and vessel
+tracking devices, is now being implemented in San Diego.
+...
+"This center is about maintaining awareness," said Capt. Robert
+O'Brien, the Coast Guard's captain of the port in Hampton Roads. "And
+that awareness is key to the safety of our port."
+...
+The JHOC, as it's called, has evolved greatly from its early days
+operating with only a handful of people out of the old watchtower on
+the Elizabeth River at Norfolk Naval Station. Since the summer of
+2004, the center has been headquartered at the Coast Guard base in
+Portsmouth, with millions of dollars worth of computers, software and
+equipment.
+...
+The idea for such a center is the brainchild of Capt. Joseph Bouchard,
+the former commanding officer at the Norfolk Naval Station.
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-25T13_58_13.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-25T14_02_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-25T08_57_04.txt" name="e2006-03-25T08_57_04.txt"></a>
+<h2 class="date">03.25.2006 08:57</h2>
+<div class="blogbody">
+<h3 class="title">First light - SR162 AIS Receiver</h3>
+<div class="item-description">
+I just received my first AIS message.  Not doing anything fancy.  Just
+watching through minicom (installed via fink) using a KeySpan
+USA-19HS.  It is set to 38.4k 8N1 looking at /dev/tty.KeySerial1.  I
+just installed the latest KeySpan driver, so /dev/*USA* is no more.
+<pre>
+        SR162 AIS Receiver                                                   
+                                                                             
+        RECE FRQ        R1F1619750                                           
+        RECE FRQ        R2F1620250                                           
+        INT RATE        I38400          
+!AIVDM,1,1,,A,13F&gt;Lh0P00JstMJHbOQskOvJ087h,0*5A
+!AIVDM,2,1,1,A,v&gt;W`lPt40030Ph0FhhQP1&lt;v00C1W@8&lt;4FS0?h000@P81O0P605P0PPm6,0*09
+!AIVDM,2,2,1,A,P004P`4,2*75                                               
+!AIVDM,1,1,,B,13F&gt;Lh0P01JstLjHbOUrp?v80D00,0*46
+</pre>
+I have to decode the messages, but this may be the Qing Ping Hai
+registered in Panama with an IMO number of 8308915.  It took a few minutes to get all those messages.
+<br /><br />
+I can't wait to get the RM808 back from service so I can see what it
+puts out.
+<br /><br />
+Note: Do not unplug the keyspan while the port it is still open.  That
+set off a kernal trap saying I had to use the power button to restart
+my laptop.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-25T08_57_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-25T13_58_13.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-24T10_30_22.txt" name="e2006-03-24T10_30_22.txt"></a>
+<h2 class="date">03.24.2006 10:30</h2>
+<div class="blogbody">
+<h3 class="title">SQLAlchemy</h3>
+<div class="item-description">
+<a href="http://techspot.zzzeek.org/index.php?/archives/1-Mapping-Heterogeneous-Types-with-SQLAlchemy.html">Mapping Heterogeneous Types with SQLAlchemy</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-24T10_30_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-25T08_57_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-24T10_28_29.txt" name="e2006-03-24T10_28_29.txt"></a>
+<h2 class="date">03.24.2006 10:28</h2>
+<div class="blogbody">
+<h3 class="title">Future of OpenGL</h3>
+<div class="item-description">
+<a href="http://www.gamedev.net/columns/events/gdc2006/article.asp?id=233">Advanced Visual Effects with OpenGL</a> [gamedev.net]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-24T10_28_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-24T10_30_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-24T07_50_59.txt" name="e2006-03-24T07_50_59.txt"></a>
+<h2 class="date">03.24.2006 07:50</h2>
+<div class="blogbody">
+<h3 class="title">line numbering for Marine Geology</h3>
+<div class="item-description">
+This is the suggestion for how to do line numbering that I got from Marine Geology.
+<pre>
+Please find below a sample on how you will prepare your LaTeX document with line number:
+<br /><br />
+\documentclass{elsart}
+<b>\usepackage{lineno}</b>
+\begin{document}
+<b>\linenumbers</b>
+\title{A Framework for Language Identification}
+\author{John Smith, John Doe, John JohnJohn}
+\address{Speech and Audio Research Laboratory,\\ Technology Way,\\ A City, AUSTRALIA, 4001.\\ \{jsmith, jdoe, johnjohnjohn\}@unversity.edu}
+\begin{abstract}
+Whilst several examples of segment based approaches to Language Identification (LID) have been published, they are not as good as this one.
+\end{abstract}
+</pre>
+Unfortunately that did not work for me.  It mangled the title and
+abstract.  I can not figure out how to no use \begin{frontmatter}
+which also stops the line numbering at the end of frontmatter.  Also,
+the line number stops for the figure captions.  Bummer.  Here is the 
+skeleton of what I did:
+<pre>
+%\documentclass{elsart}
+\documentclass[doublespacing]{elsart} % MARINE GEOLOGY DOUBLE SPACED
+\usepackage{lineno}                   % LINE NUMBER PACKAGE
+\usepackage{natbib}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{lscape} % landscape
+\usepackage[usenames]{color} 
+<br /><br />
+\begin{document}
+\begin{frontmatter}
+\title{Origin of continental margin morphology: submarine-slide or
+  downslope current-controlled bedforms, a rock magnetic approach}
+...
+\end{frontmatter}
+\linenumbers % Tell latex lineno package to start using line numbers
+\section{Introduction}
+Rest of the paper...
+</pre>
+I hope that helps someone.  I was not able to find this on the
+Elsevier web site.  Their latex help page seems to have lost most of its
+content.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-24T07_50_59.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-24T10_28_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-23T10_29_56.txt" name="e2006-03-23T10_29_56.txt"></a>
+<h2 class="date">03.23.2006 10:29</h2>
+<div class="blogbody">
+<h3 class="title">more public repositories</h3>
+<div class="item-description">
+Nathan has setup 3 more public subversion projects for me.  
+<ul>
+<li><a href="https://cowfish.unh.edu/projects/seismic-py/">https://cowfish.unh.edu/projects/seismic-py/</a>
+<li><a href="https://cowfish.unh.edu/projects/terrain/">https://cowfish.unh.edu/projects/terrain/</a>
+<li><a href="https://cowfish.unh.edu/projects/xsonar/">https://cowfish.unh.edu/projects/xsonar/</a>
+</ul>
+seismic-py represents a name change from segy-py to avoid a name clash
+(yes, I did have segy-py public first).  No point in confusing people.
+I need to do freshmeat and cheeseshop (aka pypi) announcements this
+week.
+<br /><br />
+xsonar is my protoized update to the USGS xsoanr sidescan.  That means
+I converted K&amp;R function prototypes to modern ANSI-C prototypes.
+<br /><br />
+terrain is the same old terrain that tries to convert height field
+grids between a number of different formats (gmt grids, lightwave,
+Alias obj, OpenInventor, PDS, Vicar).  Lightwave is a pretty crazy
+format, so my support for it has a lot of troubles.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-23T10_29_56.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-24T07_50_59.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-23T09_03_05.txt" name="e2006-03-23T09_03_05.txt"></a>
+<h2 class="date">03.23.2006 09:03</h2>
+<div class="blogbody">
+<h3 class="title">NASA WorldWind roadmap</h3>
+<div class="item-description">
+<a href="http://www.worldwindcentral.com/wiki/Road_Map">http://www.worldwindcentral.com/wiki/Road_Map</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-23T09_03_05.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-23T10_29_56.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-23T06_21_30.txt" name="e2006-03-23T06_21_30.txt"></a>
+<h2 class="date">03.23.2006 06:21</h2>
+<div class="blogbody">
+<h3 class="title">fink build reports</h3>
+<div class="item-description">
+This is good news.  I don't mean that it is good that some things are
+not building, but it is good that there is a master list of things
+that are not building.  There are a few of mine that are not building.
+<br /><br />
+PPC: <a href="http://fink.opendarwin.org/build/2006-03-09/ppc/out/report.html">http://fink.opendarwin.org/build/2006-03-09/ppc/out/report.html</a>
+<br /><br />
+x86: <a href="http://fink.opendarwin.org/build/2006-03-09/i386/out/report.html">http://fink.opendarwin.org/build/2006-03-09/i386/out/report.html</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-23T06_21_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-23T09_03_05.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-22T22_10_54.txt" name="e2006-03-22T22_10_54.txt"></a>
+<h2 class="date">03.22.2006 22:10</h2>
+<div class="blogbody">
+<h3 class="title">Spotlight command line</h3>
+<div class="item-description">
+This sounds like a good thing to be able to do: <a href="http://0xfe.blogspot.com/2006/03/using-spotlight-from-os-x-commandline.html">Using Spotlight from the OS X Commandline</a>
+<pre>
+$ mdfind gmt.info
+<br /><br />
+/Users/schwehr/Desktop/gmt.info.kds
+/sw/fink/10.3/stable/main/finkinfo/sci/gmt.info
+/sw/fink/10.4/stable/main/finkinfo/sci/gmt.info
+/sw/fink/10.3/unstable/main/finkinfo/sci/gmt.info
+/sw/fink/10.4/unstable/main/finkinfo/sci/gmt.info
+/sw/fink/10.4-transitional/stable/main/finkinfo/sci/gmt.info
+/sw/fink/10.4-transitional/unstable/main/finkinfo/sci/gmt.info
+/Users/schwehr/Desktop/gmt.info
+/Users/schwehr/projects/xcore/doc/backup.txt
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-22T22_10_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-23T06_21_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-22T12_50_52.txt" name="e2006-03-22T12_50_52.txt"></a>
+<h2 class="date">03.22.2006 12:50</h2>
+<div class="blogbody">
+<h3 class="title">3D view on the Navionics Platinum</h3>
+<div class="item-description">
+Take a look at the screen shots on this web page of the Navionics
+Platinum here <a
+href="http://www.panbo.com/yae/archives/001184.html>"http://www.panbo.com/yae/archives/001184.html</a>
+and here <a href="http://www.panbo.com/yae/archives/001119.html">http://www.panbo.com/yae/archives/001119.html</a>
+<br /><br />
+<a href="http://www.navionics.com/PlatinumCharts.asp">http://www.navionics.com/PlatinumCharts.asp</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-22T12_50_52.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-22T22_10_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-22T11_11_31.txt" name="e2006-03-22T11_11_31.txt"></a>
+<h2 class="date">03.22.2006 11:11</h2>
+<div class="blogbody">
+<h3 class="title">Maritime academy in Portsmouth</h3>
+<div class="item-description">
+<a href="http://www.seacoastonline.com/news/03222006/business/93865.htm">http://www.seacoastonline.com/news/03222006/business/93865.htm</a>
+<pre>
+...
+ Parker has trained as a lawyer and a ship captain. He's worked for
+ more than three decades as a maritime legal expert and a yacht and
+ ship broker. But Parker, a native of the fishing-famous town of
+ Gloucester, Mass., said for years he's thought of creating a
+ flexible, cost-effective and well-credentialed academy for both the
+ recreational boating and commercial shipping markets. 
+...
+ Classes will begin April 17 at the AMA offices on Brewery Lane just
+ off Islington Street. Parker said he plans to start small by
+ offering basic U.S. Coast Guard certification classes.  
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-22T11_11_31.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-22T12_50_52.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-22T10_46_11.txt" name="e2006-03-22T10_46_11.txt"></a>
+<h2 class="date">03.22.2006 10:46</h2>
+<div class="blogbody">
+<h3 class="title">First public svn repository - density</h3>
+<div class="item-description">
+This is exciting.  Nathan just migrated the first of my projects
+to subversion.  This one is under the GPL, so I am allowing full
+subversion read access.  Check it out at:
+<br /><br />
+<a href="https://cowfish.unh.edu/projects/density">https://cowfish.unh.edu/projects/density</a>
+<br /><br />
+I passed Nathan a dump file that I generated from cvs2svn like this:
+<pre>
+cvs2svn --dump-only --dumpfile ../../density.svndump density
+</pre>
+Inside the density subdir from within my cvs repository were these files:
+<pre>
+AMScrunch.f,v          VolHeader.C,v                 s_bootstrap.C,v
+AUTHOR,v               VolHeader.H,v                 s_bootstrap.help2man,v
+Attic                  as1-crypt.s,v                 s_bootstrap_cmd.ggo.in,v
+Bootstrap.C,v          as2-slump.s,v                 sample.wpt,v
+Bootstrap.H,v          as2xyz.bash,v                 simpleview.C,v
+Cdf.C,v                as3-undef.s,v                 simpleview.help2man.in,v
+Cdf.H,v                axes.iv,v                     simpleview.in,v
+ChangeLog,v            bootvol-thesis.bash,v         simpleview_cmd.ggo.in,v
+Density.C,v            debug.H,v                     spin_gnuplot.C,v
+Density.H,v            debug.bash,v                  spin_gnuplot_cmd.ggo.in,v
+DensityFlagged.C,v     demos.bash,v                  splitdepth.py,v
+DensityFlagged.H,v     density-sml.jpg,v             vol2vol.C,v
+Doxyfile,v             density.info.in,v             vol2vol_cmd.ggo.in,v
+Eigs.C,v               eigs2xyz.py,v                 vol_iv.C,v
+Eigs.H,v               endian.C,v                    vol_iv_cmd.ggo.in,v
+HEADER-files.html,v    getgroups-ol92.bash,v         volhdr_edit.C,v
+HEADER.html,v          histogram.C,v                 volhdr_edit_cmd.ggo.in,v
+INSTALL,v              histogram_cmd.ggo.in,v        volinfo.C,v
+InventorUtilities.C,v  hsva.cpt,v                    volinfo_cmd.ggo.in,v
+InventorUtilities.H,v  is_equal.c,v                  volmakecmap.C,v
+LICENSE.GPL,v          kdsPmagL.H,v                  volmakecmap_cmd.ggo.in,v
+Makefile,v             makeCDF.C,v                   xyz_iv.C,v
+Makefile.endian,v      makemovie.bash,v              xyz_iv_cmd.ggo.in,v
+README.txt,v           one.bash,v                    xyzdensity.C,v
+SiteSigma.C,v          regression.bash,v             xyzdensity.help2man,v
+SiteSigma.H,v          render.C,v                    xyzdensity_cmd.ggo.in,v
+TODO,v                 render.in,v                   xyzvol_cmp.C,v
+VERSION,v              render_cmd.ggo.in,v           xyzvol_cmp_cmd.ggo.in,v
+VecAngle.C,v           rgba.cpt,v
+VecAngle.H,v           rosenbaum-ams-stripped.dat,v
+</pre>
+That should give you some sense of how the svn tree is built based off of the rcs formated ,v files.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-22T10_46_11.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-22T11_11_31.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-22T10_15_29.txt" name="e2006-03-22T10_15_29.txt"></a>
+<h2 class="date">03.22.2006 10:15</h2>
+<div class="blogbody">
+<h3 class="title">svn ignore</h3>
+<div class="item-description">
+I am working on understanding how to use svn's ignore tag so that svg
+status skips things like python byte compiled files (*.pyc).  This
+does not work the same way that .cvsignore works.  Here is a quick
+example.
+<pre>
+$ svn status
+?      version.pyc
+?      verbosity.pyc
+?      BitVector-1.2
+?      dist
+?      html
+?      MANIFEST
+?      ais.pyc
+M      ais.py
+<br /><br />
+$ cd && svn propset svn:ignore "*.pyc" .
+property 'svn:ignore' set on '.'
+<br /><br />
+$ svn status
+?      BitVector-1.2
+?      dist
+?      html
+?      MANIFEST
+ M     .
+M      ais.py
+</pre>
+That is great, but I also want to ignore the html subdirectory.
+<pre>
+$ cd && svn propset svn:ignore "html" .
+property 'svn:ignore' set on '.'
+<br /><br />
+$ svn status
+?      version.pyc
+?      verbosity.pyc
+?      BitVector-1.2
+?      dist
+?      MANIFEST
+?      ais.pyc
+ M     .
+M      ais.py
+</pre>
+Whoops.  *.pyc came back to life!  Instead, I discovered that propedit
+will bring up my text editor to do the job and that new lines between
+each entry works. 
+<pre>
+  svn propedit svn:ignore .
+</pre>
+I then put in this
+<pre>
+html
+*.pyc
+MANIFEST
+dist
+BitVector*
+</pre>
+And now my svn status is much nicer.
+<pre>
+$ svn status
+ M     .
+M      ais.py
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-22T10_15_29.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-22T10_46_11.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-22T08_01_35.txt" name="e2006-03-22T08_01_35.txt"></a>
+<h2 class="date">03.22.2006 08:01</h2>
+<div class="blogbody">
+<h3 class="title">Python Testing Tools</h3>
+<div class="item-description">
+<a href="http://pycheesecake.org/wiki/PythonTestingToolsTaxonomy">Python Testing Tools Taxonomy</a>
+<br /><br />
+<a href="http://bitten.cmlenz.net/">Bitten</a> looks especially interesting.  
+<pre>
+  Bitten is a Python-based framework for collecting various software
+  metrics via continuous integration. It builds on Trac to provide an
+  integrated web-based user interface.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-22T08_01_35.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-22T10_15_29.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-21T16_41_05.txt" name="e2006-03-21T16_41_05.txt"></a>
+<h2 class="date">03.21.2006 16:41</h2>
+<div class="blogbody">
+<h3 class="title">epydoc 3.0a fink package</h3>
+<div class="item-description">
+I just put together a quick and dirty fink info package for epydoc
+3.0alpha.  I want to give it a try on a new python module I am working
+on and pydoc really is not up to what I would like to do.
+<br /><br />
+<a href="http://schwehr.org/blog/attachments/2006-03/epydoc-py.info">epydoc-py.info</a>
+<br /><br />
+Doh... why doesn't fink validate know about the MIT license?
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-21T16_41_05.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-22T08_01_35.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-21T13_20_21.txt" name="e2006-03-21T13_20_21.txt"></a>
+<h2 class="date">03.21.2006 13:20</h2>
+<div class="blogbody">
+<h3 class="title">cvs2svn</h3>
+<div class="item-description">
+I am finally converting my CVS repository that I used throughout my
+time working on my thesis into a subversion (svn) repository.  Here is
+what I had to do.  The first step was to tar up the CVS repository on
+my server.  Names are ever evolving, so I will just put them in for
+historical kicks.
+<pre>
+ssh my.server.com
+#
+cd projects/xcore/
+ls -l Master
+total 0
+drwxr-xr-x  38 schwehr  schwehr  1292  4 Nov  2002 CVSROOT
+drwxr-xr-x   8 schwehr  schwehr   272 21 Mar 09:34 dotfiles
+drwxr-xr-x   5 schwehr  schwehr   170 12 Feb 10:58 xcore
+#
+tar cf Master.tar Master
+bzip2 -9 Master.tar
+mv Master.tar.bz ~/
+exit
+#
+cd ~/Desktop/
+mkdir ForSVN
+cd ForSVN
+scp my.server.com:Master.tar.bz2 .
+tar xf Master.tar
+#
+### Rearrange things to be happier inside of Master
+#
+ls -l Master Master/src Master/doc
+drwxr-xr-x   38 schwehr  staff        1292 Nov  4  2002 CVSROOT
+drwxr-xr-x    7 schwehr  staff         238 Mar 21 13:15 doc
+drwxr-xr-x    8 schwehr  staff         272 Mar 21 08:42 dotfiles
+drwxr-xr-x    8 schwehr  staff         272 Mar 21 13:13 src
+drwxr-xr-x    5 schwehr  staff         170 Feb 12 13:58 thesis
+#
+Master/doc:
+-r--r--r--    1 schwehr  staff      448433 Apr 12  2005 kurt-2004.txt,v
+-r--r--r--    1 schwehr  staff      273650 Feb 20 12:50 kurt-2005.txt,v
+-r--r--r--    1 schwehr  staff       53270 Mar 21 10:45 kurt-2006.txt,v
+drwxr-xr-x    8 schwehr  staff         272 Mar 21 10:44 segy-py
+-r--r--r--    1 schwehr  staff       10016 Mar 21 10:45 todo.txt,v
+#
+Master/src:
+drwxr-xr-x   51 schwehr  staff        1734 Mar 21 11:26 Terrain
+drwxr-xr-x   92 schwehr  staff        3128 Mar 21 11:26 density
+drwxr-xr-x    6 schwehr  staff         204 Mar 21 11:26 mypy
+drwxr-xr-x   27 schwehr  staff         918 Mar 21 11:26 pmag-kds-py
+drwxr-xr-x   47 schwehr  staff        1598 Mar 21 11:26 segy-py
+drwxr-xr-x    6 schwehr  staff         204 Mar 21 11:26 xsonar
+# 
+cd Master/src && mv segy-py seismic-py
+cd Master && rm -rf CVSROOT # This is why I work on a copy
+mv Master schwehr
+mkdir svnrepo
+</pre>
+Now do the conversion, but the first time I tried, it failed like
+this:
+<pre>
+$ cvs2svn -s svnrepo/schwehr schwehr
+yada yada
+===== pass 2 =====
+Checking for blocked exclusions...
+Checking for forced tags with commits...
+Checking for tag/branch mismatches...
+ERROR: The following symbols are tags in some files and branches in others.
+Use --force-tag, --force-branch and/or --exclude to resolve the symbols.
+    'start' is a tag in 351 files, a branch in 4 files and has commits in 4 files.
+</pre>
+So I then tried
+<pre>
+cvs2svn --force-tag=start -s svnrepo/schwehr schwehr
+...
+===== pass 2 =====
+Checking for blocked exclusions...
+Checking for forced tags with commits...
+ERROR: The following branches cannot be forced to be tags because they have commits:
+    'start'
+</pre>
+So I made them all branches.  I hope this does not give me trouble.
+<pre>
+cvs2svn --force-branch=start -s svnrepo/schwehr schwehr
+tic tock...
+cvs2svn Statistics:
+===============---
+Total CVS Files:              2365
+Total CVS Revisions:          8885
+Total Unique Tags:              13
+Total Unique Branches:           9
+CVS Repos Size in KB:       110389
+Total SVN Commits:            5591
+First Revision Date:    Sat Jul  6 13:05:09 2002
+Last Revision Date:     Tue Mar 21 11:27:42 2006
+===============---
+Timings:
+===============---
+pass 1:    52 seconds
+pass 2:     2 seconds
+pass 3:     0 seconds
+pass 4:     3 seconds
+pass 5:    20 seconds
+pass 6:     0 seconds
+pass 7:     0 seconds
+pass 8:   964 seconds
+total:   1043 seconds
+</pre>
+And finally, to import my stuff into the new svn tree...  first to see what dump-only does.  This file is pretty large.  My 30MB CVS repository jumped to 180MB
+<pre>
+cvs2svn --dump-only --force-branch=start --dumpfile schwehr.svndump svnrepo/schwehr
+</pre>
+So maybe build the dump the way roland did:
+<pre>
+svnadmin dump schwehr --deltas > schwehr.svndump.deltas
+</pre>
+And testing out the repository, I am doing a local checkout.
+<pre>
+cd
+mkdir test
+cd test
+svn checkout file://localhost/home/schwehr/svnrepo/schwehr
+ls -la schwehr/
+  total 12
+  drwxrwxr-x   7 schwehr schwehr 4096 Mar 21 14:55 .svn/
+  drwxrwxr-x  13 schwehr schwehr 4096 Mar 21 14:54 branches/
+  drwxrwxr-x  15 schwehr schwehr 4096 Mar 21 14:55 tags/
+  drwxrwxr-x   8 schwehr schwehr 4096 Mar 21 14:54 trunk/
+</pre>
+More later when this is spliced  into the server.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-21T13_20_21.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-21T16_41_05.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-21T12_32_01.txt" name="e2006-03-21T12_32_01.txt"></a>
+<h2 class="date">03.21.2006 12:32</h2>
+<div class="blogbody">
+<h3 class="title">Mapping Human Activity in the Marine Environment</h3>
+<div class="item-description">
+<a href="http://appdomains.slashgeo.org/article.pl?sid=06/03/16/1732243"> Mapping Human Activity in the Marine Environment</a> [slashgeo]
+<pre>
+  This report summarizes the results of the workshop (convened by the
+  National Marine Protected Areas (MPA) Center Science Institute) that
+  brought together 20 social scientists, geographers, and GIS
+  specialists from government agencies, universities, and
+  non-governmental organizations with expertise in characterizing
+  human use patterns in the marine environment with the aid of GIS
+  tools. The goal of the workshop was to develop general design
+  criteria for a practical participatory method or a suite of methods
+  to collect spatial data on human use patterns to inform local and
+  regional MPA planning processes. 
+</pre>
+Bummer... this is mostly abstracts.  Maybe there is good stuff in the
+<a href="http://www3.mpa.gov/mpa_lib/publications.aspx">publications
+section</a> of the US Marine Protected Areas web site.
+<br /><br />
+Other news... <a href="http://www.gisuser.com/content/view/8464/">SAIC
+Celebrates Opening of Advanced Radar Research and Development and
+Production Center in Florida</a> [gisuser.com]
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-21T12_32_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-21T13_20_21.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-21T09_07_04.txt" name="e2006-03-21T09_07_04.txt"></a>
+<h2 class="date">03.21.2006 09:07</h2>
+<div class="blogbody">
+<h3 class="title">mapbender</h3>
+<div class="item-description">
+<a href="http://www.mapbender.org/index.php/Main_Page">mapbender</a>
+<pre>
+  Mapbender is all about maps! Have a look at this map
+  application. You can zoom in, out, pan, click and query, turn layers
+  on and off or add more maps. You can also add new points to the map
+  with the flag button, all Mapbender operators are invited to do
+  so. There are many different possibilities to make use of maps, see
+  some more examples in the Mapbender Gallery. Please observe that
+  this software only shows and manages maps. The maps themselves come
+  from many different Map Services all over the world. 
+<br /><br />
+  Mapbender is the software and portal site for geodata management of
+  OGC OWS architectures. The software provides web technology for
+  managing spatial data services implemented in PHP, JavaScript and
+  XML. It provides a data model and interfaces for displaying,
+  navigating and querying OGC compliant map services. The Mapbender
+  framework furthermore provides authentication and authorization
+  services, OWS proxy functionality, management interfaces for user,
+  group and service administration in WebGIS projects.  
+</pre>
+Not in fink, but it looks interesting.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-21T09_07_04.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-21T12_32_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-21T08_38_22.txt" name="e2006-03-21T08_38_22.txt"></a>
+<h2 class="date">03.21.2006 08:38</h2>
+<div class="blogbody">
+<h3 class="title">GNU make .PHONY</h3>
+<div class="item-description">
+I just went and read the GNU make info page on ".PHONY" targets.  I
+have read this many times, but I guess I never really internalized
+what it means I should do.  Phony rules are those that do not depend
+on files being created.  The classic is the clean rule, but I think
+test will be more informative.  Normally a test rule might look
+something like this:
+<pre>
+test:
+	cd test && make test
+</pre>
+or this (depending on your style preference)
+<pre>
+test:
+	make -f test/Makefile test
+</pre>
+If the test directory exists, make will see that directory and think
+that everything for test is already done.  make will say:
+<pre>
+make: `test' is up to date.
+</pre>
+Clearly, that is not what needs to happen.  Make should go run the
+test!  By saying that test is a phony target, make will ignore the
+test directory and happily run the commands for that target.  Here is
+a dummy test target.
+<pre>
+.PHONY: test
+test:
+	cd test && pwd
+</pre>
+Which when run will work just fine:
+<pre>
+mkdir test
+make test
+  cd test &amp;&amp; pwd
+  SOME_LONG_PATH/test
+</pre>
+And finally, the info page says this speeds up the make process
+because make is no longer looking for those targets.  This is not a
+huge speedup, but in large projects this time will add up as the build
+system gets larger and if building happens frequently.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-21T08_38_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-21T09_07_04.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-21T07_48_32.txt" name="e2006-03-21T07_48_32.txt"></a>
+<h2 class="date">03.21.2006 07:48</h2>
+<div class="blogbody">
+<h3 class="title">virtual machines</h3>
+<div class="item-description">
+Soon I will be trying to run multiple operating systems on top of Mac
+OSX.  I bought a copy of Virtual PC.  Virtual PC also gives me a legal
+copy of XP pro.  I will also be trying <a
+href="http://www.kberg.ch/q/index.php?sid=213146&p=0">Q [kju:]</a>
+which is QEMU.
+<br /><br />
+It does not look like <a
+href="http://www.vmware.com/products/ws/">VMWare</a> works on the Mac.
+<br /><br />
+It is nice to see that there are premade images for Virtual PC of
+things like <a
+href="http://www.versiontracker.com/dyn/moreinfo/macosx/29094">Ubuntu
+(The Breezy Badger) - 5.1.0; Linux i386 disk image for Virtual PC</a>
+<br /><br />
+Others include:
+<ul>
+<li><a href="http://freshmeat.net/projects/bochs/">bochs</a>
+<li><a href="http://freshmeat.net/projects/pearpc/">PearPC</a>
+<li><a href="http://freshmeat.net/projects/wine/">wine</a>/<a href="http://freshmeat.net/projects/darwine/">darwine</a>
+<li><a href="http://www.cl.cam.ac.uk/Research/SRG/netos/xen/index.html">xen</a>
+<li><a href="http://www.lismoresystems.com/en/">GuestPC</a>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-21T07_48_32.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-21T08_38_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-20T12_36_14.txt" name="e2006-03-20T12_36_14.txt"></a>
+<h2 class="date">03.20.2006 12:36</h2>
+<div class="blogbody">
+<h3 class="title">Government Open Source - What is the deal?</h3>
+<div class="item-description">
+<a href="http://www.openchannelfoundation.org/cosmic/">COSMIC</a> is
+the old NASA code release program.  You got to spend a lot of money on
+software.  I doubt that this program took in more money than it spent.
+Plus I still don't see VEVI in their list of programs and I know VEVI
+went into COSMIC.
+<br /><br />
+GCN just posted about <a
+href="http://opensource.arc.nasa.gov/">http://opensource.arc.nasa.gov</a>.
+Why is there yet another open source license?  And why is not more
+NASA developed software in there?  So much code that is written at
+NASA rots or dies as it sits around doing nothing.  I would love to
+see any of the projects I worked on at Ames go open source... even in
+those that probably don't work.  For example, we worked really hard on
+a bunch of VxWorks and Linux software for the Marsokhod rover.  Much
+of it has been superseded as new development teams take over after my
+group mostly left.  That's fine, but that old work is probably just
+gone.  It would be great to allow people to view the source code as
+the read the old journal articles!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-20T12_36_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-21T07_48_32.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-20T12_20_19.txt" name="e2006-03-20T12_20_19.txt"></a>
+<h2 class="date">03.20.2006 12:20</h2>
+<div class="blogbody">
+<h3 class="title">Game processor for military use</h3>
+<div class="item-description">
+<a href="http://www.gcn.com/online/vol1_no1/40150-1.html">Mercury Computer pitches game processor for military use</a> [Government Computer News]
+<pre>
+...
+  The Chelmsford, Mass., company is confident that the Cell Broadband
+  Engine, as it is properly known, cannot only replace existing
+  signal-processing technologies, but also introduce real-time radar,
+  sonar and signals intelligence processing into the battlefield
+  itself. 
+<br /><br />
+  The gaming machine processor "is a glimpse of the future," enthused
+  Craig Lund, Mercury chief technology officer. "It's a disruptive
+  change."
+...
+</pre>
+I am not sure why this is a "disruptive change" as general CPU's are
+becoming more and more able to do these kinds of DSP tasks.  We don't
+need the TI DSP chips as much anymore.  Many of us have been thinking 
+along these lines (e.g. Alex) since at least 1999, but not for
+specifically military applications.  The Cell architecture is going to 
+take a couple years to come into its stride as the compiler and other 
+tools get better.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-20T12_20_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-20T12_36_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-20T07_31_16.txt" name="e2006-03-20T07_31_16.txt"></a>
+<h2 class="date">03.20.2006 07:31</h2>
+<div class="blogbody">
+<h3 class="title">python asserts</h3>
+<div class="item-description">
+I'm trying to build a flexible parser for AIS.  There are a number of
+issues with the AIS specification that make it hard to parse.  AIS is
+definitely NOT something that a normal grammar parser can handle
+(e.g. LALR and friends).  One example is the region section of the
+position messages which are 1, 2, and 3.  One of the fields is a
+region specific 4 byte value.  How is the parser to know what region
+it is in?  And then there is the "bit stuffing" mode that I have not
+gotten to yet where the message must have extra bits "stuffed" in
+there.  I have yet to figure out why this is, but I am suspecting that
+certain bit patterns will be misconstrued as the training dataset at
+the beginning of each AIS message.
+<br /><br />
+I've decided to go the route of a large setup of lookup tables that
+embed parse functions that know what to do with a chunk of bits.  This
+is going to get challenging when the fields have interdependencies,
+but I will just have to refactor at that point.
+<br /><br />
+To make my life safer, I am applying asserts to many of the functions
+to validate all the input and make python a bit more type safe.  I
+know, this is not very pythonic, but I like to catch errors early.  
+This is currently my function to build one table entry.
+<pre>
+<font color="#2040a0">fieldTypes</font><font color="4444FF">=</font><font color="4444FF">[</font><font color="#008000">'int'</font><font color="4444FF">]</font>
+<font color="#2040a0">def</font> <font color="#2040a0">makeEntry</font><font color="4444FF">(</font><font color="#2040a0">offset</font>, <font color="#2040a0">fieldname</font>, <font color="#2040a0">numbits</font>, <font color="#2040a0">description</font><font color="4444FF">=</font><font color="#008000">'N/A'</font>, <font color="#2040a0">type</font><font color="4444FF">=</font><font color="#008000">'int'</font>, <font color="#2040a0">parseFunction</font><font color="4444FF">=</font><font color="#2040a0">parseInt</font>, <font color="#2040a0">units</font><font color="4444FF">=</font><font color="#008000">'N/A'</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Create the lookup table entry
+<br /><br />
+    offset - index of the first bit
+    fieldname - what is this field called.  e.g. FIX
+    numbits - number of bits for this field.  FIX: what if variable??  Scary.
+    type - dict, int, float??, string, ?? what else.  Standard types that are handled.
+        dict must have a parseFunction!
+    parseFunction - function that handles the contents of these bits
+    units - the units after being converted... e.g. degrees/minute
+    &quot;</font><font color="#008000">&quot;&quot;</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">&lt;</font><font color="#FF0000">1000</font><font color="4444FF">)</font> <font color="#FF8800"># FIX: what is the max offset?</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">offset</font><font color="4444FF">&gt;</font><font color="4444FF">=</font><font color="#FF0000">0</font><font color="4444FF">)</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">numbits</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">)</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">numbits</font><font color="4444FF">&lt;</font><font color="#FF0000">1000</font><font color="4444FF">)</font> <font color="#FF8800"># FIX: what is the max message size?</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">fieldTypes</font>.<font color="#2040a0">__contains__</font><font color="4444FF">(</font><font color="#2040a0">type</font><font color="4444FF">)</font><font color="4444FF">)</font>  <font color="#FF8800"># Make sure this is allowed</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">parseFunction</font> <font color="4444FF">!</font><font color="4444FF">=</font> <font color="#2040a0">None</font><font color="4444FF">)</font>
+    <strong>import</strong> <font color="#2040a0">types</font>
+    <strong>assert</strong><font color="4444FF">(</font><font color="#2040a0">isinstance</font><font color="4444FF">(</font><font color="#2040a0">parseInt</font>,<font color="#2040a0">types</font>.<font color="#2040a0">FunctionType</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#FF8800"># Build the entry now that the world is safe</font>
+    <font color="#2040a0">entry</font> <font color="4444FF">=</font> <font color="4444FF"><strong>{</strong></font><font color="#008000">'fieldname'</font><font color="4444FF">:</font><font color="#2040a0">fieldname</font>,
+	     <font color="#008000">'startOffset'</font><font color="4444FF">:</font> <font color="#2040a0">offset</font>,
+	     <font color="#008000">'endOffset'</font><font color="4444FF">:</font> <font color="#2040a0">offset</font><font color="4444FF">+</font><font color="#2040a0">numbits</font><font color="4444FF">-</font><font color="#FF0000">1</font>,
+	     <font color="#008000">'numbits'</font><font color="4444FF">:</font> <font color="#2040a0">numbits</font>,
+	     <font color="#008000">'description'</font><font color="4444FF">:</font><font color="#2040a0">description</font>,
+	     <font color="#008000">'type'</font><font color="4444FF">:</font> <font color="#2040a0">type</font>,
+	     <font color="#008000">'parseFunction'</font><font color="4444FF">:</font><font color="#2040a0">parseFunction</font><font color="4444FF"><strong>}</strong></font>
+    <strong>return</strong><font color="4444FF">(</font><font color="#2040a0">entry</font>,<font color="#2040a0">offset</font><font color="4444FF">+</font><font color="#2040a0">numbits</font><font color="4444FF">)</font>
+</pre>
+The first few asserts just check the range of the offset and numbits.
+These need to be constrained to the maximum sizes of AIS packets.
+For the 'type' value, this has to be something the code knows about.
+I want to be able to expose a list of known types to people using this
+library - the 'fieldTypes' variable.
+<br /><br />
+The trickiest bit is making sure parseFunction is an executable
+function.  I would rather fail when building the table than go a long
+time before some rare message hits a bad value for the parseFunction.
+<br /><br />
+And units... I have got to track these.  It is critical to know what
+units a value has.  There are too many running around in the marine
+world.  SI, CGS, and nautical.  What if someone assumed a depth was in
+fathoms and it really is feet?  That would be 'bad'.
+<br /><br />
+To build up a message dictionary, I do something like this:
+<pre>
+    msg={}
+    offset=0
+    name='MessageID'; entry,offset=makeEntry(offset,name,6); msg[name]=entry
+    name='RepeatIndicator'; entry,offset=makeEntry(offset,name,2); msg[name]=entry
+    name='UserID'; entry,offset=makeEntry(offset,name,30,'MMSI ship id'); msg[name]=entry
+    name='NavStatus'; entry,offset=makeEntry(offset,name,4); msg[name]=entry
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-20T07_31_16.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-20T12_20_19.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-20T06_34_43.txt" name="e2006-03-20T06_34_43.txt"></a>
+<h2 class="date">03.20.2006 06:34</h2>
+<div class="blogbody">
+<h3 class="title">C++ and python</h3>
+<div class="item-description">
+I am now in a waiting pattern for a couple fink packages to make it
+into the CVS tree.  I have been enjoying some python coding using the
+BitVector module.
+<br /><br />
+<a href="http://www.informit.com/articles/article.asp?p=456823">C++
+Command Pattern for Network Operations</a> reminds me that I should
+pick up my Design Patterns book again and start reading.
+<br /><br />
+<a
+href="http://www.informit.com/articles/article.asp?p=454786&rl=1">From
+QuickDraw to Quartz 2D</a> reminds me that I am not really a Mac
+programmer.  I am a software engineer, but I try to avoid too much Mac
+specific stuff.
+<br /><br />
+<a href="http://www.informit.com/articles/article.asp?p=453682">Types
+and Objects in Python</a> - Looking at the BitVector class shows that
+it is not too hard to create new solid types.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-20T06_34_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-20T07_31_16.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-19T08_43_43.txt" name="e2006-03-19T08_43_43.txt"></a>
+<h2 class="date">03.19.2006 08:43</h2>
+<div class="blogbody">
+<h3 class="title">python list comprehensions</h3>
+<div class="item-description">
+I still do not feel comfortable with this kind of thing:
+<pre>
+ipython
+In [1]: l = ['1', 'two', '3']
+In [2]: l = ["prepend" + s for s in l] 
+In [3]: print l
+['prepend1', 'prependtwo', 'prepend3']
+</pre>
+And this is even stranger.
+<pre>
+In [4]: l = ['1', 'two', '3']
+In [6]: map("prefix%s".__mod__,l)
+Out[6]: ['prefix1', 'prefixtwo', 'prefix3']
+</pre>
+Now I'm working on cppunit for fink because gnuradio-core requires a
+newer version than is in fink.  Also ran into trouble with fftw3.  The
+tar ball for fftw 3.0.1 disappeared from the ftp server.  Doh!
+Instead, I just used the binary version with a "sudo apt-get install
+fftw3 fftw3-shlibs"
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-19T08_43_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-20T06_34_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-19T07_25_07.txt" name="e2006-03-19T07_25_07.txt"></a>
+<h2 class="date">03.19.2006 07:25</h2>
+<div class="blogbody">
+<h3 class="title">disappearing x windows</h3>
+<div class="item-description">
+I seem to have a case of disappearing xterm windows.  Is it just after
+a sleep?  I open a xterm from the Applications menu, it then flashes
+on the screen and is gone.  If I open one a few seconds later, it
+opens like normal.  What gives?
+<br /><br />
+Working on packaging gnu radio for fink.  This one may take a while.
+Shared libs and a whole bunch of separate packages.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-19T07_25_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-19T08_43_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-18T22_00_15.txt" name="e2006-03-18T22_00_15.txt"></a>
+<h2 class="date">03.18.2006 22:00</h2>
+<div class="blogbody">
+<h3 class="title">CocoaLab - Learning Mac Programing</h3>
+<div class="item-description">
+<a href=http://www.cocoalab.com/developer.htm">http://www.cocoalab.com/developer.htm</a> - How to Become An Xcoder Book - free 60 page pdf book.
+<br /><br />
+I have never really gotten into the whole cocoa programming thing.
+Maybe I should read this.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-18T22_00_15.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-19T07_25_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-17T21_39_58.txt" name="e2006-03-17T21_39_58.txt"></a>
+<h2 class="date">03.17.2006 21:39</h2>
+<div class="blogbody">
+<h3 class="title">GMSK in GNU Radio</h3>
+<div class="item-description">
+<a href="http://www.gnu.org/software/gnuradio/">http://www.gnu.org/software/gnuradio/</a>
+<pre>
+December 9, 2005 - GNU Radio 2.6 release
+<br /><br />
+GNU Radio 2.6 includes sending and receiving data at up to 1Mbit/sec
+using GMSK. There's also support for the new USRP Flex 400 transceiver
+daughterboards. Handling of all daughterboards has been unified, so
+most apps will work without modification on any of them. For those of
+you interested in wireless networking, see especially
+gnuradio-examples/python/gmsk2. We've got a framework in place to
+allow you to build and experiment with your own MACs. 2.6 includes the
+"null MAC". A carrier sense MAC is the next logical step. For
+additional details see http://comsec.com/wiki?GnuRadio2.X.
+</pre>
+Will it work on the Mac? It appears so: <a href="http://staff.washington.edu/~jon/gr-osx/gr-osx.html">http://staff.washington.edu/~jon/gr-osx/gr-osx.html</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-17T21_39_58.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-18T22_00_15.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T19_28_09.txt" name="e2006-03-16T19_28_09.txt"></a>
+<h2 class="date">03.16.2006 19:28</h2>
+<div class="blogbody">
+<h3 class="title">CARIS additional military layer</h3>
+<div class="item-description">
+<a href="http://www.gisuser.com/content/view/8430/">http://www.gisuser.com/content/view/8430/</a>
+<pre>
+ Database-driven Additional Military Layer Product Editor from CARIS
+Written by CARIS 
+<br /><br />
+CARIS announces the release of the Additional Military Layer (AML)
+Product Editor, the latest addition to the CARIS Hydrographic
+Production Database (HPD) product suite.Fredericton, NB, Canada -
+March 16, 2006 - CARIS announces the release of the Additional
+Military Layer (AML) Product Editor, the latest addition to the CARIS
+Hydrographic Production Database (HPD) product suite.
+<br /><br />
+The release of AML Product Editor expands upon the existing HPD
+product suite, which already includes the HPD Source Editor, S-57 ENC
+Product Editor and Paper Chart Editor.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T19_28_09.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-17T21_39_58.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T19_19_46.txt" name="e2006-03-16T19_19_46.txt"></a>
+<h2 class="date">03.16.2006 19:19</h2>
+<div class="blogbody">
+<h3 class="title">AIS Range Performance monitoring</h3>
+<div class="item-description">
+<pre>
+AIS Range Performance Being Monitored by R&D
+<br /><br />
+An experimental Automatic Identification System (AIS) reception
+network has been established to analyze range performance and improve
+the ability to monitor vessel movement.  The network, consisting of 20
+reception sites at locations from Massachusetts to Hawaii, is used to
+study potential AIS surveillance performance.  The live vessel data
+obtained by the network are distributed to a number of experimental
+and operational government information systems, such as the USCG
+Common Operational Picture.  The AIS signals are generally thought to
+have a short operational range - only a little greater than the
+visible horizon.  Experimentation with receiver design improvements,
+gain antennas, and attention to radio noise reduction has shown that
+AIS surveillance systems can frequently receive signals at ranges 2 to
+10 times the visible horizon.  Site-by-site analysis of range
+performance for all the reception sites connected to the RDC network
+is now available on an experimental web page
+https://ra2.rdc.uscg.gov/NAISprototype/AISdata.htm.  The analysis
+should be of interest to VHF communications system planners, such as
+those designing high performance AIS facilities and surveillance
+networks.
+<br /><br />
+Project: Automatic Identification System Research and Development (2410.5)
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T19_19_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T19_28_09.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T19_14_30.txt" name="e2006-03-16T19_14_30.txt"></a>
+<h2 class="date">03.16.2006 19:14</h2>
+<div class="blogbody">
+<h3 class="title">CG Vessel Tracking Project</h3>
+<div class="item-description">
+<pre>
+Vessel Tracking Project (VTP) Moves Toward Transition
+<br /><br />
+The USCG and the U.S. Navy have joined forces in a cooperative
+partnership, funded with more than $31M of Navy money, that will
+provide the capability for extracting information from multiple
+security sources and provide the capability to fuse multi-intelligence
+data sources.  The Vessel Tracking Project (VTP) will be deployed as
+an operational prototype system to support Maritime Domain Awareness.
+The cornerstone of this project is the Common Distributed Virtual
+Database with Information Extraction (CDVD/IE).  The CDVD/IE allows a
+fusion of data with high levels of automation to create highly
+detailed vessel tracks.  The R&D Program, the primary CG liaison to
+the Naval Research Lab (NRL), has exerted significant influence over
+this project so that it will provide operational value and near-term
+return on investment for the CG.  The project's first operational
+capability will be deployed at the Maritime Intelligence Fusion Center
+(MIFC) Atlantic in July 2006, and additional installations are planned
+for Maritime Intelligence Fusion Center (MIFC) Pacific and National
+Maritime Intelligence Center (NMIC).  From a long-term transition
+perspective, initial planning meetings have resulted in the
+identification and chartering of a joint USCG-USN Transition Working
+Group.
+<br /><br />
+Project:        Department of the Navy USCG Vessel Tracking Project
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T19_14_30.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T19_19_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T14_46_45.txt" name="e2006-03-16T14_46_45.txt"></a>
+<h2 class="date">03.16.2006 14:46</h2>
+<div class="blogbody">
+<h3 class="title">Piscataqua River dredging</h3>
+<div class="item-description">
+<a href="http://www.seacoastonline.com/news/03162006/news/92812.htm">http://www.seacoastonline.com/news/03162006/news/92812.htm</a>
+<pre>
+  NEWINGTON - Port officials and the U.S. Army Corps of Engineers are
+  entering the next phase of planning the expansion of the 800-foot
+  turning basin in the Piscataqua River. 
+<br /><br />
+  Director of Ports and Harbors Geno Marconi said a new study will
+  determine what type of sediment will need to be removed, the best
+  way to remove it and where it will be sent in order to widen the
+  basin. 
+<br /><br />
+  Expanding the basin, located in the federal navigation channel
+  between the shores of Eliot, Maine, and Newington, has been
+  discussed for several years.
+...
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T14_46_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T19_14_30.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T13_47_06.txt" name="e2006-03-16T13_47_06.txt"></a>
+<h2 class="date">03.16.2006 13:47</h2>
+<div class="blogbody">
+<h3 class="title">Notes to Apple</h3>
+<div class="item-description">
+<a href="http://www.macresearch.org/survey_the_transition_to_intel_and_its_impact_on_scientific_computing">http://www.macresearch.org/survey_the_transition_to_intel_and_its_impact_on_scientific_computing</a>
+<br /><br />
+Here are some of my responses to that request.
+<pre>
+Please merge your GNU Make tweaks back into the mainline make tree!!
+It is really frustrating that the standard GNU Make does not work for
+the Fink project.
+<br /><br />
+Would be good if Apple would contribute more to the DarwinPorts and
+Fink projects.  Continual support and improvement of X11 is critical.
+<br /><br />
+The mac package management/receipt system still needs some help.
+<br /><br />
+The firewire camera support is still too complicated.  How about an
+option to work like the old Linux BTB848 drivers where programs can
+read images from /dev/camera.format (e.g. ppm or pgm).
+<br /><br />
+As a scientist, I just don't have time to struggle through learning
+Cocoa or Carbon enough to get at some of these APIs.
+<br /><br />
+Please get python to to 2.4.x!
+<br /><br />
+The lake of case sensitivity is driving me nuts with the Mac.  The
+macosx libJPEG is messing with libjpeg.  That kind of stuff is really
+painful.
+<br /><br />
+More, more, more 64 bit support.
+<br /><br />
+I would rather stick with PowerPC than go to Intel.
+<br /><br />
+More CPUs, PCIExpress slots, and RAM please.  I want a 16-way PowerPC
+box with 128GB of RAM and 4 PCI-Express 16-lane graphics cards that
+all are stereo capable.
+<br /><br />
+How about a Mac OS-X based data-logger/embedded machine.  Okay, I know
+that is crazy and I would rather use Linux where I can control
+everything, but would be interesting.
+<br /><br />
+Internal RAID arrays would be "huge."
+<br /><br />
+Why not just put the server functionality in every copy of Mac OSX?
+</pre>
+I would also like to see ports to the Mac (both x86 and PPC) of ESRI
+tools, Caris, and SGI Performer.  Not for me, but for others so that
+there is a chance of going all Mac for operations (e.g. on-board ships
+and spacecraft mission control centers)
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T13_47_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T14_46_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T12_40_41.txt" name="e2006-03-16T12_40_41.txt"></a>
+<h2 class="date">03.16.2006 12:40</h2>
+<div class="blogbody">
+<h3 class="title">Touch screens</h3>
+<div class="item-description">
+<a href="http://mblog.lib.umich.edu/~rdivecha/archives/2006/02/the_world_of_sm.html">The World of Smartboards, Sympodiums is about to change</a> by Jefferson Y. Han
+<br /><br />
+Thanks to Roi for pointing this out.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T12_40_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T13_47_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T07_07_47.txt" name="e2006-03-16T07_07_47.txt"></a>
+<h2 class="date">03.16.2006 07:07</h2>
+<div class="blogbody">
+<h3 class="title">BitVector improvement</h3>
+<div class="item-description">
+Avi tweaked BitVector a little bit to allow the binary or operator to
+work on different sized BitVectors.  This is great as it make my
+function to set grow size of a BitVector that much easier.
+<pre>
+In [1]: from BitVector import BitVector
+In [2]: print BitVector(intVal=1) ^ BitVector(intVal=2)
+11
+In [3]: print BitVector(intVal=1) ^ BitVector(bitlist=[0,0,0,0,0,0,0,0])
+00000001
+In [4]: print BitVector(intVal=1) ^ BitVector(bitlist=[0]*8)
+00000001
+</pre>
+So the new function is just two lines...
+<pre>
+def bvSize(bv,size=8):
+    return (bv ^ BitVector(bitlist=[0]*size))
+</pre>
+Which works like this:
+<pre>
+In [6]: print bvSize(BitVector(intVal=123),32)
+00000000000000000000000001111011
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T07_07_47.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T12_40_41.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T06_09_45.txt" name="e2006-03-16T06_09_45.txt"></a>
+<h2 class="date">03.16.2006 06:09</h2>
+<div class="blogbody">
+<h3 class="title">IEEE Vis 2006</h3>
+<div class="item-description">
+Abstracts are due in 5 days...
+<ul>
+<li>IEEE Visualization 2006 - <a href="http://vis.computer.org/vis2006/">http://vis.computer.org/vis2006/</a>
+<li>IEEE InfoVis 2006 <a href="http://conferences.computer.org/infovis/infovis2006/">http://conferences.computer.org/infovis/infovis2006/</a>
+<li>IEEE VAST 2006 <a href="http://conferences.computer.org/vast/vast2006/">http://conferences.computer.org/vast/vast2006/</a>
+</ul>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T06_09_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T07_07_47.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-16T00_06_01.txt" name="e2006-03-16T00_06_01.txt"></a>
+<h2 class="date">03.16.2006 00:06</h2>
+<div class="blogbody">
+<h3 class="title">Time in Google Earth</h3>
+<div class="item-description">
+<a href="http://www.ogleearth.com/2006/03/timedrive_the_f.html">TimeDrive: The fourth dimension comes to Google Earth</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-16T00_06_01.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T06_09_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-14T13_40_20.txt" name="e2006-03-14T13_40_20.txt"></a>
+<h2 class="date">03.14.2006 13:40</h2>
+<div class="blogbody">
+<h3 class="title">BitVector python module</h3>
+<div class="item-description">
+I just added <a
+href="http://rvl4.ecn.purdue.edu/~kak/dist/BitVector-1.2.html">BitVector
+1.2</a> to fink 10.4-transitional/unstable.  This is a nice package
+for bit twiddling written by <a
+href="http://rvl4.ecn.purdue.edu/~kak/">Avi Kak</a> at Purdue.
+<br /><br />
+This package makes working with bit level data much easier than it
+ever was in C or C++.  STL in C++ has trouble with bit vectors and the
+C bit operators are not the most fun.  BitVector has the muscle to
+make the job much more understandable. 
+<pre>
+python
+from BitVector import BitVector
+bv = BitVector(bitlist = [ 0,0,1,0]); print bv
+  0010
+print bv[-2]
+  1
+b2=BitVector(intVal=2);print b2
+  10
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-14T13_40_20.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-16T00_06_01.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-14T08_19_49.txt" name="e2006-03-14T08_19_49.txt"></a>
+<h2 class="date">03.14.2006 08:19</h2>
+<div class="blogbody">
+<h3 class="title">4 pci express slots - 8 heads</h3>
+<div class="item-description">
+<a
+href="http://www.hothardware.com/viewarticle.aspx?articleid=780&cid=3">Gigabyte
+GA-8N-SLI Quad Royal Motherboard</a> has 4 PCI Express x16 slots.  Too
+bad this is not the same motherboard that has 4 opteron sockets.  Just
+think about 8 Opteron Cores with 128 GB of ram and 4 Graphics Cards.
+Now combine that with a math library that is able to push some
+operations to the graphics cards.  That is some serious crunching
+power in a small form factor without going with crazy hardware.  What
+kind of powersuppy and cooling system would be needed?  Perhaps just
+hook it straight into the buildings AC system.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-14T08_19_49.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-14T13_40_20.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-13T13_52_07.txt" name="e2006-03-13T13_52_07.txt"></a>
+<h2 class="date">03.13.2006 13:52</h2>
+<div class="blogbody">
+<h3 class="title">pivy fink packages!</h3>
+<div class="item-description">
+This is VERY exciting!  After wanting a swig python API for
+OpenInventor for 9 years, I just ran one for the first time today.  I
+now have fink info files that work for 10.4-transitional.
+<ul>
+<li><a href="http://schwehr.org/blog/attachments/2006-03/swig1325.info">swig1325.info</a>
+<li><a href="http://schwehr.org/blog/attachments/2006-03/pivy-py.info">pivy-py.info</a>
+</ul>
+<b>AWESOME!!!</b>
+<pre>
+<font color="#FF8800">#!/usr/bin/env python</font>
+<font color="#FF8800"># Copyright (c) 2002, Tamer Fahmy &lt;tamer@tammura.at&gt;</font>
+<strong>import</strong> <font color="#2040a0">sys</font>
+<strong>from</strong> <font color="#2040a0">pivy</font>.<font color="#2040a0">sogui</font> <strong>import</strong> <font color="4444FF">*</font>
+<strong>from</strong> <font color="#2040a0">pivy</font>.<font color="#2040a0">coin</font> <strong>import</strong> <font color="4444FF">*</font>
+<font color="#2040a0">def</font> <font color="#2040a0">main</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">myWindow</font> <font color="4444FF">=</font> <font color="#2040a0">SoGui</font>.<font color="#2040a0">init</font><font color="4444FF">(</font><font color="#2040a0">sys</font>.<font color="#2040a0">argv</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">myWindow</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#2040a0">None</font><font color="4444FF">:</font> <font color="#2040a0">sys</font>.<font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+    <font color="#2040a0">root</font> <font color="4444FF">=</font> <font color="#2040a0">SoSeparator</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">myCamera</font> <font color="4444FF">=</font> <font color="#2040a0">SoPerspectiveCamera</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">myMaterial</font> <font color="4444FF">=</font> <font color="#2040a0">SoMaterial</font><font color="4444FF">(</font><font color="4444FF">)</font>
+    <font color="#2040a0">root</font>.<font color="#2040a0">addChild</font><font color="4444FF">(</font><font color="#2040a0">myCamera</font><font color="4444FF">)</font>
+    <font color="#2040a0">root</font>.<font color="#2040a0">addChild</font><font color="4444FF">(</font><font color="#2040a0">SoDirectionalLight</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="#2040a0">myMaterial</font>.<font color="#2040a0">diffuseColor</font> <font color="4444FF">=</font> <font color="4444FF">(</font><font color="#FF0000">1.0</font>, <font color="#FF0000">0.0</font>, <font color="#FF0000">0.0</font><font color="4444FF">)</font>   <font color="#FF8800"># Red</font>
+    <font color="#2040a0">root</font>.<font color="#2040a0">addChild</font><font color="4444FF">(</font><font color="#2040a0">myMaterial</font><font color="4444FF">)</font>
+    <font color="#2040a0">root</font>.<font color="#2040a0">addChild</font><font color="4444FF">(</font><font color="#2040a0">SoCone</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+    <font color="#2040a0">myRenderArea</font> <font color="4444FF">=</font> <font color="#2040a0">SoGuiRenderArea</font><font color="4444FF">(</font><font color="#2040a0">myWindow</font><font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+    <font color="#2040a0">myCamera</font>.<font color="#2040a0">viewAll</font><font color="4444FF">(</font><font color="#2040a0">root</font>, <font color="#2040a0">myRenderArea</font>.<font color="#2040a0">getViewportRegion</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+    <font color="#2040a0">myRenderArea</font>.<font color="#2040a0">setSceneGraph</font><font color="4444FF">(</font><font color="#2040a0">root</font><font color="4444FF">)</font>
+    <font color="#2040a0">myRenderArea</font>.<font color="#2040a0">setTitle</font><font color="4444FF">(</font><font color="#008000">&quot;Hello Cone&quot;</font><font color="4444FF">)</font>
+    <font color="#2040a0">myRenderArea</font>.<font color="#2040a0">show</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<font color="#FF8800">#</font>
+    <font color="#2040a0">SoGui</font>.<font color="#2040a0">show</font><font color="4444FF">(</font><font color="#2040a0">myWindow</font><font color="4444FF">)</font>  <font color="#FF8800"># Display main window</font>
+    <font color="#2040a0">SoGui</font>.<font color="#2040a0">mainLoop</font><font color="4444FF">(</font><font color="4444FF">)</font>    <font color="#FF8800"># Main Inventor event loop</font>
+<font color="#FF8800">#</font>
+<strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">&quot;__main__&quot;</font><font color="4444FF">:</font>
+    <font color="#2040a0">main</font><font color="4444FF">(</font><font color="4444FF">)</font>
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-13T13_52_07.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-14T08_19_49.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-13T09_43_45.txt" name="e2006-03-13T09_43_45.txt"></a>
+<h2 class="date">03.13.2006 09:43</h2>
+<div class="blogbody">
+<h3 class="title">worldKit</h3>
+<div class="item-description">
+No, this is now World Tool Kit... this is <a
+href="http://worldkit.org/index.php">worldKit</a> - a flash based
+google maps like system that is released under the GPL license.  Now
+quick as slick an interface as Google maps/local, but it looks like it
+works.  I am curious about the RSS integration, but don't have time
+right now to dig further.
+<br /><br />
+Note: I am still working on pivy and bitvector packages.  For pivy,
+Tamer let me know that it will not work with swig 1.3.28, so I am
+packaging swig 1.3.25.  Hopefully swig 1.3.29 will clear things up.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-13T09_43_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-13T13_52_07.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-13T06_49_43.txt" name="e2006-03-13T06_49_43.txt"></a>
+<h2 class="date">03.13.2006 06:49</h2>
+<div class="blogbody">
+<h3 class="title">Google Mars</h3>
+<div class="item-description">
+I heard this was going to be released soon and now I can finally talk about it.
+<pre>
+        <a href="http://www.google.com/mars/">Google Mars</a>
+</pre>
+Then click on spacecraft.  You will see where all the spacecraft have
+gone.  Now where are Zareh's movies?  If you go to the about page, you
+will eventually end up here:
+<pre>
+        <a href="http://themis.asu.edu/valles_video">Flight Into Mariner Valley: The Movie</a>
+</pre>
+I got to try the HDTV sized version of the movie and it bought my
+laptop to its knees, but the smaller versions play perfectly Great
+movie!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-13T06_49_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-13T09_43_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-12T18_36_35.txt" name="e2006-03-12T18_36_35.txt"></a>
+<h2 class="date">03.12.2006 18:36</h2>
+<div class="blogbody">
+<h3 class="title">buildbot</h3>
+<div class="item-description">
+I saw an article today about setting up buildbot to manage servers to
+build latest version of software for a project on one or more machines
+and decided to update my fink package that I started about a year ago.
+I upgraded it to version 0.7.2 and made it now depend on python 2.4,
+twisted2-web2, and zopeinterface-py24.  I only did the zope thing
+because of the articles below.  Still have not worked through them.
+Need to get my new mac server!  I can't wait to have automated
+building and testing.  Maybe I can even do Mac, Windows, and Linux all
+on the same machine using virtualization.
+<br /><br />
+<a href="http://schwehr.org/blog/attachments/2006-03/buildbot-py.info">buildbot-py.info</a>
+<br /><br />
+The articles on setup are:
+<ul>
+<li><a href="http://agiletesting.blogspot.com/2006/02/continuous-integration-with-buildbot.html">Continuous integration with buildbot</a>
+<li><a href="http://agiletesting.blogspot.com/2006/03/running-buildbot-on-various-platforms.html"> Running buildbot on various platforms</a>
+</ul>
+<br /><br />
+As usual, you will need to put the info file in
+/sw/fink/10.4-transitional/local/main/finkinfo/devel and download the
+source from the buildbot home page.  The tar.gz goes in /sw/src/
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-12T18_36_35.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-13T06_49_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-11T21_02_22.txt" name="e2006-03-11T21_02_22.txt"></a>
+<h2 class="date">03.11.2006 21:02</h2>
+<div class="blogbody">
+<h3 class="title">SigGraph 2006 in Boston</h3>
+<div class="item-description">
+The title says it all.  <a
+href="http://www.siggraph.org/s2006/">SigGraph2006</a> is in Boston
+which is just down the road from here.  Wow... it is already too late
+to submit papers.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-11T21_02_22.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-12T18_36_35.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-11T12_55_45.txt" name="e2006-03-11T12_55_45.txt"></a>
+<h2 class="date">03.11.2006 12:55</h2>
+<div class="blogbody">
+<h3 class="title">4 socket opteron = 8 cores</h3>
+<div class="item-description">
+This sounds like it has some pretty decent compute power... 4 socket 1U opteron system with 4 dual core chips:
+<a href="http://www.theregister.co.uk/2006/03/11/supermicro_super_amd/">Supermicro stuns with four-socket, 1U Opteron</a>
+<br /><br />
+<a href="http://www.supermicro.com/Aplus/motherboard/Opteron/nForce/H8QC8+.cfm">http://www.supermicro.com/Aplus/motherboard/Opteron/nForce/H8QC8+.cfm</a>
+<br /><br />
+That would make a nice little cluster with a bunch of these.  Issues
+are just power and cooling.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-11T12_55_45.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-11T21_02_22.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-11T09_12_43.txt" name="e2006-03-11T09_12_43.txt"></a>
+<h2 class="date">03.11.2006 09:12</h2>
+<div class="blogbody">
+<h3 class="title">swig 1.3.29</h3>
+<div class="item-description">
+I submitted a change request to the swig team asking for a fix so that
+swig honors the --program-suffix and --program-prefix configure
+options.  Wow, what a quick turnaround!
+<pre>
+William Fulton (wsfulton)
+Date: 2006-03-10 22:58
+<br /><br />
+Message:
+user_id=242951
+<br /><br />
+SWIG has a non-standard way of doing this, use the
+--with-release-suffix option. For 1.3.29, I've removed this
+options and fixed the standard ones, namely,
+--program-prefix and --program-suffix
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-11T09_12_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-11T12_55_45.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-10T15_53_32.txt" name="e2006-03-10T15_53_32.txt"></a>
+<h2 class="date">03.10.2006 15:53</h2>
+<div class="blogbody">
+<h3 class="title">tcpdump</h3>
+<div class="item-description">
+We have a VLinx device that is reading RS422 data and spitting out UDP
+broadcast packets.  Yesterday, I got pretty confused trying to
+understand what it was doing by looking at the tcpdump output.  Now
+that Roland has a given me his nice little SDL based application to
+read UDP traffic, the tcpdump stuff is not as important, but here is
+the tcpdump line I just came up with.
+<pre>
+sudo tcpdump -i en0 -A -n src IP-ADDRESS-OF-VLINX and udp port 4003
+</pre>
+<ul>
+<li>The "-i en0" reads my mac laptops built in ethernet port.
+<li>"-A" dumps an ascii version of the package payload
+<li>"-n" says just give the numeric port and ip numbers
+<li>"src IP-ADDRESS-OF-VLINX" only receive packets from that address
+<li>"and" logical glue to the next statement
+<li>"udp port 4003" says we only want to see that port.
+</ul>
+This gives results like this...
+<pre>
+15:27:54.796096 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 14
+E..*4.@...9.
+0
+        ............s.!AIVDO,1,1,,,1rks 27..
+15:27:54.800100 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 14
+E..*4.@...9.
+0
+        ..............018lEgP?w&lt;tSF0rks .G..
+15:27:54.803785 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 14
+E..*4.@...9.
+0
+        ..............l4Q@&gt;4?wp1d00,rks d.f\
+15:27:54.805363 IP 10.48.2.199.4003 &gt; 255.255.255.255.4003: UDP, length: 6
+E.."4.@...9.
+0............_)0*78
+</pre>
+Which is not as nice as
+<pre>
+@GZTIM,185.807016
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1l00,0*70
+@GZTIM,186.858809
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1l00,0*70
+@GZTIM,187.907003
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1d00,0*78
+@GZTIM,188.955972
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1d00,0*78
+@GZTIM,190.007628
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1l00,0*70
+@GZTIM,191.055809
+!AIVDO,1,1,,,1018lEgP?w<tSF0l4Q@>4?wp1h00,0*74
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-10T15_53_32.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-11T09_12_43.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-10T08_45_10.txt" name="e2006-03-10T08_45_10.txt"></a>
+<h2 class="date">03.10.2006 08:45</h2>
+<div class="blogbody">
+<h3 class="title">geonames and georss</h3>
+<div class="item-description">
+<a href="http://www.geonames.org/">http://www.geonames.org/</a> - does
+it an a web api or a way to get all of the database?
+<br /><br />
+<a href="http://ccablog.blogspot.com/2006/03/portland-maine-map-exhibit.html">Portland Maine map exihibit</a>
+<br /><br />
+<A HREF="http://www.georss.org/">http://www.georss.org/</a>  -  Geographically Encoded Objects for RSS feeds
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-10T08_45_10.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-10T15_53_32.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-10T05_35_14.txt" name="e2006-03-10T05_35_14.txt"></a>
+<h2 class="date">03.10.2006 05:35</h2>
+<div class="blogbody">
+<h3 class="title">nmea checksums, doctest, unittest</h3>
+<div class="item-description">
+Here is a nice example python module that illustrates 4 imporant
+concepts.
+<ol>
+<li> Using <b>doctest</b> is really easy.  Lines 15-18 and 32-38 define some
+examples that doctest will validate.  The python code starts with
+&gt;&gt;&gt; and is followed by the expected output from that
+command.  At the end of the program (lines 59-60), doctest is called.
+It will scan through the whole module and validate every doctest
+formatted example.
+<li> Using <b>unittest</b> is a little bit more work,  Lines 48-55 are
+a basic unittest setup.  This can be done much fancier with setup and
+teardown methods before and after groups of tests and much more.
+<li>On a different note, this module handles NMEA 0183
+checksum calculation and validation for AIS and GPS strings.  Not very
+exciting, but it provides an example and shows how the string is
+OR'ed (^ in python) together.
+<li>Finally, I used "pydoc -w nmeaChecksum.html" to produce the <a
+href="http://schwehr.org/blog/attachments/2006-03/nmeaChecksum.html">nmeaChecksum
+web documentation</a>.  I still need to give epydoc a try, as it looks
+more like doxygen.  Pydoc is not all that powerful.
+</ol>
+<pre>
+<a name="line1"> 1</a> <font color="#444444">#!/usr/bin/env python</font>
+<a name="line2"> 2</a> <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;
+<a name="line3"> 3</a> Background info on NMEA strings can be had from here:
+<a name="line4"> 4</a>     http://gpsd.berlios.de/NMEA.txt
+<a name="line5"> 5</a> &quot;</font><font color="#008000">&quot;&quot;</font>
+<a name="line6"> 6</a> <font color="#2040a0">__version__</font> <font color="4444FF">=</font> <font color="#008000">'$Revision: 1.1 $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font> <font color="#444444"># See man ident</font>
+<a name="line7"> 7</a> <font color="#2040a0">__date__</font> <font color="4444FF">=</font> <font color="#008000">'$Date: 2006/03/10 10:11:40 $'</font>.<font color="#2040a0">split</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font>
+<a name="line8"> 8</a> <font color="#2040a0">__author__</font> <font color="4444FF">=</font> <font color="#008000">'Kurt Schwehr'</font>
+<a name="line9"> 9</a> 
+<a name="line10">10</a> <font color="#2040a0">def</font> <font color="#2040a0">nmeaChecksumStr</font><font color="4444FF">(</font><font color="#2040a0">data</font><font color="4444FF">)</font><font color="4444FF">:</font>
+<a name="line11">11</a>     <font color="#008000">&quot;&quot;</font><font color="#008000">&quot; Take a NMEA 0183 string and compute the checksum 
+<a name="line12">12</a> 
+<a name="line13">13</a>     Checksum is calculated by xor'ing everything between ? or ! and the *
+<a name="line14">14</a> 
+<a name="line15">15</a>     &gt;&gt;&gt; nmeaChecksumStr(&quot;</font><font color="4444FF">!</font><font color="#2040a0">AIVDM</font>,<font color="#FF0000">1</font>,<font color="#FF0000">1</font>,,<font color="#2040a0">B</font>,35<font color="#2040a0">MsUdPOh8JwI</font><font color="4444FF">:</font>0<font color="#2040a0">HUwquiIFH21</font><font color="4444FF">&gt;</font><font color="#2040a0">i</font>,<font color="#FF0000">0</font><font color="4444FF">*</font><font color="#FF0000">09</font><font color="#008000">&quot;)
+<a name="line16">16</a>     '09'
+<a name="line17">17</a>     &gt;&gt;&gt; nmeaChecksumStr(&quot;</font><font color="#2040a0">AIVDM</font>,<font color="#FF0000">1</font>,<font color="#FF0000">1</font>,,<font color="#2040a0">B</font>,35<font color="#2040a0">MsUdPOh8JwI</font><font color="4444FF">:</font>0<font color="#2040a0">HUwquiIFH21</font><font color="4444FF">&gt;</font><font color="#2040a0">i</font>,<font color="#FF0000">0</font><font color="#008000">&quot;)
+<a name="line18">18</a>     '09'
+<a name="line19">19</a>     &quot;</font><font color="#008000">&quot;&quot;</font>
+<a name="line20">20</a>     
+<a name="line21">21</a>     <strong>if</strong> <font color="#2040a0">data</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'!'</font> <strong>or</strong> <font color="#2040a0">data</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'?'</font><font color="4444FF">:</font> <font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">data</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">:</font><font color="4444FF">]</font>
+<a name="line22">22</a>     <strong>if</strong> <font color="#2040a0">data</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">3</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#008000">'*'</font><font color="4444FF">:</font> <font color="#2040a0">data</font> <font color="4444FF">=</font> <font color="#2040a0">data</font><font color="4444FF">[</font><font color="4444FF">:</font><font color="4444FF">-</font><font color="#FF0000">3</font><font color="4444FF">]</font>
+<a name="line23">23</a>     <font color="#2040a0">sum</font><font color="4444FF">=</font><font color="#FF0000">0</font>
+<a name="line24">24</a>     <strong>for</strong> <font color="#2040a0">c</font> <strong>in</strong> <font color="#2040a0">data</font><font color="4444FF">:</font> <font color="#2040a0">sum</font> <font color="4444FF">=</font> <font color="#2040a0">sum</font> ^ <font color="#2040a0">ord</font><font color="4444FF">(</font><font color="#2040a0">c</font><font color="4444FF">)</font>
+<a name="line25">25</a>     <font color="#2040a0">sumHex</font> <font color="4444FF">=</font> <font color="#008000">&quot;%x&quot;</font> <font color="4444FF">%</font> <font color="#2040a0">sum</font>
+<a name="line26">26</a>     <strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">sumHex</font><font color="4444FF">)</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#FF0000">1</font><font color="4444FF">:</font> <font color="#2040a0">sumHex</font> <font color="4444FF">=</font> <font color="#008000">'0'</font><font color="4444FF">+</font><font color="#2040a0">sumHex</font>
+<a name="line27">27</a>     <strong>return</strong> <font color="#2040a0">sumHex</font>
+<a name="line28">28</a> 
+<a name="line29">29</a> <font color="#2040a0">def</font> <font color="#2040a0">isNmeaChecksumValid</font><font color="4444FF">(</font><font color="#2040a0">nmeaStr</font><font color="4444FF">)</font><font color="4444FF">:</font>
+<a name="line30">30</a>     <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Return True if the string checks out with the checksum
+<a name="line31">31</a> 
+<a name="line32">32</a>     &gt;&gt;&gt; isNmeaChecksumValid(&quot;</font><font color="4444FF">!</font><font color="#2040a0">AIVDM</font>,<font color="#FF0000">1</font>,<font color="#FF0000">1</font>,,<font color="#2040a0">B</font>,35<font color="#2040a0">MsUdPOh8JwI</font><font color="4444FF">:</font>0<font color="#2040a0">HUwquiIFH21</font><font color="4444FF">&gt;</font><font color="#2040a0">i</font>,<font color="#FF0000">0</font><font color="4444FF">*</font><font color="#FF0000">09</font><font color="#008000">&quot;)
+<a name="line33">33</a>     True
+<a name="line34">34</a> 
+<a name="line35">35</a>     Corrupted:
+<a name="line36">36</a> 
+<a name="line37">37</a>     &gt;&gt;&gt; isNmeaChecksumValid(&quot;</font><font color="4444FF">!</font><font color="#2040a0">AIVDM</font>,<font color="#FF0000">11</font>,<font color="#FF0000">1</font>,,<font color="#2040a0">B</font>,35<font color="#2040a0">MsUdPOh8JwI</font><font color="4444FF">:</font>0<font color="#2040a0">HUwquiIFH21</font><font color="4444FF">&gt;</font><font color="#2040a0">i</font>,<font color="#FF0000">0</font><font color="4444FF">*</font><font color="#FF0000">09</font><font color="#008000">&quot;)
+<a name="line38">38</a>     False
+<a name="line39">39</a>     &quot;</font><font color="#008000">&quot;&quot;</font>
+<a name="line40">40</a>     <strong>if</strong> <font color="#2040a0">nmeaStr</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">3</font><font color="4444FF">]</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#008000">'*'</font><font color="4444FF">:</font> <font color="#2040a0">False</font>  <font color="#444444"># Bad string without proper checksum</font>
+<a name="line41">41</a>     <font color="#2040a0">checksum</font><font color="4444FF">=</font><font color="#2040a0">nmeaStr</font><font color="4444FF">[</font><font color="4444FF">-</font><font color="#FF0000">2</font><font color="4444FF">:</font><font color="4444FF">]</font>
+<a name="line42">42</a>     <strong>if</strong> <font color="#2040a0">checksum</font><font color="4444FF">=</font><font color="4444FF">=</font><font color="#2040a0">nmeaChecksumStr</font><font color="4444FF">(</font><font color="#2040a0">nmeaStr</font><font color="4444FF">)</font><font color="4444FF">:</font> <strong>return</strong> <font color="#2040a0">True</font>
+<a name="line43">43</a>     <strong>return</strong> <font color="#2040a0">False</font>
+<a name="line44">44</a> 
+<a name="line45">45</a> <font color="#444444">######################################################################</font>
+<a name="line46">46</a> <font color="#444444"># Test code</font>
+<a name="line47">47</a> <font color="#444444">######################################################################</font>
+<a name="line48">48</a> <strong>import</strong> <font color="#2040a0">unittest</font>
+<a name="line49">49</a> <strong>class</strong> <font color="#2040a0">TestChecksum</font><font color="4444FF">(</font><font color="#2040a0">unittest</font>.<font color="#2040a0">TestCase</font><font color="4444FF">)</font><font color="4444FF">:</font>
+<a name="line50">50</a>     <font color="#008000">&quot;&quot;</font><font color="#008000">&quot;Are we computing the checksome correctly?&quot;</font><font color="#008000">&quot;&quot;</font>
+<a name="line51">51</a> <strong>   <font color="ff0000"> def</font><font color="ff0000"> testSimple</font><font color="2040a0">(self)</font>:
+<a name="line52">52</a> </strong>	<font color="#2040a0">self</font>.<font color="#2040a0">assertEquals</font><font color="4444FF">(</font><font color="#008000">'09'</font>,<font color="#2040a0">nmeaChecksumStr</font><font color="4444FF">(</font><font color="#008000">&quot;!AIVDM,1,1,,B,35MsUdPOh8JwI:0HUwquiIFH21&gt;i,0*09&quot;</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<a name="line53">53</a> 	<font color="#2040a0">self</font>.<font color="#2040a0">failUnless</font><font color="4444FF">(</font><font color="#2040a0">isNmeaChecksumValid</font><font color="4444FF">(</font><font color="#008000">&quot;!AIVDM,1,1,,B,35MsUdPOh8JwI:0HUwquiIFH21&gt;i,0*09&quot;</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<a name="line54">54</a> 	<font color="#444444"># Corrupted</font>
+<a name="line55">55</a> 	<font color="#2040a0">self</font>.<font color="#2040a0">failUnless</font><font color="4444FF">(</font><strong>not</strong> <font color="#2040a0">isNmeaChecksumValid</font><font color="4444FF">(</font><font color="#008000">&quot;!AIVDM,11,1,,B,35MsUdPOh8JwI:0HUwquiIFH21&gt;i,0*09&quot;</font><font color="4444FF">)</font><font color="4444FF">)</font>
+<a name="line56">56</a> 
+<a name="line57">57</a> <strong>if</strong> <font color="#2040a0">__name__</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#008000">'__main__'</font><font color="4444FF">:</font>
+<a name="line58">58</a>     <font color="#2040a0">unittest</font>.<font color="#2040a0">main</font><font color="4444FF">(</font><font color="4444FF">)</font>
+<a name="line59">59</a>     <strong>import</strong> <font color="#2040a0">doctest</font>
+<a name="line60">60</a>     <font color="#2040a0">doctest</font>.<font color="#2040a0">testmod</font><font color="4444FF">(</font><font color="4444FF">)</font>    
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-10T05_35_14.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-10T08_45_10.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-10T04_17_54.txt" name="e2006-03-10T04_17_54.txt"></a>
+<h2 class="date">03.10.2006 04:17</h2>
+<div class="blogbody">
+<h3 class="title">converting between characters and their ascii numbers in python</h3>
+<div class="item-description">
+This one stumped me way to long.  I figured that it has to be
+somewhere in python.  This is one of those things that happens through
+casting in c.
+<pre>
+ipython
+<br /><br />
+In [1]: chr(97) 
+Out[1]: 'a'
+<br /><br />
+In [2]: ord('a')
+Out[2]: 97
+</pre>
+<a href="http://www.python.org/doc/lib/built-in-funcs.html">http://www.python.org/doc/lib/built-in-funcs.html</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-10T04_17_54.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-10T05_35_14.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-08T13_06_05.txt" name="e2006-03-08T13_06_05.txt"></a>
+<h2 class="date">03.08.2006 13:06</h2>
+<div class="blogbody">
+<h3 class="title">pyvox</h3>
+<div class="item-description">
+This looks very interesting on the 3D volume rendering/volex front.
+Hopefully I will get pivy going soon and maybe can work on adding
+voleon support to it.  That would be a great combination.
+<a href="http://cheeseshop.python.org/pypi/Pyvox/0.72">http://cheeseshop.python.org/pypi/Pyvox/0.72</a>
+<pre>
+  Pyvox (formerly known as BBLimage) is a set of software tools for
+  medical image processing, particularly skull stripping and
+  segmentation of MR brain images; tools to support other applications
+  may be added later. These tools are intended to support researchers
+  who need to prototype new image analysis algorithms or to develop
+  automated image analysis tools for specific image analysis
+  applications. The sequence of processing operations is specified
+  through the scripting language Python, which can be used
+  interactively or in command files; the core image processing
+  algorithms are written in C for efficient processing of volume
+  images.
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-08T13_06_05.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-10T04_17_54.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-08T10_33_23.txt" name="e2006-03-08T10_33_23.txt"></a>
+<h2 class="date">03.08.2006 10:33</h2>
+<div class="blogbody">
+<h3 class="title">gmtplus 3.4.2</h3>
+<div class="item-description">
+In cleaning house, I have created gmtplus 3.4.2 which now builds with
+gmt 4.1.1 on Mac OSX 10.4.5.  This code is suffering serious bit rot.
+uwmtogmtplus no longer compiles and I do not personally know how to
+use it or even test it.  All I can say is that it compiles and that
+Steve Cande has given me some sample data to go along with the code.
+This will be my last attempt to do anything with the code, so I offer
+it up to the community.  Unless someone puts in some time testing and
+debugging gmtplus this is the end of the road for it.  I hear that a
+lot of the functionality in gmtplus is now in gmt, so hopefully the
+few of you that count on gmtplus can migrate to that.
+<br /><br />
+I will be switching hosting services soon and will be loosing my
+unlimited bandwidth/storage limits, so if you want it, grab this stuff
+right away:
+<br /><br />
+<a href="http://schwehr.org/software/gmtplus/">http://schwehr.org/software/gmtplus/</a>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-08T10_33_23.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-08T13_06_05.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-08T09_48_02.txt" name="e2006-03-08T09_48_02.txt"></a>
+<h2 class="date">03.08.2006 09:48</h2>
+<div class="blogbody">
+<h3 class="title">AIS</h3>
+<div class="item-description">
+We have some progress on the shore based AIS station:
+<ul>
+<li> Andy M. has the RM808 powered up on the bench and it seems happy.
+<li> I got an mmsi identifier from <a href="http://www.boatus.com/mmsi/">http://www.boatus.com/mmsi/</a>, which is free if you do it online.
+</ul>
+The RM808 is one heck of a beefy unit!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-08T09_48_02.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-08T10_33_23.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-07T16_20_17.txt" name="e2006-03-07T16_20_17.txt"></a>
+<h2 class="date">03.07.2006 16:20</h2>
+<div class="blogbody">
+<h3 class="title">My brain is melting</h3>
+<div class="item-description">
+I am starting to have strange flashbacks to IRIX/IRIX64/-old-ld/SGI
+death throws.  I got this on OSX 10.4.5.  I was trying to compile
+everything with gcc 3.3 since I am linking against all kinds of junk
+in fink 10.4-transitional that is c++ and compiled with gcc 3.3.  I
+forgot that I need to do the same in a couple of external packages.
+Maybe that is why fprintf is not defined.  Nuts!  That should never
+happen for a straight C call.  Bugger, bugger, bugger.
+<pre>
+ld: warning multiple definitions of symbol _dct64
+/sw/lib/libSDL_sound.dylib(libmpglib_la-dct64_i386.lo) definition of _dct64
+/sw/lib/libmp3lame.dylib(dct64_i386.o) definition of _dct64
+ld: Undefined symbols:
+_fprintf$LDBLStub
+_snprintf$LDBLStub
+_vfprintf$LDBLStub
+_vsnprintf$LDBLStub
+_printf$LDBLStub
+_sscanf$LDBLStub
+make[2]: *** [GeoZui4D] Error 1
+</pre>
+I even got desparate and added -lc to my link line which is now:
+<pre>
+g++-3.3 -g3 -DDEV -Wall -Wno-deprecated -o my-app-please-work
+10-billion-billion-object-files \
+-L../external-libs/lib
+-L../external-libs/lib/Tktable2.9 -L/usr/X11R6/lib -L./lib.Darwin
+-L/sw/lib -lglut -lGLU -lXmu -lXext -lX11 -ljpeg -ltiff -lsmpeg
+-lSDL_mixer -lSDL -lSDL_sound -lxml2 -lnetcdf_c++ -lnetcdf -lccom
+-lgdal -lSDL_net -ltogl -lTktable2.9 -lavformat -lavcodec -lavutil
+-ltk -ltcl -lvorbis -lz -logg -lmp3lame -lvorbisenc <b>-lc</b> -bind_at_load
+-lSDLmain -lGL -framework Cocoa
+</pre>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-07T16_20_17.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-08T09_48_02.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-07T13_18_19.txt" name="e2006-03-07T13_18_19.txt"></a>
+<h2 class="date">03.07.2006 13:18</h2>
+<div class="blogbody">
+<h3 class="title">swig 1.3.28 and pivy 0.3.0</h3>
+<div class="item-description">
+I am currently working up to having a python/OpenInventor API working
+on my mac.  I can't wait.  This is something that Alex, Laurent, and I
+have wanted since early 1997.
+<br /><br />
+Pivy needs swig >= 1.3.25, so I have created a local fink package and
+called it swig1328, but want to have this thing named correctly from
+the start.  Along with the package name being different, I have the
+swig program named swig1328.  What would be a better name/solution?
+<br /><br />
+For a python package, how do I make setup.py use gcc3.3 when it
+compiles swig generated c++ code?
+<br /><br />
+The reason I'm doing this is that swig 1.3.20 is drastically different
+than swig 1.3.28 and I hear that many programs can not handle the
+newer swig.
+<br /><br />
+So close!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-07T13_18_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-07T16_20_17.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-07T10_44_26.txt" name="e2006-03-07T10_44_26.txt"></a>
+<h2 class="date">03.07.2006 10:44</h2>
+<div class="blogbody">
+<h3 class="title">proj and pyproj</h3>
+<div class="item-description">
+More fink updates.  I am only committing changes to the
+10.4-transitional tree right now.  If you try any of my fink packages
+PLEASE SEND FEEDBACK!  Either good or bad, I want to know!  I have
+updated <a href=" http://remotesensing.org/proj/">proj</a> to 4.4.9
+which just adds some geos projection stuff.  I also upgraded <a
+href="http://www.cdc.noaa.gov/people/jeffrey.s.whitaker/python/pyproj.html">pyproj</a>
+to 1.7.
+<br /><br />
+I took a look at wxglade packaging and realize that I need to learn
+more about the python distribution tools.  All of my packages were
+really simple with everything at a top level.  wxpython is a little
+bit more complicated.
+<br /><br />
+Now I need to get the latest swig together so I can give pivy a try.
+If I remember right, swig is now radically different then at 1.3.20.
+I will be looking at swig-1.3.28.
+<br /><br />
+Note to self: It would be really nice to have a blog feature that puts
+an expiration on some parts of the text.  For example, I want to post
+a link to my gmt test packages for fink, but I want that info to
+disappear in a few days as it will all end up in the fink cvs tree and
+I will nuke that web directory when that happens.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-07T10_44_26.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-07T13_18_19.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-07T08_09_03.txt" name="e2006-03-07T08_09_03.txt"></a>
+<h2 class="date">03.07.2006 08:09</h2>
+<div class="blogbody">
+<h3 class="title">podcasts</h3>
+<div class="item-description">
+Yes, I am pretty nerdy.  I admit it.  My work world is dominated by
+bash, emacs, and other Unix like programs.  I enjoy listening to audio
+programs (aka podcasts and books on tape) while on the bus to and from
+work.  I keep looking for great content, but what I find is occasional
+good content.  A Very Spatial Poscast (AVSP) is not bad and the IT
+conversations are sometimes pretty interesting, but the best that I
+have found to date (for me at least) is The Linux Show (TLS) which is
+now defunct.  It was a little over the top on open source politics,
+but it did have some tech content.  What do I really want?  I want
+20-30 minute segments that attack some topic and take me 0-60mps in
+nothing flat.  Teach me something cool.  How about how to do something
+cool with gdb, emacs, python, whatever.  If you know something really
+well, share that howto with us.  Say you really understand the new '|'
+construct in GNU Make.  Then tell us all what it is there for and how
+to properly use it.  Are there any gotchas?  Most podcasts seem to be
+people telling me how great they are and how many people they know or
+know them.  Whatever.  I just want to learn something fun and/or
+powerful that makes my life better.
+<br /><br />
+I should lead by example right?  I have to some extent.  I had one of
+my visualization classes video taped and it was/is streamed from
+somewhere at UCSD if you want to see.  I just don't remember where.  I
+also try to do that with this blog... giving myself and others some
+insight in a length that is somewhat digestible.
+<br /><br />
+If you know something, pick up that microphone, make yourself a
+script, and make a quick and dirty audio recording and teach us
+something.  BTW, I could care less what is in iTunes for pod casts.
+What an annoying way to deal with podcasts.  I feel like one of those
+old crusty mainframe guys I used to see wandering the basements of
+NASA back in the 1980's.
+<br /><br />
+Hey Apple, how about a podcast on how to setup launchd?
+<br /><br />
+<b>fink install dict</b>
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-07T08_09_03.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-07T10_44_26.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-06T15_37_31.txt" name="e2006-03-06T15_37_31.txt"></a>
+<h2 class="date">03.06.2006 15:37</h2>
+<div class="blogbody">
+<h3 class="title">trac and mantis</h3>
+<div class="item-description">
+We have been looking into bug tracking systems.  I have had a rough
+time with bugzilla and want to avoid it.  We have tested both <a
+href="http://www.mantisbt.org/">MantisBTS</a> and <a
+href="http://www.edgewall.com/trac/">trac</a> Within about 5 minutes I
+was really impressed with trac.  It has a nice wiki and integrates
+with our svn tree... wow!  What a pleasure to use.  Here is an image
+of me looking at the attached diff to a trac item that relates to my
+top priority for GeoZui3D.  I need to get wxglade into fink.
+<br /><br />
+<img src="http://schwehr.org/blog/attachments/2006-03/trac-diff.png">
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-06T15_37_31.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-07T08_09_03.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-06T10_33_41.txt" name="e2006-03-06T10_33_41.txt"></a>
+<h2 class="date">03.06.2006 10:33</h2>
+<div class="blogbody">
+<h3 class="title">fink updates</h3>
+<div class="item-description">
+I'm made headway on a number of fink packages.  My hope is to get
+things I need for mapping and visualization up to the latest/greatest
+and tested in the next week or two.  Here is where I'm at on Monday
+morning.
+<br /><br />
+I have GMT 4.1.1 building it seems to be working.  I sent it off to a
+number of GMT folks just now for testing.  It is to the point where I
+can build MB-System 5.0.9 against it.  To me that is a pretty good
+sign!  I am having trouble with 10.3.  I am note very motivated to
+work on 10.3 since I only have access to a very slow 5 year old iMac
+running 10.3 and I'm focusing for my research on using 10.4 as my base
+platform.  (Yes, I will be running virtual PC too and am hoping that I
+can get Linux going there.)  So here is my problem with GMT 4.1.1 in
+10.3.  Anyone who wants to offer a solution, please email me!
+<pre>
+  grdraster.c: In function `main':
+  grdraster.c:324: error: structure has no member named `xy_off'
+  grdraster.c:325: error: structure has no member named `xy_off'
+  grdraster.c:327: error: structure has no member named `xy_off'
+  grdraster.c:327: error: structure has no member named `xy_off'
+  ... repeats for a number of source files.
+</pre>
+I am going to try to beef up mbsystem so that it has a -dev splitoff
+with the static libraries and headers, but I am not sure how that will
+go and if it will make it into the fink repositories.
+<br /><br />
+On the Coin/SoQt front, Kyrah, Chris S., and I have things pretty much
+all working.   There seems to be a bug with the SoQt 1.3.x code that
+prevents both static and shared library generation at the same time.
+The support from the SIM/Coin folks is always awesome!
+<br /><br />
+I am going to try to go for pyproj and proj very soon.  pyproj is way
+out of date at 5 versions back, so that is a high priority item for
+me.  Projections are one of those things that anyone working in
+spacial sciences ends struggling with way too often.  More and better
+tools is always a good thing.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-06T10_33_41.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-06T15_37_31.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-04T20_46_38.txt" name="e2006-03-04T20_46_38.txt"></a>
+<h2 class="date">03.04.2006 20:46</h2>
+<div class="blogbody">
+<h3 class="title">SoQt from CVS builds on Mac OSX 10.4/fink 10.4-transitional</h3>
+<div class="item-description">
+Kyrah got me to back up and start with the configure problem and that
+looks like was the key to getting shared libs to build for SoQt from
+cvs using Mac OSX 10.4.5/fink 10.4-transitional.  Here is how what I
+did that works for me with Coin 2.4.4 installed from
+10.4-transitional.  This requires you to be using bash as your shell.
+I remember no to long ago when this kind of syntax made no sense to
+me!  This forces the use of GCC 3.3 for the compilers.
+<pre>
+wget http://ftp.coin3d.org/coin/src/snapshots/SoQt-latest.tar.gz
+tar xf SoQt-latest.tar.gz
+cd SoQt
+QTDIR=/sw <b>CC=gcc-3.3 CXX=g++-3.3</b> ./configure --without-framework \
+  --enable-darwin-x11 --with-qt=/sw --enable-shared
+make
+<br /><br />
+ls src/Inventor/Qt/.libs/*.dylib
+  src/Inventor/Qt/.libs/libSoQt.20.3.1.dylib
+  src/Inventor/Qt/.libs/libSoQt.20.dylib
+  src/Inventor/Qt/.libs/libSoQt.dylib
+<br /><br />
+otool -L src/Inventor/Qt/.libs/libSoQt.dylib 
+  src/Inventor/Qt/.libs/libSoQt.dylib:
+        /usr/local/lib/libSoQt.20.dylib (compatibility version 24.0.0, current version 24.1.0)
+        /sw/lib/libqt-mt.3.dylib (compatibility version 3.3.0, current version 3.3.5)
+</pre>
+The question is now, can I make both shared and static libraries at
+the same time?  Looks like appending --enable-static turns off shared 
+library generation right now.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-04T20_46_38.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-06T10_33_41.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-03T14_21_38.txt" name="e2006-03-03T14_21_38.txt"></a>
+<h2 class="date">03.03.2006 14:21</h2>
+<div class="blogbody">
+<h3 class="title">pysight!</h3>
+<div class="item-description">
+<a href="http://livingcode.org/pysight/">pysight</a> is for grabbing
+isight images from within python!!! I have got to try this out.  Who
+is this guy who does <a
+href="http://livingcode.org">http://livingcode.org</a>.  Sounds like
+he is doing quite a number of interesting projects.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-03T14_21_38.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-04T20_46_38.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-02T20_04_06.txt" name="e2006-03-02T20_04_06.txt"></a>
+<h2 class="date">03.02.2006 20:04</h2>
+<div class="blogbody">
+<h3 class="title">new density release</h3>
+<div class="item-description">
+I just put together a new release of density.  Thanks to Chris and
+Kyrah for helping me figure out how to get it to work on 10.4.  My
+issue with JPEG from before is because of case insensitivity in the
+linker.  I really prefer case sensitive machines!!  The trick is to
+use the new  DYLD_LIBRARY_PATH variable and make sure that
+DYLD_LIBRARY_PATH is unset.
+<pre>
+unset DYLD_LIBRARY_PATH
+if [ -z "$DYLD_FALLBACK_LIBRARY_PATH" ]; then
+    export DYLD_FALLBACK_LIBRARY_PATH=@FINK@/lib
+else
+    export DYLD_FALLBACK_LIBRARY_PATH=@FINK@/lib:$DYLD_LIBRARY_PATH
+fi
+</pre>
+You can find it at <a
+href="http://schwehr.org/software/density/">density</a>.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-02T20_04_06.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-03T14_21_38.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-01T16_31_46.txt" name="e2006-03-01T16_31_46.txt"></a>
+<h2 class="date">03.01.2006 16:31</h2>
+<div class="blogbody">
+<h3 class="title">Bad apple</h3>
+<div class="item-description">
+Doh!  Today has been a tough one.  I have been trying to multitask my
+way through a large number of issues to get my development environment
+back to a happier state.  It is a really good thing that I did not
+upgrade before I finished my PhD.  Here are some of the battles.
+<br /><br />
+GeoZui started using the new "|" rule dependency construct as a easy
+way to avoid always running configure in each subdir.  There may be
+other ways around this, but this one was simple, so Roland went for
+it.  I figured that I could just update the fink make to be 3.80 and
+all would be well.  That was easy enough, but Max Horn informed me
+that Apple has made all kinds of tweaks to their gnu make and they did
+not merge them back into the gnu make tree.  So some things will not
+build with the stock gnu make.  BAD APPLE!  Please, please, please
+integrate your changes in or stop using them!
+<br /><br />
+The next is my trouble with Coin3d and clashing libjpeg and the
+ImageIO framework.  I can't follow the advice I found via google to
+just fink remove libjpeg.  That would probably nuke quite a bit!  This
+may be an simage issue, but I am not totally sure.  I miss the linux
+ldd command for programs.  What is the equivalent for the Mac?  I did
+make an info file for coin45 2.4.4 which looks close except for this
+clash problem.
+<br /><br />
+Then cam SoQt 1.3.  It seems to be a bit cranky.  Something was wrong
+with the man page install code and it never seemed to generate a
+shared library.  Doh.
+<br /><br />
+Then in working with GeoZui, it looks like the wxglade generated code
+from Roland is now getting nuked on clean and fink does not have
+wxglade.  No problemo... except that wxglade does not have a setup.py,
+so I need to create one and hopefully the project will take it.
+<br /><br />
+Yikes.  But tomorrow I get to take a short road trip, so that should
+be fun.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-01T16_31_46.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-02T20_04_06.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-01T13_06_43.txt" name="e2006-03-01T13_06_43.txt"></a>
+<h2 class="date">03.01.2006 13:06</h2>
+<div class="blogbody">
+<h3 class="title">mapdex.org</h3>
+<div class="item-description">
+<a href="http://mapdex.org">http://mapdex.org</a>... searched on
+Portsmouth and got a whole bunch of broken viewers, but this one
+worked.  
+<br /><br />
+<a href="http://hercules.kgs.ku.edu/dasc/ims_kgs/geo_view.cfm?servername=megisims.state.me.us&serverip=megisims.state.me.us&servicename=orthomap">orthomap</a>
+<br /><br />
+This comes from ArcNews which had a big full page writeup on it
+talking about how is is done with ArcIMS and WMS.
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-01T13_06_43.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-01T16_31_46.html#comments">Comments</a> -->
+</div>
+</div>
+<div class="item">
+<a id="e2006-03-01T08_21_19.txt" name="e2006-03-01T08_21_19.txt"></a>
+<h2 class="date">03.01.2006 08:21</h2>
+<div class="blogbody">
+<h3 class="title">Mac OSX linking issue - libjpeg</h3>
+<div class="item-description">
+I was trying to get all of my tools back in shape with Mac OSX 10.4
+(using fink 10.4-transitional) and I ran into a problem.  This occurs
+with my coin/voleon viewer, simpleview, in density.  I just updated
+the fink package for coin yesterday so it compiles, but that whole
+running thing is eluding me.
+<pre>
+./simpleview
+<br /><br />
+dyld: Symbol not found: __cg_jpeg_resync_to_restart
+  Referenced from: /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/ImageIO.framework/Versions/A/ImageIO
+  Expected in: /sw/lib/libJPEG.dylib
+./simpleview: line 15:  4734 Trace/BPT trap          $cmd
+</pre>
+Any suggestions?  I tried rebuilding libjpeg in fink.  No luck.  Does
+this error mean that ImageIO is trying to use libjpeg and is unhappy?
+Or is it the other way?
+<br /><br />
+If you want to comment, I have made a pasteboard entry... <a
+href="http://paste.lisp.org/display/17370">http://paste.lisp.org/display/17370</a>.
+BTW, I think paste is a pretty handy tool!
+</div>
+</div>
+
+<div class="posted">
+<br />Posted by <span class="item-creator">Kurt</span>
+| <a class="link" href="2006-03.html#e2006-03-01T08_21_19.txt">Permalink</a>
+
+<!-- <br /><a href="archives/2006-03-01T13_06_43.html#comments">Comments</a> -->
+</div>
+</div>

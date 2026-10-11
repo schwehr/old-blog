@@ -1,0 +1,67 @@
+TITLE: Trash instead of rm
+AUTHOR: Kurt
+DATE: 03.07.2009 12:47
+DESC: another project idea
+-----
+BODY:
+Trey commented on my last post about the dangers of rm.  He suggested
+using absolute paths when deleting to be extra safe and reminded me
+that people often replace rm with a command that moves files to a
+trash area.  It's too bad that Apple doesn't ship something like this
+by default.  There is a ruby program that provides a trash command: <a
+href="http://www.dribin.org/dave/osx-trash/">osx-trash</a> and web
+pages that give examples of putting something in your .bashrc.  
+Check out <a href="http://www.anthonysmith.me.uk/2008/01/08/moving-files-to-trash-from-the-mac-command-line/">Moving files to trash from the Mac command line</a> for several examples that cover ruby, python, and bash.
+Here is my test trash.bash:
+<pre><tt><i><font color="#9A1900">#!/bin/bash</font></i>
+<!-- -->
+touch foo bar
+<!-- -->
+<b><font color="#000000">function trash </font></b>{
+    <b><font color="#0000FF">for</font></b> file <b><font color="#0000FF">in</font></b> <font color="#009900">$@</font><font color="#990000">;</font> <b><font color="#0000FF">do</font></b>
+        echo trashing <font color="#009900">$file</font>
+        osascript -e <font color="#FF0000">'tell application "Finder"'</font> -e <font color="#FF0000">"delete POSIX file </font><font color="#CC33CC">\"</font><font color="#FF0000">${PWD}/$file</font><font color="#CC33CC">\"</font><font color="#FF0000">"</font> -e <font color="#FF0000">"end tell"</font>
+    <b><font color="#0000FF">done</font></b>
+}
+<!-- -->
+trash foo bar</tt></pre>
+And running it...
+<pre>% <b>./trash.bash</b>
+trashing foo
+foo
+trashing bar
+bar
+<!-- -->
+% <b>ls -l /Users/schwehr/.Trash/
+total 0
+-rw-r--r-- 1 schwehr schwehr 0 Mar  7 12:31 bar
+-rw-r--r-- 1 schwehr schwehr 0 Mar  7 12:31 foo
+<!-- -->
+% <b>./trash.bash 
+trashing foo
+foo 12-31-41
+trashing bar
+bar 12-31-41
+<!-- -->
+% <b>ls -l /Users/schwehr/.Trash/</b>
+total 0
+-rw-r--r-- 1 schwehr schwehr 0 Mar  7 12:31 bar
+-rw-r--r-- 1 schwehr schwehr 0 Mar  7 12:31 bar 12-31-41
+-rw-r--r-- 1 schwehr schwehr 0 Mar  7 12:31 foo
+-rw-r--r-- 1 schwehr schwehr 0 Mar  7 12:31 foo 12-31-41</pre>
+By asking Mac OSX to handle the trash, it does the right thing for files on different
+volumes and files with the same name.
+
+I wish I had a copy the old delete command that either Terry Fong or
+Eric Nygren had on the old IMG Artemis server.  I can't remember if it
+was a cshrc alias, a shell script, perl, or what.
+
+I'm not a ruby programmer, so I probably should just write a little
+python package to emulate what the ruby osx-trash does so that
+everyone with fink can have the same trash functionality.
+
+Python did have modules called Finder and findertools, but these go
+away in Python 3.  I guess that leaves me with learning <a
+href="http://appscript.sourceforge.net/py-appscript/index.html">Python
+appscript</a>
+-----

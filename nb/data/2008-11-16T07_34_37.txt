@@ -1,0 +1,38 @@
+TITLE: How do I use matplotlib to make same scale graphs?
+AUTHOR: Kurt
+DATE: 11.16.2008 07:34
+DESC: what is the answer
+-----
+BODY:
+I wrote a program to walk through some data and make one png plot per
+item with matplotlib.  This is pretty great, but how do I make the
+axes all the same range if the min and max values are often different?
+In gnuplot, I use something like this:
+<pre>set xrange [0:1000]
+set yrange [0:260]</pre>
+With matplotlib in python, I was trying this, but it doesn't control
+the axes.
+<pre>import matplotlib.pyplot as plt
+plt.ioff()
+in_file = 'somedata.dat'
+somedata = data_class(in_file)
+for item_num,item in enumerate(some_data):
+    out_filename = ('%s-%03d.png' % (in_file[:-4],item_num))
+    print out_filename
+    <!-- -->
+    p = plt.subplot(111)
+    <!-- -->
+    p.set_xlabel('sample number')
+    p.set_ylabel('value')
+    p.set_title('File: %s Item num: %d' % (in_file[:-3], item_num))
+    p.set_ylim(0,260)
+    p.plot(item)
+    #p.draw()
+    plt.savefig(out_filename) #,'png') # Freaks out if I remind it that I want png
+    plt.close()
+</pre>
+With great power comes great complexity and pain.  Gnuplot is easy,
+but I often push past its capabilities.
+
+So lazyweb, what's the answer?
+-----

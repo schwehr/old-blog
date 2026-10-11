@@ -1,0 +1,30 @@
+TITLE: blog rsync
+AUTHOR: Kurt
+DATE: 10.25.2006 08:33
+DESC: working update system
+-----
+BODY:
+I finally have rsync setup so that the web server is not running the
+nb command (which takes quite a long time).  Here is my nb-rsync.bash script:
+<pre><font color="0000ff"><strong>#!/bin/bash</strong></font>
+export <font color="#2040a0">RSYNC_RSH</font>=ssh
+<font color="#2040a0">OPTIONS</font>=<font color="#008000">&quot;${OPTIONS} --recursive&quot;</font>
+<font color="#2040a0">OPTIONS</font>=<font color="#008000">&quot;${OPTIONS} --perms&quot;</font>
+<font color="#2040a0">OPTIONS</font>=<font color="#008000">&quot;${OPTIONS} --times&quot;</font>
+<font color="#2040a0">OPTIONS</font>=<font color="#008000">&quot;${OPTIONS} --cvs-exclude&quot;</font>
+<font color="#2040a0">OPTIONS</font>=<font color="#008000">&quot;${OPTIONS} --exclude-from=${HOME}/projects/blog/scripts/nb-rsync.excludes&quot;</font>
+<font color="#2040a0">OPTIONS</font>=<font color="#008000">&quot;${OPTIONS} --verbose&quot;</font>
+<font color="#444444">#OPTIONS=&quot;${OPTIONS} --dry-run&quot;</font>
+<font color="#444444">#OPTIONS=&quot;${OPTIONS} &quot;
+</font>
+echo calling rsync...
+echo rsync ${OPTIONS}
+rsync ${OPTIONS} ${HOME}/projects/blog/nb/ schwehr.org:www/blog/</pre>
+And here are my excludes:
+<pre>blog.conf
+cache
+data
+templates
+parts</pre>
+Seems to work great!
+-----

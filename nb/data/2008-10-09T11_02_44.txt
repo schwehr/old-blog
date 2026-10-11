@@ -1,0 +1,82 @@
+TITLE: Automated metadata for Caris data
+AUTHOR: Kurt
+DATE: 10.09.2008 11:02
+DESC: More challenging
+-----
+BODY:
+Looking into the Caris directory, I see a more complicated situation.
+<pre>% <b>cd 0208_20080617_133841_RVCS</b>
+% <b>ls -l</b>
+total 203256
+-rwx------     42864 Jun 29 15:47 GPSHeight
+-rwx------       128 Jun 29 15:47 GPSHeightLineSegments
+-rwx------     28680 Jun 29 15:47 GPSHeightTmIdx
+-rwx------    424980 Jun 29 15:47 Gyro
+-rwx------       128 Jun 29 15:47 GyroLineSegments
+-rwx------    284432 Jun 29 15:47 GyroTmIdx
+-rwx------    424980 Jun 29 15:47 Heave
+-rwx------       128 Jun 29 15:47 HeaveLineSegments
+-rwx------    284432 Jun 29 15:47 HeaveTmIdx
+-rwx------      1285 Jun 29 15:47 InstallationParameter.xml
+-rwx------      4537 Oct  7 14:58 LogFile
+-rwx------     71432 Jun 29 15:47 Navigation
+-rwx------       758 Jun 29 15:58 Navigation.hndf
+-rwx------       136 Jun 29 15:47 NavigationLineSegments
+-rwx------     28680 Jun 29 15:47 NavigationTmIdx
+-rwx------  54493884 Jun 29 15:47 ObservedDepths
+-rwx------       128 Jun 29 15:47 ObservedDepthsLineSegments
+-rwx------     53752 Jun 29 15:47 ObservedDepthsTmIdx
+-rwx------    424980 Jun 29 15:47 Pitch
+-rwx------       128 Jun 29 15:47 PitchLineSegments
+-rwx------    284432 Jun 29 15:47 PitchTmIdx
+-rwx------  54627680 Oct  7 14:58 ProcessedDepths
+-rwx------     10033 Oct  7 14:58 ProcessedDepths.lsf
+-rwx------       144 Oct  7 14:58 ProcessedDepthsLineSegments
+-rwx------     53752 Oct  7 14:58 ProcessedDepthsTmIdx
+-rwx------    424980 Jun 29 15:47 Roll
+-rwx------       128 Jun 29 15:47 RollLineSegments
+-rwx------    284432 Jun 29 15:47 RollTmIdx
+-rwx------  54493876 Jun 29 15:47 SLRange
+-rwx------       120 Jun 29 15:47 SLRangeLineSegments
+-rwx------     53752 Jun 29 15:47 SLRangeTmIdx
+-rwx------    160560 Jun 29 15:47 SSP
+-rwx------       128 Jun 29 15:47 SSPLineSegments
+-rwx------    107464 Jun 29 15:47 SSPTmIdx
+-rwx------       507 Jun 29 15:47 Svp
+-rwx------  40877144 Jun 29 19:01 TPE
+-rwx------        76 Jun 29 19:01 TPELineSegments
+-rwx------     53752 Jun 29 19:01 TPETmIdx
+-rwx------       408 Oct  7 14:52 Tide
+-rwx------       124 Oct  7 14:52 TideLineSegments
+-rwx------       280 Oct  7 14:52 TideTmIdx
+-rwx------        13 Jun 29 15:47 originalSoundVelocity</pre>
+Looking into the Navigation file, I see:
+<pre>% <b>less Navigation</b>
+HDCS^@^@^@^C^@^@^@^A^@^@^@^A&lt;80&gt;^@^@^@^@^@^M&lt;F0&gt;^@^@^C&lt;E8&gt;^@&lt;E4&gt;k^S&lt;FF&gt;
+&lt;FF&gt;&lt;C7&gt;^?^@^EA&lt;D7&gt;^@^@^@^A^@^@^@^A^@vA^N^@^@^@^L^@^C)&lt;D4&gt;&lt;FF&gt;H&lt;DC&gt;&lt;F7&gt;
+&lt;FF&gt;&lt;FF&gt;GB&lt;FF&gt;&lt;FF&gt;&lt;FF&gt;&lt;F0&gt;^@^@^@^@&lt;FF&gt;&lt;FF&gt;&lt;C7&gt;^?^@^@^@^L&lt;FF&gt;&lt;FF&gt;&lt;FF&gt;&lt;F0&gt;
+^@^@^@^@^@^@^@^@&lt;FF&gt;&lt;FF&gt;&lt;C7&gt;&lt;E3&gt;^@^@^@F&lt;FF&gt;&lt;FF&gt;&lt;FF&gt;&lt;D7&gt;^@^@^@^@^@^@^@^@
+</pre>
+But looking at the LogFile as suggested by Brian Calder yields a likely solution
+<pre>    * Depth Filter Summary Report - Num Depths Rejected:
+            By Disabled Beam:         1258546
+            Less than       0 meters:      0
+            Greater than 1000 meters:      0
+    * Navigation Filter Report - 0 Rejected
+    * Extents within HDCS:
+        Time            - Min/Max:              2008 169 13:38:31 to 2008 169 13:44:30
+        Depth           - Min/Max in meters:    6.63 to 15.21
+                          Number of Profiles:   6688
+                          Number of Depths:     2138958
+        Positions       - Latitude  (Min/Max):  +044-24-13.205 to +044-24-55.965
+                          Longitude (Min/Max):  -068-46-09.951 to -068-46-00.199
+                          Number of Positions:  3568</pre>
+I need to be able to parse metadata files, so it looks like more parsing is in my future.
+Python has a range of parsing tools from the simple string searches and regular expressions (regex) to
+parsing packages.
+<ul>
+<li><a href="http://pyparsing.wikispaces.com/">PyParsing</a></li>
+<li><a href="http://pages.cpsc.ucalgary.ca/~aycock/spark/">SPARK</a> - Scanning, Parsing, and Rewriting Kit</li>
+</ul>
+<a href="http://nedbatchelder.com/text/python-parsers.html">Lot's more python parsers...</a> and <a href="http://wiki.python.org/moin/LanguageParsing">LanguageParsing</a> [Python wiki]
+-----

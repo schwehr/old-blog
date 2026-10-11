@@ -1,0 +1,527 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="NanoBlogger 3.1" />
+<meta name="robots" content="all" />
+<meta name="revisit-after" content="31 days" />
+<meta http-equiv="Content-Type" content=
+"text/html; charset=us-ascii" />
+<title>Kurt's Weblog: October 2013 Archives</title>
+<link rel="stylesheet" href="../styles/nb_default.css" type=
+"text/css" />
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0"
+href="../rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS 1.0"
+href="../index.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom 0.3"
+href="../atom.xml" />
+</head>
+<body>
+<div id="banner">
+<h1><a href="../index.html" accesskey="1">Kurt's Weblog</a></h1>
+<span class="description">electronic work log</span></div>
+<div id="content">
+<div class="blog">
+<div id="menu"><a href="../index.html">Main</a></div>
+</div>
+<div class="blog">
+<div class="item"><a id="e2013-10-18T12_26_01.txt" name=
+"e2013-10-18T12_26_01.txt"></a>
+<h2 class="date">10.18.2013 12:26</h2>
+<div class="blogbody">
+<h3 class="title">Google Maps Engine QGIS plugin</h3>
+<div class="item-description">Ujaval just released the <a href=
+"http://plugins.qgis.org/plugins/GoogleMapsEngineConnector/">Google
+Maps Engine Connector</a> for QGIS (&gt;= 2.0)!<br />
+<br />
+I got to help out with code reviews, which was a blast! You can
+check out the code here:<br />
+<br />
+<a href=
+"https://github.com/googlemaps/mapsengine-qgis-connector">https://github.com/googlemaps/mapsengine-qgis-connector</a></div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-10.html#e2013-10-18T12_26_01.txt">Permalink</a> 
+<!-- <br /><a href="archives/#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-10-17T09_43_03.txt" name=
+"e2013-10-17T09_43_03.txt"></a>
+<h2 class="date">10.17.2013 09:43</h2>
+<div class="blogbody">
+<h3 class="title">AIS hack in a box is not an AIS hack</h3>
+<div class="item-description">While I think this is a nice
+demonstration, it is most definitely NOT an AIS hack. I'm not
+saying that AIS is in any way secure (unless maybe you talk about
+blue force encrypted messages). However, this is a nice example of
+why you don't want to have totally open ports on your server
+accepting random data. Okay, so there are some cases where
+accepting data on a port can be sort of a good idea, but this is
+not one of them. You can shove any AIS message you craft at the
+marinetraffic.com server and it will process it and add it to the
+map. Yes, if there was a signature component to AIS, these messages
+could be cryptographically rejected, but that's a separate issue.
+If marinetraffic had a way to vet people and only allowed vetted
+people to send messages to the server (e.g. using ssh with a list
+of known ssh public keys), then this attack is dead, but AIS would
+still be the same old swiss cheese. You just would either have to
+spend some work to trick marine traffic that you are a good guy or
+go near a receiver and transmit your attack packets. The later is
+trivial. Also, if marinetraffic payed attention to which receiver
+the packet came from, the location, timestamps (no, they don't take
+a receiver timestamp), receive strength and direction, then they
+would have a chance to filter some attacks, but again, there would
+be plenty of attacks still on the table.<br />
+<br />
+<img width="600" height="399" title="Trend Micro not attacking AIS"
+withgrayborder="True" src=
+"../attachments/2013-10/trend-micros-non-ais-hack.png" />
+<br />
+<br />
+This attack does have merit on grounds that these two guys did not
+mention. First, Iceland's Coast Guard runs a control station that
+has to allow uncleared people to work in it. Therefore, they can't
+show the NATO EU AIS feed in the room. To have vessel traffic up,
+you guessed it, they use marinetraffic.com. So Iceland's Coast
+Guard is vulnerable to this trouble because they trust a website
+that has no measure of security.<br />
+<br />
+Second, the USCG sends messages for NAIS without encryption. You
+could easily craft a <a href=
+"http://en.wikipedia.org/wiki/Man-in-the-middle_attack">man-in-the-middle
+attack</a> with any consumer of NAIS data and inject or remove
+messages at will. No, the packets aren't raw NMEA, but they are
+just zlib compressed and I saw nothing in the code that checks the
+validity of these messages. I just ran a java decompiler on
+AISUser. Note that this was when I found out that they are using
+the unix ls command to get the inode of the current directy for the
+authentication key for an ais server. Why didn't they just use
+OpenSSH and have users send them their public key or use one of the
+many other easy ways to do this cleanly?<br />
+<br />
+This means that the ERMA disaster service that I helped build is
+susceptible to this mode of attack. There is nothing that the ERMA
+team can do to prevent the attack and it may be hard to detect if
+done carefully.<br />
+<br />
+I believe the upstream sending of messages to the NAIS aggregation
+is equally weak and if you inject there, you could hit all of the
+USCG and any of their NAIS customers.<br />
+<br />
+<iframe width="640" height="480" src=
+"//www.youtube.com/embed/QObWQ14EtFA" frameborder="0"
+allowfullscreen=""></iframe><br />
+<br />
+Thanks to gcaptain for posting with a link to this video: <a href=
+"http://gcaptain.com/researchers-discover-security/">Researchers
+Discover Serious Security Vulnerabilities to AIS Data</a> (but I
+would suggest a different title)<br />
+<br />
+Could you build a very secure system to do what AIS is designed to
+do? Yes, but you should just throw out all of the AIS standards out
+there and only use them as a source of use cases. I'd call it
+something totally different because it would have little
+relationship to current AIS.<br />
+<br />
+<b>Update 2013-10-18:</b> This made it to the BBC: <a href=
+"http://www.bbc.co.uk/news/technology-24586394">Ship trackers
+'vulnerable to hacking', experts warn By Dave Lee</a> which has
+quotes from Lloyds.
+<pre>
+...
+"The spoofing would immediately be identified by [Lloyd's List
+Intelligence] as a warp vessel,"
+...
+</pre>
+That assumes that Lloyd's is seeing the input that
+marinetraffic.com, which is a separate country. It would be
+possible to do an injection of fake data that would be extremely
+hard to detect. e.g. If you have a transmitter near a ship, send
+out noise to corrupt that ships packets. You only have to detect
+the mmsi portion and then start noise to corrupt the packet's tail.
+Then, transmit on a different slot, and slowly change the location
+of that ship. There are enless variations that would be hard for
+anyone to catch.<br />
+<br />
+The hack described just used a laptop, so I'm not sure how this
+cost 600 euros. This was just sending UDP packets over the
+internet, so I don't see any need for extra hardware (I'm assuming
+you already have a computer).<br />
+<br />
+As for pirates, I don't see much evidence for the use of AIS. They
+go out and attack what ever they see, which includes warships.
+Their boats are often barely afloat. There is no need for AIS when
+a constant stream of targets goes by. And socat/netcat is free open
+source software.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-10.html#e2013-10-17T09_43_03.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-10-18T12_26_01.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-10-14T10_33_11.txt" name=
+"e2013-10-14T10_33_11.txt"></a>
+<h2 class="date">10.14.2013 10:33</h2>
+<div class="blogbody">
+<h3 class="title">AIS vulnerabilities</h3>
+<div class="item-description">Thanks to Jordan for pointing me to
+this article. I'll be curious to see if I got all of the weaknesses
+that these folks say they will be using. Yes, AIS is swiss cheese
+when it comes to security and integrity. Back in 2006/2007, the
+USCG directly asked me not to talk about these issues, but that
+makes no sense. Anyone with a Class A device or a software defined
+radio can make a mess of things with little effort - everything
+from denial-of-service (DOS), to changing the frequencies used by
+some shipts, making fake announcements, specifically stepping on
+others' transmisssions, send fake dgps corrections, and the list
+goes on. Life is already painful enough if you look at the issues
+that are out there without any black hats adding to the mix.<br />
+<br />
+<a href=
+"http://www.darkreading.com/attacks-breaches/researchers-highlight-security-vulnerabi/240162568">
+Researchers Highlight Security Vulnerabilities In Ship-Tracking
+System</a>
+<pre>
+...
+At the upcoming Hack in the Box Security Conference in Malaysia, a
+team of security researchers are preparing to demonstrate how an
+attacker could hijack AIS traffic and perform man-in-the middle
+attacks that enable them to turn the tracking system into a liability.
+...
+According to Trend Micro's Kyle Wilhoit, one of the researchers who
+worked on the project, says the attacks can be broken up into two
+categories: those that target the AIS Internet providers that collect
+and distribute AIS information, and those that target flaws in the
+actual specification of the AIS protocol used by hardware receivers in
+all of the vessels. Without getting too deep into the vulnerabilities
+ahead of the presentation, which is slated for Oct. 16, Wilhoit
+explains that the upstream providers fail to authenticate AIS
+sentences coming from ships.
+<!-- -->
+"I could go out, and I could pretend to be a boat, and they don't even
+fact-check it," he says. "They don't look at, OK ... is this AIS
+sentence actually a boat? They don't check any of that. So it's all
+accepted as is. It's accepted as true."
+...
+</pre>
+Back in November of last year, I finally got brave enough to post
+my white board summary of AIS weaknesses:<br />
+<br />
+<a href=
+"../archives/2012-11.html#e2012-11-18T12_08_13.txt">
+AIS Security and Integrity</a><br />
+<br />
+Most of those weaknesses should be immediately obvious to anyone
+with an undergraduate CS background. This is what happens when you
+have non-practitioners, aka mariners, lawyers, electrical
+engineers, and bureaucrats design a network message specification
+instead of just writing out the use cases. <a href=
+"https://gitorious.org/toils-of-ais/toils-of-ais/source/9fdc70ed69c3cd5ec46e672eb6aa120e335d0e77:toils.txt">
+Toils of AIS</a> by Raymond and Schwehr tries to give a blunt
+description of this.<br />
+<br />
+A challenge to the reader of my blog: Given 30 minutes and no prior
+knowledge of AIS, look at <a href=
+"http://www.itu.int/rec/R-REC-M.1371/en">ITU 1371-4</a> and
+<a href="http://vislab-ccom.unh.edu/~schwehr/papers/2010-IMO-SN.1-Circ.289.pdf">
+IMO Circ 289</a> and you should be able to come up with 10 really
+nasty things to do with AIS. The Spanish have mentioned in public
+that they have practiced making ghost fleets with AIS in
+preparation for war time deceptions.<br />
+<br />
+Original article: <a href=
+"http://blog.trendmicro.com/trendlabs-security-intelligence/captain-where-is-your-ship-compromising-vessel-tracking-systems/">
+Captain, Where Is Your Ship</a> [trendmicro.com] That post shows
+just how easy it is to send random UDP packets to open services and
+send them crap. It's like turtle graphics / logo in AIS
+packets.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-10.html#e2013-10-14T10_33_11.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-10-17T09_43_03.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-10-05T23_10_13.txt" name=
+"e2013-10-05T23_10_13.txt"></a>
+<h2 class="date">10.05.2013 23:10</h2>
+<div class="blogbody">
+<h3 class="title">geeking out with programming languages</h3>
+<div class="item-description">I'm on vacation. The mountain bike
+just got a tune up. And then I read <a href=
+"http://www.informit.com/promotions/what-is-the-best-way-for-a-programmer-to-learn-a-new-139481?WT.mc_id=Author_Williams_ProgLang#james">
+What's the Best Way for a Programmer to Learn a New Language?</a>
+(note that the link takes you directly to James Williams' entry).
+So then I went and did
+<pre>
+fink install erlang-otp
+fink install swi-prolog
+fink install nodejs
+fink install lua52
+fink install haskell-platform
+fink install go # Yeah!  some beat me to packaging it
+</pre>
+And then I remembered that I want to be working on my JavaScript
+skillz. Then I remembered emacs lisp and Xah's notes. Then I
+remembered that I want to break out some java again. Oh, and I
+meant to setup <a href="http://golang.org/">go</a> in fink. Cause
+one of my projects has go in it thanks to Francesc. Oooh, and rhino
+needs to get forward ported. All that and I really need deep into
+IPython, Scipy and Pandas. Oh and Judd had some killer examples of
+looking at the assembly generated by various tiny C++ programs so
+you can see the difference (or lack thereof) in the resulting
+assembly from for(int i=0; i&lt;10; i++) {} or for(int
+i=0;i&lt;10;++i) {} and int i=0; while(i&lt;10) {i++;}. Oh oh oh! I
+need to learn ruby so that I can work with Chef and/or Puppet (and
+Les think's ruby is "epic"). My SQL is okay, but really would be
+worth digging deaper.<br />
+<br />
+Languages that I never want to see again: fortran*, basic*, ada,
+ml, Tcl/Tk, Verilog, AML, perl, awk/sed, Karol the F***ing Robot,
+php, csh, DOS batch files, etc.<br />
+<br />
+Then there are the "what should I know?" languages... dart, pl/sql,
+m4 etc.<br />
+<br />
+And the of course I know... GNU make, bash, lex/flex/yacc/bison,
+some assembly, etc. etc<br />
+<br />
+In the "meh" catagory (aka I just don't care): cobol, groovy, rust,
+chicken, guile, logo, scheme, Objective C, and so on.<br />
+<br />
+<a href=
+"//en.wikipedia.org/wiki/List_of_Hello_world_program_examples">//en.wikipedia.org/wiki/List_of_Hello_world_program_examples</a><br />
+
+<br />
+sigh. my overloaded brain is feeling soggy.<br />
+<br />
+<b>Note 2013-10-14</b>: Trying out // and dropping the http: from
+the wikipedia link. I've been told that this is better?!?!</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-10.html#e2013-10-05T23_10_13.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-10-14T10_33_11.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-10-02T09_45_44.txt" name=
+"e2013-10-02T09_45_44.txt"></a>
+<h2 class="date">10.02.2013 09:45</h2>
+<div class="blogbody">
+<h3 class="title">Oddly names NOAA bathymetry grids</h3>
+<div class="item-description">The US government is shut down, so I
+can't tell if these have been corrected, but here are some samples
+of the 47 NOAA BAG grids that do not match the established naming
+convention. These are all from <a href=
+"http://surveys.ngdc.noaa.gov/mgg/NOS/coast/">http://surveys.ngdc.noaa.gov/mgg/NOS/coast/</a>
+<pre>
+D00001-D02000/D00168/BAG/D00168_UTM02_MB_4m_MLLW_1of5.bag            # UTM02?
+F00001-F02000/F00583/BAG/F00583_EastBranch_MB_50cm_MLLW_1of6.bag.gz  # EastBranch?
+F00001-F02000/F00586/BAG/F00586_MB_1m_NGVD29_1of1.bag.gz             # NGVD29
+F00001-F02000/F00596/BAG/F00596_MB_1m_HRD_1of1.bag.gz                # HRD?
+H10001-H12000/H11348/BAG/H11348_Combined_20m_MLLW_1of1.bag.gz        # Combined placement
+H10001-H12000/H11384/BAG/H11384_2m__MLLW_1of1.bag.gz                 # __
+H10001-H12000/H11407/BAG/H11407_50cm_MLLW_4oif7.bag.gz               # oif -&gt; of
+H10001-H12000/H11478/BAG/H11478_50cm_MLLW_1of13_A.bag.gz             # _A
+H10001-H12000/H11640/BAG/H11640_MB_1m_awois_MLLW_2of3.bag.gz         # awois
+H10001-H12000/H11849/BAG/H11849_Office_4m_MLLW_3pf4.bag.gz           # pf -&gt; of
+H10001-H12000/H11849/BAG/H11849_Office_2m_MLLW_2of4.bag.gz           # Office!
+H10001-H12000/H11854/BAG/H11854_50cm_MLLW_Combined_16of16.bag.gz     # Combined placement
+H10001-H12000/H11855/BAG/H11855_2m_VBES_1of10.bag.gz                 # VBES -&gt; VB
+H10001-H12000/H11856/BAG/H11856_MB_50cm_CRD_combined.bag.gz          # CRD?
+H10001-H12000/H11929/BAG/H11929_50cm_MLLW_4o6.bag.gz                 # o -&gt; of
+H10001-H12000/H11973/BAG/H11973_MB_10m_MLWW_Combined.bag.gz          # MLWW -&gt; MLLW
+H12001-H14000/H12133/BAG/H12133_MB_1m_IGLD88_1of1.bag.gz             # 88 or no 88?
+H12001-H14000/H12132/BAG/H12132_MB_50cm_IGLD_1of3.bag.gz
+W00001-W02000/W00220/BAG/W00220_MB_1m_other_1of1.bag.gz              # other?
+W00001-W02000/W00230/BAG/W00230_MB_8m_MLLW_Combined2.bag.gz          # Combined gets a number
+</pre>
+I started with this regular expression that I think matches the
+general naming convention:
+<pre>
+<tt><i><font color="#9A1900">#!/usr/bin/env python</font></i>
+<!-- -->
+<b><font color="#000080">import</font></b> re
+<!-- -->
+FILENAME_RE <font color="#990000">=</font> re<font color=
+"#990000">.</font><b><font color=
+"#000000">compile</font></b><font color="#990000">(</font>
+    r<font color=
+"#FF0000">'(?P&lt;survey&gt;(?P&lt;survey_type&gt;[A-Z])(?P&lt;number&gt;[0-9]{5,})(?P&lt;extra&gt;[A-Z]*))'</font>
+    r<font color=
+"#FF0000">'(_(?P&lt;sensor&gt;(VB|MB|LI)+))?'</font>
+    r<font color=
+"#FF0000">'(_((?P&lt;cell_size&gt;\d+)(?P&lt;units&gt;m|cm)))?'</font>
+    r<font color=
+"#FF0000">'(_(?P&lt;vdatum&gt;MLLW|MLW|MSL|MHW|MHHW))?'</font>
+    r<font color=
+"#FF0000">'(_(?P&lt;grouping&gt;combined|((?P&lt;item_num&gt;\d+)of(?P&lt;item_total&gt;\d+))))?'</font>
+    r<font color=
+"#FF0000">'(?P&lt;complete_ext&gt;\.(?P&lt;ext&gt;tif|bag|BAG|mb168)(\.gz)?)?$'</font><font color="#990000">,</font>
+    re<font color="#990000">.</font>IGNORECASE<font color=
+"#990000">)</font>
+<!-- -->
+<b><font color="#0000FF">for</font></b> filename <b><font color=
+"#0000FF">in</font></b> <b><font color=
+"#000000">open</font></b><font color="#990000">(</font><font color=
+"#FF0000">'files.txt'</font><font color="#990000">):</font>
+  match <font color="#990000">=</font> FILENAME_RE<font color=
+"#990000">.</font><b><font color=
+"#000000">search</font></b><font color=
+"#990000">(</font>filename<font color="#990000">)</font>
+  <b><font color="#0000FF">if</font></b> <b><font color=
+"#0000FF">not</font></b> match<font color="#990000">:</font>
+    <b><font color="#0000FF">print</font></b> filename<font color=
+"#990000">,</font>
+</tt>
+</pre>
+This is the regular expression I ended up with:
+<pre>
+<tt><font color="#9A1900">FILENAME_RE</font> <font color=
+"#990000">=</font> re<font color="#990000">.</font><b><font color=
+"#000000">compile</font></b><font color="#990000">(</font>
+    r<font color=
+"#FF0000">'(?P&lt;survey&gt;(?P&lt;survey_type&gt;[A-Z])(?P&lt;number&gt;[0-9]{5,})(?P&lt;extra&gt;[A-Z]*))'</font>
+    r<font color=
+"#FF0000">'(_(Office|EastBranch|Lynnhaven|NewportNews|Pipeline|SouthBranch|Terminal|UTM..))?'</font>
+    r<font color="#FF0000">'(_Combined)?'</font>
+    r<font color=
+"#FF0000">'(_((?P&lt;cell_size_oops&gt;\d+)(?P&lt;units_oops&gt;m|cm)))?'</font>
+    r<font color=
+"#FF0000">'(_(?P&lt;sensor&gt;(VB|VBES|MB|LI)+))?'</font>
+    r<font color=
+"#FF0000">'(_((?P&lt;cell_size&gt;\d+)(?P&lt;units&gt;m|cm)))?'</font>
+    r<font color="#FF0000">'(_awois)?'</font>
+    r<font color="#FF0000">'(_Combined)?'</font>
+    r<font color=
+"#FF0000">'(_+(?P&lt;vdatum&gt;(MLLW|MLWW)|MLW|MSL|MHW|MHHW|IGLD(88)?|other|NGVD29|HRD|CRD))?'</font>
+    r<font color="#FF0000">'(_Combined)?'</font>
+    r<font color="#FF0000">'(_SwashChannel)?'</font>
+    r<font color=
+"#FF0000">'(_(?P&lt;grouping&gt;combined\d?|((?P&lt;item_num&gt;\d+)(of|o|oi|oif|pf)(?P&lt;item_total&gt;\d+))))?'</font>
+    r<font color="#FF0000">'(_A)?'</font>
+    r<font color=
+"#FF0000">'(?P&lt;complete_ext&gt;\.(?P&lt;ext&gt;tif|bag|BAG|mb168)(\.gz)?)?$'</font><font color="#990000">,</font>
+    re<font color="#990000">.</font>IGNORECASE<font color=
+"#990000">)</font>
+</tt>
+</pre>
+Looking at vdatum_regional08132013.zip from <a href=
+"http://vdatum.noaa.gov/download/data/">http://vdatum.noaa.gov/download/data/</a>,
+I see these:
+<pre>
+IGLD85/hydroc1.tif
+IGLD85/hydroc2.tif
+IGLD85/hydroc3.tif
+IGLD85/hydroc4.tif
+IGLD85/hydroc5.tif
+</pre>
+I know that NAVD29 is National Geodetic Vertical Datum of 1929
+(NGVD29). Is HRD the hurricane research division? I would guess
+that CRD is the Columbia River Datum. Dear, National Geodetic
+Survey (<a href="http://www.ngs.noaa.gov">www.ngs.noaa.gov</a>),
+what are these?</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-10.html#e2013-10-02T09_45_44.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-10-05T23_10_13.html#comments">Comments</a> --></div>
+</div>
+<div class="item"><a id="e2013-10-01T13_08_52.txt" name=
+"e2013-10-01T13_08_52.txt"></a>
+<h2 class="date">10.01.2013 13:08</h2>
+<div class="blogbody">
+<h3 class="title">comcast lying</h3>
+<div class="item-description">This is a load of crap:<br />
+<br />
+<a href=
+"http://customer.comcast.com/help-and-support/cable-tv/limited-basic-encryption/">
+http://customer.comcast.com/help-and-support/cable-tv/limited-basic-encryption/</a><br />
+
+<br />
+<pre>
+... encryption allows us to automate certain system functions
+and will reduce the need for scheduled in-home appointments, providing
+greater convenience for our customers.
+</pre>
+<br />
+<br />
+Unless they want to tell us the technical details of how that is
+better, I'm going to have to call bull shit.</div>
+</div>
+<div class="posted"><br />
+Posted by <span class="item-creator">Kurt</span> | <a class="link"
+href="2013-10.html#e2013-10-01T13_08_52.txt">Permalink</a> 
+<!-- <br /><a href="archives/2013-10-02T09_45_44.html#comments">Comments</a> --></div>
+</div>
+</div>
+</div>
+<div id="links">
+<div class="calendar">
+<table border="0" cellspacing="4" cellpadding="0" summary=
+"Calendar with links to days with entries">
+<caption class="calendarhead">October 2013</caption>
+<tr>
+<th align="center"><span class="calendarday">Su</span></th>
+<th align="center"><span class="calendarday">Mo</span></th>
+<th align="center"><span class="calendarday">Tu</span></th>
+<th align="center"><span class="calendarday">We</span></th>
+<th align="center"><span class="calendarday">Th</span></th>
+<th align="center"><span class="calendarday">Fr</span></th>
+<th align="center"><span class="calendarday">Sa</span></th>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><span class="calendar"><a href=
+"2013-10.html#e2013-10-01T13_08_52.txt">1</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-10.html#e2013-10-02T09_45_44.txt">2</a></span></td>
+<td align="center"><span class="calendar">3</span></td>
+<td align="center"><span class="calendar">4</span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-10.html#e2013-10-05T23_10_13.txt">5</a></span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">6</span></td>
+<td align="center"><span class="calendar">7</span></td>
+<td align="center"><span class="calendar">8</span></td>
+<td align="center"><span class="calendar">9</span></td>
+<td align="center"><span class="calendar">10</span></td>
+<td align="center"><span class="calendar">11</span></td>
+<td align="center"><span class="calendar">12</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">13</span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-10.html#e2013-10-14T10_33_11.txt">14</a></span></td>
+<td align="center"><span class="calendar">15</span></td>
+<td align="center"><span class="calendar">16</span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-10.html#e2013-10-17T09_43_03.txt">17</a></span></td>
+<td align="center"><span class="calendar"><a href=
+"2013-10.html#e2013-10-18T12_26_01.txt">18</a></span></td>
+<td align="center"><span class="calendar">19</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">20</span></td>
+<td align="center"><span class="calendar">21</span></td>
+<td align="center"><span class="calendar">22</span></td>
+<td align="center"><span class="calendar">23</span></td>
+<td align="center"><span class="calendar">24</span></td>
+<td align="center"><span class="calendar">25</span></td>
+<td align="center"><span class="calendar">26</span></td>
+</tr>
+<tr>
+<td align="center"><span class="calendar">27</span></td>
+<td align="center"><span class="calendar">28</span></td>
+<td align="center"><span class="calendar">29</span></td>
+<td align="center"><span class="calendar">30</span></td>
+<td align="center"><span class="calendar">31</span></td>
+</tr>
+</table>
+</div>
+</div>
+<br clear="all" />
+</body>
+</html>

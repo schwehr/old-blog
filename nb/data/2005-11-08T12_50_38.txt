@@ -1,0 +1,44 @@
+TITLE: python script to check references
+AUTHOR: Kurt
+DATE: 11.08.2005 12:50
+DESC: 1st pass
+-----
+BODY:
+This script compares the references of figures to the label
+definitions of figures.  These need to match up in a paper!  The key
+is to use findall().
+<pre>
+<font color="#444444">#!/usr/bin/env python</font>
+<strong>import</strong> <font color="#2040a0">re</font>
+<font color="#444444">#</font>
+<font color="#2040a0">figRE</font> <font color="4444FF">=</font> <font color="#2040a0">re</font>.<font color="#2040a0">compile</font><font color="4444FF">(</font><font color="#2040a0">r</font><font color="#008000">&quot;<font color="#77dd77">\\</font>ref{fig:([a-z]+)}&quot;</font><font color="4444FF">)</font>
+<font color="#2040a0">figDefRE</font> <font color="4444FF">=</font> <font color="#2040a0">re</font>.<font color="#2040a0">compile</font><font color="4444FF">(</font><font color="#2040a0">r</font><font color="#008000">&quot;<font color="#77dd77">\\</font>label{fig:([a-z]+)}&quot;</font><font color="4444FF">)</font>
+<font color="#444444">#</font>
+<font color="#2040a0">cites</font> <font color="4444FF">=</font> <font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font>
+<font color="#2040a0">labels</font> <font color="4444FF">=</font> <font color="4444FF"><strong>{</strong></font><font color="4444FF"><strong>}</strong></font>
+<font color="#444444">#</font>
+<strong>for</strong> <font color="#2040a0">line</font> <strong>in</strong> <font color="#2040a0">open</font><font color="4444FF">(</font><font color="#008000">'short.tex'</font><font color="4444FF">)</font>.<font color="#2040a0">readlines</font><font color="4444FF">(</font><font color="4444FF">)</font><font color="4444FF">:</font>
+    <font color="#2040a0">matches</font> <font color="4444FF">=</font> <font color="#2040a0">figRE</font>.<font color="#2040a0">findall</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">matches</font><font color="4444FF">:</font>
+        <strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">matches</font><font color="4444FF">:</font>
+            <strong>if</strong> <font color="#2040a0">cites</font>.<font color="#2040a0">has_key</font><font color="4444FF">(</font><font color="#2040a0">key</font><font color="4444FF">)</font><font color="4444FF">:</font>
+                <font color="#2040a0">cites</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">cites</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#FF0000">1</font>
+            <strong>else</strong><font color="4444FF">:</font>
+                <font color="#2040a0">cites</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+    <font color="#2040a0">matches</font> <font color="4444FF">=</font> <font color="#2040a0">figDefRE</font>.<font color="#2040a0">findall</font><font color="4444FF">(</font><font color="#2040a0">line</font><font color="4444FF">)</font>
+    <strong>if</strong> <font color="#2040a0">None</font><font color="4444FF">!</font><font color="4444FF">=</font><font color="#2040a0">matches</font><font color="4444FF">:</font>
+        <strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">matches</font><font color="4444FF">:</font>
+            <strong>if</strong> <font color="#2040a0">labels</font>.<font color="#2040a0">has_key</font><font color="4444FF">(</font><font color="#2040a0">key</font><font color="4444FF">)</font><font color="4444FF">:</font>
+                <font color="#2040a0">labels</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">labels</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font><font color="4444FF">+</font><font color="#FF0000">1</font>
+            <strong>else</strong><font color="4444FF">:</font>
+                <font color="#2040a0">labels</font><font color="4444FF">[</font><font color="#2040a0">key</font><font color="4444FF">]</font><font color="4444FF">=</font><font color="#FF0000">1</font>
+<font color="#444444">#</font>
+<font color="#2040a0">citesSet</font><font color="4444FF">=</font><font color="#2040a0">set</font><font color="4444FF">(</font><font color="#2040a0">cites</font><font color="4444FF">)</font>
+<font color="#2040a0">labelsSet</font><font color="4444FF">=</font><font color="#2040a0">set</font><font color="4444FF">(</font><font color="#2040a0">labels</font><font color="4444FF">)</font>
+<font color="#2040a0">diffSet</font> <font color="4444FF">=</font> <font color="#2040a0">citesSet</font>.<font color="#2040a0">difference</font><font color="4444FF">(</font><font color="#2040a0">labelsSet</font><font color="4444FF">)</font>
+<strong>if</strong> <font color="#2040a0">len</font><font color="4444FF">(</font><font color="#2040a0">diffSet</font><font color="4444FF">)</font><font color="4444FF">&gt;</font><font color="#FF0000">0</font><font color="4444FF">:</font>
+    <strong>print</strong> <font color="#008000">'ERROR: missmatch between cites and labels...'</font>
+    <strong>for</strong> <font color="#2040a0">key</font> <strong>in</strong> <font color="#2040a0">diffSet</font><font color="4444FF">:</font>
+        <strong>print</strong> <font color="#008000">'  '</font>,<font color="#2040a0">key</font>
+</pre>
+-----

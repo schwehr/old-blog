@@ -1,0 +1,54 @@
+TITLE: Water bottom thresholding
+AUTHOR: Kurt
+DATE: 09.25.2005 15:29
+DESC: evaluation shows 10000 is close
+-----
+BODY:
+I have been trying to see what is up with the water bottom
+thresholding that I was working on in sioseis.  It was hard to see
+what was going, so I took a few minutes to start writing a water
+bottom program.  Right now, I have only implemented thresholding.  It
+is clear that thresholding is very touchy.  I am doing 4 thresholds at
+dn levels of 15000, 10000, and 5000.  The sensor is clipping at +/-
+32000 for a few percent of the pings.  Here is the command:
+<pre>
+  ./segywaterbottom.py -t 15000 -t 10000 -t 5000 -t 1000 \
+    -f line43.sgy -s 10 &gt; foo
+
+head foo
+
+# FILE:  line43.sgy
+10 818   818   143   1  
+20 819   819   85   3  
+30 817   814   176   0  
+40 814   814   0   0  
+50 817   814   71   8  
+60 815   812   203   3  
+70 815   812   139   0  
+80 813   813   213   2  
+</pre>
+Then I did a quick gnuplot:
+<pre>
+gnuplot&gt; set title 'water bottom thresholding'
+gnuplot&gt; set yrange [0:2000]
+gnuplot&gt; set terminal gif
+Terminal type set to 'gif'
+Options are 'small size 640,480 '
+gnuplot&gt; set output 'threshold.gif'
+gnuplot&gt; plot 'foo' with l title '15000'\
+         , 'foo' using 1:3 with lp title '10000'\
+         , 'foo' using 1:4 with l title '5000'
+</pre>
+<img src="http://schwehr.org/blog/attachments/2005-09/threshold.gif"><br>
+A few things are clear.  10000 is very close to finding the water
+bottom.  It occasionally triggers early.  5000 triggers too soon for
+most of the line (until ~17000).  15000 never triggers for a lot of
+traces.  This freaks out gnuplot with data like this:
+<pre>
+7640 None   None   35   9  
+14350 None   452   26   5  
+14500 None   632   3   0  
+17890 None   82   6   1  
+17900 None   463   28   5  
+</pre>
+-----

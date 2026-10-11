@@ -1,0 +1,35 @@
+TITLE: Google project with mapserver
+AUTHOR: Kurt
+DATE: 01.25.2008 11:01
+DESC: think I got it for my background layer
+-----
+BODY:
+Turns out that with mapserver, for data files, it is up to the user to
+specify the projection of files used in layers.  Here is my map file
+for my previous hello world example now done up in the google mercator
+projection.
+<pre>
+MAP
+  SIZE 512 512
+  PROJECTION
+   <font color="#008000">&quot;init=epsg:900913&quot;</font> <font color="orange"># Google Maps projection</font>
+  END
+  UNITS METERS <font color="orange"># Have to work in meters</font>
+  EXTENT  -7925000 5240000 -7825000 5400000 <font color="orange"># Ouch... guess where this is</font>
+  LAYER
+    NAME states
+    TYPE POLYGON
+    STATUS DEFAULT
+    PROJECTION
+      <font color="#008000">&quot;init=epsg:4326&quot;</font> <font color="orange"># Tell mapserver that this is geographic with WGS84 ellps and datum</font>
+    END
+    DATA statesp020/statesp020.shp
+    CLASS
+      STYLE
+        OUTLINECOLOR 100 100 100
+      END<font color="orange"> # STYLE</font>
+    END<font color="orange"> # CLASS</font>
+  END<font color="orange"> # LAYER</font>
+END<font color="orange"> # MAP</font>
+</pre>
+-----

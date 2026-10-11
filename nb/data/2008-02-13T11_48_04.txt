@@ -1,0 +1,22 @@
+TITLE: AIS Simulator
+AUTHOR: Kurt
+DATE: 02.13.2008 11:48
+DESC: fuzzing
+-----
+BODY:
+Panbo has a writeup of <a
+href="http://www.kagstrom.no/ais_simulator.htm">AIS Simulator</a>: <a
+href="http://www.panbo.com/archives/2008/02/kagstroms_ais_simulator_and_good_b_news.html">Kagstrom's
+AIS Simulator, and good B news</a>
+
+Remember too that you can use noaadata to craft AIS NMEA messages.
+I've been thinking about creating a fuzz test tool for AIS tools.  It
+would work in two modes.  The first is to take the message definitions
+and create random AIS NMEA strings that will decode, but have random
+values filled out in the fields.  The second is to generate random
+NMEA and NMEA like messages.  I need to have software that will not
+crash if there is line noise on the serial connection (which is rare,
+but does happen) or if the receiver decides to output something funky.
+It shouldn't be too hard to do this with the mechanisms already in the 
+python message code that I have.
+-----

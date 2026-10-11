@@ -1,0 +1,26 @@
+TITLE: First AIS ship location decoding
+AUTHOR: Kurt
+DATE: 03.28.2006 09:49
+DESC: 
+-----
+BODY:
+This is not so exciting for those who have been using AIS for quite a
+while (e.g. Matt and Roland) but it is pretty exciting for me.  First,
+this morning I created functions for the BitVector class that go to
+and from signed integers.  That was pretty cool by itself, but that
+fix the last hurdle to fully decoding the longitude and latitudes from
+AIS messages 1-3.  Those fields use signed integers of 10000 minute
+increments to store the location.  Being in the western hemisphere, I
+was expecting negative longitudes (e.g. NOT 373 degrees).
+
+To give ais-py a sanity test, I did a quick dump of the location and
+got these values for one message:
+<pre>
+  MMSI/UserID Longitude Latitude SpeedOverGround
+   353556000  -70.7583  43.07995        0
+</pre>
+Google Maps/Local was kind enough to show me that this is indeed the
+salt hauler that was docked in Portsmouth over the weekend.
+
+<img src="http://schwehr.org/blog/attachments/2006-03/ship-location.png">
+-----

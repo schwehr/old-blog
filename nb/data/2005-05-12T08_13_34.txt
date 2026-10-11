@@ -1,0 +1,74 @@
+TITLE: OpenInventor LineSet
+AUTHOR: Kurt
+DATE: 05.12.2005 08:13
+DESC: and PointSets
+-----
+BODY:
+This is a quick exploration of the OpenInventor/Coin LineSet (man <a
+href="http://doc.coin3d.org/Coin/classSoLineSet.html">SoLineSet</a>).
+I want to be able to simplify my usage of IndexedLineSet when I am not
+reusing vertices and I also want to be able to do reasonable effecient
+scatter plots so I will take a look at <a
+href="http://doc.coin3d.org/Coin/classSoPointSet.html">PointSet</a>.
+I do not know if PointSet is in SGI's OpenInventor, but I am hoping
+that it is.
+
+For LineSet, here is the example straight out of the Coin
+documentation:
+<pre>
+#Inventor V2.1 ascii
+
+Separator {
+    Coordinate3 {
+        point [ 0 0 0, 1 1 1, 2 1 1, 2 2 1, 2 2 2, 2 2 3, 2 3 2, 2 3 3, 3 3 3 
+	]
+    }
+    LineSet {
+        numVertices [ 3, 4, 2 ]
+    }
+}
+</pre>
+The above example makes three disconnected lines.  What if we have the
+simpler case of just one line for all the vertices that we specify?
+All you have to do is change the numVertices to be -1!
+<pre>
+#Inventor V2.1 ascii
+
+Separator {
+    Coordinate3 {
+        point [ 0 0 0, 1 1 1, 2 1 1, 2 2 1, 2 2 2, 2 2 3, 2 3 2, 2 3 3, 3 3 3 
+	]
+    }
+    LineSet {
+        numVertices [ -1 ]
+    }
+}
+</pre>
+Now for a PointSet (man SoPointSet):
+<pre>
+#Inventor V2.1 ascii
+
+Separator {
+    Material {
+        diffuseColor [
+            1 0 0, 0 1 0, 0 0 1, 1 1 0, 1 0 1, 1 1 1, 1 0.8 0.6, 0.6 0.8 1
+        ]
+    }
+    MaterialBinding { value PER_PART }
+
+    Coordinate3 {
+        point [
+            -1 1 0, -1 -1 0, 1 -1 0, 1 1 0, 0 2 -1, -2 0 -1, 0 -2 -1, 2 0 -1
+        ]
+    }
+
+    DrawStyle { pointSize 3 }
+
+    PointSet { }
+}
+</pre>
+Why is it that we had a separate DotCloud application back in
+1996-1997?  Did Lew Hitchner all  sorts of features that I never knew
+about (which is probably true) or was it a more fundamental problem
+with OpenInventor not having a PointSet back then? 
+-----

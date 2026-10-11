@@ -1,0 +1,17 @@
+TITLE: Dynamically pulling out all of the database fields
+AUTHOR: Kurt
+DATE: 03.30.2006 16:43
+DESC: not pretty
+-----
+BODY:
+Here is a quick example to go with the previous on.  I am sure this is
+not the best way to do it, but it works.  For each row in the
+database, I want to print out all the fields with their values.
+<pre>
+results = usermapper.select_text('select * from msg1 where mmsi=353556000 order by messageId')
+
+for r in results:
+    for attribute in r._managed_attributes.keys():
+	print attribute,':     ',r.__getattribute__(attribute)
+</pre>
+-----

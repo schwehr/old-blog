@@ -1,0 +1,39 @@
+TITLE: simplest xsd schema example
+AUTHOR: Kurt
+DATE: 04.05.2006 14:08
+DESC: xmlstarlet and xmllint
+-----
+BODY:
+In my quest to get this stuff figured out, here is the simplest
+example that I can come up with that validates.  First the GNU Makefile:
+<pre>
+<font color="8b2252"><strong>validate</strong>:</font>
+	xmllint ais.xsd
+	xmllint ais.xml
+	xml val -e --xsd ais.xsd ais.xml
+<font color="8b2252">
+<strong>html</strong>:</font>
+	code2html -l html ais.xsd &gt; ais.xsd.html
+	code2html -l html ais.xml &gt; ais.xml.html
+	code2html Makefile &gt; Makefile.html
+<font color="8b2252">
+<strong>clean</strong>:</font>
+	rm *.html
+</pre>
+I like the idea of validating with multiple tools.  The more checks
+the better and if there is an error, one program may have a more
+comprehensible error message.  Now the xsd schema.  This is not much.
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:schema</font> <font color="#2040a0">xmlns:xsd=</font><font color="#008000">&quot;http://www.w3.org/2001/XMLSchema&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">xsd:element</font> <font color="#2040a0">name=</font><font color="#008000">&quot;ais&quot;</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+  <font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:element</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/xsd:schema</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+Finally, the xml document:
+<pre>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">?xml</font> <font color="#2040a0">version=</font><font color="#008000">&quot;1.0&quot;</font><font color="#2040a0">?</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">ais</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+<font color="#2040a0"><strong><font color="4444FF"><strong>&lt;</strong></font><font color="#2040a0">/ais</font><font color="4444FF"><strong>&gt;</strong></font></strong></font>
+</pre>
+-----

@@ -1,0 +1,49 @@
+TITLE: gnuplot xtics new tricks
+AUTHOR: Kurt
+DATE: 04.24.2007 13:56
+DESC: gnuplot gets better
+-----
+BODY:
+Tics for tricks... Check out what Stephen S. figured out for the
+x-axis with gnuplot.  You can now have the axes labeled by text
+strings.  Gnuplot 4.2 is a much better thing.
+
+<img src="http://schwehr.org/blog/attachments/2007-04/plot.gif">
+
+The source follows.  I've commented out, but left in a few other
+useful features.
+<pre>
+<font color="0000ff"><strong>#!/usr/bin/env gnuplot</strong></font>
+<font color="#444444">#</font>
+<font color="#444444">#set terminal gif</font>
+<font color="#444444">#set output 'plot.gif'
+set terminal svg size 800 600
+set output &quot;plot.svg&quot;
+#show terminal</font>
+<font color="#444444">#</font>
+set xrange [0.5:4.5]
+set key off
+set xlabel 'Category'
+set ylabel 'Average and Variance'
+<font color="#444444">#</font>
+set grid y
+<font color="#444444">#</font>
+set xtics 1
+show label
+set xtics (<font color="#008000">&quot;Scroll&quot;</font> 1, <font color="#008000">&quot;Squeeze&quot;</font> 2, <font color="#008000">&quot;Three&quot;</font> 3, <font color="#008000">&quot;Four&quot;</font> 4)
+set bars 3
+set pointsize 3
+<font color="#444444">#</font>
+plot 'one.dat' with errorbars lw 3 pt 7, \
+	 'two.dat' with errorbars lw 3 pt 7, \
+	 'three.dat' with errorbars lw 3 pt 7, \
+	 'four.dat' with errorbars lw 3 pt 7
+<font color="#444444">#</font>
+<font color="#444444">#show plot
+#
+#set terminal x11
+#replot
+#
+#pause -1 &quot;Hit return to finish&quot;</font>
+</pre>
+-----

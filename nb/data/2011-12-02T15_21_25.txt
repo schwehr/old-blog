@@ -1,0 +1,29 @@
+TITLE: basemap for matplotlib back in fink!
+AUTHOR: Kurt
+DATE: 12.02.2011 15:21
+DESC: yeah, but will it be happy?
+-----
+BODY:
+basemap is back! at least for fink on 10.7... it is using libgeos3.3.1.
+<pre><tt><b><font color="#000080">from</font></b> mpl_toolkits<font color="#990000">.</font>basemap <b><font color="#000080">import</font></b> Basemap
+<b><font color="#000080">import</font></b> numpy as np
+<b><font color="#000080">import</font></b> matplotlib<font color="#990000">.</font>pyplot as plt
+width <font color="#990000">=</font> <font color="#993399">28000000</font><font color="#990000">;</font> lon_0 <font color="#990000">=</font> <font color="#990000">-</font><font color="#993399">105</font><font color="#990000">;</font> lat_0 <font color="#990000">=</font> <font color="#993399">40</font>
+m <font color="#990000">=</font> <b><font color="#000000">Basemap</font></b><font color="#990000">(</font>width<font color="#990000">=</font>width<font color="#990000">,</font>height<font color="#990000">=</font>width<font color="#990000">,</font>projection<font color="#990000">=</font><font color="#FF0000">'aeqd'</font><font color="#990000">,</font>
+            lat_0<font color="#990000">=</font>lat_0<font color="#990000">,</font>lon_0<font color="#990000">=</font>lon_0<font color="#990000">)</font>
+<i><font color="#9A1900"># fill background.</font></i>
+m<font color="#990000">.</font><b><font color="#000000">drawmapboundary</font></b><font color="#990000">(</font>fill_color<font color="#990000">=</font><font color="#FF0000">'aqua'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># draw coasts and fill continents.</font></i>
+m<font color="#990000">.</font><b><font color="#000000">drawcoastlines</font></b><font color="#990000">(</font>linewidth<font color="#990000">=</font><font color="#993399">0.5</font><font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color="#000000">fillcontinents</font></b><font color="#990000">(</font>color<font color="#990000">=</font><font color="#FF0000">'coral'</font><font color="#990000">,</font>lake_color<font color="#990000">=</font><font color="#FF0000">'aqua'</font><font color="#990000">)</font>
+<i><font color="#9A1900"># 20 degree graticule.</font></i>
+m<font color="#990000">.</font><b><font color="#000000">drawparallels</font></b><font color="#990000">(</font>np<font color="#990000">.</font><b><font color="#000000">arange</font></b><font color="#990000">(-</font><font color="#993399">80</font><font color="#990000">,</font><font color="#993399">81</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">))</font>
+m<font color="#990000">.</font><b><font color="#000000">drawmeridians</font></b><font color="#990000">(</font>np<font color="#990000">.</font><b><font color="#000000">arange</font></b><font color="#990000">(-</font><font color="#993399">180</font><font color="#990000">,</font><font color="#993399">180</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">))</font>
+<i><font color="#9A1900"># draw a black dot at the center.</font></i>
+xpt<font color="#990000">,</font> ypt <font color="#990000">=</font> <b><font color="#000000">m</font></b><font color="#990000">(</font>lon_0<font color="#990000">,</font> lat_0<font color="#990000">)</font>
+m<font color="#990000">.</font><b><font color="#000000">plot</font></b><font color="#990000">([</font>xpt<font color="#990000">],[</font>ypt<font color="#990000">],</font><font color="#FF0000">'ko'</font><font color="#990000">)</font> 
+<i><font color="#9A1900"># draw the title.</font></i>
+plt<font color="#990000">.</font><b><font color="#000000">title</font></b><font color="#990000">(</font><font color="#FF0000">'Azimuthal Equidistant Projection'</font><font color="#990000">)</font>
+plt<font color="#990000">.</font><b><font color="#000000">savefig</font></b><font color="#990000">(</font><font color="#FF0000">'aeqd.png'</font><font color="#990000">)</font></tt></pre>
+<img width="600" height="450" title="Basemap demo on macosx 10.7 from fink" withgrayborder="True" src="http://schwehr.org/blog/attachments/2011-12/matplotlib-basemap-aeqd.png"/>
+-----

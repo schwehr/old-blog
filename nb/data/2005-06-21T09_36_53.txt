@@ -1,0 +1,772 @@
+TITLE: sioseis and pltsegy
+AUTHOR: Kurt
+DATE: 06.21.2005 09:36
+DESC: here we go
+-----
+BODY:
+Now I am going to try to work through a seismic line on my own without
+anyone arround to baby site and without internet.  This will be the
+true test :)
+
+But first, what does it mean when a CA license plate has "LIVERY" at
+the bottom?
+
+For this all to work, you must have segydump.py, sioseis, and pltsegy
+all in your path.  Here is my particular setup.
+<pre>
+&gt; sioseis
+  SIOSEIS ver 2005.1 (7 Feb. 2005)  (C) Regents of U.C.
+&gt; segydump.py --version
+  segydump.py 0.13 - 1.11
+
+&gt; type -a  pltsegy pltsegy_prep.macX sioseis segydump.py
+pltsegy is /Users/schwehr/bin/pltsegy
+pltsegy_prep.macX is /Users/schwehr/bin/pltsegy_prep.macX
+sioseis is /Users/schwehr/bin/sioseis
+segydump.py is /Users/schwehr/x/src/segy-py/segydump.py
+</pre>
+
+Setup phase.  The Babcock/Kent/Dingler convention for script files is
+to have them start with C_, which I think means "command."
+<pre>
+   cd ~/Desktop/Segy/
+   mkdir Try2         # Try1 was coached by Becca... thanks Becca!
+   cp xstar/bpsio04L04.xstar.bz2 Try2/
+   cp DinglerClassNotes/C_ConvertXstar_CMT Try2
+</pre>
+The real the first step was to pull the data off of the cruise tapes
+using my <em>readtape.bash</em> script, but I did that last year.  The
+resulting xstar files are in the EdgeTech XSTAR format which most
+seismic systems have trouble with.  Paul Henkart has written a special
+"format edgetech" to pull in these files.  I will first use sioseis to
+convert xstar to a sioseis sgy file.  I rewrote Jeff D.'s script to be
+xstar2segy.bash.  This has only the sioseis conversion script.
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+
+declare -ri <font color="#2040a0">EXIT_FAILURE</font>=1
+
+if [ <font color="#2040a0">$#</font> != 2 ] ; then
+  echo <font color="#008000">&quot;usage:  [Input XstarFile] [Output SegyFile] &quot;</font> ; exit <font color="#2040a0">$EXIT_FAILURE</font>
+fi
+
+<font color="#444444">####################################
+# Convert Xstar to Segy.  Must use 10Aug2004 version of SIOSEIS or newer</font>
+<font color="#444444"># course and speed located in i63 &amp; i64</font>
+
+<font color="#444444"># xstar variable dummies is a switch indicating how the program should treat </font>
+<font color="#444444"># missing pings or a missing ducer on the dual ducer xstar. When dummies = 2, 
+# when 1 ducer is missing, the single trace is scaled and output.  Missing pings 
+# are replaced by dead traces.</font>
+
+sioseis &lt;&lt; EOF
+<font color="#FF8800">
+procs diskin xstar header diskoa end
+
+diskin
+    format edgetech
+    ipath <font color="#2040a0">$1</font> end
+end
+
+xstar
+   type 2 dummies 2 end
+end
+
+header
+     fno 0 lno 999999 ftr 0 ltr 999999
+     l3 = l1 l6 = l3 end
+end
+
+diskoa
+  opath $2 end
+end
+
+end
+EOF
+</font>
+echo <font color="#008000">&quot;Done.&quot;</font>
+</pre>
+Now to run the script:
+<pre>
+./xstar2segy.bash bpsio04L04.xstar bpsio04L04.sgy
+  SIOSEIS ver 2005.1 (7 Feb. 2005)  (C) Regents of U.C.                          
+ procs diskin xstar header diskoa end 
+  
+ diskin 
+     format edgetech 
+     ipath bpsio04L04.xstar end 
+ end 
+  ...
+
+ diskoa 
+   opath bpsio04L04.sgy end 
+ end 
+  
+ end 
+ ****    0 ERRORS IN THIS JOB   ****
+  Ping has only 1 ducer.
+  Ping has only 1 ducer.
+  ...
+  Ping has only 1 ducer.
+  Ping has only 1 ducer.
+  Ping has only 1 ducer.
+ 1 missing pings will be replaced by dead ones.
+  Ping has only 1 ducer.
+  Ping has only 1 ducer.
+  Ping has only 1 ducer.
+  ...
+  Ping has only 1 ducer.
+ 1 missing pings will be replaced by dead ones.
+  END OF SIOSEIS RUN
+Done.
+
+&gt; ls -l bp*
+-rwxr-xr-x    1 schwehr  staff    83652112 Jun 21 10:04 bpsio04L04.sgy
+-rwxr-xr-x    1 schwehr  staff    163843600 Jun 21 09:39 bpsio04L04.xstar
+
+&gt; md5 bp*
+MD5 (bpsio04L04.sgy) = 8f4bd9e3bf622efa59176ce020369c76
+MD5 (bpsio04L04.xstar) = 2ddcb3f76d1df7ee21da69d3aa568b60
+</pre>
+Keeping a record of md5 sums for seismic files is not a bad idea.
+Then you can know for sure if you are working with the exact same file
+at a later date.  This can be critical if there has been a change in,
+for example, the way that sioseis handles xstar data or a change with
+the header reassignments (e.g. l3=l1 l6=l3).
+
+Looking at the file size for the xstar and sioseis segy files, you
+will see that the sgy is about 1/2 the size of the xstar.  This is
+because sioseis turns the "complex" two trace values from xstar into a
+"real" value (I think using a Hilbert transform).
+
+Another thing to note is that in the header field above, I used "fno 0
+lno 999999 ftr 0 ltr 999999".  This is an attempt to write all of the
+traces.
+
+Now I need to know the beginning and end shot numbers for the file.  I
+will show two ways to do this: first with segydump.py and second with
+sutil.
+<pre>
+&gt; segydump.py -d xstar -t 1 bpsio04L04.xstar | grep Shotpoint
+
+  1:  LineSeqNo=79818
+
+&gt;  segydump.py -d xstar -t -1 bpsio04L04.xstar | grep Shotpoint
+
+  20000:  LineSeqNo=89824
+
+==============================
+
+&gt; sutil
+      Enter SEG-Y file name: bpsio04L04.sgy
+
+OVERVIEW: 
+       Data format: IEEE floating point 
+ Total # of traces:   10211
+ dt (milliseconds):   0.083
+     samples/trace:    1988
+
+                    shot       (trc)         cdp       (trc)      0ffset
+========================================================================
+ First trc:        79818           1       79818           0           0
+  Last trc:        89824           1       89824           0           0
+========================================================================
+</pre>
+Make sure that you specify the xstar driver or you will get crazy
+results when using segydump.py.
+
+Now I know that the shots in this file go from 79818 to 89824.  Now I
+can move on to using pltsegy to give a first view of the data.  I have
+to use pltsegy files from templates or I am lost.  I will start with
+one from Becca and go from there.  I will just paste it in.  This will
+be long!  Plt_ice2001L28
+<pre>
+plot 
+       dtfile = ice2001L28.P.sgy;
+       plfile = ice2001L28.ps;
+       srtfile = sort.ice;
+       cdp = t;
+       device = 16;
+       interact = 1;
+       size = 550, 350;
+       sort = shot;
+       shb= 116000;
+       shf = 130000;       
+       noinc = 1;
+       ntrab = 1;
+       ntraf = 1;
+       ntrinc = 1;
+       speq = t;
+       delt = 0.000083;
+       tbi = 0.05;
+       tfi = 0.25;
+       timscal = 1000;
+       tmark = 0.01;
+       spa = 0.025;
+       negpol= f;
+       form = I6;
+       anninc = 500;
+       xann = 116000;
+       delann = 1;
+       reduc = 1.00;
+       clip = 1.0;
+       {mxdef = -1.0;
+       pscale = 30000000;
+       rtl = f;
+       shad = 5;
+       level =       
+     0.007874
+     0.015748
+     0.023622
+     0.031496
+      0.03937
+     0.047244
+     0.055118
+     0.062992
+     0.070866
+      0.07874
+     0.086614
+     0.094488
+      0.10236
+      0.11024
+      0.11811
+      0.12598
+      0.13386
+      0.14173
+      0.14961
+      0.15748
+      0.16535
+      0.17323
+       0.1811
+      0.18898
+      0.19685
+      0.20472
+       0.2126
+      0.22047
+      0.22835
+      0.23622
+      0.24409
+      0.25197
+      0.25984
+      0.26772
+      0.27559
+      0.28346
+      0.29134
+      0.29921
+      0.30709
+      0.31496
+      0.32283
+      0.33071
+      0.33858
+      0.34646
+      0.35433
+       0.3622
+      0.37008
+      0.37795
+      0.38583
+       0.3937
+      0.40157
+      0.40945
+      0.41732
+       0.4252
+      0.43307
+      0.44094
+      0.44882
+      0.45669
+      0.46457
+      0.47244
+      0.48031
+      0.48819
+      0.49606
+      0.50394
+      0.51181
+      0.51969
+      0.52756
+      0.53543
+      0.54331
+      0.55118
+      0.55906
+      0.56693
+       0.5748
+      0.58268
+      0.59055
+      0.59843
+       0.6063
+      0.61417
+      0.62205
+      0.62992
+       0.6378
+      0.64567
+      0.65354
+      0.66142
+      0.66929
+      0.67717
+      0.68504
+      0.69291
+      0.70079
+      0.70866
+      0.71654
+      0.72441
+      0.73228
+      0.74016
+      0.74803
+      0.75591
+      0.76378
+      0.77165
+      0.77953
+       0.7874
+      0.79528
+      0.80315
+      0.81102
+       0.8189
+      0.82677
+      0.83465
+      0.84252
+      0.85039
+      0.85827
+      0.86614
+      0.87402
+      0.88189
+      0.88976
+      0.89764
+      0.90551
+      0.91339
+      0.92126
+      0.92913
+      0.93701
+      0.94488
+      0.95276
+      0.96063
+       0.9685
+      0.97638
+      0.98425
+      0.99213
+            1;
+       palette =     
+  255.0000  255.0000  255.0000
+  253.0078  253.0078  253.0078
+  251.0156  251.0156  251.0156
+  249.0234  249.0234  249.0234
+  247.0312  247.0312  247.0312
+  245.0391  245.0391  245.0391
+  243.0469  243.0469  243.0469
+  241.0547  241.0547  241.0547
+  239.0625  239.0625  239.0625
+  237.0703  237.0703  237.0703
+  235.0781  235.0781  235.0781
+  233.0859  233.0859  233.0859
+  231.0938  231.0938  231.0938
+  229.1016  229.1016  229.1016
+  227.1094  227.1094  227.1094
+  225.1172  225.1172  225.1172
+  223.1250  223.1250  223.1250
+  221.1328  221.1328  221.1328
+  219.1406  219.1406  219.1406
+  217.1484  217.1484  217.1484
+  215.1562  215.1562  215.1562
+  213.1641  213.1641  213.1641
+  211.1719  211.1719  211.1719
+  209.1797  209.1797  209.1797
+  207.1875  207.1875  207.1875
+  205.1953  205.1953  205.1953
+  203.2031  203.2031  203.2031
+  201.2109  201.2109  201.2109
+  199.2188  199.2188  199.2188
+  197.2266  197.2266  197.2266
+  195.2344  195.2344  195.2344
+  193.2422  193.2422  193.2422
+  191.2500  191.2500  191.2500
+  189.2578  189.2578  189.2578
+  187.2656  187.2656  187.2656
+  185.2734  185.2734  185.2734
+  183.2812  183.2812  183.2812
+  181.2891  181.2891  181.2891
+  179.2969  179.2969  179.2969
+  177.3047  177.3047  177.3047
+  175.3125  175.3125  175.3125
+  173.3203  173.3203  173.3203
+  171.3281  171.3281  171.3281
+  169.3359  169.3359  169.3359
+  167.3438  167.3438  167.3438
+  165.3516  165.3516  165.3516
+  163.3594  163.3594  163.3594
+  161.3672  161.3672  161.3672
+  159.3750  159.3750  159.3750
+  157.3828  157.3828  157.3828
+  155.3906  155.3906  155.3906
+  153.3984  153.3984  153.3984
+  151.4062  151.4062  151.4062
+  149.4141  149.4141  149.4141
+  147.4219  147.4219  147.4219
+  145.4297  145.4297  145.4297
+  143.4375  143.4375  143.4375
+  141.4453  141.4453  141.4453
+  139.4531  139.4531  139.4531
+  137.4609  137.4609  137.4609
+  135.4688  135.4688  135.4688
+  133.4766  133.4766  133.4766
+  131.4844  131.4844  131.4844
+  129.4922  129.4922  129.4922
+  127.5000  127.5000  127.5000
+  125.5078  125.5078  125.5078
+  123.5156  123.5156  123.5156
+  121.5234  121.5234  121.5234
+  119.5312  119.5312  119.5312
+  117.5391  117.5391  117.5391
+  115.5469  115.5469  115.5469
+  113.5547  113.5547  113.5547
+  111.5625  111.5625  111.5625
+  109.5703  109.5703  109.5703
+  107.5781  107.5781  107.5781
+  105.5859  105.5859  105.5859
+  103.5938  103.5938  103.5938
+  101.6016  101.6016  101.6016
+   99.6094   99.6094   99.6094
+   97.6172   97.6172   97.6172
+   95.6250   95.6250   95.6250
+   93.6328   93.6328   93.6328
+   91.6406   91.6406   91.6406
+   89.6484   89.6484   89.6484
+   87.6562   87.6562   87.6562
+   85.6641   85.6641   85.6641
+   83.6719   83.6719   83.6719
+   81.6797   81.6797   81.6797
+   79.6875   79.6875   79.6875
+   77.6953   77.6953   77.6953
+   75.7031   75.7031   75.7031
+   73.7109   73.7109   73.7109
+   71.7188   71.7188   71.7188
+   69.7266   69.7266   69.7266
+   67.7344   67.7344   67.7344
+   65.7422   65.7422   65.7422
+   63.7500   63.7500   63.7500
+   61.7578   61.7578   61.7578
+   59.7656   59.7656   59.7656
+   57.7734   57.7734   57.7734
+   55.7812   55.7812   55.7812
+   53.7891   53.7891   53.7891
+   51.7969   51.7969   51.7969
+   49.8047   49.8047   49.8047
+   47.8125   47.8125   47.8125
+   45.8203   45.8203   45.8203
+   43.8281   43.8281   43.8281
+   41.8359   41.8359   41.8359
+   39.8438   39.8438   39.8438
+   37.8516   37.8516   37.8516
+   35.8594   35.8594   35.8594
+   33.8672   33.8672   33.8672
+   31.8750   31.8750   31.8750
+   29.8828   29.8828   29.8828
+   27.8906   27.8906   27.8906
+   25.8984   25.8984   25.8984
+   23.9062   23.9062   23.9062
+   21.9141   21.9141   21.9141
+   19.9219   19.9219   19.9219
+   17.9297   17.9297   17.9297
+   15.9375   15.9375   15.9375
+   13.9453   13.9453   13.9453
+   11.9531   11.9531   11.9531
+    9.9609    9.9609    9.9609
+    7.9688    7.9688    7.9688
+    5.9766    5.9766    5.9766
+    3.9844    3.9844    3.9844
+         0         0         0;         
+       chgt = 2.0;
+       labhgt = 3.0;
+       label = 'l' 116000  0.255   0 'Iceland 2001 Line 28 ';
+       ifilc = 0;
+       advplt = f;
+       origin = 35 30;      
+end$
+</pre>
+From this file I need to change a number of parameters or pltsegy will
+give me nothing.  Note that '{' is the comment character.  First I
+need to change the input and output file names.  dtfile is the input
+segy file (dt = data?).  plfile is output file where postscript will
+be written.
+<pre>
+       dtfile = bpsio04L04.sgy;
+       plfile = bpsio04L04-01.ps;
+</pre>
+Next, pltsegy needs to know the range of shots to plot.  shb is the
+beginning shot, while shf is the ending shot.  It is often wise to
+round to the nearest 100 shot so that the labeling looks ok.
+<pre>
+       shb= 80000;
+       shf = 89800;       
+</pre>
+Next comes a more difficult part.  I do not currently know how to
+easily get the time range of the plot (I am sure that this would not
+be hard to script).  I have to guess the time range and vertical scale
+to plot.  I will pick a wide range to start.
+<pre>
+       tbi = 0.00;
+       tfi = 0.5;
+       timscal = 300;
+</pre>
+tbi is the beginning time in seconds(?) and tfi is the ending time.
+timscal is the scale for the vertical access in mm/seconds according
+to the pltsegy man page.  The next thing to specify is the spaceing
+between traces.  This is done with the "spa" tag which is in mm.
+<pre>
+	spa = 0.025  {We will see
+</pre>
+The xann and delann handle where annotations begin and the offset.
+Set xann == shb (beginning shot).
+<pre>
+       xann = 80000;
+</pre>
+For the chirp in the normal mode that we use, delt = 0.000083 should
+work.  This is the sampling interval of the data in seconds.  I am not
+sure why pltsegy does not calculate this itself.  The last change is
+to alter the label field.  This labels the plot.  The first two number
+are the x offset in shots and the time down the plot.  Then the 0 says
+to draw the label horizontally.  Finally, the string is what to write
+on the plot.
+<pre>
+       label = 'l' 80000  0.255   0 'bpsio04L04';
+</pre>
+Forgot to mention that you should rename the srtfile to match the
+filename.  Any time things get redone in the pltsegy file, remove the
+sort file.
+<pre>
+       srtfile = sort.bpsio04L04;
+</pre>
+Fingers crossed and here it goes!
+<pre>
+    rm -f sort.bpsio04L04; pltsegy bpsio04L04-01.pltsegy
+
+reduc 1
+Screen width  1280 pixels or 433 mm
+Screen height  854 pixels or 289 mm
+Screen dpi (estimate) 75
+Depth = 24
+Display is True Color
+Wanted color (RGB)  255 255 255  Allocated color (RGB)  255 255 255
+Wanted color (RGB)    0   0   0  Allocated color (RGB)    0   0   0
+Wanted color (RGB)  255   0   0  Allocated color (RGB)  255   0   0
+Wanted color (RGB)    0 255   0  Allocated color (RGB)    0 255   0
+Wanted color (RGB)    0   0 255  Allocated color (RGB)    0   0 255
+Wanted color (RGB)    0 255 255  Allocated color (RGB)    0 255 255
+Wanted color (RGB)  255   0 255  Allocated color (RGB)  255   0 255
+Wanted color (RGB)  255 255   0  Allocated color (RGB)  255 255   0
+setting X init background to pixel 0
+setting X init foreground to pixel 1
+         < 0.00787RGB = 255255255
+ 0.00787 -   0.0157RGB =  253 253 253
+  0.0157 -   0.0236RGB =  251 251 251
+ ...
+   0.969 -    0.976RGB =    9   9   9
+   0.976 -    0.984RGB =    7   7   7
+   0.984 -    0.992RGB =    5   5   5
+   0.992 -        1RGB =    3   3   3
+           >1
+RGB =    0   0   0Wanted color (RGB)  253 253 253  Allocated color (RGB)  253 253 253
+Wanted color (RGB)  251 251 251  Allocated color (RGB)  251 251 251
+Wanted color (RGB)  249 249 249  Allocated color (RGB)  249 249 249
+Wanted color (RGB)  247 247 247  Allocated color (RGB)  247 247 247
+Wanted color (RGB)  245 245 245  Allocated color (RGB)  245 245 245
+Wanted color (RGB)  243 243 243  Allocated color (RGB)  243 243 243
+Wanted color (RGB)  241 241 241  Allocated color (RGB)  241 241 241
+...
+Wanted color (RGB)    7   7   7  Allocated color (RGB)    7   7   7
+Wanted color (RGB)    5   5   5  Allocated color (RGB)    5   5   5
+Wanted color (RGB)    3   3   3  Allocated color (RGB)    3   3   3
+Data file: bpsio04L04.sgy
+Sort file: sort.bpsio04L04
+ Data format  5
+*** Trace not found - 1st idx: 80040 2nd idx: 1
+Missed: 2 successive traces
+Last trace not found - 1st idx: 81216 2nd idx: 1
+
+*** Trace not found - 1st idx: 81724 2nd idx: 1
+Missed: 2 successive traces
+Last trace not found - 1st idx: 82157 2nd idx: 1
+...
+</pre>
+For this line, it first looks like nothing as it plots.  Then about
+1/4 into the plot I see the see floor coming up, but very dim.  This
+is alright.  I just need to open up the time window for plotting.
+<pre>
+       tbi = 0.00;
+       tfi = 0.75;
+       timscal = 200;
+
+&gt; rm -f sort.bpsio04L04; pltsegy bpsio04L04-01.pltsegy 
+</pre>
+At this point, my laptop is working pretty hard and getting warm :)  I
+now have a very ghostly looking seismic line.  Use the mouse and make
+some quick water bottom picks from left to right.  Then click dump.
+pltsegy will write out a file pick.xtp and print this to the screen:
+<pre>
+Indx1 Indx2    Range     Time  Reduced
+80097     1       0   0.705   0.705
+80645     1       0    0.66    0.66
+81336     1       0   0.585   0.585
+81978     1       0   0.518   0.518
+82556     1       0   0.438   0.438
+83181     1       0   0.365   0.365
+83979     1       0   0.291   0.291
+84789     1       0   0.223   0.223
+85419     1       0   0.188   0.188
+85623     1       0   0.176   0.176
+86545     1       0    0.12    0.12
+87046     1       0  0.0914  0.0914
+87586     1       0  0.0762  0.0762
+87938     1       0  0.0745  0.0745
+88249     1       0  0.0694  0.0694
+88818     1       0   0.066   0.066
+89562     1       0  0.0626  0.0626
+</pre>
+Rename this file so that it can be saved:
+<pre>
+  &gt; awk '{print $1,$4}' pick.xtp  &gt; bpsio04L04-01.h2o
+</pre>
+We now need to use these water bottom picks(wbt) to make a new segy
+file to replot with pltsegy.  We should then be able to see something
+in the plot.  I copied a sioseis script and changed the beginning
+shot, ending shot and the INFILE.
+<pre>
+declare -r FNO="80000"
+declare -r LNO="89800"
+declare -r INFILE=bpsio04L04.sgy
+</pre>
+Now go down to the wbt section.  Remove the old data and insert the
+new wbt picks.  In emacs:
+<pre>
+C-s C-q C-j wbt  # Search for wbt on the beginning of a line
+C-space          # Mark from the first entry
+C-s end C-a      # Go to just before the "end" keyword
+C-w              # Cut the data out
+C-i bpsio04L04-01.h2o # Past in the new data
+</pre>
+Now the wbt section should look basically like this:
+<pre>
+wbt
+80097 0.705
+80645 0.660
+81336 0.585
+81978 0.518
+82556 0.438
+83181 0.365
+83979 0.291
+84789 0.223
+85419 0.188
+85623 0.176
+86545 0.120
+87046 0.091
+87586 0.076
+87938 0.074
+88249 0.069
+88818 0.066
+89562 0.063
+end
+</pre>
+Here is the complete script:
+<pre>
+<font color="0000ff"><strong>#!/bin/bash</strong></font>
+
+<font color="#444444"># First try at wbt
+</font>
+declare -r <font color="#2040a0">FNO</font>=<font color="#008000">&quot;80000&quot;</font>
+declare -r <font color="#2040a0">LNO</font>=<font color="#008000">&quot;89800&quot;</font>
+declare -r <font color="#2040a0">INFILE</font>=bpsio04L04.sgy
+declare -r <font color="#2040a0">OUTFILE</font>=${INFILE%%.sgy}-wbt01.sgy
+
+<font color="#444444">#procs diskin wbt gains header prout diskoa end</font>
+
+sioseis &lt;&lt; eof1 
+procs diskin wbt gains header prout diskoa end
+diskin
+  ipath <font color="#2040a0">$INFILE</font> end
+end
+
+header 
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font>
+ l6 = l3 end
+end
+
+wbt
+80097 0.705
+80645 0.660
+81336 0.585
+81978 0.518
+82556 0.438
+83181 0.365
+83979 0.291
+84789 0.223
+85419 0.188
+85623 0.176
+86545 0.120
+87046 0.091
+87586 0.076
+87938 0.074
+88249 0.069
+88818 0.066
+89562 0.063
+end
+
+wbt2
+ solrat 1.5 ses 0.049 0.05 sel 0.017 0.025 track 0.0005 end
+end
+
+
+wbt3
+ thres 0.000000005 track 0.005 end
+end
+
+filter
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftype 99  pass 150 6500 end
+end
+
+mix
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> type 1 weight 0.25 0.50 0.25 end
+end
+
+agc
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> winlen .005 pctagc 90 end
+end
+
+gains
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> addwb yes type 9 TGP
+    0.0000    01.0000
+    0.0001    05.0000
+    0.0100    10.0000
+    0.0200    40.0000
+    0.0300    50.0000
+    0.0350    60.0000
+    0.0400    55.0000
+    0.0500    40.0000 end
+end
+
+prout
+ fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftr 0 ltr 1 noinc 100 end
+end
+
+diskoa
+ opath <font color="#2040a0">$OUTFILE</font> fno <font color="#2040a0">$FNO</font> lno <font color="#2040a0">$LNO</font> ftr 0 ltr 1 end
+end
+
+end
+eof1
+</pre>
+Finally, run the script: "./bpsio04L04-sioseis-01.bash".  This leaves
+me with a new sgy file with the water bottem selected and gains
+applied.  I created a new pltsegy script with almost the same
+parameters.  Here are the only changes:
+<pre>
+       dtfile = bpsio04L04-wbt01.sgy;
+       plfile = bpsio04L04-wbt01.ps;
+       srtfile = sort.bpsio04L04-wbt01;
+</pre>
+Run this pltsegy file.
+<pre>
+rm -rf sort.bpsio04L04-wbt01; pltsegy bpsio04L04-02.pltsegy 
+</pre>
+I now have an absolutely horrible plot. The upside is that I can
+clearly see the water bottom/sediment interface.  It is time now to go
+in and repeat the picks in pltsegy very carefully and frequently to
+make a nice plot.  Here is the file that I will now use to really do a
+good job of the water bottom picking:<br>
+<img src="http://schwehr.org/blog/attachments/2005-06/bpsio04-02-pltsegy.png">
+-----

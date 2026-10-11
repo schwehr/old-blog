@@ -1,0 +1,34 @@
+TITLE: Updating Ubuntu Linux for servers
+AUTHOR: Kurt
+DATE: 04.23.2009 11:50
+DESC: better?
+-----
+BODY:
+My datalogging boxes and servers all run <a
+href="http://ubuntu.com/">Ubuntu</a>.  Today, I'm updating one of our
+field dataloggers from 7.10 to the latest.  However, I probably picked
+a bad day to do the updating.. <a
+href="http://www.ubuntu.com/getubuntu/releasenotes/904overview">9.04
+was released today</a> (<a href="http://linux.slashdot.org/article.pl?sid=09/04/23/1359201">Ubuntu 9.04 Released</a> [slashdot]), so I'm seeing only 92kB/s on the update.
+After many hours I'm still somewhere between 8.04 and 8.10.  I'm seeing
+60-150kB/s from a Internet2 IP, so I don't think the bandwidth problem is
+at my end.
+
+Some notes on updating....
+
+I had to use the GUI update manager.  And it stalled out on on the
+post-install of locales.  About 5 times, I had to do a ps, find the
+stuck localdef, and kill it.  Then I had to reboot afterwards to kill
+one of the instances that wouldn't respond to any of the 15 signal types
+I threw at it.
+
+I did some permutation of:
+<pre>sudo apt-get dist-upgrade
+sudo apt-get update-manager-core
+sudo do-release-upgrade
+sudo update-manager -d</pre>
+I got turned around by a custom firewall that was blocking DNS
+lookups.  Points to Lester for being first to guess that it was a
+firewall problem.  But in the process, I'm not sure what finally
+was the key sequence to doing the upgrades.
+-----

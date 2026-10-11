@@ -1,0 +1,128 @@
+TITLE: Building debs
+AUTHOR: Kurt
+DATE: 12.02.2008 07:53
+DESC: does this help?
+-----
+BODY:
+Val <a
+href="http://www.aliceandval.com/valswork/blog/archives/2008/12/02/creating_a__deb_for_mb-system/index.html">pointed</a>
+to <a href="http://thedarkmaster.wordpress.com/2008/05/24/how-to-create-manipulate-a-deb-file-of-a-compiled-application/">making debs of packages</a>.  I'm pretty good at the fink info files,
+but it hides the deb creation, so I don't really know how to make debs
+correctly.  
+
+In the past, I've looked through the Ubuntu resources to see if they could help.
+
+<a href="https://wiki.ubuntu.com/PackagingGuide/HandsOn">Hands On Packaging Guide</a> and <a href="https://wiki.ubuntu.com/MOTU/School">Masters of the Universe School</a>
+
+Here is how to see what fink is doing...
+
+First edit /sw/etc/fink.conf and add this line to keep part of the build
+process around.  Fink normally deletes these temporary files.  Make sure to
+remove the line when done!
+<pre>KeepRootDir: true</pre>
+Now build something or rebuild it if you already have it installed.
+<pre>% <b>fink rebuild pyserial-py6</b></pre>
+Now take a look at the deb that was just produced:
+<pre>% <b>dpkg-deb --info /sw/fink/debs/pyserial-py26_2.0-12_darwin-i386.deb</b> 
+ new debian package, version 2.0.
+ size 31270 bytes: control archive= 1539 bytes.
+    1652 bytes,    40 lines      control              
+    2129 bytes,    58 lines      package.info         
+ Package: pyserial-py26
+ Source: pyserial-py26
+ Version: 2.0-12
+ Section: libs
+ Installed-Size: 136
+ Architecture: darwin-i386
+ Priority: optional
+ BuildDependsOnly: Undefined
+ Depends: python26, darwin (&gt;= 9-1)
+...</pre>
+And what files are in the deb:
+<pre><b>dpkg-deb --contents /sw/fink/debs/pyserial-py26_2.0-12_darwin-i386.deb</b>
+drwxr-xr-x root/admin        0 2008-12-02 07:34 ./
+drwxr-xr-x root/admin        0 2008-12-02 07:34 ./sw/
+drwxr-xr-x root/admin        0 2008-12-02 07:34 ./sw/lib/
+drwxr-xr-x root/admin        0 2008-12-02 07:34 ./sw/lib/python2.6/
+drwxr-xr-x root/admin        0 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/
+-rw-r--r-- root/admin      822 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/pyserial-2.0-py2.6.egg-info
+drwxr-xr-x root/admin        0 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/serial/
+-rw-r--r-- root/admin      722 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/serial/__init__.py
+-rw-r--r-- root/admin      533 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/serial/__init__.pyc
+-rw-r--r-- root/admin     7778 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/serial/serialjava.py
+-rw-r--r-- root/admin     8260 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/serial/serialjava.pyc
+-rw-r--r-- root/admin    14431 2008-12-02 07:34 ./sw/lib/python2.6/site-packages/serial/serialposix.py
+...</pre>
+Now it is time to see where this stuff came from.
+<pre>% <b>cd /sw/src/fink.build/root-pyserial-py26-2.0-12/</b>
+% <b>ls -l</b>
+total 0
+drwxr-xr-x 4 root admin 136 Dec  2 07:34 DEBIAN
+drwxr-xr-x 4 root admin 136 Dec  2 07:34 sw</pre>
+sw contains the files to be installed as a complete tree.  The DEBIAN 
+directory contains the control files.
+<pre>% <b>cd DEBIAN</b>
+% <b>ls -l</b>
+total 8
+-rw-r--r-- 1 root admin 1652 Dec  2 07:34 control
+-rw-r--r-- 1 root admin 2129 Dec  2 07:34 package.info</pre>
+Take a look at the control file that describes the package:
+<pre>% <b>less control</b>
+Package: pyserial-py26
+Source: pyserial-py26
+Version: 2.0-12
+Section: libs
+Installed-Size: 136
+Architecture: darwin-i386
+Priority: optional
+BuildDependsOnly: Undefined
+Depends: python26, darwin (&gt;= 9-1)
+Maintainer: Blair Zajac 
+Description: Python access to serial ports
+ pySerial
+ --------
+ This module encapsulates the access for the serial port. It provides
+ backends for standard Python running on Windows, Linux, BSD (possibly
+ ...Content truncated to save space...
+ .
+ Web site: http://pyserial.sourceforge.net/
+ .
+ Maintainer: Blair Zajac</pre>
+</pre>
+And the package.info:
+<pre>
+Info2: &lt;&lt;
+Package: pyserial-py%type_pkg[python]
+Version: 2.0
+Revision: 12
+Distribution: (%type_pkg[python] = 23) 10.3, (%type_pkg[python] = 23) 10.4
+Type: python(2.3 2.4 2.5 2.6)
+Description: Python access to serial ports
+License: OSI-Approved
+Homepage: http://pyserial.sourceforge.net/
+Maintainer: Blair Zajac 
+<!-- -->
+# Dependencies.
+Depends: python%type_pkg[python]
+<!-- -->
+# Unpack Phase.
+Source: mirror:sourceforge:pyserial/pyserial-%v.zip
+Source-MD5: 80a26774156ba38b63b0945f2b511695
+<!-- -->
+# Patch Phase.
+# Change CRLF line endings to LR line endings.
+PatchScript: find . -type f -print0 | xargs -0 perl -w -p -i -e 's/\s+$/\n/'
+...</pre>
+That is a a pretty simple package.  There are not post install or post
+removal scripts to run.  To take a look at something more complicated, try
+looking at PostgreSQL:
+<pre>% <b>fink rebuild postgresql83</b></pre>
+Now take a look at the DEBIAN files:
+<pre>% <b>/sw/src/fink.build/root-postgresql83-8.3.5-1/DEBIAN</b>
+% <b>ls -l</b>
+-rw-r--r-- 1 root admin  1545 Dec  2 07:56 control
+-rw-r--r-- 1 root admin 21230 Dec  2 07:56 package.info
+-rwxr-xr-x 1 root admin  1775 Dec  2 07:56 postinst
+-rwxr-xr-x 1 root admin   192 Dec  2 07:56 postrm
+-rwxr-xr-x 1 root admin   265 Dec  2 07:56 prerm</pre>
+-----

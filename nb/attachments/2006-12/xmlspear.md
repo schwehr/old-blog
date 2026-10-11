@@ -1,0 +1,63 @@
+# XMLSpear XML Editor on Mac OS X (`xmlspear.png`)
+
+## Overview
+A screenshot of the **XMLSpear** application running on Mac OS X, displaying an AIS (Automatic Identification System) binary message definition XML file (`waterlevel.xml`) in a structured tree-table view.
+
+## Interface & Layout
+- **Menu Bar & Window Title**:
+  - Top Mac OS X menu bar: Apple icon, **`XMLSpear`**, **`File`**, **`Import`**, **`Export`**, **`Network`**, **`Help`**.
+  - Window title bar: **`XMLSpear`** with standard red, yellow, and green window buttons.
+- **Left File Browser Sidebar**:
+  - Top navigation button **`ais`** and a back arrow button (`◀`), above a **`P+`** project icon.
+  - Directory tree rooted at **`ais`**:
+    - `.svn`
+    - `ais-waterlevel.doc`
+    - `ais.xsl`
+    - `ais_msg_1.py`
+    - `ais_msg_1.pyc`
+    - `ais_msg_1.xml`
+    - `ais_msg_1_exp.xml`
+    - `aisfield.py`
+    - `aisfield.wxg`
+    - `aisstring.py`
+    - `aisstring.pyc`
+    - `aisxmlbinmsg2py.py`
+    - `allaistypes.xml`
+    - `Away` (folder)
+    - `binary.py`
+    - `binary.pyc`
+    - `exampleParser.py`
+    - `expandais.py`
+    - `html` (folder)
+    - `Makefile`
+    - `prototype.py`
+    - `test` (folder)
+    - `translators.py`
+    - `waterlevel` (expanded folder)
+      - `waterlevel.py`
+      - **`waterlevel.xml`** (highlighted in blue)
+- **Main Editor Pane (Right)**:
+  - **Document Tabs**: Three open file tabs across the top: **`intro.html`**, **`ais.xsl`**, and **`waterlevel.xml`** (active, highlighted in blue).
+  - **Editor Toolbar**: Save icons, green checkmark validation icon, radio buttons for **`xsd`** and **`dtd`**, and table layout toggle buttons.
+  - **XML Tree Table (`Name` | `Value`)**:
+    - `▼ ais-binary-message` (highlighted row)
+      - `= version` | `1.0`
+      - `▼ struct`
+        - `= name` | `position2d`
+        - `description` | `Generic representation of position on the WGS84 sphe...`
+        - `▼ field`
+          - `= name` | `longitude`
+          - `= numberofbits` | `28`
+          - `= type` | `decimal`
+          - `description` | `East West location`
+          - `▼ range`
+            - `= max` | `180`
+            - `= min` | `-180`
+          - `unavailable` | `181`
+          - `units` | `degrees`
+          - `scale` | `600000`
+          - `decimalplaces` | `5`
+  - **View Mode Switcher**: Three segmented buttons below the table: **`Table`** (active, blue), **`Element`**, and **`Source`**.
+- **Bottom Panel**:
+  - Three tabs: **`Console`**, **`Problems`** (active, blue), and **`SchemaMappings`**.
+  - Empty problem table with columns `!`, **`Description`**, and **`Lo...`** above a blue horizontal scrollbar.
